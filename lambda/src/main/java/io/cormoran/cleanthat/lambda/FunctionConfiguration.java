@@ -1,8 +1,11 @@
 package io.cormoran.cleanthat.lambda;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,19 +35,17 @@ public class FunctionConfiguration {
 	}
 
 	@Bean
-	public IGithubWebhookHandler githubWebhookHandler() {
-		return new GithubWebhookHandler();
+	public IGithubWebhookHandler githubWebhookHandler(GitHub github) {
+		return new GithubWebhookHandler(github);
+	}
+
+	@Bean
+	public GitHub github() throws IOException {
+		return GitHubBuilder.fromEnvironment().build();
 	}
 
 	@Bean
 	public Function<Map<String, ?>, Map<String, ?>> uppercase(IGithubWebhookHandler githubWebhookHandler) {
 		return input -> githubWebhookHandler.processWebhookBody(input);
 	}
-
-	// @Bean
-	// public Function<Flux<Map<String, ?>>, Flux<Map<String, ?>>> uppercase() {
-	// return flux -> flux.map(value -> value.entrySet()
-	// .stream()
-	// .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().toString().toUpperCase(Locale.US))));
-	// }
 }

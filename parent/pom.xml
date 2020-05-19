@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<!-- Import dependency management from Spring Boot -->
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-dependencies</artifactId>
+		<version>2.2.7.RELEASE</version>
+		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
+		<relativePath />
+	</parent>
+
+	<groupId>com.github.cormoran-io.cleanthat</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<inceptionYear>2020</inceptionYear>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.release>11</maven.compiler.release>
+		<maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
+		<!-- https://nodejs.org/en/download/ -->
+		<!-- Stick to the latest LTS -->
+		<node.version>v12.16.1</node.version>
+
+		<!-- Skip javadoc, especially as it would break mvn:release -->
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<!-- We deploy only into lambda -->
+		<maven.deploy.skip>true</maven.deploy.skip>
+		<!-- We have many false positive related to NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE -->
+		<!-- https://github.com/spotbugs/spotbugs/issues/756 -->
+		<spotbugs.skip>false</spotbugs.skip>
+		<!-- Execute license-check manually, only before doing a release -->
+		<license.skip>true</license.skip>
+
+		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
+		<!-- We suppose the developper would see the fixed and include them in his commit. -->
+		<!-- In the CI, we check BEFORE automatic fixes as the CI should report early invalid code -->
+		<staticChecks>process-sources</staticChecks>
+
+		<!-- By default (i.e. in local environments), check for code linting AFTER trying automatic fixes. -->
+		<lintGoal>lint-autofix</lintGoal>
+	</properties>
+
+	<scm>
+		<url>https://github.com/cormoran-io/agilea</url>
+		<connection>scm:git:ssh://git@github.com/cormoran-io/agilea.git</connection>
+		<!-- developperConnection is in top module, where maven release plugin is called -->
+		<tag>HEAD</tag>
+	</scm>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<failFast>true</failFast>
+							<!-- https://maven.apache.org/enforcer/enforcer-rules/index.html -->
+							<rules>
+								<!-- We have a local site used to upload report in circleci -->
+								<!-- <banDistributionManagement /> -->
+								<banDuplicatePomDependencyVersions />
+								<!-- TODO Activate this rule requiring to force quite many dependencies -->
+								<!-- <dependencyConvergence /> -->
+								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
+								<!-- <reactorModuleConvergence /> -->
+								<requireMavenVersion>
+									<version>3.0</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>1.11</version>
+								</requireJavaVersion>
+								<!-- We leave some plugin versions to SpringBoot -->
+								<!-- <requirePluginVersions /> -->
+								<requireReleaseDeps>
+									<onlyWhenRelease>true</onlyWhenRelease>
+								</requireReleaseDeps>
+
+								<!-- TODO Activate this rule -->
+								<!-- <requireUpperBoundDeps> -->
+								<!-- <excludes> -->
+								<!--no dependency need to be excluded from this rule -->
+								<!-- </excludes> -->
+								<!-- </requireUpperBoundDeps> -->
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- skip everything, test, quality, format,... -->
+			<id>skipStyle</id>
+			<properties>
+				<!--<skipTests>true</skipTests> -->
+				<!--<jacoco.skip>true</jacoco.skip> -->
+				<checkstyle.skip>true</checkstyle.skip>
+				<pmd.skip>true</pmd.skip>
+				<cpd.skip>true</cpd.skip>
+				<spotbugs.skip>true</spotbugs.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+				<license.skip>true</license.skip>
+				<formatter.skip>true</formatter.skip>
+				<impsort.skip>true</impsort.skip>
+				<!-- Dependency will be checked with style -->
+				<enforcer.skip>true</enforcer.skip>
+			</properties>
+		</profile>
+		<profile>
+			<!-- If tests are skipped, we also want to skip Jacoco -->
+			<id>skipTests</id>
+			<activation>
+				<!-- Triggered by -DskipTests -->
+				<property>
+					<name>skipTests</name>
+				</property>
+			</activation>
+			<properties>
+				<!-- Skip static-analysis -->
+				<jacoco.skip>true</jacoco.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>skipITs</id>
+			<activation>
+				<!-- Integration-tests are heavy, and should not be triggered by a simple 'mvn install' -->
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<skipITs>true</skipITs>
+			</properties>
+		</profile>
+
+		<!-- Useful to skip JS compilation -->
+		<profile>
+			<id>skipJs</id>
+			<activation>
+				<property>
+					<name>infra</name>
+					<value>heroku</value>
+				</property>
+			</activation>
+			<properties>
+				<skip.npm>true</skip.npm>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>ci</id>
+			<activation>
+				<property>
+					<name>env.CI</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<properties>
+				<!-- In CI environments, we should check code formatting before trying to autofix it -->
+				<staticChecks>validate</staticChecks>
+				<!-- In CI, we should not auto-fix, but only checking/linting -->
+				<lintGoal>lint</lintGoal>
+			</properties>
+		</profile>
+	</profiles>
+
+	<!-- Add Spring repositories -->
+	<!-- (you don't need this if you are using a .RELEASE version) -->
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-milestones</id>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+</project>

@@ -1,0 +1,107 @@
+# https://github.com/github/gitignore/blob/master/Maven.gitignore
+target/
+pom.xml.tag
+# mvn release
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+
+# Custom
+*.class
+
+# Package Files #
+# *.jar keep jar as we may need to commit external jars not in any maven repo
+*.war
+*.ear
+
+# eclipse
+.classpath
+.project
+.settings
+bin
+
+# JavaMissionControl
+*.jfr
+
+# SSL Certificates
+*.pfx
+
+#netbeans
+nbproject
+
+# hs_err
+*.log
+*.log.gz
+
+#android
+gen
+proguard
+local.properties
+
+#IntelliJ
+*.iml
+.idea
+
+.DS_Store
+Thumbs.db
+# Used by jenv under MacOS
+.java-version
+
+
+.java-version
+
+#Crashlytics
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
+/pricestore/src/main/resources/nbproject/private/
+
+#Android Studio
+#http://stackoverflow.com/questions/16736856/what-should-be-in-my-gitignore-for-an-android-studio-project
+.gradle
+/local.properties
+.google
+#build is expected by NodeWebPack
+#build
+captures
+screenshots
+*.apk
+
+# H2
+*.db
+
+# NPM
+node
+node_modules
+
+# Karma
+coverage
+
+# SSL Certificates
+*.m-itrust.com.pfx
+
+.pmd
+.pmdruleset.xml
+.checkstyle
+
+dist/
+dist-filtered/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/test/unit/coverage/
+lcov-report
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+# VS Build folder?
+obj

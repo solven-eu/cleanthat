@@ -1,0 +1,13 @@
+
+spring:
+  profiles.include:
+    - h2
+    - jwk-test
+    - preload-dummy-data
+  h2.console:
+    enabled: true
+    path: /h2
+
+logging:
+  level:
+    org.springframework.security: DEBUG

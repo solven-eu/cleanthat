@@ -1,0 +1,1 @@
+ java -jar lambda/target/*.jar

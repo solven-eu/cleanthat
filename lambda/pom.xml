@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<artifactId>aggregator-cleanthat</artifactId>
+	</parent>
+
+	<artifactId>lambda</artifactId>
+
+	<properties>
+		<wrapper.version>1.0.17.RELEASE</wrapper.version>
+	</properties>
+
+
+	<!-- <dependencyManagement> -->
+	<!-- <dependencies> -->
+	<!-- <dependency> -->
+	<!-- <groupId>org.springframework.cloud</groupId> -->
+	<!-- <artifactId>spring-cloud-function-dependencies</artifactId> -->
+	<!-- <version>${spring-cloud-function.version}</version> -->
+	<!-- <type>pom</type> -->
+	<!-- <scope>import</scope> -->
+	<!-- </dependency> -->
+	<!-- </dependencies> -->
+	<!-- </dependencyManagement> -->
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.cormoran-io.pepper</groupId>
+			<artifactId>pepper</artifactId>
+			<version>${pepper.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot2 -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.amazonaws.serverless</groupId> -->
+		<!-- <artifactId>aws-serverless-java-container-springboot2</artifactId> -->
+		<!-- <version>1.5</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-function-adapter-aws</artifactId>
+			<!-- <version>3.0.6.RELEASE</version> -->
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-lambda-java-core</artifactId>
+			<version>1.2.1</version>
+			<!-- TODO Why provided? -->
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<!-- Else failure in SimpleFunctionRegistry$FunctionInvocationWrapper.isJson(SimpleFunctionRegistry.java:850) -->
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20190722</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>29.0-jre</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-spring</artifactId>
+			<version>${sentry.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- Encrypt login token, and sensible data in DB -->
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>8.16</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>3.0.1u2</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.kohsuke/github-api -->
+		<dependency>
+			<!-- https://github-api.kohsuke.org/ -->
+			<groupId>org.kohsuke</groupId>
+			<artifactId>github-api</artifactId>
+			<version>1.111</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://github.com/spring-io/spring-javaformat -->
+			<groupId>io.spring.javaformat</groupId>
+			<artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId>
+			<version>0.0.22</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html#_comparing_functional_with_traditional_bean_definitions -->
+			<!-- It seems we need this to open an actual HTTP server for the Function -->
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-function-web</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- @WithMockUser -->
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- https://github.com/spring-cloud/spring-cloud-function/blob/master/spring-cloud-function-samples/function-sample-aws/pom.xml -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!-- <plugin> -->
+			<!-- <groupId>org.springframework.boot</groupId> -->
+			<!-- <artifactId>spring-boot-maven-plugin</artifactId> -->
+			<!-- <dependencies> -->
+			<!-- <dependency> -->
+			<!-- <groupId>org.springframework.boot.experimental</groupId> -->
+			<!-- <artifactId>spring-boot-thin-layout</artifactId> -->
+			<!-- <version>${wrapper.version}</version> -->
+			<!-- </dependency> -->
+			<!-- </dependencies> -->
+			<!-- <executions> -->
+			<!-- mvn clean package -DskipTests spring-boot:repackage -->
+			<!-- <execution> -->
+			<!-- <id>buildFatJar</id> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>repackage</goal> -->
+			<!-- <goal>build-info</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<dependencies>
+					<dependency>
+						<!-- https://stackoverflow.com/questions/51521953/how-to-use-propertiesmergingresourcetransformer-of-maven-shade-plugin-when-add -->
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<version>2.2.7.RELEASE</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<shadedClassifierName>aws</shadedClassifierName>
+				</configuration>
+				<executions>
+					<execution>
+						<id>shadeFatJar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.handlers</resource>
+								</transformer>
+								<transformer implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+									<resource>META-INF/spring.factories</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.schemas</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>io.cormoran.cleanthat.lambda.FunctionConfiguration</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- mvn package lambda:deploy-lambda -->
+			<!-- mvn lambda:deploy-lambda -->
+			<plugin>
+				<!-- https://github.com/SeanRoy/lambda-maven-plugin -->
+				<groupId>com.github.seanroy</groupId>
+				<artifactId>lambda-maven-plugin</artifactId>
+				<version>2.3.3</version>
+				<dependencies>
+					<dependency>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+						<version>${javax-jaxb.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<functionCode>${project.build.directory}/${project.build.finalName}-aws.jar</functionCode>
+					<version>${project.version}</version>
+					<alias>development</alias>
+					<!-- <vpcSecurityGroupIds>sg-123456</vpcSecurityGroupIds> -->
+					<!-- <vpcSubnetIds>subnet-123456,subnet-123456,subnet-123456</vpcSubnetIds> -->
+
+					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/users/circleci-olapless -->
+					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/roles/hello-lambda-role -->
+					<lambdaRoleArn>arn:aws:iam::144657973876:role/hello-lambda-role</lambdaRoleArn>
+
+					<!-- olapless-us-east-1-unittests -->
+					<s3Bucket>olapless-lambda-us-east-1</s3Bucket>
+
+					<runtime>java11</runtime>
+
+					<!-- <keyPrefix>my/awesome/prefix</keyPrefix> -->
+					<publish>true</publish>
+					<forceUpdate>true</forceUpdate>
+					<functionNameSuffix>${lambda.functionNameSuffix}</functionNameSuffix>
+					<!-- <environmentVariables> -->
+					<!-- <key0>value0</key0> -->
+					<!-- </environmentVariables> -->
+					<!-- <clientConfiguration> -->
+					<!-- <protocol>https</protocol> -->
+					<!-- <proxyHost>proxy-host.net</proxyHost> -->
+					<!-- <proxyPort>1234</proxyPort> -->
+					<!-- </clientConfiguration> -->
+					<lambdaFunctions>
+						<lambdaFunction>
+							<functionName>upperCase</functionName>
+							<handler>io.cormoran.cleanthat.MyStringHandlers</handler>
+							<!-- MB -->
+							<memorySize>512</memorySize>
+						</lambdaFunction>
+					</lambdaFunctions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>parent</relativePath>
+	</parent>
+
+	<artifactId>aggregator-cleanthat</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>parent</module>
+
+		<module>lambda</module>
+		<module>gateway</module>
+	</modules>
+
+	<properties>
+		<release.suffix>RELEASE</release.suffix>
+
+		<!-- https://github.com/cormoran-io/pepper/releases -->
+		<pepper.version>1.24</pepper.version>
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<guava.version>28.2-jre</guava.version>
+		<!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-keyvault-secrets-spring-boot-starter -->
+
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+		<nimbus-jose-jwt.version>8.9</nimbus-jose-jwt.version>
+		<!-- https://mvnrepository.com/artifact/org.jooq/jool -->
+		<jool.version>0.9.14</jool.version>
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<springfox-swagger2.version>2.9.2</springfox-swagger2.version>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
+		<spotbugs.version>4.0.0</spotbugs.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+		<checkstyle.version>8.32</checkstyle.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
+		<maven-pmd-plugin.version>3.13.0</maven-pmd-plugin.version>
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
+		<pmd.version>6.23.0</pmd.version>
+		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
+		<git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
+		<license-maven-plugin.version>3.0</license-maven-plugin.version>
+		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
+		<formatter-maven-plugin.version>2.11.0</formatter-maven-plugin.version>
+		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
+		<impsort-maven-plugin.version>1.4.1</impsort-maven-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
+		<frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
+
+		<sentry.version>1.7.30</sentry.version>
+
+		<spring-cloud.version>Hoxton.SR4</spring-cloud.version>
+
+		<!-- quality properties -->
+		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
+		<jacoco.instruction.ratio>0.19</jacoco.instruction.ratio>
+		<!-- CPD: We configure as property to enable overriding by sub-modules -->
+		<!-- Code duplication: Lower is better. Default is 100 -->
+		<minimumTokens>60</minimumTokens>
+
+		<!-- By default, there is no additional argument -->
+		<surefire.additionalArgument />
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.checkerframework/checker-qual -->
+			<dependency>
+				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
+				<groupId>org.checkerframework</groupId>
+				<artifactId>checker-qual</artifactId>
+				<version>3.3.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- https://maven.apache.org/plugins/maven-resources-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<configuration>
+						<delimiters>
+							<delimiter>${resource.delimiter}</delimiter>
+						</delimiters>
+						<useDefaultDelimiters>false</useDefaultDelimiters>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>${maven-release-plugin.version}</version>
+					<configuration>
+						<!-- Prevent git to clone the whole repo which is quite slow -->
+						<!-- https://issues.apache.org/jira/browse/MRELEASE-777 -->
+						<localCheckout>true</localCheckout>
+						<pushChanges>true</pushChanges>
+
+						<!-- This should ensure the next SNAPSHOT does compile, and it installed in local repo -->
+						<!-- TODO Is this useful only for Benoit Lacelle conveniency? -->
+						<!-- <completionGoals>install -DskipTests</completionGoals> -->
+
+						<!-- All modules shall have the same version -->
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+
+						<!-- By default, mvn:release will deploy but we have nothing to deploy here -->
+						<goals>install</goals>
+
+						<!-- Same convention as Spring -->
+						<tagNameFormat>v@{project.version}.${release.suffix}</tagNameFormat>
+
+						<!-- Skip NPM as JS apps are very slow to compile -->
+						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipJs</arguments>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!-- https://www.eclemma.org/jacoco/trunk/doc/maven.html -->
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco-maven-plugin.version}</version>
+					<configuration>
+						<excludes>
+							<!-- Exclude JooQ generated classes -->
+							<!-- https://stackoverflow.com/questions/27799419/maven-jacoco-configuration-exclude-classes-packages-from-report-not-working -->
+							<exclude>**/generated/**/*</exclude>
+
+							<!-- Hacked in datasharing module (Unclear why the last '*' is needed) -->
+							<exclude>**/org/springframework/security/oauth2/provider/endpoint/AuthorizationEndpoint.*</exclude>
+
+							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is needed) -->
+							<exclude>**/org/apache/pdfbox/pdmodel/font/PDSimpleFont.*</exclude>
+
+							<!-- Used to be hack in Gateway module -->
+							<exclude>**/org/springframework/cloud/gateway/**/*</exclude>
+						</excludes>
+						<rules>
+							<rule>
+								<!-- BUNDLE, PACKAGE, CLASS, SOURCEFILE or METHOD -->
+								<element>BUNDLE</element>
+								<limits>
+									<limit>
+										<!-- INSTRUCTION, LINE, BRANCH, COMPLEXITY, METHOD, CLASS -->
+										<counter>BRANCH</counter>
+										<!-- TOTALCOUNT, COVEREDCOUNT, MISSEDCOUNT, COVEREDRATIO, MISSEDRATIO -->
+										<value>COVEREDRATIO</value>
+										<minimum>${jacoco.branch.ratio}</minimum>
+									</limit>
+									<limit>
+										<!-- INSTRUCTION, LINE, BRANCH, COMPLEXITY, METHOD, CLASS -->
+										<counter>INSTRUCTION</counter>
+										<!-- TOTALCOUNT, COVEREDCOUNT, MISSEDCOUNT, COVEREDRATIO, MISSEDRATIO -->
+										<value>COVEREDRATIO</value>
+										<minimum>${jacoco.instruction.ratio}</minimum>
+									</limit>
+								</limits>
+							</rule>
+						</rules>
+					</configuration>
+					<executions>
+						<execution>
+							<id>prepare-agent</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>report</id>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>prepare-agent-integration</id>
+							<goals>
+								<goal>prepare-agent-integration</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>report-integration</id>
+							<goals>
+								<goal>report-integration</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>check</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- https://maven.apache.org/surefire/maven-failsafe-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<configuration>
+						<runOrder>alphabetical</runOrder>
+						<!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
+						<!--<forkCount>0.5C</forkCount> -->
+						<excludes>
+							<exclude>**/*Test.java</exclude>
+							<exclude>**/Test*.java</exclude>
+							<exclude>**/*TestCase.java</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<runOrder>alphabetical</runOrder>
+						<!-- http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html -->
+						<!--<forkCount>0.5C</forkCount> -->
+						<excludes>
+							<exclude>**/*IT.java</exclude>
+							<exclude>**/IT*.java</exclude>
+							<exclude>**/*ITCase.java</exclude>
+						</excludes>
+						<!-- Add ${argLine} to maintain the argument from Jacoco -->
+						<!-- https://groups.google.com/forum/#!topic/jacoco/LzmCezW8VKA -->
+
+						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
+						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
+						<argLine>
+							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
+					</configuration>
+				</plugin>
+				<plugin>
+					<!-- http://code.mycila.com/license-maven-plugin/ -->
+					<!-- Usage: mvn com.mycila:license-maven-plugin:format -Dlicense.skip=false -->
+					<!-- Beware this will corrupt UTF-16 files (typically XML files) -->
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${license-maven-plugin.version}</version>
+					<configuration>
+						<mapping>
+							<java>SLASHSTAR_STYLE</java>
+							<xml>XML_PER_LINE</xml>
+						</mapping>
+						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
+						<inlineHeader>
+							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
+						</inlineHeader>
+						<properties>
+							<owner>Agilea</owner>
+							<year>2020</year>
+							<email>benoit.lacelle@solven.eu</email>
+						</properties>
+						<excludes>
+							<exclude>pom.xml</exclude>
+							<exclude>**/*.js</exclude>
+							<exclude>**/*.css</exclude>
+							<exclude>**/*.html</exclude>
+							<exclude>**/*.vue</exclude>
+							<exclude>**/node_modules/**</exclude>
+							<exclude>README.MD</exclude>
+
+							<exclude>pom.xml.versionsBackup</exclude>
+							<exclude>**/.pmd</exclude>
+							<exclude>**/.pmdruleset.xml</exclude>
+							<exclude>**/.checktyle</exclude>
+
+							<!-- Eclipse Launch (Debug/Run) files -->
+							<exclude>**/*.launch</exclude>
+
+							<!-- Hacked class -->
+							<exclude>**/AuthorizationEndpoint.java</exclude>
+							<exclude>**/PDSimpleFont.java</exclude>
+
+							<!-- Useless to License generated files are regeneration will remove license -->
+							<excludes>**/generated/**</excludes>
+
+							<!-- Specific to module gui-web -->
+							<exclude>**/.babelrc</exclude>
+							<exclude>**/.gitkeep</exclude>
+							<exclude>**/*.js.map</exclude>
+							<exclude>**/*.css.map</exclude>
+							<exclude>**/npm</exclude>
+							<exclude>**/node</exclude>
+							<exclude>**/.eslintrc</exclude>
+							<exclude>**/.eslintignore</exclude>
+							<exclude>**/lcov.info</exclude>
+
+							<!-- Specific to Docker -->
+							<exclude>sshd_config</exclude>
+
+							<!-- A marker file typically used to materialize a folder in git -->
+							<exclude>empty</exclude>
+
+							<!-- Leftovers to Logback wiring in files -->
+							<exclude>**/app.log</exclude>
+
+							<!-- Android -->
+							<exclude>**/.gradle/**</exclude>
+
+							<!-- Used to exclude gui-web and gui-back -->
+							<exclude>**/node/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- https://code.revelc.net/formatter-maven-plugin/ -->
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>${formatter-maven-plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.github.cormoran-io.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<configFile>eclipse/eclipse_java_code_formatter.xml</configFile>
+						<encoding>UTF-8</encoding>
+						<excludes>
+							<exclude>**/generated/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>apply_code_format</id>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
+							<goals>
+								<!-- https://code.revelc.net/formatter-maven-plugin/format-mojo.html -->
+								<goal>format</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>validate_code_format</id>
+							<!-- runs at validate phase by default -->
+							<phase>${staticChecks}</phase>
+							<goals>
+								<!-- https://code.revelc.net/formatter-maven-plugin/validate-mojo.html -->
+								<goal>validate</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- http://code.revelc.net/impsort-maven-plugin/ -->
+					<groupId>net.revelc.code</groupId>
+					<artifactId>impsort-maven-plugin</artifactId>
+					<version>${impsort-maven-plugin.version}</version>
+					<configuration>
+						<!-- Eclipse default -->
+						<groups>java.,javax.,org.,com.</groups>
+						<staticGroups>java,*</staticGroups>
+						<removeUnused>true</removeUnused>
+						<excludes>
+							<!-- PGSQL -->
+							<exclude>**/generated/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>sort-imports</id>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
+							<goals>
+								<goal>sort</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>check-imports</id>
+							<phase>${staticChecks}</phase>
+							<goals>
+								<goal>check</goal><!-- runs at process-sources phase by default -->
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!--https://spotbugs.github.io/spotbugs-maven-plugin/index.html -->
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs.version}</version>
+					<dependencies>
+						<dependency>
+							<!-- This dependency holds the default configuration -->
+							<groupId>com.github.cormoran-io.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
+						<!-- Activate with Pepper1.25 -->
+						<skip>true</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<id>check</id>
+							<!-- default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+							<phase>${staticChecks}</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- https://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>${maven-checkstyle-plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<!-- This dependency holds the default configuration -->
+							<groupId>com.github.cormoran-io.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+						<dependency>
+							<!-- more recent than brought by maven plugin -->
+							<groupId>com.puppycrawl.tools</groupId>
+							<artifactId>checkstyle</artifactId>
+							<version>${checkstyle.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<excludes>**/generated/**,**/jwk.test.properties</excludes>
+						<!-- We seem not able to exclude jwk.test.properties with <excludes> -->
+						<includeTestResources>false</includeTestResources>
+					</configuration>
+					<executions>
+						<execution>
+							<id>check</id>
+							<!-- default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+							<phase>${staticChecks}</phase>
+							<configuration>
+								<configLocation>style/pepper.checkstyle.xml</configLocation>
+								<encoding>UTF-8</encoding>
+								<consoleOutput>true</consoleOutput>
+								<failsOnError>true</failsOnError>
+								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+								<!-- only with goal checkstyle-aggregate or checkstyle generating a report -->
+								<!--<linkXRef>false</linkXRef> -->
+							</configuration>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!--https://maven.apache.org/plugins/maven-pmd-plugin/ -->
+					<!-- Skip a row by adding '//NOPMD' at the end -->
+					<!-- https://pmd.github.io/pmd-6.6.0/pmd_userdocs_suppressing_warnings.html#nopmd-comment -->
+					<!-- Trigger only pmd with 'mvn pmd:check' -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>${maven-pmd-plugin.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.github.cormoran-io.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle java11 -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-java</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+						<!-- Enables rules for XML, including pom.xml -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-xml</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+						<!-- maven-pmd-plugin relies by default on some version of PMD which -->
+						<!-- may be incompatible withcustom PMD versions -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-core</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<!-- <includeTests>true</includeTests> -->
+						<indentSize>4</indentSize>
+						<printFailingErrors>true</printFailingErrors>
+
+						<!-- TODO Decrease to 4, then 3, until 1 -->
+						<failurePriority>5</failurePriority>
+						<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+						<linkXRef>false</linkXRef>
+						<rulesets>
+							<ruleset>style/pepper.pmd.rulesets.xml</ruleset>
+						</rulesets>
+						<excludes>
+							<exclude>**/generated/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<!-- Default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+
+							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
+							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+							<phase>${staticChecks}</phase>
+							<goals>
+								<goal>check</goal>
+								<goal>cpd-check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>com.github.eirslett</groupId>
+					<artifactId>frontend-maven-plugin</artifactId>
+					<version>${frontend-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<!-- Generate a git.properties file only in this 'helpers' jar -->
+					<!-- https://github.com/ktoso/maven-git-commit-id-plugin -->
+					<groupId>pl.project13.maven</groupId>
+					<artifactId>git-commit-id-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>get-the-git-infos</id>
+							<goals>
+								<goal>revision</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>validate-the-git-infos</id>
+							<goals>
+								<goal>validateRevision</goal>
+							</goals>
+							<phase>package</phase>
+						</execution>
+					</executions>
+
+					<configuration>
+						<!-- If you'd like to tell the plugin where your .git directory is, -->
+						<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+
+						<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
+						<format>properties</format>
+
+						<!-- https://github.com/ktoso/maven-git-commit-id-plugin/pull/65 -->
+						<injectAllReactorProjects>false</injectAllReactorProjects>
+
+						<abbrevLength>7</abbrevLength>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically clean some style rules -->
+				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+				<groupId>net.revelc.code</groupId>
+				<artifactId>impsort-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

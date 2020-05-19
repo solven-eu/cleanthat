@@ -4,6 +4,12 @@ import java.util.Map;
 
 import org.kohsuke.github.GitHub;
 
+/**
+ * Default implementation for IGithubWebhookHandler
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	final GitHub github;

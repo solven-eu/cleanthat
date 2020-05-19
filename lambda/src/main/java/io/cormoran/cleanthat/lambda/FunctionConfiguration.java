@@ -41,6 +41,7 @@ public class FunctionConfiguration {
 
 	@Bean
 	public GitHub github() throws IOException {
+		// TODO Get JWT following https://github-api.kohsuke.org/githubappjwtauth.html
 		return GitHubBuilder.fromEnvironment().build();
 	}
 

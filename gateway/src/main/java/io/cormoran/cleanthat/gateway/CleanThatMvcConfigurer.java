@@ -17,12 +17,12 @@ public class CleanThatMvcConfigurer implements WebMvcConfigurer {
 
 	// public static final int DEFAULT_CACHEPERIOD_MINUTE = 10;
 
-	/**
-	 * Controllers always produce application/json response even other type is asked (eg: xml/application)
-	 *
-	 * @param configurer
-	 *            content negotiation configurer
-	 */
+	// /**
+	// * Controllers always produce application/json response even other type is asked (eg: xml/application)
+	// *
+	// * @param configurer
+	// * content negotiation configurer
+	// */
 	// @Override
 	// public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 	// configurer.ignoreAcceptHeader(true).defaultContentType(MediaType.APPLICATION_JSON);
@@ -57,7 +57,7 @@ public class CleanThatMvcConfigurer implements WebMvcConfigurer {
 		// Resources controlled by Spring Security has
 		// "Cache-Control: must-revalidate". -> We override it with some value
 
-		ResourceHandlerRegistration resourceHandler = registry.addResourceHandler("/**")
+		registry.addResourceHandler("/**")
 				.addResourceLocations(
 						// Static resources written in the gateway
 						"classpath:/public/"

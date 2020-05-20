@@ -100,12 +100,10 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.kohsuke/github-api -->
 		<dependency>
-			<!-- https://github-api.kohsuke.org/ -->
-			<groupId>org.kohsuke</groupId>
-			<artifactId>github-api</artifactId>
-			<version>1.111</version>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>github</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

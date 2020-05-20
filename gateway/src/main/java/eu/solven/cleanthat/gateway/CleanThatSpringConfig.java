@@ -1,10 +1,10 @@
-package io.cormoran.cleanthat.gateway;
+package eu.solven.cleanthat.gateway;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
+import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**
  * Main SpringBoot {@link Configuration}

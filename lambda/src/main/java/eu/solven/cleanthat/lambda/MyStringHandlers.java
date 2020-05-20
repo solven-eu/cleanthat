@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.lambda;
+package eu.solven.cleanthat.lambda;
 
 import java.util.Map;
 

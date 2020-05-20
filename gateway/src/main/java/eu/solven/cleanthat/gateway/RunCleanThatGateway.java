@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.gateway;
+package eu.solven.cleanthat.gateway;
 
 import java.util.ArrayList;
 import java.util.List;

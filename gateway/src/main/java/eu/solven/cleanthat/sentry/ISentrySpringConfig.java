@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.sentry;
+package eu.solven.cleanthat.sentry;
 
 /**
  * Common interface to Direct and Reactive implementations. Used to load Sentry as early as possible

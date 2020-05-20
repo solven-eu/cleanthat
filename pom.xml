@@ -18,6 +18,8 @@
 
 		<module>lambda</module>
 		<module>gateway</module>
+		
+		<module>test-helpers</module>
 	</modules>
 
 	<properties>

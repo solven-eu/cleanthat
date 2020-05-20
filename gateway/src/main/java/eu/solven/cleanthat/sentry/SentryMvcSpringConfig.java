@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.sentry;
+package eu.solven.cleanthat.sentry;
 
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;

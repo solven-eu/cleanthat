@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.lambda;
+package eu.solven.cleanthat.lambda;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,14 +24,14 @@ import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 @SpringBootApplication
 @Import({ SentryMvcSpringConfig.class })
-public class FunctionConfiguration {
+public class CleanThatLambdaFunction {
 
 	/*
 	 * You need this main method or explicit <start-class>example.FunctionConfiguration</start-class> in the POM to
 	 * ensure boot plug-in makes the correct entry
 	 */
 	public static void main(String[] args) {
-		SpringApplication.run(FunctionConfiguration.class, args);
+		SpringApplication.run(CleanThatLambdaFunction.class, args);
 	}
 
 	@Bean

@@ -50,7 +50,13 @@ public class CleanThatLambdaInvoker {
 		Future<InvokeResult> future = client.invokeAsync(request);
 		LOGGER.info("Invoked " + functionName + ": " + request);
 		InvokeResult result = Futures.getUnchecked(future);
-		LOGGER.info("Completed " + functionName + ": " + result);
+		LOGGER.info("Completed " + functionName
+				+ ": "
+				+ result.getLogResult()
+				+ ": "
+				+ result.getFunctionError()
+				+ ": "
+				+ result.getSdkResponseMetadata().getRequestId());
 	}
 
 	private AWSLambdaAsync makeClient(String region) {

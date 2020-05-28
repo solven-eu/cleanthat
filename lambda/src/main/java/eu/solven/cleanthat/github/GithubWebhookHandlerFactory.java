@@ -18,7 +18,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+/**
+ * Factory for {@link GitHub}, on a per-installation basis
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class GithubWebhookHandlerFactory {
+	private static final int GITHUB_TIMEOUT_JWK_MINUTES = 10;
 	final Environment env;
 
 	public GithubWebhookHandlerFactory(Environment env) {
@@ -45,7 +52,7 @@ public class GithubWebhookHandlerFactory {
 		// Prepare JWT with claims set
 		Date now = new Date();
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
-		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(10));
+		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES));
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(env.getRequiredProperty("github.app.app-id"))
 				.issueTime(now)
 				// The expiration seems a required parameter, with 10 minutes maximum

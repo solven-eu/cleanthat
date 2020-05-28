@@ -24,28 +24,28 @@ import org.apache.commons.digester3.RuleSetBase;
  */
 class RuleSet extends RuleSetBase {
 
-    private static final String PROFILES_PROFILE = "profiles/profile";
-    private static final String PROFILES_PROFILE_SETTING = PROFILES_PROFILE + "/setting";
+	private static final String PROFILES_PROFILE = "profiles/profile";
+	private static final String PROFILES_PROFILE_SETTING = PROFILES_PROFILE + "/setting";
 
-    /**
-     * Adds the rule instances.
-     *
-     * @param digester
-     *            the digester
-     * @see org.apache.commons.digester3.RuleSetBase#addRuleInstances(org.apache.commons.digester3.Digester)
-     */
-    @Override
-    public void addRuleInstances(Digester digester) {
-        digester.addObjectCreate("profiles", Profiles.class);
-        digester.addObjectCreate(PROFILES_PROFILE, Profile.class);
-        digester.addObjectCreate(PROFILES_PROFILE_SETTING, Setting.class);
+	/**
+	 * Adds the rule instances.
+	 *
+	 * @param digester
+	 *            the digester
+	 * @see org.apache.commons.digester3.RuleSetBase#addRuleInstances(org.apache.commons.digester3.Digester)
+	 */
+	@Override
+	public void addRuleInstances(Digester digester) {
+		digester.addObjectCreate("profiles", Profiles.class);
+		digester.addObjectCreate(PROFILES_PROFILE, Profile.class);
+		digester.addObjectCreate(PROFILES_PROFILE_SETTING, Setting.class);
 
-        digester.addSetNext(PROFILES_PROFILE, "addProfile");
-        digester.addSetNext(PROFILES_PROFILE_SETTING, "addSetting");
+		digester.addSetNext(PROFILES_PROFILE, "addProfile");
+		digester.addSetNext(PROFILES_PROFILE_SETTING, "addSetting");
 
-        digester.addSetProperties(PROFILES_PROFILE, "kind", "kind");
-        digester.addSetProperties(PROFILES_PROFILE_SETTING, "id", "id");
-        digester.addSetProperties(PROFILES_PROFILE_SETTING, "value", "value");
-    }
+		digester.addSetProperties(PROFILES_PROFILE, "kind", "kind");
+		digester.addSetProperties(PROFILES_PROFILE_SETTING, "id", "id");
+		digester.addSetProperties(PROFILES_PROFILE_SETTING, "value", "value");
+	}
 
 }

@@ -39,11 +39,17 @@ import io.cormoran.cleanthat.formatter.LineEnding;
 import io.cormoran.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import io.cormoran.cleanthat.formatter.eclipse.revelc.ConfigReader;
 
+/**
+ * Bridges to Eclipse formatting engine
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class EclipseJavaFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
-	private CodeFormatter formatter;
+	private final CodeFormatter formatter;
 
 	public EclipseJavaFormatter(CleanThatRepositoryProperties properties) {
 		Map<String, String> options = new LinkedHashMap<>();
@@ -52,7 +58,7 @@ public class EclipseJavaFormatter {
 
 		// Eclipse default
 		if (Strings.isNullOrEmpty(javaConfigFile)) {
-			// https://github.com/revelc/formatter-maven-plugin/blob/8d18b56855e682940e746caadc33e2a40a6b15b7/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
+			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			options.put(JavaCore.COMPILER_SOURCE, "1.8");
 			options.put(JavaCore.COMPILER_COMPLIANCE, "1.8");
 			options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "1.8");

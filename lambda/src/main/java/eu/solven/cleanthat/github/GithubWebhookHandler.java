@@ -73,8 +73,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		LOGGER.info("Received a webhook for installationId={}", installationId);
 
-		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
-
 		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
 		if (ref.isPresent()) {
@@ -102,6 +100,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 		}
+
+		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
 
 		try {
 			GHRepository repoId =

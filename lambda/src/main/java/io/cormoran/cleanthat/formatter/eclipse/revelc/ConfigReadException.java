@@ -21,17 +21,17 @@ package io.cormoran.cleanthat.formatter.eclipse.revelc;
  */
 public class ConfigReadException extends Exception {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = 1L;
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * Instantiates a new config read exception.
-     *
-     * @param message
-     *            the message
-     */
-    public ConfigReadException(String message) {
-        super(message);
-    }
+	/**
+	 * Instantiates a new config read exception.
+	 *
+	 * @param message
+	 *            the message
+	 */
+	public ConfigReadException(String message) {
+		super(message);
+	}
 
 }

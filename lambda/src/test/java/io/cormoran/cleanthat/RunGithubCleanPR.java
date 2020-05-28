@@ -14,9 +14,12 @@ import java.util.regex.Pattern;
 import org.eclipse.jface.text.BadLocationException;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCommitBuilder;
 import org.kohsuke.github.GHContent;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeBuilder;
@@ -47,9 +50,16 @@ import io.cormoran.cleanthat.formatter.eclipse.EclipseJavaFormatter;
 
 @SpringBootApplication
 public class RunGithubCleanPR extends CleanThatLambdaFunction {
+	private static final String PATH_CLEANTHAT_JSON = "/cleanthat.json";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubCleanPR.class);
 
+	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
+	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
+
 	final int solvenEuCleanThatInstallationId = 9086720;
+
+	final String repoFullName = SOLVEN_EU_AGILEA;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RunGithubCleanPR.class, args);
@@ -63,7 +73,13 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 
 		GitHub github = handler.makeInstallationGithub(solvenEuCleanThatInstallationId);
 
-		GHRepository repo = github.getRepository("solven-eu/mitrust-datasharing");
+		GHRepository repo;
+		try {
+			repo = github.getRepository(repoFullName);
+		} catch (GHFileNotFoundException e) {
+			LOGGER.error("Either the repository is private, or it does not exist: '{}'", repoFullName);
+			return;
+		}
 
 		LOGGER.info("Repositry name={} id={}", repo.getName(), repo.getId());
 
@@ -72,13 +88,10 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		GHBranch defaultBranch;
 		try {
 			defaultBranch = repo.getBranch(defaultBranchName);
+		} catch (GHFileNotFoundException e) {
+			throw new IllegalStateException("We can not find as default branch: " + defaultBranchName, e);
 		} catch (IOException e) {
-			if (e.getMessage().contains("404")) {
-				LOGGER.warn("We can not find as default branch: {}", defaultBranchName);
-				return;
-			} else {
-				throw new UncheckedIOException(e);
-			}
+			throw new UncheckedIOException(e);
 		}
 
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -112,6 +125,9 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 			Optional<String> optConfig =
 					Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, "java", "config_url"));
 			optConfig.ifPresent(properties::setJavaConfigUrl);
+
+			Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, "java", "eol"));
+			optJavaEOL.ifPresent(properties::setEol);
 
 			Set<String> extention = new TreeSet<>();
 			pr.listFiles().forEach(file -> {
@@ -151,16 +167,15 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 	private Optional<Map<String, ?>> prConfig(ObjectMapper objectMapper, GHPullRequest pr) {
 		Optional<Map<String, ?>> prConfig;
 		try {
-			String asString = loadContent(pr, "/cleanthat.json");
+			String asString = loadContent(pr, PATH_CLEANTHAT_JSON);
 
 			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
+		} catch (GHFileNotFoundException e) {
+			LOGGER.trace("We miss a '{}' file", PATH_CLEANTHAT_JSON, e);
+			LOGGER.info("We miss a '{}' file", PATH_CLEANTHAT_JSON);
+			prConfig = Optional.empty();
 		} catch (IOException e) {
-			if (e.getMessage().contains("404")) {
-				LOGGER.info("We miss a '{}' file", "/cleanthat.json");
-				prConfig = Optional.empty();
-			} else {
-				throw new UncheckedIOException(e);
-			}
+			throw new UncheckedIOException(e);
 		}
 		return prConfig;
 	}
@@ -170,16 +185,15 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 			ObjectMapper objectMapper) {
 		Optional<Map<String, ?>> defaultBranchConfig;
 		try {
-			String asString = loadContent(repo, defaultBranch.getSHA1(), "/cleanthat.json");
+			String asString = loadContent(repo, defaultBranch.getSHA1(), PATH_CLEANTHAT_JSON);
 
 			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
+		} catch (GHFileNotFoundException e) {
+			LOGGER.trace("We miss a '{}' file", PATH_CLEANTHAT_JSON, e);
+			LOGGER.info("We miss a '{}' file", PATH_CLEANTHAT_JSON);
+			defaultBranchConfig = Optional.empty();
 		} catch (IOException e) {
-			if (e.getMessage().contains("404")) {
-				LOGGER.info("We miss a '{}' file", "/cleanthat.json");
-				defaultBranchConfig = Optional.empty();
-			} else {
-				throw new UncheckedIOException(e);
-			}
+			throw new UncheckedIOException(e);
 		}
 		return defaultBranchConfig;
 	}
@@ -187,28 +201,37 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 	private void openPRWithCleanThatStandardConfiguration(GHBranch defaultBranch) {
 		// Let's follow Renovate and its configuration PR
 		// https://github.com/solven-eu/agilea/pull/1
+		String body = readResource("/templates/onboarding-body.md");
+
+		GHRepository repo = defaultBranch.getOwner();
+		body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
+
+		try {
+			GHTree createTree = repo.createTree().add("cleanthat.json", body, false).create();
+			GHCommit commit = prepareCommit(repo).message("Add cleanthat.json").tree(createTree.getSha()).create();
+			GHRef configureBranch = repo.createRef("refs/heads/cleanthat/configure", commit.getSHA1());
+
+			// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
+			repo.createPullRequest("Configure CleanThat",
+					configureBranch.getRef(),
+					defaultBranch.getName(),
+					body,
+					true,
+					false);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private String readResource(String path) {
 		String body;
 		try (InputStreamReader reader =
-				new InputStreamReader(new ClassPathResource("/templates/onboarding-body.md").getInputStream(),
-						Charsets.UTF_8)) {
+				new InputStreamReader(new ClassPathResource(path).getInputStream(), Charsets.UTF_8)) {
 			body = CharStreams.toString(reader);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-		body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), defaultBranch.getOwner().getFullName());
-
-		try {
-			defaultBranch.getOwner()
-					.createPullRequest("Configure CleanThat",
-							"cleanthat/configure",
-							defaultBranch.getName(),
-							body,
-							true,
-							false);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return body;
 	}
 
 	private void formatPR(CleanThatRepositoryProperties properties, GHPullRequest pr) {
@@ -224,15 +247,6 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 			}
 
 			String fileName = file.getFilename();
-			try {
-				String content = loadContent(pr, "cleanthat.json");
-			} catch (IOException e) {
-				if (e.getMessage().contains("404")) {
-					LOGGER.warn("There is no 'cleanthat.json' file");
-				} else {
-					throw new UncheckedIOException(e);
-				}
-			}
 
 			int lastIndexOfDot = fileName.lastIndexOf('.');
 
@@ -242,8 +256,14 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 
 					String output;
 					try {
-						output = new EclipseJavaFormatter(properties).doFormat(asString,
-								LineEnding.determineLineEnding(asString));
+						LineEnding eolToApply;
+						if (properties.getLineEnding() == LineEnding.KEEP) {
+							eolToApply = LineEnding.determineLineEnding(asString);
+						} else {
+							eolToApply = properties.getLineEnding();
+						}
+
+						output = new EclipseJavaFormatter(properties).doFormat(asString, eolToApply);
 					} catch (BadLocationException e) {
 						throw new RuntimeException(e);
 					}
@@ -256,8 +276,6 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 				} catch (IOException e) {
 					throw new UncheckedIOException("Issue with file: " + fileName, e);
 				}
-
-				// LineEnding lineEnding = LineEnding.determineLineEnding(file.get);
 			}
 		});
 
@@ -266,10 +284,9 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 			try {
 				GHTree createdTree = createTree.baseTree(ref).create();
 
-				GHCommit commit = pr.getRepository()
-						.createCommit()
-						.author("CleanThat", "CleanThat", new Date())
-						.message("formatting")
+				GHCommit commit = prepareCommit(pr.getRepository())
+						.message("Formatting " + nbFilesInTree
+								.get() + " " + "java" + " files with engine=" + properties.getJavaEngine())
 						.parent(ref)
 						.tree(createdTree.getSha())
 						.create();
@@ -278,13 +295,15 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 				String newHead = commit.getSHA1();
 				LOGGER.info("Update ref {} to {}", branchRef, newHead);
 				pr.getRepository().getRef("heads/" + branchRef).updateTo(newHead);
-
-				// System.out.println("sha1: " + newHead);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		}
 
+	}
+
+	private GHCommitBuilder prepareCommit(GHRepository repo) {
+		return repo.createCommit().author("CleanThat", "CleanThat", new Date());
 	}
 
 	private String loadContent(GHPullRequest pr, String filename) throws IOException {

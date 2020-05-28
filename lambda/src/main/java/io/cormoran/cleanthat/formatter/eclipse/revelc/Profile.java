@@ -13,7 +13,7 @@
  */
 package io.cormoran.cleanthat.formatter.eclipse.revelc;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -24,47 +24,47 @@ import java.util.Map;
  */
 public class Profile {
 
-    /** The kind. */
-    private String kind;
+	/** The kind. */
+	private String kind;
 
-    /** The settings. */
-    private Map<String, String> settings = new HashMap<>();
+	/** The settings. */
+	private final Map<String, String> settings = new LinkedHashMap<>();
 
-    /**
-     * Adds the setting.
-     *
-     * @param setting
-     *            the setting
-     */
-    public void addSetting(Setting setting) {
-        this.settings.put(setting.getId(), setting.getValue());
-    }
+	/**
+	 * Adds the setting.
+	 *
+	 * @param setting
+	 *            the setting
+	 */
+	public void addSetting(Setting setting) {
+		this.settings.put(setting.getId(), setting.getValue());
+	}
 
-    /**
-     * Gets the settings.
-     *
-     * @return the settings
-     */
-    public Map<String, String> getSettings() {
-        return this.settings;
-    }
+	/**
+	 * Gets the settings.
+	 *
+	 * @return the settings
+	 */
+	public Map<String, String> getSettings() {
+		return this.settings;
+	}
 
-    /**
-     * Gets the kind.
-     *
-     * @return the kind
-     */
-    public String getKind() {
-        return this.kind;
-    }
+	/**
+	 * Gets the kind.
+	 *
+	 * @return the kind
+	 */
+	public String getKind() {
+		return this.kind;
+	}
 
-    /**
-     * Sets the kind.
-     *
-     * @param value
-     *            the new kind
-     */
-    public void setKind(String value) {
-        this.kind = value;
-    }
+	/**
+	 * Sets the kind.
+	 *
+	 * @param value
+	 *            the new kind
+	 */
+	public void setKind(String value) {
+		this.kind = value;
+	}
 }

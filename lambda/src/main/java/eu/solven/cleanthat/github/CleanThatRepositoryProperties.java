@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.github;
 
+import io.cormoran.cleanthat.formatter.LineEnding;
+
 /**
  * The configuration of a formatting job
  * 
@@ -13,6 +15,12 @@ public class CleanThatRepositoryProperties {
 	// May be
 	// https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
 	String javaConfigUrl = null;
+
+	String javaEngine = "eclipse";
+
+	// Git has some preference to committing LF
+	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
+	LineEnding eol = LineEnding.valueOf("LF");
 
 	public boolean isAppendToExistingPullRequest() {
 		return appendToExistingPullRequest;
@@ -28,6 +36,18 @@ public class CleanThatRepositoryProperties {
 
 	public void setJavaConfigUrl(String javaConfigUrl) {
 		this.javaConfigUrl = javaConfigUrl;
+	}
+
+	public LineEnding getLineEnding() {
+		return this.eol;
+	}
+
+	public void setEol(String eol) {
+		this.eol = LineEnding.valueOf(eol);
+	}
+
+	public String getJavaEngine() {
+		return javaEngine;
 	}
 
 }

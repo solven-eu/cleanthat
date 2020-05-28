@@ -34,6 +34,7 @@ public enum LineEnding {
 	/**
 	 * Returns the most occurring line-ending characters in the file text or null if no line-ending occurs the most.
 	 */
+	@SuppressWarnings("PMD.AvoidReassigningLoopVariables")
 	public static LineEnding determineLineEnding(String fileDataString) {
 		int lfCount = 0;
 		int crCount = 0;

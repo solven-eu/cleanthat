@@ -3,3 +3,10 @@ spring:
   jackson.property-naming-strategy: SNAKE_CASE
 
 sentry.dsn: https://22586844ad7d4f21b837cf5ea3600a1f@o222257.ingest.sentry.io/5245874
+
+github.app:
+  app-id: 65550
+  client-id: Iv1.35f0415ae74331de
+  client-secret: SECRET
+  private-jwk: SECRET
+

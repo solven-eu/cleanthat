@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
-import eu.solven.cleanthat.github.GoogleController;
+import eu.solven.cleanthat.github.GithubController;
 
 public class RunPushEventToLambda {
 	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
@@ -22,7 +22,7 @@ public class RunPushEventToLambda {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		CleanThatLambdaInvoker lambdaInvoker = new CleanThatLambdaInvoker(env, objectMapper);
-		GoogleController googleController = new GoogleController(lambdaInvoker);
+		GithubController googleController = new GithubController(lambdaInvoker);
 
 		googleController.onWebhook(
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class));

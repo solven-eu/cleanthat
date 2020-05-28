@@ -67,6 +67,12 @@
 			<version>20190722</version>
 		</dependency>
 
+		<dependency>
+			<!-- https://github.com/INRIA/spoon -->
+			<groupId>fr.inria.gforge.spoon</groupId>
+			<artifactId>spoon-core</artifactId>
+			<version>8.2.0-beta-8</version>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -106,11 +112,26 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- This hacks many Eclipse classes -->
+		<!-- <dependency> -->
+		<!-- https://github.com/spring-io/spring-javaformat -->
+		<!-- <groupId>io.spring.javaformat</groupId> -->
+		<!-- <artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId> -->
+		<!-- <version>0.0.22</version> -->
+		<!-- </dependency> -->
+
+
+		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
 		<dependency>
-			<!-- https://github.com/spring-io/spring-javaformat -->
-			<groupId>io.spring.javaformat</groupId>
-			<artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId>
-			<version>0.0.22</version>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.21.0</version>
+		</dependency>
+		<dependency>
+			<!-- Used to parse Eclipse XML config files -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-digester3</artifactId>
+			<version>3.2</version>
 		</dependency>
 
 		<dependency>

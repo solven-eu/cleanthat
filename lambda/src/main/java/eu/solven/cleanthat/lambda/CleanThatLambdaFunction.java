@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 
+import com.nimbusds.jose.JOSEException;
+
+import eu.solven.cleanthat.github.GithubWebhookHandlerFactory;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**
@@ -35,18 +37,19 @@ public class CleanThatLambdaFunction {
 	}
 
 	@Bean
-	public IGithubWebhookHandler githubWebhookHandler(GitHub github) {
-		return new GithubWebhookHandler(github);
+	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env) {
+		return new GithubWebhookHandlerFactory(env);
 	}
 
 	@Bean
-	public GitHub github() throws IOException {
-		// TODO Get JWT following https://github-api.kohsuke.org/githubappjwtauth.html
-		return GitHubBuilder.fromEnvironment().build();
-	}
-
-	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(IGithubWebhookHandler githubWebhookHandler) {
-		return input -> githubWebhookHandler.processWebhookBody(input);
+	public Function<Map<String, ?>, Map<String, ?>> uppercase(GithubWebhookHandlerFactory githubFactory) {
+		return input -> {
+			try {
+				// TODO Cache the Github instance for the JWT duration
+				return githubFactory.makeWithFreshJwt().processWebhookBody(input);
+			} catch (IOException | JOSEException e) {
+				throw new RuntimeException(e);
+			}
+		};
 	}
 }

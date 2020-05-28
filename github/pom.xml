@@ -13,8 +13,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>com.github.cormoran-io.pepper</groupId>
+			<artifactId>pepper</artifactId>
+			<version>${pepper.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.kohsuke/github-api -->
@@ -23,6 +24,28 @@
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
 			<version>1.111</version>
+		</dependency>
+
+		<dependency>
+			<!-- Enables loading a PEM file -->
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>8.17</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- Enables loading a PEM file -->
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.65</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

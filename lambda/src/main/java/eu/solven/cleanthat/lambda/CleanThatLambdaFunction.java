@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
+import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**
@@ -27,26 +31,26 @@ import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 @SpringBootApplication
 @Import({ SentryMvcSpringConfig.class })
 public class CleanThatLambdaFunction {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
 
-	/*
-	 * You need this main method or explicit <start-class>example.FunctionConfiguration</start-class> in the POM to
-	 * ensure boot plug-in makes the correct entry
-	 */
 	public static void main(String[] args) {
 		SpringApplication.run(CleanThatLambdaFunction.class, args);
 	}
 
 	@Bean
-	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env) {
-		return new GithubWebhookHandlerFactory(env);
+	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env, ObjectMapper objectMapper) {
+		return new GithubWebhookHandlerFactory(env, objectMapper);
 	}
 
 	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(GithubWebhookHandlerFactory githubFactory) {
+	public Function<Map<String, ?>, Map<String, ?>> uppercase(ObjectMapper objectMapper,
+			GithubWebhookHandlerFactory githubFactory) {
 		return input -> {
 			try {
+				LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
+
 				// TODO Cache the Github instance for the JWT duration
-				return githubFactory.makeWithFreshJwt().processWebhookBody(input);
+				return githubFactory.makeWithFreshJwt().processWebhookBody(input, new JavaFormatter());
 			} catch (IOException | JOSEException e) {
 				throw new RuntimeException(e);
 			}

@@ -26,6 +26,12 @@
 			<version>1.111</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 
 		<dependency>
 			<!-- Encrypt login token, and sensible data in DB -->
@@ -57,8 +63,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 	</dependencies>

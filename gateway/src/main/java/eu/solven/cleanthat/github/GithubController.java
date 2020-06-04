@@ -54,6 +54,7 @@ public class GithubController {
 			return Map.of("status", "ARG");
 		}
 		if ("synchronize".equals(payload.get("action"))) {
+			// TODO What is the purpose of this pull_request action?
 			LOGGER.info("Skip action=synchronize");
 			return Map.of("status", "skipped");
 		}

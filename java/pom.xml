@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<artifactId>aggregator-cleanthat</artifactId>
+	</parent>
+
+	<artifactId>java</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.pepper</groupId>
+			<artifactId>pepper</artifactId>
+			<version>${pepper.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://github.com/INRIA/spoon -->
+			<groupId>fr.inria.gforge.spoon</groupId>
+			<artifactId>spoon-core</artifactId>
+			<version>8.2.0-beta-8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-spring</artifactId>
+			<version>${sentry.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>3.0.1u2</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- This hacks many Eclipse classes -->
+		<!-- <dependency> -->
+		<!-- https://github.com/spring-io/spring-javaformat -->
+		<!-- <groupId>io.spring.javaformat</groupId> -->
+		<!-- <artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId> -->
+		<!-- <version>0.0.22</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>net.revelc.code</groupId>
+			<artifactId>impsort-maven-plugin</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+
+		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.21.0</version>
+		</dependency>
+		<dependency>
+			<!-- Used to parse Eclipse XML config files -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-digester3</artifactId>
+			<version>3.2</version>
+		</dependency>
+
+	</dependencies>
+</project>

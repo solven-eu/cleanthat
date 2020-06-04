@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class EclipseJavaFormatter {
 		this.formatter = ToolFactory.createCodeFormatter(options, ToolFactory.M_FORMAT_EXISTING);
 	}
 
-	public String doFormat(String code, LineEnding ending) throws IOException, BadLocationException {
+	public String doFormat(String code, LineEnding ending) throws IOException {
 		TextEdit te;
 		try {
 			te = this.formatter.format(CodeFormatter.K_COMPILATION_UNIT
@@ -95,7 +96,11 @@ public class EclipseJavaFormatter {
 		}
 
 		IDocument doc = new Document(code);
-		te.apply(doc);
+		try {
+			te.apply(doc);
+		} catch (MalformedTreeException | BadLocationException e) {
+			throw new IllegalArgumentException(e);
+		}
 		String formattedCode = doc.get();
 
 		if (code.equals(formattedCode)) {

@@ -15,41 +15,15 @@
 		<wrapper.version>1.0.17.RELEASE</wrapper.version>
 	</properties>
 
-
-	<!-- <dependencyManagement> -->
-	<!-- <dependencies> -->
-	<!-- <dependency> -->
-	<!-- <groupId>org.springframework.cloud</groupId> -->
-	<!-- <artifactId>spring-cloud-function-dependencies</artifactId> -->
-	<!-- <version>${spring-cloud-function.version}</version> -->
-	<!-- <type>pom</type> -->
-	<!-- <scope>import</scope> -->
-	<!-- </dependency> -->
-	<!-- </dependencies> -->
-	<!-- </dependencyManagement> -->
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.github.cormoran-io.pepper</groupId>
-			<artifactId>pepper</artifactId>
-			<version>${pepper.version}</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.amazonaws.serverless/aws-serverless-java-container-springboot2 -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.amazonaws.serverless</groupId> -->
-		<!-- <artifactId>aws-serverless-java-container-springboot2</artifactId> -->
-		<!-- <version>1.5</version> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-function-adapter-aws</artifactId>
-			<!-- <version>3.0.6.RELEASE</version> -->
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
@@ -80,12 +54,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>29.0-jre</version>
-		</dependency>
-
-		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-spring</artifactId>
 			<version>${sentry.version}</version>
@@ -112,26 +80,10 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- This hacks many Eclipse classes -->
-		<!-- <dependency> -->
-		<!-- https://github.com/spring-io/spring-javaformat -->
-		<!-- <groupId>io.spring.javaformat</groupId> -->
-		<!-- <artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId> -->
-		<!-- <version>0.0.22</version> -->
-		<!-- </dependency> -->
-
-
-		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
 		<dependency>
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>org.eclipse.jdt.core</artifactId>
-			<version>3.21.0</version>
-		</dependency>
-		<dependency>
-			<!-- Used to parse Eclipse XML config files -->
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-digester3</artifactId>
-			<version>3.2</version>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>java</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

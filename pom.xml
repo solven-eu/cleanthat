@@ -18,9 +18,14 @@
 
 		<module>github</module>
 
+		<module>config</module>
+
+		<module>java</module>
+		<!-- <module>python</module> -->
+
 		<module>lambda</module>
 		<module>gateway</module>
-		
+
 		<module>test-helpers</module>
 	</modules>
 

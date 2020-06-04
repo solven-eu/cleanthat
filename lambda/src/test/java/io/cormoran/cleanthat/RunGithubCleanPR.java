@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCommitBuilder;
@@ -207,17 +206,37 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 
 		try {
-			GHTree createTree = repo.createTree().add("cleanthat.json", body, false).create();
-			GHCommit commit = prepareCommit(repo).message("Add cleanthat.json").tree(createTree.getSha()).create();
-			GHRef configureBranch = repo.createRef("refs/heads/cleanthat/configure", commit.getSHA1());
+			GHTree createTree =
+					repo.createTree().baseTree(defaultBranch.getSHA1()).add("cleanthat.json", body, false).create();
+			GHCommit commit = prepareCommit(repo).message("Add cleanthat.json")
+					.parent(defaultBranch.getSHA1())
+					.tree(createTree.getSha())
+					.create();
+
+			String configureRefName = "refs/heads/cleanthat/configure";
+			// AtomicBoolean refAlreadyExists = new AtomicBoolean();
+
+			GHRef refToPR;
+			try {
+				refToPR = repo.getRef(configureRefName);
+
+				LOGGER.info("There is already a ref: " + configureRefName);
+				// refAlreadyExists.set(true);
+
+				boolean force = true;
+				refToPR.updateTo(commit.getSHA1(), force);
+			} catch (GHFileNotFoundException e) {
+				LOGGER.trace("There is not yet a ref: " + configureRefName, e);
+				LOGGER.info("There is not yet a ref: " + configureRefName);
+				// refAlreadyExists.set(false);
+				refToPR = repo.createRef(configureRefName, commit.getSHA1());
+			}
+
+			// if (!refAlreadyExists.get()) {
+			// }
 
 			// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
-			repo.createPullRequest("Configure CleanThat",
-					configureBranch.getRef(),
-					defaultBranch.getName(),
-					body,
-					true,
-					false);
+			repo.createPullRequest("Configure CleanThat", refToPR.getRef(), defaultBranch.getName(), body, true, false);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -255,18 +274,18 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 					String asString = loadContent(pr, file.getFilename());
 
 					String output;
-					try {
-						LineEnding eolToApply;
-						if (properties.getLineEnding() == LineEnding.KEEP) {
-							eolToApply = LineEnding.determineLineEnding(asString);
-						} else {
-							eolToApply = properties.getLineEnding();
-						}
-
-						output = new EclipseJavaFormatter(properties).doFormat(asString, eolToApply);
-					} catch (BadLocationException e) {
-						throw new RuntimeException(e);
+					// try {
+					LineEnding eolToApply;
+					if (properties.getLineEnding() == LineEnding.KEEP) {
+						eolToApply = LineEnding.determineLineEnding(asString);
+					} else {
+						eolToApply = properties.getLineEnding();
 					}
+
+					output = new EclipseJavaFormatter(properties).doFormat(asString, eolToApply);
+					// } catch (BadLocationException e) {
+					// throw new RuntimeException(e);
+					// }
 
 					if (!Strings.isNullOrEmpty(output) && !asString.equals(output)) {
 						// TODO isExecutable isn't a parameter from original file?

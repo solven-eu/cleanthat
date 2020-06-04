@@ -38,7 +38,7 @@ public class TestGithubWebhookHandler {
 
 	final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Before
+		@Before
 	public void initMocks() throws IOException {
 		GHApp ghApp = Mockito.mock(GHApp.class);
 		Mockito.when(github.getApp()).thenReturn(ghApp);

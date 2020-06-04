@@ -10,6 +10,7 @@ import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
+import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
@@ -20,10 +21,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.github.event.GithubWebhookHandler;
+import eu.solven.cleanthat.github.event.IGithubPullRequestCleaner;
 
 public class TestGithubWebhookHandler {
 	final GitHub github = Mockito.mock(GitHub.class);
+
 	final GitHub installGithub = Mockito.mock(GitHub.class);
+	final GHRepository repo = Mockito.mock(GHRepository.class);
 
 	final GithubWebhookHandler handler = new GithubWebhookHandler(github, new ObjectMapper()) {
 		@Override
@@ -48,7 +52,7 @@ public class TestGithubWebhookHandler {
 		GHAppInstallationToken installToken = Mockito.mock(GHAppInstallationToken.class);
 		Mockito.when(tokenBuilder.create()).thenReturn(installToken);
 
-		Mockito.when(installGithub.getRepositoryById(Mockito.anyString())).thenReturn(Mockito.mock(GHRepository.class));
+		Mockito.when(installGithub.getRepositoryById(Mockito.anyString())).thenReturn(repo);
 	}
 
 	@Test
@@ -56,7 +60,11 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
 
-		handler.processWebhookBody(input, (config, i) -> i.toUpperCase(Locale.US));
+		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(Mockito.mock(GHPullRequest.class));
+
+		handler.processWebhookBody(input,
+				(config, i) -> i.toUpperCase(Locale.US),
+				Mockito.mock(IGithubPullRequestCleaner.class));
 	}
 
 	@Test
@@ -64,6 +72,8 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input =
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
 
-		handler.processWebhookBody(input, (config, i) -> i.toUpperCase(Locale.US));
+		handler.processWebhookBody(input,
+				(config, i) -> i.toUpperCase(Locale.US),
+				Mockito.mock(IGithubPullRequestCleaner.class));
 	}
 }

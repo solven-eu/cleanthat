@@ -54,7 +54,7 @@ public class CleanThatLambdaInvoker {
 
 		AWSLambdaAsync client = makeClient(region);
 
-				LOGGER.info("Invoking " + functionName + ": " + request);
+		LOGGER.info("Invoking " + functionName + ": " + request);
 		Future<InvokeResult> future = client.invokeAsync(request);
 		LOGGER.info("Invoked " + functionName + ": " + request);
 

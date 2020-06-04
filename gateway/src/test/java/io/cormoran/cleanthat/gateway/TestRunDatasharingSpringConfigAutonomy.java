@@ -24,8 +24,7 @@ import io.cormoran.cleanthat.gateway.TestRunDatasharingSpringConfigAutonomy.RunM
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { CleanThatSpringConfig.class,
-		RunMiTrustSpringConfigComplement.class })
+@ContextConfiguration(classes = { CleanThatSpringConfig.class, RunMiTrustSpringConfigComplement.class })
 public class TestRunDatasharingSpringConfigAutonomy {
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(TestRunDatasharingSpringConfigAutonomy.class);

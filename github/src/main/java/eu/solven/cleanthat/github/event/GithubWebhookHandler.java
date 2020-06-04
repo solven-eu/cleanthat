@@ -77,14 +77,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	@Override
-	public Map<String, ?> processWebhookBody(Map<String, ?> input, IStringFormatter formatter) {
+	public Map<String, ?> processWebhookBody(Map<String, ?> input,
+			IStringFormatter formatter,
+			IGithubPullRequestCleaner prCleaner) {
 		// https://developer.github.com/webhooks/event-payloads/
 
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		LOGGER.info("Received a webhook for installationId={}", installationId);
 		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
-
-		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
 		GHRepository repoId;
 		try {
@@ -93,6 +93,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+
+		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
 		Optional<GHPullRequest> optPr;
 		if (ref.isPresent()) {
@@ -132,13 +134,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 
 		if (optPr.isPresent()) {
-			// try {
-			new GithubPullRequestCleaner(objectMapper, formatter)
-					.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
-			// repoId.createIssue("test").create();
-			// } catch (IOException e) {
-			// throw new UncheckedIOException(e);
-			// }
+			prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
 		}
 
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation

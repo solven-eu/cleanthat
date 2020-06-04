@@ -34,9 +34,18 @@ import com.google.common.io.CharStreams;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
-import io.cormoran.cleanthat.formatter.LineEnding;
 
+/**
+ * Default for {@link IGithubPullRequestCleaner}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
+	private static final String TEMPLATE_MISS_FILE = "We miss a '{}' file";
+
+	private static final String KEY_JAVA = "java";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
 
 	private static final String PATH_CLEANTHAT_JSON = "/cleanthat.json";
@@ -49,6 +58,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		this.formatter = formatter;
 	}
 
+	@Override
 	public void formatPR(Optional<Map<String, ?>> defaultBranchConfig,
 			AtomicInteger nbBranchWithConfig,
 			GHPullRequest pr) {
@@ -73,10 +83,11 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 				Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, "meta", "mutate_pull_requests"));
 		optMutatePR.ifPresent(properties::setAppendToExistingPullRequest);
 
-		Optional<String> optConfig = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, "java", "config_url"));
+		Optional<String> optConfig =
+				Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "config_url"));
 		optConfig.ifPresent(properties::setJavaConfigUrl);
 
-		Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, "java", "eol"));
+		Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "eol"));
 		optJavaEOL.ifPresent(properties::setEol);
 
 		Set<String> extention = new TreeSet<>();
@@ -90,7 +101,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			}
 		});
 
-		if (!extention.contains("java")) {
+		if (!extention.contains(KEY_JAVA)) {
 			LOGGER.info("Not a single .java file impacted by this PR");
 			return;
 		}
@@ -114,8 +125,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
-			LOGGER.trace("We miss a '{}' file", PATH_CLEANTHAT_JSON, e);
-			LOGGER.info("We miss a '{}' file", PATH_CLEANTHAT_JSON);
+			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
+			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			prConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -130,8 +141,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
-			LOGGER.trace("We miss a '{}' file", PATH_CLEANTHAT_JSON, e);
-			LOGGER.info("We miss a '{}' file", PATH_CLEANTHAT_JSON);
+			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
+			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			defaultBranchConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -211,7 +222,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 			int lastIndexOfDot = fileName.lastIndexOf('.');
 
-			if (lastIndexOfDot >= 0 && "java".equals(fileName.substring(lastIndexOfDot + 1))) {
+			if (lastIndexOfDot >= 0 && KEY_JAVA.equals(fileName.substring(lastIndexOfDot + 1))) {
 				try {
 					String asString = loadContent(pr, file.getFilename());
 
@@ -229,13 +240,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		});
 
 		if (nbFilesInTree.get() >= 1) {
-			LOGGER.info("About to commit {} files into {} ()", nbFilesInTree, pr.getHtmlUrl(), pr.getTitle());
+			LOGGER.info("About to commit {} files into {} ({})", nbFilesInTree, pr.getHtmlUrl(), pr.getTitle());
 			try {
 				GHTree createdTree = createTree.baseTree(ref).create();
 
 				GHCommit commit = prepareCommit(pr.getRepository())
 						.message("Formatting " + nbFilesInTree
-								.get() + " " + "java" + " files with engine=" + properties.getJavaEngine())
+								.get() + " " + KEY_JAVA + " files with engine=" + properties.getJavaEngine())
 						.parent(ref)
 						.tree(createdTree.getSha())
 						.create();

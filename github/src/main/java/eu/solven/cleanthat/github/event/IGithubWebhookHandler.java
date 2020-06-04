@@ -14,7 +14,9 @@ import eu.solven.cleanthat.github.IStringFormatter;
  */
 public interface IGithubWebhookHandler {
 
-	Map<String, ?> processWebhookBody(Map<String, ?> input, IStringFormatter formatter);
+	Map<String, ?> processWebhookBody(Map<String, ?> input,
+			IStringFormatter formatter,
+			IGithubPullRequestCleaner prCleaner);
 
 	GitHub getGithub();
 

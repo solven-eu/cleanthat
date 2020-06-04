@@ -15,6 +15,7 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
@@ -50,7 +51,9 @@ public class CleanThatLambdaFunction {
 				LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
 
 				// TODO Cache the Github instance for the JWT duration
-				return githubFactory.makeWithFreshJwt().processWebhookBody(input, new JavaFormatter());
+				JavaFormatter formatter = new JavaFormatter();
+				return githubFactory.makeWithFreshJwt()
+						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
 			} catch (IOException | JOSEException e) {
 				throw new RuntimeException(e);
 			}

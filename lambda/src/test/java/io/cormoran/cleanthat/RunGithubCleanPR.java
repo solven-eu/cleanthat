@@ -1,28 +1,15 @@
 package io.cormoran.cleanthat;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCommitBuilder;
-import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHIssueState;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeBuilder;
-import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,22 +18,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.io.CharStreams;
 import com.nimbusds.jose.JOSEException;
 
-import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
-import io.cormoran.cleanthat.formatter.LineEnding;
-import io.cormoran.cleanthat.formatter.eclipse.EclipseJavaFormatter;
 import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 
 @SpringBootApplication

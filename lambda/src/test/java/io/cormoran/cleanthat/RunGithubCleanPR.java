@@ -257,7 +257,7 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		String ref = pr.getHead().getSha();
 
 		GHTreeBuilder createTree = pr.getRepository().createTree();
-		AtomicInteger nbFilesInTree = new AtomicInteger();
+AtomicInteger nbFilesInTree = new AtomicInteger();
 
 		pr.listFiles().forEach(file -> {
 			if (file.getStatus().equals("removed")) {

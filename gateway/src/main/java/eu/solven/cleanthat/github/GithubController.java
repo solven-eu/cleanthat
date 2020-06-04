@@ -25,7 +25,7 @@ import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
 public class GithubController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubController.class);
 
-	final CleanThatLambdaInvoker lambdaInvoker;
+		final CleanThatLambdaInvoker lambdaInvoker;
 
 	public GithubController(CleanThatLambdaInvoker lambdaInvoker) {
 		this.lambdaInvoker = lambdaInvoker;

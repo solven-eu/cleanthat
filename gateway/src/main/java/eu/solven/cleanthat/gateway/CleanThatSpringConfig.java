@@ -3,6 +3,7 @@ package eu.solven.cleanthat.gateway;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
 import eu.solven.cleanthat.github.GithubController;
 import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 
@@ -18,6 +19,7 @@ import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 		CleanThatMvcConfigurer.class,
 
 		GithubController.class,
+		CleanThatLambdaInvoker.class,
 
 		// Monitoring
 		SentryMvcSpringConfig.class, })

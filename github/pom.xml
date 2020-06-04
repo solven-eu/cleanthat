@@ -26,13 +26,21 @@
 			<version>1.111</version>
 		</dependency>
 
+
 		<dependency>
-			<!-- Enables loading a PEM file -->
+			<!-- Encrypt login token, and sensible data in DB -->
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>8.17</version>
-			<scope>test</scope>
+			<version>8.16</version>
 		</dependency>
+
+		<!-- <dependency> -->
+		<!-- Enables loading a PEM file -->
+		<!-- <groupId>com.nimbusds</groupId> -->
+		<!-- <artifactId>nimbus-jose-jwt</artifactId> -->
+		<!-- <version>8.17</version> -->
+		<!-- <scope>test</scope> -->
+		<!-- </dependency> -->
 		<dependency>
 			<!-- Enables loading a PEM file -->
 			<groupId>org.bouncycastle</groupId>
@@ -49,25 +57,9 @@
 		</dependency>
 
 		<dependency>
-			<!-- https://github-api.kohsuke.org/githubappjwtauth.html -->
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>0.10.5</version>
-			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
 		</dependency>
-		<dependency>
-			<!-- https://github-api.kohsuke.org/githubappjwtauth.html -->
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-			<version>0.10.5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<!-- https://github-api.kohsuke.org/githubappjwtauth.html -->
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId>
-			<version>0.10.5</version>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
 </project>

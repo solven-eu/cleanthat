@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github;
+package eu.solven.cleanthat.github.event;
 
 import java.util.Map;
 

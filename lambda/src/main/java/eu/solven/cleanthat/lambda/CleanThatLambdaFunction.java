@@ -12,7 +12,7 @@ import org.springframework.core.env.Environment;
 
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.github.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**

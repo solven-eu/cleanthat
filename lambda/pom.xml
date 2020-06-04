@@ -42,13 +42,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- https://github.com/INRIA/spoon -->
-			<groupId>fr.inria.gforge.spoon</groupId>
-			<artifactId>spoon-core</artifactId>
-			<version>8.2.0-beta-8</version>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 		</dependency>
@@ -58,14 +51,6 @@
 			<artifactId>sentry-spring</artifactId>
 			<version>${sentry.version}</version>
 		</dependency>
-
-		<dependency>
-			<!-- Encrypt login token, and sensible data in DB -->
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>8.16</version>
-		</dependency>
-
 		<dependency>
 			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
 			<groupId>com.google.code.findbugs</groupId>

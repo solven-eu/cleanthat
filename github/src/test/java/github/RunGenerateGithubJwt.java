@@ -1,25 +1,21 @@
 package github;
 
 import java.io.File;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Date;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.env.MockEnvironment;
 
 import com.google.common.io.Files;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 
 // https://github-api.kohsuke.org/githubappjwtauth.html
 public class RunGenerateGithubJwt {
@@ -37,31 +33,6 @@ public class RunGenerateGithubJwt {
 		return kf.generatePrivate(spec);
 	}
 
-	static String createJWT(String githubAppId, long ttlMillis) throws Exception {
-		// The JWT signature algorithm we will be using to sign the token
-		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.RS256;
-
-		long nowMillis = System.currentTimeMillis();
-		Date now = new Date(nowMillis);
-
-		// We will sign our JWT with our private key
-		Key signingKey = get("/Users/blacelle/Dropbox/Solven/Dev/CleanThat/github-api-app.private-key.der");
-
-		// Let's set the JWT Claims
-		JwtBuilder builder =
-				Jwts.builder().setIssuedAt(now).setIssuer(githubAppId).signWith(signingKey, signatureAlgorithm);
-
-		// if it has been specified, let's add the expiration
-		if (ttlMillis > 0) {
-			long expMillis = nowMillis + ttlMillis;
-			Date exp = new Date(expMillis);
-			builder.setExpiration(exp);
-		}
-
-		// Builds the JWT and serializes it to a compact, URL-safe string
-		return builder.compact();
-	}
-
 	public static void main(String[] args) throws Exception {
 		JWK jwk = JWK.parseFromPEMEncodedObjects(Files.asCharSource(
 				new File("/Users/blacelle/Dropbox/Solven/Dev/CleanThat/cleanthat.2020-05-19.private-key.pem"),
@@ -69,12 +40,16 @@ public class RunGenerateGithubJwt {
 
 		LOGGER.info("github.app.private-jwk: '{}'", jwk.toJSONString());
 
-		String jwtToken = createJWT(githubAppId, 600000);
-		GitHub gitHubApp = new GitHubBuilder().withJwtToken(jwtToken).build();
+		MockEnvironment env = new MockEnvironment();
+		env.setProperty("github.app.app-id", "65550");
+		env.setProperty("github.app.private-jwk", jwk.toJSONString());
+		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env);
+
+		GitHub gitHubApp = factory.makeWithFreshJwt().getGithub();
 
 		GHApp app = gitHubApp.getApp();
 		app.listInstallations().forEach(install -> {
-			LOGGER.info("appId={}", install.getId());
+			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());
 		});
 	}
 }

@@ -41,8 +41,8 @@ import com.nimbusds.jose.JOSEException;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
-import eu.solven.cleanthat.github.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.github.IGithubWebhookHandler;
+import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 import io.cormoran.cleanthat.formatter.LineEnding;
 import io.cormoran.cleanthat.formatter.eclipse.EclipseJavaFormatter;

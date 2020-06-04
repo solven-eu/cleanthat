@@ -9,6 +9,7 @@ import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.springframework.core.env.Environment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -27,14 +28,16 @@ import com.nimbusds.jwt.SignedJWT;
 public class GithubWebhookHandlerFactory {
 	private static final int GITHUB_TIMEOUT_JWK_MINUTES = 10;
 	final Environment env;
+	final ObjectMapper objectMapper;
 
-	public GithubWebhookHandlerFactory(Environment env) {
+	public GithubWebhookHandlerFactory(Environment env, ObjectMapper objectMapper) {
 		this.env = env;
+		this.objectMapper = objectMapper;
 	}
 
 	public IGithubWebhookHandler makeWithFreshJwt() throws IOException, JOSEException {
 		GitHub github = new GitHubBuilder().withJwtToken(makeJWT()).build();
-		return new GithubWebhookHandler(github);
+		return new GithubWebhookHandler(github, objectMapper);
 	}
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature

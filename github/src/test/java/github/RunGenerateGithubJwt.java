@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.env.MockEnvironment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
@@ -43,7 +44,7 @@ public class RunGenerateGithubJwt {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("github.app.app-id", "65550");
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
-		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env);
+		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env, new ObjectMapper());
 
 		GitHub gitHubApp = factory.makeWithFreshJwt().getGithub();
 

@@ -44,6 +44,8 @@ public class GithubController {
 	@PostMapping("webhook")
 	public Map<String, ?> onWebhook(@RequestHeader(value = "X-Hub-Signature", required = false) String githubSignature,
 			@RequestBody String body) {
+		verifySignature(githubSignature);
+
 		Map<?, ?> payload;
 		try {
 			payload = objectMapper.readValue(body, Map.class);
@@ -51,9 +53,14 @@ public class GithubController {
 			LOGGER.warn("Issue with body", e);
 			return Map.of("status", "ARG");
 		}
-		LOGGER.info("Payload: {}", payload);
+		if ("synchronize".equals(payload.get("action"))) {
+			// TODO What is the purpose of this pull_request action?
+			LOGGER.info("Skip action=synchronize");
+			return Map.of("status", "skipped");
+		}
 
-		verifySignature(githubSignature);
+		// Used for the sake of checking what inputs actually looks like
+		LOGGER.info("TMP Body: {}", body);
 
 		processPayload(payload);
 

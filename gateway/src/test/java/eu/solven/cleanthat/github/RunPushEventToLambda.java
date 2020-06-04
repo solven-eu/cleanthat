@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.lambda;
+package eu.solven.cleanthat.github;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
-import eu.solven.cleanthat.github.GithubController;
 
 public class RunPushEventToLambda {
 	public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
@@ -22,9 +21,9 @@ public class RunPushEventToLambda {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		CleanThatLambdaInvoker lambdaInvoker = new CleanThatLambdaInvoker(env, objectMapper);
-		GithubController googleController = new GithubController(lambdaInvoker);
+		GithubController googleController = new GithubController(lambdaInvoker, objectMapper);
 
-		googleController.onWebhook(
+		googleController.processPayload(
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class));
 	}
 }

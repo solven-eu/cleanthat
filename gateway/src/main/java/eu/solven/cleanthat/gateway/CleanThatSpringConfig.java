@@ -1,9 +1,9 @@
 package eu.solven.cleanthat.gateway;
 
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import eu.solven.cleanthat.github.GithubController;
 import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**
@@ -14,30 +14,12 @@ import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
  */
 @Configuration
 @Import({
-		// Security
-		// AgileaSecurityConfig.class,
-
 		// MVC
 		CleanThatMvcConfigurer.class,
-		// AgileaSwaggerMvcConfigurer.class,
-		// AgileaExceptionAdvisor.class,
 
-		// SQL
-		// AgileaPgsqlConfig.class,
-
-		// GraphQL
-		// AgileaGraphQLSpringConfig.class,
-
-		// Encryption
-		// AgileaEncrypter.class,
-		// AgileaDecrypter.class,
+		GithubController.class,
 
 		// Monitoring
 		SentryMvcSpringConfig.class, })
-@ComponentScan(basePackages = { "eu.agilea.pgsql.bridges", "eu.agilea.mvc.controllers", "eu.agilea.services" })
 public class CleanThatSpringConfig {
-	// @Bean
-	// public ObjectMapper objectMapper() {
-	// return AgileaJsonHelpers.makeObjectMapper();
-	// }
 }

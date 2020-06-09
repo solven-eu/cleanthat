@@ -123,13 +123,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			} else {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
 			}
-
-			// Optional.of(repoId.getPullRequest(prId));
-			// } else {
-			// LOGGER.warn("Not-managed ref: {}", ref.get());
-			// optPr = Optional.empty();
-			// }
-
 		} else {
 			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
@@ -155,15 +148,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 		}
-
-		if (optPr.isPresent()) {
-			prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
-		}
-
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
-		return Map.of();
+		if (optPr.isPresent()) {
+			return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+		} else {
+			return Map.of("skipped", "webhook is not attached to a PullRequest");
+		}
+
 	}
 
 }

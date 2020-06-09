@@ -3,7 +3,9 @@ package eu.solven.cleanthat.github.event;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.io.CharStreams;
+import com.google.common.util.concurrent.AtomicLongMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
@@ -59,7 +62,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	@Override
-	public void formatPR(Optional<Map<String, ?>> defaultBranchConfig,
+	public Map<String, ?> formatPR(Optional<Map<String, ?>> defaultBranchConfig,
 			AtomicInteger nbBranchWithConfig,
 			GHPullRequest pr) {
 		LOGGER.info("PR: {}", pr);
@@ -72,7 +75,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			} else {
 				LOGGER.info("Config neither on default branch nor on PR {}", pr.getHtmlUrl().toExternalForm());
 			}
-			return;
+
+			return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
 			nbBranchWithConfig.getAndIncrement();
 		}
@@ -92,6 +96,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Set<String> extention = new TreeSet<>();
 		pr.listFiles().forEach(file -> {
+			// TODO How can we exclude deleted files?
 			String fileName = file.getFilename();
 
 			int lastIndexOfDot = fileName.lastIndexOf('.');
@@ -103,7 +108,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		if (!extention.contains(KEY_JAVA)) {
 			LOGGER.info("Not a single .java file impacted by this PR");
-			return;
+
+			return Collections.singletonMap("skipped", "Not a single file matching '.*\\.java'");
 		}
 
 		try {
@@ -115,7 +121,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			throw new UncheckedIOException(e);
 		}
 
-		formatPR(properties, pr);
+		return formatPR(properties, pr);
 	}
 
 	private Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
@@ -206,11 +212,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return body;
 	}
 
-	public void formatPR(CleanThatRepositoryProperties properties, GHPullRequest pr) {
+	public Map<String, ?> formatPR(CleanThatRepositoryProperties properties, GHPullRequest pr) {
 		String ref = pr.getHead().getSha();
 
 		GHTreeBuilder createTree = pr.getRepository().createTree();
 		AtomicInteger nbFilesInTree = new AtomicInteger();
+
+		AtomicLongMap<String> counters = AtomicLongMap.create();
 
 		pr.listFiles().forEach(file -> {
 			if (file.getStatus().equals("removed")) {
@@ -232,10 +240,16 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 						// TODO isExecutable isn't a parameter from original file?
 						createTree.add(file.getFilename(), output, false);
 						nbFilesInTree.getAndIncrement();
+
+						counters.incrementAndGet("nb_files_formatted");
+					} else {
+						counters.incrementAndGet("nb_files_already_formatted");
 					}
 				} catch (IOException e) {
 					throw new UncheckedIOException("Issue with file: " + fileName, e);
 				}
+			} else {
+				counters.incrementAndGet("nb_files_not_considered");
 			}
 		});
 
@@ -260,6 +274,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			}
 		}
 
+		Map<String, Object> output = new LinkedHashMap<>();
+		output.putAll(counters.asMap());
+		return output;
 	}
 
 	private String doFormat(CleanThatRepositoryProperties properties, String asString) throws IOException {

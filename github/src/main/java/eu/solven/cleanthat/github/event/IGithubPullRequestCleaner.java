@@ -14,6 +14,8 @@ import org.kohsuke.github.GHPullRequest;
  */
 public interface IGithubPullRequestCleaner {
 
-	void formatPR(Optional<Map<String, ?>> defaultBranchConfig, AtomicInteger nbBranchWithConfig, GHPullRequest pr);
+	Map<String, ?> formatPR(Optional<Map<String, ?>> defaultBranchConfig,
+			AtomicInteger nbBranchWithConfig,
+			GHPullRequest pr);
 
 }

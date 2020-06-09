@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
@@ -106,7 +107,22 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("We are notified of a new commit: {}", ref.get());
 			// }
 
-			optPr = Optional.empty();
+			// if (ref.get().startsWith("refs/")) {
+			// GHRef ghRef = repoId.getRef(ref.get().substring("refs/".length()));
+
+			try {
+				optPr = repoId.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
+					return ref.get().equals("refs/heads/" + pr.getHead().getRef());
+				}).findFirst();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			if (optPr.isPresent()) {
+				LOGGER.info("We found a open-PR ({}) for ref={}", optPr.get().getId(), ref.get());
+			} else {
+				LOGGER.info("We found no open-PR for ref={}", ref.get());
+			}
 		} else {
 			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
@@ -132,15 +148,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 		}
-
-		if (optPr.isPresent()) {
-			prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
-		}
-
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
-		return Map.of();
+		if (optPr.isPresent()) {
+			return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+		} else {
+			return Map.of("skipped", "webhook is not attached to a PullRequest");
+		}
+
 	}
 
 }

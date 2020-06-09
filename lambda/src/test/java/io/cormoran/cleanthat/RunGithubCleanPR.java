@@ -34,11 +34,12 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubCleanPR.class);
 
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
+	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
 	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
 
 	final int solvenEuCleanThatInstallationId = 9086720;
 
-	final String repoFullName = SOLVEN_EU_AGILEA;
+	final String repoFullName = SOLVEN_EU_CLEANTHAT;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RunGithubCleanPR.class, args);
@@ -81,7 +82,8 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		AtomicInteger nbBranchWithConfig = new AtomicInteger();
 
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
-			cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
+			Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
+			LOGGER.info("Result for {}: {}", pr, output);
 		});
 
 		if (defaultBranchConfig.isEmpty() && nbBranchWithConfig.get() == 0) {

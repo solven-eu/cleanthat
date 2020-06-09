@@ -83,7 +83,7 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
 			Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
-			LOGGER.info("Result for {}: {}", pr, output);
+			LOGGER.info("Result for {}: {}", pr.getHtmlUrl().toExternalForm(), output);
 		});
 
 		if (defaultBranchConfig.isEmpty() && nbBranchWithConfig.get() == 0) {

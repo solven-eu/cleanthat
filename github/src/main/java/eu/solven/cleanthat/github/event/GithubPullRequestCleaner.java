@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -65,21 +66,24 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public Map<String, ?> formatPR(Optional<Map<String, ?>> defaultBranchConfig,
 			AtomicInteger nbBranchWithConfig,
 			GHPullRequest pr) {
-		LOGGER.info("PR: {}", pr);
+		String prUrl = pr.getHtmlUrl().toExternalForm();
+		LOGGER.info("PR: {}", prUrl);
 
-		Optional<Map<String, ?>> prConfig = prConfig(pr);
+		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
 
-		if (prConfig.isEmpty()) {
+		if (optPrConfig.isEmpty()) {
 			if (defaultBranchConfig.isPresent()) {
-				LOGGER.info("Config on default branch but not on PR {}", pr.getHtmlUrl().toExternalForm());
+				LOGGER.info("Config on default branch but not on PR {}", prUrl);
 			} else {
-				LOGGER.info("Config neither on default branch nor on PR {}", pr.getHtmlUrl().toExternalForm());
+				LOGGER.info("Config neither on default branch nor on PR {}", prUrl);
 			}
 
 			return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
 			nbBranchWithConfig.getAndIncrement();
 		}
+
+		Map<String, ?> prConfig = optPrConfig.get();
 
 		CleanThatRepositoryProperties properties = new CleanThatRepositoryProperties();
 
@@ -124,6 +128,15 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return formatPR(properties, pr);
 	}
 
+	private Optional<Map<String, ?>> safePrConfig(GHPullRequest pr) {
+		try {
+			return prConfig(pr);
+		} catch (RuntimeException e) {
+			LOGGER.warn("Issue loading the configuration", e);
+			return Optional.empty();
+		}
+	}
+
 	private Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
 		Optional<Map<String, ?>> prConfig;
 		try {
@@ -157,30 +170,29 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	public void openPRWithCleanThatStandardConfiguration(GHBranch defaultBranch) {
-		// Let's follow Renovate and its configuration PR
-		// https://github.com/solven-eu/agilea/pull/1
-		String body = readResource("/templates/onboarding-body.md");
 
 		GHRepository repo = defaultBranch.getOwner();
-		body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 
 		try {
-			GHTree createTree =
-					repo.createTree().baseTree(defaultBranch.getSHA1()).add("cleanthat.json", body, false).create();
+			String exampleConfig = readResource("/standard-configurations/standard-java.json");
+			GHTree createTree = repo.createTree()
+					.baseTree(defaultBranch.getSHA1())
+					.add("cleanthat.json", exampleConfig, false)
+					.create();
 			GHCommit commit = prepareCommit(repo).message("Add cleanthat.json")
 					.parent(defaultBranch.getSHA1())
 					.tree(createTree.getSha())
 					.create();
 
 			String configureRefName = "refs/heads/cleanthat/configure";
-			// AtomicBoolean refAlreadyExists = new AtomicBoolean();
+			AtomicBoolean refAlreadyExists = new AtomicBoolean();
 
 			GHRef refToPR;
 			try {
 				refToPR = repo.getRef(configureRefName);
 
 				LOGGER.info("There is already a ref: " + configureRefName);
-				// refAlreadyExists.set(true);
+				refAlreadyExists.set(true);
 
 				boolean force = true;
 				refToPR.updateTo(commit.getSHA1(), force);
@@ -191,11 +203,23 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 				refToPR = repo.createRef(configureRefName, commit.getSHA1());
 			}
 
-			// if (!refAlreadyExists.get()) {
-			// }
+			if (refAlreadyExists.get()) {
+				LOGGER.info("There is already a ref about to introduce a cleanthat.json ; do not open a new PR");
+			} else {
+				// Let's follow Renovate and its configuration PR
+				// https://github.com/solven-eu/agilea/pull/1
+				String body = readResource("/templates/onboarding-body.md");
+				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 
-			// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
-			repo.createPullRequest("Configure CleanThat", refToPR.getRef(), defaultBranch.getName(), body, true, false);
+				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
+				repo.createPullRequest("Configure CleanThat",
+						refToPR.getRef(),
+						defaultBranch.getName(),
+						body,
+						true,
+						false);
+			}
+
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

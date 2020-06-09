@@ -20,14 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.time.PepperDateHelper;
 import eu.solven.cleanthat.gateway.CleanThatSpringConfig;
-import io.cormoran.cleanthat.gateway.TestRunDatasharingSpringConfigAutonomy.RunMiTrustSpringConfigComplement;
+import io.cormoran.cleanthat.gateway.TestRunCleanThatSpringConfigAutonomy.RunMiTrustSpringConfigComplement;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { CleanThatSpringConfig.class, RunMiTrustSpringConfigComplement.class })
-public class TestRunDatasharingSpringConfigAutonomy {
+public class TestRunCleanThatSpringConfigAutonomy {
 
-	protected static final Logger LOGGER = LoggerFactory.getLogger(TestRunDatasharingSpringConfigAutonomy.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(TestRunCleanThatSpringConfigAutonomy.class);
 
 	@Configuration
 	public static class RunMiTrustSpringConfigComplement {

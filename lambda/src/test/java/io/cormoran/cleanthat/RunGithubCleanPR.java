@@ -51,7 +51,7 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
 
-			GitHub github = handler.makeInstallationGithub(solvenEuCleanThatInstallationId);
+		GitHub github = handler.makeInstallationGithub(solvenEuCleanThatInstallationId);
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(objectMapper, new JavaFormatter());

@@ -36,7 +36,7 @@ import io.sentry.SentryClient;
 public class CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
 
-			public static void main(String[] args) {
+	public static void main(String[] args) {
 		SpringApplication.run(CleanThatLambdaFunction.class, args);
 	}
 

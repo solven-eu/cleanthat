@@ -122,7 +122,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 
 			if (optPr.isPresent()) {
-				LOGGER.info("We found a open-PR ({}) for ref={}", optPr.get().getHtmlUrl(), ref.get());
+				LOGGER.info("We found an open-PR ({}) for ref={}", optPr.get().getHtmlUrl(), ref.get());
 			} else {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
 			}

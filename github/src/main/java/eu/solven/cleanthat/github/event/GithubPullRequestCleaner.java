@@ -67,6 +67,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			AtomicInteger nbBranchWithConfig,
 			GHPullRequest pr) {
 		String prUrl = pr.getHtmlUrl().toExternalForm();
+		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
 
 		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
@@ -120,7 +121,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			GHUser user = pr.getUser();
 
 			// TODO Do not process PR opened by CleanThat
-			LOGGER.info("user_id={}", user.getId());
+			LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -296,6 +297,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		} else {
+			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
 		}
 
 		Map<String, Object> output = new LinkedHashMap<>();

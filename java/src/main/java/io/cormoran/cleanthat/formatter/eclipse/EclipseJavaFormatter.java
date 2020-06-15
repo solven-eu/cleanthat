@@ -53,7 +53,7 @@ public class EclipseJavaFormatter {
 	private final CodeFormatter formatter;
 
 	public EclipseJavaFormatter(CleanThatRepositoryProperties properties) {
-		Map<String, String> options = new LinkedHashMap<>();
+			Map<String, String> options = new LinkedHashMap<>();
 
 		String javaConfigFile = properties.getJavaConfigUrl();
 

@@ -19,6 +19,7 @@ import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
+import io.sentry.SentryClient;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -35,7 +36,7 @@ import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
 public class CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
 
-	public static void main(String[] args) {
+		public static void main(String[] args) {
 		SpringApplication.run(CleanThatLambdaFunction.class, args);
 	}
 
@@ -45,7 +46,8 @@ public class CleanThatLambdaFunction {
 	}
 
 	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(ObjectMapper objectMapper,
+	public Function<Map<String, ?>, Map<String, ?>> uppercase(SentryClient sentryClient,
+			ObjectMapper objectMapper,
 			GithubWebhookHandlerFactory githubFactory) {
 		return input -> {
 			try {
@@ -56,6 +58,10 @@ public class CleanThatLambdaFunction {
 				return githubFactory.makeWithFreshJwt()
 						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
 			} catch (IOException | JOSEException e) {
+				sentryClient.sendException(e);
+				throw new RuntimeException(e);
+			} catch (RuntimeException e) {
+				sentryClient.sendException(e);
 				throw new RuntimeException(e);
 			}
 		};

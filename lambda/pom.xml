@@ -216,6 +216,8 @@
 							<handler>eu.solven.cleanthat.lambda.MyStringHandlers</handler>
 							<!-- MB -->
 							<memorySize>512</memorySize>
+							<!-- Startup can take up to 30 seconds -->
+							<timeout>90</timeout>
 						</lambdaFunction>
 					</lambdaFunctions>
 				</configuration>

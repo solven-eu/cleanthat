@@ -84,7 +84,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/webhooks/event-payloads/
 
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
-		LOGGER.info("Received a webhook for installationId={}", installationId);
+		Optional<Object> organizationUrl = Optional.ofNullable(PepperMapHelper.getAs(input, "organization", "url"));
+		LOGGER.info("Received a webhook for installationId={} (organization={})",
+				installationId,
+				organizationUrl.orElse("-"));
 		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
 
 		GHRepository repoId;
@@ -119,7 +122,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 
 			if (optPr.isPresent()) {
-				LOGGER.info("We found a open-PR ({}) for ref={}", optPr.get().getId(), ref.get());
+				LOGGER.info("We found a open-PR ({}) for ref={}", optPr.get().getHtmlUrl(), ref.get());
 			} else {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
 			}
@@ -137,7 +140,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					return Map.of("action", "discarded");
 				} else {
 					String url = PepperMapHelper.getRequiredString(input, "pull_request", "url");
-					int prId = PepperMapHelper.getRequiredNumber(input, "pull_request", "id").intValue();
+					// We need the PR number (and not its id)
+					int prId = PepperMapHelper.getRequiredNumber(input, "pull_request", "number").intValue();
 					LOGGER.info("We are notified of a new PR: {}", url);
 
 					try {
@@ -152,7 +156,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
 		if (optPr.isPresent()) {
-			return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+			if (optPr.get().isLocked()) {
+				LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
+				return Map.of("skipped", "PullRequest is locked");
+			} else {
+				return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+			}
 		} else {
 			return Map.of("skipped", "webhook is not attached to a PullRequest");
 		}

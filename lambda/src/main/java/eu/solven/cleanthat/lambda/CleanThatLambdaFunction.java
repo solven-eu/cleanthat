@@ -29,12 +29,13 @@ import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
  */
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
+// https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
 @SpringBootApplication
 @Import({ SentryMvcSpringConfig.class })
 public class CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
 
-		public static void main(String[] args) {
+	public static void main(String[] args) {
 		SpringApplication.run(CleanThatLambdaFunction.class, args);
 	}
 

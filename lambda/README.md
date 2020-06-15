@@ -1,6 +1,10 @@
-To deploy me:
+To rebuild with dependencies from root:
 
-    mvn clean package lambda:deploy-lambda
+     mvn clean install -pl :lambda -am
+
+To deploy:
+
+     mvn lambda:deploy-lambda -pl :lambda
     
     
     

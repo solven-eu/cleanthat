@@ -34,7 +34,9 @@ public class SentryCoreSpringConfig implements ISentrySpringConfig {
 		// TODO git.properties is not generated in Heroku as .git is removed by Heroku
 		// https://stackoverflow.com/questions/14583282/heroku-display-hash-of-current-commit/34536363#34536363
 		// heroku labs:enable runtime-dyno-metadata -a agilea-app
-		String release = env.getProperty("heroku.slug.commit", "not_heroku");
+		// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html
+		String release =
+				env.getProperty("heroku.slug.commit", env.getProperty("aws.lambda.function-version", "not_heroku"));
 		LOGGER.info("release={}", release);
 		sentryClient.setRelease(release);
 

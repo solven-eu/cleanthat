@@ -88,8 +88,21 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			nbBranchWithConfig.getAndIncrement();
 		}
 
-		Map<String, ?> prConfig = optPrConfig.get();
+		try {
+			GHUser user = pr.getUser();
 
+			// TODO Do not process PR opened by CleanThat
+			LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		Map<String, ?> prConfig = optPrConfig.get();
+		CleanThatRepositoryProperties properties = prepareConfiguration(prConfig);
+		return formatPR(properties, pr);
+	}
+
+	private CleanThatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
 		CleanThatRepositoryProperties properties = new CleanThatRepositoryProperties();
 
 		Optional<Boolean> optMutatePR =
@@ -122,57 +135,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "staticGroups"))
 				.ifPresent(properties::setStaticGroups);
-
-		AtomicInteger nbIncludedNotExcluded = new AtomicInteger();
-
-		LOGGER.info("Applying includes rules: {}", properties.getIncludes());
-		LOGGER.info("Applying excludes rules: {}", properties.getExcludes());
-
-		pr.listFiles().forEach(file -> {
-			if (fileIsRemoved(file)) {
-				// Skip deleted files
-				return;
-			}
-
-			String fileName = file.getFilename();
-
-			Optional<PathMatcher> matchingInclude = findMatching(fileName, properties.getIncludes());
-			Optional<PathMatcher> matchingExclude = findMatching(fileName, properties.getExcludes());
-
-			if (matchingInclude.isPresent()) {
-				if (matchingExclude.isPresent()) {
-					LOGGER.info("Both included and excluded (then excluded): {}", fileName);
-				} else {
-					LOGGER.debug("Accepted for process: {}", fileName);
-					nbIncludedNotExcluded.incrementAndGet();
-				}
-			} else {
-				if (matchingExclude.isPresent()) {
-					LOGGER.debug("Explicitely excluded: {}", fileName);
-				} else {
-					LOGGER.debug("Nor included neither excluded: {}", fileName);
-				}
-			}
-		});
-
-		if (nbIncludedNotExcluded.get() == 0) {
-			LOGGER.info("Not a single included file is impacted by this PR");
-
-			return Collections.singletonMap("skipped", "Not a single matching file is impacted");
-		} else {
-			LOGGER.info("{} files included not excluded", nbIncludedNotExcluded);
-		}
-
-		try {
-			GHUser user = pr.getUser();
-
-			// TODO Do not process PR opened by CleanThat
-			LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
-		return formatPR(properties, pr);
+		return properties;
 	}
 
 	private boolean fileIsRemoved(GHPullRequestFileDetail file) {
@@ -302,6 +265,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		AtomicInteger nbFilesInTree = new AtomicInteger();
 
 		AtomicLongMap<String> counters = AtomicLongMap.create();
+
+		LOGGER.info("Applying includes rules: {}", properties.getIncludes());
+		LOGGER.info("Applying excludes rules: {}", properties.getExcludes());
 
 		pr.listFiles().forEach(file -> {
 			if (fileIsRemoved(file)) {

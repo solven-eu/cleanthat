@@ -91,7 +91,7 @@ public class CleanThatRepositoryProperties {
 		this.encoding = encoding;
 	}
 
-	public boolean getRemoveUnusedImports() {
+	public boolean isRemoveUnusedImports() {
 		return removeUnusedImports;
 	}
 

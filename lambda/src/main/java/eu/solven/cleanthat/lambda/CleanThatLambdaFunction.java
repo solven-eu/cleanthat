@@ -57,10 +57,7 @@ public class CleanThatLambdaFunction {
 				JavaFormatter formatter = new JavaFormatter();
 				return githubFactory.makeWithFreshJwt()
 						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
-			} catch (IOException | JOSEException e) {
-				sentryClient.sendException(e);
-				throw new RuntimeException(e);
-			} catch (RuntimeException e) {
+			} catch (IOException | JOSEException | RuntimeException e) {
 				sentryClient.sendException(e);
 				throw new RuntimeException(e);
 			}

@@ -43,7 +43,7 @@ public class JavaFormatter implements IStringFormatter {
 		Charset charset = Charset.forName(properties.getEncoding());
 		ImpSort impsort = new ImpSort(charset,
 				grouper,
-				properties.getRemoveUnusedImports(),
+				properties.isRemoveUnusedImports(),
 				true,
 				net.revelc.code.impsort.LineEnding.valueOf(eolToApply.name()));
 

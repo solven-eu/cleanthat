@@ -9,6 +9,8 @@ import java.nio.file.StandardOpenOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
 import io.cormoran.cleanthat.formatter.LineEnding;
@@ -37,6 +39,11 @@ public class JavaFormatter implements IStringFormatter {
 		}
 
 		output = new EclipseJavaFormatter(properties).doFormat(asString, eolToApply);
+
+		if (Strings.isNullOrEmpty(output)) {
+			// Formatter has not done anything, returning null as no-op marker
+			output = asString;
+		}
 
 		// see net.revelc.code.impsort.maven.plugin.AbstractImpSortMojo
 		Grouper grouper = new Grouper(properties.getGroups(), properties.getStaticGroups(), false, false, true);

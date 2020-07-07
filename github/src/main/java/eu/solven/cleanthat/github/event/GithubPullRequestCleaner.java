@@ -3,16 +3,19 @@ package eu.solven.cleanthat.github.event;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
@@ -20,6 +23,7 @@ import org.kohsuke.github.GHCommitBuilder;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
@@ -99,22 +103,64 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "eol"));
 		optJavaEOL.ifPresent(properties::setEol);
 
-		Set<String> extention = new TreeSet<>();
+		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "encoding"))
+				.ifPresent(properties::setEncoding);
+
+		Optional<List<String>> optExcludes =
+				Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "excludes"));
+		optExcludes.ifPresent(properties::setExcludes);
+
+		Optional<List<String>> optIncludes =
+				Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "includes"));
+		optIncludes.ifPresent(properties::setIncludes);
+
+		Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, KEY_JAVA, "imports", "remove_unused"))
+				.ifPresent(properties::setRemoveUnusedImports);
+
+		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "groups"))
+				.ifPresent(properties::setGroups);
+
+		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "staticGroups"))
+				.ifPresent(properties::setStaticGroups);
+
+		AtomicInteger nbIncludedNotExcluded = new AtomicInteger();
+
+		LOGGER.info("Applying includes rules: {}", properties.getIncludes());
+		LOGGER.info("Applying excludes rules: {}", properties.getExcludes());
+
 		pr.listFiles().forEach(file -> {
-			// TODO How can we exclude deleted files?
+			if (fileIsRemoved(file)) {
+				// Skip deleted files
+				return;
+			}
+
 			String fileName = file.getFilename();
 
-			int lastIndexOfDot = fileName.lastIndexOf('.');
+			Optional<PathMatcher> matchingInclude = findMatching(fileName, properties.getIncludes());
+			Optional<PathMatcher> matchingExclude = findMatching(fileName, properties.getExcludes());
 
-			if (lastIndexOfDot >= 0) {
-				extention.add(fileName.substring(lastIndexOfDot + 1));
+			if (matchingInclude.isPresent()) {
+				if (matchingExclude.isPresent()) {
+					LOGGER.info("Both included and excluded (then excluded): {}", fileName);
+				} else {
+					LOGGER.debug("Accepted for process: {}", fileName);
+					nbIncludedNotExcluded.incrementAndGet();
+				}
+			} else {
+				if (matchingExclude.isPresent()) {
+					LOGGER.debug("Explicitely excluded: {}", fileName);
+				} else {
+					LOGGER.debug("Nor included neither excluded: {}", fileName);
+				}
 			}
 		});
 
-		if (!extention.contains(KEY_JAVA)) {
-			LOGGER.info("Not a single .java file impacted by this PR");
+		if (nbIncludedNotExcluded.get() == 0) {
+			LOGGER.info("Not a single included file is impacted by this PR");
 
-			return Collections.singletonMap("skipped", "Not a single file matching '.*\\.java'");
+			return Collections.singletonMap("skipped", "Not a single matching file is impacted");
+		} else {
+			LOGGER.info("{} files included not excluded", nbIncludedNotExcluded);
 		}
 
 		try {
@@ -127,6 +173,18 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 
 		return formatPR(properties, pr);
+	}
+
+	private boolean fileIsRemoved(GHPullRequestFileDetail file) {
+		return file.getStatus().equals("removed");
+	}
+
+	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java
+	private Optional<PathMatcher> findMatching(String fileName, List<String> regex) {
+		return regex.stream()
+				.map(r -> FileSystems.getDefault().getPathMatcher(r))
+				.filter(pm -> pm.matches(Paths.get(fileName)))
+				.findFirst();
 	}
 
 	private Optional<Map<String, ?>> safePrConfig(GHPullRequest pr) {
@@ -246,46 +304,60 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		AtomicLongMap<String> counters = AtomicLongMap.create();
 
 		pr.listFiles().forEach(file -> {
-			if (file.getStatus().equals("removed")) {
+			if (fileIsRemoved(file)) {
 				// Skip deleted files
 				return;
 			}
 
 			String fileName = file.getFilename();
 
-			int lastIndexOfDot = fileName.lastIndexOf('.');
+			Optional<PathMatcher> matchingInclude = findMatching(fileName, properties.getIncludes());
+			Optional<PathMatcher> matchingExclude = findMatching(fileName, properties.getExcludes());
 
-			if (lastIndexOfDot >= 0 && KEY_JAVA.equals(fileName.substring(lastIndexOfDot + 1))) {
-				try {
-					String asString = loadContent(pr, file.getFilename());
+			if (matchingInclude.isPresent()) {
+				if (matchingExclude.isEmpty()) {
+					try {
+						String asString = loadContent(pr, file.getFilename());
 
-					String output = doFormat(properties, asString);
+						String output = doFormat(properties, asString);
 
-					if (!Strings.isNullOrEmpty(output) && !asString.equals(output)) {
-						// TODO isExecutable isn't a parameter from original file?
-						createTree.add(file.getFilename(), output, false);
-						nbFilesInTree.getAndIncrement();
+						if (!Strings.isNullOrEmpty(output) && !asString.equals(output)) {
+							// TODO isExecutable isn't a parameter from original file?
+							createTree.add(file.getFilename(), output, false);
+							nbFilesInTree.getAndIncrement();
 
-						counters.incrementAndGet("nb_files_formatted");
-					} else {
-						counters.incrementAndGet("nb_files_already_formatted");
+							counters.incrementAndGet("nb_files_formatted");
+						} else {
+							counters.incrementAndGet("nb_files_already_formatted");
+						}
+					} catch (IOException e) {
+						throw new UncheckedIOException("Issue with file: " + fileName, e);
 					}
-				} catch (IOException e) {
-					throw new UncheckedIOException("Issue with file: " + fileName, e);
+				} else {
+					counters.incrementAndGet("nb_files_both_included_excluded");
 				}
+			} else if (matchingExclude.isEmpty()) {
+				counters.incrementAndGet("nb_files_excluded_not_included");
 			} else {
-				counters.incrementAndGet("nb_files_not_considered");
+				counters.incrementAndGet("nb_files_neither_included_nor_included");
 			}
 		});
 
 		if (nbFilesInTree.get() >= 1) {
 			LOGGER.info("About to commit {} files into {} ({})", nbFilesInTree, pr.getHtmlUrl(), pr.getTitle());
+
+			String details = counters.asMap()
+					.entrySet()
+					.stream()
+					.map(e -> e.getKey() + ": " + e.getValue())
+					.collect(Collectors.joining("\r\n"));
+
 			try {
 				GHTree createdTree = createTree.baseTree(ref).create();
 
-				GHCommit commit = prepareCommit(pr.getRepository())
-						.message("Formatting " + nbFilesInTree
-								.get() + " " + KEY_JAVA + " files with engine=" + properties.getJavaEngine())
+				String message = "Formatted " + nbFilesInTree
+						.get() + " " + KEY_JAVA + " files with engine=" + properties.getJavaEngine() + "\r\n" + details;
+				GHCommit commit = prepareCommit(pr.getRepository()).message(message)
 						.parent(ref)
 						.tree(createdTree.getSha())
 						.create();

@@ -28,6 +28,9 @@ public class TestGithubWebhookHandler {
 
 	final GitHub installGithub = Mockito.mock(GitHub.class);
 	final GHRepository repo = Mockito.mock(GHRepository.class);
+	final GHPullRequest pr = Mockito.mock(GHPullRequest.class);
+
+	final IGithubPullRequestCleaner prCleaner = Mockito.mock(IGithubPullRequestCleaner.class);
 
 	final GithubWebhookHandler handler = new GithubWebhookHandler(github, new ObjectMapper()) {
 		@Override
@@ -60,11 +63,13 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
 
-		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(Mockito.mock(GHPullRequest.class));
+		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(pr);
 
-		handler.processWebhookBody(input,
-				(config, i) -> i.toUpperCase(Locale.US),
-				Mockito.mock(IGithubPullRequestCleaner.class));
+		handler.processWebhookBody(input, (config, i) -> i.toUpperCase(Locale.US), prCleaner);
+
+		Mockito.verify(repo).getPullRequest(2);
+		// Mockito.verify(prCleaner)
+		// .formatPR(Mockito.any(Optional.class), Mockito.eq(new AtomicInteger()), Mockito.eq(pr));
 	}
 
 	@Test
@@ -72,8 +77,6 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input =
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
 
-		handler.processWebhookBody(input,
-				(config, i) -> i.toUpperCase(Locale.US),
-				Mockito.mock(IGithubPullRequestCleaner.class));
+		handler.processWebhookBody(input, (config, i) -> i.toUpperCase(Locale.US), prCleaner);
 	}
 }

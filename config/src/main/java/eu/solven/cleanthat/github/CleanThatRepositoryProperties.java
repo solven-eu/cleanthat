@@ -1,5 +1,9 @@
 package eu.solven.cleanthat.github;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+
 import io.cormoran.cleanthat.formatter.LineEnding;
 
 /**
@@ -21,6 +25,19 @@ public class CleanThatRepositoryProperties {
 	// Git has some preference to committing LF
 	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
 	LineEnding eol = LineEnding.valueOf("LF");
+
+	// If empty, no file is exclude
+	List<String> excludes = Arrays.asList();
+
+	// If empty, no file is included
+	List<String> includes = Arrays.asList("regex:.*\\.java");
+
+	String encoding = StandardCharsets.UTF_8.name();
+
+	boolean removeUnusedImports = true;
+
+	String groups = "java.,javax.,org.,com.";
+	String staticGroups = "java,*";
 
 	public boolean isAppendToExistingPullRequest() {
 		return appendToExistingPullRequest;
@@ -50,4 +67,51 @@ public class CleanThatRepositoryProperties {
 		return javaEngine;
 	}
 
+	public List<String> getExcludes() {
+		return excludes;
+	}
+
+	public void setExcludes(List<String> excludes) {
+		this.excludes = excludes;
+	}
+
+	public List<String> getIncludes() {
+		return includes;
+	}
+
+	public void setIncludes(List<String> includes) {
+		this.includes = includes;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public boolean isRemoveUnusedImports() {
+		return removeUnusedImports;
+	}
+
+	public void setRemoveUnusedImports(boolean removeUnusedImports) {
+		this.removeUnusedImports = removeUnusedImports;
+	}
+
+	public String getGroups() {
+		return groups;
+	}
+
+	public void setGroups(String groups) {
+		this.groups = groups;
+	}
+
+	public String getStaticGroups() {
+		return staticGroups;
+	}
+
+	public void setStaticGroups(String staticGroups) {
+		this.staticGroups = staticGroups;
+	}
 }

@@ -19,6 +19,7 @@ import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
+import io.sentry.SentryClient;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -29,6 +30,7 @@ import io.cormoran.cleanthat.sentry.SentryMvcSpringConfig;
  */
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
+// https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
 @SpringBootApplication
 @Import({ SentryMvcSpringConfig.class })
 public class CleanThatLambdaFunction {
@@ -44,7 +46,8 @@ public class CleanThatLambdaFunction {
 	}
 
 	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(ObjectMapper objectMapper,
+	public Function<Map<String, ?>, Map<String, ?>> uppercase(SentryClient sentryClient,
+			ObjectMapper objectMapper,
 			GithubWebhookHandlerFactory githubFactory) {
 		return input -> {
 			try {
@@ -54,7 +57,8 @@ public class CleanThatLambdaFunction {
 				JavaFormatter formatter = new JavaFormatter();
 				return githubFactory.makeWithFreshJwt()
 						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
-			} catch (IOException | JOSEException e) {
+			} catch (IOException | JOSEException | RuntimeException e) {
+				sentryClient.sendException(e);
 				throw new RuntimeException(e);
 			}
 		};

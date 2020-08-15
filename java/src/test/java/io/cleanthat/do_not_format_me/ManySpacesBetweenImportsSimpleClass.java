@@ -1,12 +1,6 @@
 package io.cleanthat.do_not_format_me;
 
 import java.time.LocalDate;
-
-
-
-
-
-
 import java.time.LocalDateTime;
 
 public class ManySpacesBetweenImportsSimpleClass {

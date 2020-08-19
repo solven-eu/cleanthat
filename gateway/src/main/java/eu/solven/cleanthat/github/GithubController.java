@@ -41,6 +41,13 @@ public class GithubController {
 		return Map.of("message", "Happy CleanThat new user!");
 	}
 
+	// https://github.com/marketplace/cleanthat/hook
+	// https://docs.github.com/en/developers/github-marketplace/configuring-a-webhook-to-notify-you-of-plan-changes
+	@GetMapping("on_marketplace")
+	public Map<String, ?> onMarketPlace() {
+		return Map.of("message", "When does this happen?");
+	}
+
 	@PostMapping("webhook")
 	public Map<String, ?> onWebhook(@RequestHeader(value = "X-Hub-Signature", required = false) String githubSignature,
 			@RequestBody String body) {

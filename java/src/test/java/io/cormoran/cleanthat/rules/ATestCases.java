@@ -21,7 +21,7 @@ public class ATestCases {
 		Assert.assertEquals("classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
 		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
 		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
-		Path srcMainJava = srcMainResource.resolve("./../../src/main/java").toAbsolutePath();
+		Path srcMainJava = srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";

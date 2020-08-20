@@ -2,7 +2,6 @@ package eu.solven.cleanthat.rules;
 
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
-// see https://jsparrow.github.io/rules/primitive-boxed-for-string.html
 public class PrimitiveBoxedForStringCases {
 	public String getId() {
 		return "PrimitiveBoxedForString";
@@ -31,12 +30,12 @@ public class PrimitiveBoxedForStringCases {
 			return "Byte";
 		}
 
-		public Object pre(byte someByte) {
-			return new Byte(someByte).toString();
+		public Object pre(byte input) {
+			return new Byte(input).toString();
 		}
 
-		public Object post(byte someByte) {
-			return Byte.toString(someByte);
+		public Object post(byte input) {
+			return Byte.toString(input);
 		}
 	}
 

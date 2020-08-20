@@ -16,6 +16,12 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
+/**
+ * Prevent relying .equals on {@link Enum} types
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 @Deprecated(since = "Not-Ready: how can we infer a Type is an Enum?")
 public class EnumsWithoutEquals implements IClassTransformer {

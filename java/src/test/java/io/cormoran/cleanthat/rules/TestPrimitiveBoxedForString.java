@@ -10,7 +10,7 @@ import eu.solven.cleanthat.rules.PrimitiveBoxedForStringCases;
 public class TestPrimitiveBoxedForString extends ATestCases {
 
 	@Test
-	public void testCases_JavaParsdr() throws IOException {
+	public void testCases() throws IOException {
 		testCasesIn(PrimitiveBoxedForStringCases.class, new PrimitiveBoxedForString());
 	}
 }

@@ -19,6 +19,14 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
+/**
+ * Clean the way of converting primitives into {@link String}.
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+// https://jsparrow.github.io/rules/primitive-boxed-for-string.html
+// https://rules.sonarsource.com/java/RSPEC-1158
 public class PrimitiveBoxedForString implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 

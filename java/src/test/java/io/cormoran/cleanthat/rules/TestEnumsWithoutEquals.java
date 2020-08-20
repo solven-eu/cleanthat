@@ -9,7 +9,7 @@ import eu.solven.cleanthat.rules.EnumsWithoutEqualsCases;
 
 public class TestEnumsWithoutEquals extends ATestCases {
 	@Test
-	public void testCases_JavaParsdr() throws IOException {
+	public void testCases() throws IOException {
 		testCasesIn(EnumsWithoutEqualsCases.class, new EnumsWithoutEquals());
 	}
 }

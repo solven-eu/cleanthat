@@ -51,7 +51,7 @@
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-		<spotbugs.version>4.0.0</spotbugs.version>
+		<spotbugs.version>4.0.4</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->

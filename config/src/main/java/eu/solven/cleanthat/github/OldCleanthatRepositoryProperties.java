@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-import io.cormoran.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * The configuration of a formatting job
@@ -12,7 +12,7 @@ import io.cormoran.cleanthat.formatter.LineEnding;
  * @author Benoit Lacelle
  *
  */
-public class CleanThatRepositoryProperties {
+public class OldCleanthatRepositoryProperties {
 	// Either we commit directly in PR, or we open new PR to merge in existing ones
 	boolean appendToExistingPullRequest = false;
 
@@ -22,8 +22,6 @@ public class CleanThatRepositoryProperties {
 
 	String javaEngine = "eclipse";
 
-	// Git has some preference to committing LF
-	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
 	LineEnding eol = LineEnding.valueOf("LF");
 
 	// If empty, no file is exclude

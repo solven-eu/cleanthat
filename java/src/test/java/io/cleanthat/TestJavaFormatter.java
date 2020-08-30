@@ -12,12 +12,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.FileCopyUtils;
 
-import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
+import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import io.cleanthat.do_not_format_me.CleanClass;
 import io.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
-import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 
 public class TestJavaFormatter {
+
+	final ObjectMapper objectMapper = new ObjectMapper();
 
 	// https://www.baeldung.com/spring-load-resource-as-string
 	public static String asString(Resource resource) {
@@ -30,23 +34,23 @@ public class TestJavaFormatter {
 
 	@Test
 	public void testFormat_Clean() throws IOException {
-		JavaFormatter formatter = new JavaFormatter();
+		JavaFormatter formatter = new JavaFormatter(objectMapper);
 		URL location = CleanClass.class.getProtectionDomain().getCodeSource().getLocation();
 
 		String classAsString = asString(new UrlResource(location));
 
-		CleanThatRepositoryProperties properties = new CleanThatRepositoryProperties();
+		CleanthatLanguageProperties properties = new CleanthatLanguageProperties();
 		formatter.format(properties, classAsString);
 	}
 
 	@Test
 	public void testFormat_ManySpacesMiddleImports() throws IOException {
-		JavaFormatter formatter = new JavaFormatter();
+		JavaFormatter formatter = new JavaFormatter(objectMapper);
 		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
 
 		String classAsString = asString(new UrlResource(location));
 
-		CleanThatRepositoryProperties properties = new CleanThatRepositoryProperties();
+		CleanthatLanguageProperties properties = new CleanthatLanguageProperties();
 		formatter.format(properties, classAsString);
 	}
 }

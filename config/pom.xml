@@ -17,5 +17,12 @@
 			<artifactId>pepper</artifactId>
 			<version>${pepper.version}</version>
 		</dependency>
+
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

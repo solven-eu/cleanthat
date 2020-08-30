@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -40,7 +41,10 @@ import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.AtomicLongMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.CleanThatRepositoryProperties;
+import eu.solven.cleanthat.github.CleanthatConfigHelper;
+import eu.solven.cleanthat.github.CleanthatLanguageProperties;
+import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
 
 /**
@@ -50,9 +54,11 @@ import eu.solven.cleanthat.github.IStringFormatter;
  *
  */
 public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
+	private static final String EOL = "\r\n";
+
 	private static final String TEMPLATE_MISS_FILE = "We miss a '{}' file";
 
-	private static final String KEY_JAVA = "java";
+	// private static final String KEY_JAVA = "java";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
 
@@ -98,44 +104,46 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 
 		Map<String, ?> prConfig = optPrConfig.get();
-		CleanThatRepositoryProperties properties = prepareConfiguration(prConfig);
+		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
 		return formatPR(properties, pr);
 	}
 
-	private CleanThatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
-		CleanThatRepositoryProperties properties = new CleanThatRepositoryProperties();
-
-		Optional<Boolean> optMutatePR =
-				Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, "meta", "mutate_pull_requests"));
-		optMutatePR.ifPresent(properties::setAppendToExistingPullRequest);
-
-		Optional<String> optConfig =
-				Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "config_url"));
-		optConfig.ifPresent(properties::setJavaConfigUrl);
-
-		Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "eol"));
-		optJavaEOL.ifPresent(properties::setEol);
-
-		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "encoding"))
-				.ifPresent(properties::setEncoding);
-
-		Optional<List<String>> optExcludes =
-				Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "excludes"));
-		optExcludes.ifPresent(properties::setExcludes);
-
-		Optional<List<String>> optIncludes =
-				Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "includes"));
-		optIncludes.ifPresent(properties::setIncludes);
-
-		Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, KEY_JAVA, "imports", "remove_unused"))
-				.ifPresent(properties::setRemoveUnusedImports);
-
-		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "groups"))
-				.ifPresent(properties::setGroups);
-
-		Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "staticGroups"))
-				.ifPresent(properties::setStaticGroups);
-		return properties;
+	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
+		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
+		//
+		// OldCleanthatRepositoryProperties properties = new OldCleanthatRepositoryProperties();
+		//
+		// Optional<Boolean> optMutatePR =
+		// Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, "meta", "mutate_pull_requests"));
+		// optMutatePR.ifPresent(properties::setAppendToExistingPullRequest);
+		//
+		// Optional<String> optConfig =
+		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "config_url"));
+		// optConfig.ifPresent(properties::setJavaConfigUrl);
+		//
+		// Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "eol"));
+		// optJavaEOL.ifPresent(properties::setEol);
+		//
+		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "encoding"))
+		// .ifPresent(properties::setEncoding);
+		//
+		// Optional<List<String>> optExcludes =
+		// Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "excludes"));
+		// optExcludes.ifPresent(properties::setExcludes);
+		//
+		// Optional<List<String>> optIncludes =
+		// Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "includes"));
+		// optIncludes.ifPresent(properties::setIncludes);
+		//
+		// Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, KEY_JAVA, "imports", "remove_unused"))
+		// .ifPresent(properties::setRemoveUnusedImports);
+		//
+		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "groups"))
+		// .ifPresent(properties::setGroups);
+		//
+		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "staticGroups"))
+		// .ifPresent(properties::setStaticGroups);
+		// return properties;
 	}
 
 	private boolean fileIsRemoved(GHPullRequestFileDetail file) {
@@ -258,72 +266,95 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return body;
 	}
 
-	public Map<String, ?> formatPR(CleanThatRepositoryProperties properties, GHPullRequest pr) {
+	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, GHPullRequest pr) {
 		String ref = pr.getHead().getSha();
 
 		GHTreeBuilder createTree = pr.getRepository().createTree();
-		AtomicInteger nbFilesInTree = new AtomicInteger();
 
-		AtomicLongMap<String> counters = AtomicLongMap.create();
+		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 
-		LOGGER.info("Applying includes rules: {}", properties.getIncludes());
-		LOGGER.info("Applying excludes rules: {}", properties.getExcludes());
+		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 
-		pr.listFiles().forEach(file -> {
-			if (fileIsRemoved(file)) {
-				// Skip deleted files
-				return;
-			}
+		List<String> prComments = new ArrayList<>();
+		properties.getLanguages().forEach(languageConfig -> {
+			String language = PepperMapHelper.getRequiredString(languageConfig, "language");
+			ILanguageProperties languageP =
+					objectMapper.convertValue(languageConfig, CleanthatLanguageProperties.class);
 
-			String fileName = file.getFilename();
+			LOGGER.info("Applying includes rules: {}", languageP.getIncludes());
+			LOGGER.info("Applying excludes rules: {}", languageP.getExcludes());
 
-			Optional<PathMatcher> matchingInclude = findMatching(fileName, properties.getIncludes());
-			Optional<PathMatcher> matchingExclude = findMatching(fileName, properties.getExcludes());
+			// AtomicInteger nbFilesInTree = new AtomicInteger();
 
-			if (matchingInclude.isPresent()) {
-				if (matchingExclude.isEmpty()) {
-					try {
-						String asString = loadContent(pr, file.getFilename());
+			AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-						String output = doFormat(properties, asString);
-
-						if (!Strings.isNullOrEmpty(output) && !asString.equals(output)) {
-							// TODO isExecutable isn't a parameter from original file?
-							createTree.add(file.getFilename(), output, false);
-							nbFilesInTree.getAndIncrement();
-
-							counters.incrementAndGet("nb_files_formatted");
-						} else {
-							counters.incrementAndGet("nb_files_already_formatted");
-						}
-					} catch (IOException e) {
-						throw new UncheckedIOException("Issue with file: " + fileName, e);
-					}
-				} else {
-					counters.incrementAndGet("nb_files_both_included_excluded");
+			pr.listFiles().forEach(file -> {
+				if (fileIsRemoved(file)) {
+					// Skip deleted files
+					return;
 				}
-			} else if (matchingExclude.isEmpty()) {
-				counters.incrementAndGet("nb_files_excluded_not_included");
-			} else {
-				counters.incrementAndGet("nb_files_neither_included_nor_included");
-			}
-		});
 
-		if (nbFilesInTree.get() >= 1) {
-			LOGGER.info("About to commit {} files into {} ({})", nbFilesInTree, pr.getHtmlUrl(), pr.getTitle());
+				String fileName = file.getFilename();
 
-			String details = counters.asMap()
+				Optional<PathMatcher> matchingInclude = findMatching(fileName, languageP.getIncludes());
+				Optional<PathMatcher> matchingExclude = findMatching(fileName, languageP.getExcludes());
+
+				if (matchingInclude.isPresent()) {
+					if (matchingExclude.isEmpty()) {
+						try {
+							String code = loadContent(pr, file.getFilename());
+
+							String output = doFormat(languageP, code);
+
+							// TODO: THIS WONT'T HANDLE MULTIPLE PROCESSORS OVER SAME FILE
+							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+								// TODO isExecutable isn't a parameter from original file?
+								createTree.add(file.getFilename(), output, false);
+								languageToNbAddedFiles.incrementAndGet(language);
+
+								languageCounters.incrementAndGet("nb_files_formatted");
+							} else {
+								languageCounters.incrementAndGet("nb_files_already_formatted");
+							}
+						} catch (IOException e) {
+							throw new UncheckedIOException("Issue with file: " + fileName, e);
+						}
+					} else {
+						languageCounters.incrementAndGet("nb_files_both_included_excluded");
+					}
+				} else if (matchingExclude.isEmpty()) {
+					languageCounters.incrementAndGet("nb_files_excluded_not_included");
+				} else {
+					languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
+				}
+			});
+
+			String details = languageCounters.asMap()
 					.entrySet()
 					.stream()
 					.map(e -> e.getKey() + ": " + e.getValue())
-					.collect(Collectors.joining("\r\n"));
+					.collect(Collectors.joining(EOL));
+
+			prComments.add("language=" + language + EOL + details);
+
+			languageCounters.asMap().forEach((l, c) -> {
+				languagesCounters.addAndGet(l, c);
+			});
+		});
+
+		if (languageToNbAddedFiles.isEmpty()) {
+			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
+		} else {
+			LOGGER.info("About to commit {} files into {} ({})",
+					languageToNbAddedFiles.sum(),
+					pr.getHtmlUrl(),
+					pr.getTitle());
 
 			try {
 				GHTree createdTree = createTree.baseTree(ref).create();
 
-				String message = "Formatted " + nbFilesInTree
-						.get() + " " + KEY_JAVA + " files with engine=" + properties.getJavaEngine() + "\r\n" + details;
-				GHCommit commit = prepareCommit(pr.getRepository()).message(message)
+				String commitMessage = prComments.stream().collect(Collectors.joining(EOL));
+				GHCommit commit = prepareCommit(pr.getRepository()).message(commitMessage)
 						.parent(ref)
 						.tree(createdTree.getSha())
 						.create();
@@ -335,17 +366,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-		} else {
-			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
 		}
 
-		Map<String, Object> output = new LinkedHashMap<>();
-		output.putAll(counters.asMap());
-		return output;
+		return new LinkedHashMap<>(languagesCounters.asMap());
 	}
 
-	private String doFormat(CleanThatRepositoryProperties properties, String asString) throws IOException {
-		return formatter.format(properties, asString);
+	private String doFormat(ILanguageProperties properties, String code) throws IOException {
+		return formatter.format(properties, code);
 	}
 
 	private GHCommitBuilder prepareCommit(GHRepository repo) {

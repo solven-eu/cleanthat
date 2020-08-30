@@ -9,5 +9,5 @@ import java.io.IOException;
  *
  */
 public interface IStringFormatter {
-	String format(CleanThatRepositoryProperties config, String input) throws IOException;
+	String format(ILanguageProperties config, String code) throws IOException;
 }

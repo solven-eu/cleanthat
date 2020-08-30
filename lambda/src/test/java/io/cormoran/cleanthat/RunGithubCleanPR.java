@@ -22,11 +22,11 @@ import org.springframework.context.event.EventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
-import io.cormoran.cleanthat.formatter.eclipse.JavaFormatter;
 
 @SpringBootApplication
 public class RunGithubCleanPR extends CleanThatLambdaFunction {
@@ -54,7 +54,7 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 		GitHub github = handler.makeInstallationGithub(solvenEuCleanThatInstallationId);
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(objectMapper, new JavaFormatter());
+		GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(objectMapper, new JavaFormatter(objectMapper));
 
 		GHRepository repo;
 		try {

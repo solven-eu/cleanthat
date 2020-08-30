@@ -28,7 +28,7 @@ public class EnumsWithoutEquals implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
 	public String minimalJavaVersion() {
-		return "5";
+		return "1.5";
 	}
 
 	public void transform(MethodDeclaration pre) {

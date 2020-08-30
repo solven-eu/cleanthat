@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cormoran.cleanthat.formatter.eclipse.revelc;
+package eu.solven.cleanthat.formatter.eclipse.revelc;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

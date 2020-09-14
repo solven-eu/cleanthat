@@ -54,7 +54,7 @@
 			<!-- Encrypt login token, and sensible data in DB -->
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>8.19</version>
+			<version>8.20.1</version>
 		</dependency>
 
 		<dependency>

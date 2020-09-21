@@ -38,7 +38,7 @@
 			<!-- Else failure in SimpleFunctionRegistry$FunctionInvocationWrapper.isJson(SimpleFunctionRegistry.java:850) -->
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20190722</version>
+			<version>20200518</version>
 		</dependency>
 
 		<dependency>
@@ -132,7 +132,7 @@
 						<!-- https://stackoverflow.com/questions/51521953/how-to-use-propertiesmergingresourcetransformer-of-maven-shade-plugin-when-add -->
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
-						<version>2.2.7.RELEASE</version>
+						<version>2.3.4.RELEASE</version>
 					</dependency>
 				</dependencies>
 				<configuration>

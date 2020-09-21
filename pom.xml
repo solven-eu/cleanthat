@@ -33,7 +33,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/cormoran-io/pepper/releases -->
-		<pepper.version>1.24</pepper.version>
+		<pepper.version>1.26</pepper.version>
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<guava.version>28.2-jre</guava.version>
 		<!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-keyvault-secrets-spring-boot-starter -->
@@ -49,23 +49,23 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
-		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-		<spotbugs.version>4.0.0</spotbugs.version>
+		<spotbugs.version>4.0.4</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
-		<checkstyle.version>8.32</checkstyle.version>
+		<checkstyle.version>8.36.1</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
 		<maven-pmd-plugin.version>3.13.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
-		<pmd.version>6.23.0</pmd.version>
+		<pmd.version>6.24.0</pmd.version>
 		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
 		<git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
-		<formatter-maven-plugin.version>2.11.0</formatter-maven-plugin.version>
+		<formatter-maven-plugin.version>2.12.2</formatter-maven-plugin.version>
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.4.1</impsort-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
@@ -73,7 +73,7 @@
 
 		<sentry.version>1.7.30</sentry.version>
 
-		<spring-cloud.version>Hoxton.SR4</spring-cloud.version>
+		<spring-cloud.version>Hoxton.SR5</spring-cloud.version>
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
@@ -101,7 +101,7 @@
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
 				<groupId>org.checkerframework</groupId>
 				<artifactId>checker-qual</artifactId>
-				<version>3.3.0</version>
+				<version>3.6.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

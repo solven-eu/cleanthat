@@ -23,7 +23,7 @@
 			<!-- https://github-api.kohsuke.org/ -->
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
-			<version>1.111</version>
+			<version>1.116</version>
 		</dependency>
 
 		<dependency>
@@ -37,7 +37,7 @@
 			<!-- Encrypt login token, and sensible data in DB -->
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>8.16</version>
+			<version>8.20.1</version>
 		</dependency>
 
 		<!-- <dependency> -->
@@ -51,7 +51,7 @@
 			<!-- Enables loading a PEM file -->
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.65</version>
+			<version>1.66</version>
 			<scope>test</scope>
 		</dependency>
 

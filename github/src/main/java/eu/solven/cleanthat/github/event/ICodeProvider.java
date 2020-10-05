@@ -1,0 +1,29 @@
+package eu.solven.cleanthat.github.event;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public interface ICodeProvider {
+
+	List<?> listFiles() throws IOException;
+
+	boolean fileIsRemoved(Object file);
+
+	String getHtmlUrl();
+
+	String getTitle();
+
+	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments);
+
+	String loadContent(Object file) throws IOException;
+
+	String getFilePath(Object file);
+
+}

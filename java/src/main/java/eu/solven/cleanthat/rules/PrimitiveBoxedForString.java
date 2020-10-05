@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
@@ -34,6 +35,7 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 		return "1.1";
 	}
 
+	@Override
 	public void transform(MethodDeclaration tree) {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
@@ -44,7 +46,7 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 
 			if (node instanceof MethodCallExpr
 					&& "toString".equals(((MethodCallExpr) node).getName().getIdentifier())) {
-				MethodCallExpr methodCall = ((MethodCallExpr) node);
+				MethodCallExpr methodCall = (MethodCallExpr) node;
 				Optional<Expression> optScope = methodCall.getScope();
 				if (!optScope.isPresent()) {
 					// TODO Document when this would happen
@@ -62,27 +64,35 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 					// throw new IllegalStateException("Issue on scope=" + scope, e);
 				}
 
-				if (type.isReferenceType()) {
-					if (Boolean.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Byte.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Short.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Integer.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Long.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Float.class.getName().equals(type.asReferenceType().getQualifiedName())
-							|| Double.class.getName().equals(type.asReferenceType().getQualifiedName())) {
-						if (scope instanceof ObjectCreationExpr) {
-							ObjectCreationExpr creation = (ObjectCreationExpr) scope;
-
-							NodeList<Expression> inputs = creation.getArguments();
-
-							MethodCallExpr replacement =
-									new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
-							LOGGER.info("Turning {} into {}", node, replacement);
-							node.replace(replacement);
-						}
-					}
-				}
+				process(node, scope, type);
 			}
 		});
+	}
+
+	private void process(Node node, Expression scope, ResolvedType type) {
+		if (!type.isReferenceType()) {
+
+			return;
+		}
+		LOGGER.debug("{} is referenceType", type);
+		if (Boolean.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Byte.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Short.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Integer.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Long.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Float.class.getName().equals(type.asReferenceType().getQualifiedName())
+				|| Double.class.getName().equals(type.asReferenceType().getQualifiedName())) {
+			LOGGER.debug("{} is AutoBoxed", type);
+			if (scope instanceof ObjectCreationExpr) {
+				ObjectCreationExpr creation = (ObjectCreationExpr) scope;
+
+				NodeList<Expression> inputs = creation.getArguments();
+
+				MethodCallExpr replacement =
+						new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
+				LOGGER.info("Turning {} into {}", node, replacement);
+				node.replace(replacement);
+			}
+		}
 	}
 }

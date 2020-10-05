@@ -1,26 +1,36 @@
 package eu.solven.cleanthat.java.imports;
 
+import java.nio.charset.StandardCharsets;
 
+/**
+ * Configuration for Java Revelc imports cleaner
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class JavaRevelcImportsCleanerProperties {
 
+	String encoding = StandardCharsets.UTF_8.name();
+
+	boolean removeUnusedImports = true;
+
+	String groups = "java.,javax.,org.,com.";
+	String staticGroups = "java,*";
+
 	public String getGroups() {
-		// TODO Auto-generated method stub
-		return null;
+		return groups;
 	}
 
 	public String getStaticGroups() {
-		// TODO Auto-generated method stub
-		return null;
+		return staticGroups;
 	}
 
 	public String getEncoding() {
-		// TODO Auto-generated method stub
-		return null;
+		return encoding;
 	}
 
 	public boolean isRemoveUnusedImports() {
-		// TODO Auto-generated method stub
-		return false;
+		return removeUnusedImports;
 	}
 
 }

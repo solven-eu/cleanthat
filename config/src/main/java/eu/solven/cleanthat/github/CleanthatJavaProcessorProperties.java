@@ -19,6 +19,7 @@ import eu.solven.cleanthat.formatter.LineEnding;
  *
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@SuppressWarnings("PMD.ImmutableField")
 public class CleanthatJavaProcessorProperties {
 
 	// If empty, no file is excluded

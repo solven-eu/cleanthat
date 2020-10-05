@@ -29,9 +29,9 @@ import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 @SpringBootApplication
-public class RunGithubCleanPR extends CleanThatLambdaFunction {
+public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubCleanPR.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPR.class);
 
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
 	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
@@ -42,7 +42,7 @@ public class RunGithubCleanPR extends CleanThatLambdaFunction {
 	final String repoFullName = SOLVEN_EU_CLEANTHAT;
 
 	public static void main(String[] args) {
-		SpringApplication.run(RunGithubCleanPR.class, args);
+		SpringApplication.run(RunCleanGithubPR.class, args);
 	}
 
 	@EventListener(ContextRefreshedEvent.class)

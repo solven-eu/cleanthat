@@ -77,7 +77,7 @@
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
-		<jacoco.instruction.ratio>0.17</jacoco.instruction.ratio>
+		<jacoco.instruction.ratio>0.15</jacoco.instruction.ratio>
 		<!-- CPD: We configure as property to enable overriding by sub-modules -->
 		<!-- Code duplication: Lower is better. Default is 100 -->
 		<minimumTokens>60</minimumTokens>

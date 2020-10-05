@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -31,12 +32,13 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class UseIsEmptyOnCollections implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
-	final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
+	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
 
 	public String minimalJavaVersion() {
 		return "6";
 	}
 
+	@Override
 	public void transform(MethodDeclaration pre) {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
@@ -46,7 +48,7 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 
 			if (node instanceof BinaryExpr && BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
-				BinaryExpr binaryExpr = ((BinaryExpr) node);
+				BinaryExpr binaryExpr = (BinaryExpr) node;
 
 				Optional<MethodCallExpr> checkmeForIsEmpty;
 				if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
@@ -83,33 +85,37 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 					// throw new IllegalStateException("Issue on scope=" + scope, e);
 				}
 
-				if (type.isReferenceType()) {
-					LOGGER.info("scope={} type={}", lengthScope, type);
-
-					boolean doIt = false;
-					if (type.asReferenceType().getQualifiedName().equals(Collection.class.getName())
-							|| type.asReferenceType().getQualifiedName().equals(Map.class.getName())
-							|| type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
-						doIt = true;
-					} else {
-						// Try to load the Class to check if it is a matching sub-type
-						try {
-							Class<?> clazz = Class.forName(type.asReferenceType().getQualifiedName());
-
-							if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-									|| String.class.isAssignableFrom(clazz)) {
-								doIt = true;
-							}
-						} catch (RuntimeException | ClassNotFoundException e) {
-							LOGGER.debug("This class is not available. Can not confirm it is a Colletion/Map/String");
-						}
-					}
-
-					if (doIt) {
-						node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
-					}
-				}
+				process(node, lengthScope, type);
 			}
 		});
+	}
+
+	private void process(Node node, Expression lengthScope, ResolvedType type) {
+		if (type.isReferenceType()) {
+			LOGGER.info("scope={} type={}", lengthScope, type);
+
+			boolean doIt = false;
+			if (type.asReferenceType().getQualifiedName().equals(Collection.class.getName())
+					|| type.asReferenceType().getQualifiedName().equals(Map.class.getName())
+					|| type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
+				doIt = true;
+			} else {
+				// Try to load the Class to check if it is a matching sub-type
+				try {
+					Class<?> clazz = Class.forName(type.asReferenceType().getQualifiedName());
+
+					if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+							|| String.class.isAssignableFrom(clazz)) {
+						doIt = true;
+					}
+				} catch (RuntimeException | ClassNotFoundException e) {
+					LOGGER.debug("This class is not available. Can not confirm it is a Colletion/Map/String");
+				}
+			}
+
+			if (doIt) {
+				node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
+			}
+		}
 	}
 }

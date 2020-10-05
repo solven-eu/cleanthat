@@ -31,13 +31,14 @@ public class EnumsWithoutEquals implements IClassTransformer {
 		return "1.5";
 	}
 
+	@Override
 	public void transform(MethodDeclaration pre) {
 		// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 		pre.walk(node -> {
 			LOGGER.info("{}", PepperLogHelper.getObjectAndClass(node));
 
 			if (node instanceof MethodCallExpr && "equals".equals(((MethodCallExpr) node).getName().getIdentifier())) {
-				MethodCallExpr methodCall = ((MethodCallExpr) node);
+				MethodCallExpr methodCall = (MethodCallExpr) node;
 				Optional<Expression> optScope = methodCall.getScope();
 				if (!optScope.isPresent()) {
 					// TODO Document when this would happen

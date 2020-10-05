@@ -19,6 +19,7 @@ import eu.solven.cleanthat.formatter.LineEnding;
  *
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@SuppressWarnings("PMD.ImmutableField")
 public class CleanthatLanguageProperties implements ILanguageProperties {
 
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();

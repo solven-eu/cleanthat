@@ -44,6 +44,7 @@ public class JavaRevelcImportsCleaner implements ICodeProcessor {
 		this.properties = properties;
 	}
 
+	@Override
 	public String doFormat(String code, LineEnding eolToApply) throws IOException {
 		// see net.revelc.code.impsort.maven.plugin.AbstractImpSortMojo
 		Grouper grouper = new Grouper(properties.getGroups(), properties.getStaticGroups(), false, false, true);

@@ -54,7 +54,9 @@ public class RulesJavaMutator implements ICodeProcessor {
 				Arrays.asList(new EnumsWithoutEquals(), new PrimitiveBoxedForString(), new UseIsEmptyOnCollections());
 	}
 
+	@Override
 	public String doFormat(String code, LineEnding eolToApply) throws IOException {
+		LOGGER.debug("{}", this.properties);
 		AtomicReference<String> codeRef = new AtomicReference<>(code);
 
 		transformers.forEach(ct -> {

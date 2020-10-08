@@ -26,10 +26,10 @@ import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 public class JavaFormatter implements IStringFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatter.class);
 
-	final ObjectMapper objectmapper;
+	final ObjectMapper objectMapper;
 
-	public JavaFormatter(ObjectMapper objectmapper) {
-		this.objectmapper = objectmapper;
+	public JavaFormatter(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
 	}
 
 	@Override
@@ -49,16 +49,16 @@ public class JavaFormatter implements IStringFormatter {
 
 			if ("eclipse_formatter".equals(engine)) {
 				CleanthatJavaProcessorProperties processorConfig =
-						objectmapper.convertValue(pAsMap, CleanthatJavaProcessorProperties.class);
+						objectMapper.convertValue(pAsMap, CleanthatJavaProcessorProperties.class);
 				processor = new EclipseJavaFormatter(processorConfig);
 			} else if ("revelc_imports".equals(engine)) {
 				JavaRevelcImportsCleanerProperties processorConfig =
-						objectmapper.convertValue(pAsMap, JavaRevelcImportsCleanerProperties.class);
+						objectMapper.convertValue(pAsMap, JavaRevelcImportsCleanerProperties.class);
 
 				processor = new JavaRevelcImportsCleaner(processorConfig);
 			} else if ("rules".equals(engine)) {
 				CleanthatJavaProcessorProperties processorConfig =
-						objectmapper.convertValue(pAsMap, CleanthatJavaProcessorProperties.class);
+						objectMapper.convertValue(pAsMap, CleanthatJavaProcessorProperties.class);
 				processor = new RulesJavaMutator(processorConfig);
 			} else {
 				throw new IllegalArgumentException("Unknown engine: " + engine);

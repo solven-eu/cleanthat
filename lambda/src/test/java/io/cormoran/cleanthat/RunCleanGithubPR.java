@@ -64,7 +64,7 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			return;
 		}
 
-		LOGGER.info("Repositry name={} id={}", repo.getName(), repo.getId());
+		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
 
 		String defaultBranchName = Optional.ofNullable(repo.getDefaultBranch()).orElse("master");
 
@@ -82,8 +82,12 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		AtomicInteger nbBranchWithConfig = new AtomicInteger();
 
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
-			Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
-			LOGGER.info("Result for {}: {}", pr.getHtmlUrl().toExternalForm(), output);
+			try {
+				Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
+				LOGGER.info("Result for {}: {}", pr.getHtmlUrl().toExternalForm(), output);
+			} catch (RuntimeException e) {
+				LOGGER.warn("Issue processing this PR: " + pr.getHtmlUrl().toExternalForm(), e);
+			}
 		});
 
 		if (defaultBranchConfig.isEmpty() && nbBranchWithConfig.get() == 0) {

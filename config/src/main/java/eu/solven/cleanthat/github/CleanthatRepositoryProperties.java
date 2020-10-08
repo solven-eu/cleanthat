@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.github;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class CleanthatRepositoryProperties {
 
 	private CleanthatMetaProperties meta;
 
-	private List<Map<String, ?>> languages;
+	private List<Map<String, ?>> languages = Arrays.asList();
 
 	// private CleanthatJavaProperties java;
 

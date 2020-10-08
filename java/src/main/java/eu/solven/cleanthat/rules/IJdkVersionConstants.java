@@ -1,0 +1,14 @@
+package eu.solven.cleanthat.rules;
+
+/**
+ * List the JDK versions
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public interface IJdkVersionConstants {
+	String JDK_1 = "1";
+	String JDK_6 = "6";
+	String JDK_8 = "8";
+	String JDK_11 = "11";
+}

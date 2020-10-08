@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
+import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -64,16 +65,29 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
 
+		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			if (defaultBranchConfig.isPresent()) {
 				LOGGER.info("Config on default branch but not on PR {}", prUrl);
+				optConfigurationToUse = defaultBranchConfig;
 			} else {
-				LOGGER.info("Config neither on default branch nor on PR {}", prUrl);
+				LOGGER.warn("Config neither on default branch nor on PR {}", prUrl);
+				return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
 			}
-
-			return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
+			optConfigurationToUse = optPrConfig;
 			nbBranchWithConfig.getAndIncrement();
+		}
+
+		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "version");
+
+		if (version.isEmpty()) {
+			LOGGER.info("No version on configuration applying to PR {}", prUrl);
+			return Collections.singletonMap("skipped", "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
+		} else if (!"v2".equals(version.get())) {
+			LOGGER.info("No version on configuration applying to PR {}", prUrl);
+			return Collections.singletonMap("skipped",
+					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only 'v2' for now)");
 		}
 
 		try {
@@ -85,47 +99,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			throw new UncheckedIOException(e);
 		}
 
-		Map<String, ?> prConfig = optPrConfig.get();
+		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
 		return formatPR(properties, new GithubPRCodeProvider(pr));
 	}
 
 	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
 		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
-		//
-		// OldCleanthatRepositoryProperties properties = new OldCleanthatRepositoryProperties();
-		//
-		// Optional<Boolean> optMutatePR =
-		// Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, "meta", "mutate_pull_requests"));
-		// optMutatePR.ifPresent(properties::setAppendToExistingPullRequest);
-		//
-		// Optional<String> optConfig =
-		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "config_url"));
-		// optConfig.ifPresent(properties::setJavaConfigUrl);
-		//
-		// Optional<String> optJavaEOL = Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "eol"));
-		// optJavaEOL.ifPresent(properties::setEol);
-		//
-		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "encoding"))
-		// .ifPresent(properties::setEncoding);
-		//
-		// Optional<List<String>> optExcludes =
-		// Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "excludes"));
-		// optExcludes.ifPresent(properties::setExcludes);
-		//
-		// Optional<List<String>> optIncludes =
-		// Optional.ofNullable(PepperMapHelper.<List<String>>getAs(prConfig, KEY_JAVA, "includes"));
-		// optIncludes.ifPresent(properties::setIncludes);
-		//
-		// Optional.ofNullable(PepperMapHelper.<Boolean>getAs(prConfig, KEY_JAVA, "imports", "remove_unused"))
-		// .ifPresent(properties::setRemoveUnusedImports);
-		//
-		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "groups"))
-		// .ifPresent(properties::setGroups);
-		//
-		// Optional.ofNullable(PepperMapHelper.<String>getAs(prConfig, KEY_JAVA, "imports", "staticGroups"))
-		// .ifPresent(properties::setStaticGroups);
-		// return properties;
 	}
 
 	private Optional<Map<String, ?>> safePrConfig(GHPullRequest pr) {

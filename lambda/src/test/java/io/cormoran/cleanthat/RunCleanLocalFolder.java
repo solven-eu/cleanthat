@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +18,7 @@ import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.LocalFolderCodeProvider;
+import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
@@ -28,6 +30,12 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RunCleanLocalFolder.class, args);
+	}
+
+	@Bean
+	public CodeProviderFormatter codeProviderFormatter() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return new CodeProviderFormatter(objectMapper, new JavaFormatter(objectMapper));
 	}
 
 	@EventListener(ContextRefreshedEvent.class)

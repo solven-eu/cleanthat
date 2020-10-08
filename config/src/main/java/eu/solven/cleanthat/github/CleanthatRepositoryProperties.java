@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The configuration of a formatting job
  * 
@@ -16,7 +18,8 @@ public class CleanthatRepositoryProperties {
 
 	private List<Map<String, ?>> languages = Arrays.asList();
 
-	// private CleanthatJavaProperties java;
+	// Properties to apply to each children
+	private ISourceCodeProperties sourceCodeProperties;
 
 	public CleanthatMetaProperties getMeta() {
 		return meta;
@@ -26,15 +29,6 @@ public class CleanthatRepositoryProperties {
 		this.meta = meta;
 	}
 
-	// @JsonProperty
-	// public CleanthatJavaProperties getJava() {
-	// return java;
-	// }
-	//
-	// public void setJava(CleanthatJavaProperties java) {
-	// this.java = java;
-	// }
-
 	public List<Map<String, ?>> getLanguages() {
 		return languages;
 	}
@@ -42,4 +36,14 @@ public class CleanthatRepositoryProperties {
 	public void setLanguages(List<Map<String, ?>> languages) {
 		this.languages = languages;
 	}
+
+	public ISourceCodeProperties getSourceCodeProperties() {
+		return sourceCodeProperties;
+	}
+
+	@JsonProperty("source_code")
+	public void setSourceCodeProperties(SourceCodeProperties sourceCodeProperties) {
+		this.sourceCodeProperties = sourceCodeProperties;
+	}
+
 }

@@ -1,5 +1,6 @@
 package io.cormoran.cleanthat;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -22,7 +23,7 @@ import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "none")
 public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanLocalFolder.class);
 
@@ -42,17 +43,19 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		Path localFolder = currentRepoSomeFile.getFile().toPath();
 
-		// Given the root, we may want to move to a different folder
-		String finalRelativePath = ".";
-
 		// Move up to git repository root folder
 		while (!localFolder.resolve(".git").toFile().isDirectory()) {
 			localFolder = localFolder.toFile().getParentFile().toPath();
 		}
 		LOGGER.info("We moved to {}", localFolder);
 
+		// Given the root, we may want to move to a different folder
+		String finalRelativePath = ".";
+		// We'd better processing a sibling folder/repository
+		finalRelativePath = "../mitrust-backend";
+
 		LOGGER.info("About to resolve {}", finalRelativePath);
-		localFolder = localFolder.resolve(finalRelativePath);
+		localFolder = localFolder.resolve(finalRelativePath).normalize();
 
 		LOGGER.info("About to process {}", localFolder);
 
@@ -60,8 +63,13 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
 
-		CleanthatRepositoryProperties properties = appContext.getBean(ObjectMapper.class)
-				.readValue(localFolder.resolve("cleanthat.json").toFile(), CleanthatRepositoryProperties.class);
+		File pathToConfig = localFolder.resolve("cleanthat.json").toFile();
+
+		// We prefer to test with a different configuration
+		pathToConfig = new ClassPathResource("/overrides/eu.solven/mitrust-datasharing/cleanthat.json").getFile();
+
+		CleanthatRepositoryProperties properties =
+				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
 		codeProviderFormatter.formatPR(properties, new LocalFolderCodeProvider(localFolder));
 	}
 

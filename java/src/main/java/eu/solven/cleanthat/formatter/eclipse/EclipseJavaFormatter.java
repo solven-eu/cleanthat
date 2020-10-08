@@ -63,7 +63,7 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 	public EclipseJavaFormatter(CleanthatJavaProcessorProperties processorConfig) {
 		Map<String, String> options = new LinkedHashMap<>();
 
-		String javaConfigFile = PepperMapHelper.getRequiredString(processorConfig.getConfiguration(), KEY_URL);
+		String javaConfigFile = processorConfig.getUrl();
 
 		// Eclipse default
 		if (Strings.isNullOrEmpty(javaConfigFile)) {
@@ -72,12 +72,11 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
 
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
-			Optional<String> optJdkVersion =
-					PepperMapHelper.getOptionalString(processorConfig.getConfiguration(), KEY_JDK_VERSION);
-			if (optJdkVersion.isEmpty()) {
-				LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
-			}
-			String jdkVersion = optJdkVersion.orElse(DEFAULT_JDK_VERSION);
+			String jdkVersion = processorConfig.getLanguageProperties().getLanguageVersion();
+			// if (optJdkVersion.isEmpty()) {
+			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
+			// }
+			// String jdkVersion = optJdkVersion.orElse();
 			options.put(JavaCore.COMPILER_SOURCE, jdkVersion);
 			options.put(JavaCore.COMPILER_COMPLIANCE, jdkVersion);
 			options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, jdkVersion);

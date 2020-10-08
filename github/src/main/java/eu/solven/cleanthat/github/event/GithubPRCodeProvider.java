@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.kohsuke.github.GHCommit;
@@ -40,8 +41,8 @@ public class GithubPRCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public List<GHPullRequestFileDetail> listFiles() throws IOException {
-		return pr.listFiles().toList();
+	public void listFiles(Consumer<Object> consumer) throws IOException {
+		pr.listFiles().forEach(consumer);
 	}
 
 	@Override

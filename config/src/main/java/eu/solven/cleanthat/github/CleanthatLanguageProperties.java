@@ -1,16 +1,12 @@
 package eu.solven.cleanthat.github;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * The configuration of what is not related to a language.
@@ -22,64 +18,42 @@ import eu.solven.cleanthat.formatter.LineEnding;
 @SuppressWarnings("PMD.ImmutableField")
 public class CleanthatLanguageProperties implements ILanguageProperties {
 
-	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
-	public static final String DEFAULT_LINE_ENDING = "LF";
+	private ISourceCodeProperties sourceCodeProperties;
 
-	// If empty, no file is excluded
-	// If multiple, we exclude files matching at least one exclude (OR)
-	private List<String> excludes = Arrays.asList();
+	private String language;
 
-	// If empty, no file is included
-	// If multiple, we include files matching at least one include (OR)
-	private List<String> includes = Arrays.asList();
-
-	// The encoding of files
-	private String encoding = DEFAULT_ENCODING;
-
-	private String lineEnding = DEFAULT_LINE_ENDING;
+	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
+	private String languageVersion;
 
 	// The (ordered) processors to apply
 	// @JsonDeserialize(using = ProcessorsDeseralizer.class)
 	private List<Map<String, ?>> processors = Arrays.asList();
 
 	@Override
-	public List<String> getExcludes() {
-		return excludes;
+	@JsonProperty("source_code")
+	public ISourceCodeProperties getSourceCodeProperties() {
+		return sourceCodeProperties;
 	}
 
-	public void setExcludes(List<String> excludes) {
-		this.excludes = excludes;
+	@JsonProperty("source_code")
+	public void setSourceCodeProperties(SourceCodeProperties sourceCodeProperties) {
+		this.sourceCodeProperties = sourceCodeProperties;
 	}
 
-	@Override
-	public List<String> getIncludes() {
-		return includes;
+	public String getLanguage() {
+		return language;
 	}
 
-	public void setIncludes(List<String> includes) {
-		this.includes = includes;
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
-	@Override
-	public String getEncoding() {
-		return encoding;
+	public String getLanguageVersion() {
+		return languageVersion;
 	}
 
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	// Git has some preference to committing LF
-	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
-	@JsonIgnore
-	@Override
-	public LineEnding getLineEnding() {
-		return LineEnding.valueOf(lineEnding);
-	}
-
-	@JsonProperty("line_ending")
-	public String getRawLineEnding() {
-		return lineEnding;
+	public void setLanguageVersion(String languageVersion) {
+		this.languageVersion = languageVersion;
 	}
 
 	@Override

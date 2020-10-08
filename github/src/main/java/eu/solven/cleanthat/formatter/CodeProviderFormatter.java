@@ -23,7 +23,9 @@ import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
+import eu.solven.cleanthat.github.SourceCodeProperties;
 import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
@@ -51,72 +53,78 @@ public class CodeProviderFormatter {
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
 
 		List<String> prComments = new ArrayList<>();
-		properties.getLanguages().forEach(languageConfig -> {
-			List<?> files;
-			try {
-				files = pr.listFiles();
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue listing files", e);
-			}
+		properties.getLanguages().forEach(dirtyLanguageConfig -> {
+			ISourceCodeProperties sourceConfdig = mergeSourceConfig(properties, dirtyLanguageConfig);
 
-			String language = PepperMapHelper.getRequiredString(languageConfig, "language");
+			Map<String, Object> languageConfig = new LinkedHashMap<>();
+			languageConfig.putAll(dirtyLanguageConfig);
+			languageConfig.put("source_code", sourceConfdig);
+
+			String language = PepperMapHelper.getRequiredString(dirtyLanguageConfig, "language");
+			LOGGER.info("About to prepare files for language: {}", language);
 			ILanguageProperties languageP =
 					objectMapper.convertValue(languageConfig, CleanthatLanguageProperties.class);
 
-			LOGGER.info("Applying includes rules: {}", languageP.getIncludes());
-			LOGGER.info("Applying excludes rules: {}", languageP.getExcludes());
+			ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
+			LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
+			LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
 
 			AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-			files.forEach(file -> {
-				if (pr.fileIsRemoved(file)) {
-					// Skip files deleted within PR
-					return;
-				}
-
-				String fileName = pr.getFilePath(file);
-
-				Optional<PathMatcher> matchingInclude = findMatching(fileName, languageP.getIncludes());
-				Optional<PathMatcher> matchingExclude = findMatching(fileName, languageP.getExcludes());
-
-				if (matchingInclude.isPresent()) {
-					if (matchingExclude.isEmpty()) {
-						try {
-							Optional<String> optAlreadyMutated =
-									Optional.ofNullable(pathToMutatedContent.get(fileName));
-							String code = optAlreadyMutated.orElseGet(() -> {
-								try {
-									return pr.loadContent(file);
-								} catch (IOException e) {
-									throw new UncheckedIOException(e);
-								}
-							});
-
-							String output = doFormat(languageP, code);
-
-							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-								pathToMutatedContent.put(fileName, output);
-
-								languageToNbAddedFiles.incrementAndGet(language);
-
-								languageCounters.incrementAndGet("nb_files_formatted");
-							} else {
-								languageCounters.incrementAndGet("nb_files_already_formatted");
-							}
-						} catch (IOException e) {
-							throw new UncheckedIOException("Issue with file: " + fileName, e);
-						} catch (RuntimeException e) {
-							throw new RuntimeException("Issue with file: " + fileName, e);
-						}
-					} else {
-						languageCounters.incrementAndGet("nb_files_both_included_excluded");
+			try {
+				pr.listFiles(file -> {
+					if (pr.fileIsRemoved(file)) {
+						// Skip files deleted within PR
+						return;
 					}
-				} else if (matchingExclude.isEmpty()) {
-					languageCounters.incrementAndGet("nb_files_excluded_not_included");
-				} else {
-					languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
-				}
-			});
+
+					String fileName = pr.getFilePath(file);
+
+					Optional<PathMatcher> matchingInclude = findMatching(fileName, sourceCodeProperties.getIncludes());
+					Optional<PathMatcher> matchingExclude = findMatching(fileName, sourceCodeProperties.getExcludes());
+
+					if (matchingInclude.isPresent()) {
+						if (matchingExclude.isEmpty()) {
+							try {
+								Optional<String> optAlreadyMutated =
+										Optional.ofNullable(pathToMutatedContent.get(fileName));
+								String code = optAlreadyMutated.orElseGet(() -> {
+									try {
+										return pr.loadContent(file);
+									} catch (IOException e) {
+										throw new UncheckedIOException(e);
+									}
+								});
+
+								LOGGER.info("Processing {}", fileName);
+								String output = doFormat(languageP, code);
+
+								if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+									pathToMutatedContent.put(fileName, output);
+
+									languageToNbAddedFiles.incrementAndGet(language);
+
+									languageCounters.incrementAndGet("nb_files_formatted");
+								} else {
+									languageCounters.incrementAndGet("nb_files_already_formatted");
+								}
+							} catch (IOException e) {
+								throw new UncheckedIOException("Issue with file: " + fileName, e);
+							} catch (RuntimeException e) {
+								throw new RuntimeException("Issue with file: " + fileName, e);
+							}
+						} else {
+							languageCounters.incrementAndGet("nb_files_both_included_excluded");
+						}
+					} else if (matchingExclude.isEmpty()) {
+						languageCounters.incrementAndGet("nb_files_excluded_not_included");
+					} else {
+						languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
+					}
+				});
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue listing files", e);
+			}
 
 			String details = languageCounters.asMap()
 					.entrySet()
@@ -143,6 +151,22 @@ public class CodeProviderFormatter {
 		}
 
 		return new LinkedHashMap<>(languagesCounters.asMap());
+	}
+
+	private ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
+			Map<String, ?> dirtyLanguageConfig) {
+		Map<String, Object> sourceConfig = new LinkedHashMap<>();
+
+		// Apply defaults from parent
+		sourceConfig.putAll(objectMapper.convertValue(properties.getSourceCodeProperties(), Map.class));
+
+		// Apply explicit configuration
+		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
+		if (explicitSourceCodeProperties != null) {
+			sourceConfig.putAll(explicitSourceCodeProperties);
+		}
+
+		return objectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
 	}
 
 	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java

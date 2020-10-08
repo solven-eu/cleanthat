@@ -3,8 +3,6 @@ package eu.solven.cleanthat.github;
 import java.util.List;
 import java.util.Map;
 
-import eu.solven.cleanthat.formatter.LineEnding;
-
 /**
  * The common configuration on a per-language basis
  * 
@@ -13,13 +11,11 @@ import eu.solven.cleanthat.formatter.LineEnding;
  */
 public interface ILanguageProperties {
 
-	List<String> getExcludes();
+	ISourceCodeProperties getSourceCodeProperties();
 
-	List<String> getIncludes();
+	String getLanguage();
 
-	String getEncoding();
-
-	LineEnding getLineEnding();
+	String getLanguageVersion();
 
 	List<Map<String, ?>> getProcessors();
 

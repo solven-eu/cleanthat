@@ -1,17 +1,21 @@
 package eu.solven.cleanthat.formatter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 import eu.solven.cleanthat.github.event.ICodeProvider;
@@ -32,8 +36,28 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public List<Path> listFiles() throws IOException {
-		return Files.walk(root).filter(p -> p.toFile().isFile()).collect(Collectors.toList());
+	public void listFiles(Consumer<Object> consumer) throws IOException {
+		File gitIgnore = root.resolve(".gitignore").toFile();
+
+		Predicate<Path> gitIgnorePredicate;
+		if (gitIgnore.isFile()) {
+			Set<String> lines = ImmutableSet.copyOf(Files.readAllLines(gitIgnore.toPath(), StandardCharsets.UTF_8));
+
+			gitIgnorePredicate = p -> {
+				for (int i = 0; i < p.getNameCount(); i++) {
+					// This will typically match the exclusion of 'target' (and 'target/')
+					if (lines.contains(p.getName(i).toString()) || lines.contains(p.getName(i).toString() + "/")) {
+						return false;
+					}
+				}
+
+				return true;
+			};
+		} else {
+			gitIgnorePredicate = p -> true;
+		}
+
+		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(consumer);
 	}
 
 	@Override
@@ -57,7 +81,7 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 		pathToMutatedContent.forEach((path, content) -> {
 			try {
 				LOGGER.info("Write file: {}", path);
-				Files.write(Paths.get(path), content.getBytes(StandardCharsets.UTF_8));
+				Files.write(root.resolve(path), content.getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue on: " + path, e);
 			}

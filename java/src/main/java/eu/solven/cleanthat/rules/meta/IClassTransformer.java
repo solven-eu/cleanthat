@@ -10,6 +10,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
  */
 public interface IClassTransformer {
 
-	void transform(MethodDeclaration pre);
+	boolean transform(MethodDeclaration pre);
 
 }

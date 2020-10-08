@@ -28,7 +28,7 @@ import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "none")
 public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPR.class);

@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github.event;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
@@ -12,7 +13,8 @@ import java.util.Map;
  */
 public interface ICodeProvider {
 
-	List<?> listFiles() throws IOException;
+	// List<?> listFiles() throws IOException;
+	void listFiles(Consumer<Object> consumer) throws IOException;
 
 	boolean fileIsRemoved(Object file);
 

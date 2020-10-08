@@ -66,7 +66,11 @@ public class RulesJavaMutator implements ICodeProcessor {
 			compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
 					.stream()
 					.flatMap(classDef -> classDef.getMethods().stream())
-					.forEach(methodDef -> ct.transform(methodDef));
+					.forEach(methodDef -> {
+						if (ct.transform(methodDef)) {
+							LOGGER.info("It is a hit");
+						}
+					});
 
 			codeRef.set(compilationUnit.toString());
 		});

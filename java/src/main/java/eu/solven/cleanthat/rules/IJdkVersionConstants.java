@@ -8,7 +8,8 @@ package eu.solven.cleanthat.rules;
  */
 public interface IJdkVersionConstants {
 	String JDK_1 = "1";
-	String JDK_6 = "6";
+	String JDK_5 = "1.5";
+	String JDK_6 = "1.6";
 	String JDK_8 = "8";
 	String JDK_11 = "11";
 }

@@ -39,7 +39,7 @@ public class PreferConstantsAsEqualsLeftOperator implements IClassTransformer {
 	}
 
 	@Override
-	public void transform(MethodDeclaration pre) {
+	public boolean transform(MethodDeclaration pre) {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
 		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
@@ -88,6 +88,8 @@ public class PreferConstantsAsEqualsLeftOperator implements IClassTransformer {
 				process(node, lengthScope, type);
 			}
 		});
+
+		return false;
 	}
 
 	private void process(Node node, Expression lengthScope, ResolvedType type) {

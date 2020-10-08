@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.ICodeProcessor;
+import eu.solven.cleanthat.github.ISourceCodeProperties;
 import net.revelc.code.impsort.Grouper;
 import net.revelc.code.impsort.ImpSort;
 import net.revelc.code.impsort.Result;
@@ -38,9 +39,12 @@ import net.revelc.code.impsort.Result;
 public class JavaRevelcImportsCleaner implements ICodeProcessor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRevelcImportsCleaner.class);
 
-	private final JavaRevelcImportsCleanerProperties properties;
+	final ISourceCodeProperties sourceCodeProperties;
+	final JavaRevelcImportsCleanerProperties properties;
 
-	public JavaRevelcImportsCleaner(JavaRevelcImportsCleanerProperties properties) {
+	public JavaRevelcImportsCleaner(ISourceCodeProperties sourceCodeProperties,
+			JavaRevelcImportsCleanerProperties properties) {
+		this.sourceCodeProperties = sourceCodeProperties;
 		this.properties = properties;
 	}
 
@@ -48,22 +52,33 @@ public class JavaRevelcImportsCleaner implements ICodeProcessor {
 	public String doFormat(String code, LineEnding eolToApply) throws IOException {
 		// see net.revelc.code.impsort.maven.plugin.AbstractImpSortMojo
 		Grouper grouper = new Grouper(properties.getGroups(), properties.getStaticGroups(), false, false, true);
-		Charset charset = Charset.forName(properties.getEncoding());
+		Charset charset = Charset.forName(sourceCodeProperties.getEncoding());
 		ImpSort impsort = new ImpSort(charset,
 				grouper,
-				properties.isRemoveUnusedImports(),
+				properties.isRemoveUnused(),
 				true,
 				net.revelc.code.impsort.LineEnding.valueOf(eolToApply.name()));
 
 		Path tmpFile = Files.createTempFile("cleanthat", ".tmp");
-		Files.writeString(tmpFile, code, charset, StandardOpenOption.TRUNCATE_EXISTING);
+		try {
+			Files.writeString(tmpFile, code, charset, StandardOpenOption.TRUNCATE_EXISTING);
 
-		Result result = impsort.parseFile(tmpFile);
-		if (!result.isSorted()) {
-			LOGGER.info("Saving imports-sorted file to {}", tmpFile);
-			result.saveSorted(tmpFile);
-			LOGGER.info("Loading imports-sorted file to {}", tmpFile);
-			code = new String(Files.readAllBytes(tmpFile), charset);
+			Result result = impsort.parseFile(tmpFile);
+			if (!result.isSorted()) {
+				LOGGER.debug("Saving imports-sorted file to {}", tmpFile);
+				result.saveSorted(tmpFile);
+				LOGGER.debug("Loading imports-sorted file to {}", tmpFile);
+				String newCode = new String(Files.readAllBytes(tmpFile), charset);
+
+				if (newCode.equals(code)) {
+					LOGGER.info("Sorted imports (with no impact ???)");
+				} else {
+					LOGGER.info("Sorted imports (with an impact)");
+				}
+				code = newCode;
+			}
+		} finally {
+			tmpFile.toFile().delete();
 		}
 
 		return code;

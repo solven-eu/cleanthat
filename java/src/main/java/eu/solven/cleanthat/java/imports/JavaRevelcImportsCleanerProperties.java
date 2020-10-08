@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.java.imports;
 
-import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * Configuration for Java Revelc imports cleaner
@@ -8,29 +9,39 @@ import java.nio.charset.StandardCharsets;
  * @author Benoit Lacelle
  *
  */
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JavaRevelcImportsCleanerProperties {
 
-	String encoding = StandardCharsets.UTF_8.name();
+	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#removeUnused
+	boolean removeUnused = true;
 
-	boolean removeUnusedImports = true;
-
+	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#groups
 	String groups = "java.,javax.,org.,com.";
+
+	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#staticGroups
 	String staticGroups = "java,*";
 
 	public String getGroups() {
 		return groups;
 	}
 
+	public void setGroups(String groups) {
+		this.groups = groups;
+	}
+
 	public String getStaticGroups() {
 		return staticGroups;
 	}
 
-	public String getEncoding() {
-		return encoding;
+	public void setStaticGroups(String staticGroups) {
+		this.staticGroups = staticGroups;
 	}
 
-	public boolean isRemoveUnusedImports() {
-		return removeUnusedImports;
+	public boolean isRemoveUnused() {
+		return removeUnused;
 	}
 
+	public void setRemoveUnusedImports(boolean removeUnusedImports) {
+		this.removeUnused = removeUnusedImports;
+	}
 }

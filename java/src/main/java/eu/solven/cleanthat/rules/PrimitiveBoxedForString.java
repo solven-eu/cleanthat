@@ -36,13 +36,13 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 	}
 
 	@Override
-	public void transform(MethodDeclaration tree) {
+	public boolean transform(MethodDeclaration tree) {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
 		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
 
 		tree.walk(node -> {
-			LOGGER.info("{}", PepperLogHelper.getObjectAndClass(node));
+			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 
 			if (node instanceof MethodCallExpr
 					&& "toString".equals(((MethodCallExpr) node).getName().getIdentifier())) {
@@ -67,6 +67,7 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 				process(node, scope, type);
 			}
 		});
+		return false;
 	}
 
 	private void process(Node node, Expression scope, ResolvedType type) {

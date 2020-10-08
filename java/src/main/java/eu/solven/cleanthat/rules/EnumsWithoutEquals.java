@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -28,14 +29,14 @@ public class EnumsWithoutEquals implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
 	public String minimalJavaVersion() {
-		return "1.5";
+		return IJdkVersionConstants.JDK_5;
 	}
 
 	@Override
-	public void transform(MethodDeclaration pre) {
+	public boolean transform(MethodDeclaration pre) {
 		// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 		pre.walk(node -> {
-			LOGGER.info("{}", PepperLogHelper.getObjectAndClass(node));
+			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 
 			if (node instanceof MethodCallExpr && "equals".equals(((MethodCallExpr) node).getName().getIdentifier())) {
 				MethodCallExpr methodCall = (MethodCallExpr) node;
@@ -48,12 +49,24 @@ public class EnumsWithoutEquals implements IClassTransformer {
 
 				CombinedTypeSolver ts = new CombinedTypeSolver();
 				ts.add(new ReflectionTypeSolver());
-				ResolvedType type = JavaParserFacade.get(ts).getType(scope);
+
+				ResolvedType type;
+				try {
+					type = JavaParserFacade.get(ts).getType(scope);
+				} catch (RuntimeException e) {
+					// UnsolvedSymbolException
+					// https://github.com/javaparser/javaparser/issues/1491
+					LOGGER.debug("What are we doing wrong here?", e);
+					LOGGER.warn("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
+					return;
+				}
 
 				if (type.isReferenceType()) {
-					LOGGER.info("scope={} type={}", scope, type);
+					LOGGER.debug("scope={} type={}", scope, type);
 				}
 			}
 		});
+
+		return false;
 	}
 }

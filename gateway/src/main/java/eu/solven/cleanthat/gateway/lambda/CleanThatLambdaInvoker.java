@@ -44,7 +44,6 @@ public class CleanThatLambdaInvoker {
 	}
 
 	public void runWithPayload(String region, String functionName, Object payload) {
-
 		InvokeRequest request = new InvokeRequest();
 		try {
 			request.withFunctionName(functionName).withPayload(objectMapper.writeValueAsString(payload));

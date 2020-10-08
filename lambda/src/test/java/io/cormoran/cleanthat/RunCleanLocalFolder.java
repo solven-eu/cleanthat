@@ -43,7 +43,7 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 		Path localFolder = currentRepoSomeFile.getFile().toPath();
 
 		// Given the root, we may want to move to a different folder
-		String finalRelativePath = "../mitrust-backend";
+		String finalRelativePath = ".";
 
 		// Move up to git repository root folder
 		while (!localFolder.resolve(".git").toFile().isDirectory()) {

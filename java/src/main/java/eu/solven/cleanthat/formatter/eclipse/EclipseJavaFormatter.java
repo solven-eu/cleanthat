@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.ToolFactory;
@@ -36,7 +35,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReader;

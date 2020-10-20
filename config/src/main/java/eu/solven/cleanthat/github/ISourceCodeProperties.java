@@ -1,7 +1,6 @@
 package eu.solven.cleanthat.github;
 
 import java.util.List;
-import java.util.Map;
 
 import eu.solven.cleanthat.formatter.LineEnding;
 

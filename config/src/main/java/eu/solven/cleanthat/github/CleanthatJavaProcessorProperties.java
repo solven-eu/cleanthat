@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public class CleanthatJavaProcessorProperties {
 
 	private ILanguageProperties languageProperties;
+	private String url;
 
 	@JsonIgnore
 	public ILanguageProperties getLanguageProperties() {
@@ -26,8 +27,6 @@ public class CleanthatJavaProcessorProperties {
 	public void setLanguageProperties(ILanguageProperties languageProperties) {
 		this.languageProperties = languageProperties;
 	}
-
-	private String url;
 
 	public String getUrl() {
 		return url;

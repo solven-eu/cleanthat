@@ -31,6 +31,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class PrimitiveBoxedForString implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 
+	@Override
 	public String minimalJavaVersion() {
 		return "1.1";
 	}

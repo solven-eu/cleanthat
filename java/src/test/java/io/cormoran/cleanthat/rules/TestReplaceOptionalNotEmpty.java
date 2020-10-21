@@ -3,7 +3,7 @@ package io.cormoran.cleanthat.rules;
 import java.io.IOException;
 
 import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import eu.solven.cleanthat.rules.ReplaceOptionalNotEmpty;
 import eu.solven.cleanthat.rules.ReplaceOptionalNotEmptyCases;

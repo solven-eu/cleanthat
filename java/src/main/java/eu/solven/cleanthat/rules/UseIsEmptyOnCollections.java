@@ -34,6 +34,7 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
 
+	@Override
 	public String minimalJavaVersion() {
 		return "6";
 	}

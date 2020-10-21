@@ -53,8 +53,8 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 
 	private static final String KEY_URL = "url";
 
-	private static final String KEY_JDK_VERSION = "jdk_version";
-	private static final String DEFAULT_JDK_VERSION = "1.8";
+	// private static final String KEY_JDK_VERSION = "jdk_version";
+	// private static final String DEFAULT_JDK_VERSION = "1.8";
 
 	private final CodeFormatter formatter;
 

@@ -33,12 +33,14 @@ import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 public class JavaFormatter implements IStringFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatter.class);
 
+	private static final int DEFAULT_CACHE_SIZE = 16;
+
 	final ObjectMapper objectMapper;
 
 	// Prevents parsing/loading remote configuration on each parse
 	// We expect a low number of different configurations
 	final LoadingCache<CleanthatJavaProcessorProperties, EclipseJavaFormatter> configToEngine =
-			CacheBuilder.newBuilder().maximumSize(16).build(CacheLoader.from(config -> {
+			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build(CacheLoader.from(config -> {
 				return new EclipseJavaFormatter(config);
 			}));
 

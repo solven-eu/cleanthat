@@ -40,6 +40,7 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 		this.sourceCodeProperties = sourceCodeProperties;
 	}
 
+	@Override
 	public String getLanguage() {
 		return language;
 	}
@@ -48,6 +49,7 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 		this.language = language;
 	}
 
+	@Override
 	public String getLanguageVersion() {
 		return languageVersion;
 	}

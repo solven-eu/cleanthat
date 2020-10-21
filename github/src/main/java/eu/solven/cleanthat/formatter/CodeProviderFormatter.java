@@ -69,62 +69,12 @@ public class CodeProviderFormatter {
 			LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
 			LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
 
-			AtomicLongMap<String> languageCounters = AtomicLongMap.create();
-
-			try {
-				pr.listFiles(file -> {
-					if (pr.fileIsRemoved(file)) {
-						// Skip files deleted within PR
-						return;
-					}
-
-					String fileName = pr.getFilePath(file);
-
-					Optional<PathMatcher> matchingInclude = findMatching(fileName, sourceCodeProperties.getIncludes());
-					Optional<PathMatcher> matchingExclude = findMatching(fileName, sourceCodeProperties.getExcludes());
-
-					if (matchingInclude.isPresent()) {
-						if (matchingExclude.isEmpty()) {
-							try {
-								Optional<String> optAlreadyMutated =
-										Optional.ofNullable(pathToMutatedContent.get(fileName));
-								String code = optAlreadyMutated.orElseGet(() -> {
-									try {
-										return pr.loadContent(file);
-									} catch (IOException e) {
-										throw new UncheckedIOException(e);
-									}
-								});
-
-								LOGGER.info("Processing {}", fileName);
-								String output = doFormat(languageP, code);
-
-								if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-									pathToMutatedContent.put(fileName, output);
-
-									languageToNbAddedFiles.incrementAndGet(language);
-
-									languageCounters.incrementAndGet("nb_files_formatted");
-								} else {
-									languageCounters.incrementAndGet("nb_files_already_formatted");
-								}
-							} catch (IOException e) {
-								throw new UncheckedIOException("Issue with file: " + fileName, e);
-							} catch (RuntimeException e) {
-								throw new RuntimeException("Issue with file: " + fileName, e);
-							}
-						} else {
-							languageCounters.incrementAndGet("nb_files_both_included_excluded");
-						}
-					} else if (matchingExclude.isEmpty()) {
-						languageCounters.incrementAndGet("nb_files_excluded_not_included");
-					} else {
-						languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
-					}
-				});
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue listing files", e);
-			}
+			AtomicLongMap<String> languageCounters = countFiles(pr,
+					languageToNbAddedFiles,
+					pathToMutatedContent,
+					language,
+					languageP,
+					sourceCodeProperties);
 
 			String details = languageCounters.asMap()
 					.entrySet()
@@ -151,6 +101,72 @@ public class CodeProviderFormatter {
 		}
 
 		return new LinkedHashMap<>(languagesCounters.asMap());
+	}
+
+	private AtomicLongMap<String> countFiles(ICodeProvider pr,
+			AtomicLongMap<String> languageToNbAddedFiles,
+			Map<String, String> pathToMutatedContent,
+			String language,
+			ILanguageProperties languageP,
+			ISourceCodeProperties sourceCodeProperties) {
+		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
+
+		try {
+			pr.listFiles(file -> {
+				if (pr.fileIsRemoved(file)) {
+					// Skip files deleted within PR
+					return;
+				}
+
+				String fileName = pr.getFilePath(file);
+
+				Optional<PathMatcher> matchingInclude = findMatching(fileName, sourceCodeProperties.getIncludes());
+				Optional<PathMatcher> matchingExclude = findMatching(fileName, sourceCodeProperties.getExcludes());
+
+				if (matchingInclude.isPresent()) {
+					if (matchingExclude.isEmpty()) {
+						try {
+							Optional<String> optAlreadyMutated =
+									Optional.ofNullable(pathToMutatedContent.get(fileName));
+							String code = optAlreadyMutated.orElseGet(() -> {
+								try {
+									return pr.loadContent(file);
+								} catch (IOException e) {
+									throw new UncheckedIOException(e);
+								}
+							});
+
+							LOGGER.info("Processing {}", fileName);
+							String output = doFormat(languageP, code);
+
+							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+								pathToMutatedContent.put(fileName, output);
+
+								languageToNbAddedFiles.incrementAndGet(language);
+
+								languageCounters.incrementAndGet("nb_files_formatted");
+							} else {
+								languageCounters.incrementAndGet("nb_files_already_formatted");
+							}
+						} catch (IOException e) {
+							throw new UncheckedIOException("Issue with file: " + fileName, e);
+						} catch (RuntimeException e) {
+							throw new RuntimeException("Issue with file: " + fileName, e);
+						}
+					} else {
+						languageCounters.incrementAndGet("nb_files_both_included_excluded");
+					}
+				} else if (matchingExclude.isEmpty()) {
+					languageCounters.incrementAndGet("nb_files_excluded_not_included");
+				} else {
+					languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
+				}
+			});
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue listing files", e);
+		}
+
+		return languageCounters;
 	}
 
 	private ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,

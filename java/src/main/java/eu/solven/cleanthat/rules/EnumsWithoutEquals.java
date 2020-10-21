@@ -27,6 +27,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class EnumsWithoutEquals implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
+	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_5;
 	}

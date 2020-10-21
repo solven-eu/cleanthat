@@ -52,7 +52,7 @@ public class EnumsWithoutEqualsCases {
 		}
 
 		public boolean post(RoundingMode roundingMode) {
-			return !(RoundingMode.UP == roundingMode);
+			return RoundingMode.UP != roundingMode;
 		}
 	}
 }

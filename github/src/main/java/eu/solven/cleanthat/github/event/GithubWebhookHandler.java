@@ -88,6 +88,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
 				organizationUrl.orElse("-"));
+
 		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
 
 		GHRepository repoId;
@@ -107,13 +108,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		Optional<GHPullRequest> optPr;
 		if (ref.isPresent()) {
+			if (Boolean.TRUE.equals(input.get("deleted"))) {
+				LOGGER.info("This is the deletion of ref={}", ref.get());
+			}
+
 			// https://developer.github.com/webhooks/event-payloads/#push
-			// if (!"created".equals(action)) {
-			// LOGGER.info("We are not interested in action={}", action);
-			// return Map.of("action", "discarded");
-			// } else {
-			LOGGER.info("We are notified of a new commit on Git ref={}", ref.get());
-			// }
+			LOGGER.info("We are notified of a new commit on ref={}", ref.get());
 
 			if (defaultBranch.equals("refs/heads/" + ref.get())) {
 				isCommitMainBranch = true;
@@ -121,9 +121,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				isCommitMainBranch = false;
 			}
 
-			// if (ref.get().startsWith("refs/")) {
-			// GHRef ghRef = repoId.getRef(ref.get().substring("refs/".length()));
-
+			// We search for a matching PR, as in such a case, we would wait for a relevant PR event (is there a PR
+			// event when its branch changes HEAD?)
+			// NO, it is rather interesting for the case there is no PR. Then, we could try to process changed files, in
+			// order to manage PR-less branches
 			try {
 				optPr = repoId.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
 					return ref.get().equals("refs/heads/" + pr.getHead().getRef());
@@ -134,16 +135,20 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			if (optPr.isPresent()) {
 				LOGGER.info("We found an open-PR ({}) for ref={}", optPr.get().getHtmlUrl(), ref.get());
+				isBranchWithoutPR = false;
 			} else {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
+				isBranchWithoutPR = true;
 			}
 		} else {
 			isCommitMainBranch = false;
+			isBranchWithoutPR = false;
 
 			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
 
 			if (pullRequest == null) {
+				// TODO When does this happen?
 				LOGGER.info("We are not interested in action={} as no pull_request", action);
 				optPr = Optional.empty();
 			} else {

@@ -1,5 +1,5 @@
 {
-    "syntax_version": "1",
+    "syntax_version": "2",
 	"java": {
 		"engine": "eclipse",
         "config_url": "https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml",

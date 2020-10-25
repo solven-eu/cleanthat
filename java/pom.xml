@@ -30,6 +30,13 @@
 			<artifactId>spoon-core</artifactId>
 			<version>8.2.0</version>
 		</dependency>
+		<dependency>
+			<!-- https://github.com/javaparser/javaparser -->
+			<!-- JavaParser seems a better option to later handle more languages -->
+			<groupId>com.github.javaparser</groupId>
+			<artifactId>javaparser-symbol-solver-core</artifactId>
+			<version>3.16.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.xml.bind</groupId>

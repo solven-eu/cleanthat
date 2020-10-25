@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -77,6 +76,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return new GitHubBuilder().withAppInstallationToken(token).build();
 	}
 
+	@SuppressWarnings("PMD.ExcessiveMethodLength")
 	@Override
 	public Map<String, ?> processWebhookBody(Map<String, ?> input,
 			IStringFormatter formatter,
@@ -176,13 +176,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
 		LOGGER.info("Commit on main branch: {}", isMainBranchCommit);
+		CommitContext commitContext = new CommitContext(isMainBranchCommit, isBranchWithoutPR);
 
 		if (optPr.isPresent()) {
 			if (optPr.get().isLocked()) {
 				LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
 				return Map.of("skipped", "PullRequest is locked");
 			} else {
-				return prCleaner.formatPR(new CommitContext(isMainBranchCommit, isBranchWithoutPR), optPr.get());
+				return prCleaner.formatPR(commitContext, optPr.get());
 			}
 		} else {
 			return Map.of("skipped", "webhook is not attached to a PullRequest");

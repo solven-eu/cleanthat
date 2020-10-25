@@ -57,6 +57,10 @@ public class CleanthatMetaProperties {
 		return cleanOrphanBranches;
 	}
 
+	public void setCleanOrphanBranches(boolean cleanOrphanBranches) {
+		this.cleanOrphanBranches = cleanOrphanBranches;
+	}
+
 	public List<String> getLabels() {
 		return labels;
 	}

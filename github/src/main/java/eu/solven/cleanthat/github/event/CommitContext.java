@@ -23,4 +23,9 @@ public class CommitContext {
 		return branchWithoutPR;
 	}
 
+	@Override
+	public String toString() {
+		return "CommitContext [commitOnMainBranch=" + commitOnMainBranch + ", branchWithoutPR=" + branchWithoutPR + "]";
+	}
+
 }

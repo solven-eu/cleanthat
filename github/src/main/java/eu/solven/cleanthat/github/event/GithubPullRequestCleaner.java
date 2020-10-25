@@ -38,6 +38,8 @@ import eu.solven.cleanthat.github.IStringFormatter;
  *
  */
 public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
+	private static final String KEY_SKIPPED = "skipped";
+
 	private static final String TEMPLATE_MISS_FILE = "We miss a '{}' file";
 
 	// private static final String KEY_JAVA = "java";
@@ -65,7 +67,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
-			return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
+			return Collections.singletonMap(KEY_SKIPPED, "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
 			optConfigurationToUse = optPrConfig;
 		}
@@ -74,10 +76,10 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		if (version.isEmpty()) {
 			LOGGER.info("No version on configuration applying to PR {}", prUrl);
-			return Collections.singletonMap("skipped", "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
+			return Collections.singletonMap(KEY_SKIPPED, "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
 		} else if (!"2".equals(version.get())) {
 			LOGGER.info("Version '{}' on configuration is not valid {}", version.get(), prUrl);
-			return Collections.singletonMap("skipped",
+			return Collections.singletonMap(KEY_SKIPPED,
 					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only '2' for now)");
 		}
 
@@ -95,13 +97,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
 			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
-			return Map.of("skipped", "Commit on main banch, but not allowed to mutate main_branch by configuration");
+			return Map.of(KEY_SKIPPED, "Commit on main banch, but not allowed to mutate main_branch by configuration");
 		} else if (commitContext.isBranchWithoutPR() && properties.getMeta().isCleanOrphanBranches()) {
 			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
-			return Map.of("skipped",
+			return Map.of(KEY_SKIPPED,
 					"Commit on orphan banch, but not allowed to mutate orphan_branch by configuration");
 		} else if (!properties.getMeta().isCleanPullRequests()) {
-			return Map.of("skipped", "Commit on PR, but not allowed to mutate PR by configuration");
+			return Map.of(KEY_SKIPPED, "Commit on PR, but not allowed to mutate PR by configuration");
 		} else {
 			return formatPR(properties, new GithubPRCodeProvider(pr));
 		}

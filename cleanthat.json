@@ -1,12 +1,44 @@
 {
-	"version": "v2",
-	"java": {
-		"engine": "eclipse",
-		"config_url": "https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml"
-	},
-	"meta":{
-  		"labels": ["cleanthat"],
-  		"mutate_pull_requests": true,
-  		"mutate_main_branch": true
-	}
+    "syntax_version": "2",
+    "meta": {
+        "labels": [
+            "cleanthat"
+        ],
+        "commit_pull_requests": true,
+        "commit_main_branch": false
+    },
+    "source_code": {
+        "includes": [
+            "regex:.*\\.java"
+        ],
+        "excludes": [
+            "regex:.*/generated/.*"
+        ],
+        "encoding": "UTF-8"
+    },
+    "languages": [
+        {
+            "language": "java",
+            "language_version": "11",
+            "processors": [
+                {
+                    "engine": "rules"
+                },
+                {
+                    "engine": "eclipse_formatter",
+                    "parameters": {
+                        "url": "https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml"
+                    }
+                },
+                {
+                    "engine": "revelc_imports",
+                    "parameters": {
+                        "remove_unused": true,
+                        "groups": "java.,javax.,org.,com.",
+                        "static_groups": "java,*"
+                    }
+                }
+            ]
+        }
+    ]
 }

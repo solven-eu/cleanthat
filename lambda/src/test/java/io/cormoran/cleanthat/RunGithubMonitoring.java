@@ -5,8 +5,9 @@ import java.io.IOException;
 import org.kohsuke.github.GHApp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -19,11 +20,10 @@ import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 @SpringBootApplication(scanBasePackages = "none")
 public class RunGithubMonitoring extends CleanThatLambdaFunction {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubMonitoring.class);
 
 	public static void main(String[] args) {
-		SpringApplication.run(RunGithubMonitoring.class, args);
+		new SpringApplicationBuilder(RunGithubMonitoring.class).web(WebApplicationType.NONE).run(args);
 	}
 
 	@EventListener(ContextRefreshedEvent.class)
@@ -41,6 +41,7 @@ public class RunGithubMonitoring extends CleanThatLambdaFunction {
 			String url = installation.getHtmlUrl().toExternalForm();
 
 			LOGGER.info("appId={} url={} selection={}", appId, url, installation.getRepositorySelection());
+			LOGGER.info("appId={} repositories={}", appId, installation.getRepositoriesUrl());
 		});
 	}
 

@@ -44,7 +44,8 @@ public class GithubWebhookHandlerFactory {
 	public String makeJWT() throws JOSEException {
 		RSAKey rsaJWK;
 		try {
-			rsaJWK = RSAKey.parse(env.getRequiredProperty("github.app.private-jwk"));
+			String rawJwk = env.getRequiredProperty("github.app.private-jwk");
+			rsaJWK = RSAKey.parse(rawJwk);
 		} catch (IllegalStateException | ParseException e) {
 			throw new IllegalStateException("Issue parsing privateKey", e);
 		}

@@ -83,7 +83,7 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
 			try {
-				Map<String, ?> output = cleaner.formatPR(new CommitContext(false), pr);
+				Map<String, ?> output = cleaner.formatPR(new CommitContext(false, false), pr);
 
 				if (!output.containsKey("skipped")) {
 					nbBranchWithConfig.incrementAndGet();

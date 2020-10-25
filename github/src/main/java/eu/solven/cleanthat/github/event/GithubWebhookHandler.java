@@ -104,7 +104,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repoId.getDefaultBranch()));
 
 		boolean isBranchWithoutPR = false;
-		final boolean isCommitMainBranch;
+		final boolean isMainBranchCommit;
 
 		Optional<GHPullRequest> optPr;
 		if (ref.isPresent()) {
@@ -116,15 +116,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("We are notified of a new commit on ref={}", ref.get());
 
 			if (defaultBranch.equals("refs/heads/" + ref.get())) {
-				isCommitMainBranch = true;
+				isMainBranchCommit = true;
 			} else {
-				isCommitMainBranch = false;
+				isMainBranchCommit = false;
 			}
 
 			// We search for a matching PR, as in such a case, we would wait for a relevant PR event (is there a PR
 			// event when its branch changes HEAD?)
 			// NO, it is rather interesting for the case there is no PR. Then, we could try to process changed files, in
-			// order to manage PR-less branches
+			// order to manage PR-less branches.
+			// Still, this seems a very complex features, as it is diffiult to know from which branch/the full
+			// commit-list we have to process
 			try {
 				optPr = repoId.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
 					return ref.get().equals("refs/heads/" + pr.getHead().getRef());
@@ -141,7 +143,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				isBranchWithoutPR = true;
 			}
 		} else {
-			isCommitMainBranch = false;
+			isMainBranchCommit = false;
 			isBranchWithoutPR = false;
 
 			String action = PepperMapHelper.getRequiredString(input, "action");
@@ -173,14 +175,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
-		LOGGER.info("Commit on main branch: {}", isCommitMainBranch);
+		LOGGER.info("Commit on main branch: {}", isMainBranchCommit);
 
 		if (optPr.isPresent()) {
 			if (optPr.get().isLocked()) {
 				LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
 				return Map.of("skipped", "PullRequest is locked");
 			} else {
-				return prCleaner.formatPR(new CommitContext(isCommitMainBranch), optPr.get());
+				return prCleaner.formatPR(new CommitContext(isMainBranchCommit, isBranchWithoutPR), optPr.get());
 			}
 		} else {
 			return Map.of("skipped", "webhook is not attached to a PullRequest");

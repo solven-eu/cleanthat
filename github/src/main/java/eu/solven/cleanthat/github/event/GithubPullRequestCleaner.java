@@ -93,9 +93,15 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
 
-		if (!properties.getMeta().isCommitMainBranch() && commitContext.isCommitOnMainBranch()) {
+		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
 			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
-			return Map.of("skipped", "Commit on main banch, while not allowed by configuration");
+			return Map.of("skipped", "Commit on main banch, but not allowed to mutate main_branch by configuration");
+		} else if (commitContext.isBranchWithoutPR() && properties.getMeta().isCleanOrphanBranches()) {
+			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
+			return Map.of("skipped",
+					"Commit on orphan banch, but not allowed to mutate orphan_branch by configuration");
+		} else if (!properties.getMeta().isCleanPullRequests()) {
+			return Map.of("skipped", "Commit on PR, but not allowed to mutate PR by configuration");
 		} else {
 			return formatPR(properties, new GithubPRCodeProvider(pr));
 		}

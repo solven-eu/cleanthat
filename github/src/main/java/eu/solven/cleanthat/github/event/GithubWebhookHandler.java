@@ -100,6 +100,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
+		String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repoId.getDefaultBranch()));
+
+		boolean isBranchWithoutPR = false;
+		final boolean isCommitMainBranch;
+
 		Optional<GHPullRequest> optPr;
 		if (ref.isPresent()) {
 			// https://developer.github.com/webhooks/event-payloads/#push
@@ -107,8 +112,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// LOGGER.info("We are not interested in action={}", action);
 			// return Map.of("action", "discarded");
 			// } else {
-			LOGGER.info("We are notified of a new commit: {}", ref.get());
+			LOGGER.info("We are notified of a new commit on Git ref={}", ref.get());
 			// }
+
+			if (defaultBranch.equals("refs/heads/" + ref.get())) {
+				isCommitMainBranch = true;
+			} else {
+				isCommitMainBranch = false;
+			}
 
 			// if (ref.get().startsWith("refs/")) {
 			// GHRef ghRef = repoId.getRef(ref.get().substring("refs/".length()));
@@ -127,6 +138,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
 			}
 		} else {
+			isCommitMainBranch = false;
+
 			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
 
@@ -155,12 +168,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
+		LOGGER.info("Commit on main branch: {}", isCommitMainBranch);
+
 		if (optPr.isPresent()) {
 			if (optPr.get().isLocked()) {
 				LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
 				return Map.of("skipped", "PullRequest is locked");
 			} else {
-				return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+				return prCleaner.formatPR(new CommitContext(isCommitMainBranch), optPr.get());
 			}
 		} else {
 			return Map.of("skipped", "webhook is not attached to a PullRequest");

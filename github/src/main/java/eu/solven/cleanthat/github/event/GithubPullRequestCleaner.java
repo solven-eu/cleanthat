@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
@@ -56,9 +55,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	@Override
-	public Map<String, ?> formatPR(Optional<Map<String, ?>> defaultBranchConfig,
-			AtomicInteger nbBranchWithConfig,
-			GHPullRequest pr) {
+	public Map<String, ?> formatPR(CommitContext commitContext, GHPullRequest pr) {
 		String prUrl = pr.getHtmlUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
@@ -67,27 +64,21 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			if (defaultBranchConfig.isPresent()) {
-				LOGGER.info("Config on default branch but not on PR {}", prUrl);
-				optConfigurationToUse = defaultBranchConfig;
-			} else {
-				LOGGER.warn("Config neither on default branch nor on PR {}", prUrl);
-				return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
-			}
+			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
+			return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
 			optConfigurationToUse = optPrConfig;
-			nbBranchWithConfig.getAndIncrement();
 		}
 
-		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "version");
+		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 
 		if (version.isEmpty()) {
 			LOGGER.info("No version on configuration applying to PR {}", prUrl);
 			return Collections.singletonMap("skipped", "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
-		} else if (!"v2".equals(version.get())) {
-			LOGGER.info("No version on configuration applying to PR {}", prUrl);
+		} else if (!"2".equals(version.get())) {
+			LOGGER.info("Version '{}' on configuration is not valid {}", version.get(), prUrl);
 			return Collections.singletonMap("skipped",
-					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only 'v2' for now)");
+					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only '2' for now)");
 		}
 
 		try {
@@ -101,7 +92,14 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
-		return formatPR(properties, new GithubPRCodeProvider(pr));
+
+		if (!properties.getMeta().isCommitMainBranch() && commitContext.isCommitOnMainBranch()) {
+			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
+			return Map.of("skipped", "Commit on main banch, while not allowed by configuration");
+		} else {
+			return formatPR(properties, new GithubPRCodeProvider(pr));
+		}
+
 	}
 
 	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
@@ -117,7 +115,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 	}
 
-	private Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
+	public Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
 		Optional<Map<String, ?>> prConfig;
 		try {
 			String asString = GithubPRCodeProvider.loadContent(pr, PATH_CLEANTHAT_JSON);
@@ -125,7 +123,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
+			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			prConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -133,15 +131,17 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return prConfig;
 	}
 
-	public Optional<Map<String, ?>> defaultBranchConfig(GHRepository repo, GHBranch defaultBranch) {
+	@Override
+	public Optional<Map<String, ?>> branchConfig(GHBranch branch) {
 		Optional<Map<String, ?>> defaultBranchConfig;
 		try {
-			String asString = GithubPRCodeProvider.loadContent(repo, defaultBranch.getSHA1(), PATH_CLEANTHAT_JSON);
+			String asString =
+					GithubPRCodeProvider.loadContent(branch.getOwner(), branch.getSHA1(), PATH_CLEANTHAT_JSON);
 
 			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
+			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			defaultBranchConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

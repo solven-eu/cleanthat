@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kohsuke.github.GHBranch;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
+import eu.solven.cleanthat.github.event.CommitContext;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
@@ -77,20 +79,30 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			throw new UncheckedIOException(e);
 		}
 
-		Optional<Map<String, ?>> defaultBranchConfig = cleaner.defaultBranchConfig(repo, defaultBranch);
-
 		AtomicInteger nbBranchWithConfig = new AtomicInteger();
 
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
 			try {
-				Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
+				Map<String, ?> output = cleaner.formatPR(new CommitContext(false), pr);
+
+				if (!output.containsKey("skipped")) {
+					nbBranchWithConfig.incrementAndGet();
+				}
+
 				LOGGER.info("Result for {}: {}", pr.getHtmlUrl().toExternalForm(), output);
 			} catch (RuntimeException e) {
 				LOGGER.warn("Issue processing this PR: " + pr.getHtmlUrl().toExternalForm(), e);
 			}
 		});
 
-		if (defaultBranchConfig.isEmpty() && nbBranchWithConfig.get() == 0) {
+		boolean configExistsAnywhere = repo.getBranches()
+				.values()
+				.stream()
+				.filter(b -> cleaner.branchConfig(b).isPresent())
+				.findAny()
+				.isPresent();
+
+		if (!configExistsAnywhere) {
 			// At some point, we could prefer remaining silent if we understand the repository tried to integrate us,
 			// but did not completed.
 			cleaner.openPRWithCleanThatStandardConfiguration(defaultBranch);

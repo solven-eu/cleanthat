@@ -110,8 +110,8 @@ public class GithubPRCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public String loadContent(Object file) {
-		return loadContent(file);
+	public String loadContent(Object file) throws IOException {
+		return loadContent(pr, ((GHPullRequestFileDetail) file).getFilename());
 	}
 
 	@Override

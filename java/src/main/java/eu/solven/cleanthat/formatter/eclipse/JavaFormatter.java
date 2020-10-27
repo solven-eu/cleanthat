@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -39,9 +40,9 @@ public class JavaFormatter implements IStringFormatter {
 
 	// Prevents parsing/loading remote configuration on each parse
 	// We expect a low number of different configurations
-	final LoadingCache<CleanthatJavaProcessorProperties, EclipseJavaFormatter> configToEngine =
+	final LoadingCache<Map.Entry<ILanguageProperties, CleanthatEclipsejavaFormatterProcessorProperties>, EclipseJavaFormatter> configToEngine =
 			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build(CacheLoader.from(config -> {
-				return new EclipseJavaFormatter(config);
+				return new EclipseJavaFormatter(config.getKey(), config.getValue());
 			}));
 
 	public JavaFormatter(ObjectMapper objectMapper) {
@@ -50,64 +51,89 @@ public class JavaFormatter implements IStringFormatter {
 
 	@Override
 	public String format(ILanguageProperties languageProperties, String asString) throws IOException {
-		Map<String, ?> languagePropertiesTemplate =
-				ImmutableMap.copyOf(objectMapper.convertValue(languageProperties, Map.class));
 		AtomicReference<String> outputRef = new AtomicReference<>(asString);
-		languageProperties.getProcessors().forEach(pAsMap -> {
-			Map<String, Object> languagePropertiesAsMap = new LinkedHashMap<>(languagePropertiesTemplate);
-			Map<String, ?> languageOverload = PepperMapHelper.getAs(pAsMap, "language");
-			if (languageOverload != null) {
-				languagePropertiesAsMap.put("language", languageOverload);
-			}
-			Map<String, ?> languageVersionOverload = PepperMapHelper.getAs(pAsMap, "language_version");
-			if (languageVersionOverload != null) {
-				languagePropertiesAsMap.put("language_version", languageVersionOverload);
-			}
-			Map<String, ?> sourceOverloads = PepperMapHelper.getAs(pAsMap, "source_code");
-			if (sourceOverloads != null) {
-				Map<String, Object> sourcePropertiesAsMap =
-						PepperMapHelper.getAs(languagePropertiesAsMap, "source_code");
-				sourcePropertiesAsMap.putAll(sourceOverloads);
-			}
-			ILanguageProperties languagePropertiesForProcessor =
-					objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
-			ICodeProcessor processor;
-			String engine = PepperMapHelper.getRequiredString(pAsMap, "engine");
-			// override with explicit configuration
-			Map<String, Object> parameters = PepperMapHelper.getAs(pAsMap, "parameters");
-			if (parameters == null) {
-				// Some engine takes no parameter
-				parameters = Map.of();
-			}
-			if ("eclipse_formatter".equals(engine)) {
-				CleanthatJavaProcessorProperties processorConfig =
-						objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);
-				processor = configToEngine.getUnchecked(processorConfig);
-			} else if ("revelc_imports".equals(engine)) {
-				JavaRevelcImportsCleanerProperties processorConfig =
-						objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
-				processor = new JavaRevelcImportsCleaner(languagePropertiesForProcessor.getSourceCodeProperties(),
-						processorConfig);
-			} else if ("rules".equals(engine)) {
-				CleanthatJavaProcessorProperties processorConfig =
-						objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);
-				processor = new RulesJavaMutator(processorConfig);
-			} else {
-				throw new IllegalArgumentException("Unknown engine: " + engine);
-			}
+		languageProperties.getProcessors().forEach(rawProcessor -> {
+			// TODO Is this really a deep-copy?
+			Map<String, ?> languagePropertiesTemplate =
+					ImmutableMap.copyOf(objectMapper.convertValue(languageProperties, Map.class));
+
 			try {
-				LineEnding lineEnding = languagePropertiesForProcessor.getSourceCodeProperties().getLineEnding();
 				String input = outputRef.get();
-				String output = processor.doFormat(input, lineEnding);
+				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, input);
 				if (!input.equals(output)) {
-					LOGGER.info("{} mutated a file", engine);
+					LOGGER.info("{} mutated a file", rawProcessor);
 				}
 				outputRef.set(output);
 			} catch (IOException | RuntimeException e) {
 				// Log and move to next processor
-				LOGGER.warn("Issue with " + processor, e);
+				LOGGER.warn("Issue with " + rawProcessor, e);
 			}
+
 		});
 		return outputRef.getAcquire();
+	}
+
+	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate,
+			Map<String, ?> rawProcessor,
+			String input) throws IOException {
+		Map<String, Object> languagePropertiesAsMap = new LinkedHashMap<>(languagePropertiesTemplate);
+
+		// As we are processing a single processor, we can get ride of the processors field
+		languagePropertiesAsMap.remove("processors");
+
+		// TODO What would it mean to override the language?
+		// Map<String, ?> languageOverload = PepperMapHelper.getAs(pAsMap, "language");
+		// if (languageOverload != null) {
+		// languagePropertiesAsMap.put("language", languageOverload);
+		// }
+
+		// An processor may need to be applied with an override languageVersion
+		Map<String, ?> languageVersionOverload = PepperMapHelper.getAs(rawProcessor, "language_version");
+		if (languageVersionOverload != null) {
+			languagePropertiesAsMap.put("language_version", languageVersionOverload);
+		}
+		Map<String, ?> sourceOverloads = PepperMapHelper.getAs(rawProcessor, "source_code");
+		if (sourceOverloads != null) {
+			// Mutable copy
+			Map<String, Object> sourcePropertiesAsMap =
+					new LinkedHashMap<>(PepperMapHelper.getAs(languagePropertiesAsMap, "source_code"));
+			// Mutate
+			sourcePropertiesAsMap.putAll(sourceOverloads);
+			// Re-inject
+			languagePropertiesAsMap.put("source_code", sourcePropertiesAsMap);
+		}
+		ILanguageProperties languageProperties =
+				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
+		ICodeProcessor processor;
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
+
+		// Map<String, Object> fullParameters = new LinkedHashMap<>();
+		// fullParameters.put("language_properties", languagePropertiesAsMap);
+
+		// override with explicit configuration
+		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
+		if (parameters == null) {
+			// Some engine takes no parameter
+			parameters = Map.of();
+			// fullParameters.putAll(parameters);
+		}
+
+		if ("eclipse_formatter".equals(engine)) {
+			CleanthatEclipsejavaFormatterProcessorProperties processorConfig =
+					objectMapper.convertValue(parameters, CleanthatEclipsejavaFormatterProcessorProperties.class);
+			processor = configToEngine.getUnchecked(Map.entry(languageProperties, processorConfig));
+		} else if ("revelc_imports".equals(engine)) {
+			JavaRevelcImportsCleanerProperties processorConfig =
+					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
+			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCodeProperties(), processorConfig);
+		} else if ("rules".equals(engine)) {
+			CleanthatJavaProcessorProperties processorConfig =
+					objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);
+			processor = new RulesJavaMutator(languageProperties, processorConfig);
+		} else {
+			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
+		LineEnding lineEnding = languageProperties.getSourceCodeProperties().getLineEnding();
+		return processor.doFormat(input, lineEnding);
 	}
 }

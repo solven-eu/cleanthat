@@ -4,8 +4,8 @@
         "labels": [
             "cleanthat"
         ],
-        "commit_pull_requests": true,
-        "commit_main_branch": false
+        "clean_pull_requests": true,
+        "clean_main_branch": true
     },
     "source_code": {
         "includes": [
@@ -22,7 +22,12 @@
             "language_version": "11",
             "processors": [
                 {
-                    "engine": "rules"
+                    "engine": "rules",
+    				"source_code": {
+				        "excludes": [
+				            "regex:.*/src/test/java/eu/solven/cleanthat/rules/.*"
+				        ]
+				    }
                 },
                 {
                     "engine": "eclipse_formatter",

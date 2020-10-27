@@ -38,7 +38,9 @@ import com.google.common.base.Strings;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReader;
+import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
+import eu.solven.cleanthat.github.ILanguageProperties;
 
 /**
  * Bridges to Eclipse formatting engine
@@ -56,7 +58,8 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 	// private static final String DEFAULT_JDK_VERSION = "1.8";
 	private final CodeFormatter formatter;
 
-	public EclipseJavaFormatter(CleanthatJavaProcessorProperties processorConfig) {
+	public EclipseJavaFormatter(ILanguageProperties languageProperties,
+			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
 		Map<String, String> options = new LinkedHashMap<>();
 		String javaConfigFile = processorConfig.getUrl();
 		// Eclipse default
@@ -65,7 +68,7 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
-			String jdkVersion = processorConfig.getLanguageProperties().getLanguageVersion();
+			String jdkVersion = languageProperties.getLanguageVersion();
 			// if (optJdkVersion.isEmpty()) {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
 			// }

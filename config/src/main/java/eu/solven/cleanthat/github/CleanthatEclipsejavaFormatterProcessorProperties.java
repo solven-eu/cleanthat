@@ -1,6 +1,5 @@
 package eu.solven.cleanthat.github;
 
-import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,10 +14,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
-public class CleanthatJavaProcessorProperties {
+public class CleanthatEclipsejavaFormatterProcessorProperties {
 
 	// private ILanguageProperties languageProperties;
-	private Map<String, ?> parameters;
+	private String url;
 
 	// @JsonIgnore
 	// public ILanguageProperties getLanguageProperties() {
@@ -29,18 +28,18 @@ public class CleanthatJavaProcessorProperties {
 	// this.languageProperties = languageProperties;
 	// }
 
-	public Map<String, ?> getParameters() {
-		return parameters;
+	public String getUrl() {
+		return url;
 	}
 
-	public void setParameters(Map<String, ?> parameters) {
-		this.parameters = parameters;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	// Needed to handle caching in JavaFormatter
 	@Override
 	public int hashCode() {
-		return Objects.hash(parameters);
+		return Objects.hash(url);
 	}
 
 	// Needed to handle caching in JavaFormatter
@@ -55,8 +54,8 @@ public class CleanthatJavaProcessorProperties {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		CleanthatJavaProcessorProperties other = (CleanthatJavaProcessorProperties) obj;
-		return Objects.equals(parameters, other.parameters);
+		CleanthatEclipsejavaFormatterProcessorProperties other = (CleanthatEclipsejavaFormatterProcessorProperties) obj;
+		return Objects.equals(url, other.url);
 	}
 
 }

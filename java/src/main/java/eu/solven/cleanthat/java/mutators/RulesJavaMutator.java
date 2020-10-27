@@ -28,6 +28,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.ICodeProcessor;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
+import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
@@ -43,13 +44,15 @@ public class RulesJavaMutator implements ICodeProcessor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesJavaMutator.class);
 
+	private final ILanguageProperties languageProperties;
 	private final CleanthatJavaProcessorProperties properties;
 
 	private final List<IClassTransformer> transformers;
 
-	public RulesJavaMutator(CleanthatJavaProcessorProperties properties) {
+	public RulesJavaMutator(ILanguageProperties languageProperties, CleanthatJavaProcessorProperties properties) {
+		this.languageProperties = languageProperties;
 		this.properties = properties;
-		transformers =
+		this.transformers =
 				Arrays.asList(new EnumsWithoutEquals(), new PrimitiveBoxedForString(), new UseIsEmptyOnCollections());
 	}
 

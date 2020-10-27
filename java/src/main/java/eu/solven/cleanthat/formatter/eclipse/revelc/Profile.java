@@ -19,15 +19,19 @@ import java.util.Map;
 /**
  * A class representing the profile XML element in the Eclipse formatter config file, including the kind attribute and
  * Map of setting id and value.
- * 
+ *
  * @author Matt Blanchette
  */
 public class Profile {
 
-	/** The kind. */
+	/**
+	 * The kind.
+	 */
 	private String kind;
 
-	/** The settings. */
+	/**
+	 * The settings.
+	 */
 	private final Map<String, String> settings = new LinkedHashMap<>();
 
 	/**

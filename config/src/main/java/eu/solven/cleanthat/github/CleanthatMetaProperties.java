@@ -8,9 +8,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * The configuration of what is not related to a language.
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CleanthatMetaProperties {
@@ -24,7 +23,6 @@ public class CleanthatMetaProperties {
 	// TODO We could offer to input a list of branches to keep clean
 	// Are we allowed to mutate the main branch, or should we create a pull-request/merge-request
 	// private boolean commitMainBranch = false;
-
 	// Should we create pull-requests/merge-requests to clean the main branch?
 	private boolean cleanMainBranch = true;
 

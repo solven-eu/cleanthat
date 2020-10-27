@@ -23,13 +23,13 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
  * Prefer 'm.isEmpty()' over 'm.size() == 0'
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
 public class UseIsEmptyOnCollections implements IClassTransformer {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
@@ -44,13 +44,10 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
 		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
-
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 			if (node instanceof BinaryExpr && BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
 				BinaryExpr binaryExpr = (BinaryExpr) node;
-
 				Optional<MethodCallExpr> checkmeForIsEmpty;
 				if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
 					checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
@@ -59,22 +56,18 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 				} else {
 					checkmeForIsEmpty = Optional.empty();
 				}
-
 				if (checkmeForIsEmpty.isEmpty()) {
 					return;
 				}
-
 				Optional<Expression> optLengthScope = checkmeForIsEmpty.get().getScope();
 				if (optLengthScope.isEmpty()) {
 					return;
 				}
-
 				if (!"size".equals(checkmeForIsEmpty.get().getNameAsString())
 						&& !"length".equals(checkmeForIsEmpty.get().getNameAsString())) {
 					LOGGER.debug("Not calling .size()");
 					return;
 				}
-
 				Expression lengthScope = optLengthScope.get();
 				ResolvedType type;
 				try {
@@ -85,7 +78,6 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 					return;
 					// throw new IllegalStateException("Issue on scope=" + scope, e);
 				}
-
 				process(node, lengthScope, type);
 			}
 		});
@@ -95,7 +87,6 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 	private void process(Node node, Expression lengthScope, ResolvedType type) {
 		if (type.isReferenceType()) {
 			LOGGER.info("scope={} type={}", lengthScope, type);
-
 			boolean doIt = false;
 			if (type.asReferenceType().getQualifiedName().equals(Collection.class.getName())
 					|| type.asReferenceType().getQualifiedName().equals(Map.class.getName())
@@ -105,7 +96,6 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 				// Try to load the Class to check if it is a matching sub-type
 				try {
 					Class<?> clazz = Class.forName(type.asReferenceType().getQualifiedName());
-
 					if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
 							|| String.class.isAssignableFrom(clazz)) {
 						doIt = true;
@@ -114,7 +104,6 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 					LOGGER.debug("This class is not available. Can not confirm it is a Colletion/Map/String");
 				}
 			}
-
 			if (doIt) {
 				node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
 			}

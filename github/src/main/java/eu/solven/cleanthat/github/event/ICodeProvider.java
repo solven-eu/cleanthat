@@ -7,9 +7,8 @@ import java.util.function.Consumer;
 
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public interface ICodeProvider {
 
@@ -27,5 +26,4 @@ public interface ICodeProvider {
 	String loadContent(Object file) throws IOException;
 
 	String getFilePath(Object file);
-
 }

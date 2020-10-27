@@ -11,9 +11,8 @@ import io.sentry.spring.SentryServletContextInitializer;
 
 /**
  * Add Sentry specific behavior for Spring MVC
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @Import(SentryCoreSpringConfig.class)
 @Configuration

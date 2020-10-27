@@ -4,11 +4,11 @@ import java.util.Optional;
 
 /**
  * Helpers for Git
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class GitHelper {
+
 	protected GitHelper() {
 		// hidden
 	}

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * Configuration for Java Revelc imports cleaner
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JavaRevelcImportsCleanerProperties {

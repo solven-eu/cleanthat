@@ -26,11 +26,11 @@ import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 
 /**
  * Formatter for Java
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class JavaFormatter implements IStringFormatter {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatter.class);
 
 	private static final int DEFAULT_CACHE_SIZE = 16;
@@ -52,11 +52,9 @@ public class JavaFormatter implements IStringFormatter {
 	public String format(ILanguageProperties languageProperties, String asString) throws IOException {
 		Map<String, ?> languagePropertiesTemplate =
 				ImmutableMap.copyOf(objectMapper.convertValue(languageProperties, Map.class));
-
 		AtomicReference<String> outputRef = new AtomicReference<>(asString);
 		languageProperties.getProcessors().forEach(pAsMap -> {
 			Map<String, Object> languagePropertiesAsMap = new LinkedHashMap<>(languagePropertiesTemplate);
-
 			Map<String, ?> languageOverload = PepperMapHelper.getAs(pAsMap, "language");
 			if (languageOverload != null) {
 				languagePropertiesAsMap.put("language", languageOverload);
@@ -65,27 +63,22 @@ public class JavaFormatter implements IStringFormatter {
 			if (languageVersionOverload != null) {
 				languagePropertiesAsMap.put("language_version", languageVersionOverload);
 			}
-
 			Map<String, ?> sourceOverloads = PepperMapHelper.getAs(pAsMap, "source_code");
 			if (sourceOverloads != null) {
 				Map<String, Object> sourcePropertiesAsMap =
 						PepperMapHelper.getAs(languagePropertiesAsMap, "source_code");
 				sourcePropertiesAsMap.putAll(sourceOverloads);
 			}
-
 			ILanguageProperties languagePropertiesForProcessor =
 					objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
-
 			ICodeProcessor processor;
 			String engine = PepperMapHelper.getRequiredString(pAsMap, "engine");
-
 			// override with explicit configuration
 			Map<String, Object> parameters = PepperMapHelper.getAs(pAsMap, "parameters");
 			if (parameters == null) {
 				// Some engine takes no parameter
 				parameters = Map.of();
 			}
-
 			if ("eclipse_formatter".equals(engine)) {
 				CleanthatJavaProcessorProperties processorConfig =
 						objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);
@@ -93,7 +86,6 @@ public class JavaFormatter implements IStringFormatter {
 			} else if ("revelc_imports".equals(engine)) {
 				JavaRevelcImportsCleanerProperties processorConfig =
 						objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
-
 				processor = new JavaRevelcImportsCleaner(languagePropertiesForProcessor.getSourceCodeProperties(),
 						processorConfig);
 			} else if ("rules".equals(engine)) {
@@ -103,7 +95,6 @@ public class JavaFormatter implements IStringFormatter {
 			} else {
 				throw new IllegalArgumentException("Unknown engine: " + engine);
 			}
-
 			try {
 				LineEnding lineEnding = languagePropertiesForProcessor.getSourceCodeProperties().getLineEnding();
 				String input = outputRef.get();
@@ -117,8 +108,6 @@ public class JavaFormatter implements IStringFormatter {
 				LOGGER.warn("Issue with " + processor, e);
 			}
 		});
-
 		return outputRef.getAcquire();
 	}
-
 }

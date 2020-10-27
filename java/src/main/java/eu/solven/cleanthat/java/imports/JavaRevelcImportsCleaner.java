@@ -31,15 +31,16 @@ import net.revelc.code.impsort.Result;
 
 /**
  * Bridges to Eclipse formatting engine
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class JavaRevelcImportsCleaner implements ICodeProcessor {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRevelcImportsCleaner.class);
 
 	final ISourceCodeProperties sourceCodeProperties;
+
 	final JavaRevelcImportsCleanerProperties properties;
 
 	public JavaRevelcImportsCleaner(ISourceCodeProperties sourceCodeProperties,
@@ -58,18 +59,15 @@ public class JavaRevelcImportsCleaner implements ICodeProcessor {
 				properties.isRemoveUnused(),
 				true,
 				net.revelc.code.impsort.LineEnding.valueOf(eolToApply.name()));
-
 		Path tmpFile = Files.createTempFile("cleanthat", ".tmp");
 		try {
 			Files.writeString(tmpFile, code, charset, StandardOpenOption.TRUNCATE_EXISTING);
-
 			Result result = impsort.parseFile(tmpFile);
 			if (!result.isSorted()) {
 				LOGGER.debug("Saving imports-sorted file to {}", tmpFile);
 				result.saveSorted(tmpFile);
 				LOGGER.debug("Loading imports-sorted file to {}", tmpFile);
 				String newCode = new String(Files.readAllBytes(tmpFile), charset);
-
 				if (newCode.equals(code)) {
 					LOGGER.info("Sorted imports (with no impact ???)");
 				} else {
@@ -80,8 +78,6 @@ public class JavaRevelcImportsCleaner implements ICodeProcessor {
 		} finally {
 			tmpFile.toFile().delete();
 		}
-
 		return code;
 	}
-
 }

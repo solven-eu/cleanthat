@@ -42,9 +42,8 @@ import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 
 /**
  * Bridges to Eclipse formatting engine
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class EclipseJavaFormatter implements ICodeProcessor {
@@ -55,20 +54,16 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 
 	// private static final String KEY_JDK_VERSION = "jdk_version";
 	// private static final String DEFAULT_JDK_VERSION = "1.8";
-
 	private final CodeFormatter formatter;
 
 	public EclipseJavaFormatter(CleanthatJavaProcessorProperties processorConfig) {
 		Map<String, String> options = new LinkedHashMap<>();
-
 		String javaConfigFile = processorConfig.getUrl();
-
 		// Eclipse default
 		if (Strings.isNullOrEmpty(javaConfigFile)) {
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
-
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			String jdkVersion = processorConfig.getLanguageProperties().getLanguageVersion();
 			// if (optJdkVersion.isEmpty()) {
@@ -92,7 +87,6 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 				throw new UncheckedIOException(e);
 			}
 		}
-
 		this.formatter = ToolFactory.createCodeFormatter(options, ToolFactory.M_FORMAT_EXISTING);
 	}
 
@@ -110,7 +104,6 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 			LOGGER.debug("Code cannot be formatted for text -->" + code + "<--", e);
 			return null;
 		}
-
 		IDocument doc = new Document(code);
 		try {
 			te.apply(doc);
@@ -118,11 +111,9 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 			throw new IllegalArgumentException(e);
 		}
 		String formattedCode = doc.get();
-
 		if (code.equals(formattedCode)) {
 			LOGGER.debug("Formatting was a no-op");
 		}
 		return formattedCode;
 	}
-
 }

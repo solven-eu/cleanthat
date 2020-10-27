@@ -8,9 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The configuration of a formatting job
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class CleanthatRepositoryProperties {
 
@@ -45,5 +44,4 @@ public class CleanthatRepositoryProperties {
 	public void setSourceCodeProperties(SourceCodeProperties sourceCodeProperties) {
 		this.sourceCodeProperties = sourceCodeProperties;
 	}
-
 }

@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat;
+package io.cormoran.cleanthat.local;
 
 import java.io.IOException;
 
@@ -20,6 +20,7 @@ import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 @SpringBootApplication(scanBasePackages = "none")
 public class RunGithubMonitoring extends CleanThatLambdaFunction {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubMonitoring.class);
 
 	public static void main(String[] args) {
@@ -31,18 +32,14 @@ public class RunGithubMonitoring extends CleanThatLambdaFunction {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
-
 		GHApp app = handler.getGithub().getApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());
-
 		app.listInstallations().forEach(installation -> {
 			long appId = installation.getAppId();
 			// Date creationDate = installation.getCreatedAt();
 			String url = installation.getHtmlUrl().toExternalForm();
-
 			LOGGER.info("appId={} url={} selection={}", appId, url, installation.getRepositorySelection());
 			LOGGER.info("appId={} repositories={}", appId, installation.getRepositoriesUrl());
 		});
 	}
-
 }

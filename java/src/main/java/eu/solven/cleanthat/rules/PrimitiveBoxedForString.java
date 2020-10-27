@@ -22,13 +22,13 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
  * Clean the way of converting primitives into {@link String}.
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/primitive-boxed-for-string.html
 // https://rules.sonarsource.com/java/RSPEC-1158
 public class PrimitiveBoxedForString implements IClassTransformer {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 
 	@Override
@@ -41,10 +41,8 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
 		ts.add(new ReflectionTypeSolver());
 		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
-
 		tree.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 			if (node instanceof MethodCallExpr
 					&& "toString".equals(((MethodCallExpr) node).getName().getIdentifier())) {
 				MethodCallExpr methodCall = (MethodCallExpr) node;
@@ -54,7 +52,6 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 					return;
 				}
 				Expression scope = optScope.get();
-
 				ResolvedType type;
 				try {
 					type = javaParserFacade.getType(scope);
@@ -64,7 +61,6 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 					return;
 					// throw new IllegalStateException("Issue on scope=" + scope, e);
 				}
-
 				process(node, scope, type);
 			}
 		});
@@ -73,7 +69,6 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 
 	private void process(Node node, Expression scope, ResolvedType type) {
 		if (!type.isReferenceType()) {
-
 			return;
 		}
 		LOGGER.debug("{} is referenceType", type);
@@ -87,9 +82,7 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 			LOGGER.debug("{} is AutoBoxed", type);
 			if (scope instanceof ObjectCreationExpr) {
 				ObjectCreationExpr creation = (ObjectCreationExpr) scope;
-
 				NodeList<Expression> inputs = creation.getArguments();
-
 				MethodCallExpr replacement =
 						new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
 				LOGGER.info("Turning {} into {}", node, replacement);

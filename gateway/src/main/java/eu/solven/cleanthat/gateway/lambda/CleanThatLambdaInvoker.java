@@ -22,15 +22,16 @@ import cormoran.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Invoke AWS Lambda
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // https://aws.amazon.com/fr/blogs/developer/invoking-aws-lambda-functions-from-java/
 public class CleanThatLambdaInvoker {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaInvoker.class);
 
 	final Environment env;
+
 	final ObjectMapper objectMapper;
 
 	final ListeningExecutorService completionService;
@@ -38,7 +39,6 @@ public class CleanThatLambdaInvoker {
 	public CleanThatLambdaInvoker(Environment env, ObjectMapper objectMapper) {
 		this.env = env;
 		this.objectMapper = objectMapper;
-
 		this.completionService = PepperExecutorsHelper.newShrinkableCachedThreadPool("Lambda Awaiter",
 				PepperExecutorsHelper.TIMEOUT_POLICY_1_HOUR);
 	}
@@ -50,13 +50,10 @@ public class CleanThatLambdaInvoker {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
-
 		AWSLambdaAsync client = makeClient(region);
-
 		LOGGER.info("Invoking " + functionName + ": " + request);
 		Future<InvokeResult> future = client.invokeAsync(request);
 		LOGGER.info("Invoked " + functionName + ": " + request);
-
 		// Ensure do not keep the IO open while maybe for the lambda to complete.
 		completionService.execute(() -> {
 			InvokeResult result = Futures.getUnchecked(future);

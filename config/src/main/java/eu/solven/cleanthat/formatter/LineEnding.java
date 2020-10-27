@@ -39,7 +39,6 @@ public enum LineEnding {
 		int lfCount = 0;
 		int crCount = 0;
 		int crlfCount = 0;
-
 		for (int i = 0; i < fileDataString.length(); i++) {
 			char c = fileDataString.charAt(i);
 			if (c == '\r') {
@@ -53,7 +52,6 @@ public enum LineEnding {
 				lfCount++;
 			}
 		}
-
 		if (lfCount > crCount && lfCount > crlfCount) {
 			return LF;
 		} else if (crlfCount > lfCount && crlfCount > crCount) {
@@ -63,5 +61,4 @@ public enum LineEnding {
 		}
 		return UNKNOWN;
 	}
-
 }

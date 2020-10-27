@@ -9,11 +9,11 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
  * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class PreferConstantsAsEqualsLeftOperator implements IClassTransformer {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
 	// Optional exists since 8

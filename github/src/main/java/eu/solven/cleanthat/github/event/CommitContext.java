@@ -2,12 +2,13 @@ package eu.solven.cleanthat.github.event;
 
 /**
  * Helps knowing in which context a commit has been done
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class CommitContext {
+
 	final boolean commitOnMainBranch;
+
 	final boolean branchWithoutPR;
 
 	public CommitContext(boolean commitOnMainBranch, boolean branchWithoutPR) {
@@ -27,5 +28,4 @@ public class CommitContext {
 	public String toString() {
 		return "CommitContext [commitOnMainBranch=" + commitOnMainBranch + ", branchWithoutPR=" + branchWithoutPR + "]";
 	}
-
 }

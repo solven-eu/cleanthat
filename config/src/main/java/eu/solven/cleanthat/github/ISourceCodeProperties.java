@@ -6,9 +6,8 @@ import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * The common configuration on a per-language basis
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public interface ISourceCodeProperties {
 
@@ -19,5 +18,4 @@ public interface ISourceCodeProperties {
 	String getEncoding();
 
 	LineEnding getLineEnding();
-
 }

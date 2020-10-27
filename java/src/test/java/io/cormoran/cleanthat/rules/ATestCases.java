@@ -22,32 +22,24 @@ public class ATestCases {
 		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
 		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
 		Path srcMainJava = srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
-
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
-
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
-
 		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 		});
-
 		cases.forEach(oneCase -> {
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
-
 			// Check the transformer is impact-less on already clean code
 			{
 				MethodDeclaration postPost = post.clone();
 				transformer.transform(postPost);
 				Assert.assertEquals(post, postPost);
 			}
-
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
-
 			// Check 'pre' is transformed into 'post'
 			{
 				transformer.transform(pre);
-
 				// Rename the method bfore checking full equality
 				pre.setName("post");
 				Assert.assertEquals(post, pre);
@@ -57,7 +49,6 @@ public class ATestCases {
 
 	private MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
 		List<MethodDeclaration> preMethods = oneCase.getMethodsByName(name);
-
 		if (preMethods.size() != 1) {
 			throw new IllegalStateException("Expected a single 'pre' method in " + oneCase);
 		}

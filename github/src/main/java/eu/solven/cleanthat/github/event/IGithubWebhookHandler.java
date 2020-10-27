@@ -8,9 +8,8 @@ import eu.solven.cleanthat.github.IStringFormatter;
 
 /**
  * Knows how to process a Github webhook
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public interface IGithubWebhookHandler {
 
@@ -21,5 +20,4 @@ public interface IGithubWebhookHandler {
 	GitHub getGithub();
 
 	GitHub makeInstallationGithub(long installationId);
-
 }

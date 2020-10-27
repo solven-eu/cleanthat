@@ -18,13 +18,13 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
  * Prevent relying .equals on {@link Enum} types
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 @Deprecated(since = "Not-Ready: how can we infer a Type is an Enum?")
 public class EnumsWithoutEquals implements IClassTransformer {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
 	@Override
@@ -37,7 +37,6 @@ public class EnumsWithoutEquals implements IClassTransformer {
 		// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 			if (node instanceof MethodCallExpr && "equals".equals(((MethodCallExpr) node).getName().getIdentifier())) {
 				MethodCallExpr methodCall = (MethodCallExpr) node;
 				Optional<Expression> optScope = methodCall.getScope();
@@ -46,10 +45,8 @@ public class EnumsWithoutEquals implements IClassTransformer {
 					return;
 				}
 				Expression scope = optScope.get();
-
 				CombinedTypeSolver ts = new CombinedTypeSolver();
 				ts.add(new ReflectionTypeSolver());
-
 				ResolvedType type;
 				try {
 					type = JavaParserFacade.get(ts).getType(scope);
@@ -60,13 +57,11 @@ public class EnumsWithoutEquals implements IClassTransformer {
 					LOGGER.warn("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
 					return;
 				}
-
 				if (type.isReferenceType()) {
 					LOGGER.debug("scope={} type={}", scope, type);
 				}
 			}
 		});
-
 		return false;
 	}
 }

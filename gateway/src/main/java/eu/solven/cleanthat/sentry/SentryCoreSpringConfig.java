@@ -15,34 +15,29 @@ import io.sentry.Sentry;
 import io.sentry.SentryClient;
 
 /**
- *
  * @see https://sentry.io/onboarding/m-itrust/datasharing/configure/java
  * @author Benoit Lacelle
- *
  */
 @Configuration
 public class SentryCoreSpringConfig implements ISentrySpringConfig {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SentryCoreSpringConfig.class);
 
 	@Bean
 	public SentryClient sentryClient(Environment env) {
 		String sentryDsn = env.getRequiredProperty("sentry.dsn");
 		LOGGER.info("Initializing Sentry with DSN: {}", sentryDsn);
-
 		SentryClient sentryClient = Sentry.init(sentryDsn);
-
 		// TODO git.properties is not generated in Heroku as .git is removed by Heroku
 		// https://stackoverflow.com/questions/14583282/heroku-display-hash-of-current-commit/34536363#34536363
 		// heroku labs:enable runtime-dyno-metadata -a agilea-app
 		String release = env.getProperty("heroku.slug.commit", "not_heroku");
 		LOGGER.info("release={}", release);
 		sentryClient.setRelease(release);
-
 		// https://devcenter.heroku.com/articles/dynos#local-environment-variables
 		String serverName = env.getProperty("dyno", "not_heroku");
 		LOGGER.info("server_name={}", serverName);
 		sentryClient.setServerName(serverName);
-
 		return sentryClient;
 	}
 
@@ -59,7 +54,6 @@ public class SentryCoreSpringConfig implements ISentrySpringConfig {
 			}
 		};
 		eventBus.register(exceptionListener);
-
 		return exceptionListener;
 	}
 }

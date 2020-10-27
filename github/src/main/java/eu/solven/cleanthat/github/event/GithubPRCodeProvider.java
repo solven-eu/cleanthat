@@ -27,11 +27,11 @@ import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class GithubPRCodeProvider implements ICodeProvider {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
 	final GHPullRequest pr;
@@ -58,7 +58,6 @@ public class GithubPRCodeProvider implements ICodeProvider {
 
 	public static String loadContent(GHRepository repository, String filename, String sha1) throws IOException {
 		GHContent content = repository.getFileContent(filename, sha1);
-
 		String asString;
 		try (InputStreamReader reader = new InputStreamReader(content.read(), Charsets.UTF_8)) {
 			asString = CharStreams.toString(reader);
@@ -83,23 +82,18 @@ public class GithubPRCodeProvider implements ICodeProvider {
 	@Override
 	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments) {
 		String ref = pr.getHead().getSha();
-
 		GHTreeBuilder createTree = pr.getRepository().createTree();
-
 		pathToMutatedContent.forEach((path, content) -> {
 			// TODO isExecutable isn't a parameter from original file?
 			createTree.add(path, content, false);
 		});
-
 		try {
 			GHTree createdTree = createTree.baseTree(ref).create();
-
 			String commitMessage = prComments.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
 			GHCommit commit = prepareCommit(pr.getRepository()).message(commitMessage)
 					.parent(ref)
 					.tree(createdTree.getSha())
 					.create();
-
 			String branchRef = pr.getHead().getRef();
 			String newHead = commit.getSHA1();
 			LOGGER.info("Update ref {} to {}", branchRef, newHead);
@@ -118,5 +112,4 @@ public class GithubPRCodeProvider implements ICodeProvider {
 	public String getFilePath(Object file) {
 		return ((GHPullRequestFileDetail) file).getFilename();
 	}
-
 }

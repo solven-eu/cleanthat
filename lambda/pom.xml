@@ -46,11 +46,18 @@
 			<artifactId>jaxb-api</artifactId>
 		</dependency>
 
+		<!-- https://docs.sentry.io/platforms/java/guides/spring-boot/ -->
 		<dependency>
 			<groupId>io.sentry</groupId>
-			<artifactId>sentry-spring</artifactId>
-			<version>${sentry.version}</version>
+			<artifactId>sentry-spring-boot-starter</artifactId>
+			<version>3.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-logback</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
 		<dependency>
 			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
 			<groupId>com.google.code.findbugs</groupId>
@@ -96,34 +103,18 @@
 	<build>
 		<plugins>
 			<plugin>
+				<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-git-info -->
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
 			</plugin>
-			<!-- <plugin> -->
-			<!-- <groupId>org.springframework.boot</groupId> -->
-			<!-- <artifactId>spring-boot-maven-plugin</artifactId> -->
-			<!-- <dependencies> -->
-			<!-- <dependency> -->
-			<!-- <groupId>org.springframework.boot.experimental</groupId> -->
-			<!-- <artifactId>spring-boot-thin-layout</artifactId> -->
-			<!-- <version>${wrapper.version}</version> -->
-			<!-- </dependency> -->
-			<!-- </dependencies> -->
-			<!-- <executions> -->
-			<!-- mvn clean package -DskipTests spring-boot:repackage -->
-			<!-- <execution> -->
-			<!-- <id>buildFatJar</id> -->
-			<!-- <phase>package</phase> -->
-			<!-- <goals> -->
-			<!-- <goal>repackage</goal> -->
-			<!-- <goal>build-info</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>

@@ -16,6 +16,7 @@ package eu.solven.cleanthat.java.mutators;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -63,15 +64,22 @@ public class RulesJavaMutator implements ICodeProcessor {
 		transformers.forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
 			CompilationUnit compilationUnit = StaticJavaParser.parse(codeRef.get());
+
+			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST
+			AtomicBoolean hasImpacted = new AtomicBoolean();
 			compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
 					.stream()
 					.flatMap(classDef -> classDef.getMethods().stream())
 					.forEach(methodDef -> {
 						if (ct.transform(methodDef)) {
+							hasImpacted.set(true);
 							LOGGER.info("It is a hit");
 						}
 					});
-			codeRef.set(compilationUnit.toString());
+			if (hasImpacted.get()) {
+				// One relevant change: building back from the AST
+				codeRef.set(compilationUnit.toString());
+			}
 		});
 		return codeRef.get();
 	}

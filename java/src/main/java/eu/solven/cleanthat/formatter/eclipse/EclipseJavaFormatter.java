@@ -39,7 +39,6 @@ import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReader;
 import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
-import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 
 /**

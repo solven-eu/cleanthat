@@ -61,6 +61,8 @@ public class JavaFormatter implements IStringFormatter {
 				String input = outputRef.get();
 				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, input);
 				if (!input.equals(output)) {
+					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
+					// final formatting step clean all previous not relevant changes)
 					LOGGER.info("{} mutated a file", rawProcessor);
 				}
 				outputRef.set(output);
@@ -70,7 +72,7 @@ public class JavaFormatter implements IStringFormatter {
 			}
 
 		});
-		return outputRef.getAcquire();
+		return outputRef.get();
 	}
 
 	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate,

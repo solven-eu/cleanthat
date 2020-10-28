@@ -35,7 +35,8 @@ public class ReplaceOptionalNotEmpty implements IClassTransformer {
 		pre.walk(actualNode -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
 
-			if (actualNode instanceof MethodCallExpr && "equals".equals(((MethodCallExpr) actualNode).getName().getIdentifier())) {
+			if (actualNode instanceof MethodCallExpr
+					&& "equals".equals(((MethodCallExpr) actualNode).getName().getIdentifier())) {
 				MethodCallExpr methodCall = (MethodCallExpr) actualNode;
 				// recover argument of equals
 				Expression argument = methodCall.getArgument(0);

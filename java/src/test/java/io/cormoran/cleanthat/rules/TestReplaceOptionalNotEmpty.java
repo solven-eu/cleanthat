@@ -10,7 +10,6 @@ import eu.solven.cleanthat.rules.ReplaceOptionalNotEmptyCases;
 
 public class TestReplaceOptionalNotEmpty extends ATestCases {
 
-	@Ignore("TODO")
 	@Test
 	public void testCases() throws IOException {
 		testCasesIn(ReplaceOptionalNotEmptyCases.class, new ReplaceOptionalNotEmpty());

@@ -10,7 +10,6 @@ import eu.solven.cleanthat.rules.PreferConstantsAsEqualsLeftOperatorCases;
 
 public class TestPreferConstantsAsEqualsLeftOperator extends ATestCases {
 
-	@Ignore("TODO")
 	@Test
 	public void testCases() throws IOException {
 		testCasesIn(PreferConstantsAsEqualsLeftOperatorCases.class, new PreferConstantsAsEqualsLeftOperator());

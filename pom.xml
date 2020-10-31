@@ -44,7 +44,7 @@
 		<jool.version>0.9.14</jool.version>
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
-		<springfox-swagger2.version>2.10.5</springfox-swagger2.version>
+		<springfox-swagger2.version>3.0.0</springfox-swagger2.version>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>

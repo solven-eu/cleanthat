@@ -71,6 +71,10 @@ public class RulesJavaMutator implements ICodeProcessor {
 					.stream()
 					.flatMap(classDef -> classDef.getMethods().stream())
 					.forEach(methodDef -> {
+						if (!ct.minimalJavaVersion().equals(languageProperties.getLanguageVersion())) {
+							LOGGER.debug("TODO Implement a rule to skip incompatible rules");
+						}
+
 						if (ct.transform(methodDef)) {
 							hasImpacted.set(true);
 							LOGGER.info("It is a hit");

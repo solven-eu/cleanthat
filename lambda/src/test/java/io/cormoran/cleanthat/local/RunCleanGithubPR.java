@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat;
+package io.cormoran.cleanthat.local;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
+import eu.solven.cleanthat.github.event.CommitContext;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
@@ -34,7 +35,9 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPR.class);
 
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
+
 	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
+
 	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
 
 	final int solvenEuCleanThatInstallationId = 9086720;
@@ -50,12 +53,9 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
-
 		GitHub github = handler.makeInstallationGithub(solvenEuCleanThatInstallationId);
-
 		ObjectMapper objectMapper = new ObjectMapper();
 		GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(objectMapper, new JavaFormatter(objectMapper));
-
 		GHRepository repo;
 		try {
 			repo = github.getRepository(repoFullName);
@@ -63,11 +63,8 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			LOGGER.error("Either the repository is private, or it does not exist: '{}'", repoFullName);
 			return;
 		}
-
 		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
-
 		String defaultBranchName = Optional.ofNullable(repo.getDefaultBranch()).orElse("master");
-
 		GHBranch defaultBranch;
 		try {
 			defaultBranch = repo.getBranch(defaultBranchName);
@@ -76,25 +73,28 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-		Optional<Map<String, ?>> defaultBranchConfig = cleaner.defaultBranchConfig(repo, defaultBranch);
-
 		AtomicInteger nbBranchWithConfig = new AtomicInteger();
-
 		repo.queryPullRequests().state(GHIssueState.OPEN).list().forEach(pr -> {
 			try {
-				Map<String, ?> output = cleaner.formatPR(defaultBranchConfig, nbBranchWithConfig, pr);
+				Map<String, ?> output = cleaner.formatPR(new CommitContext(false, false), pr);
+				if (!output.containsKey("skipped")) {
+					nbBranchWithConfig.incrementAndGet();
+				}
 				LOGGER.info("Result for {}: {}", pr.getHtmlUrl().toExternalForm(), output);
 			} catch (RuntimeException e) {
 				LOGGER.warn("Issue processing this PR: " + pr.getHtmlUrl().toExternalForm(), e);
 			}
 		});
-
-		if (defaultBranchConfig.isEmpty() && nbBranchWithConfig.get() == 0) {
+		boolean configExistsAnywhere = repo.getBranches()
+				.values()
+				.stream()
+				.filter(b -> cleaner.branchConfig(b).isPresent())
+				.findAny()
+				.isPresent();
+		if (!configExistsAnywhere) {
 			// At some point, we could prefer remaining silent if we understand the repository tried to integrate us,
 			// but did not completed.
 			cleaner.openPRWithCleanThatStandardConfiguration(defaultBranch);
 		}
 	}
-
 }

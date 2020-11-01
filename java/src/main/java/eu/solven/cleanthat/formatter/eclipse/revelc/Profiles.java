@@ -20,15 +20,19 @@ import java.util.Map;
 /**
  * A class representing the profiles XML element in the Eclipse formatter config file, including a List of profile
  * setting Maps with id and value.
- * 
+ *
  * @author Matt Blanchette
  */
 public class Profiles {
 
-	/** The Constant PROFILE_KIND. */
+	/**
+	 * The Constant PROFILE_KIND.
+	 */
 	public static final String PROFILE_KIND = "CodeFormatterProfile";
 
-	/** The profiles. */
+	/**
+	 * The profiles.
+	 */
 	private final List<Map<String, String>> profileList = new ArrayList<>();
 
 	/**

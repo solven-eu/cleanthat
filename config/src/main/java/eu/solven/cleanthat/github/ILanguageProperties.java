@@ -5,9 +5,8 @@ import java.util.Map;
 
 /**
  * The common configuration on a per-language basis
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public interface ILanguageProperties {
 
@@ -18,5 +17,4 @@ public interface ILanguageProperties {
 	String getLanguageVersion();
 
 	List<Map<String, ?>> getProcessors();
-
 }

@@ -22,11 +22,11 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
  * An {@link ICodeProvider} for local folders
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class LocalFolderCodeProvider implements ICodeProvider {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
 	final Path root;
@@ -38,11 +38,9 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	@Override
 	public void listFiles(Consumer<Object> consumer) throws IOException {
 		File gitIgnore = root.resolve(".gitignore").toFile();
-
 		Predicate<Path> gitIgnorePredicate;
 		if (gitIgnore.isFile()) {
 			Set<String> lines = ImmutableSet.copyOf(Files.readAllLines(gitIgnore.toPath(), StandardCharsets.UTF_8));
-
 			gitIgnorePredicate = p -> {
 				for (int i = 0; i < p.getNameCount(); i++) {
 					// This will typically match the exclusion of 'target' (and 'target/')
@@ -50,13 +48,11 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 						return false;
 					}
 				}
-
 				return true;
 			};
 		} else {
 			gitIgnorePredicate = p -> true;
 		}
-
 		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(consumer);
 	}
 
@@ -98,5 +94,4 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 		Path path = (Path) file;
 		return path.subpath(root.getNameCount(), path.getNameCount()).toString();
 	}
-
 }

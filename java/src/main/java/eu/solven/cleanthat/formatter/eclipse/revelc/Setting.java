@@ -16,15 +16,19 @@ package eu.solven.cleanthat.formatter.eclipse.revelc;
 /**
  * A class representing the setting XML element in the Eclipse formatter config file, including the id and value
  * attributes.
- * 
+ *
  * @author Matt Blanchette
  */
 public class Setting {
 
-	/** The id. */
+	/**
+	 * The id.
+	 */
 	private String id;
 
-	/** The value. */
+	/**
+	 * The value.
+	 */
 	private String value;
 
 	/**

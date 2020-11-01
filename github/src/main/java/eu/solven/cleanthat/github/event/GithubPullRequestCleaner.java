@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
@@ -34,20 +33,22 @@ import eu.solven.cleanthat.github.IStringFormatter;
 
 /**
  * Default for {@link IGithubPullRequestCleaner}
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
+
+	private static final String KEY_SKIPPED = "skipped";
+
 	private static final String TEMPLATE_MISS_FILE = "We miss a '{}' file";
 
 	// private static final String KEY_JAVA = "java";
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
 
 	private static final String PATH_CLEANTHAT_JSON = "/cleanthat.json";
 
 	final ObjectMapper objectMapper;
+
 	final IStringFormatter formatter;
 
 	public GithubPullRequestCleaner(ObjectMapper objectMapper, IStringFormatter formatter) {
@@ -56,52 +57,48 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	@Override
-	public Map<String, ?> formatPR(Optional<Map<String, ?>> defaultBranchConfig,
-			AtomicInteger nbBranchWithConfig,
-			GHPullRequest pr) {
+	public Map<String, ?> formatPR(CommitContext commitContext, GHPullRequest pr) {
 		String prUrl = pr.getHtmlUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
-
 		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
-
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			if (defaultBranchConfig.isPresent()) {
-				LOGGER.info("Config on default branch but not on PR {}", prUrl);
-				optConfigurationToUse = defaultBranchConfig;
-			} else {
-				LOGGER.warn("Config neither on default branch nor on PR {}", prUrl);
-				return Collections.singletonMap("skipped", "missing '" + PATH_CLEANTHAT_JSON + "'");
-			}
+			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
+			return Collections.singletonMap(KEY_SKIPPED, "missing '" + PATH_CLEANTHAT_JSON + "'");
 		} else {
 			optConfigurationToUse = optPrConfig;
-			nbBranchWithConfig.getAndIncrement();
 		}
-
-		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "version");
-
+		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 		if (version.isEmpty()) {
 			LOGGER.info("No version on configuration applying to PR {}", prUrl);
-			return Collections.singletonMap("skipped", "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
-		} else if (!"v2".equals(version.get())) {
-			LOGGER.info("No version on configuration applying to PR {}", prUrl);
-			return Collections.singletonMap("skipped",
-					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only 'v2' for now)");
+			return Collections.singletonMap(KEY_SKIPPED, "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
+		} else if (!"2".equals(version.get())) {
+			LOGGER.info("Version '{}' on configuration is not valid {}", version.get(), prUrl);
+			return Collections.singletonMap(KEY_SKIPPED,
+					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only '2' for now)");
 		}
-
 		try {
 			GHUser user = pr.getUser();
-
 			// TODO Do not process PR opened by CleanThat
 			LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
-		return formatPR(properties, new GithubPRCodeProvider(pr));
+		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
+			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
+			return Map.of(KEY_SKIPPED, "Commit on main banch, but not allowed to mutate main_branch by configuration");
+		} else if (commitContext.isBranchWithoutPR() && properties.getMeta().isCleanOrphanBranches()) {
+			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
+			return Map.of(KEY_SKIPPED,
+					"Commit on orphan banch, but not allowed to mutate orphan_branch by configuration");
+		} else if (!properties.getMeta().isCleanPullRequests()) {
+			return Map.of(KEY_SKIPPED, "Commit on PR, but not allowed to mutate PR by configuration");
+		} else {
+			return formatPR(properties, new GithubPRCodeProvider(pr));
+		}
 	}
 
 	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
@@ -117,15 +114,14 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 	}
 
-	private Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
+	public Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
 		Optional<Map<String, ?>> prConfig;
 		try {
 			String asString = GithubPRCodeProvider.loadContent(pr, PATH_CLEANTHAT_JSON);
-
 			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
+			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			prConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -133,15 +129,16 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return prConfig;
 	}
 
-	public Optional<Map<String, ?>> defaultBranchConfig(GHRepository repo, GHBranch defaultBranch) {
+	@Override
+	public Optional<Map<String, ?>> branchConfig(GHBranch branch) {
 		Optional<Map<String, ?>> defaultBranchConfig;
 		try {
-			String asString = GithubPRCodeProvider.loadContent(repo, defaultBranch.getSHA1(), PATH_CLEANTHAT_JSON);
-
+			String asString =
+					GithubPRCodeProvider.loadContent(branch.getOwner(), branch.getSHA1(), PATH_CLEANTHAT_JSON);
 			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.info(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
+			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
 			defaultBranchConfig = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -150,9 +147,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	public void openPRWithCleanThatStandardConfiguration(GHBranch defaultBranch) {
-
 		GHRepository repo = defaultBranch.getOwner();
-
 		try {
 			String exampleConfig = readResource("/standard-configurations/standard-java.json");
 			GHTree createTree = repo.createTree()
@@ -164,17 +159,13 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 					.parent(defaultBranch.getSHA1())
 					.tree(createTree.getSha())
 					.create();
-
 			String configureRefName = "refs/heads/" + "cleanthat/configure";
 			AtomicBoolean refAlreadyExists = new AtomicBoolean();
-
 			GHRef refToPR;
 			try {
 				refToPR = repo.getRef(configureRefName);
-
 				LOGGER.info("There is already a ref: " + configureRefName);
 				refAlreadyExists.set(true);
-
 				boolean force = true;
 				refToPR.updateTo(commit.getSHA1(), force);
 			} catch (GHFileNotFoundException e) {
@@ -183,7 +174,6 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 				// refAlreadyExists.set(false);
 				refToPR = repo.createRef(configureRefName, commit.getSHA1());
 			}
-
 			if (refAlreadyExists.get()) {
 				LOGGER.info("There is already a ref about to introduce a cleanthat.json ; do not open a new PR");
 			} else {
@@ -191,7 +181,6 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 				// https://github.com/solven-eu/agilea/pull/1
 				String body = readResource("/templates/onboarding-body.md");
 				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
-
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
 				repo.createPullRequest("Configure CleanThat",
 						refToPR.getRef(),
@@ -200,7 +189,6 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 						true,
 						false);
 			}
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -220,5 +208,4 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, ICodeProvider pr) {
 		return new CodeProviderFormatter(objectMapper, formatter).formatPR(properties, pr);
 	}
-
 }

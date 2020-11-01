@@ -1,8 +1,20 @@
 spring:
   # https://stackoverflow.com/questions/10519265/jackson-overcoming-underscores-in-favor-of-camel-case
   jackson.property-naming-strategy: SNAKE_CASE
+# https://stackoverflow.com/questions/26585959/how-to-disable-spring-boot-logo-in-stdout
+  main:
+    banner-mode: "off"
+# Something seems broken in Sentry configuration
+  main.allow-bean-definition-overriding: true
 
-sentry.dsn: https://22586844ad7d4f21b837cf5ea3600a1f@o222257.ingest.sentry.io/5245874
+sentry:
+  dsn: https://22586844ad7d4f21b837cf5ea3600a1f@o222257.ingest.sentry.io/5245874
+  logging.minimum-event-level: warn
+  logging.minimum-breadcrumb-level: debug
+  in-app-include:
+    - eu.solven
+    - io.cormoran
+
 
 github.app:
   app-id: 65550

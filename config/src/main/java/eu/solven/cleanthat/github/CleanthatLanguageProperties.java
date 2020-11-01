@@ -10,9 +10,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * The configuration of what is not related to a language.
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
@@ -66,5 +65,4 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 	public void setProcessors(List<Map<String, ?>> processors) {
 		this.processors = processors;
 	}
-
 }

@@ -38,9 +38,7 @@ public class TestJavaFormatter {
 	public void testFormat_Clean() throws IOException {
 		JavaFormatter formatter = new JavaFormatter(objectMapper);
 		URL location = CleanClass.class.getProtectionDomain().getCodeSource().getLocation();
-
 		String classAsString = asString(new UrlResource(location));
-
 		CleanthatLanguageProperties properties = new CleanthatLanguageProperties();
 		formatter.format(properties, classAsString);
 	}
@@ -49,9 +47,7 @@ public class TestJavaFormatter {
 	public void testFormat_ManySpacesMiddleImports() throws IOException {
 		JavaFormatter formatter = new JavaFormatter(objectMapper);
 		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
-
 		String classAsString = asString(new UrlResource(location));
-
 		CleanthatLanguageProperties properties = new CleanthatLanguageProperties();
 		formatter.format(properties, classAsString);
 	}

@@ -13,15 +13,15 @@ import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * The configuration of what is not related to a language.
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 public class SourceCodeProperties implements ISourceCodeProperties {
 
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+
 	public static final String DEFAULT_LINE_ENDING = "LF";
 
 	// If empty, no file is excluded

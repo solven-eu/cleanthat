@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This class reads a config file for Eclipse code formatter.
- * 
+ *
  * @author jecki
  * @author Matt Blanchette
  */
@@ -46,19 +46,15 @@ public class ConfigReader {
 	public Map<String, String> read(InputStream input) throws IOException, SAXException, ConfigReadException {
 		Digester digester = new Digester();
 		digester.addRuleSet(new RuleSet());
-
 		Object result = digester.parse(input);
 		if (!(result instanceof Profiles)) {
 			throw new ConfigReadException("No profiles found in config file");
 		}
-
 		Profiles profiles = (Profiles) result;
 		List<Map<String, String>> list = profiles.getProfiles();
 		if (list.isEmpty()) {
 			throw new ConfigReadException("No profile in config file of kind: " + Profiles.PROFILE_KIND);
 		}
-
 		return list.get(0);
 	}
-
 }

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CleanClass {
+
 	final LocalDate someLocalDate;
+
 	final LocalDateTime someLocalDateTime;
 
 	public CleanClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {
@@ -12,5 +14,4 @@ public class CleanClass {
 		this.someLocalDate = someLocalDate;
 		this.someLocalDateTime = someLocalDateTime;
 	}
-
 }

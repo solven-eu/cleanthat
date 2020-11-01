@@ -31,6 +31,7 @@ public class TestRunCleanThatSpringConfigAutonomy {
 
 	@Configuration
 	public static class RunMiTrustSpringConfigComplement {
+
 		// Required by CorsConfigurer as one of SpringMVC or SpringSecurity is not configured
 		@Bean
 		public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
@@ -50,5 +51,4 @@ public class TestRunCleanThatSpringConfigAutonomy {
 	public void testAutonomy() {
 		LOGGER.debug("Started on {}", PepperDateHelper.now());
 	}
-
 }

@@ -30,16 +30,17 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
  * Unclear what is the point of this class
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class CodeProviderFormatter {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final String EOL = "\r\n";
 
 	final ObjectMapper objectMapper;
+
 	final IStringFormatter formatter;
 
 	public CodeProviderFormatter(ObjectMapper objectMapper, IStringFormatter formatter) {
@@ -51,44 +52,35 @@ public class CodeProviderFormatter {
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
-
 		List<String> prComments = new ArrayList<>();
 		properties.getLanguages().forEach(dirtyLanguageConfig -> {
 			ISourceCodeProperties sourceConfdig = mergeSourceConfig(properties, dirtyLanguageConfig);
-
 			Map<String, Object> languageConfig = new LinkedHashMap<>();
 			languageConfig.putAll(dirtyLanguageConfig);
 			languageConfig.put("source_code", sourceConfdig);
-
 			String language = PepperMapHelper.getRequiredString(dirtyLanguageConfig, "language");
 			LOGGER.info("About to prepare files for language: {}", language);
 			ILanguageProperties languageP =
 					objectMapper.convertValue(languageConfig, CleanthatLanguageProperties.class);
-
 			ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
 			LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
 			LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
-
 			AtomicLongMap<String> languageCounters = countFiles(pr,
 					languageToNbAddedFiles,
 					pathToMutatedContent,
 					language,
 					languageP,
 					sourceCodeProperties);
-
 			String details = languageCounters.asMap()
 					.entrySet()
 					.stream()
 					.map(e -> e.getKey() + ": " + e.getValue())
 					.collect(Collectors.joining(EOL));
-
 			prComments.add("language=" + language + EOL + details);
-
 			languageCounters.asMap().forEach((l, c) -> {
 				languagesCounters.addAndGet(l, c);
 			});
 		});
-
 		if (languageToNbAddedFiles.isEmpty()) {
 			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
 		} else {
@@ -96,10 +88,8 @@ public class CodeProviderFormatter {
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
-
 			pr.commitIntoPR(pathToMutatedContent, prComments);
 		}
-
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}
 
@@ -110,19 +100,15 @@ public class CodeProviderFormatter {
 			ILanguageProperties languageP,
 			ISourceCodeProperties sourceCodeProperties) {
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
-
 		try {
 			pr.listFiles(file -> {
 				if (pr.fileIsRemoved(file)) {
 					// Skip files deleted within PR
 					return;
 				}
-
 				String fileName = pr.getFilePath(file);
-
 				Optional<PathMatcher> matchingInclude = findMatching(fileName, sourceCodeProperties.getIncludes());
 				Optional<PathMatcher> matchingExclude = findMatching(fileName, sourceCodeProperties.getExcludes());
-
 				if (matchingInclude.isPresent()) {
 					if (matchingExclude.isEmpty()) {
 						try {
@@ -135,15 +121,11 @@ public class CodeProviderFormatter {
 									throw new UncheckedIOException(e);
 								}
 							});
-
 							LOGGER.info("Processing {}", fileName);
 							String output = doFormat(languageP, code);
-
 							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
 								pathToMutatedContent.put(fileName, output);
-
 								languageToNbAddedFiles.incrementAndGet(language);
-
 								languageCounters.incrementAndGet("nb_files_formatted");
 							} else {
 								languageCounters.incrementAndGet("nb_files_already_formatted");
@@ -165,23 +147,19 @@ public class CodeProviderFormatter {
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing files", e);
 		}
-
 		return languageCounters;
 	}
 
 	private ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, Object> sourceConfig = new LinkedHashMap<>();
-
 		// Apply defaults from parent
 		sourceConfig.putAll(objectMapper.convertValue(properties.getSourceCodeProperties(), Map.class));
-
 		// Apply explicit configuration
 		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
 		if (explicitSourceCodeProperties != null) {
 			sourceConfig.putAll(explicitSourceCodeProperties);
 		}
-
 		return objectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
 	}
 
@@ -196,5 +174,4 @@ public class CodeProviderFormatter {
 	private String doFormat(ILanguageProperties properties, String code) throws IOException {
 		return formatter.format(properties, code);
 	}
-
 }

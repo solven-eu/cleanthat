@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -77,6 +76,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return new GitHubBuilder().withAppInstallationToken(token).build();
 	}
 
+	@SuppressWarnings("PMD.ExcessiveMethodLength")
 	@Override
 	public Map<String, ?> processWebhookBody(Map<String, ?> input,
 			IStringFormatter formatter,
@@ -88,6 +88,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
 				organizationUrl.orElse("-"));
+
 		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
 
 		GHRepository repoId;
@@ -100,19 +101,32 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
+		String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repoId.getDefaultBranch()));
+
+		boolean isBranchWithoutPR = false;
+		final boolean isMainBranchCommit;
+
 		Optional<GHPullRequest> optPr;
 		if (ref.isPresent()) {
+			if (Boolean.TRUE.equals(input.get("deleted"))) {
+				LOGGER.info("This is the deletion of ref={}", ref.get());
+			}
+
 			// https://developer.github.com/webhooks/event-payloads/#push
-			// if (!"created".equals(action)) {
-			// LOGGER.info("We are not interested in action={}", action);
-			// return Map.of("action", "discarded");
-			// } else {
-			LOGGER.info("We are notified of a new commit: {}", ref.get());
-			// }
+			LOGGER.info("We are notified of a new commit on ref={}", ref.get());
 
-			// if (ref.get().startsWith("refs/")) {
-			// GHRef ghRef = repoId.getRef(ref.get().substring("refs/".length()));
+			if (defaultBranch.equals("refs/heads/" + ref.get())) {
+				isMainBranchCommit = true;
+			} else {
+				isMainBranchCommit = false;
+			}
 
+			// We search for a matching PR, as in such a case, we would wait for a relevant PR event (is there a PR
+			// event when its branch changes HEAD?)
+			// NO, it is rather interesting for the case there is no PR. Then, we could try to process changed files, in
+			// order to manage PR-less branches.
+			// Still, this seems a very complex features, as it is diffiult to know from which branch/the full
+			// commit-list we have to process
 			try {
 				optPr = repoId.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
 					return ref.get().equals("refs/heads/" + pr.getHead().getRef());
@@ -123,14 +137,20 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			if (optPr.isPresent()) {
 				LOGGER.info("We found an open-PR ({}) for ref={}", optPr.get().getHtmlUrl(), ref.get());
+				isBranchWithoutPR = false;
 			} else {
 				LOGGER.info("We found no open-PR for ref={}", ref.get());
+				isBranchWithoutPR = true;
 			}
 		} else {
+			isMainBranchCommit = false;
+			isBranchWithoutPR = false;
+
 			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
 
 			if (pullRequest == null) {
+				// TODO When does this happen?
 				LOGGER.info("We are not interested in action={} as no pull_request", action);
 				optPr = Optional.empty();
 			} else {
@@ -155,12 +175,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
+		LOGGER.info("Commit on main branch: {}", isMainBranchCommit);
+		CommitContext commitContext = new CommitContext(isMainBranchCommit, isBranchWithoutPR);
+
 		if (optPr.isPresent()) {
 			if (optPr.get().isLocked()) {
 				LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
 				return Map.of("skipped", "PullRequest is locked");
 			} else {
-				return prCleaner.formatPR(Optional.empty(), new AtomicInteger(), optPr.get());
+				return prCleaner.formatPR(commitContext, optPr.get());
 			}
 		} else {
 			return Map.of("skipped", "webhook is not attached to a PullRequest");

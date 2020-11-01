@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Helps manipulating CleanThat.json files
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class CleanthatConfigHelper {
+
 	protected CleanthatConfigHelper() {
 		// hidden
 	}

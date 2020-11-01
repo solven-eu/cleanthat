@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ManySpacesBetweenImportsSimpleClass {
+
 	final LocalDate someLocalDate;
+
 	final LocalDateTime someLocalDateTime;
 
 	public ManySpacesBetweenImportsSimpleClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {
@@ -12,5 +14,4 @@ public class ManySpacesBetweenImportsSimpleClass {
 		this.someLocalDate = someLocalDate;
 		this.someLocalDateTime = someLocalDateTime;
 	}
-
 }

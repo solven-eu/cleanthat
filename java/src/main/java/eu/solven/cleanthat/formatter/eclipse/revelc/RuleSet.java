@@ -18,13 +18,14 @@ import org.apache.commons.digester3.RuleSetBase;
 
 /**
  * An Apache Commons Digester RuleSet for configuring a digester to parse the Eclipse formatter config XML into objects.
- * 
+ *
  * @author jecki
  * @author Matt Blanchette
  */
 class RuleSet extends RuleSetBase {
 
 	private static final String PROFILES_PROFILE = "profiles/profile";
+
 	private static final String PROFILES_PROFILE_SETTING = PROFILES_PROFILE + "/setting";
 
 	/**
@@ -39,13 +40,10 @@ class RuleSet extends RuleSetBase {
 		digester.addObjectCreate("profiles", Profiles.class);
 		digester.addObjectCreate(PROFILES_PROFILE, Profile.class);
 		digester.addObjectCreate(PROFILES_PROFILE_SETTING, Setting.class);
-
 		digester.addSetNext(PROFILES_PROFILE, "addProfile");
 		digester.addSetNext(PROFILES_PROFILE_SETTING, "addSetting");
-
 		digester.addSetProperties(PROFILES_PROFILE, "kind", "kind");
 		digester.addSetProperties(PROFILES_PROFILE_SETTING, "id", "id");
 		digester.addSetProperties(PROFILES_PROFILE_SETTING, "value", "value");
 	}
-
 }

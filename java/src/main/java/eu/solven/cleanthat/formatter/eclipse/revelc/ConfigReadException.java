@@ -16,12 +16,14 @@ package eu.solven.cleanthat.formatter.eclipse.revelc;
 /**
  * An exception thrown when there is an error reading settings from the code formatter profile of an Eclipse formatter
  * config file.
- * 
+ *
  * @author Matt Blanchette
  */
 public class ConfigReadException extends Exception {
 
-	/** The Constant serialVersionUID. */
+	/**
+	 * The Constant serialVersionUID.
+	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -33,5 +35,4 @@ public class ConfigReadException extends Exception {
 	public ConfigReadException(String message) {
 		super(message);
 	}
-
 }

@@ -19,16 +19,17 @@ import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
 
 /**
  * Specific to Github.com
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 @RestController
 @RequestMapping("/github")
 public class GithubController {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubController.class);
 
 	final CleanThatLambdaInvoker lambdaInvoker;
+
 	final ObjectMapper objectMapper;
 
 	public GithubController(CleanThatLambdaInvoker lambdaInvoker, ObjectMapper objectMapper) {
@@ -52,7 +53,6 @@ public class GithubController {
 	public Map<String, ?> onWebhook(@RequestHeader(value = "X-Hub-Signature", required = false) String githubSignature,
 			@RequestBody String body) {
 		verifySignature(githubSignature);
-
 		Map<?, ?> payload;
 		try {
 			payload = objectMapper.readValue(body, Map.class);
@@ -65,12 +65,9 @@ public class GithubController {
 			LOGGER.info("Skip action=synchronize");
 			return Map.of("status", "skipped");
 		}
-
 		// Used for the sake of checking what inputs actually looks like
 		LOGGER.info("TMP Body: {}", body);
-
 		processPayload(payload);
-
 		return Map.of("status", "accepted");
 	}
 

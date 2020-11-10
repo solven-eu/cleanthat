@@ -36,19 +36,17 @@ public class ReplaceOptionalNotEmpty implements IClassTransformer {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
 
 			if (actualNode instanceof MethodCallExpr
-					&& "equals".equals(((MethodCallExpr) actualNode).getName().getIdentifier())) {
+					&& "equals".equals(((MethodCallExpr) actualNode).getName().getIdentifier())
+					&& ((MethodCallExpr) actualNode).getArgument(0) instanceof StringLiteralExpr) {
 				MethodCallExpr methodCall = (MethodCallExpr) actualNode;
 				// recover argument of equals
 				Expression argument = methodCall.getArgument(0);
 				// hardocoded string seems to be instance of StringLiteralExpr
-				if (argument instanceof StringLiteralExpr) {
-					LOGGER.debug("Find a hardcoded string : {}", argument);
-					// argument is hard coded <e need scope to inverse the two
-					Optional<Expression> optScope = methodCall.getScope();
-					// if (!optScope.isPresent()) {
-					// // TODO Document when this would happen
-					// return;
-					// }
+				LOGGER.debug("Find a hardcoded string : {}", argument);
+				// argument is hard coded we need scope to inverse the two
+				Optional<Expression> optScope = methodCall.getScope();
+				if (optScope.isPresent()) {
+					// equals must be called by something, otherwise we don't touch this part
 					Expression scope = optScope.get();
 					// inversion
 					MethodCallExpr replacement =
@@ -56,6 +54,7 @@ public class ReplaceOptionalNotEmpty implements IClassTransformer {
 					LOGGER.info("Turning {} into {}", actualNode, replacement);
 					actualNode.replace(replacement);
 				}
+
 			}
 		});
 

@@ -42,14 +42,10 @@ public class PreferConstantsAsEqualsLeftOperator implements IClassTransformer {
 				Optional<Node> optParent = methodCall.getParentNode();
 				// on cherche le '!' logique
 				if (optParent.isPresent() && optParent.get() instanceof UnaryExpr
-						&& "LOGICAL_COMPLEMENT".equals(((UnaryExpr) optParent.get()).getOperator().name())) {
-					LOGGER.info("jai trouvé !");
+						&& "LOGICAL_COMPLEMENT".equals(((UnaryExpr) optParent.get()).getOperator().name())
+						&& methodCall.getScope().isPresent()) {
 					// une fois trouvee on fait l'inversion qui convient en recuperant dabord le scope
 					Optional<Expression> optScope = methodCall.getScope();
-					// if (!optScope.isPresent()) {
-					// // TODO Document when this would happen
-					// return;
-					// }
 					Expression scope = optScope.get();
 					if ("isEmpty".equals(((MethodCallExpr) node).getName().getIdentifier())) {
 						MethodCallExpr replacement = new MethodCallExpr(scope, "isPresent");

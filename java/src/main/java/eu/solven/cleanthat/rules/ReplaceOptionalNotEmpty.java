@@ -1,10 +1,17 @@
 package eu.solven.cleanthat.rules;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 
+import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
@@ -20,12 +27,37 @@ public class ReplaceOptionalNotEmpty implements IClassTransformer {
 	// Optional.isPresent exists since 11
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_11;
+		return IJdkVersionConstants.JDK_1;
 	}
 
 	@Override
 	public boolean transform(MethodDeclaration pre) {
-		LOGGER.debug("TODO");
+		pre.walk(actualNode -> {
+			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
+
+			if (actualNode instanceof MethodCallExpr
+					&& "equals".equals(((MethodCallExpr) actualNode).getName().getIdentifier())
+					&& ((MethodCallExpr) actualNode).getArgument(0) instanceof StringLiteralExpr) {
+				MethodCallExpr methodCall = (MethodCallExpr) actualNode;
+				// recover argument of equals
+				Expression argument = methodCall.getArgument(0);
+				// hardocoded string seems to be instance of StringLiteralExpr
+				LOGGER.debug("Find a hardcoded string : {}", argument);
+				// argument is hard coded we need scope to inverse the two
+				Optional<Expression> optScope = methodCall.getScope();
+				if (optScope.isPresent()) {
+					// equals must be called by something, otherwise we don't touch this part
+					Expression scope = optScope.get();
+					// inversion
+					MethodCallExpr replacement =
+							new MethodCallExpr(argument, "equals", new NodeList<Expression>(scope));
+					LOGGER.info("Turning {} into {}", actualNode, replacement);
+					actualNode.replace(replacement);
+				}
+
+			}
+		});
+
 		return false;
 	}
 }

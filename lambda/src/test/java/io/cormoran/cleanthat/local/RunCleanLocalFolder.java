@@ -21,6 +21,7 @@ import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.LocalFolderCodeProvider;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 // @Import({ SentryAutoConfiguration.class })
@@ -58,9 +59,12 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 		LOGGER.info("About to process {}", localFolder);
 		ApplicationContext appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
-		File pathToConfig = localFolder.resolve("cleanthat.json").toFile();
+		File pathToConfig = localFolder.resolve(GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON).toFile();
 		// We prefer to test with a different configuration
-		pathToConfig = new ClassPathResource("/overrides/eu.solven/mitrust-datasharing/cleanthat.json").getFile();
+		String overridePackage = "/eu.solven/mitrust-datasharing/";
+		pathToConfig =
+				new ClassPathResource("/overrides" + overridePackage + GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON)
+						.getFile();
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
 		codeProviderFormatter.formatPR(properties, new LocalFolderCodeProvider(localFolder));

@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -81,4 +82,27 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	public void setLineEnding(String lineEnding) {
 		this.lineEnding = lineEnding;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(encoding, excludes, includes, lineEnding);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		SourceCodeProperties other = (SourceCodeProperties) obj;
+		return Objects.equals(encoding, other.encoding) && Objects.equals(excludes, other.excludes)
+				&& Objects.equals(includes, other.includes)
+				&& Objects.equals(lineEnding, other.lineEnding);
+	}
+
 }

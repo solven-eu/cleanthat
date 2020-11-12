@@ -31,6 +31,8 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
@@ -77,7 +79,10 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 			options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, jdkVersion);
 		} else {
 			LOGGER.info("Loading Eclipse java formatting configuration from {}", javaConfigFile);
-			try (InputStream is = new URL(javaConfigFile).openStream()) {
+
+			Resource resource = new DefaultResourceLoader().getResource(javaConfigFile);
+
+			try (InputStream is = resource.getInputStream()) {
 				try {
 					options = new ConfigReader().read(is);
 				} catch (SAXException | ConfigReadException e) {

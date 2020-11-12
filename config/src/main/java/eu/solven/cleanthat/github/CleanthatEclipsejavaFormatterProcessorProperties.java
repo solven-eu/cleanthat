@@ -15,17 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @SuppressWarnings("PMD.ImmutableField")
 public class CleanthatEclipsejavaFormatterProcessorProperties {
 
-	// private ILanguageProperties languageProperties;
 	private String url;
-
-	// @JsonIgnore
-	// public ILanguageProperties getLanguageProperties() {
-	// return languageProperties;
-	// }
-	//
-	// public void setLanguageProperties(ILanguageProperties languageProperties) {
-	// this.languageProperties = languageProperties;
-	// }
 
 	public String getUrl() {
 		return url;

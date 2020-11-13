@@ -103,7 +103,6 @@ public class CodeProviderFormatter {
 			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
 		} else if (configIsChanged.get()) {
 			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
-					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
 			pr.commitIntoPR(pathToMutatedContent, prComments);

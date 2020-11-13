@@ -380,7 +380,8 @@
 						<configFile>eclipse/eclipse_java_code_formatter.xml</configFile>
 						<encoding>UTF-8</encoding>
 						<excludes>
-							<exclude>**/generated/**</exclude>
+							<!-- Test classes -->
+							<exclude>**/do_not_format_me/**</exclude>
 						</excludes>
 					</configuration>
 					<executions>
@@ -415,8 +416,8 @@
 						<staticGroups>java,*</staticGroups>
 						<removeUnused>true</removeUnused>
 						<excludes>
-							<!-- PGSQL -->
-							<exclude>**/generated/**</exclude>
+							<!-- Test classes -->
+							<exclude>**/do_not_format_me/**</exclude>
 						</excludes>
 					</configuration>
 					<executions>

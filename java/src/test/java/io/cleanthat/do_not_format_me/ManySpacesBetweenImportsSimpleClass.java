@@ -2,12 +2,7 @@ package io.cleanthat.do_not_format_me;
 
 import java.time.LocalDate;
 // START Keep EOLs here
-
-
-
-
 // STOP Keep EOLs here
-
 import java.time.LocalDateTime;
 
 /**

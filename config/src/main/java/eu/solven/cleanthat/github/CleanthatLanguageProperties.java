@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -65,4 +66,27 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 	public void setProcessors(List<Map<String, ?>> processors) {
 		this.processors = processors;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(language, languageVersion, processors, sourceCodeProperties);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		CleanthatLanguageProperties other = (CleanthatLanguageProperties) obj;
+		return Objects.equals(language, other.language) && Objects.equals(languageVersion, other.languageVersion)
+				&& Objects.equals(processors, other.processors)
+				&& Objects.equals(sourceCodeProperties, other.sourceCodeProperties);
+	}
+
 }

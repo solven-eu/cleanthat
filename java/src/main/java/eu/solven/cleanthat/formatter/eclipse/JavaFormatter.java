@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -49,6 +50,11 @@ public class JavaFormatter implements IStringFormatter {
 		this.objectMapper = objectMapper;
 	}
 
+	@VisibleForTesting
+	protected long getCacheSize() {
+		return configToEngine.size();
+	}
+
 	@Override
 	public String format(ILanguageProperties languageProperties, String asString) throws IOException {
 		AtomicReference<String> outputRef = new AtomicReference<>(asString);
@@ -83,12 +89,6 @@ public class JavaFormatter implements IStringFormatter {
 		// As we are processing a single processor, we can get ride of the processors field
 		languagePropertiesAsMap.remove("processors");
 
-		// TODO What would it mean to override the language?
-		// Map<String, ?> languageOverload = PepperMapHelper.getAs(pAsMap, "language");
-		// if (languageOverload != null) {
-		// languagePropertiesAsMap.put("language", languageOverload);
-		// }
-
 		// An processor may need to be applied with an override languageVersion
 		Map<String, ?> languageVersionOverload = PepperMapHelper.getAs(rawProcessor, "language_version");
 		if (languageVersionOverload != null) {
@@ -109,15 +109,11 @@ public class JavaFormatter implements IStringFormatter {
 		ICodeProcessor processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
 
-		// Map<String, Object> fullParameters = new LinkedHashMap<>();
-		// fullParameters.put("language_properties", languagePropertiesAsMap);
-
 		// override with explicit configuration
 		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
 		if (parameters == null) {
 			// Some engine takes no parameter
 			parameters = Map.of();
-			// fullParameters.putAll(parameters);
 		}
 
 		if ("eclipse_formatter".equals(engine)) {

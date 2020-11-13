@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -20,12 +21,12 @@ import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.CleanthatLanguageProperties;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
-import eu.solven.cleanthat.github.SourceCodeProperties;
+import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
@@ -49,22 +50,39 @@ public class CodeProviderFormatter {
 	}
 
 	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, ICodeProvider pr) {
+		// A config change may be cleanthat.json
+
+		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
+		// version upgrade led to a change of some engine, which should trigger a full re-compute)
+		AtomicBoolean configIsChanged = new AtomicBoolean();
+
+		List<String> prComments = new ArrayList<>();
+
+		try {
+			pr.listFiles(fileChanged -> {
+				if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(pr.getFilePath(fileChanged))) {
+					configIsChanged.set(true);
+					prComments.add("Configuration has changed");
+				}
+			});
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue while checking for config change", e);
+		}
+
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
-		List<String> prComments = new ArrayList<>();
 		properties.getLanguages().forEach(dirtyLanguageConfig -> {
-			ISourceCodeProperties sourceConfdig = mergeSourceConfig(properties, dirtyLanguageConfig);
-			Map<String, Object> languageConfig = new LinkedHashMap<>();
-			languageConfig.putAll(dirtyLanguageConfig);
-			languageConfig.put("source_code", sourceConfdig);
+			ILanguageProperties languageP =
+					new ConfigHelpers(objectMapper).mergeLanguageProperties(properties, dirtyLanguageConfig);
+
 			String language = PepperMapHelper.getRequiredString(dirtyLanguageConfig, "language");
 			LOGGER.info("About to prepare files for language: {}", language);
-			ILanguageProperties languageP =
-					objectMapper.convertValue(languageConfig, CleanthatLanguageProperties.class);
 			ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
 			LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
 			LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
+
+			// TODO Process all languages in a single pass
 			AtomicLongMap<String> languageCounters = countFiles(pr,
 					languageToNbAddedFiles,
 					pathToMutatedContent,
@@ -81,10 +99,15 @@ public class CodeProviderFormatter {
 				languagesCounters.addAndGet(l, c);
 			});
 		});
-		if (languageToNbAddedFiles.isEmpty()) {
+		if (languageToNbAddedFiles.isEmpty() && !configIsChanged.get()) {
 			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
+		} else if (configIsChanged.get()) {
+			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
+					pr.getHtmlUrl(),
+					pr.getTitle());
+			pr.commitIntoPR(pathToMutatedContent, prComments);
 		} else {
-			LOGGER.info("About to commit {} files into {} ({})",
+			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
@@ -148,19 +171,6 @@ public class CodeProviderFormatter {
 			throw new UncheckedIOException("Issue listing files", e);
 		}
 		return languageCounters;
-	}
-
-	private ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
-			Map<String, ?> dirtyLanguageConfig) {
-		Map<String, Object> sourceConfig = new LinkedHashMap<>();
-		// Apply defaults from parent
-		sourceConfig.putAll(objectMapper.convertValue(properties.getSourceCodeProperties(), Map.class));
-		// Apply explicit configuration
-		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
-		if (explicitSourceCodeProperties != null) {
-			sourceConfig.putAll(explicitSourceCodeProperties);
-		}
-		return objectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
 	}
 
 	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java

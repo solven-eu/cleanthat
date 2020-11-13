@@ -26,4 +26,6 @@ public interface ICodeProvider {
 	String loadContent(Object file) throws IOException;
 
 	String getFilePath(Object file);
+
+	// void fileIsChanged(String pathCleanthatJson);
 }

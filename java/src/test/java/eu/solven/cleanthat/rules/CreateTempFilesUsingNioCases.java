@@ -18,7 +18,7 @@ public class CreateTempFilesUsingNioCases {
 	public CreateTempFilesUsingNioCases() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public String getId() {
 		return "CreateTempFilesUsingNio";
 	}
@@ -54,7 +54,7 @@ public class CreateTempFilesUsingNioCases {
 			return Files.createTempFile(Paths.get("/tmp/test/"), "myFile", ".tmp").toFile();
 		}
 	}
-	
+
 	public static class CaseWithDirectory {
 		public String getTitle() {
 			return "File.createTempFile(\"myFile\", \".tmp\", directory)";
@@ -68,7 +68,7 @@ public class CreateTempFilesUsingNioCases {
 			return Files.createTempFile(directory.toPath(), "myFile", ".tmp").toFile();
 		}
 	}
-	
+
 	public static class CaseNullDirectory {
 		public String getTitle() {
 			return "File.createTempFile(\"myFile\", \".tmp\", null)";

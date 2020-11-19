@@ -50,20 +50,12 @@
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-spring-boot-starter</artifactId>
-<<<<<<< Updated upstream
-			<version>3.2.0</version>
-=======
 			<version>${sentry-spring.version}</version>
->>>>>>> Stashed changes
 		</dependency>
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-logback</artifactId>
-<<<<<<< Updated upstream
-			<version>3.2.0</version>
-=======
 			<version>${sentry-spring.version}</version>
->>>>>>> Stashed changes
 		</dependency>
 
 		<dependency>

@@ -7,6 +7,12 @@ import java.nio.file.Paths;
 
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
+/**
+ * cases inspired from https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html#code-changes
+ *
+ * @author Sébastien Collard
+ */
+
 public class CreateTempFilesUsingNioCases {
 
 	public CreateTempFilesUsingNioCases() {

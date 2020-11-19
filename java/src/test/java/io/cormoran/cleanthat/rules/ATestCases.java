@@ -17,11 +17,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class ATestCases {
 
 	protected void testCasesIn(Class<?> casesClass, IClassTransformer transformer) throws IOException {
-		Path srcMainResource = new ClassPathResource("empty").getFile().getParentFile().toPath();
-		Assert.assertEquals("classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
-		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
-		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
-		Path srcMainJava = srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
+		Path srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
@@ -45,6 +41,14 @@ public class ATestCases {
 				Assert.assertEquals(post, pre);
 			}
 		});
+	}
+	
+	public Path getProjectTestSourceCode() throws IOException {
+		Path srcMainResource = new ClassPathResource("empty").getFile().getParentFile().toPath();
+		Assert.assertEquals("classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
+		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
+		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
+		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 
 	private MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {

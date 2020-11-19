@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import com.github.javaparser.StaticJavaParser;
@@ -15,6 +17,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class ATestCases {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
 	protected void testCasesIn(Class<?> casesClass, IClassTransformer transformer) throws IOException {
 		Path srcMainResource = new ClassPathResource("empty").getFile().getParentFile().toPath();
@@ -29,20 +32,25 @@ public class ATestCases {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 		});
 		cases.forEach(oneCase -> {
-			MethodDeclaration post = getMethodWithName(oneCase, "post");
-			// Check the transformer is impact-less on already clean code
-			{
-				MethodDeclaration postPost = post.clone();
-				transformer.transform(postPost);
-				Assert.assertEquals(post, postPost);
-			}
+			LOGGER.info("Processing the case: {}", oneCase.getName());
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
+			MethodDeclaration post = getMethodWithName(oneCase, "post");
+
 			// Check 'pre' is transformed into 'post'
+			// This is generally the most relevant test: to be done first
 			{
 				transformer.transform(pre);
 				// Rename the method bfore checking full equality
 				pre.setName("post");
 				Assert.assertEquals(post, pre);
+			}
+
+			// Check the transformer is impact-less on already clean code
+			// This is a less relevant test: to be done later
+			{
+				MethodDeclaration postPost = post.clone();
+				transformer.transform(postPost);
+				Assert.assertEquals(post, postPost);
 			}
 		});
 	}

@@ -50,7 +50,7 @@ public class ATestCases {
 			}
 		});
 	}
-	
+
 	public Path getProjectTestSourceCode() throws IOException {
 		Path srcMainResource = new ClassPathResource("empty").getFile().getParentFile().toPath();
 		Assert.assertEquals("classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
@@ -59,7 +59,7 @@ public class ATestCases {
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 
-	private MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
+	protected MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
 		List<MethodDeclaration> preMethods = oneCase.getMethodsByName(name);
 		if (preMethods.size() != 1) {
 			throw new IllegalStateException("Expected a single 'pre' method in " + oneCase);

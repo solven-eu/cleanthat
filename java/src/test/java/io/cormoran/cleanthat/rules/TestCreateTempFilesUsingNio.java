@@ -20,7 +20,7 @@ import eu.solven.cleanthat.rules.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class TestCreateTempFilesUsingNio extends ATestCases {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNio.class);
 
 	@Test
@@ -32,7 +32,7 @@ public class TestCreateTempFilesUsingNio extends ATestCases {
 	public void testImportNioFiles() throws IOException {
 		Path srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
-		String path = CreateTempFilesUsingNioCases.class .getName().replaceAll("\\.", "/") + ".java";
+		String path = CreateTempFilesUsingNioCases.class.getName().replaceAll("\\.", "/") + ".java";
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
 		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
@@ -44,13 +44,15 @@ public class TestCreateTempFilesUsingNio extends ATestCases {
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
 
 			// Check if 'pre' transformation into 'post' add the good library
-			//TODO not yet testing import of Paths
+			// TODO not yet testing import of Paths
 			{
-				compilationUnit.getImports().removeIf(im -> im.equals(new ImportDeclaration("java.nio.file.Files",false,false)));
+				compilationUnit.getImports()
+						.removeIf(im -> im.equals(new ImportDeclaration("java.nio.file.Files", false, false)));
 				transformer.transform(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
-				Assert.assertTrue(compilationUnit.getImports().contains(new ImportDeclaration("java.nio.file.Files",false,false)));
+				Assert.assertTrue(compilationUnit.getImports()
+						.contains(new ImportDeclaration("java.nio.file.Files", false, false)));
 			}
 
 		});

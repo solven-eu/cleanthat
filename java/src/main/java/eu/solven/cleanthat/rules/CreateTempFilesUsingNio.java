@@ -87,8 +87,9 @@ public class CreateTempFilesUsingNio implements IClassTransformer {
 	private void process(MethodCallExpr methodExp) {
 		List<Expression> arguments = methodExp.getArguments();
 		if (arguments.size() == 2) {
-			methodExp.tryAddImportToParentCompilationUnit(Files.class);
 			LOGGER.debug("Add java.nio.file.Files to import");
+			methodExp.tryAddImportToParentCompilationUnit(Files.class);
+
 			// inversion
 			MethodCallExpr replacement = new MethodCallExpr(
 					new MethodCallExpr(new NameExpr("Files"), "createTempFile", methodExp.getArguments()),

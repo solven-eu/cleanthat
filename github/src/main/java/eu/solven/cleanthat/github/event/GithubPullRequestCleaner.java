@@ -45,7 +45,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	// private static final String KEY_JAVA = "java";
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
 
-	private static final String PATH_CLEANTHAT_JSON = "/cleanthat.json";
+	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
+	public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
 	final ObjectMapper objectMapper;
 

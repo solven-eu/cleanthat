@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * The configuration of a formatting job
  *
  * @author Benoit Lacelle
  */
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CleanthatRepositoryProperties {
+
+	private String syntaxVersion;
 
 	private CleanthatMetaProperties meta;
 
@@ -19,6 +24,14 @@ public class CleanthatRepositoryProperties {
 
 	// Properties to apply to each children
 	private ISourceCodeProperties sourceCodeProperties;
+
+	public String getSyntaxVersion() {
+		return syntaxVersion;
+	}
+
+	public void setSyntaxVersion(String syntaxVersion) {
+		this.syntaxVersion = syntaxVersion;
+	}
 
 	public CleanthatMetaProperties getMeta() {
 		return meta;

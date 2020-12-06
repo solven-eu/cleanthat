@@ -9,9 +9,13 @@ public interface IJdkVersionConstants {
 
 	String JDK_1 = "1";
 
+	String JDK_4 = "1.4";
+
 	String JDK_5 = "1.5";
 
 	String JDK_6 = "1.6";
+
+	String JDK_7 = "1.7";
 
 	String JDK_8 = "8";
 

@@ -15,6 +15,8 @@ public interface IJdkVersionConstants {
 
 	String JDK_6 = "1.6";
 
+	String JDK_7 = "1.7";
+
 	String JDK_8 = "8";
 
 	String JDK_11 = "11";

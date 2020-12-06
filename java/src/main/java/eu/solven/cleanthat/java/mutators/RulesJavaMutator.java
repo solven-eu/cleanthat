@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,12 @@ import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.ICodeProcessor;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.meta.Version;
 
 /**
  * Bridges to Eclipse formatting engine
@@ -48,13 +51,26 @@ public class RulesJavaMutator implements ICodeProcessor {
 	private final ILanguageProperties languageProperties;
 	private final CleanthatJavaProcessorProperties properties;
 
+	private static final List<IClassTransformer> ALL_TRANSFORMERS = Arrays.asList(new EnumsWithoutEquals(),
+			new PrimitiveBoxedForString(),
+			new UseIsEmptyOnCollections(),
+			new CreateTempFilesUsingNio());
+
 	private final List<IClassTransformer> transformers;
 
 	public RulesJavaMutator(ILanguageProperties languageProperties, CleanthatJavaProcessorProperties properties) {
 		this.languageProperties = languageProperties;
 		this.properties = properties;
-		this.transformers =
-				Arrays.asList(new EnumsWithoutEquals(), new PrimitiveBoxedForString(), new UseIsEmptyOnCollections());
+
+		Version languageVersion = new Version(languageProperties.getLanguageVersion());
+		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
+			Version transformerVersion = new Version(ct.minimalJavaVersion());
+			return languageVersion.compareTo(transformerVersion) >= 0;
+		}).collect(Collectors.toList());
+	}
+
+	public List<IClassTransformer> getTransformers() {
+		return transformers;
 	}
 
 	@Override

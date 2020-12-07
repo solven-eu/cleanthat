@@ -36,7 +36,7 @@ import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.Version;
+import eu.solven.cleanthat.rules.meta.VersionWrapper;
 
 /**
  * Bridges to Eclipse formatting engine
@@ -62,9 +62,9 @@ public class RulesJavaMutator implements ICodeProcessor {
 		this.languageProperties = languageProperties;
 		this.properties = properties;
 
-		Version languageVersion = new Version(languageProperties.getLanguageVersion());
+		VersionWrapper languageVersion = new VersionWrapper(languageProperties.getLanguageVersion());
 		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
-			Version transformerVersion = new Version(ct.minimalJavaVersion());
+			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
 			return languageVersion.compareTo(transformerVersion) >= 0;
 		}).collect(Collectors.toList());
 	}

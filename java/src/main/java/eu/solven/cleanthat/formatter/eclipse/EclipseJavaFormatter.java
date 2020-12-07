@@ -106,7 +106,7 @@ public class EclipseJavaFormatter implements ICodeProcessor {
 				LOGGER.debug("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
 				return null;
 			}
-		} catch (IndexOutOfBoundsException e) {
+		} catch (RuntimeException e) {
 			LOGGER.debug("Code cannot be formatted for text -->" + code + "<--", e);
 			return null;
 		}

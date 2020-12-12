@@ -27,8 +27,8 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
+import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.formatter.eclipse.ICodeProcessor;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;

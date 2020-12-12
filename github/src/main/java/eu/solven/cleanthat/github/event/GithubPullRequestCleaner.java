@@ -151,7 +151,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		GHRepository repo = defaultBranch.getOwner();
 		try {
 			// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
-			// Detect usage of Checkstyle: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
+			// Detect usage of Checkstyle:
+			// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
 			// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
 			// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
 			// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck

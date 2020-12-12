@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.lambda;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -14,10 +15,10 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
-import io.sentry.IHub;
 import io.sentry.Sentry;
 
 /**
@@ -49,17 +50,32 @@ public class CleanThatLambdaFunction {
 			ObjectMapper objectMapper,
 			GithubWebhookHandlerFactory githubFactory) {
 		return input -> {
-			try {
-				// We log the payload temporarily, in order to have easy access to metadata
-				LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
-				// TODO Cache the Github instance for the JWT duration
-				JavaFormatter formatter = new JavaFormatter(objectMapper);
-				return githubFactory.makeWithFreshJwt()
-						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
-			} catch (IOException | JOSEException | RuntimeException e) {
-				Sentry.captureException(e, "Lambda");
-				throw new RuntimeException(e);
+			if (input.containsKey("Records")) {
+				// This comes from SQS, which pushes SQSEvent
+
+				Collection<Map<String, ?>> records = PepperMapHelper.getRequiredAs(input, "Records");
+
+				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
+				return Map.of("sqs", records.stream().map(r -> processOneMessage(objectMapper, githubFactory, r)));
+			} else {
+				return processOneMessage(objectMapper, githubFactory, input);
 			}
 		};
+	}
+
+	private Map<String, ?> processOneMessage(ObjectMapper objectMapper,
+			GithubWebhookHandlerFactory githubFactory,
+			Map<String, ?> input) {
+		try {
+			// We log the payload temporarily, in order to have easy access to metadata
+			LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
+			// TODO Cache the Github instance for the JWT duration
+			JavaFormatter formatter = new JavaFormatter(objectMapper);
+			return githubFactory.makeWithFreshJwt()
+					.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
+		} catch (IOException | JOSEException | RuntimeException e) {
+			Sentry.captureException(e, "Lambda");
+			throw new RuntimeException(e);
+		}
 	}
 }

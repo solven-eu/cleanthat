@@ -16,6 +16,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;

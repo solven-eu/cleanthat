@@ -28,7 +28,7 @@ import eu.solven.cleanthat.github.ILanguageProperties;
 public class SpringJavaFormatter implements ISourceCodeFormatter {
 	public SpringJavaFormatter(ILanguageProperties languageProperties,
 			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
-		throw new IllegalStateException("TODO");
+		throw new IllegalStateException("TODO" + languageProperties + processorConfig);
 	}
 
 	@Override

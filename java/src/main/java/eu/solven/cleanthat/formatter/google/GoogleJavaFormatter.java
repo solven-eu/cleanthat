@@ -29,7 +29,7 @@ import eu.solven.cleanthat.github.ILanguageProperties;
 public class GoogleJavaFormatter implements ISourceCodeFormatter {
 	public GoogleJavaFormatter(ILanguageProperties languageProperties,
 			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
-		throw new IllegalStateException("TODO");
+		throw new IllegalStateException("TODO " + languageProperties + processorConfig);
 	}
 
 	@Override

@@ -6,6 +6,11 @@ spring:
 # Default is '/actuator'
 management.endpoints.web.base-path: /api/actuator
 
+#TODO git.properties is not generated in Heroku as .git is removed by Heroku
+#https://stackoverflow.com/questions/14583282/heroku-display-hash-of-current-commit/34536363#34536363
+#heroku labs:enable runtime-dyno-metadata -a agilea-app
+#String release = env.getProperty("heroku.slug.commit", "not_heroku");
+
 sentry.dsn: https://22586844ad7d4f21b837cf5ea3600a1f@o222257.ingest.sentry.io/5245874
 
 aws.lambda.invoke:

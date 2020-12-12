@@ -121,7 +121,8 @@ public class CodeProviderFormatter {
 			if ("java".equals(languageP.getLanguage())) {
 				List<String> defaultIncludes = Arrays.asList("glob:**/*.java");
 				LOGGER.info("Default includes to: {}", defaultIncludes);
-				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/src/main/java/io/spring/format/maven/FormatMojo.java#L47
+				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
+				// .../src/main/java/io/spring/format/maven/FormatMojo.java#L47
 				languageP = configHelpers.forceIncludes(languageP, defaultIncludes);
 				sourceCodeProperties = languageP.getSourceCodeProperties();
 				includes = languageP.getSourceCodeProperties().getIncludes();

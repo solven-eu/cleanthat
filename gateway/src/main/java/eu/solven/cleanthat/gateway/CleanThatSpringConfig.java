@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.gateway.lambda.CleanThatLambdaInvoker;
 import eu.solven.cleanthat.github.GithubController;
-import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 
 /**
  * Main SpringBoot {@link Configuration}
@@ -19,9 +18,6 @@ import eu.solven.cleanthat.sentry.SentryMvcSpringConfig;
 		CleanThatMvcConfigurer.class,
 
 		GithubController.class,
-		CleanThatLambdaInvoker.class,
-
-		// Monitoring
-		SentryMvcSpringConfig.class, })
+		CleanThatLambdaInvoker.class, })
 public class CleanThatSpringConfig {
 }

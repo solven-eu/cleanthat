@@ -5,7 +5,7 @@ spring:
   main:
     banner-mode: "off"
 # Something seems broken in Sentry configuration
-  main.allow-bean-definition-overriding: true
+#  main.allow-bean-definition-overriding: true
 
 sentry:
   dsn: https://22586844ad7d4f21b837cf5ea3600a1f@o222257.ingest.sentry.io/5245874

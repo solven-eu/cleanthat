@@ -2,6 +2,7 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -31,6 +32,11 @@ public class ConfigHelpers {
 		this.objectMapper = objectMapper;
 	}
 
+	public CleanthatRepositoryProperties loadRepoConfig(Resource resource)
+			throws JsonParseException, JsonMappingException, IOException {
+		return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
+	}
+
 	protected ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, Object> sourceConfig = new LinkedHashMap<>();
@@ -54,8 +60,14 @@ public class ConfigHelpers {
 		return languageP;
 	}
 
-	public CleanthatRepositoryProperties loadRepoConfig(Resource resource)
-			throws JsonParseException, JsonMappingException, IOException {
-		return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
+	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
+		Map<String, Object> languageAsMap = objectMapper.convertValue(languageP, Map.class);
+
+		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCodeProperties(), Map.class);
+		sourceCodeAsMap.put("includes", includes);
+
+		languageAsMap.put("source_code", sourceCodeAsMap);
+
+		return objectMapper.convertValue(languageAsMap, CleanthatLanguageProperties.class);
 	}
 }

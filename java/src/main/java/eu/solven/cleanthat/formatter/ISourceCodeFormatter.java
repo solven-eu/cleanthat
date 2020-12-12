@@ -1,15 +1,13 @@
-package eu.solven.cleanthat.formatter.eclipse;
+package eu.solven.cleanthat.formatter;
 
 import java.io.IOException;
-
-import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * Knows how to format a piece of code
  *
  * @author Benoit Lacelle
  */
-public interface ICodeProcessor {
+public interface ISourceCodeFormatter {
 
 	String doFormat(String code, LineEnding ending) throws IOException;
 }

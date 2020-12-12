@@ -18,6 +18,7 @@ import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import io.sentry.IHub;
+import io.sentry.Sentry;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -43,7 +44,8 @@ public class CleanThatLambdaFunction {
 	}
 
 	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(IHub sentryClient,
+	public Function<Map<String, ?>, Map<String, ?>> uppercase(
+			// IHub sentryClient,
 			ObjectMapper objectMapper,
 			GithubWebhookHandlerFactory githubFactory) {
 		return input -> {
@@ -55,7 +57,7 @@ public class CleanThatLambdaFunction {
 				return githubFactory.makeWithFreshJwt()
 						.processWebhookBody(input, formatter, new GithubPullRequestCleaner(objectMapper, formatter));
 			} catch (IOException | JOSEException | RuntimeException e) {
-				sentryClient.captureException(e, "Lambda");
+				Sentry.captureException(e, "Lambda");
 				throw new RuntimeException(e);
 			}
 		};

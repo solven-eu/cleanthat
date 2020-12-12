@@ -44,7 +44,7 @@ import eu.solven.cleanthat.rules.meta.VersionWrapper;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class RulesJavaMutator implements ICodeProcessor {
+public class RulesJavaMutator implements ISourceCodeFormatter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesJavaMutator.class);
 

@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReader;
@@ -48,7 +49,10 @@ import eu.solven.cleanthat.github.ILanguageProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class EclipseJavaFormatter implements ICodeProcessor {
+// Example configurations:
+// https://raw.githubusercontent.com/spring-io/spring-javaformat/master/.eclipse/eclipse-code-formatter.xml
+// https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+public class EclipseJavaFormatter implements ISourceCodeFormatter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 

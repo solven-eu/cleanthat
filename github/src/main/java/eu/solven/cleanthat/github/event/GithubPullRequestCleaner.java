@@ -150,6 +150,11 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public void openPRWithCleanThatStandardConfiguration(GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
 		try {
+			// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
+			// Detect usage of Checkstyle: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
+			// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
+			// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
+			// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
 			String exampleConfig = readResource("/standard-configurations/standard-java.json");
 			GHTree createTree = repo.createTree()
 					.baseTree(defaultBranch.getSHA1())

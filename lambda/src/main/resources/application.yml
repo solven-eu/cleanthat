@@ -19,6 +19,3 @@ sentry:
 github.app:
   app-id: 65550
   client-id: Iv1.35f0415ae74331de
-  client-secret: SECRET
-  private-jwk: SECRET
-

@@ -6,6 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -49,7 +49,7 @@ public class CodeProviderFormatter {
 		this.formatter = formatter;
 	}
 
-	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, ICodeProvider pr) {
+	public Map<String, ?> formatPR(CleanthatRepositoryProperties repoProperties, ICodeProvider pr) {
 		// A config change may be cleanthat.json
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
@@ -72,29 +72,19 @@ public class CodeProviderFormatter {
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
-		properties.getLanguages().forEach(dirtyLanguageConfig -> {
-			ILanguageProperties languageP =
-					new ConfigHelpers(objectMapper).mergeLanguageProperties(properties, dirtyLanguageConfig);
-
-			String language = PepperMapHelper.getRequiredString(dirtyLanguageConfig, "language");
-			LOGGER.info("About to prepare files for language: {}", language);
-			ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
-			LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
-			LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
+		repoProperties.getLanguages().forEach(dirtyLanguageConfig -> {
+			ILanguageProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
-			AtomicLongMap<String> languageCounters = countFiles(pr,
-					languageToNbAddedFiles,
-					pathToMutatedContent,
-					language,
-					languageP,
-					sourceCodeProperties);
+			AtomicLongMap<String> languageCounters =
+					countFiles(pr, languageToNbAddedFiles, pathToMutatedContent, languageP);
 			String details = languageCounters.asMap()
 					.entrySet()
 					.stream()
 					.map(e -> e.getKey() + ": " + e.getValue())
 					.collect(Collectors.joining(EOL));
-			prComments.add("language=" + language + EOL + details);
+
+			prComments.add("language=" + languageP.getLanguage() + EOL + details);
 			languageCounters.asMap().forEach((l, c) -> {
 				languagesCounters.addAndGet(l, c);
 			});
@@ -116,12 +106,42 @@ public class CodeProviderFormatter {
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}
 
+	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
+			Map<String, ?> dirtyLanguageConfig) {
+		ConfigHelpers configHelpers = new ConfigHelpers(objectMapper);
+
+		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
+
+		String language = languageP.getLanguage();
+		LOGGER.info("About to prepare files for language: {}", language);
+
+		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
+		List<String> includes = languageP.getSourceCodeProperties().getIncludes();
+		if (includes.isEmpty()) {
+			if ("java".equals(languageP.getLanguage())) {
+				List<String> defaultIncludes = Arrays.asList("glob:**/*.java");
+				LOGGER.info("Default includes to: {}", defaultIncludes);
+				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/src/main/java/io/spring/format/maven/FormatMojo.java#L47
+				languageP = configHelpers.forceIncludes(languageP, defaultIncludes);
+				sourceCodeProperties = languageP.getSourceCodeProperties();
+				includes = languageP.getSourceCodeProperties().getIncludes();
+			} else {
+				LOGGER.warn("No includes and no default for language={}", language);
+			}
+		}
+
+		LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
+		LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
+		return languageP;
+	}
+
 	private AtomicLongMap<String> countFiles(ICodeProvider pr,
 			AtomicLongMap<String> languageToNbAddedFiles,
 			Map<String, String> pathToMutatedContent,
-			String language,
-			ILanguageProperties languageP,
-			ISourceCodeProperties sourceCodeProperties) {
+			ILanguageProperties languageP) {
+		String language = languageP.getLanguage();
+		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
+
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 		try {
 			pr.listFiles(file -> {

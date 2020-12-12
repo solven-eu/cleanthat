@@ -35,7 +35,7 @@ import net.revelc.code.impsort.Result;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRevelcImportsCleaner implements ICodeProcessor {
+public class JavaRevelcImportsCleaner implements ISourceCodeFormatter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRevelcImportsCleaner.class);
 

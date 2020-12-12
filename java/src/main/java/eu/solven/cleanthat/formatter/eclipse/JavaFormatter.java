@@ -106,7 +106,7 @@ public class JavaFormatter implements IStringFormatter {
 		}
 		ILanguageProperties languageProperties =
 				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
-		ICodeProcessor processor;
+		ISourceCodeFormatter processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
 
 		// override with explicit configuration

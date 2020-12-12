@@ -40,9 +40,11 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
 
+	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
+
 	final int solvenEuCleanThatInstallationId = 9086720;
 
-	final String repoFullName = SOLVEN_EU_CLEANTHAT;
+	final String repoFullName = SOLVEN_EU_SPRING_BOOT;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RunCleanGithubPR.class, args);

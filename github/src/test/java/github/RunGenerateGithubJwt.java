@@ -40,7 +40,7 @@ public class RunGenerateGithubJwt {
 				StandardCharset.UTF_8).read());
 		LOGGER.info("github.app.private-jwk: '{}'", jwk.toJSONString());
 		MockEnvironment env = new MockEnvironment();
-		env.setProperty("github.app.app-id", "65550");
+		env.setProperty("github.app.app-id", githubAppId);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
 		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env, new ObjectMapper());
 		GitHub gitHubApp = factory.makeWithFreshJwt().getGithub();

@@ -165,7 +165,9 @@
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin -->
 				<groupId>com.github.seanroy</groupId>
 				<artifactId>lambda-maven-plugin</artifactId>
-				<version>2.3.3</version>
+				<!-- 2.3.3 is KO -->
+				<!-- https://github.com/SeanRoy/lambda-maven-plugin/issues/104 -->
+				<version>2.3.2</version>
 				<dependencies>
 					<dependency>
 						<groupId>javax.xml.bind</groupId>

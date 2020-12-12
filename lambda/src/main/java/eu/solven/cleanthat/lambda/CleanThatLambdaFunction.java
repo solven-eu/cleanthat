@@ -2,8 +2,11 @@ package eu.solven.cleanthat.lambda;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
@@ -55,8 +59,25 @@ public class CleanThatLambdaFunction {
 
 				Collection<Map<String, ?>> records = PepperMapHelper.getRequiredAs(input, "Records");
 
+				LOGGER.info("About to process a batch of {} events from SQS", records.size());
+
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
-				return Map.of("sqs", records.stream().map(r -> processOneMessage(objectMapper, githubFactory, r)));
+				List<?> output = records.stream().map(r -> {
+					String body = PepperMapHelper.getRequiredString(r, "body");
+
+					// SQS transfer the body 'as is'
+					try {
+						return (Map<String, ?>) objectMapper.readValue(body, Map.class);
+					} catch (JsonProcessingException e) {
+						LOGGER.warn("Issue while parsing: {}", body);
+						LOGGER.warn("Issue while parsing body", e);
+						return Collections.<String, Object>emptyMap();
+					}
+				})
+						.filter(m -> !m.isEmpty())
+						.map(r -> processOneMessage(objectMapper, githubFactory, r))
+						.collect(Collectors.toList());
+				return Map.of("sqs", output);
 			} else {
 				return processOneMessage(objectMapper, githubFactory, input);
 			}

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
@@ -58,7 +59,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	@Override
-	public Map<String, ?> formatPR(CommitContext commitContext, GHPullRequest pr) {
+	public Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> prSupplier) {
+		GHPullRequest pr = prSupplier.get();
+
 		String prUrl = pr.getHtmlUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);

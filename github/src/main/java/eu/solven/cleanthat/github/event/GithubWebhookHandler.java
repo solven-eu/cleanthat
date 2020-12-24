@@ -91,9 +91,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
 
-		GHRepository repoId;
+		GHRepository repo;
 		try {
-			repoId = githubAuthAsInst.getRepositoryById(
+			repo = githubAuthAsInst.getRepositoryById(
 					Long.toString(PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue()));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -101,7 +101,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		Optional<String> ref = PepperMapHelper.getOptionalString(input, "ref");
 
-		String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repoId.getDefaultBranch()));
+		String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repo.getDefaultBranch()));
 
 		final boolean isBranchWithoutPR;
 		final boolean isMainBranchCommit;
@@ -132,7 +132,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// Still, this seems a very complex features, as it is difficult to know from which branch/the full
 			// commit-list we have to process
 			try {
-				optPr = repoId.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
+				optPr = repo.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
 					return ref.get().equals("refs/heads/" + pr.getHead().getRef());
 				}).findFirst();
 			} catch (IOException e) {
@@ -170,7 +170,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					LOGGER.info("We are notified of a new PR: {}", url);
 
 					try {
-						optPr = Optional.of(repoId.getPullRequest(prId));
+						optPr = Optional.of(repo.getPullRequest(prId));
 					} catch (IOException e) {
 						throw new UncheckedIOException(e);
 					}
@@ -183,7 +183,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		if (isBranchDeleted) {
 			return Map.of("skipped", "webhook triggered on a branch deletion");
 		} else {
-			LOGGER.info("Commit on main branch: {}", isMainBranchCommit);
+			LOGGER.info("Notified commit on main branch: {}", isMainBranchCommit);
 			CommitContext commitContext = new CommitContext(isMainBranchCommit, isBranchWithoutPR);
 
 			if (optPr.isPresent()) {
@@ -191,7 +191,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
 					return Map.of("skipped", "PullRequest is locked");
 				} else {
-					return prCleaner.formatPR(commitContext, optPr.get());
+					return prCleaner.formatPR(commitContext, optPr::get);
 				}
 			} else {
 				return Map.of("skipped", "webhook is not attached to a PullRequest");

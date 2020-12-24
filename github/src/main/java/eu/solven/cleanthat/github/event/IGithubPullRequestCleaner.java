@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github.event;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHPullRequest;
@@ -13,7 +14,7 @@ import org.kohsuke.github.GHPullRequest;
  */
 public interface IGithubPullRequestCleaner {
 
-	Map<String, ?> formatPR(CommitContext commitContext, GHPullRequest pr);
+	Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> pr);
 
 	Optional<Map<String, ?>> branchConfig(GHBranch branch);
 }

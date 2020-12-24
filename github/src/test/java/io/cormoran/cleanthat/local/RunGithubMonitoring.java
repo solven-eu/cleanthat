@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallationToken;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.PagedSearchIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.WebApplicationType;
@@ -19,6 +21,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
@@ -81,9 +84,15 @@ public class RunGithubMonitoring {
 
 				installation.setRoot(installationGithub);
 
-				installation.listRepositories().forEach(repo -> {
-					LOGGER.info("repo: {}", repo.getHtmlUrl());
-					LOGGER.info("language: {}", repo.getLanguage());
+				PagedSearchIterable<GHRepository> repositories = installation.listRepositories();
+				LOGGER.info("#repositories: {}", repositories.getTotalCount());
+				repositories.forEach(repo -> {
+					if (Strings.isNullOrEmpty(repo.getLanguage())) {
+						LOGGER.debug("Not very interesting");
+					} else {
+						LOGGER.info("repo: {}", repo.getHtmlUrl());
+						LOGGER.info("language: {}", repo.getLanguage());
+					}
 				});
 
 				// token.
@@ -93,7 +102,11 @@ public class RunGithubMonitoring {
 
 			// GHUser user = github.getUser(installation.getAccount().getLogin());
 
-			LOGGER.info("appId={} url={} selection={}", appId, url, installation.getRepositorySelection());
+			LOGGER.info("appId={} id={} url={} selection={}",
+					appId,
+					installation.getId(),
+					url,
+					installation.getRepositorySelection());
 			LOGGER.info("appId={} repositories={}", appId, installation.getRepositoriesUrl());
 		});
 	}

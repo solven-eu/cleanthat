@@ -43,7 +43,7 @@ public class RunGenerateGithubJwt {
 		env.setProperty("github.app.app-id", githubAppId);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
 		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env, new ObjectMapper());
-		GitHub gitHubApp = factory.makeWithFreshJwt().getGithub();
+		GitHub gitHubApp = factory.makeWithFreshJwt().getGithubAsApp();
 		GHApp app = gitHubApp.getApp();
 		app.listInstallations().forEach(install -> {
 			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());

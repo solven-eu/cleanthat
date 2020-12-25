@@ -13,11 +13,19 @@ import eu.solven.cleanthat.github.IStringFormatter;
  */
 public interface IGithubWebhookHandler {
 
-	Map<String, ?> processWebhookBody(Map<String, ?> input,
-			IStringFormatter formatter,
-			IGithubPullRequestCleaner prCleaner);
+	Map<String, ?> processWebhookBody(Map<String, ?> input, IGithubPullRequestCleaner prCleaner);
 
-	GitHub getGithub();
+	/**
+	 * Typically useful to list installations
+	 * 
+	 * @return a {@link GitHub} instance authenticated as the Github Application.
+	 */
+	GitHub getGithubAsApp();
 
+	/**
+	 * 
+	 * @param installationId
+	 * @return a {@link GitHub} instance authenticated as given installation, having access to permitted repositories
+	 */
 	GitHub makeInstallationGithub(long installationId);
 }

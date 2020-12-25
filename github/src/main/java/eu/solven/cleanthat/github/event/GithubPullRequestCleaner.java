@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -27,10 +29,9 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.formatter.CodeProviderFormatter;
+import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.IStringFormatter;
 
 /**
  * Default for {@link IGithubPullRequestCleaner}
@@ -51,11 +52,11 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 	final ObjectMapper objectMapper;
 
-	final IStringFormatter formatter;
+	final ICodeProviderFormatter formatterProvider;
 
-	public GithubPullRequestCleaner(ObjectMapper objectMapper, IStringFormatter formatter) {
+	public GithubPullRequestCleaner(ObjectMapper objectMapper, ICodeProviderFormatter formatterProvider) {
 		this.objectMapper = objectMapper;
-		this.formatter = formatter;
+		this.formatterProvider = formatterProvider;
 	}
 
 	@Override
@@ -150,58 +151,85 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return defaultBranchConfig;
 	}
 
-	public void openPRWithCleanThatStandardConfiguration(GHBranch defaultBranch) {
+	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
+
+		String refName = "cleanthat/configure";
+		String fullRefName = "refs/heads/" + refName;
+
+		boolean refAlreadyExists;
+		Optional<GHRef> refToPR = Optional.empty();
 		try {
-			// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
-			// Detect usage of Checkstyle:
-			// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
-			// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
-			// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
-			// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-			String exampleConfig = readResource("/standard-configurations/standard-java.json");
-			GHTree createTree = repo.createTree()
-					.baseTree(defaultBranch.getSHA1())
-					.add("cleanthat.json", exampleConfig, false)
-					.create();
-			GHCommit commit = GithubPRCodeProvider.prepareCommit(repo)
-					.message("Add cleanthat.json")
-					.parent(defaultBranch.getSHA1())
-					.tree(createTree.getSha())
-					.create();
-			String configureRefName = "refs/heads/" + "cleanthat/configure";
-			AtomicBoolean refAlreadyExists = new AtomicBoolean();
-			GHRef refToPR;
 			try {
-				refToPR = repo.getRef(configureRefName);
-				LOGGER.info("There is already a ref: " + configureRefName);
-				refAlreadyExists.set(true);
-				boolean force = true;
-				refToPR.updateTo(commit.getSHA1(), force);
+				refToPR = Optional.of(repo.getRef(fullRefName));
+				LOGGER.info("There is already a ref: " + fullRefName);
+				refAlreadyExists = true;
 			} catch (GHFileNotFoundException e) {
-				LOGGER.trace("There is not yet a ref: " + configureRefName, e);
-				LOGGER.info("There is not yet a ref: " + configureRefName);
-				// refAlreadyExists.set(false);
-				refToPR = repo.createRef(configureRefName, commit.getSHA1());
+				LOGGER.trace("There is not yet a ref: " + fullRefName, e);
+				LOGGER.info("There is not yet a ref: " + fullRefName);
+				refAlreadyExists = false;
+				refToPR = Optional.empty();
 			}
-			if (refAlreadyExists.get()) {
-				LOGGER.info("There is already a ref about to introduce a cleanthat.json ; do not open a new PR");
+		} catch (IOException e) {
+			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
+			throw new UncheckedIOException(e);
+		}
+
+		try {
+			if (refAlreadyExists) {
+				LOGGER.info(
+						"There is already a ref about to introduce a cleanthat.json ; do not open a new PR (url={})",
+						refToPR.get().getUrl().toExternalForm());
+
+				repo.listPullRequests(GHIssueState.ALL).forEach(pr -> {
+					if (refName.equals(pr.getHead().getRef())) {
+						LOGGER.info("Related PR: {}", pr.getHtmlUrl());
+					}
+				});
 			} else {
+				GHCommit commit = commitConfig(defaultBranch, repo);
+
+				refToPR = Optional.of(repo.createRef(fullRefName, commit.getSHA1()));
+
+				boolean force = false;
+				refToPR.get().updateTo(commit.getSHA1(), force);
+
 				// Let's follow Renovate and its configuration PR
 				// https://github.com/solven-eu/agilea/pull/1
 				String body = readResource("/templates/onboarding-body.md");
 				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
 				repo.createPullRequest("Configure CleanThat",
-						refToPR.getRef(),
+						refToPR.get().getRef(),
 						defaultBranch.getName(),
 						body,
 						true,
 						false);
 			}
 		} catch (IOException e) {
+			// TODO If 401, it probably means the Installation is not allowed to modify given repo
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo) throws IOException {
+		// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
+		// Detect usage of Checkstyle:
+		// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
+		// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
+		// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
+		// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
+		String exampleConfig = readResource("/standard-configurations/standard-java.json");
+		GHTree createTree = repo.createTree()
+				.baseTree(defaultBranch.getSHA1())
+				.add("cleanthat.json", exampleConfig, false)
+				.create();
+		GHCommit commit = GithubPRCodeProvider.prepareCommit(repo)
+				.message("Add cleanthat.json")
+				.parent(defaultBranch.getSHA1())
+				.tree(createTree.getSha())
+				.create();
+		return commit;
 	}
 
 	private String readResource(String path) {
@@ -216,6 +244,6 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, ICodeProvider pr) {
-		return new CodeProviderFormatter(objectMapper, formatter).formatPR(properties, pr);
+		return formatterProvider.formatPR(properties, pr);
 	}
 }

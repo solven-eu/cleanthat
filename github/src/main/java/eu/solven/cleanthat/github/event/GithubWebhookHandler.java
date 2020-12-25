@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.IStringFormatter;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -39,7 +38,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	@Override
-	public GitHub getGithub() {
+	public GitHub getGithubAsApp() {
 		return github;
 	}
 
@@ -78,9 +77,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings("PMD.ExcessiveMethodLength")
 	@Override
-	public Map<String, ?> processWebhookBody(Map<String, ?> input,
-			IStringFormatter formatter,
-			IGithubPullRequestCleaner prCleaner) {
+	public Map<String, ?> processWebhookBody(Map<String, ?> input, IGithubPullRequestCleaner prCleaner) {
 		// https://developer.github.com/webhooks/event-payloads/
 
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();

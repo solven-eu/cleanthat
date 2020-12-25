@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
@@ -24,10 +25,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 
 @SpringBootApplication(scanBasePackages = "none")
+@Import(GithubSpringConfig.class)
 public class RunGithubMonitoring {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubMonitoring.class);
@@ -36,23 +39,13 @@ public class RunGithubMonitoring {
 		new SpringApplicationBuilder(RunGithubMonitoring.class).web(WebApplicationType.NONE).run(args);
 	}
 
-	@Bean
-	public ObjectMapper objectMapper() {
-		return new ObjectMapper();
-	}
-
-	@Bean
-	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env, ObjectMapper objectMapper) {
-		return new GithubWebhookHandlerFactory(env, objectMapper);
-	}
-
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
 
-		GitHub github = handler.getGithub();
+		GitHub github = handler.getGithubAsApp();
 		GHApp app = github.getApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());
 		app.listInstallations().forEach(installation -> {

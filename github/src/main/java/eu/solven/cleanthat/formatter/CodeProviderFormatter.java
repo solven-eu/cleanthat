@@ -34,7 +34,7 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class CodeProviderFormatter {
+public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
 

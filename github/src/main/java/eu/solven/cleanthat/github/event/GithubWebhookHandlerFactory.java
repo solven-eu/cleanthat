@@ -44,9 +44,9 @@ public class GithubWebhookHandlerFactory {
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
 	public String makeJWT() throws JOSEException {
+		String rawJwk = env.getRequiredProperty("github.app.private-jwk");
 		RSAKey rsaJWK;
 		try {
-			String rawJwk = env.getRequiredProperty("github.app.private-jwk");
 			rsaJWK = RSAKey.parse(rawJwk);
 		} catch (IllegalStateException | ParseException e) {
 			throw new IllegalStateException("Issue parsing privateKey", e);
@@ -57,7 +57,7 @@ public class GithubWebhookHandlerFactory {
 		Date now = new Date();
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
 		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES));
-		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(env.getRequiredProperty("github.app.app-id"))
+		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(env.getProperty("github.app.app-id", "65550"))
 				.issueTime(now)
 				.expirationTime(expiresAt)
 				.build();

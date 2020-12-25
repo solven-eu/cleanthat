@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
@@ -16,16 +17,19 @@ import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
+import eu.solven.cleanthat.github.GithubHelper;
+import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.CommitContext;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
@@ -33,6 +37,7 @@ import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 @SpringBootApplication(scanBasePackages = "none")
+@Import({ GithubSpringConfig.class, JavaFormatter.class })
 public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPR.class);
@@ -45,12 +50,14 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
 
-	final int githubInstallationId = 9086720;
+	// final int githubInstallationId = 9086720;
 
 	final String repoFullName = SOLVEN_EU_SPRING_BOOT;
 
 	public static void main(String[] args) {
-		SpringApplication.run(RunCleanGithubPR.class, args);
+		SpringApplication app = new SpringApplication(RunCleanGithubPR.class);
+		app.setWebApplicationType(WebApplicationType.NONE);
+		app.run(args);
 	}
 
 	@EventListener(ContextRefreshedEvent.class)
@@ -58,9 +65,16 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
-		GitHub github = handler.makeInstallationGithub(githubInstallationId);
-		ObjectMapper objectMapper = new ObjectMapper();
-		GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(objectMapper, new JavaFormatter(objectMapper));
+
+		GHAppInstallation installation = handler.getGithubAsApp()
+				.getApp()
+				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
+
+		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
+		GitHub github = handler.makeInstallationGithub(installation.getId());
+		GitHub userToServerGithub = handler.getGithubAsApp();
+
+		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
 		GHRepository repo;
 		try {
 			repo = github.getRepository(repoFullName);
@@ -69,15 +83,7 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			return;
 		}
 		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
-		String defaultBranchName = Optional.ofNullable(repo.getDefaultBranch()).orElse("master");
-		GHBranch defaultBranch;
-		try {
-			defaultBranch = repo.getBranch(defaultBranchName);
-		} catch (GHFileNotFoundException e) {
-			throw new IllegalStateException("We can not find as default branch: " + defaultBranchName, e);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
 
 		Optional<Map<String, ?>> mainBranchConfig = cleaner.branchConfig(defaultBranch);
 
@@ -90,7 +96,7 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			if (!configExistsAnywhere) {
 				// At some point, we could prefer remaining silent if we understand the repository tried to integrate
 				// us, but did not completed.
-				cleaner.openPRWithCleanThatStandardConfiguration(defaultBranch);
+				cleaner.openPRWithCleanThatStandardConfiguration(userToServerGithub, defaultBranch);
 			} else {
 				LOGGER.info("There is at least one branch with CleanThat configured ({})",
 						branchWithConfig.get().getName());
@@ -120,7 +126,7 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		try {
 			GHRef ref = repo.createRef("CleanThat_" + cleanThatPrId, base.getSHA1());
 			return repo.createPullRequest("CleanThat - Cleaning style - "
-					+ cleanThatPrId, ref.getRef(), base.getName(), SOLVEN_EU_AGILEA, false, true);
+					+ cleanThatPrId, ref.getRef(), base.getName(), "CleanThat cleaning PR", false, true);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue opening PR", e);
 		}

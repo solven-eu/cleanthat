@@ -1,7 +1,7 @@
 version: 2.1 # use CircleCI 2.0
 
 orbs:
-  slack: circleci/slack@4.1.3
+  slack: circleci/slack@4.2.0
 
 aliases:
   - &exclude-deploy

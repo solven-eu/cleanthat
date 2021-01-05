@@ -11,6 +11,7 @@ import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
@@ -59,6 +60,10 @@ public class TestGithubWebhookHandler {
 
 	@Test
 	public void processTestOpenPR() throws JsonParseException, JsonMappingException, IOException {
+		GHUser ghUser = Mockito.mock(GHUser.class);
+		Mockito.when(ghUser.getId()).thenReturn(123456789L);
+		Mockito.when(pr.getUser()).thenReturn(ghUser);
+
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
 		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(pr);

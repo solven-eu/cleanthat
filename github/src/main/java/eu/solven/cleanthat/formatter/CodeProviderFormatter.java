@@ -49,6 +49,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		this.formatter = formatter;
 	}
 
+	@Override
 	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties, ICodeProvider pr) {
 		// A config change may be cleanthat.json
 

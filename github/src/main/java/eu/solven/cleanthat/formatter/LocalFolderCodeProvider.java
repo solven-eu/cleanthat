@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -93,5 +94,10 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	public String getFilePath(Object file) {
 		Path path = (Path) file;
 		return path.subpath(root.getNameCount(), path.getNameCount()).toString();
+	}
+
+	@Override
+	public Optional<String> loadContentForPath(String path) throws IOException {
+		return Optional.of(Files.readString(Path.of(path)));
 	}
 }

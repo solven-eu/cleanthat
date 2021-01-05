@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.kohsuke.github.GitHub;
 
-import eu.solven.cleanthat.github.IStringFormatter;
-
 /**
  * Knows how to process a Github webhook
  *

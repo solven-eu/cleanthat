@@ -31,18 +31,13 @@ public class GithubSpringConfig {
 		return new GithubWebhookHandlerFactory(env, objectMapper);
 	}
 
-	// @Bean
-	// public IStringFormatter stringFormatter(ObjectMapper objectMapper) {
-	// return new JavaFormatter(objectMapper);
-	// }
-
 	@Bean
 	public ICodeProviderFormatter codeProviderFormatter(ObjectMapper objectMapper, IStringFormatter formatter) {
 		return new CodeProviderFormatter(objectMapper, formatter);
 	}
 
 	@Bean
-	public GithubPullRequestCleaner GithubPullRequestCleaner(ObjectMapper objectMapper,
+	public GithubPullRequestCleaner githubPullRequestCleaner(ObjectMapper objectMapper,
 			ICodeProviderFormatter formatterProvider) {
 		return new GithubPullRequestCleaner(objectMapper, formatterProvider);
 	}

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
@@ -66,10 +67,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
 
-		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
 		ICodeProvider codeProvider = new GithubPRCodeProvider(pr);
 
-		return formatCodeGivenConfig(commitContext, prUrl, optPrConfig, codeProvider);
+		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
 	}
 
 	@Override
@@ -79,16 +79,16 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		String prUrl = ref.getUrl().toExternalForm();
 		LOGGER.info("Ref: {}", prUrl);
 
-		Optional<Map<String, ?>> optPrConfig = safeRefConfig(repo, ref);
 		ICodeProvider codeProvider = new GithubRefCodeProvider(repo, ref);
 
-		return formatCodeGivenConfig(commitContext, prUrl, optPrConfig, codeProvider);
+		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
 	}
 
 	private Map<String, ?> formatCodeGivenConfig(CommitContext commitContext,
 			String prUrl,
-			Optional<Map<String, ?>> optPrConfig,
 			ICodeProvider codeProvider) {
+		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
@@ -125,18 +125,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
 	}
 
-	private Optional<Map<String, ?>> safePrConfig(GHPullRequest pr) {
+	private Optional<Map<String, ?>> safeConfig(ICodeProvider codeProvider) {
 		try {
-			return prConfig(pr);
-		} catch (RuntimeException e) {
-			LOGGER.warn("Issue loading the configuration", e);
-			return Optional.empty();
-		}
-	}
-
-	private Optional<Map<String, ?>> safeRefConfig(GHRepository repo, GHRef ref) {
-		try {
-			return refConfig(repo, ref);
+			return unsafeConfig(codeProvider);
 		} catch (RuntimeException e) {
 			LOGGER.warn("Issue loading the configuration", e);
 			return Optional.empty();
@@ -145,34 +136,20 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 	// TODO Get the merged configuration head -> base
 	// It will enable cleaning a PR given the configuration of the base branch
-	public Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
-		Optional<Map<String, ?>> prConfig;
+	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
+		Optional<String> optContent;
 		try {
-			String asString = GithubPRCodeProvider.loadContent(pr, PATH_CLEANTHAT_JSON);
-			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
-		} catch (GHFileNotFoundException e) {
-			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
-			prConfig = Optional.empty();
+			optContent = codeProvider.loadContentForPath(PATH_CLEANTHAT_JSON);
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw new IllegalArgumentException(e);
 		}
-		return prConfig;
-	}
-
-	public Optional<Map<String, ?>> refConfig(GHRepository repo, GHRef ref) {
-		Optional<Map<String, ?>> prConfig;
-		try {
-			String asString = GithubRefCodeProvider.loadContent(repo, ref, PATH_CLEANTHAT_JSON);
-			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
-		} catch (GHFileNotFoundException e) {
-			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
-			prConfig = Optional.empty();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		return prConfig;
+		return optContent.map(content -> {
+			try {
+				return objectMapper.readValue(content, Map.class);
+			} catch (JsonProcessingException e) {
+				throw new IllegalArgumentException("Invalid json", e);
+			}
+		});
 	}
 
 	@Override

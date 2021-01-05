@@ -1,24 +1,19 @@
 package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.kohsuke.github.GHCommitBuilder;
-import org.kohsuke.github.GHContent;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -84,5 +79,16 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 	@Override
 	public String getFilePath(Object file) {
 		return ((GHPullRequestFileDetail) file).getFilename();
+	}
+
+	@Override
+	public Optional<String> loadContentForPath(String path) throws IOException {
+		try {
+			return Optional.of(loadContent(pr.getRepository(), path, pr.getHead().getSha()));
+		} catch (GHFileNotFoundException e) {
+			LOGGER.trace("We miss: {}", path, e);
+			LOGGER.debug("We miss: {}", path);
+			return Optional.empty();
+		}
 	}
 }

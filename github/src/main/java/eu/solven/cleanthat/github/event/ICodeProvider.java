@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github.event;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -24,6 +25,8 @@ public interface ICodeProvider {
 	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments);
 
 	String loadContent(Object file) throws IOException;
+
+	Optional<String> loadContentForPath(String path) throws IOException;
 
 	String getFilePath(Object file);
 

@@ -6,7 +6,6 @@ import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -18,7 +17,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +37,7 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
  * @author Benoit Lacelle
  */
 public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
+	public static final String REF_CONFIGURE = "cleanthat/configure";
 
 	private static final String KEY_SKIPPED = "skipped";
 
@@ -63,10 +62,33 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> prSupplier) {
 		GHPullRequest pr = prSupplier.get();
 
-		String prUrl = pr.getHtmlUrl().toExternalForm();
+		String prUrl = pr.getUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
+
 		Optional<Map<String, ?>> optPrConfig = safePrConfig(pr);
+		ICodeProvider codeProvider = new GithubPRCodeProvider(pr);
+
+		return formatCodeGivenConfig(commitContext, prUrl, optPrConfig, codeProvider);
+	}
+
+	@Override
+	public Map<String, ?> formatRef(CommitContext commitContext, GHRepository repo, Supplier<GHRef> refSupplier) {
+		GHRef ref = refSupplier.get();
+
+		String prUrl = ref.getUrl().toExternalForm();
+		LOGGER.info("Ref: {}", prUrl);
+
+		Optional<Map<String, ?>> optPrConfig = safeRefConfig(repo, ref);
+		ICodeProvider codeProvider = new GithubRefCodeProvider(repo, ref);
+
+		return formatCodeGivenConfig(commitContext, prUrl, optPrConfig, codeProvider);
+	}
+
+	private Map<String, ?> formatCodeGivenConfig(CommitContext commitContext,
+			String prUrl,
+			Optional<Map<String, ?>> optPrConfig,
+			ICodeProvider codeProvider) {
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
@@ -83,13 +105,6 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 			return Collections.singletonMap(KEY_SKIPPED,
 					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only '2' for now)");
 		}
-		try {
-			GHUser user = pr.getUser();
-			// TODO Do not process PR opened by CleanThat
-			LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
 		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
@@ -102,7 +117,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		} else if (!properties.getMeta().isCleanPullRequests()) {
 			return Map.of(KEY_SKIPPED, "Commit on PR, but not allowed to mutate PR by configuration");
 		} else {
-			return formatPR(properties, new GithubPRCodeProvider(pr));
+			return formatCode(properties, codeProvider);
 		}
 	}
 
@@ -119,10 +134,36 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 	}
 
+	private Optional<Map<String, ?>> safeRefConfig(GHRepository repo, GHRef ref) {
+		try {
+			return refConfig(repo, ref);
+		} catch (RuntimeException e) {
+			LOGGER.warn("Issue loading the configuration", e);
+			return Optional.empty();
+		}
+	}
+
+	// TODO Get the merged configuration head -> base
+	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> prConfig(GHPullRequest pr) {
 		Optional<Map<String, ?>> prConfig;
 		try {
 			String asString = GithubPRCodeProvider.loadContent(pr, PATH_CLEANTHAT_JSON);
+			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
+		} catch (GHFileNotFoundException e) {
+			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
+			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
+			prConfig = Optional.empty();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		return prConfig;
+	}
+
+	public Optional<Map<String, ?>> refConfig(GHRepository repo, GHRef ref) {
+		Optional<Map<String, ?>> prConfig;
+		try {
+			String asString = GithubRefCodeProvider.loadContent(repo, ref, PATH_CLEANTHAT_JSON);
 			prConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
@@ -139,7 +180,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		Optional<Map<String, ?>> defaultBranchConfig;
 		try {
 			String asString =
-					GithubPRCodeProvider.loadContent(branch.getOwner(), branch.getSHA1(), PATH_CLEANTHAT_JSON);
+					GithubPRCodeProvider.loadContent(branch.getOwner(), PATH_CLEANTHAT_JSON, branch.getSHA1());
 			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
@@ -154,7 +195,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
 
-		String refName = "cleanthat/configure";
+		String refName = REF_CONFIGURE;
 		String fullRefName = "refs/heads/" + refName;
 
 		boolean refAlreadyExists;
@@ -198,13 +239,16 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 				// https://github.com/solven-eu/agilea/pull/1
 				String body = readResource("/templates/onboarding-body.md");
 				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
+
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
-				repo.createPullRequest("Configure CleanThat",
+				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
+				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
 						refToPR.get().getRef(),
 						defaultBranch.getName(),
 						body,
 						true,
 						false);
+				LOGGER.info("Open PR: {}", pr.getHtmlUrl());
 			}
 		} catch (IOException e) {
 			// TODO If 401, it probably means the Installation is not allowed to modify given repo
@@ -243,7 +287,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return body;
 	}
 
-	public Map<String, ?> formatPR(CleanthatRepositoryProperties properties, ICodeProvider pr) {
-		return formatterProvider.formatPR(properties, pr);
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProvider pr) {
+		return formatterProvider.formatCode(properties, pr);
 	}
 }

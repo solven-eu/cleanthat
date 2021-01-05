@@ -49,7 +49,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		this.formatter = formatter;
 	}
 
-	public Map<String, ?> formatPR(CleanthatRepositoryProperties repoProperties, ICodeProvider pr) {
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties, ICodeProvider pr) {
 		// A config change may be cleanthat.json
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit

@@ -88,7 +88,17 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 		Optional<Map<String, ?>> mainBranchConfig = cleaner.branchConfig(defaultBranch);
 
 		if (mainBranchConfig.isEmpty()) {
-			LOGGER.info("CleanThat is not configured in the main branch ({})", defaultBranch.getName());
+			String configureRef = GithubPullRequestCleaner.REF_CONFIGURE;
+			LOGGER.info("CleanThat is not configured in the main branch ({}). Try switching to {}",
+					defaultBranch.getName(),
+					configureRef);
+
+			defaultBranch = repo.getBranch(configureRef);
+			mainBranchConfig = cleaner.branchConfig(defaultBranch);
+		}
+
+		if (mainBranchConfig.isEmpty()) {
+			LOGGER.info("CleanThat is not configured in the main/configure branch ({})", defaultBranch.getName());
 
 			Optional<GHBranch> branchWithConfig =
 					repo.getBranches().values().stream().filter(b -> cleaner.branchConfig(b).isPresent()).findAny();
@@ -102,12 +112,13 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 						branchWithConfig.get().getName());
 			}
 		} else {
-			LOGGER.info("CleanThat is configured in the main branch ({})", defaultBranch.getName());
+			LOGGER.info("CleanThat is configured in the main/configure branch ({})", defaultBranch.getName());
 
-			AtomicReference<GHPullRequest> createdPr = new AtomicReference<>();
+			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
-			Map<String, ?> output = cleaner.formatPR(new CommitContext(false, false), Suppliers.memoize(() -> {
-				GHPullRequest pr = makePR(repo, defaultBranch);
+			GHBranch finalDefaultBranch = defaultBranch;
+			Map<String, ?> output = cleaner.formatRef(new CommitContext(false, false), repo, Suppliers.memoize(() -> {
+				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
 				createdPr.set(pr);
 				return pr;
 			}));
@@ -115,21 +126,9 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 			if (createdPr.get() == null) {
 				LOGGER.info("Not a single file has been impacted");
 			} else {
-				LOGGER.info("Created PR: {}", createdPr.get().getHtmlUrl().toExternalForm());
+				LOGGER.info("Created PR: {}", createdPr.get().getUrl().toExternalForm());
 				LOGGER.info("Details: {}", output);
 			}
 		}
-	}
-
-	private GHPullRequest makePR(GHRepository repo, GHBranch base) {
-		String cleanThatPrId = UUID.randomUUID().toString();
-		try {
-			GHRef ref = repo.createRef("CleanThat_" + cleanThatPrId, base.getSHA1());
-			return repo.createPullRequest("CleanThat - Cleaning style - "
-					+ cleanThatPrId, ref.getRef(), base.getName(), "CleanThat cleaning PR", false, true);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue opening PR", e);
-		}
-
 	}
 }

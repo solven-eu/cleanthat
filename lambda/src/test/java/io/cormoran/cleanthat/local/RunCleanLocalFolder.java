@@ -67,6 +67,6 @@ public class RunCleanLocalFolder extends CleanThatLambdaFunction {
 						.getFile();
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
-		codeProviderFormatter.formatPR(properties, new LocalFolderCodeProvider(localFolder));
+		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(localFolder));
 	}
 }

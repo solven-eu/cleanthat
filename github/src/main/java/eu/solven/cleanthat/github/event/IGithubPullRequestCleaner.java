@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
 
 /**
  * Holds the logic to clean a PR
@@ -14,7 +16,9 @@ import org.kohsuke.github.GHPullRequest;
  */
 public interface IGithubPullRequestCleaner {
 
+	Optional<Map<String, ?>> branchConfig(GHBranch branch);
+
 	Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> pr);
 
-	Optional<Map<String, ?>> branchConfig(GHBranch branch);
+	Map<String, ?> formatRef(CommitContext commitContext, GHRepository repo, Supplier<GHRef> refSupplier);
 }

@@ -11,6 +11,7 @@ import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
@@ -184,10 +185,19 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			CommitContext commitContext = new CommitContext(isMainBranchCommit, isBranchWithoutPR);
 
 			if (optPr.isPresent()) {
-				if (optPr.get().isLocked()) {
-					LOGGER.info("PR is locked: {}", optPr.get().getHtmlUrl());
+				GHPullRequest pr = optPr.get();
+				if (pr.isLocked()) {
+					LOGGER.info("PR is locked: {}", pr.getHtmlUrl());
 					return Map.of("skipped", "PullRequest is locked");
 				} else {
+					try {
+						GHUser user = pr.getUser();
+						// TODO Do not process PR opened by CleanThat
+						LOGGER.info("user_id={} ({})", user.getId(), user.getHtmlUrl());
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+
 					return prCleaner.formatPR(commitContext, optPr::get);
 				}
 			} else {

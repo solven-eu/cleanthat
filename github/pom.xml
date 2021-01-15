@@ -23,7 +23,7 @@
 			<!-- https://github-api.kohsuke.org/ -->
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
-			<version>1.117</version>
+			<version>1.122</version>
 		</dependency>
 
 		<dependency>

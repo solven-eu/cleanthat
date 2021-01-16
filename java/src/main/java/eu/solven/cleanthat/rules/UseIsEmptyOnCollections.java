@@ -28,7 +28,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  */
 // https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIsEmptyOnCollections implements IClassTransformer {
+public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
@@ -36,7 +36,7 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 
 	@Override
 	public String minimalJavaVersion() {
-		return "6";
+		return IJdkVersionConstants.JDK_6;
 	}
 
 	@Override
@@ -69,16 +69,11 @@ public class UseIsEmptyOnCollections implements IClassTransformer {
 					return;
 				}
 				Expression lengthScope = optLengthScope.get();
-				ResolvedType type;
-				try {
-					type = javaParserFacade.getType(lengthScope);
-				} catch (RuntimeException e) {
-					LOGGER.debug("ARG", e);
-					LOGGER.info("ARG solving type of scope: {}", optLengthScope);
-					return;
-					// throw new IllegalStateException("Issue on scope=" + scope, e);
+				Optional<ResolvedType> type = optResolvedType(lengthScope);
+
+				if (type.isPresent()) {
+					process(node, lengthScope, type.get());
 				}
-				process(node, lengthScope, type);
 			}
 		});
 		return false;

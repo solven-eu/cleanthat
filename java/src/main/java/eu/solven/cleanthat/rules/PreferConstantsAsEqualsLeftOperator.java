@@ -19,7 +19,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  *
  * @author Benoit Lacelle
  */
-public class PreferConstantsAsEqualsLeftOperator implements IClassTransformer {
+public class PreferConstantsAsEqualsLeftOperator extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 

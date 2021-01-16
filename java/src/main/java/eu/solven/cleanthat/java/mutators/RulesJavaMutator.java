@@ -79,7 +79,13 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 		AtomicReference<String> codeRef = new AtomicReference<>(code);
 		transformers.forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
-			CompilationUnit compilationUnit = StaticJavaParser.parse(codeRef.get());
+
+			CompilationUnit compilationUnit;
+			try {
+				compilationUnit = StaticJavaParser.parse(codeRef.get());
+			} catch (RuntimeException e) {
+				throw new RuntimeException("Issue parsing the code", e);
+			}
 
 			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST
 			AtomicBoolean hasImpacted = new AtomicBoolean();

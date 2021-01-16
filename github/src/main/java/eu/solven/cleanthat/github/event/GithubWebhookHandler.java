@@ -44,8 +44,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	@Override
-	public GitHub makeInstallationGithub(long installationId) {
-		GitHub githubAuthAsInst;
+	public GithubAndToken makeInstallationGithub(long installationId) {
 		try {
 			GHAppInstallation installationById = github.getApp().getInstallationById(installationId);
 
@@ -65,11 +64,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					GHPermissionType.WRITE));
 
 			// https://github.com/hub4j/github-api/issues/570
-			githubAuthAsInst = makeInstallationGithub(installationGithub.create().getToken());
+			String token = installationGithub.create().getToken();
+
+			return new GithubAndToken(makeInstallationGithub(token), token);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		return githubAuthAsInst;
 	}
 
 	protected GitHub makeInstallationGithub(String token) throws IOException {
@@ -87,12 +87,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				installationId,
 				organizationUrl.orElse("-"));
 
-		GitHub githubAuthAsInst = makeInstallationGithub(installationId);
+		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
 
 		GHRepository repo;
 		try {
-			repo = githubAuthAsInst.getRepositoryById(
-					Long.toString(PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue()));
+			repo = githubAuthAsInst.getGithub()
+					.getRepositoryById(
+							Long.toString(PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue()));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -198,7 +199,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						throw new UncheckedIOException(e);
 					}
 
-					return prCleaner.formatPR(commitContext, optPr::get);
+					return prCleaner.formatPR(githubAuthAsInst.getToken(), commitContext, optPr::get);
 				}
 			} else {
 				return Map.of("skipped", "webhook is not attached to a PullRequest");

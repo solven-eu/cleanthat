@@ -28,6 +28,7 @@ import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.CommitContext;
+import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
@@ -66,7 +67,8 @@ public class RunCleanGithubBranch extends CleanThatLambdaFunction {
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
 		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
-		GitHub github = handler.makeInstallationGithub(installation.getId());
+		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId());
+		GitHub github = githubAndToken.getGithub();
 		GitHub userToServerGithub = handler.getGithubAsApp();
 
 		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
@@ -112,11 +114,14 @@ public class RunCleanGithubBranch extends CleanThatLambdaFunction {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			Map<String, ?> output = cleaner.formatRef(new CommitContext(false, false), repo, Suppliers.memoize(() -> {
-				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
-				createdPr.set(pr);
-				return pr;
-			}));
+			Map<String, ?> output = cleaner.formatRef(githubAndToken.getToken(),
+					new CommitContext(false, false),
+					repo,
+					Suppliers.memoize(() -> {
+						GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
+						createdPr.set(pr);
+						return pr;
+					}));
 
 			if (createdPr.get() == null) {
 				LOGGER.info("Not a single file has been impacted");

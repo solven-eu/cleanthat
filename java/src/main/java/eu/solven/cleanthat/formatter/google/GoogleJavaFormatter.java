@@ -30,7 +30,6 @@ import eu.solven.cleanthat.github.ISourceCodeProperties;
  *
  * @author Benoit Lacelle
  */
-// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class GoogleJavaFormatter implements ISourceCodeFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleJavaFormatter.class);
 

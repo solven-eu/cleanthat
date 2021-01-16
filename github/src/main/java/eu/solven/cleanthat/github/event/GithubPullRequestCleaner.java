@@ -60,26 +60,29 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	}
 
 	@Override
-	public Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> prSupplier) {
+	public Map<String, ?> formatPR(String token, CommitContext commitContext, Supplier<GHPullRequest> prSupplier) {
 		GHPullRequest pr = prSupplier.get();
 
 		String prUrl = pr.getUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
 
-		ICodeProvider codeProvider = new GithubPRCodeProvider(pr);
+		ICodeProvider codeProvider = new GithubPRCodeProvider(token, pr);
 
 		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
 	}
 
 	@Override
-	public Map<String, ?> formatRef(CommitContext commitContext, GHRepository repo, Supplier<GHRef> refSupplier) {
+	public Map<String, ?> formatRef(String token,
+			CommitContext commitContext,
+			GHRepository repo,
+			Supplier<GHRef> refSupplier) {
 		GHRef ref = refSupplier.get();
 
 		String prUrl = ref.getUrl().toExternalForm();
 		LOGGER.info("Ref: {}", prUrl);
 
-		ICodeProvider codeProvider = new GithubRefCodeProvider(repo, ref);
+		ICodeProvider codeProvider = new GithubRefCodeProvider(token, repo, ref);
 
 		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
 	}

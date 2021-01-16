@@ -12,6 +12,8 @@ import java.util.function.Consumer;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ProgressMonitor;
+import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -31,10 +33,13 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCodeProvider.class);
 
+	final String token;
 	final GHRepository repo;
 	final GHRef ref;
 
-	public GithubRefCodeProvider(GHRepository repo, GHRef ref) {
+	public GithubRefCodeProvider(String token, GHRepository repo, GHRef ref) {
+		this.token = token;
+
 		this.repo = repo;
 		this.ref = ref;
 	}
@@ -46,12 +51,21 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 
 		GHTree tree = repo.getTreeRecursive(sha, 1);
 
-		processTree(tree, consumer);
+		// https://docs.github.com/en/developers/apps/rate-limits-for-github-apps#server-to-server-requests
+		// At best, we will be limited at queries 12,500
+		if (tree.getTree().size() >= 1250) {
+			// TODO count only files relevant given our includes/excludes constrains
+			// https://github.blog/2012-09-21-easier-builds-and-deployments-using-git-over-https-and-oauth/
+			makeGitRepo().getRepository();
+		} else {
+			processTree(tree, consumer);
+		}
+
 	}
 
 	private void processTree(GHTree tree, Consumer<Object> consumer) {
 		if (tree.isTruncated()) {
-			LOGGER.debug("Should we process each folder independantly?");
+			LOGGER.debug("Should we process some folders independantly?");
 		}
 
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
@@ -135,6 +149,7 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public Git makeGitRepo() {
+		// https://github.community/t/cloning-private-repo-with-a-github-app-private-key/14726
 		Path tmpDir;
 		try {
 			tmpDir = Files.createTempDirectory("cleanthat-clone");
@@ -142,13 +157,19 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 			throw new UncheckedIOException(e);
 		}
 
+		// v1.5c177cb5229fa3f27e85f7472881be4022d58f20
+		String rawTransportUrl = repo.getHttpTransportUrl();
+		String authTransportUrl =
+				"https://x-access-token:" + token + "@" + rawTransportUrl.substring("https://".length());
+
 		try {
 			return Git.cloneRepository()
-					.setURI(repo.getGitTransportUrl())
+					.setURI(authTransportUrl)
 					.setDirectory(tmpDir.toFile())
 					.setBranch(ref.getRef())
 					.setCloneAllBranches(false)
 					.setCloneSubmodules(false)
+					.setProgressMonitor(new TextProgressMonitor())
 					.call();
 		} catch (GitAPIException e) {
 			throw new IllegalArgumentException(e);

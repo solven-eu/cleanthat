@@ -27,7 +27,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  */
 // https://jsparrow.github.io/rules/primitive-boxed-for-string.html
 // https://rules.sonarsource.com/java/RSPEC-1158
-public class PrimitiveBoxedForString implements IClassTransformer {
+public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 
@@ -38,9 +38,6 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 
 	@Override
 	public boolean transform(MethodDeclaration tree) {
-		CombinedTypeSolver ts = new CombinedTypeSolver();
-		ts.add(new ReflectionTypeSolver());
-		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
 		tree.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 			if (node instanceof MethodCallExpr
@@ -52,16 +49,11 @@ public class PrimitiveBoxedForString implements IClassTransformer {
 					return;
 				}
 				Expression scope = optScope.get();
-				ResolvedType type;
-				try {
-					type = javaParserFacade.getType(scope);
-				} catch (RuntimeException e) {
-					LOGGER.debug("ARG", e);
-					LOGGER.info("ARG solving type of scope: {}", scope);
-					return;
-					// throw new IllegalStateException("Issue on scope=" + scope, e);
+				Optional<ResolvedType> type = optResolvedType(scope);
+
+				if (type.isPresent()) {
+					process(node, scope, type.get());
 				}
-				process(node, scope, type);
 			}
 		});
 		return false;

@@ -23,9 +23,15 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 @Deprecated(since = "Not-Ready: how can we infer a Type is an Enum?")
-public class EnumsWithoutEquals implements IClassTransformer {
+public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
+
+	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
+		CombinedTypeSolver ts = new CombinedTypeSolver();
+		ts.add(new ReflectionTypeSolver());
+		return JavaParserFacade.get(ts);
+	});
 
 	@Override
 	public String minimalJavaVersion() {
@@ -45,23 +51,14 @@ public class EnumsWithoutEquals implements IClassTransformer {
 					return;
 				}
 				Expression scope = optScope.get();
-				CombinedTypeSolver ts = new CombinedTypeSolver();
-				ts.add(new ReflectionTypeSolver());
-				ResolvedType type;
-				try {
-					type = JavaParserFacade.get(ts).getType(scope);
-				} catch (RuntimeException e) {
-					// UnsolvedSymbolException
-					// https://github.com/javaparser/javaparser/issues/1491
-					LOGGER.debug("What are we doing wrong here?", e);
-					LOGGER.warn("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
-					return;
-				}
-				if (type.isReferenceType()) {
+				Optional<ResolvedType> type = optResolvedType(scope);
+
+				if (type.isPresent() && type.get().isReferenceType()) {
 					LOGGER.debug("scope={} type={}", scope, type);
 				}
 			}
 		});
 		return false;
 	}
+
 }

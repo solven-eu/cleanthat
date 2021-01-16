@@ -19,7 +19,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  *
  * @author Benoit Lacelle
  */
-public class ReplaceOptionalNotEmpty implements IClassTransformer {
+public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 

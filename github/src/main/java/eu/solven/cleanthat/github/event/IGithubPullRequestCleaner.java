@@ -18,7 +18,8 @@ public interface IGithubPullRequestCleaner {
 
 	Optional<Map<String, ?>> branchConfig(GHBranch branch);
 
-	Map<String, ?> formatPR(CommitContext commitContext, Supplier<GHPullRequest> pr);
+	Map<String, ?> formatPR(String token, CommitContext commitContext, Supplier<GHPullRequest> prSupplier);
 
-	Map<String, ?> formatRef(CommitContext commitContext, GHRepository repo, Supplier<GHRef> refSupplier);
+	Map<String, ?> formatRef(String token, CommitContext commitContext, GHRepository repo, Supplier<GHRef> refSupplier);
+
 }

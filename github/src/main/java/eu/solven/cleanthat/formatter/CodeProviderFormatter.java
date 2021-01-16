@@ -11,9 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +25,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
+import com.google.common.util.concurrent.ListeningExecutorService;
 
+import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -156,16 +162,18 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private AtomicLongMap<String> processFiles(ICodeProvider pr,
-			AtomicLongMap<String> languageToNbAddedFiles,
+			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP) {
-		String language = languageP.getLanguage();
 		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
 		List<PathMatcher> includeMatchers = prepareMatcher(sourceCodeProperties.getIncludes());
 		List<PathMatcher> excludeMatchers = prepareMatcher(sourceCodeProperties.getExcludes());
+
+		ListeningExecutorService executor = PepperExecutorsHelper.newShrinkableFixedThreadPool(16, "CodeFormatter");
+		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		try {
 			pr.listFiles(file -> {
@@ -179,40 +187,15 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				Optional<PathMatcher> matchingExclude = findMatching(excludeMatchers, fileName);
 				if (matchingInclude.isPresent()) {
 					if (matchingExclude.isEmpty()) {
-						try {
-							Optional<String> optAlreadyMutated =
-									Optional.ofNullable(pathToMutatedContent.get(fileName));
-							String code = optAlreadyMutated.orElseGet(() -> {
-								try {
-									return pr.loadContent(file);
-								} catch (IOException e) {
-									throw new UncheckedIOException(e);
-								}
-							});
-							LOGGER.info("Processing {}", fileName);
-							String output = doFormat(languageP, code);
-							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-								System.out.println(code);
-								System.out.println(output);
-
-								pathToMutatedContent.put(fileName, output);
-								languageToNbAddedFiles.incrementAndGet(language);
-								languageCounters.incrementAndGet("nb_files_formatted");
-
-								if (pathToMutatedContent.size() > 128
-										&& Integer.bitCount(pathToMutatedContent.size()) == 1) {
-									LOGGER.warn("We are about to commit {} files. That's quite a lot.",
-											pathToMutatedContent.size());
-								}
-
-							} else {
-								languageCounters.incrementAndGet("nb_files_already_formatted");
+						cs.submit(() -> {
+							try {
+								return doFormat(pr, pathToMutatedContent, languageP, file, fileName);
+							} catch (IOException e) {
+								throw new UncheckedIOException("Issue with file: " + fileName, e);
+							} catch (RuntimeException e) {
+								throw new RuntimeException("Issue with file: " + fileName, e);
 							}
-						} catch (IOException e) {
-							throw new UncheckedIOException("Issue with file: " + fileName, e);
-						} catch (RuntimeException e) {
-							throw new RuntimeException("Issue with file: " + fileName, e);
-						}
+						});
 					} else {
 						languageCounters.incrementAndGet("nb_files_both_included_excluded");
 					}
@@ -224,8 +207,72 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing files", e);
+		} finally {
+			executor.shutdown();
+			// TODO Should wait given time left in Lambda
+			try {
+				executor.awaitTermination(1, TimeUnit.DAYS);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException(e);
+			}
 		}
+
+		while (true) {
+			try {
+				Future<Boolean> polled = cs.poll();
+
+				if (polled == null) {
+					break;
+				}
+				boolean result = polled.get();
+
+				if (result) {
+					languageToNbMutatedFiles.incrementAndGet(languageP.getLanguage());
+					languageCounters.incrementAndGet("nb_files_formatted");
+				} else {
+					languageCounters.incrementAndGet("nb_files_already_formatted");
+				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException("Arg", e);
+			}
+		}
+
 		return languageCounters;
+	}
+
+	private boolean doFormat(ICodeProvider pr,
+			Map<String, String> pathToMutatedContent,
+			ILanguageProperties languageP,
+			Object file,
+			String fileName) throws IOException {
+		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(fileName));
+		String code = optAlreadyMutated.orElseGet(() -> {
+			try {
+				return pr.loadContent(file);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
+		LOGGER.info("Processing {}", fileName);
+		String output = doFormat(languageP, code);
+		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+			System.out.println(code);
+			System.out.println(output);
+
+			pathToMutatedContent.put(fileName, output);
+
+			if (pathToMutatedContent.size() > 128 && Integer.bitCount(pathToMutatedContent.size()) == 1) {
+				LOGGER.warn("We are about to commit {} files. That's quite a lot.", pathToMutatedContent.size());
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java

@@ -28,9 +28,11 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
+	final String token;
 	final GHPullRequest pr;
 
-	public GithubPRCodeProvider(GHPullRequest pr) {
+	public GithubPRCodeProvider(String token, GHPullRequest pr) {
+		this.token = token;
 		this.pr = pr;
 	}
 

@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
@@ -30,7 +29,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Sébastien Collard
  */
 
-public class CreateTempFilesUsingNio implements IClassTransformer {
+public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
@@ -42,10 +41,6 @@ public class CreateTempFilesUsingNio implements IClassTransformer {
 
 	@Override
 	public boolean transform(MethodDeclaration pre) {
-		CombinedTypeSolver ts = new CombinedTypeSolver();
-		ts.add(new ReflectionTypeSolver());
-		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
-
 		AtomicBoolean hasTransformed = new AtomicBoolean();
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
@@ -68,18 +63,7 @@ public class CreateTempFilesUsingNio implements IClassTransformer {
 			Optional<Expression> optScope = methodCallExpr.getScope();
 
 			if (optScope.isPresent()) {
-				Optional<ResolvedType> type;
-				Node scope = optScope.get();
-
-				try {
-					type = Optional.of(javaParserFacade.getType(scope));
-				} catch (RuntimeException e) {
-					// https://github.com/javaparser/javaparser/issues/1491
-					LOGGER.debug("ARG", e);
-					LOGGER.info("ARG solving type of scope: {}", scope);
-					// throw new IllegalStateException("Issue on scope=" + scope, e);
-					type = Optional.empty();
-				}
+				Optional<ResolvedType> type = optResolvedType(optScope.get());
 
 				if (!type.isPresent() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
 					return;

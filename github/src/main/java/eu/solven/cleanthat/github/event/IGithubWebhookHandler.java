@@ -25,5 +25,5 @@ public interface IGithubWebhookHandler {
 	 * @param installationId
 	 * @return a {@link GitHub} instance authenticated as given installation, having access to permitted repositories
 	 */
-	GitHub makeInstallationGithub(long installationId);
+	GithubAndToken makeInstallationGithub(long installationId);
 }

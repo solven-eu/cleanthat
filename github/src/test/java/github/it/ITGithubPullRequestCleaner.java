@@ -17,6 +17,7 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.IStringFormatter;
+import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
@@ -25,7 +26,7 @@ import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 @ContextConfiguration(classes = { GithubSpringConfig.class })
 @MockBean({ IStringFormatter.class })
 public class ITGithubPullRequestCleaner {
-	final GithubPullRequestCleaner cleaner = new GithubPullRequestCleaner(null, null);
+	GithubPullRequestCleaner cleaner;
 
 	@Autowired
 	GithubWebhookHandlerFactory factory;
@@ -39,9 +40,12 @@ public class ITGithubPullRequestCleaner {
 
 		String repoName = "cleanthat";
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GitHub githubForRepo = handler.makeInstallationGithub(installation.getAppId());
+		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getAppId());
 
-		cleaner.openPRWithCleanThatStandardConfiguration(githubForRepo,
-				GithubHelper.getDefaultBranch(githubForRepo.getRepository(repoName)));
+		cleaner = new GithubPullRequestCleaner(null, null);
+
+		GitHub installationGithub = githubForRepo.getGithub();
+		cleaner.openPRWithCleanThatStandardConfiguration(installationGithub,
+				GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName)));
 	}
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.eclipse.jgit.api.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,5 +100,15 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
 		return Optional.of(Files.readString(Path.of(path)));
+	}
+
+	@Override
+	public String getRepoUri() {
+		throw new IllegalArgumentException("No repository URI");
+	}
+
+	@Override
+	public Git makeGitRepo() {
+		throw new IllegalArgumentException("No repository URI");
 	}
 }

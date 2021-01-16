@@ -2,11 +2,15 @@ package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
@@ -89,6 +93,34 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);
 			return Optional.empty();
+		}
+	}
+
+	@Override
+	public String getRepoUri() {
+		return pr.getRepository().getGitTransportUrl();
+	}
+
+	@Override
+	public Git makeGitRepo() {
+		Path tmpDir;
+		try {
+			tmpDir = Files.createTempDirectory("cleanthat-clone");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		try {
+			GHRepository repo = pr.getRepository();
+			return Git.cloneRepository()
+					.setURI(repo.getGitTransportUrl())
+					.setDirectory(tmpDir.toFile())
+					.setBranch(pr.getHead().getRef())
+					.setCloneAllBranches(false)
+					.setCloneSubmodules(false)
+					.call();
+		} catch (GitAPIException e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 }

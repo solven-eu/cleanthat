@@ -35,9 +35,9 @@ import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class, JavaFormatter.class })
-public class RunCleanGithubPR extends CleanThatLambdaFunction {
+public class RunCleanGithubBranch extends CleanThatLambdaFunction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPR.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubBranch.class);
 
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
 
@@ -47,12 +47,10 @@ public class RunCleanGithubPR extends CleanThatLambdaFunction {
 
 	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
 
-	// final int githubInstallationId = 9086720;
-
 	final String repoFullName = SOLVEN_EU_SPRING_BOOT;
 
 	public static void main(String[] args) {
-		SpringApplication app = new SpringApplication(RunCleanGithubPR.class);
+		SpringApplication app = new SpringApplication(RunCleanGithubBranch.class);
 		app.setWebApplicationType(WebApplicationType.NONE);
 		app.run(args);
 	}

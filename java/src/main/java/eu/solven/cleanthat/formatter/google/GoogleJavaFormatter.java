@@ -15,10 +15,15 @@ package eu.solven.cleanthat.formatter.google;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.googlejavaformat.java.Formatter;
+import com.google.googlejavaformat.java.FormatterException;
+
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
-import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.github.ISourceCodeProperties;
 
 /**
  * Google Java Formatter
@@ -27,13 +32,31 @@ import eu.solven.cleanthat.github.ILanguageProperties;
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class GoogleJavaFormatter implements ISourceCodeFormatter {
-	public GoogleJavaFormatter(ILanguageProperties languageProperties,
-			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
-		throw new IllegalStateException("TODO " + languageProperties + processorConfig);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleJavaFormatter.class);
+
+	final ISourceCodeProperties sourceCodeProperties;
+	final GoogleJavaFormatterProperties processorConfig;
+
+	public GoogleJavaFormatter(ISourceCodeProperties sourceCodeProperties,
+			GoogleJavaFormatterProperties processorConfig) {
+		this.sourceCodeProperties = sourceCodeProperties;
+		this.processorConfig = processorConfig;
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
-		throw new IllegalStateException("TODO");
+	public String doFormat(String code, LineEnding eol) throws IOException {
+		try {
+			Formatter formatter = new Formatter();
+			String output = formatter.formatSource(code);
+			if (output.equals(code)) {
+				LOGGER.debug("No change in the source");
+			} else {
+				LOGGER.debug("Some change in the source");
+			}
+			return output;
+		} catch (FormatterException e) {
+			// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/src/main/java/io/spring/format/maven/ApplyMojo.java
+			throw new IllegalArgumentException("Unable to format code", e);
+		}
 	}
 }

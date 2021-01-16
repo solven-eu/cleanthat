@@ -15,10 +15,18 @@ package eu.solven.cleanthat.formatter.spring;
 
 import java.io.IOException;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
-import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.github.ISourceCodeProperties;
+import io.spring.javaformat.formatter.Formatter;
 
 /**
  * Spring Java formatter
@@ -26,13 +34,39 @@ import eu.solven.cleanthat.github.ILanguageProperties;
  * @author Benoit Lacelle
  */
 public class SpringJavaFormatter implements ISourceCodeFormatter {
-	public SpringJavaFormatter(ILanguageProperties languageProperties,
-			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
-		throw new IllegalStateException("TODO" + languageProperties + processorConfig);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpringJavaFormatter.class);
+
+	final ISourceCodeProperties sourceCodeProperties;
+	final SpringJavaFormatterProperties processorConfig;
+
+	public SpringJavaFormatter(ISourceCodeProperties sourceCodeProperties,
+			SpringJavaFormatterProperties processorConfig) {
+		this.sourceCodeProperties = sourceCodeProperties;
+		this.processorConfig = processorConfig;
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
-		throw new IllegalStateException("TODO");
+	public String doFormat(String code, LineEnding eol) throws IOException {
+		try {
+			Formatter formatter = new Formatter();
+			TextEdit edit = formatter.format(code);
+
+			String output;
+			if (edit.hasChildren() || edit.getLength() > 0) {
+				LOGGER.debug("Some change in the source");
+
+				IDocument document = new Document(code);
+				edit.apply(document);
+				output = document.get();
+			} else {
+				LOGGER.debug("No change in the source");
+				output = code;
+			}
+
+			return output;
+		} catch (MalformedTreeException | BadLocationException e) {
+			// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/src/main/java/io/spring/format/maven/ApplyMojo.java
+			throw new IllegalArgumentException("Unable to format code", e);
+		}
 	}
 }

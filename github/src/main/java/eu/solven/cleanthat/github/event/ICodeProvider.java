@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.eclipse.jgit.api.Git;
+
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
  *
@@ -29,6 +31,10 @@ public interface ICodeProvider {
 	Optional<String> loadContentForPath(String path) throws IOException;
 
 	String getFilePath(Object file);
+
+	String getRepoUri();
+
+	Git makeGitRepo();
 
 	// void fileIsChanged(String pathCleanthatJson);
 }

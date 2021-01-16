@@ -1,0 +1,27 @@
+{
+    "syntax_version": "2",
+    "meta": {
+        "labels": [
+            "cleanthat"
+        ],
+        "clean_pull_requests": true,
+        "clean_main_branch": true
+    },
+    "source_code": {
+        "encoding": "UTF-8"
+    },
+    "languages": [
+        {
+            "language": "java",
+            "language_version": "11",
+            "processors": [
+                {
+                    "engine": "rules"
+                },
+                {
+                    "engine": "spring_formatter"
+                }
+            ]
+        }
+    ]
+}

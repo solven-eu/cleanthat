@@ -32,6 +32,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<!-- Used to clone a repo -->
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+		</dependency>
 
 		<dependency>
 			<!-- Encrypt login token, and sensible data in DB -->

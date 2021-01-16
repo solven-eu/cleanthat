@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
+import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.ICodeProvider;
 
@@ -35,6 +37,8 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
  * @author Benoit Lacelle
  */
 public class CodeProviderFormatter implements ICodeProviderFormatter {
+
+	public static final List<String> DEFAULT_INCLUDES_JAVA = Arrays.asList("glob:**/*.java");
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
 
@@ -59,26 +63,39 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		List<String> prComments = new ArrayList<>();
 
-		try {
-			pr.listFiles(fileChanged -> {
-				if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(pr.getFilePath(fileChanged))) {
-					configIsChanged.set(true);
-					prComments.add("Configuration has changed");
-				}
-			});
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue while checking for config change", e);
+		if (pr instanceof GithubPRCodeProvider) {
+			try {
+				pr.listFiles(fileChanged -> {
+					if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(pr.getFilePath(fileChanged))) {
+						configIsChanged.set(true);
+						prComments.add("Configuration has changed");
+					}
+				});
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue while checking for config change", e);
+			}
 		}
+		// else {
+		// // We are in a branch: all files are candidates, which makes too many files to iterate over them here
+		// // https://www.baeldung.com/jgit
+		// try {
+		// Git git = pr.makeGitRepo();
+		// } catch (RuntimeException e) {
+		// throw new IllegalStateException("Issue while cloning the repository");
+		// }
+		// }
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
+
 		repoProperties.getLanguages().forEach(dirtyLanguageConfig -> {
 			ILanguageProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
 			AtomicLongMap<String> languageCounters =
-					countFiles(pr, languageToNbAddedFiles, pathToMutatedContent, languageP);
+					processFiles(pr, languageToNbAddedFiles, pathToMutatedContent, languageP);
+
 			String details = languageCounters.asMap()
 					.entrySet()
 					.stream()
@@ -90,6 +107,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				languagesCounters.addAndGet(l, c);
 			});
 		});
+
 		if (languageToNbAddedFiles.isEmpty() && !configIsChanged.get()) {
 			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
 		} else if (configIsChanged.get()) {
@@ -120,7 +138,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		List<String> includes = languageP.getSourceCodeProperties().getIncludes();
 		if (includes.isEmpty()) {
 			if ("java".equals(languageP.getLanguage())) {
-				List<String> defaultIncludes = Arrays.asList("glob:**/*.java");
+				List<String> defaultIncludes = DEFAULT_INCLUDES_JAVA;
 				LOGGER.info("Default includes to: {}", defaultIncludes);
 				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
 				// .../src/main/java/io/spring/format/maven/FormatMojo.java#L47
@@ -137,7 +155,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		return languageP;
 	}
 
-	private AtomicLongMap<String> countFiles(ICodeProvider pr,
+	private AtomicLongMap<String> processFiles(ICodeProvider pr,
 			AtomicLongMap<String> languageToNbAddedFiles,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP) {
@@ -145,6 +163,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
+
+		List<PathMatcher> includeMatchers = prepareMatcher(sourceCodeProperties.getIncludes());
+		List<PathMatcher> excludeMatchers = prepareMatcher(sourceCodeProperties.getExcludes());
+
 		try {
 			pr.listFiles(file -> {
 				if (pr.fileIsRemoved(file)) {
@@ -152,8 +174,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					return;
 				}
 				String fileName = pr.getFilePath(file);
-				Optional<PathMatcher> matchingInclude = findMatching(fileName, sourceCodeProperties.getIncludes());
-				Optional<PathMatcher> matchingExclude = findMatching(fileName, sourceCodeProperties.getExcludes());
+
+				Optional<PathMatcher> matchingInclude = findMatching(includeMatchers, fileName);
+				Optional<PathMatcher> matchingExclude = findMatching(excludeMatchers, fileName);
 				if (matchingInclude.isPresent()) {
 					if (matchingExclude.isEmpty()) {
 						try {
@@ -169,9 +192,19 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 							LOGGER.info("Processing {}", fileName);
 							String output = doFormat(languageP, code);
 							if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+								System.out.println(code);
+								System.out.println(output);
+
 								pathToMutatedContent.put(fileName, output);
 								languageToNbAddedFiles.incrementAndGet(language);
 								languageCounters.incrementAndGet("nb_files_formatted");
+
+								if (pathToMutatedContent.size() > 128
+										&& Integer.bitCount(pathToMutatedContent.size()) == 1) {
+									LOGGER.warn("We are about to commit {} files. That's quite a lot.",
+											pathToMutatedContent.size());
+								}
+
 							} else {
 								languageCounters.incrementAndGet("nb_files_already_formatted");
 							}
@@ -183,7 +216,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					} else {
 						languageCounters.incrementAndGet("nb_files_both_included_excluded");
 					}
-				} else if (matchingExclude.isEmpty()) {
+				} else if (matchingExclude.isPresent()) {
 					languageCounters.incrementAndGet("nb_files_excluded_not_included");
 				} else {
 					languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
@@ -196,11 +229,12 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java
-	private Optional<PathMatcher> findMatching(String fileName, List<String> regex) {
-		return regex.stream()
-				.map(r -> FileSystems.getDefault().getPathMatcher(r))
-				.filter(pm -> pm.matches(Paths.get(fileName)))
-				.findFirst();
+	public static Optional<PathMatcher> findMatching(List<PathMatcher> includeMatchers, String fileName) {
+		return includeMatchers.stream().filter(pm -> pm.matches(Paths.get(fileName))).findFirst();
+	}
+
+	public static List<PathMatcher> prepareMatcher(List<String> regex) {
+		return regex.stream().map(r -> FileSystems.getDefault().getPathMatcher(r)).collect(Collectors.toList());
 	}
 
 	private String doFormat(ILanguageProperties properties, String code) throws IOException {

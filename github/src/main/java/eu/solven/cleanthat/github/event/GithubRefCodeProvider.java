@@ -2,11 +2,16 @@ package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -14,6 +19,8 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteStreams;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -36,7 +43,6 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 	public void listFiles(Consumer<Object> consumer) throws IOException {
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		String sha = ref.getObject().getSha();
-		// GHCommit commit = repo.getCommit(sha);
 
 		GHTree tree = repo.getTreeRecursive(sha, 1);
 
@@ -44,18 +50,25 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 	}
 
 	private void processTree(GHTree tree, Consumer<Object> consumer) {
+		if (tree.isTruncated()) {
+			LOGGER.debug("Should we process each folder independantly?");
+		}
+
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		tree.getTree().forEach(ghTreeEntry -> {
 			if ("blob".equals(ghTreeEntry.getType())) {
 				consumer.accept(ghTreeEntry);
 			} else if ("tree".equals(ghTreeEntry.getType())) {
-				GHTree subTree;
-				try {
-					subTree = ghTreeEntry.asTree();
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-				processTree(subTree, consumer);
+				LOGGER.debug("Discard tree as original call for tree was recursive: {}", ghTreeEntry);
+
+				// GHTree subTree;
+				// try {
+				// subTree = ghTreeEntry.asTree();
+				// } catch (IOException e) {
+				// throw new UncheckedIOException(e);
+				// }
+				// // TODO This can lead with very deep stack: BAD. Switch to a queue
+				// processTree(subTree, consumer);
 			} else {
 				LOGGER.debug("Discard: {}", ghTreeEntry);
 			}
@@ -90,7 +103,13 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public String loadContent(Object file) throws IOException {
-		return ((GHTreeEntry) file).asBlob().getContent();
+		String encoding = ((GHTreeEntry) file).asBlob().getEncoding();
+		if ("base64".equals(encoding)) {
+			// https://github.com/hub4j/github-api/issues/878
+			return new String(ByteStreams.toByteArray(((GHTreeEntry) file).asBlob().read()), StandardCharsets.UTF_8);
+		} else {
+			throw new RuntimeException("TODO Managed encoding: " + encoding);
+		}
 	}
 
 	@Override
@@ -106,6 +125,33 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);
 			return Optional.empty();
+		}
+	}
+
+	@Override
+	public String getRepoUri() {
+		return repo.getGitTransportUrl();
+	}
+
+	@Override
+	public Git makeGitRepo() {
+		Path tmpDir;
+		try {
+			tmpDir = Files.createTempDirectory("cleanthat-clone");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		try {
+			return Git.cloneRepository()
+					.setURI(repo.getGitTransportUrl())
+					.setDirectory(tmpDir.toFile())
+					.setBranch(ref.getRef())
+					.setCloneAllBranches(false)
+					.setCloneSubmodules(false)
+					.call();
+		} catch (GitAPIException e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 }

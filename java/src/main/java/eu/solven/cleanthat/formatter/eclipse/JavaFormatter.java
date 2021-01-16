@@ -18,6 +18,8 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.spring.SpringJavaFormatter;
+import eu.solven.cleanthat.formatter.spring.SpringJavaFormatterProperties;
 import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
@@ -125,6 +127,10 @@ public class JavaFormatter implements IStringFormatter {
 			JavaRevelcImportsCleanerProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
 			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCodeProperties(), processorConfig);
+		} else if ("spring_formatter".equals(engine)) {
+			SpringJavaFormatterProperties processorConfig =
+					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
+			processor = new SpringJavaFormatter(languageProperties.getSourceCodeProperties(), processorConfig);
 		} else if ("rules".equals(engine)) {
 			CleanthatJavaProcessorProperties processorConfig =
 					objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);

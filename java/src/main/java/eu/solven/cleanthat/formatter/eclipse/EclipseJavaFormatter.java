@@ -58,8 +58,6 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 
 	private static final String KEY_URL = "url";
 
-	// private static final String KEY_JDK_VERSION = "jdk_version";
-	// private static final String DEFAULT_JDK_VERSION = "1.8";
 	private final CodeFormatter formatter;
 
 	public EclipseJavaFormatter(ILanguageProperties languageProperties,

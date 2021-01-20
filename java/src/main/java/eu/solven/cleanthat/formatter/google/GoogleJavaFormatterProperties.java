@@ -21,7 +21,4 @@ package eu.solven.cleanthat.formatter.google;
 // TODO What would be the options?
 public class GoogleJavaFormatterProperties {
 
-	public GoogleJavaFormatterProperties() {
-	}
-
 }

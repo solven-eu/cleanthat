@@ -65,7 +65,6 @@ public class SpringJavaFormatter implements ISourceCodeFormatter {
 
 			return output;
 		} catch (MalformedTreeException | BadLocationException e) {
-			// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/src/main/java/io/spring/format/maven/ApplyMojo.java
 			throw new IllegalArgumentException("Unable to format code", e);
 		}
 	}

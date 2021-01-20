@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
@@ -211,13 +212,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing files", e);
 		} finally {
-			executor.shutdown();
 			// TODO Should wait given time left in Lambda
-			try {
-				executor.awaitTermination(1, TimeUnit.DAYS);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				throw new RuntimeException(e);
+			if (!MoreExecutors.shutdownAndAwaitTermination(executor, 1, TimeUnit.DAYS)) {
+				LOGGER.warn("Executor not terminated");
 			}
 		}
 

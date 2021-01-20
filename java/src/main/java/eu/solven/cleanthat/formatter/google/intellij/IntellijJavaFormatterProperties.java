@@ -21,7 +21,4 @@ package eu.solven.cleanthat.formatter.google.intellij;
 // TODO What would be the options?
 public class IntellijJavaFormatterProperties {
 
-	public IntellijJavaFormatterProperties() {
-	}
-
 }

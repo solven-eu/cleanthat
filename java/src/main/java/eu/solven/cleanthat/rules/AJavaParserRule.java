@@ -5,12 +5,15 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
+import eu.solven.cleanthat.rules.function.OnMethodName;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
@@ -42,6 +45,23 @@ public abstract class AJavaParserRule implements IClassTransformer {
 			// https://github.com/javaparser/javaparser/issues/1491
 			LOGGER.debug("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
 			return Optional.empty();
+		}
+	}
+
+	protected void onMethodName(Node node, String methodName, OnMethodName consumer) {
+		if (node instanceof MethodCallExpr && methodName.equals(((MethodCallExpr) node).getName().getIdentifier())) {
+			MethodCallExpr methodCall = (MethodCallExpr) node;
+			Optional<Expression> optScope = methodCall.getScope();
+			if (!optScope.isPresent()) {
+				// TODO Document when this would happen
+				return;
+			}
+			Expression scope = optScope.get();
+			Optional<ResolvedType> type = optResolvedType(scope);
+
+			if (type.isPresent()) {
+				consumer.onMethodName(node, scope, type.get());
+			}
 		}
 	}
 }

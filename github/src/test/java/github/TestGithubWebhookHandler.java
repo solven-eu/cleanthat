@@ -61,7 +61,7 @@ public class TestGithubWebhookHandler {
 	@Test
 	public void processTestOpenPR() throws JsonParseException, JsonMappingException, IOException {
 		GHUser ghUser = Mockito.mock(GHUser.class);
-		Mockito.when(ghUser.getId()).thenReturn(123456789L);
+		Mockito.doReturn(123456789L).when(ghUser).getId();
 		Mockito.when(pr.getUser()).thenReturn(ghUser);
 
 		Map<String, ?> input = objectMapper

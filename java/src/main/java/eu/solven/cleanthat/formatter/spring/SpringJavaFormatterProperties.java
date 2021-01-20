@@ -21,7 +21,4 @@ package eu.solven.cleanthat.formatter.spring;
 // TODO What would be the options?
 public class SpringJavaFormatterProperties {
 
-	public SpringJavaFormatterProperties() {
-	}
-
 }

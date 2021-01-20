@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.rules;
 
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +11,6 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -40,21 +35,9 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 	public boolean transform(MethodDeclaration tree) {
 		tree.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-			if (node instanceof MethodCallExpr
-					&& "toString".equals(((MethodCallExpr) node).getName().getIdentifier())) {
-				MethodCallExpr methodCall = (MethodCallExpr) node;
-				Optional<Expression> optScope = methodCall.getScope();
-				if (!optScope.isPresent()) {
-					// TODO Document when this would happen
-					return;
-				}
-				Expression scope = optScope.get();
-				Optional<ResolvedType> type = optResolvedType(scope);
-
-				if (type.isPresent()) {
-					process(node, scope, type.get());
-				}
-			}
+			onMethodName(node, "toString", (methodNode, scope, type) -> {
+				process(methodNode, scope, type);
+			});
 		});
 		return false;
 	}

@@ -128,8 +128,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public boolean deprecatedFileIsRemoved(Object file) {
-		// TODO Should we check the blob actually exists for given sha1?
-		return false;
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	public static String loadContent(GHRepository repository, GHRef ref, String filename) throws IOException {

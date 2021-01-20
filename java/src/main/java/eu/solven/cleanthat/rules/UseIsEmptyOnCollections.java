@@ -14,9 +14,6 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -41,9 +38,6 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 
 	@Override
 	public boolean transform(MethodDeclaration pre) {
-		CombinedTypeSolver ts = new CombinedTypeSolver();
-		ts.add(new ReflectionTypeSolver());
-		JavaParserFacade javaParserFacade = JavaParserFacade.get(ts);
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 			if (node instanceof BinaryExpr && BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {

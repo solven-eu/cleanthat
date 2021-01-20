@@ -69,8 +69,8 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 		}
 	}
 
-	private synchronized void ensureLocalClone() {
-
+	@SuppressWarnings("PMD.CloseResource")
+	private void ensureLocalClone() {
 		// https://github.community/t/cloning-private-repo-with-a-github-app-private-key/14726
 		Path workingDir;
 		try {
@@ -79,7 +79,10 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 			throw new UncheckedIOException(e);
 		}
 
-		localClone.set(new JGitCodeProvider(workingDir, makeGitRepo(workingDir), ref.getObject().getSha()));
+		synchronized (this) {
+			Git jgit = makeGitRepo(workingDir);
+			localClone.compareAndSet(null, new JGitCodeProvider(workingDir, jgit, ref.getObject().getSha()));
+		}
 	}
 
 	private void processTree(GHTree tree, Consumer<ICodeProviderFile> consumer) {
@@ -110,13 +113,7 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public boolean deprecatedFileIsRemoved(Object file) {
-		// TODO Should we check the blob actually exists for given sha1?
-		return false;
-	}
-
-	public static String loadContent(GHRepository repository, GHRef ref, String filename) throws IOException {
-		String sha1 = ref.getObject().getSha();
-		return loadContent(repository, filename, sha1);
+		throw new UnsupportedOperationException("TODO");
 	}
 
 	@Override

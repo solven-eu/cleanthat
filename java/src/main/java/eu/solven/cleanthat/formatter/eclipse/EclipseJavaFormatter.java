@@ -40,7 +40,7 @@ import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.formatter.eclipse.revelc.ConfigReader;
-import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
+import eu.solven.cleanthat.github.EclipseJavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 
 /**
@@ -61,7 +61,7 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 	private final CodeFormatter formatter;
 
 	public EclipseJavaFormatter(ILanguageProperties languageProperties,
-			CleanthatEclipsejavaFormatterProcessorProperties processorConfig) {
+			EclipseJavaFormatterProcessorProperties processorConfig) {
 		Map<String, String> options = new LinkedHashMap<>();
 		String javaConfigFile = processorConfig.getUrl();
 		// Eclipse default

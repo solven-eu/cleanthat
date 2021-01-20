@@ -88,8 +88,6 @@ public class CleanThatLambdaFunction {
 		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
 
 		try {
-			// We log the payload temporarily, in order to have easy access to metadata
-			LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
 			// TODO Cache the Github instance for the JWT duration
 			return githubFactory.makeWithFreshJwt().processWebhookBody(input, cleaner);
 		} catch (IOException | JOSEException | RuntimeException e) {

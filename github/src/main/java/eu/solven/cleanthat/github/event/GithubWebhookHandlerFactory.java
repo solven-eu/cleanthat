@@ -26,6 +26,9 @@ import com.nimbusds.jwt.SignedJWT;
  */
 public class GithubWebhookHandlerFactory {
 
+	// https://github.community/t/expiration-time-claim-exp-is-too-far-in-the-future-when-creating-an-access-token/13830
+	private static final int GITHUB_TIMEOUT_SAFETY_SECONDS = 15;
+
 	private static final int GITHUB_TIMEOUT_JWK_MINUTES = 10;
 
 	final Environment env;
@@ -55,8 +58,10 @@ public class GithubWebhookHandlerFactory {
 		JWSSigner signer = new RSASSASigner(rsaJWK);
 		// Prepare JWT with claims set
 		Date now = new Date();
+
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
-		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES));
+		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES)
+				- TimeUnit.SECONDS.toMillis(GITHUB_TIMEOUT_SAFETY_SECONDS));
 		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(env.getProperty("github.app.app-id", "65550"))
 				.issueTime(now)
 				.expirationTime(expiresAt)

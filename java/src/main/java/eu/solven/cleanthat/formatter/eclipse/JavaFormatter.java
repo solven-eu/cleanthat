@@ -20,7 +20,7 @@ import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.spring.SpringJavaFormatter;
 import eu.solven.cleanthat.formatter.spring.SpringJavaFormatterProperties;
-import eu.solven.cleanthat.github.CleanthatEclipsejavaFormatterProcessorProperties;
+import eu.solven.cleanthat.github.EclipseJavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -44,7 +44,7 @@ public class JavaFormatter implements IStringFormatter {
 
 	// Prevents parsing/loading remote configuration on each parse
 	// We expect a low number of different configurations
-	final LoadingCache<Map.Entry<ILanguageProperties, CleanthatEclipsejavaFormatterProcessorProperties>, EclipseJavaFormatter> configToEngine =
+	final LoadingCache<Map.Entry<ILanguageProperties, EclipseJavaFormatterProcessorProperties>, EclipseJavaFormatter> configToEngine =
 			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build(CacheLoader.from(config -> {
 				return new EclipseJavaFormatter(config.getKey(), config.getValue());
 			}));
@@ -120,8 +120,8 @@ public class JavaFormatter implements IStringFormatter {
 		}
 
 		if ("eclipse_formatter".equals(engine)) {
-			CleanthatEclipsejavaFormatterProcessorProperties processorConfig =
-					objectMapper.convertValue(parameters, CleanthatEclipsejavaFormatterProcessorProperties.class);
+			EclipseJavaFormatterProcessorProperties processorConfig =
+					objectMapper.convertValue(parameters, EclipseJavaFormatterProcessorProperties.class);
 			processor = configToEngine.getUnchecked(Map.entry(languageProperties, processorConfig));
 		} else if ("revelc_imports".equals(engine)) {
 			JavaRevelcImportsCleanerProperties processorConfig =

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
-public class CleanthatEclipsejavaFormatterProcessorProperties {
+public class EclipseJavaFormatterProcessorProperties {
 
 	private String url;
 
@@ -43,7 +43,7 @@ public class CleanthatEclipsejavaFormatterProcessorProperties {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		CleanthatEclipsejavaFormatterProcessorProperties other = (CleanthatEclipsejavaFormatterProcessorProperties) obj;
+		EclipseJavaFormatterProcessorProperties other = (EclipseJavaFormatterProcessorProperties) obj;
 		return Objects.equals(url, other.url);
 	}
 

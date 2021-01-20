@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -17,6 +18,7 @@ import org.kohsuke.github.GitHubBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -53,7 +55,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			// https://github.com/hub4j/github-api/issues/570
 			GHAppCreateTokenBuilder installationGithub = installationById.createToken(Map.of(
-					// Required to open new pul-requests
+					// Required to open new pull-requests
 					"pull_requests",
 					GHPermissionType.WRITE,
 					// Required to access a repository without having to list all available repositories
@@ -88,6 +90,27 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				organizationUrl.orElse("-"));
 
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
+
+		String action = PepperMapHelper.getRequiredString(input, "action");
+
+		if (Set.of("created", "deleted", "uspend", "unsuspend", "new_permissions_accepted").contains(action)) {
+			// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
+			LOGGER.info("We are not interested in action={} (installation)", action);
+
+			return Map.of("skipped", "Github action: " + action);
+		} else if (Set.of("added", "removed").contains(action)) {
+			// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
+			LOGGER.info("We are not interested in action={} (installation_repositories)", action);
+
+			return Map.of("skipped", "Github action: " + action);
+		}
+
+		// We log the payload temporarily, in order to have easy access to metadata
+		try {
+			LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
+		} catch (JsonProcessingException e) {
+			LOGGER.warn("Issue while printing the json of the webhook", e);
+		}
 
 		GHRepository repo;
 		try {
@@ -150,7 +173,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			isBranchWithoutPR = false;
 			isBranchDeleted = false;
 
-			String action = PepperMapHelper.getRequiredString(input, "action");
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
 
 			if (pullRequest == null) {

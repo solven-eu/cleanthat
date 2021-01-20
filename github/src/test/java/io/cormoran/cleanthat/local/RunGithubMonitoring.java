@@ -15,6 +15,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -23,17 +24,30 @@ import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.GithubSpringConfig;
+import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.github.IStringFormatter;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 
 @SpringBootApplication(scanBasePackages = "none")
-@Import(GithubSpringConfig.class)
+@Import({ GithubSpringConfig.class })
 public class RunGithubMonitoring {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGithubMonitoring.class);
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(RunGithubMonitoring.class).web(WebApplicationType.NONE).run(args);
+	}
+
+	@Bean
+	public IStringFormatter stringFormatter() {
+		return new IStringFormatter() {
+
+			@Override
+			public String format(ILanguageProperties config, String code) throws IOException {
+				throw new UnsupportedOperationException("Should not format anything");
+			}
+		};
 	}
 
 	@EventListener(ContextRefreshedEvent.class)

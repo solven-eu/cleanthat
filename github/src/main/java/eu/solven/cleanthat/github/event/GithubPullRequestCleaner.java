@@ -28,6 +28,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;

@@ -2,8 +2,8 @@ package eu.solven.cleanthat.formatter;
 
 import java.util.Map;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
  * 
@@ -12,6 +12,6 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
  */
 public interface ICodeProviderFormatter {
 
-	Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProvider pr);
+	Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProvider codeProvider);
 
 }

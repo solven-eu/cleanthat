@@ -28,6 +28,8 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 
 import cormoran.pepper.thread.PepperExecutorsHelper;
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -35,7 +37,6 @@ import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
 import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
-import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
  * Unclear what is the point of this class
@@ -43,12 +44,13 @@ import eu.solven.cleanthat.github.event.ICodeProvider;
  * @author Benoit Lacelle
  */
 public class CodeProviderFormatter implements ICodeProviderFormatter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final List<String> DEFAULT_INCLUDES_JAVA = Arrays.asList("glob:**/*.java");
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
-
 	public static final String EOL = "\r\n";
+	private static final int CORES_FORMATTER = 16;
+	private static final int MAX_LOG_MANY_FILES = 128;
 
 	final ObjectMapper objectMapper;
 
@@ -72,7 +74,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		if (pr instanceof GithubPRCodeProvider) {
 			try {
 				pr.listFiles(fileChanged -> {
-					if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(pr.getFilePath(fileChanged))) {
+					if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(fileChanged.getFilePath(pr))) {
 						configIsChanged.set(true);
 						prComments.add("Configuration has changed");
 					}
@@ -172,16 +174,17 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		List<PathMatcher> includeMatchers = prepareMatcher(sourceCodeProperties.getIncludes());
 		List<PathMatcher> excludeMatchers = prepareMatcher(sourceCodeProperties.getExcludes());
 
-		ListeningExecutorService executor = PepperExecutorsHelper.newShrinkableFixedThreadPool(16, "CodeFormatter");
+		ListeningExecutorService executor =
+				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		try {
 			pr.listFiles(file -> {
-				if (pr.fileIsRemoved(file)) {
+				if (file.fileIsRemoved(pr)) {
 					// Skip files deleted within PR
 					return;
 				}
-				String fileName = pr.getFilePath(file);
+				String fileName = file.getFilePath(pr);
 
 				Optional<PathMatcher> matchingInclude = findMatching(includeMatchers, fileName);
 				Optional<PathMatcher> matchingExclude = findMatching(excludeMatchers, fileName);
@@ -252,7 +255,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(fileName));
 		String code = optAlreadyMutated.orElseGet(() -> {
 			try {
-				return pr.loadContent(file);
+				return new DummyCodeProviderFile(file).loadContent(pr);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -260,12 +263,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		LOGGER.info("Processing {}", fileName);
 		String output = doFormat(languageP, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-			System.out.println(code);
-			System.out.println(output);
-
 			pathToMutatedContent.put(fileName, output);
 
-			if (pathToMutatedContent.size() > 128 && Integer.bitCount(pathToMutatedContent.size()) == 1) {
+			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES
+					&& Integer.bitCount(pathToMutatedContent.size()) == 1) {
 				LOGGER.warn("We are about to commit {} files. That's quite a lot.", pathToMutatedContent.size());
 			}
 

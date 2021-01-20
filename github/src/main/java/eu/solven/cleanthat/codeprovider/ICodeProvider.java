@@ -1,12 +1,10 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import org.eclipse.jgit.api.Git;
 
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
@@ -15,10 +13,16 @@ import org.eclipse.jgit.api.Git;
  */
 public interface ICodeProvider {
 
-	// List<?> listFiles() throws IOException;
-	void listFiles(Consumer<Object> consumer) throws IOException;
+	void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException;
 
-	boolean fileIsRemoved(Object file);
+	@Deprecated
+	boolean deprecatedFileIsRemoved(Object raw);
+
+	@Deprecated
+	String deprecatedLoadContent(Object file) throws IOException;
+
+	@Deprecated
+	String deprecatedGetFilePath(Object file);
 
 	String getHtmlUrl();
 
@@ -26,15 +30,8 @@ public interface ICodeProvider {
 
 	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments);
 
-	String loadContent(Object file) throws IOException;
-
 	Optional<String> loadContentForPath(String path) throws IOException;
-
-	String getFilePath(Object file);
 
 	String getRepoUri();
 
-	Git makeGitRepo();
-
-	// void fileIsChanged(String pathCleanthatJson);
 }

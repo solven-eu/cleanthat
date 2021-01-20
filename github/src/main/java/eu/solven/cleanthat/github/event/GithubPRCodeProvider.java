@@ -19,6 +19,10 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
@@ -37,12 +41,12 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void listFiles(Consumer<Object> consumer) throws IOException {
-		pr.listFiles().forEach(consumer);
+	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+		pr.listFiles().forEach(prFile -> consumer.accept(new DummyCodeProviderFile(consumer)));
 	}
 
 	@Override
-	public boolean fileIsRemoved(Object file) {
+	public boolean deprecatedFileIsRemoved(Object file) {
 		return ((GHPullRequestFileDetail) file).getStatus().equals("removed");
 	}
 
@@ -78,12 +82,12 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public String loadContent(Object file) throws IOException {
+	public String deprecatedLoadContent(Object file) throws IOException {
 		return loadContent(pr, ((GHPullRequestFileDetail) file).getFilename());
 	}
 
 	@Override
-	public String getFilePath(Object file) {
+	public String deprecatedGetFilePath(Object file) {
 		return ((GHPullRequestFileDetail) file).getFilename();
 	}
 
@@ -103,7 +107,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 		return pr.getRepository().getGitTransportUrl();
 	}
 
-	@Override
+	// @Override
 	public Git makeGitRepo() {
 		Path tmpDir;
 		try {

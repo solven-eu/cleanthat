@@ -13,14 +13,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.eclipse.jgit.api.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
-import eu.solven.cleanthat.github.event.ICodeProvider;
 
 /**
  * An {@link ICodeProvider} for local folders
@@ -38,7 +39,7 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public void listFiles(Consumer<Object> consumer) throws IOException {
+	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		File gitIgnore = root.resolve(".gitignore").toFile();
 		Predicate<Path> gitIgnorePredicate;
 		if (gitIgnore.isFile()) {
@@ -55,11 +56,14 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 		} else {
 			gitIgnorePredicate = p -> true;
 		}
-		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(consumer);
+		Files.walk(root)
+				.filter(p -> p.toFile().isFile())
+				.filter(gitIgnorePredicate)
+				.forEach(f -> consumer.accept(new DummyCodeProviderFile(f)));
 	}
 
 	@Override
-	public boolean fileIsRemoved(Object file) {
+	public boolean deprecatedFileIsRemoved(Object file) {
 		// This class sees only existing files
 		return false;
 	}
@@ -87,14 +91,14 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public String loadContent(Object file) throws IOException {
+	public String deprecatedLoadContent(Object file) throws IOException {
 		return Files.readString((Path) file);
 	}
 
 	@Override
-	public String getFilePath(Object file) {
-		Path path = (Path) file;
-		return path.subpath(root.getNameCount(), path.getNameCount()).toString();
+	public String deprecatedGetFilePath(Object rawFile) {
+		Path file = (Path) rawFile;
+		return file.subpath(root.getNameCount(), file.getNameCount()).toString();
 	}
 
 	@Override
@@ -107,8 +111,4 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 		throw new IllegalArgumentException("No repository URI");
 	}
 
-	@Override
-	public Git makeGitRepo() {
-		throw new IllegalArgumentException("No repository URI");
-	}
 }

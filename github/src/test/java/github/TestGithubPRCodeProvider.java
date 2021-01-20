@@ -13,6 +13,7 @@ import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 
 public class TestGithubPRCodeProvider {
@@ -31,7 +32,8 @@ public class TestGithubPRCodeProvider {
 		Mockito.when(repository.getFileContent("someFileName", "headSha")).thenReturn(ghContent);
 		Mockito.when(ghContent.read())
 				.thenReturn(new ByteArrayInputStream("someContent".getBytes(StandardCharsets.UTF_8)));
-		String content = new GithubPRCodeProvider("someToken", pr).loadContent(file);
+		String content =
+				new GithubPRCodeProvider("someToken", pr).deprecatedLoadContent(new DummyCodeProviderFile(file));
 		Assert.assertEquals("someContent", content);
 	}
 }

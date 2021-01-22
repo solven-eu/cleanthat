@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import cormoran.pepper.jvm.GCInspector;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -29,8 +30,11 @@ import cormoran.pepper.collection.PepperMapHelper;
  * @author Benoit Lacelle
  *
  */
+// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
+
+	private static final String KEY_SKIPPED = "skipped";
 
 	final GitHub github;
 	final ObjectMapper objectMapper;
@@ -78,7 +82,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return new GitHubBuilder().withAppInstallationToken(token).build();
 	}
 
-	@SuppressWarnings("PMD.ExcessiveMethodLength")
+	@SuppressWarnings({ "PMD.ExcessiveMethodLength", "checkstyle:MethodLength", "PMD.NPathComplexity" })
 	@Override
 	public Map<String, ?> processWebhookBody(Map<String, ?> input, IGithubPullRequestCleaner prCleaner) {
 		// https://developer.github.com/webhooks/event-payloads/
@@ -89,29 +93,37 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				installationId,
 				organizationUrl.orElse("-"));
 
-		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
+		// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
+		// Push on PR: there is no action. There may be multiple commits being pushed
 
-		String action = PepperMapHelper.getRequiredString(input, "action");
+		Optional<String> optAction = PepperMapHelper.getOptionalString(input, "action");
 
-		if (Set.of("created", "deleted", "uspend", "unsuspend", "new_permissions_accepted").contains(action)) {
-			// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
-			LOGGER.info("We are not interested in action={} (installation)", action);
+		if (optAction.isPresent()) {
+			String action = optAction.get();
 
-			return Map.of("skipped", "Github action: " + action);
-		} else if (Set.of("added", "removed").contains(action)) {
-			// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
-			LOGGER.info("We are not interested in action={} (installation_repositories)", action);
+			if (Set.of("created", "deleted", "uspend", "unsuspend", "new_permissions_accepted").contains(action)) {
+				// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
+				LOGGER.info("We are not interested in action={} (installation)", action);
 
-			return Map.of("skipped", "Github action: " + action);
+				return Map.of(KEY_SKIPPED, "Github action: " + action);
+			} else if (Set.of("added", "removed").contains(action)) {
+				// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation_repositories
+				LOGGER.info("We are not interested in action={} (installation_repositories)", action);
+
+				return Map.of(KEY_SKIPPED, "Github action: " + action);
+			}
 		}
 
 		// We log the payload temporarily, in order to have easy access to metadata
-		try {
-			LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
-		} catch (JsonProcessingException e) {
-			LOGGER.warn("Issue while printing the json of the webhook", e);
+		if (!GCInspector.inUnitTest()) {
+			try {
+				LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
+			} catch (JsonProcessingException e) {
+				LOGGER.warn("Issue while printing the json of the webhook", e);
+			}
 		}
 
+		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
 		GHRepository repo;
 		try {
 			repo = githubAuthAsInst.getGithub()
@@ -149,8 +161,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// We search for a matching PR, as in such a case, we would wait for a relevant PR event (is there a PR
 			// event when its branch changes HEAD?)
 			// NO, it is rather interesting for the case there is no PR. Then, we could try to process changed
-			// files, in
-			// order to manage PR-less branches.
+			// files, in order to manage PR-less branches.
 			// Still, this seems a very complex features, as it is difficult to know from which branch/the full
 			// commit-list we have to process
 			try {
@@ -175,14 +186,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			Map<String, ?> pullRequest = PepperMapHelper.getAs(input, "pull_request");
 
+			String actionOrMissingMarker = optAction.orElse("<missing>");
 			if (pullRequest == null) {
 				// TODO When does this happen?
-				LOGGER.info("We are not interested in action={} as no pull_request", action);
+				LOGGER.info("We are not interested in action={} as no pull_request", actionOrMissingMarker);
 				optPr = Optional.empty();
 			} else {
 				// https://developer.github.com/webhooks/event-payloads/#pull_request
-				if (!"opened".equals(action)) {
-					LOGGER.info("We are not interested in action={}", action);
+				if (!"opened".equals(actionOrMissingMarker)) {
+					LOGGER.info("We are not interested in action={}", actionOrMissingMarker);
 					return Map.of("action", "discarded");
 				} else {
 					String url = PepperMapHelper.getRequiredString(input, "pull_request", "url");
@@ -202,7 +214,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// git clone https://x-access-token:<token>@github.com/owner/repo.git
 
 		if (isBranchDeleted) {
-			return Map.of("skipped", "webhook triggered on a branch deletion");
+			return Map.of(KEY_SKIPPED, "webhook triggered on a branch deletion");
 		} else {
 			LOGGER.info("Notified commit on main branch: {}", isMainBranchCommit);
 			CommitContext commitContext = new CommitContext(isMainBranchCommit, isBranchWithoutPR);
@@ -211,7 +223,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				GHPullRequest pr = optPr.get();
 				if (pr.isLocked()) {
 					LOGGER.info("PR is locked: {}", pr.getHtmlUrl());
-					return Map.of("skipped", "PullRequest is locked");
+					return Map.of(KEY_SKIPPED, "PullRequest is locked");
 				} else {
 					try {
 						GHUser user = pr.getUser();
@@ -224,7 +236,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					return prCleaner.formatPR(githubAuthAsInst.getToken(), commitContext, optPr::get);
 				}
 			} else {
-				return Map.of("skipped", "webhook is not attached to a PullRequest");
+				return Map.of(KEY_SKIPPED, "webhook is not attached to a PullRequest");
 			}
 		}
 	}

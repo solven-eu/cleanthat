@@ -1,4 +1,4 @@
-package github;
+package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,9 +19,6 @@ import org.springframework.core.io.ClassPathResource;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.github.event.GithubWebhookHandler;
-import eu.solven.cleanthat.github.event.IGithubPullRequestCleaner;
 
 public class TestGithubWebhookHandler {
 

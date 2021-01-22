@@ -1,4 +1,4 @@
-package github;
+package eu.solven.cleanthat.github.event;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,8 +12,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
-
-import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 
 public class TestGithubPRCodeProvider {
 

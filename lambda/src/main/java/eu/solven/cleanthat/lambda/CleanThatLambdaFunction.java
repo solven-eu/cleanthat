@@ -70,20 +70,15 @@ public class CleanThatLambdaFunction {
 						LOGGER.warn("Issue while parsing body", e);
 						return Collections.<String, Object>emptyMap();
 					}
-				})
-						.filter(m -> !m.isEmpty())
-						.map(r -> processOneMessage(appContext, objectMapper, r))
-						.collect(Collectors.toList());
+				}).filter(m -> !m.isEmpty()).map(r -> processOneMessage(appContext, r)).collect(Collectors.toList());
 				return Map.of("sqs", output);
 			} else {
-				return processOneMessage(appContext, objectMapper, input);
+				return processOneMessage(appContext, input);
 			}
 		};
 	}
 
-	private Map<String, ?> processOneMessage(ApplicationContext appContext,
-			ObjectMapper objectMapper,
-			Map<String, ?> input) {
+	private Map<String, ?> processOneMessage(ApplicationContext appContext, Map<String, ?> input) {
 		GithubWebhookHandlerFactory githubFactory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
 

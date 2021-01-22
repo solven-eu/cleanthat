@@ -1,4 +1,4 @@
-package github;
+package eu.solven.cleanthat.github.run;
 
 import java.io.File;
 import java.security.KeyFactory;
@@ -20,12 +20,7 @@ import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 
 // https://github-api.kohsuke.org/githubappjwtauth.html
 public class RunGenerateGithubJwt {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunGenerateGithubJwt.class);
-
-	// https://github.com/organizations/solven-eu/settings/apps/cleanthat
-	// https://github.com/apps/cleanthat
-	public static final String githubAppId = "65550";
 
 	static PrivateKey get(String filename) throws Exception {
 		byte[] keyBytes = Files.toByteArray(new File(filename));
@@ -36,11 +31,12 @@ public class RunGenerateGithubJwt {
 
 	public static void main(String[] args) throws Exception {
 		JWK jwk = JWK.parseFromPEMEncodedObjects(Files.asCharSource(
-				new File("/Users/blacelle/Dropbox/Solven/Dev/CleanThat/cleanthat.2020-05-19.private-key.pem"),
+				new File(System.getProperty("user.home")
+						+ "/Dropbox/Solven/Dev/CleanThat/cleanthat.2020-05-19.private-key.pem"),
 				StandardCharset.UTF_8).read());
 		LOGGER.info("github.app.private-jwk: '{}'", jwk.toJSONString());
 		MockEnvironment env = new MockEnvironment();
-		env.setProperty("github.app.app-id", githubAppId);
+		env.setProperty("github.app.app-id", GithubWebhookHandlerFactory.GITHUB_DEFAULT_APP_ID);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
 		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env, new ObjectMapper());
 		GitHub gitHubApp = factory.makeWithFreshJwt().getGithubAsApp();

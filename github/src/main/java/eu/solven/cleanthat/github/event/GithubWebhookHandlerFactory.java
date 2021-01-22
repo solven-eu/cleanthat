@@ -26,6 +26,10 @@ import com.nimbusds.jwt.SignedJWT;
  */
 public class GithubWebhookHandlerFactory {
 
+	// https://github.com/organizations/solven-eu/settings/apps/cleanthat
+	// https://github.com/apps/cleanthat
+	public static final String GITHUB_DEFAULT_APP_ID = "65550";
+
 	// https://github.community/t/expiration-time-claim-exp-is-too-far-in-the-future-when-creating-an-access-token/13830
 	private static final int GITHUB_TIMEOUT_SAFETY_SECONDS = 15;
 
@@ -62,10 +66,9 @@ public class GithubWebhookHandlerFactory {
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
 		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES)
 				- TimeUnit.SECONDS.toMillis(GITHUB_TIMEOUT_SAFETY_SECONDS));
-		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(env.getProperty("github.app.app-id", "65550"))
-				.issueTime(now)
-				.expirationTime(expiresAt)
-				.build();
+		String githubAppId = env.getProperty("github.app.app-id", GITHUB_DEFAULT_APP_ID);
+		JWTClaimsSet claimsSet =
+				new JWTClaimsSet.Builder().issuer(githubAppId).issueTime(now).expirationTime(expiresAt).build();
 		SignedJWT signedJWT =
 				new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaJWK.getKeyID()).build(), claimsSet);
 		// Compute the RSA signature

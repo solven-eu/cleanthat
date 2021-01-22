@@ -1,4 +1,4 @@
-package github;
+package eu.solven.cleanthat.github.event;
 
 import java.nio.file.PathMatcher;
 import java.util.List;

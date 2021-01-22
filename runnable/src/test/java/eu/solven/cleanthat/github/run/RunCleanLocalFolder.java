@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.local;
+package eu.solven.cleanthat.github.run;
 
 import java.io.File;
 import java.io.IOException;

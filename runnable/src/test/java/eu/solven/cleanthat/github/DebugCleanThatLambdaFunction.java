@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.local;
+package eu.solven.cleanthat.github;
 
 import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
 
@@ -8,7 +8,7 @@ import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
  *
  * @author Benoit Lacelle
  */
-public class DebugFunctionConfiguration extends CleanThatLambdaFunction {
+public class DebugCleanThatLambdaFunction extends CleanThatLambdaFunction {
 
 	public static void main(String[] args) {
 		CleanThatLambdaFunction.main(args);

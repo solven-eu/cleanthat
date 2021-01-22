@@ -17,8 +17,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>runnable</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -46,55 +47,11 @@
 			<artifactId>jaxb-api</artifactId>
 		</dependency>
 
-		<!-- https://docs.sentry.io/platforms/java/guides/spring-boot/ -->
-		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-spring-boot-starter</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-logback</artifactId>
-			<version>3.2.0</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>annotations</artifactId>
-			<version>3.0.1u2</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
-			<artifactId>github</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
-			<artifactId>java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<dependency>
 			<!-- https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html#_comparing_functional_with_traditional_bean_definitions -->
 			<!-- It seems we need this to open an actual HTTP server for the Function -->
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-function-web</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<!-- @WithMockUser -->
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

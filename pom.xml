@@ -23,6 +23,7 @@
 		<module>java</module>
 		<!-- <module>python</module> -->
 
+		<module>runnable</module>
 		<module>lambda</module>
 
 		<module>test-helpers</module>

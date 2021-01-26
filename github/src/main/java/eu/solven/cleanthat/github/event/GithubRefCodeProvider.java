@@ -27,6 +27,7 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.jgit.JGitCodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -127,7 +128,14 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments) {
+	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments
+	// ,
+	// Optional<String> targetBranch
+	) {
+		// if (targetBranch.isPresent()) {
+		// throw new UnsupportedOperationException("TODO");
+		// }
+
 		commitIntoRef(pathToMutatedContent, prComments, repo, ref);
 	}
 
@@ -169,17 +177,6 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 		String authTransportUrl =
 				"https://x-access-token:" + token + "@" + rawTransportUrl.substring("https://".length());
 
-		try {
-			return Git.cloneRepository()
-					.setURI(authTransportUrl)
-					.setDirectory(tmpDir.toFile())
-					.setBranch(ref.getRef())
-					.setCloneAllBranches(false)
-					.setCloneSubmodules(false)
-					.setProgressMonitor(new TextProgressMonitor())
-					.call();
-		} catch (GitAPIException e) {
-			throw new IllegalArgumentException(e);
-		}
+		return JGitCodeProvider.makeGitRepo(tmpDir, authTransportUrl, ref.getRef());
 	}
 }

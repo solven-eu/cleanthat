@@ -15,28 +15,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
 import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubHelper;
-import eu.solven.cleanthat.github.GithubSpringConfig;
-import eu.solven.cleanthat.github.event.CommitContext;
 import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
+import eu.solven.cleanthat.jgit.CommitContext;
+import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
 
-@SpringBootApplication(scanBasePackages = "none")
-@Import({ GithubSpringConfig.class, JavaFormatter.class })
-public class RunCleanGithubBranch extends CleanThatLambdaFunction {
+public class RunCleanGithubBranch extends ACleanThatXxxFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubBranch.class);
 

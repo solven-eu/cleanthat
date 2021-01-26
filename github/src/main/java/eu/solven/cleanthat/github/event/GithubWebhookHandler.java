@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
+import eu.solven.cleanthat.jgit.CommitContext;
+import eu.solven.cleanthat.jgit.GitHelper;
 
 /**
  * Default implementation for IGithubWebhookHandler

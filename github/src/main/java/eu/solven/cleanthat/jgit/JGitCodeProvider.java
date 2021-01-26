@@ -1,21 +1,29 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.jgit;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import org.eclipse.jgit.api.CheckoutResult;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.NoWorkTreeException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -28,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.github.event.AGithubCodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -46,24 +55,37 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		this.workingDir = workingDir;
 		this.jgit = jgit;
 		this.commit = commit;
+
+		Status status;
+		try {
+			status = jgit.status().call();
+		} catch (NoWorkTreeException | GitAPIException e) {
+			throw new IllegalStateException("Issue while checking repository status", null);
+		}
+		if (status.hasUncommittedChanges()) {
+			throw new IllegalArgumentException("We expect to work on a clean repository");
+		}
+
+		// try {
+		// String fullBranchName = jgit.getRepository().getFullBranch();
+		String head = getHeadName(jgit.getRepository());
+		if (!commit.equals(head)) {
+			throw new IllegalArgumentException("Invalid current sh1: " + head + " (expected: " + commit + ")");
+		}
+		// } catch (IOException e) {
+		// throw new UncheckedIOException("Issue getting current branch name", e);
+		// }
 	}
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		LOGGER.debug("About to list files");
 
-		// TODO count only files relevant given our includes/excludes constrains
-		// https://github.blog/2012-09-21-easier-builds-and-deployments-using-git-over-https-and-oauth/
-		CheckoutResult.Status checkoutStatus = jgit.checkout().setName(commit).getResult().getStatus();
+		walkFiles(consumer, "");
+	}
 
-		if (checkoutStatus != CheckoutResult.Status.OK) {
-			throw new IllegalStateException("Issue while checkouting: " + commit);
-		}
-
-		// https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/api/ListFilesOfCommitAndTag.java
-
-		String path = "";
-
+	// https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/api/ListFilesOfCommitAndTag.java
+	private void walkFiles(Consumer<ICodeProviderFile> consumer, String path) throws IOException {
 		Repository localRepository = jgit.getRepository();
 		RevCommit revCommit = buildRevCommit(localRepository, commit);
 
@@ -74,7 +96,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		if (path.isEmpty()) {
 			try (TreeWalk treeWalk = new TreeWalk(localRepository)) {
 				treeWalk.addTree(localTree);
-				treeWalk.setRecursive(false);
+				treeWalk.setRecursive(true);
 				treeWalk.setPostOrderTraversal(false);
 
 				while (treeWalk.next()) {
@@ -94,7 +116,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 
 				try (TreeWalk dirWalk = new TreeWalk(localRepository)) {
 					dirWalk.addTree(treeWalk.getObjectId(0));
-					dirWalk.setRecursive(false);
+					dirWalk.setRecursive(true);
 					while (dirWalk.next()) {
 						acceptLocalTreeWalk(consumer, treeWalk);
 					}
@@ -128,7 +150,15 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public boolean deprecatedFileIsRemoved(Object file) {
-		throw new UnsupportedOperationException("TODO");
+		String relativePath = (String) file;
+		Path path = workingDir.resolve(relativePath);
+
+		if (!path.startsWith(workingDir)) {
+			// https://stackoverflow.com/questions/53157337/validate-to-prevent-a-path-string-to-go-up-to-parent-folder
+			throw new IllegalArgumentException("Can not move out of the parent folder");
+		}
+
+		return !path.toFile().exists();
 	}
 
 	public static String loadContent(GHRepository repository, GHRef ref, String filename) throws IOException {
@@ -151,8 +181,33 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments) {
-		throw new UnsupportedOperationException("TODO");
+	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments
+	// , Optional<String> targetBranch
+	) {
+		// targetBranch
+
+		pathToMutatedContent.forEach((k, v) -> {
+			Path resolvedPath = workingDir.resolve((String) k);
+
+			try {
+				Files.writeString(resolvedPath, v, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
+
+		// https://stackoverflow.com/questions/12734760/jgit-how-to-add-all-files-to-staging-area
+		try {
+			jgit.add().addFilepattern(".").call();
+		} catch (GitAPIException e) {
+			throw new RuntimeException("Issue adding all files into staging area");
+		}
+
+		// try {
+		// jgit.commit().setMessage(prComments.stream().collect(Collectors.joining("\r\n"))).call();
+		// } catch (GitAPIException e) {
+		// throw new RuntimeException("Issue committing all files");
+		// }
 	}
 
 	@Override
@@ -181,6 +236,33 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	@Override
 	public String getRepoUri() {
 		return "TODO";
+	}
+
+	public static String getHeadName(Repository repo) {
+		String result = null;
+		try {
+			ObjectId id = repo.resolve(Constants.HEAD);
+			result = id.getName();
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue fetching the head sha1", e);
+		}
+		return result;
+	}
+
+	public static Git makeGitRepo(Path dir, String authTransportUrl, String branch) {
+		// https://stackoverflow.com/questions/11475263/shallow-clone-with-jgit
+		CloneCommand builder = Git.cloneRepository()
+				.setURI(authTransportUrl)
+				.setDirectory(dir.toFile())
+				.setBranch(branch)
+				.setCloneAllBranches(false)
+				.setCloneSubmodules(false)
+				.setProgressMonitor(new TextProgressMonitor());
+		try {
+			return builder.call();
+		} catch (GitAPIException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 }

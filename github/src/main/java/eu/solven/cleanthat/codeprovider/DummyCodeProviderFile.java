@@ -12,7 +12,10 @@ public class DummyCodeProviderFile implements ICodeProviderFile {
 	private final Object raw;
 
 	public DummyCodeProviderFile(Object raw) {
-		super();
+		if (raw instanceof DummyCodeProviderFile) {
+			throw new IllegalArgumentException("input can not be an instance of " + this.getClass());
+		}
+
 		this.raw = raw;
 	}
 

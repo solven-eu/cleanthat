@@ -16,6 +16,7 @@ package eu.solven.cleanthat.java.mutators;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -77,18 +78,29 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 	public String doFormat(String code, LineEnding eolToApply) throws IOException {
 		LOGGER.debug("{}", this.properties);
 		AtomicReference<String> codeRef = new AtomicReference<>(code);
+
+		// Ensure we compute the compilation-unit only once per String
+		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
+
 		transformers.forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
 
-			CompilationUnit compilationUnit;
-			try {
-				compilationUnit = StaticJavaParser.parse(codeRef.get());
-			} catch (RuntimeException e) {
-				throw new RuntimeException("Issue parsing the code", e);
+			// Fill cache
+			if (optCompilationUnit.get() == null) {
+				// Synchronized until: https://github.com/javaparser/javaparser/issues/3050
+				synchronized (StaticJavaParser.class) {
+					try {
+						optCompilationUnit.set(StaticJavaParser.parse(codeRef.get()));
+					} catch (RuntimeException e) {
+						throw new RuntimeException("Issue parsing the code", e);
+					}
+				}
 			}
 
 			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST
+			// We rely on javaParser source-code only if the rule has actually impacted the AST
 			AtomicBoolean hasImpacted = new AtomicBoolean();
+			CompilationUnit compilationUnit = optCompilationUnit.get();
 			compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
 					.stream()
 					.flatMap(classDef -> classDef.getMethods().stream())
@@ -105,6 +117,9 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			if (hasImpacted.get()) {
 				// One relevant change: building back from the AST
 				codeRef.set(compilationUnit.toString());
+
+				// Discard cache
+				optCompilationUnit.set(null);
 			}
 		});
 		return codeRef.get();

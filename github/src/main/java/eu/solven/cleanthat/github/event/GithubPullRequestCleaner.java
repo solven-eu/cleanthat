@@ -32,6 +32,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.jgit.CommitContext;
 
 /**
  * Default for {@link IGithubPullRequestCleaner}

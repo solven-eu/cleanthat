@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.formatter;
+package eu.solven.cleanthat.jgit;
 
 import java.io.File;
 import java.io.IOException;

@@ -3,7 +3,9 @@ package eu.solven.cleanthat.github.run;
 import java.io.IOException;
 
 import org.kohsuke.github.GHApp;
+import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
+import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -64,28 +66,11 @@ public class RunGithubMonitoring {
 			// Date creationDate = installation.getCreatedAt();
 			String url = installation.getHtmlUrl().toExternalForm();
 
-			GHUser user = installation.getAccount();
-			LOGGER.info("user: {}", user.getHtmlUrl());
-
-			try {
-				String email = user.getEmail();
-				if (null != email) {
-					LOGGER.info("email: {}", email);
-				}
-
-				String twitter = user.getTwitterUsername();
-				if (null != twitter) {
-					LOGGER.info("twitter: {}", twitter);
-				}
-			} catch (IOException e) {
-				LOGGER.warn("Issue fetching email for user=" + user, e);
-			}
-
 			try {
 				GHAppInstallationToken token = installation.createToken().create();
 
 				GitHub installationGithub = new GitHubBuilder().withAppInstallationToken(token.getToken()).build();
-
+				logAboutUser(installationGithub, installation);
 				installation.setRoot(installationGithub);
 
 				PagedSearchIterable<GHRepository> repositories = installation.listRepositories();
@@ -113,5 +98,59 @@ public class RunGithubMonitoring {
 					installation.getRepositorySelection());
 			LOGGER.info("appId={} repositories={}", appId, installation.getRepositoriesUrl());
 		});
+	}
+
+	private void logAboutUser(GitHub github, GHAppInstallation installation) {
+		GHUser user = installation.getAccount();
+
+		String login = user.getLogin();
+		String type = "?";
+		try {
+			type = user.getType();
+		} catch (IOException e) {
+			LOGGER.debug("Issue getting type of login=" + login, e);
+		}
+		LOGGER.info("{}: {}", type, user.getHtmlUrl());
+
+		try {
+			unsafeLogUserDetails(user);
+		} catch (IOException e) {
+			LOGGER.trace("It may not be legit to get User information as an installation. Try as the app");
+			try {
+				GHUser userAsApp = github.getUser(login);
+				unsafeLogUserDetails(userAsApp);
+			} catch (IOException e2) {
+				try {
+					GHOrganization organisationAsApp = github.getOrganization(login);
+					unsafeLogUserDetails(organisationAsApp);
+				} catch (IOException e3) {
+					LOGGER.debug("Issue fetching email for " + type + "=" + login, e3);
+				}
+			}
+		}
+	}
+
+	private void unsafeLogUserDetails(GHUser user) throws IOException {
+		String email = user.getEmail();
+		if (null != email) {
+			LOGGER.info("email: {}", email);
+		}
+
+		String twitter = user.getTwitterUsername();
+		if (null != twitter) {
+			LOGGER.info("twitter: {}", twitter);
+		}
+	}
+
+	private void unsafeLogUserDetails(GHOrganization organisation) throws IOException {
+		String email = organisation.getEmail();
+		if (null != email) {
+			LOGGER.info("email: {}", email);
+		}
+
+		String twitter = organisation.getTwitterUsername();
+		if (null != twitter) {
+			LOGGER.info("twitter: {}", twitter);
+		}
 	}
 }

@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -18,22 +17,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
-import eu.solven.cleanthat.formatter.LocalFolderCodeProvider;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
-import eu.solven.cleanthat.lambda.CleanThatLambdaFunction;
+import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
+import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
 
-// @Import({ SentryAutoConfiguration.class })
-@SpringBootApplication(scanBasePackages = "none")
-public class RunCleanLocalFolder extends CleanThatLambdaFunction {
-
+public class RunCleanLocalFolder extends ACleanThatXxxFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanLocalFolder.class);
 
-	ClassPathResource currentRepoSomeFile = new ClassPathResource("/logback.xml");
+	final ClassPathResource currentRepoSomeFile = new ClassPathResource("/logback.xml");
 
 	public static void main(String[] args) {
-		SpringApplication.run(RunCleanLocalFolder.class, args);
+		new SpringApplication(RunCleanLocalFolder.class).run(args);
 	}
 
 	@Bean

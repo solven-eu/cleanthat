@@ -1,6 +1,5 @@
 package eu.solven.cleanthat.lambda;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -14,18 +13,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JOSEException;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
-import eu.solven.cleanthat.github.GithubSpringConfig;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
-import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
-import io.sentry.Sentry;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -36,9 +28,7 @@ import io.sentry.Sentry;
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
-@SpringBootApplication
-@Import({ GithubSpringConfig.class, JavaFormatter.class })
-public class CleanThatLambdaFunction {
+public class CleanThatLambdaFunction extends ACleanThatXxxFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
 
@@ -76,18 +66,5 @@ public class CleanThatLambdaFunction {
 				return processOneMessage(appContext, input);
 			}
 		};
-	}
-
-	private Map<String, ?> processOneMessage(ApplicationContext appContext, Map<String, ?> input) {
-		GithubWebhookHandlerFactory githubFactory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
-
-		try {
-			// TODO Cache the Github instance for the JWT duration
-			return githubFactory.makeWithFreshJwt().processWebhookBody(input, cleaner);
-		} catch (IOException | JOSEException | RuntimeException e) {
-			Sentry.captureException(e, "Lambda");
-			throw new RuntimeException(e);
-		}
 	}
 }

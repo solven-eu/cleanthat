@@ -31,6 +31,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
@@ -247,12 +248,12 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private boolean doFormat(ICodeProvider pr,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP,
-			Object file,
+			ICodeProviderFile file,
 			String fileName) throws IOException {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(fileName));
 		String code = optAlreadyMutated.orElseGet(() -> {
 			try {
-				return new DummyCodeProviderFile(file).loadContent(pr);
+				return file.loadContent(pr);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}

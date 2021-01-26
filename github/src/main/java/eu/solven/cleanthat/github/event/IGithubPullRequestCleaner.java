@@ -9,6 +9,8 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
+import eu.solven.cleanthat.jgit.CommitContext;
+
 /**
  * Holds the logic to clean a PR
  *

@@ -67,7 +67,14 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments) {
+	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments
+	// ,
+	// Optional<String> targetBranch
+	) {
+		// if (targetBranch.isPresent()) {
+		// throw new UnsupportedOperationException("TODO");
+		// }
+
 		String refName = pr.getHead().getRef();
 		GHRepository repo = pr.getRepository();
 		GHRef ref;

@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.jgit;
 
 /**
  * Helps knowing in which context a commit has been done

@@ -7,6 +7,7 @@ import java.util.List;
 import eu.solven.cleanthat.rules.UseDiamondOperator;
 import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 //TODO Have a maven module per version of Java, to ensure the post is valid
 public class UseDiamondOperatorJdk8Cases {
@@ -18,11 +19,7 @@ public class UseDiamondOperatorJdk8Cases {
 		return new UseDiamondOperatorJdk8();
 	}
 
-	public static class CaseCollection {
-		public String getTitle() {
-			return "TypeArgumentOnInvocationParameter";
-		}
-
+	public static class CaseCollection implements ICaseOverMethod {
 		private <T> List<T> genericMethod(List<T> list) {
 			return list;
 		}

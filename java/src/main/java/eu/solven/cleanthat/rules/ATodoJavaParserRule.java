@@ -34,7 +34,7 @@ public abstract class ATodoJavaParserRule extends AJavaParserRule implements ICl
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration tree) {
+	public boolean transformMethod(MethodDeclaration tree) {
 		LOGGER.debug("TODO");
 		return false;
 	}

@@ -11,7 +11,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -34,29 +33,29 @@ public class ATestCases {
 				compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 					return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 				});
-		// methodCases.forEach(oneCase -> {
-		// LOGGER.info("Processing the case: {}", oneCase.getName());
-		//
-		// MethodDeclaration pre = getMethodWithName(oneCase, "pre");
-		// MethodDeclaration post = getMethodWithName(oneCase, "post");
-		//
-		// // Check 'pre' is transformed into 'post'
-		// // This is generally the most relevant test: to be done first
-		// {
-		// transformer.transform(pre);
-		// // Rename the method before checking full equality
-		// pre.setName("post");
-		// Assert.assertEquals(post, pre);
-		// }
-		//
-		// // Check the transformer is impact-less on already clean code
-		// // This is a less relevant test: to be done later
-		// {
-		// MethodDeclaration postPost = post.clone();
-		// transformer.transform(postPost);
-		// Assert.assertEquals(post, postPost);
-		// }
-		// });
+		methodCases.forEach(oneCase -> {
+			LOGGER.info("Processing the case: {}", oneCase.getName());
+
+			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
+			MethodDeclaration post = getMethodWithName(oneCase, "post");
+
+			// Check 'pre' is transformed into 'post'
+			// This is generally the most relevant test: to be done first
+			{
+				Assert.assertTrue("We miss a transformation flag for: " + pre, transformer.transformMethod(pre));
+				// Rename the method before checking full equality
+				pre.setName("post");
+				Assert.assertEquals(post, pre);
+			}
+
+			// Check the transformer is impact-less on already clean code
+			// This is a less relevant test: to be done later
+			{
+				MethodDeclaration postPost = post.clone();
+				Assert.assertFalse(transformer.transformMethod(postPost));
+				Assert.assertEquals(post, postPost);
+			}
+		});
 
 		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return c.getImplementedTypes()

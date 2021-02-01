@@ -6,6 +6,7 @@ import eu.solven.cleanthat.rules.ReorderModifiers;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 import eu.solven.cleanthat.rules.test.ICaseOverClass;
+import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class ReorderModifiersCases extends ACases {
 	@Override
@@ -13,11 +14,7 @@ public class ReorderModifiersCases extends ACases {
 		return new ReorderModifiers();
 	}
 
-	public static class CaseFields {
-		public String getTitle() {
-			return "Fields";
-		}
-
+	public static class CaseFields implements ICaseOverMethod {
 		@SuppressWarnings("unused")
 		public Object pre() {
 			return new Object() {
@@ -43,7 +40,7 @@ public class ReorderModifiersCases extends ACases {
 		}
 	}
 
-	public static class CaseMethods {
+	public static class CaseMethods implements ICaseOverMethod {
 		public String getTitle() {
 			return "Methods";
 		}
@@ -68,11 +65,7 @@ public class ReorderModifiersCases extends ACases {
 	}
 
 	public static class CaseTypes implements ICaseOverClass {
-		public String getTitle() {
-			return "Types";
-		}
-
-		static private class Pre {
+		static public class Pre {
 			// empty
 		}
 

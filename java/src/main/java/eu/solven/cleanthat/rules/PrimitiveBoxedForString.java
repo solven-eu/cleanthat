@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.rules;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,19 +34,23 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration tree) {
+	public boolean transformMethod(MethodDeclaration tree) {
+		AtomicBoolean transformed = new AtomicBoolean();
+
 		tree.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 			onMethodName(node, "toString", (methodNode, scope, type) -> {
-				process(methodNode, scope, type);
+				if (process(methodNode, scope, type)) {
+					transformed.set(true);
+				}
 			});
 		});
-		return false;
+		return transformed.get();
 	}
 
-	private void process(Node node, Expression scope, ResolvedType type) {
+	private boolean process(Node node, Expression scope, ResolvedType type) {
 		if (!type.isReferenceType()) {
-			return;
+			return false;
 		}
 		LOGGER.debug("{} is referenceType", type);
 		if (Boolean.class.getName().equals(type.asReferenceType().getQualifiedName())
@@ -61,8 +67,10 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 				MethodCallExpr replacement =
 						new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
 				LOGGER.info("Turning {} into {}", node, replacement);
-				node.replace(replacement);
+				return node.replace(replacement);
 			}
 		}
+
+		return false;
 	}
 }

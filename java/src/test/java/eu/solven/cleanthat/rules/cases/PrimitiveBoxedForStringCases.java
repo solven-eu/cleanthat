@@ -2,23 +2,18 @@ package eu.solven.cleanthat.rules.cases;
 
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ACases;
+import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
-public class PrimitiveBoxedForStringCases {
-	public String getId() {
-		return "PrimitiveBoxedForString";
-	}
-
+public class PrimitiveBoxedForStringCases extends ACases {
+	@Override
 	public IClassTransformer getTransformer() {
 		return new PrimitiveBoxedForString();
 	}
 
-	public static class CaseBoolean {
-		public String getTitle() {
-			return "Boolean";
-		}
-
+	public static class CaseBoolean implements ICaseOverMethod {
 		public Object pre(boolean input) {
-			return new Boolean(input).toString();
+			return Boolean.valueOf(input).toString();
 		}
 
 		public Object post(boolean input) {
@@ -26,13 +21,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseByte {
-		public String getTitle() {
-			return "Byte";
-		}
-
+	public static class CaseByte implements ICaseOverMethod {
 		public Object pre(byte input) {
-			return new Byte(input).toString();
+			return Byte.valueOf(input).toString();
 		}
 
 		public Object post(byte input) {
@@ -40,13 +31,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseShort {
-		public String getTitle() {
-			return "Short";
-		}
-
+	public static class CaseShort implements ICaseOverMethod {
 		public Object pre(short input) {
-			return new Short(input).toString();
+			return Short.valueOf(input).toString();
 		}
 
 		public Object post(short input) {
@@ -54,13 +41,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseInteger {
-		public String getTitle() {
-			return "Integer";
-		}
-
+	public static class CaseInteger implements ICaseOverMethod {
 		public Object pre(int input) {
-			return new Integer(input).toString();
+			return Integer.valueOf(input).toString();
 		}
 
 		public Object post(int input) {
@@ -68,13 +51,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseLong {
-		public String getTitle() {
-			return "Long";
-		}
-
+	public static class CaseLong implements ICaseOverMethod {
 		public Object pre(long input) {
-			return new Long(input).toString();
+			return Long.valueOf(input).toString();
 		}
 
 		public Object post(long input) {
@@ -82,13 +61,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseFloat {
-		public String getTitle() {
-			return "Float";
-		}
-
+	public static class CaseFloat implements ICaseOverMethod {
 		public Object pre(float someByte) {
-			return new Float(someByte).toString();
+			return Float.valueOf(someByte).toString();
 		}
 
 		public Object post(float someByte) {
@@ -96,13 +71,9 @@ public class PrimitiveBoxedForStringCases {
 		}
 	}
 
-	public static class CaseDouble {
-		public String getTitle() {
-			return "Double";
-		}
-
+	public static class CaseDouble implements ICaseOverMethod {
 		public Object pre(double someByte) {
-			return new Double(someByte).toString();
+			return Double.valueOf(someByte).toString();
 		}
 
 		public Object post(double someByte) {

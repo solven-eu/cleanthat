@@ -49,7 +49,7 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean transformMethod(MethodDeclaration pre) {
 		AtomicBoolean hasTransformed = new AtomicBoolean();
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));

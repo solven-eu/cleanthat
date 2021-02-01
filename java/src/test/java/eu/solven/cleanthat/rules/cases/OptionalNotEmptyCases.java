@@ -2,23 +2,16 @@ package eu.solven.cleanthat.rules.cases;
 
 import java.util.Optional;
 
-import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
-public class PreferConstantsAsEqualsLeftOperatorCases {
-	public String getId() {
-		return "PrimitiveBoxedForString";
-	}
-
+public class OptionalNotEmptyCases implements ICaseOverMethod {
 	public IClassTransformer getTransformer() {
-		return new PrimitiveBoxedForString();
+		return new OptionalNotEmpty();
 	}
 
-	public static class CaseNotEmpty {
-		public String getTitle() {
-			return "!Optional.empty()";
-		}
-
+	public static class CaseNotEmpty implements ICaseOverMethod {
 		public Object pre(Optional<?> input) {
 			return !input.isEmpty();
 		}
@@ -28,11 +21,7 @@ public class PreferConstantsAsEqualsLeftOperatorCases {
 		}
 	}
 
-	public static class CaseNotPresent {
-		public String getTitle() {
-			return "!Optional.present()";
-		}
-
+	public static class CaseNotPresent implements ICaseOverMethod {
 		public Object pre(Optional<?> input) {
 			return !input.isPresent();
 		}

@@ -12,16 +12,15 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.meta.IRuleDescriber;
 
 /**
- * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'
+ * Switch o.equals("someString") to "someString".equals(o)
  *
  * @author Benoit Lacelle
  */
-public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
+public class VariableEqualsConstant extends ATodoJavaParserRule implements IRuleDescriber {
+	private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsConstant.class);
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11
@@ -31,7 +30,12 @@ public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean isPreventingExceptions() {
+		return true;
+	}
+
+	@Override
+	public boolean transformMethod(MethodDeclaration pre) {
 		pre.walk(actualNode -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
 

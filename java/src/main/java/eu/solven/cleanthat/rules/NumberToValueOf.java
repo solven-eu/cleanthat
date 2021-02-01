@@ -5,5 +5,5 @@ package eu.solven.cleanthat.rules;
  *
  * @author Benoit Lacelle
  */
-public class SwitchNumberToValueOf extends ATodoJavaParserRule {
+public class NumberToValueOf extends ATodoJavaParserRule {
 }

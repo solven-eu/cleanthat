@@ -10,11 +10,17 @@ import com.github.javaparser.ast.body.TypeDeclaration;
  */
 public interface IClassTransformer {
 
-	boolean transform(MethodDeclaration pre);
+	default String getId() {
+		return "TODO";
+	}
+
+	default boolean transformMethod(MethodDeclaration pre) {
+		return false;
+	}
 
 	String minimalJavaVersion();
 
-	default void transformType(TypeDeclaration<?> pre) {
-		// No impact over types
+	default boolean transformType(TypeDeclaration<?> pre) {
+		return false;
 	}
 }

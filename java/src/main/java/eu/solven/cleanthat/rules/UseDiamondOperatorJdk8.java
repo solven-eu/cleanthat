@@ -33,7 +33,7 @@ public class UseDiamondOperatorJdk8 extends AJavaParserRule implements IClassTra
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration tree) {
+	public boolean transformMethod(MethodDeclaration tree) {
 		LOGGER.debug("TODO");
 		return false;
 	}

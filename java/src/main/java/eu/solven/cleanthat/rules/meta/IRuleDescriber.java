@@ -1,7 +1,7 @@
 package eu.solven.cleanthat.rules.meta;
 
 import eu.solven.cleanthat.rules.IJdkVersionConstants;
-import eu.solven.cleanthat.rules.SwitchNumberToValueOf;
+import eu.solven.cleanthat.rules.NumberToValueOf;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 
 /**
@@ -15,7 +15,7 @@ public interface IRuleDescriber {
 	 * 
 	 * @return true if the rule helps cleaning deprecation notice
 	 * 
-	 * @see SwitchNumberToValueOf
+	 * @see NumberToValueOf
 	 */
 	default boolean isDeprecationNotice() {
 		return false;

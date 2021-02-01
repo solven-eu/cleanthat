@@ -6,9 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 
 import cormoran.pepper.logging.PepperLogHelper;
@@ -19,7 +21,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  *
  * @author Benoit Lacelle
  */
-public class PreferConstantsAsEqualsLeftOperator extends AJavaParserRule implements IClassTransformer {
+public class OptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
@@ -31,7 +33,7 @@ public class PreferConstantsAsEqualsLeftOperator extends AJavaParserRule impleme
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean transformMethod(MethodDeclaration pre) {
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 
@@ -64,4 +66,5 @@ public class PreferConstantsAsEqualsLeftOperator extends AJavaParserRule impleme
 
 		return false;
 	}
+
 }

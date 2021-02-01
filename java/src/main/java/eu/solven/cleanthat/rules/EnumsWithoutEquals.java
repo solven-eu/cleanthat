@@ -25,7 +25,7 @@ public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransfo
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean transformMethod(MethodDeclaration pre) {
 		// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));

@@ -1,5 +1,6 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.cases;
 
+import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class PrimitiveBoxedForStringCases {

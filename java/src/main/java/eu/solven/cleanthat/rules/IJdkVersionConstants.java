@@ -20,4 +20,8 @@ public interface IJdkVersionConstants {
 	String JDK_8 = "8";
 
 	String JDK_11 = "11";
+
+	@Deprecated(
+			since = "Unclear if safe given this is doomed to be deprecated (as JDK won't stop releasing new versions)")
+	String JDK_LATEST = JDK_11;
 }

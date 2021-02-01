@@ -16,8 +16,9 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.rules.CreateTempFilesUsingNioCases;
+import eu.solven.cleanthat.rules.cases.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ATestCases;
 
 public class TestCreateTempFilesUsingNio extends ATestCases {
 

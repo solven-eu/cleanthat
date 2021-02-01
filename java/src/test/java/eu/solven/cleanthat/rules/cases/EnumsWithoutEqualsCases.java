@@ -1,7 +1,8 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.cases;
 
 import java.math.RoundingMode;
 
+import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties

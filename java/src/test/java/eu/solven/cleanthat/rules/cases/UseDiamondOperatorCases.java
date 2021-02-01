@@ -1,31 +1,31 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.cases;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.solven.cleanthat.rules.UseDiamondOperator;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ACases;
 
-public class UseIsEmptyOnCollectionsCases {
-	public String getId() {
-		return "UseIsEmptyOnCollections";
-	}
-
+public class UseDiamondOperatorCases extends ACases {
+	@Override
 	public IClassTransformer getTransformer() {
-		return new UseIsEmptyOnCollections();
+		return new UseDiamondOperator();
 	}
 
 	public static class CaseCollection {
 		public String getTitle() {
-			return "Collection";
+			return "Map";
 		}
 
-		public Object pre(Collection<?> input) {
-			return input.size() == 0;
+		public Map<String, List<String>> pre() {
+			return new HashMap<String, List<String>>();
 		}
 
-		public Object post(Collection<?> input) {
-			return input.isEmpty();
+		public Map<String, List<String>> post(Collection<?> input) {
+			return new HashMap<>();
 		}
 	}
 

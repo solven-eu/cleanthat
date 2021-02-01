@@ -1,10 +1,11 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.cases;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**

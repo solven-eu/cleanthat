@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.rules;
+package eu.solven.cleanthat.rules.test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,6 +18,10 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class ATestCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
+
+	protected void testCasesIn(ACases cases) throws IOException {
+		testCasesIn(cases.getClass(), cases.getTransformer());
+	}
 
 	protected void testCasesIn(Class<?> casesClass, IClassTransformer transformer) throws IOException {
 		Path srcMainJava = getProjectTestSourceCode();

@@ -5,7 +5,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
-import eu.solven.cleanthat.rules.PrimitiveBoxedForStringCases;
+import eu.solven.cleanthat.rules.cases.PrimitiveBoxedForStringCases;
+import eu.solven.cleanthat.rules.test.ATestCases;
 
 public class TestPrimitiveBoxedForString extends ATestCases {
 

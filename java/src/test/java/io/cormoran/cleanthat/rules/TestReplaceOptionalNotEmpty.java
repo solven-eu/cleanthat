@@ -5,7 +5,8 @@ import java.io.IOException;
 import org.junit.Test;
 
 import eu.solven.cleanthat.rules.ReplaceOptionalNotEmpty;
-import eu.solven.cleanthat.rules.ReplaceOptionalNotEmptyCases;
+import eu.solven.cleanthat.rules.cases.ReplaceOptionalNotEmptyCases;
+import eu.solven.cleanthat.rules.test.ATestCases;
 
 public class TestReplaceOptionalNotEmpty extends ATestCases {
 

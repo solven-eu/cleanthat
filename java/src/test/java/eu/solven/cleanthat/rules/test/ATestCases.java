@@ -11,8 +11,10 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
@@ -28,19 +30,64 @@ public class ATestCases {
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
-		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
-			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
+		List<ClassOrInterfaceDeclaration> methodCases =
+				compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
+					return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
+				});
+		// methodCases.forEach(oneCase -> {
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
+		//
+		// MethodDeclaration pre = getMethodWithName(oneCase, "pre");
+		// MethodDeclaration post = getMethodWithName(oneCase, "post");
+		//
+		// // Check 'pre' is transformed into 'post'
+		// // This is generally the most relevant test: to be done first
+		// {
+		// transformer.transform(pre);
+		// // Rename the method before checking full equality
+		// pre.setName("post");
+		// Assert.assertEquals(post, pre);
+		// }
+		//
+		// // Check the transformer is impact-less on already clean code
+		// // This is a less relevant test: to be done later
+		// {
+		// MethodDeclaration postPost = post.clone();
+		// transformer.transform(postPost);
+		// Assert.assertEquals(post, postPost);
+		// }
+		// });
+
+		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
+			return c.getImplementedTypes()
+					.stream()
+					.filter(parentC -> parentC.getNameAsString().equals(ICaseOverClass.class.getSimpleName()))
+					.findAny()
+					.isPresent();
 		});
-		cases.forEach(oneCase -> {
+		typeCases.forEach(oneCase -> {
 			LOGGER.info("Processing the case: {}", oneCase.getName());
-			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
-			MethodDeclaration post = getMethodWithName(oneCase, "post");
+			TypeDeclaration<?> pre = oneCase.getMembers()
+					.stream()
+					.filter(n -> n instanceof TypeDeclaration)
+					.map(n -> (TypeDeclaration<?>) n)
+					.filter(n -> n.getNameAsString().equals("Pre"))
+					.findAny()
+					.get();
+
+			TypeDeclaration<?> post = oneCase.getMembers()
+					.stream()
+					.filter(n -> n instanceof TypeDeclaration)
+					.map(n -> (TypeDeclaration<?>) n)
+					.filter(n -> n.getNameAsString().equals("Post"))
+					.findAny()
+					.get();
 
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
-				transformer.transform(pre);
-				// Rename the method bfore checking full equality
+				transformer.transformType(pre);
+				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertEquals(post, pre);
 			}
@@ -48,8 +95,8 @@ public class ATestCases {
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
-				MethodDeclaration postPost = post.clone();
-				transformer.transform(postPost);
+				TypeDeclaration<?> postPost = post.clone();
+				transformer.transformType(postPost);
 				Assert.assertEquals(post, postPost);
 			}
 		});

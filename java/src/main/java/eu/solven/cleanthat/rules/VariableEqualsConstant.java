@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.rules;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ public class VariableEqualsConstant extends ATodoJavaParserRule implements IRule
 
 	@Override
 	public boolean transformMethod(MethodDeclaration pre) {
+		AtomicBoolean transformed = new AtomicBoolean();
+
 		pre.walk(actualNode -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
 
@@ -49,19 +52,20 @@ public class VariableEqualsConstant extends ATodoJavaParserRule implements IRule
 				LOGGER.debug("Find a hardcoded string : {}", argument);
 				// argument is hard coded we need scope to inverse the two
 				Optional<Expression> optScope = methodCall.getScope();
-				if (optScope.isPresent()) {
-					// equals must be called by something, otherwise we don't touch this part
-					Expression scope = optScope.get();
-					// inversion
-					MethodCallExpr replacement =
-							new MethodCallExpr(argument, "equals", new NodeList<Expression>(scope));
-					LOGGER.info("Turning {} into {}", actualNode, replacement);
-					actualNode.replace(replacement);
+				if (!optScope.isPresent()) {
+					return;
 				}
-
+				// equals must be called by something, otherwise we don't touch this part
+				Expression scope = optScope.get();
+				// inversion
+				MethodCallExpr replacement = new MethodCallExpr(argument, "equals", new NodeList<Expression>(scope));
+				LOGGER.info("Turning {} into {}", actualNode, replacement);
+				if (actualNode.replace(replacement)) {
+					transformed.set(true);
+				}
 			}
 		});
 
-		return false;
+		return transformed.get();
 	}
 }

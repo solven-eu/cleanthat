@@ -1,10 +1,5 @@
 package eu.solven.cleanthat.rules;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.javaparser.ast.body.MethodDeclaration;
-
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 
@@ -13,10 +8,7 @@ import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
  *
  * @author Benoit Lacelle
  */
-public class UseDiamondOperator extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
-
+public class UseDiamondOperator extends ATodoJavaParserRule implements IClassTransformer, IRuleExternalUrls {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
@@ -37,9 +29,4 @@ public class UseDiamondOperator extends AJavaParserRule implements IClassTransfo
 		return "https://jsparrow.github.io/rules/diamond-operator.html";
 	}
 
-	@Override
-	public boolean transformMethod(MethodDeclaration tree) {
-		LOGGER.debug("TODO");
-		return false;
-	}
 }

@@ -10,6 +10,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
  */
 public interface IClassTransformer {
 
+	// For java, prefer Checkstyle name, else PMD name
 	default String getId() {
 		return "TODO";
 	}

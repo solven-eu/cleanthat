@@ -4,9 +4,11 @@ import java.util.Optional;
 
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ACases;
 import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
-public class OptionalNotEmptyCases implements ICaseOverMethod {
+public class OptionalNotEmptyCases extends ACases {
+	@Override
 	public IClassTransformer getTransformer() {
 		return new OptionalNotEmpty();
 	}

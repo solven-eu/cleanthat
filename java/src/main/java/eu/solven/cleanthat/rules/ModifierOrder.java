@@ -1,11 +1,9 @@
 package eu.solven.cleanthat.rules;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +22,8 @@ import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
  *
  * @author Benoit Lacelle
  */
-public class ReorderModifiers extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ReorderModifiers.class);
+public class ModifierOrder extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",
 			"protected",
@@ -39,6 +37,12 @@ public class ReorderModifiers extends AJavaParserRule implements IClassTransform
 			"synchronized",
 			"native",
 			"strictfp");
+
+	@Override
+	public String getId() {
+		// Same name as checkstyle
+		return "ModifierOrder";
+	}
 
 	@Override
 	public String minimalJavaVersion() {

@@ -58,7 +58,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		try {
 			status = jgit.status().call();
 		} catch (NoWorkTreeException | GitAPIException e) {
-			throw new IllegalStateException("Issue while checking repository status", null);
+			throw new IllegalStateException("Issue while checking repository status", e);
 		}
 		if (status.hasUncommittedChanges()) {
 			throw new IllegalArgumentException("We expect to work on a clean repository");
@@ -198,7 +198,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		try {
 			jgit.add().addFilepattern(".").call();
 		} catch (GitAPIException e) {
-			throw new RuntimeException("Issue adding all files into staging area");
+			throw new RuntimeException("Issue adding all files into staging area", e);
 		}
 
 		// try {

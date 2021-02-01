@@ -11,9 +11,19 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		return new PrimitiveBoxedForString();
 	}
 
-	public static class CaseBoolean implements ICaseOverMethod {
+	public static class CaseBoolean_valueOf implements ICaseOverMethod {
 		public Object pre(boolean input) {
 			return Boolean.valueOf(input).toString();
+		}
+
+		public Object post(boolean input) {
+			return Boolean.toString(input);
+		}
+	}
+
+	public static class CaseBoolean_consctructor implements ICaseOverMethod {
+		public Object pre(boolean input) {
+			return new Boolean(input).toString();
 		}
 
 		public Object post(boolean input) {

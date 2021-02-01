@@ -2,7 +2,7 @@ package eu.solven.cleanthat.rules.cases;
 
 import java.util.Collection;
 
-import eu.solven.cleanthat.rules.ReorderModifiers;
+import eu.solven.cleanthat.rules.ModifierOrder;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 import eu.solven.cleanthat.rules.test.ICaseOverClass;
@@ -11,7 +11,7 @@ import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 public class ReorderModifiersCases extends ACases {
 	@Override
 	public IClassTransformer getTransformer() {
-		return new ReorderModifiers();
+		return new ModifierOrder();
 	}
 
 	public static class CaseFields implements ICaseOverMethod {

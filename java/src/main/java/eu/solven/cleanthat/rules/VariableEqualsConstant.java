@@ -13,6 +13,8 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.rules.framework.ATodoJavaParserRule;
+import eu.solven.cleanthat.rules.framework.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IRuleDescriber;
 
 /**

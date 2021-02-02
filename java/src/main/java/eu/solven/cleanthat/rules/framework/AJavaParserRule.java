@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.framework;
 
 import java.util.Optional;
 

@@ -14,6 +14,8 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.rules.framework.AJavaParserRule;
+import eu.solven.cleanthat.rules.framework.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 

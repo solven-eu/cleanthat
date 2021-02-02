@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.rules;
 
+import eu.solven.cleanthat.rules.framework.ATodoJavaParserRule;
+import eu.solven.cleanthat.rules.framework.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 

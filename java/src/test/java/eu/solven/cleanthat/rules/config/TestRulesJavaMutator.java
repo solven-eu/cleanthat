@@ -8,7 +8,7 @@ import org.junit.Test;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
-import eu.solven.cleanthat.rules.IJdkVersionConstants;
+import eu.solven.cleanthat.rules.framework.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class TestRulesJavaMutator {
@@ -19,9 +19,11 @@ public class TestRulesJavaMutator {
 
 		languageProperties.setLanguageVersion(IJdkVersionConstants.JDK_5);
 		List<IClassTransformer> transformers5 = new RulesJavaMutator(languageProperties, properties).getTransformers();
+		Assertions.assertThat(transformers5).isNotEmpty();
 
 		languageProperties.setLanguageVersion(IJdkVersionConstants.JDK_11);
 		List<IClassTransformer> transformers11 = new RulesJavaMutator(languageProperties, properties).getTransformers();
+		Assertions.assertThat(transformers11).isNotEmpty();
 
 		// We expect less rules compatible with Java5 than Java11
 		Assertions.assertThat(transformers5.size()).isLessThan(transformers11.size());

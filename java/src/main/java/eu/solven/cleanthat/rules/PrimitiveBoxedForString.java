@@ -17,6 +17,7 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.rules.framework.AJavaParserRule;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 
@@ -39,6 +40,11 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 	@Override
 	public String jsparrowUrl() {
 		return "https://jsparrow.github.io/rules/reorder-modifiers.html";
+	}
+
+	@Override
+	public String sonarUrl() {
+		return "https://rules.sonarsource.com/java/RSPEC-1124";
 	}
 
 	@Override

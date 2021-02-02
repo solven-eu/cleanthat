@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.rules.framework.AJavaParserRule;
+import eu.solven.cleanthat.rules.framework.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**

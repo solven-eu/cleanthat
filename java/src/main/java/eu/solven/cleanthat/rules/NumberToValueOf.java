@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.rules;
 
+import eu.solven.cleanthat.rules.framework.ATodoJavaParserRule;
+
 /**
  * Switch new Double(d) to Double.valueOf(d)
  *

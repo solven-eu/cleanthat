@@ -14,8 +14,9 @@
 package eu.solven.cleanthat.java.mutators;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -26,16 +27,15 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 
+import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
-import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.rules.EnumsWithoutEquals;
-import eu.solven.cleanthat.rules.IJdkVersionConstants;
-import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
-import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.VersionWrapper;
 
@@ -49,25 +49,69 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesJavaMutator.class);
 
-	private final ILanguageProperties languageProperties;
 	private final CleanthatJavaProcessorProperties properties;
 
-	private static final List<IClassTransformer> ALL_TRANSFORMERS = Arrays.asList(new EnumsWithoutEquals(),
-			new PrimitiveBoxedForString(),
-			new UseIsEmptyOnCollections(),
-			new CreateTempFilesUsingNio());
+	private static final List<IClassTransformer> ALL_TRANSFORMERS;
+
+	static {
+		ImmutableSet<ClassInfo> classes;
+		try {
+			classes = ClassPath.from(Thread.currentThread().getContextClassLoader())
+					.getTopLevelClasses("eu.solven.cleanthat.rules");
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Issue scanning for available Rules");
+		}
+
+		ALL_TRANSFORMERS = classes.stream().map(c -> {
+			try {
+				return Class.forName(c.getName());
+			} catch (ClassNotFoundException e) {
+				throw new IllegalStateException(e);
+			}
+		}).filter(c -> IClassTransformer.class.isAssignableFrom(c)).map(c -> {
+			try {
+				return (IClassTransformer) c.getConstructor().newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				throw new IllegalStateException(e);
+			}
+		}).collect(Collectors.toList());
+		;
+	}
 
 	private final List<IClassTransformer> transformers;
 
 	public RulesJavaMutator(ILanguageProperties languageProperties, CleanthatJavaProcessorProperties properties) {
-		this.languageProperties = languageProperties;
 		this.properties = properties;
 
 		VersionWrapper languageVersion = new VersionWrapper(languageProperties.getLanguageVersion());
 		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
-			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
-			return languageVersion.compareTo(transformerVersion) >= 0;
-		}).collect(Collectors.toList());
+			List<String> includes = PepperMapHelper.getAs(properties.getParameters(), "includes");
+
+			if (includes != null) {
+				Optional<String> includeMatch = includes.stream().filter(i -> ct.getId().contains(i)).findAny();
+				if (includeMatch.isEmpty()) {
+					return false;
+				}
+
+			}
+
+			List<String> excludes = PepperMapHelper.getAs(properties.getParameters(), "includes");
+			if (excludes != null) {
+
+				Optional<String> excludeMatch = excludes.stream().filter(i -> ct.getId().contains(i)).findAny();
+				if (excludeMatch.isPresent()) {
+					return false;
+				}
+			}
+			return true;
+		})
+
+				.filter(ct -> {
+					VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
+					return languageVersion.compareTo(transformerVersion) >= 0;
+				})
+				.collect(Collectors.toList());
 	}
 
 	public List<IClassTransformer> getTransformers() {
@@ -83,21 +127,6 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
 
 		transformers.forEach(ct -> {
-			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
-			int codeVersion = IJdkVersionConstants.ORDERED.indexOf(languageProperties.getLanguageVersion());
-
-			if (ruleMinimal > codeVersion) {
-				LOGGER.debug("We skip {} as {} > {}",
-						ct,
-						ct.minimalJavaVersion(),
-						languageProperties.getLanguageVersion());
-				return;
-			}
-
-			if (!ct.minimalJavaVersion().equals(languageProperties.getLanguageVersion())) {
-				LOGGER.debug("TODO Implement a rule to skip incompatible rules");
-			}
-
 			LOGGER.debug("Applying {}", ct);
 
 			// Fill cache

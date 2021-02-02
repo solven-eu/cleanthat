@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.framework;
 
 import java.util.List;
 
@@ -31,5 +31,7 @@ public interface IJdkVersionConstants {
 			since = "Unclear if safe given this is doomed to be deprecated (as JDK won't stop releasing new versions)")
 	String JDK_LATEST = JDK_11;
 
+	// TODO We may prefer relying on VersionWrapper
+	@Deprecated
 	List<String> ORDERED = ImmutableList.of(JDK_1, JDK_4, JDK_5, JDK_6, JDK_7, JDK_8, JDK_9, JDK_11);
 }

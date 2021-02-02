@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-logback</artifactId>
-			<version>3.2.0</version>
+			<version>3.2.1</version>
 		</dependency>
 
 		<dependency>

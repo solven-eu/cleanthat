@@ -5,14 +5,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -60,7 +58,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		try {
 			status = jgit.status().call();
 		} catch (NoWorkTreeException | GitAPIException e) {
-			throw new IllegalStateException("Issue while checking repository status", null);
+			throw new IllegalStateException("Issue while checking repository status", e);
 		}
 		if (status.hasUncommittedChanges()) {
 			throw new IllegalArgumentException("We expect to work on a clean repository");
@@ -200,7 +198,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		try {
 			jgit.add().addFilepattern(".").call();
 		} catch (GitAPIException e) {
-			throw new RuntimeException("Issue adding all files into staging area");
+			throw new RuntimeException("Issue adding all files into staging area", e);
 		}
 
 		// try {

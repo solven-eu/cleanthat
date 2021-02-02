@@ -16,7 +16,6 @@ package eu.solven.cleanthat.java.mutators;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -34,6 +33,7 @@ import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.rules.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -83,6 +83,21 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
 
 		transformers.forEach(ct -> {
+			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
+			int codeVersion = IJdkVersionConstants.ORDERED.indexOf(languageProperties.getLanguageVersion());
+
+			if (ruleMinimal > codeVersion) {
+				LOGGER.debug("We skip {} as {} > {}",
+						ct,
+						ct.minimalJavaVersion(),
+						languageProperties.getLanguageVersion());
+				return;
+			}
+
+			if (!ct.minimalJavaVersion().equals(languageProperties.getLanguageVersion())) {
+				LOGGER.debug("TODO Implement a rule to skip incompatible rules");
+			}
+
 			LOGGER.debug("Applying {}", ct);
 
 			// Fill cache
@@ -100,20 +115,19 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST
 			// We rely on javaParser source-code only if the rule has actually impacted the AST
 			AtomicBoolean hasImpacted = new AtomicBoolean();
-			CompilationUnit compilationUnit = optCompilationUnit.get();
-			compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
-					.stream()
-					.flatMap(classDef -> classDef.getMethods().stream())
-					.forEach(methodDef -> {
-						if (!ct.minimalJavaVersion().equals(languageProperties.getLanguageVersion())) {
-							LOGGER.debug("TODO Implement a rule to skip incompatible rules");
-						}
 
-						if (ct.transform(methodDef)) {
-							hasImpacted.set(true);
-							LOGGER.info("It is a hit");
-						}
-					});
+			CompilationUnit compilationUnit = optCompilationUnit.get();
+			compilationUnit.findAll(ClassOrInterfaceDeclaration.class).stream().peek(c -> {
+				if (ct.transformType(c)) {
+					hasImpacted.set(true);
+					LOGGER.info("It is a hit");
+				}
+			}).flatMap(classDef -> classDef.getMethods().stream()).forEach(methodDef -> {
+				if (ct.transformMethod(methodDef)) {
+					hasImpacted.set(true);
+					LOGGER.info("It is a hit");
+				}
+			});
 			if (hasImpacted.get()) {
 				// One relevant change: building back from the AST
 				codeRef.set(compilationUnit.toString());

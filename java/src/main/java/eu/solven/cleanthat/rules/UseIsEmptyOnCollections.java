@@ -3,6 +3,7 @@ package eu.solven.cleanthat.rules;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,9 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean transformMethod(MethodDeclaration pre) {
+		AtomicBoolean transformed = new AtomicBoolean();
+
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 			if (node instanceof BinaryExpr && BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
@@ -66,14 +69,19 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 				Optional<ResolvedType> type = optResolvedType(lengthScope);
 
 				if (type.isPresent()) {
-					process(node, lengthScope, type.get());
+					boolean localTransformed = process(node, lengthScope, type.get());
+					if (localTransformed) {
+						transformed.set(true);
+					}
 				}
 			}
 		});
-		return false;
+
+		return transformed.get();
 	}
 
-	private void process(Node node, Expression lengthScope, ResolvedType type) {
+	private boolean process(Node node, Expression lengthScope, ResolvedType type) {
+		boolean transformed;
 		if (type.isReferenceType()) {
 			LOGGER.info("scope={} type={}", lengthScope, type);
 			boolean doIt = false;
@@ -94,8 +102,13 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 				}
 			}
 			if (doIt) {
-				node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
+				transformed = node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
+			} else {
+				transformed = false;
 			}
+		} else {
+			transformed = false;
 		}
+		return transformed;
 	}
 }

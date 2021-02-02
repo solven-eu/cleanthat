@@ -12,8 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;

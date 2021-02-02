@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.rules;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,16 +13,15 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.meta.IRuleDescriber;
 
 /**
- * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'
+ * Switch o.equals("someString") to "someString".equals(o)
  *
  * @author Benoit Lacelle
  */
-public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
+public class VariableEqualsConstant extends ATodoJavaParserRule implements IRuleDescriber {
+	private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsConstant.class);
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11
@@ -31,7 +31,14 @@ public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean isPreventingExceptions() {
+		return true;
+	}
+
+	@Override
+	public boolean transformMethod(MethodDeclaration pre) {
+		AtomicBoolean transformed = new AtomicBoolean();
+
 		pre.walk(actualNode -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(actualNode));
 
@@ -45,19 +52,20 @@ public class ReplaceOptionalNotEmpty extends AJavaParserRule implements IClassTr
 				LOGGER.debug("Find a hardcoded string : {}", argument);
 				// argument is hard coded we need scope to inverse the two
 				Optional<Expression> optScope = methodCall.getScope();
-				if (optScope.isPresent()) {
-					// equals must be called by something, otherwise we don't touch this part
-					Expression scope = optScope.get();
-					// inversion
-					MethodCallExpr replacement =
-							new MethodCallExpr(argument, "equals", new NodeList<Expression>(scope));
-					LOGGER.info("Turning {} into {}", actualNode, replacement);
-					actualNode.replace(replacement);
+				if (!optScope.isPresent()) {
+					return;
 				}
-
+				// equals must be called by something, otherwise we don't touch this part
+				Expression scope = optScope.get();
+				// inversion
+				MethodCallExpr replacement = new MethodCallExpr(argument, "equals", new NodeList<Expression>(scope));
+				LOGGER.info("Turning {} into {}", actualNode, replacement);
+				if (actualNode.replace(replacement)) {
+					transformed.set(true);
+				}
 			}
 		});
 
-		return false;
+		return transformed.get();
 	}
 }

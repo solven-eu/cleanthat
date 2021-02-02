@@ -1,11 +1,14 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.rules.cases;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.test.ACases;
+import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 /**
  * cases inspired from https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html#code-changes
@@ -13,25 +16,14 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Sébastien Collard
  */
 
-public class CreateTempFilesUsingNioCases {
+public class CreateTempFilesUsingNioCases extends ACases {
 
-	public CreateTempFilesUsingNioCases() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public String getId() {
-		return "CreateTempFilesUsingNio";
-	}
-
+	@Override
 	public IClassTransformer getTransformer() {
 		return new CreateTempFilesUsingNio();
 	}
 
-	public static class CasePrefixSuffix {
-		public String getTitle() {
-			return "File.createTempFile(\"myFile\", \".tmp\")";
-		}
-
+	public static class CasePrefixSuffix implements ICaseOverMethod {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp");
 		}
@@ -41,11 +33,7 @@ public class CreateTempFilesUsingNioCases {
 		}
 	}
 
-	public static class CaseDirectoryCreation {
-		public String getTitle() {
-			return "File.createTempFile(\"myFile\", \".tmp\", new File(\"/tmp/test/\"))";
-		}
-
+	public static class CaseDirectoryCreation implements ICaseOverMethod {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp", new File("/tmp/test/"));
 		}
@@ -55,11 +43,7 @@ public class CreateTempFilesUsingNioCases {
 		}
 	}
 
-	public static class CaseWithDirectory {
-		public String getTitle() {
-			return "File.createTempFile(\"myFile\", \".tmp\", directory)";
-		}
-
+	public static class CaseWithDirectory implements ICaseOverMethod {
 		public Object pre(File directory) throws IOException {
 			return File.createTempFile("myFile", ".tmp", directory);
 		}
@@ -69,11 +53,7 @@ public class CreateTempFilesUsingNioCases {
 		}
 	}
 
-	public static class CaseNullDirectory {
-		public String getTitle() {
-			return "File.createTempFile(\"myFile\", \".tmp\", null)";
-		}
-
+	public static class CaseNullDirectory implements ICaseOverMethod {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp", null);
 		}

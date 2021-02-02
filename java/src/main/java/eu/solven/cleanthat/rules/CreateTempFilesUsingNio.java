@@ -21,7 +21,7 @@ import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
- * cases inspired from https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html#description
+ * cases inspired from #description
  *
  * @author Sébastien Collard
  */
@@ -36,8 +36,20 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 		return IJdkVersionConstants.JDK_7;
 	}
 
+	public String sonarUrl() {
+		return "https://rules.sonarsource.com/java/RSPEC-2976";
+	}
+
+	public String pmdUrl() {
+		return "none";
+	}
+
+	public String jsparrowUrl() {
+		return "https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html";
+	}
+
 	@Override
-	public boolean transform(MethodDeclaration pre) {
+	public boolean transformMethod(MethodDeclaration pre) {
 		AtomicBoolean hasTransformed = new AtomicBoolean();
 		pre.walk(node -> {
 			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));

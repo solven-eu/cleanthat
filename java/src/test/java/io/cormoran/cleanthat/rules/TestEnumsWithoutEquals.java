@@ -6,7 +6,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
-import eu.solven.cleanthat.rules.EnumsWithoutEqualsCases;
+import eu.solven.cleanthat.rules.cases.EnumsWithoutEqualsCases;
+import eu.solven.cleanthat.rules.test.ATestCases;
 
 public class TestEnumsWithoutEquals extends ATestCases {
 

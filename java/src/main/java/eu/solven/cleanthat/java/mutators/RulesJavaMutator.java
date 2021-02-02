@@ -59,7 +59,7 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			classes = ClassPath.from(Thread.currentThread().getContextClassLoader())
 					.getTopLevelClasses("eu.solven.cleanthat.rules");
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Issue scanning for available Rules");
+			throw new IllegalArgumentException("Issue scanning for available Rules", e);
 		}
 
 		ALL_TRANSFORMERS = classes.stream().map(c -> {
@@ -76,7 +76,6 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 				throw new IllegalStateException(e);
 			}
 		}).collect(Collectors.toList());
-		;
 	}
 
 	private final List<IClassTransformer> transformers;

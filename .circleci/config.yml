@@ -71,5 +71,6 @@ workflows:
           context: slack-secrets
           filters: *include-deploy-prd
       - deploy-lambda:
-          context: slack-secrets
+          # https://ideas.circleci.com/cloud-feature-requests/p/multiple-contexts-in-a-workflow
+          context: aws-cleanthat
           filters: *include-deploy-prd

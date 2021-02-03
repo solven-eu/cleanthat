@@ -181,7 +181,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		String fullRefName = "refs/heads/" + refName;
 
 		boolean refAlreadyExists;
-		Optional<GHRef> refToPR = Optional.empty();
+		Optional<GHRef> refToPR;
 		try {
 			try {
 				refToPR = Optional.of(repo.getRef(fullRefName));

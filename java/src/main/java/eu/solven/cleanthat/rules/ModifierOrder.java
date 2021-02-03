@@ -82,14 +82,7 @@ public class ModifierOrder extends AJavaParserRule implements IClassTransformer,
 					}
 				});
 
-				boolean changed = false;
-				for (int i = 0; i < modifiers.size(); i++) {
-					// Check by reference
-					if (modifiers.get(i) != mutableModifiers.get(i)) {
-						changed = true;
-						break;
-					}
-				}
+				boolean changed = areSameReferences(modifiers, mutableModifiers);
 
 				if (changed) {
 					LOGGER.debug("We fixed the ordering of modifiers");
@@ -97,8 +90,20 @@ public class ModifierOrder extends AJavaParserRule implements IClassTransformer,
 					transformed.set(true);
 				}
 			}
-
 		});
 		return transformed.get();
+	}
+
+	@SuppressWarnings("PMD.CompareObjectsWithEquals")
+	private boolean areSameReferences(NodeList<Modifier> modifiers, NodeList<Modifier> mutableModifiers) {
+		boolean changed = false;
+		for (int i = 0; i < modifiers.size(); i++) {
+			// Check by reference
+			if (modifiers.get(i) != mutableModifiers.get(i)) {
+				changed = true;
+				break;
+			}
+		}
+		return changed;
 	}
 }

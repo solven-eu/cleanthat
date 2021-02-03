@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-spring</artifactId>
-			<version>${sentry.version}</version>
+			<version>${sentry-spring.version}</version>
 		</dependency>
 
 		<dependency>

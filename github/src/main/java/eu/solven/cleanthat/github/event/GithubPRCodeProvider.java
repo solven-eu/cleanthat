@@ -47,7 +47,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public boolean deprecatedFileIsRemoved(Object file) {
-		return ((GHPullRequestFileDetail) file).getStatus().equals("removed");
+		return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
 	}
 
 	public static String loadContent(GHPullRequest pr, String filename) throws IOException {

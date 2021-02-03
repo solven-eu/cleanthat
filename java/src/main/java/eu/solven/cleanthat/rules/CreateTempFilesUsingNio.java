@@ -65,7 +65,7 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 
 			Optional<Boolean> optIsStatic = mayStaticCall(methodCallExpr);
 
-			if (optIsStatic.isPresent() && optIsStatic.get() == Boolean.FALSE) {
+			if (optIsStatic.isPresent() && !optIsStatic.get()) {
 				return;
 			}
 

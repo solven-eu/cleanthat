@@ -71,7 +71,7 @@
 		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
 		<frontend-maven-plugin.version>1.11.0</frontend-maven-plugin.version>
 
-		<sentry.version>3.2.1</sentry.version>
+		<sentry-spring.version>3.2.1</sentry-spring.version>
 
 		<spring-cloud.version>Hoxton.SR9</spring-cloud.version>
 
@@ -172,14 +172,8 @@
 							<!-- https://stackoverflow.com/questions/27799419/maven-jacoco-configuration-exclude-classes-packages-from-report-not-working -->
 							<exclude>**/generated/**/*</exclude>
 
-							<!-- Hacked in datasharing module (Unclear why the last '*' is needed) -->
-							<exclude>**/org/springframework/security/oauth2/provider/endpoint/AuthorizationEndpoint.*</exclude>
-
 							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is needed) -->
 							<exclude>**/org/apache/pdfbox/pdmodel/font/PDSimpleFont.*</exclude>
-
-							<!-- Used to be hack in Gateway module -->
-							<exclude>**/org/springframework/cloud/gateway/**/*</exclude>
 						</excludes>
 						<rules>
 							<rule>
@@ -300,8 +294,8 @@
 							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
 						</inlineHeader>
 						<properties>
-							<owner>Agilea</owner>
-							<year>2020</year>
+							<owner>SOLVEN</owner>
+							<year>2021</year>
 							<email>benoit.lacelle@solven.eu</email>
 						</properties>
 						<excludes>

@@ -159,7 +159,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			}
 		}
 
-		LOGGER.info("Applying includes rules: {}", sourceCodeProperties.getIncludes());
+		LOGGER.info("Applying includes rules: {}", includes);
 		LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
 		return languageP;
 	}

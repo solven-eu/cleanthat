@@ -237,14 +237,12 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	}
 
 	public static String getHeadName(Repository repo) {
-		String result = null;
 		try {
 			ObjectId id = repo.resolve(Constants.HEAD);
-			result = id.getName();
+			return id.getName();
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue fetching the head sha1", e);
 		}
-		return result;
 	}
 
 	public static Git makeGitRepo(Path dir, String authTransportUrl, String branch) {

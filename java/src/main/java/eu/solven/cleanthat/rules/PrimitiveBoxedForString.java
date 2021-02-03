@@ -83,7 +83,7 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 				// Boolean.valueOf(b).toString()
 				MethodCallExpr call = (MethodCallExpr) scope;
 
-				if (!call.getNameAsString().equals("valueOf") || call.getScope().isEmpty()) {
+				if (!"valueOf".equals(call.getNameAsString()) || call.getScope().isEmpty()) {
 					return false;
 				}
 

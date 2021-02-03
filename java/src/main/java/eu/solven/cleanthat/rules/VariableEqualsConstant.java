@@ -23,11 +23,20 @@ import eu.solven.cleanthat.rules.meta.IRuleDescriber;
 public class VariableEqualsConstant extends ATodoJavaParserRule implements IRuleDescriber {
 	private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsConstant.class);
 
-	// Optional exists since 8
-	// Optional.isPresent exists since 11
+	@Override
+	public String getId() {
+		// PMD
+		return "LiteralsFirstInComparisons";
+	}
+
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons";
 	}
 
 	@Override

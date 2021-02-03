@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -34,6 +35,10 @@ public class ATestCases {
 					return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 				});
 		methodCases.forEach(oneCase -> {
+			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
+				return;
+			}
+
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
@@ -65,6 +70,10 @@ public class ATestCases {
 					.isPresent();
 		});
 		typeCases.forEach(oneCase -> {
+			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
+				return;
+			}
+
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 			TypeDeclaration<?> pre = oneCase.getMembers()
 					.stream()

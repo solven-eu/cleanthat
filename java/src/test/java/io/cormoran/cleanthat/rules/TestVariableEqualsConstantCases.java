@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import eu.solven.cleanthat.rules.cases.VariableEqualsConstantCases;
 import eu.solven.cleanthat.rules.test.ATestCases;
 
-public class TestSwitchVariableEqualsConstantCases extends ATestCases {
+public class TestVariableEqualsConstantCases extends ATestCases {
 
 	@Test
 	public void testCases() throws IOException {

@@ -71,7 +71,7 @@
 		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
 		<frontend-maven-plugin.version>1.11.0</frontend-maven-plugin.version>
 
-		<sentry.version>3.2.1</sentry.version>
+		<sentry.version>4.1.0</sentry.version>
 
 		<spring-cloud.version>Hoxton.SR9</spring-cloud.version>
 

@@ -132,6 +132,7 @@
 						<version>${javax-jaxb.version}</version>
 					</dependency>
 				</dependencies>
+				<!-- IAM configuration is described here: https://github.com/SeanRoy/lambda-maven-plugin#credentials -->
 				<configuration>
 					<functionCode>${project.build.directory}/${project.build.finalName}-aws.jar</functionCode>
 					<version>${project.version}</version>

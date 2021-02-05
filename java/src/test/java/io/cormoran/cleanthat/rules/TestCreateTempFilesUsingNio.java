@@ -49,7 +49,7 @@ public class TestCreateTempFilesUsingNio extends ATestCases {
 			{
 				compilationUnit.getImports()
 						.removeIf(im -> im.equals(new ImportDeclaration("java.nio.file.Files", false, false)));
-				transformer.transformMethod(pre);
+				transformer.walkNode(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertTrue(compilationUnit.getImports()

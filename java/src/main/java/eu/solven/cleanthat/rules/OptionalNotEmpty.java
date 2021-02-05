@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
@@ -32,7 +31,7 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 	}
 
 	@Override
-	public boolean transformMethod(MethodDeclaration pre) {
+	public boolean walkNode(Node pre) {
 		AtomicBoolean transformed = new AtomicBoolean();
 
 		pre.walk(node -> {

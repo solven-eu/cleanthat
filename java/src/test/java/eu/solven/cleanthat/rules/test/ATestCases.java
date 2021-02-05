@@ -16,6 +16,9 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.rules.cases.annotations.CompareTypes;
+import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class ATestCases {
@@ -30,10 +33,16 @@ public class ATestCases {
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
-		List<ClassOrInterfaceDeclaration> methodCases =
-				compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
-					return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
-				});
+
+		checkMethodCases(transformer, compilationUnit);
+		checkMethodUnchangedCases(transformer, compilationUnit);
+		checkTypeCases(transformer, compilationUnit);
+	}
+
+	private void checkMethodCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+		List<ClassOrInterfaceDeclaration> methodCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
+				c -> c.getAnnotationByClass(CompareMethods.class).isPresent());
+
 		methodCases.forEach(oneCase -> {
 			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
 				return;
@@ -47,28 +56,51 @@ public class ATestCases {
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
-				Assert.assertTrue("We miss a transformation flag for: " + pre, transformer.transformMethod(pre));
+				boolean transformed = transformer.walkNode(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertEquals(post, pre);
+
+				// We check this after checking comparison with 'post' for greater test result readibility
+				Assert.assertTrue("We miss a transformation flag for: " + pre, transformed);
 			}
 
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
 				MethodDeclaration postPost = post.clone();
-				Assert.assertFalse(transformer.transformMethod(postPost));
+				Assert.assertFalse(transformer.walkNode(postPost));
 				Assert.assertEquals(post, postPost);
 			}
 		});
+	}
 
-		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
-			return c.getImplementedTypes()
-					.stream()
-					.filter(parentC -> parentC.getNameAsString().equals(ICaseOverClass.class.getSimpleName()))
-					.findAny()
-					.isPresent();
+	private void checkMethodUnchangedCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+		List<ClassOrInterfaceDeclaration> unchangedMethods = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
+				c -> c.getAnnotationByClass(UnchangedMethod.class).isPresent());
+		unchangedMethods.stream().forEach(oneCase -> {
+			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
+				return;
+			}
+
+			LOGGER.info("Processing the case: {}", oneCase.getName());
+
+			MethodDeclaration post = getMethodWithName(oneCase, "post");
+
+			// Check the transformer is impact-less on already clean code
+			// This is a less relevant test: to be done later
+			{
+				MethodDeclaration postPost = post.clone();
+				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + postPost,
+						transformer.walkNode(postPost));
+				Assert.assertEquals(post, postPost);
+			}
 		});
+	}
+
+	private void checkTypeCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
+				c -> c.getAnnotationByClass(CompareTypes.class).isPresent());
 		typeCases.forEach(oneCase -> {
 			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
 				return;
@@ -94,9 +126,9 @@ public class ATestCases {
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
-				transformer.transformType(pre);
+				transformer.walkNode(pre);
 				// Rename the method before checking full equality
-				pre.setName("post");
+				pre.setName("Post");
 				Assert.assertEquals(post, pre);
 			}
 
@@ -104,7 +136,7 @@ public class ATestCases {
 			// This is a less relevant test: to be done later
 			{
 				TypeDeclaration<?> postPost = post.clone();
-				transformer.transformType(postPost);
+				transformer.walkNode(postPost);
 				Assert.assertEquals(post, postPost);
 			}
 		});
@@ -121,7 +153,7 @@ public class ATestCases {
 	protected MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
 		List<MethodDeclaration> preMethods = oneCase.getMethodsByName(name);
 		if (preMethods.size() != 1) {
-			throw new IllegalStateException("Expected a single 'pre' method in " + oneCase);
+			throw new IllegalStateException("Expected a single '" + name + "' method in " + oneCase);
 		}
 		MethodDeclaration pre = preMethods.get(0);
 		return pre;

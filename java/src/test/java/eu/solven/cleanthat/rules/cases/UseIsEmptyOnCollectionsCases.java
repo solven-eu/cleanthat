@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class UseIsEmptyOnCollectionsCases extends ACases {
 	@Override
@@ -15,7 +15,8 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 		return new UseIsEmptyOnCollections();
 	}
 
-	public static class CaseCollection implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseCollection {
 		public Object pre(Collection<?> input) {
 			return input.size() == 0;
 		}
@@ -26,7 +27,8 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 	}
 
 	// Check we handle most Collection sub-types
-	public static class CaseList implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseList {
 		public Object pre(List<?> input) {
 			return input.size() == 0;
 		}
@@ -36,7 +38,8 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 		}
 	}
 
-	public static class CaseMap implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseMap {
 		public Object pre(Map<?, ?> input) {
 			return input.size() == 0;
 		}
@@ -46,7 +49,8 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 		}
 	}
 
-	public static class CaseString implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseString {
 		public Object pre(String input) {
 			return input.length() == 0;
 		}

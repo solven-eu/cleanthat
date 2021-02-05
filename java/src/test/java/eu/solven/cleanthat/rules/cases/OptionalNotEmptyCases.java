@@ -3,9 +3,9 @@ package eu.solven.cleanthat.rules.cases;
 import java.util.Optional;
 
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class OptionalNotEmptyCases extends ACases {
 	@Override
@@ -13,7 +13,8 @@ public class OptionalNotEmptyCases extends ACases {
 		return new OptionalNotEmpty();
 	}
 
-	public static class CaseNotEmpty implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseNotEmpty {
 		public Object pre(Optional<?> input) {
 			return !input.isEmpty();
 		}
@@ -23,7 +24,8 @@ public class OptionalNotEmptyCases extends ACases {
 		}
 	}
 
-	public static class CaseNotPresent implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseNotPresent {
 		public Object pre(Optional<?> input) {
 			return !input.isPresent();
 		}

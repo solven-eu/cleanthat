@@ -3,7 +3,7 @@ package eu.solven.cleanthat.rules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.Node;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -24,17 +24,16 @@ public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransfo
 		return IJdkVersionConstants.JDK_5;
 	}
 
+	// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 	@Override
-	public boolean transformMethod(MethodDeclaration pre) {
-		// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
-		pre.walk(node -> {
-			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-			onMethodName(node, "equals", (methodNode, scope, type) -> {
-				if (type.isReferenceType()) {
-					LOGGER.debug("scope={} type={}", scope, type);
-				}
-			});
+	protected boolean processNotRecursively(Node node) {
+		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
+		onMethodName(node, "equals", (methodNode, scope, type) -> {
+			if (type.isReferenceType()) {
+				LOGGER.debug("scope={} type={}", scope, type);
+			}
 		});
+
 		return false;
 	}
 

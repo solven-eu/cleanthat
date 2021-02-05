@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules.test;
+package eu.solven.cleanthat.rules.cases.annotations;
 
 /**
  * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method. They can take and
@@ -7,6 +7,6 @@ package eu.solven.cleanthat.rules.test;
  * @author Benoit Lacelle
  *
  */
-public interface ICaseOverMethod {
+public @interface CompareMethods {
 
 }

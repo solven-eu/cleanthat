@@ -6,9 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 /**
  * cases inspired from https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html#code-changes
@@ -23,7 +23,8 @@ public class CreateTempFilesUsingNioCases extends ACases {
 		return new CreateTempFilesUsingNio();
 	}
 
-	public static class CasePrefixSuffix implements ICaseOverMethod {
+	@CompareMethods
+	public static class CasePrefixSuffix {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp");
 		}
@@ -33,7 +34,8 @@ public class CreateTempFilesUsingNioCases extends ACases {
 		}
 	}
 
-	public static class CaseDirectoryCreation implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseDirectoryCreation {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp", new File("/tmp/test/"));
 		}
@@ -43,7 +45,8 @@ public class CreateTempFilesUsingNioCases extends ACases {
 		}
 	}
 
-	public static class CaseWithDirectory implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseWithDirectory {
 		public Object pre(File directory) throws IOException {
 			return File.createTempFile("myFile", ".tmp", directory);
 		}
@@ -53,7 +56,8 @@ public class CreateTempFilesUsingNioCases extends ACases {
 		}
 	}
 
-	public static class CaseNullDirectory implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseNullDirectory {
 		public Object pre() throws IOException {
 			return File.createTempFile("myFile", ".tmp", null);
 		}

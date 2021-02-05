@@ -3,9 +3,9 @@ package eu.solven.cleanthat.rules.cases;
 import java.math.RoundingMode;
 
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 public class EnumsWithoutEqualsCases extends ACases {
@@ -14,7 +14,8 @@ public class EnumsWithoutEqualsCases extends ACases {
 		return new EnumsWithoutEquals();
 	}
 
-	public static class EnumInRightHandSide implements ICaseOverMethod {
+	@CompareMethods
+	public static class EnumInRightHandSide {
 		public boolean pre(RoundingMode roundingMode) {
 			return roundingMode.equals(RoundingMode.UP);
 		}
@@ -24,7 +25,8 @@ public class EnumsWithoutEqualsCases extends ACases {
 		}
 	}
 
-	public static class CaseEnumInLeftHandSide implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseEnumInLeftHandSide {
 		public boolean pre(RoundingMode roundingMode) {
 			return RoundingMode.UP.equals(roundingMode);
 		}
@@ -34,7 +36,8 @@ public class EnumsWithoutEqualsCases extends ACases {
 		}
 	}
 
-	public static class CaseEnumInInfixExpression implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseEnumInInfixExpression {
 		public boolean pre(RoundingMode roundingMode) {
 			return !RoundingMode.UP.equals(roundingMode);
 		}

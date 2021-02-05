@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.rules;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +16,14 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import eu.solven.cleanthat.rules.function.OnMethodName;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 
 /**
  * Enables common behavior to JavaParser-based rules
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserRule implements IClassTransformer {
+public abstract class AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserRule.class);
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
@@ -32,6 +34,22 @@ public abstract class AJavaParserRule implements IClassTransformer {
 
 	protected final JavaParserFacade getThreadJavaParser() {
 		return TL_JAVAPARSER.get();
+	}
+
+	@Override
+	public boolean walkNode(Node tree) {
+		AtomicBoolean transformed = new AtomicBoolean();
+
+		tree.walk(node -> {
+			if (processNotRecursively(node)) {
+				transformed.set(true);
+			}
+		});
+		return transformed.get();
+	}
+
+	protected boolean processNotRecursively(Node node) {
+		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 
 	protected Optional<ResolvedType> optResolvedType(Expression scope) {

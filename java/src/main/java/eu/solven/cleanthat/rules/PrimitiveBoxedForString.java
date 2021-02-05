@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -42,17 +41,16 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
-	public boolean transformMethod(MethodDeclaration tree) {
+	protected boolean processNotRecursively(Node node) {
 		AtomicBoolean transformed = new AtomicBoolean();
 
-		tree.walk(node -> {
-			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-			onMethodName(node, "toString", (methodNode, scope, type) -> {
-				if (process(methodNode, scope, type)) {
-					transformed.set(true);
-				}
-			});
+		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
+		onMethodName(node, "toString", (methodNode, scope, type) -> {
+			if (process(methodNode, scope, type)) {
+				transformed.set(true);
+			}
 		});
+
 		return transformed.get();
 	}
 

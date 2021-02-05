@@ -3,10 +3,10 @@ package eu.solven.cleanthat.rules.cases;
 import java.util.Collection;
 
 import eu.solven.cleanthat.rules.ModifierOrder;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.rules.cases.annotations.CompareTypes;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverClass;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class ReorderModifiersCases extends ACases {
 	@Override
@@ -14,7 +14,8 @@ public class ReorderModifiersCases extends ACases {
 		return new ModifierOrder();
 	}
 
-	public static class CaseFields implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseFields {
 		@SuppressWarnings("unused")
 		public Object pre() {
 			return new Object() {
@@ -40,7 +41,8 @@ public class ReorderModifiersCases extends ACases {
 		}
 	}
 
-	public static class CaseMethods implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseMethods {
 		public String getTitle() {
 			return "Methods";
 		}
@@ -64,7 +66,8 @@ public class ReorderModifiersCases extends ACases {
 		}
 	}
 
-	public static class CaseTypes implements ICaseOverClass {
+	@CompareTypes
+	public static class CaseTypes {
 		static public class Pre {
 			// empty
 		}

@@ -3,7 +3,7 @@ package eu.solven.cleanthat.rules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
@@ -21,20 +21,8 @@ public abstract class ATodoJavaParserRule extends AJavaParserRule implements ICl
 		return IJdkVersionConstants.JDK_LATEST;
 	}
 
-	public String sonarUrl() {
-		return "?";
-	}
-
-	public String pmdUrl() {
-		return "?";
-	}
-
-	public String jsparrowUrl() {
-		return "?";
-	}
-
 	@Override
-	public boolean transformMethod(MethodDeclaration tree) {
+	public boolean walkNode(Node tree) {
 		LOGGER.debug("TODO");
 		return false;
 	}

@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
@@ -117,17 +116,11 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			AtomicBoolean hasImpacted = new AtomicBoolean();
 
 			CompilationUnit compilationUnit = optCompilationUnit.get();
-			compilationUnit.findAll(ClassOrInterfaceDeclaration.class).stream().peek(c -> {
-				if (ct.transformType(c)) {
-					hasImpacted.set(true);
-					LOGGER.info("It is a hit");
-				}
-			}).flatMap(classDef -> classDef.getMethods().stream()).forEach(methodDef -> {
-				if (ct.transformMethod(methodDef)) {
-					hasImpacted.set(true);
-					LOGGER.info("It is a hit");
-				}
-			});
+			if (ct.walkNode(compilationUnit)) {
+				hasImpacted.set(true);
+				LOGGER.info("It is a hit");
+			}
+
 			if (hasImpacted.get()) {
 				// One relevant change: building back from the AST
 				codeRef.set(compilationUnit.toString());

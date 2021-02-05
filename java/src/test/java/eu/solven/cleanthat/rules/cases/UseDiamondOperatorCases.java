@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import eu.solven.cleanthat.rules.UseDiamondOperator;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class UseDiamondOperatorCases extends ACases {
 	@Override
@@ -16,7 +16,8 @@ public class UseDiamondOperatorCases extends ACases {
 		return new UseDiamondOperator();
 	}
 
-	public static class CaseCollection implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseCollection {
 		public Map<String, List<String>> pre() {
 			return new HashMap<String, List<String>>();
 		}

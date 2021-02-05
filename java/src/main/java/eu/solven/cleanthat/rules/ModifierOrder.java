@@ -3,14 +3,13 @@ package eu.solven.cleanthat.rules;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 
@@ -60,38 +59,35 @@ public class ModifierOrder extends AJavaParserRule implements IClassTransformer,
 	}
 
 	@Override
-	public boolean transformType(TypeDeclaration<?> tree) {
-		AtomicBoolean transformed = new AtomicBoolean();
+	protected boolean processNotRecursively(Node node) {
+		if (node instanceof NodeWithModifiers<?>) {
+			NodeWithModifiers<?> nodeWithModifiers = (NodeWithModifiers<?>) node;
+			NodeList<Modifier> modifiers = nodeWithModifiers.getModifiers();
 
-		tree.walk(node -> {
-			if (node instanceof NodeWithModifiers<?>) {
-				NodeWithModifiers<?> nodeWithModifiers = (NodeWithModifiers<?>) node;
-				NodeList<Modifier> modifiers = nodeWithModifiers.getModifiers();
+			NodeList<Modifier> mutableModifiers = new NodeList<>(modifiers);
 
-				NodeList<Modifier> mutableModifiers = new NodeList<>(modifiers);
+			Collections.sort(mutableModifiers, new Comparator<Modifier>() {
 
-				Collections.sort(mutableModifiers, new Comparator<Modifier>() {
-
-					@Override
-					public int compare(Modifier o1, Modifier o2) {
-						return compare2(o1.getKeyword().asString(), o1.getKeyword().asString());
-					}
-
-					private int compare2(String left, String right) {
-						return Integer.compare(ORDERED_MODIFIERS.indexOf(left), ORDERED_MODIFIERS.indexOf(right));
-					}
-				});
-
-				boolean changed = areSameReferences(modifiers, mutableModifiers);
-
-				if (changed) {
-					LOGGER.debug("We fixed the ordering of modifiers");
-					nodeWithModifiers.setModifiers(mutableModifiers);
-					transformed.set(true);
+				@Override
+				public int compare(Modifier o1, Modifier o2) {
+					return compare2(o1.getKeyword().asString(), o1.getKeyword().asString());
 				}
+
+				private int compare2(String left, String right) {
+					return Integer.compare(ORDERED_MODIFIERS.indexOf(left), ORDERED_MODIFIERS.indexOf(right));
+				}
+			});
+
+			boolean changed = areSameReferences(modifiers, mutableModifiers);
+
+			if (changed) {
+				LOGGER.debug("We fixed the ordering of modifiers");
+				nodeWithModifiers.setModifiers(mutableModifiers);
+				return true;
 			}
-		});
-		return transformed.get();
+		}
+
+		return false;
 	}
 
 	@SuppressWarnings("PMD.CompareObjectsWithEquals")

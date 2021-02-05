@@ -1,9 +1,9 @@
 package eu.solven.cleanthat.rules.cases;
 
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
-import eu.solven.cleanthat.rules.test.ICaseOverMethod;
 
 public class PrimitiveBoxedForStringCases extends ACases {
 	@Override
@@ -11,7 +11,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		return new PrimitiveBoxedForString();
 	}
 
-	public static class CaseBoolean_valueOf implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseBoolean_valueOf {
 		public Object pre(boolean input) {
 			return Boolean.valueOf(input).toString();
 		}
@@ -21,7 +22,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseBoolean_consctructor implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseBoolean_consctructor {
 		public Object pre(boolean input) {
 			return new Boolean(input).toString();
 		}
@@ -31,7 +33,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseByte implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseByte {
 		public Object pre(byte input) {
 			return Byte.valueOf(input).toString();
 		}
@@ -41,7 +44,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseShort implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseShort {
 		public Object pre(short input) {
 			return Short.valueOf(input).toString();
 		}
@@ -51,7 +55,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseInteger implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseInteger {
 		public Object pre(int input) {
 			return Integer.valueOf(input).toString();
 		}
@@ -61,7 +66,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseLong implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseLong {
 		public Object pre(long input) {
 			return Long.valueOf(input).toString();
 		}
@@ -71,7 +77,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseFloat implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseFloat {
 		public Object pre(float someByte) {
 			return Float.valueOf(someByte).toString();
 		}
@@ -81,7 +88,8 @@ public class PrimitiveBoxedForStringCases extends ACases {
 		}
 	}
 
-	public static class CaseDouble implements ICaseOverMethod {
+	@CompareMethods
+	public static class CaseDouble {
 		public Object pre(double someByte) {
 			return Double.valueOf(someByte).toString();
 		}

@@ -1,7 +1,6 @@
 package eu.solven.cleanthat.rules.meta;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.Node;
 
 /**
  * For classes knowing how to modify code
@@ -15,13 +14,13 @@ public interface IClassTransformer {
 		return "TODO";
 	}
 
-	default boolean transformMethod(MethodDeclaration pre) {
-		return false;
-	}
-
 	String minimalJavaVersion();
 
-	default boolean transformType(TypeDeclaration<?> pre) {
-		return false;
-	}
+	/**
+	 * 
+	 * @param pre
+	 * @return true if the AST has been modified.
+	 */
+	boolean walkNode(Node pre);
+
 }

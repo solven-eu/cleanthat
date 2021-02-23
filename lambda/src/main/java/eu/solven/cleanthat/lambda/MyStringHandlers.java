@@ -11,4 +11,9 @@ import org.springframework.cloud.function.adapter.aws.SpringBootRequestHandler;
  * @author Benoit Lacelle
  */
 public class MyStringHandlers extends SpringBootRequestHandler<Map<String, ?>, Map<String, ?>> {
+	public MyStringHandlers() {
+		// We should rely on META-INF/MANIFEST.MF, but sometimes, it does not work: we then declare the function
+		// explicitly
+		super(CleanThatLambdaFunction.class);
+	}
 }

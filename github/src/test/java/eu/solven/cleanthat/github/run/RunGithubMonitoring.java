@@ -72,7 +72,7 @@ public class RunGithubMonitoring {
 				GHAppInstallationToken token = installation.createToken().create();
 
 				GitHub installationGithub = new GitHubBuilder().withAppInstallationToken(token.getToken())
-						.withRateLimitChecker(new NoWaitRateLimitChecker())
+						// .withRateLimitChecker(new NoWaitRateLimitChecker())
 						.build();
 
 				GHRateLimit rateLimit = installationGithub.getRateLimit();

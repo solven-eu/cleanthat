@@ -5,7 +5,6 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -29,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.github.NoWaitRateLimitChecker;
 import eu.solven.cleanthat.jgit.CommitContext;
 import eu.solven.cleanthat.jgit.GitHelper;
 
@@ -94,7 +92,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	protected GitHub makeInstallationGithub(String token) throws IOException {
 		return new GitHubBuilder().withAppInstallationToken(token)
-				.withRateLimitChecker(new NoWaitRateLimitChecker())
+				// .withRateLimitChecker(new NoWaitRateLimitChecker())
 				.build();
 	}
 

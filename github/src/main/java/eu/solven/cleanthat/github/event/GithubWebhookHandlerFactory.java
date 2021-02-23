@@ -19,8 +19,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-import eu.solven.cleanthat.github.NoWaitRateLimitChecker;
-
 /**
  * Factory for {@link GitHub}, on a per-installation basis
  *
@@ -47,8 +45,10 @@ public class GithubWebhookHandlerFactory {
 	}
 
 	public IGithubWebhookHandler makeWithFreshJwt() throws IOException, JOSEException {
-		GitHub github =
-				new GitHubBuilder().withJwtToken(makeJWT()).withRateLimitChecker(new NoWaitRateLimitChecker()).build();
+		GitHub github = new GitHubBuilder().withJwtToken(makeJWT())
+				// This leads to 401. Why?
+				// .withRateLimitChecker(new NoWaitRateLimitChecker())
+				.build();
 		return new GithubWebhookHandler(github, objectMapper);
 	}
 

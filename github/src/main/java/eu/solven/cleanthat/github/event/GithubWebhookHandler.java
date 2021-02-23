@@ -5,12 +5,14 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
+import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.jgit.CommitContext;
 import eu.solven.cleanthat.jgit.GitHelper;
 
@@ -60,7 +63,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("RepositorySelection: {}", installationById.getRepositorySelection());
 
 			// https://github.com/hub4j/github-api/issues/570
-			GHAppCreateTokenBuilder installationGithub = installationById.createToken(Map.of(
+			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken(Map.of(
 					// Required to open new pull-requests
 					"pull_requests",
 					GHPermissionType.WRITE,
@@ -72,9 +75,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					GHPermissionType.WRITE));
 
 			// https://github.com/hub4j/github-api/issues/570
-			String token = installationGithub.create().getToken();
+			String token = installationGithubBuilder.create().getToken();
 
-			return new GithubAndToken(makeInstallationGithub(token), token);
+			GitHub installationGithub = makeInstallationGithub(token);
+
+			// https://stackoverflow.com/questions/45427275/how-to-check-my-github-current-rate-limit
+			LOGGER.info("Initialized an installation github. RateLimit status: {}", installationGithub.getRateLimit());
+
+			return new GithubAndToken(installationGithub, token);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -126,6 +134,24 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
+
+		{
+			GHRateLimit rateLimit;
+			int rateLimitRemaining;
+			try {
+				rateLimit = githubAuthAsInst.getGithub().getRateLimit();
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue checking rateLimit", e);
+			}
+			rateLimitRemaining = rateLimit.getRemaining();
+
+			if (rateLimitRemaining == 0) {
+				throw new IllegalStateException(
+						"This installation has no remaining rateLimit. Reset in: " + PepperLogHelper
+								.humanDuration(rateLimit.getResetEpochSeconds() * 1000 - System.currentTimeMillis()));
+			}
+		}
+
 		GHRepository repo;
 		try {
 			repo = githubAuthAsInst.getGithub()

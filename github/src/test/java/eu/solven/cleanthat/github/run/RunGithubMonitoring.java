@@ -6,6 +6,7 @@ import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
 import org.kohsuke.github.GHOrganization;
+import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -28,6 +29,7 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
+import eu.solven.cleanthat.github.NoWaitRateLimitChecker;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 
@@ -69,7 +71,16 @@ public class RunGithubMonitoring {
 			try {
 				GHAppInstallationToken token = installation.createToken().create();
 
-				GitHub installationGithub = new GitHubBuilder().withAppInstallationToken(token.getToken()).build();
+				GitHub installationGithub = new GitHubBuilder().withAppInstallationToken(token.getToken())
+						.withRateLimitChecker(new NoWaitRateLimitChecker())
+						.build();
+
+				GHRateLimit rateLimit = installationGithub.getRateLimit();
+				if (0 == rateLimit.getRemaining()) {
+					LOGGER.warn("Installation={} has not action left until {}", installation, rateLimit.getResetDate());
+					return;
+				}
+
 				logAboutUser(installationGithub, installation);
 				installation.setRoot(installationGithub);
 

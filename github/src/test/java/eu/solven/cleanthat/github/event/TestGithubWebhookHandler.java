@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TestGithubWebhookHandler {
 
+	// Relevant to rely on GitHub.offline()?
 	final GitHub github = Mockito.mock(GitHub.class);
 
 	final GitHub installGithub = Mockito.mock(GitHub.class);

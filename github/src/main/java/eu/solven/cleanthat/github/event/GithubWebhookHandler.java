@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHCheckRun;
+import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
@@ -26,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.github.NoWaitRateLimitChecker;
 import eu.solven.cleanthat.jgit.CommitContext;
 import eu.solven.cleanthat.jgit.GitHelper;
 
@@ -89,7 +93,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	protected GitHub makeInstallationGithub(String token) throws IOException {
-		return new GitHubBuilder().withAppInstallationToken(token).build();
+		return new GitHubBuilder().withAppInstallationToken(token)
+				.withRateLimitChecker(new NoWaitRateLimitChecker())
+				.build();
 	}
 
 	@SuppressWarnings({ "PMD.ExcessiveMethodLength", "checkstyle:MethodLength", "PMD.NPathComplexity" })
@@ -135,28 +141,31 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
 
+		GitHub githubAsInst = githubAuthAsInst.getGithub();
 		{
 			GHRateLimit rateLimit;
 			int rateLimitRemaining;
 			try {
-				rateLimit = githubAuthAsInst.getGithub().getRateLimit();
+				rateLimit = githubAsInst.getRateLimit();
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue checking rateLimit", e);
 			}
 			rateLimitRemaining = rateLimit.getRemaining();
 
 			if (rateLimitRemaining == 0) {
-				throw new IllegalStateException(
-						"This installation has no remaining rateLimit. Reset in: " + PepperLogHelper
-								.humanDuration(rateLimit.getResetEpochSeconds() * 1000 - System.currentTimeMillis()));
+				Object resetIn = PepperLogHelper
+						.humanDuration(rateLimit.getResetEpochSeconds() * 1000 - System.currentTimeMillis());
+				// throw new IllegalStateException("This installation has no remaining rateLimit. Reset in: " +
+				// resetIn);
+
+				return Map.of(KEY_SKIPPED, "Installation has hit its own RateLimit. Reset in: " + resetIn);
 			}
 		}
 
 		GHRepository repo;
 		try {
-			repo = githubAuthAsInst.getGithub()
-					.getRepositoryById(
-							Long.toString(PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue()));
+			repo = githubAsInst.getRepositoryById(
+					Long.toString(PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue()));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -234,6 +243,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						optPr = Optional.of(repo.getPullRequest(prId));
 					} catch (IOException e) {
 						throw new UncheckedIOException(e);
+					}
+
+					// TODO Go into this only if we have 'checks:write' permission
+					GHCheckRunBuilder checkRunBuilder =
+							repo.createCheckRun("CleanThat", optPr.get().getHead().getSha());
+					try {
+						GHCheckRun checkRun = checkRunBuilder.create();
+
+						checkRun.update().withStatus(Status.COMPLETED);
+					} catch (IOException e) {
+						LOGGER.warn("Issue creating the CheckRun");
 					}
 				}
 			}

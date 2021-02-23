@@ -3,6 +3,7 @@ package eu.solven.cleanthat.jgit;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,11 +26,14 @@ import org.eclipse.jgit.lib.TextProgressMonitor;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -254,6 +258,17 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 				.setCloneAllBranches(false)
 				.setCloneSubmodules(false)
 				.setProgressMonitor(new TextProgressMonitor());
+
+		String userInfo = URI.create(authTransportUrl).getUserInfo();
+		if (!Strings.isNullOrEmpty(userInfo) && userInfo.indexOf(':') >= 0) {
+			int indexofSemiColumn = userInfo.indexOf(':');
+			// Unclear why, sometimes, JGit fails with BASIC in provided URL: we help it through an explicit
+			// CredentialProvider
+			builder.setCredentialsProvider(
+					new UsernamePasswordCredentialsProvider(userInfo.substring(0, indexofSemiColumn),
+							userInfo.substring(indexofSemiColumn + 1)));
+		}
+
 		try {
 			return builder.call();
 		} catch (GitAPIException e) {

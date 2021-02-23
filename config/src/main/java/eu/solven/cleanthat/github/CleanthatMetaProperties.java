@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -28,13 +29,16 @@ public class CleanthatMetaProperties {
 
 	// Are we allowed to mutate the branches which has not PR, or should we wait for a PR?
 	// We prefer not to open PR to clean (not-main) branches, to prevent opening too many PRs, which may be out of the
-	// branch commiter radar
+	// branch committer radar
 	// Default: false as, as of 2020-10, the feature is not implemented yet
 	private boolean cleanOrphanBranches = false;
 
 	// The labels to apply to created PRs
 	private List<String> labels = Arrays.asList();
 
+	// https://stackoverflow.com/questions/19564711/json-jackson-parse-different-keys-into-same-field
+	// TODO Enable update of these deprecated aliases dring the PR
+	@JsonAlias({ "commit_pull_requests" })
 	public boolean isCleanPullRequests() {
 		return cleanPullRequests;
 	}
@@ -43,6 +47,7 @@ public class CleanthatMetaProperties {
 		this.cleanPullRequests = cleanPullRequests;
 	}
 
+	@JsonAlias({ "commit_main_branch" })
 	public boolean isCleanMainBranch() {
 		return cleanMainBranch;
 	}

@@ -42,7 +42,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxFunction {
 
 	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
 
-	final String repoFullName = SOLVEN_EU_SPRING_BOOT;
+	final String repoFullName = SOLVEN_EU_MITRUST_DATASHARING;
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(RunCleanGithubBranch.class);

@@ -112,6 +112,9 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
+
+		migrateConfigurationCode(properties);
+
 		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
 			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
 			return Map.of(KEY_SKIPPED, "Commit on main banch, but not allowed to mutate main_branch by configuration");
@@ -124,6 +127,16 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		} else {
 			return formatCode(properties, codeProvider);
 		}
+	}
+
+	/**
+	 * Used to migrate the configuration file automatically. Typically to handle changes of keys.
+	 * 
+	 * @param properties
+	 */
+	private void migrateConfigurationCode(CleanthatRepositoryProperties properties) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {

@@ -170,7 +170,6 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 	}
 
 	public Git makeGitRepo(Path tmpDir) {
-		// v1.5c177cb5229fa3f27e85f7472881be4022d58f20
 		String rawTransportUrl = repo.getHttpTransportUrl();
 		String authTransportUrl =
 				"https://x-access-token:" + token + "@" + rawTransportUrl.substring("https://".length());

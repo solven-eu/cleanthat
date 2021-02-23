@@ -73,6 +73,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		List<String> prComments = new ArrayList<>();
 
 		if (pr instanceof GithubPRCodeProvider) {
+			// TODO Check if number of files is compatible with RateLimit
 			try {
 				pr.listFiles(fileChanged -> {
 					if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(fileChanged.getFilePath(pr))) {
@@ -123,13 +124,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoPR(pathToMutatedContent, prComments);
+			pr.commitIntoPR(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		} else {
 			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoPR(pathToMutatedContent, prComments);
+			pr.commitIntoPR(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		}
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}

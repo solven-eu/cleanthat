@@ -52,6 +52,7 @@ public class CleanthatMetaProperties {
 		return cleanMainBranch;
 	}
 
+	// TODO It is unclear if we will clean in-place, or through a PR
 	public void setCleanMainBranch(boolean cleanMainBranch) {
 		this.cleanMainBranch = cleanMainBranch;
 	}

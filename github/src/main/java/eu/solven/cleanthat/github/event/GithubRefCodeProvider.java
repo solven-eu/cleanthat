@@ -5,6 +5,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -126,7 +127,9 @@ public class GithubRefCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments
+	public void commitIntoPR(Map<String, String> pathToMutatedContent,
+			List<String> prComments,
+			Collection<String> prLabels
 	// ,
 	// Optional<String> targetBranch
 	) {

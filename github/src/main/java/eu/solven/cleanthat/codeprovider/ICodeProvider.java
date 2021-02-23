@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public interface ICodeProvider {
 
 	String getTitle();
 
-	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments);
+	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
 
 	Optional<String> loadContentForPath(String path) throws IOException;
 

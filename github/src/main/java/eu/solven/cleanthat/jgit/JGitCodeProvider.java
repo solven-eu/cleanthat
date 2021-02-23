@@ -8,10 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -183,7 +185,9 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments
+	public void commitIntoPR(Map<String, String> pathToMutatedContent,
+			List<String> prComments,
+			Collection<String> prLabels
 	// , Optional<String> targetBranch
 	) {
 		// targetBranch
@@ -201,15 +205,24 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		// https://stackoverflow.com/questions/12734760/jgit-how-to-add-all-files-to-staging-area
 		try {
 			jgit.add().addFilepattern(".").call();
+			LOGGER.info("Added");
 		} catch (GitAPIException e) {
 			throw new RuntimeException("Issue adding all files into staging area", e);
 		}
 
-		// try {
-		// jgit.commit().setMessage(prComments.stream().collect(Collectors.joining("\r\n"))).call();
-		// } catch (GitAPIException e) {
-		// throw new RuntimeException("Issue committing all files");
-		// }
+		try {
+			jgit.commit().setMessage(prComments.stream().collect(Collectors.joining("\r\n"))).call();
+			LOGGER.info("Committed");
+		} catch (GitAPIException e) {
+			throw new RuntimeException("Issue committing");
+		}
+
+		try {
+			jgit.push().call();
+			LOGGER.info("Pushed");
+		} catch (GitAPIException e) {
+			throw new RuntimeException("Issue pushing");
+		}
 	}
 
 	@Override

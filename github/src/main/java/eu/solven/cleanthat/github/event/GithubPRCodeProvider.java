@@ -42,7 +42,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
-		pr.listFiles().forEach(prFile -> consumer.accept(new DummyCodeProviderFile(consumer)));
+		pr.listFiles().forEach(prFile -> consumer.accept(new DummyCodeProviderFile(prFile)));
 	}
 
 	@Override

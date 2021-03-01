@@ -59,7 +59,7 @@ public class TestJavaFormatter_Eclipse {
 		URL location = CleanClass.class.getProtectionDomain().getCodeSource().getLocation();
 		String classAsString = asString(new UrlResource(location));
 
-		String cleaned = formatter.format(languageP, classAsString);
+		String cleaned = formatter.format(languageP, "someFilePath", classAsString);
 		Assert.assertEquals(cleaned, classAsString);
 
 		Assert.assertEquals(1, formatter.getCacheSize());
@@ -72,7 +72,7 @@ public class TestJavaFormatter_Eclipse {
 		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
 		String classAsString = asString(new UrlResource(location));
 
-		String cleaned = formatter.format(languageP, classAsString);
+		String cleaned = formatter.format(languageP, "someFilePath", classAsString);
 		Assert.assertEquals(cleaned, classAsString);
 
 		Assert.assertEquals(1, formatter.getCacheSize());
@@ -86,8 +86,8 @@ public class TestJavaFormatter_Eclipse {
 		String classAsString = asString(new UrlResource(location));
 
 		// Format twice
-		formatter.format(languageP, classAsString);
-		formatter.format(languageP, classAsString);
+		formatter.format(languageP, "someFilePath", classAsString);
+		formatter.format(languageP, "someFilePath", classAsString);
 
 		// Check the cache is used properly
 		Assert.assertEquals(1, formatter.getCacheSize());

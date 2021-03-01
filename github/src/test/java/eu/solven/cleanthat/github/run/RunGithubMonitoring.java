@@ -47,7 +47,7 @@ public class RunGithubMonitoring {
 		return new IStringFormatter() {
 
 			@Override
-			public String format(ILanguageProperties config, String code) throws IOException {
+			public String format(ILanguageProperties config, String filePath, String code) throws IOException {
 				throw new UnsupportedOperationException("Should not format anything");
 			}
 		};

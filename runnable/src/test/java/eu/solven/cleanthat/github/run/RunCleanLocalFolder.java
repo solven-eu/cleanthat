@@ -54,7 +54,7 @@ public class RunCleanLocalFolder extends ACleanThatXxxFunction {
 		String finalRelativePath = ".";
 
 		// We'd better processing a sibling folder/repository
-		finalRelativePath = "../mitrust-datasharing";
+		// finalRelativePath = "../mitrust-datasharing";
 
 		LOGGER.info("About to resolve {}", finalRelativePath);
 		localFolder = localFolder.resolve(finalRelativePath).normalize();

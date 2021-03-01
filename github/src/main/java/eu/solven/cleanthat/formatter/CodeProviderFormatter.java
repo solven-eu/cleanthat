@@ -2,11 +2,8 @@ package eu.solven.cleanthat.formatter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +29,7 @@ import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.ISourceCodeProperties;
@@ -46,8 +44,6 @@ import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
  */
 public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
-
-	public static final List<String> DEFAULT_INCLUDES_JAVA = Arrays.asList("glob:**/*.java");
 
 	public static final String EOL = "\r\n";
 	private static final int CORES_FORMATTER = 16;
@@ -148,7 +144,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		List<String> includes = languageP.getSourceCodeProperties().getIncludes();
 		if (includes.isEmpty()) {
 			if ("java".equals(languageP.getLanguage())) {
-				List<String> defaultIncludes = DEFAULT_INCLUDES_JAVA;
+				List<String> defaultIncludes = IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA;
 				LOGGER.info("Default includes to: {}", defaultIncludes);
 				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
 				// .../src/main/java/io/spring/format/maven/FormatMojo.java#L47
@@ -173,8 +169,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-		List<PathMatcher> includeMatchers = prepareMatcher(sourceCodeProperties.getIncludes());
-		List<PathMatcher> excludeMatchers = prepareMatcher(sourceCodeProperties.getExcludes());
+		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
+		List<PathMatcher> excludeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getExcludes());
 
 		ListeningExecutorService executor =
 				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
@@ -186,19 +182,19 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					// Skip files deleted within PR
 					return;
 				}
-				String fileName = file.getFilePath(pr);
+				String filePath = file.getFilePath(pr);
 
-				Optional<PathMatcher> matchingInclude = findMatching(includeMatchers, fileName);
-				Optional<PathMatcher> matchingExclude = findMatching(excludeMatchers, fileName);
+				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
 				if (matchingInclude.isPresent()) {
 					if (matchingExclude.isEmpty()) {
 						cs.submit(() -> {
 							try {
-								return doFormat(pr, pathToMutatedContent, languageP, file, fileName);
+								return doFormat(pr, pathToMutatedContent, languageP, file, filePath);
 							} catch (IOException e) {
-								throw new UncheckedIOException("Issue with file: " + fileName, e);
+								throw new UncheckedIOException("Issue with file: " + filePath, e);
 							} catch (RuntimeException e) {
-								throw new RuntimeException("Issue with file: " + fileName, e);
+								throw new RuntimeException("Issue with file: " + filePath, e);
 							}
 						});
 					} else {
@@ -250,8 +246,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP,
 			ICodeProviderFile file,
-			String fileName) throws IOException {
-		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(fileName));
+			String filePath) throws IOException {
+		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
 		String code = optAlreadyMutated.orElseGet(() -> {
 			try {
 				return file.loadContent(pr);
@@ -259,10 +255,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				throw new UncheckedIOException(e);
 			}
 		});
-		LOGGER.info("Processing {}", fileName);
-		String output = doFormat(languageP, code);
+		LOGGER.info("Processing {}", filePath);
+		String output = doFormat(languageP, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-			pathToMutatedContent.put(fileName, output);
+			pathToMutatedContent.put(filePath, output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES
 					&& Integer.bitCount(pathToMutatedContent.size()) == 1) {
@@ -275,16 +271,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 	}
 
-	// https://stackoverflow.com/questions/794381/how-to-find-files-that-match-a-wildcard-string-in-java
-	public static Optional<PathMatcher> findMatching(List<PathMatcher> includeMatchers, String fileName) {
-		return includeMatchers.stream().filter(pm -> pm.matches(Paths.get(fileName))).findFirst();
-	}
-
-	public static List<PathMatcher> prepareMatcher(List<String> regex) {
-		return regex.stream().map(r -> FileSystems.getDefault().getPathMatcher(r)).collect(Collectors.toList());
-	}
-
-	private String doFormat(ILanguageProperties properties, String code) throws IOException {
-		return formatter.format(properties, code);
+	private String doFormat(ILanguageProperties properties, String filepath, String code) throws IOException {
+		return formatter.format(properties, filepath, code);
 	}
 }

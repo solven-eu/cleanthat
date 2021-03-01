@@ -1,9 +1,12 @@
 package eu.solven.cleanthat.formatter.eclipse;
 
 import java.io.IOException;
+import java.nio.file.PathMatcher;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -17,6 +20,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.spring.SpringJavaFormatter;
@@ -25,6 +29,7 @@ import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.github.EclipseJavaFormatterProcessorProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
 import eu.solven.cleanthat.java.imports.JavaRevelcImportsCleaner;
 import eu.solven.cleanthat.java.imports.JavaRevelcImportsCleanerProperties;
@@ -61,8 +66,8 @@ public class JavaFormatter implements IStringFormatter {
 	}
 
 	@Override
-	public String format(ILanguageProperties languageProperties, String asString) throws IOException {
-		AtomicReference<String> outputRef = new AtomicReference<>(asString);
+	public String format(ILanguageProperties languageProperties, String filepath, String code) throws IOException {
+		AtomicReference<String> outputRef = new AtomicReference<>(code);
 		languageProperties.getProcessors().forEach(rawProcessor -> {
 			// TODO Is this really a deep-copy?
 			Map<String, ?> languagePropertiesTemplate =
@@ -70,7 +75,7 @@ public class JavaFormatter implements IStringFormatter {
 
 			try {
 				String input = outputRef.get();
-				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, input);
+				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, filepath, input);
 
 				if (output == null) {
 					throw new IllegalStateException("Null code. TODO");
@@ -91,8 +96,10 @@ public class JavaFormatter implements IStringFormatter {
 		return outputRef.get();
 	}
 
-	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate, Map<String, ?> rawProcessor, String code)
-			throws IOException {
+	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate,
+			Map<String, ?> rawProcessor,
+			String filepath,
+			String code) throws IOException {
 		Objects.requireNonNull(code, "code should not be null");
 
 		Map<String, Object> languagePropertiesAsMap = new LinkedHashMap<>(languagePropertiesTemplate);
@@ -118,6 +125,23 @@ public class JavaFormatter implements IStringFormatter {
 		ILanguageProperties languageProperties =
 				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
 		ISourceCodeFormatter processor = makeFormatter(rawProcessor, languageProperties);
+
+		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCodeProperties();
+
+		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
+		List<PathMatcher> excludeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getExcludes());
+
+		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filepath);
+		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filepath);
+
+		if (!matchingInclude.isPresent()) {
+			LOGGER.info("File {} was initially included but not included for processor: {}", processor);
+			return code;
+		} else if (matchingExclude.isPresent()) {
+			LOGGER.info("File {} was initially not-excluded but excluded for processor: {}", processor);
+			return code;
+		}
+
 		LineEnding lineEnding = languageProperties.getSourceCodeProperties().getLineEnding();
 		return processor.doFormat(code, lineEnding);
 	}

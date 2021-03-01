@@ -25,7 +25,7 @@
                     "engine": "rules",
     				"source_code": {
 				        "excludes": [
-				            "regex:.*/src/test/java/eu/solven/cleanthat/rules/.*"
+				            "regex:.*/src/test/java/eu/solven/cleanthat/rules/cases/.*"
 				        ]
 				    }
                 },

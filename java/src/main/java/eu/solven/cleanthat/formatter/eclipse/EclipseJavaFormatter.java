@@ -58,7 +58,9 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 
 	private static final String KEY_URL = "url";
 
-	private final CodeFormatter formatter;
+	// private final CodeFormatter formatter;
+
+	private final Map<String, String> defaultOptions;
 
 	public EclipseJavaFormatter(ILanguageProperties languageProperties,
 			EclipseJavaFormatterProcessorProperties processorConfig) {
@@ -95,14 +97,18 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 				throw new UncheckedIOException(e);
 			}
 		}
-		this.formatter = ToolFactory.createCodeFormatter(options, ToolFactory.M_FORMAT_EXISTING);
+
+		defaultOptions = new LinkedHashMap<>(options);
 	}
 
 	@Override
 	public String doFormat(String code, LineEnding ending) throws IOException {
+		// Make a new formatter to enable thread-safety
+		CodeFormatter formatter = makeFormatter();
+
 		TextEdit te;
 		try {
-			te = this.formatter.format(CodeFormatter.K_COMPILATION_UNIT
+			te = formatter.format(CodeFormatter.K_COMPILATION_UNIT
 					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, ending.getChars());
 			if (te == null) {
 				LOGGER.debug("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
@@ -119,9 +125,15 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 			throw new IllegalArgumentException(e);
 		}
 		String formattedCode = doc.get();
-		if (code.equals(formattedCode)) {
+		if (formattedCode == null) {
+			throw new IllegalStateException("This happened while accessing concurrently a single CodeFormatter");
+		} else if (code.equals(formattedCode)) {
 			LOGGER.debug("Formatting was a no-op");
 		}
 		return formattedCode;
+	}
+
+	private CodeFormatter makeFormatter() {
+		return ToolFactory.createCodeFormatter(defaultOptions, ToolFactory.M_FORMAT_EXISTING);
 	}
 }

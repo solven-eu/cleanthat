@@ -41,6 +41,8 @@ public class CleanThatLambdaFunction extends ACleanThatXxxFunction {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 
 		return input -> {
+			Map<String, ?> functionOutput;
+
 			if (input.containsKey("Records")) {
 				// This comes from SQS, which pushes SQSEvent
 
@@ -61,10 +63,14 @@ public class CleanThatLambdaFunction extends ACleanThatXxxFunction {
 						return Collections.<String, Object>emptyMap();
 					}
 				}).filter(m -> !m.isEmpty()).map(r -> processOneMessage(appContext, r)).collect(Collectors.toList());
-				return Map.of("sqs", output);
+				functionOutput = Map.of("sqs", output);
 			} else {
-				return processOneMessage(appContext, input);
+				functionOutput = processOneMessage(appContext, input);
 			}
+
+			LOGGER.info("Output: {}", functionOutput);
+
+			return functionOutput;
 		};
 	}
 }

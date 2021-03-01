@@ -18,6 +18,7 @@ package eu.solven.cleanthat.formatter.google;
  *
  * @author Benoit Lacelle
  */
+
 // TODO What would be the options?
 public class GoogleJavaFormatterProperties {
 

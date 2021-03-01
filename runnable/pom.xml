@@ -50,6 +50,13 @@
 		</dependency>
 
 		<dependency>
+			<!-- https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java-aop-spring.html -->
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-xray-recorder-sdk-spring</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<dependency>
 			<!-- https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html#_comparing_functional_with_traditional_bean_definitions -->
 			<!-- It seems we need this to open an actual HTTP server for the Function -->
 			<groupId>org.springframework.cloud</groupId>

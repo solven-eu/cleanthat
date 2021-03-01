@@ -29,7 +29,6 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
-import eu.solven.cleanthat.github.NoWaitRateLimitChecker;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 

@@ -11,6 +11,7 @@ import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
@@ -85,6 +86,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("Initialized an installation github. RateLimit status: {}", installationGithub.getRateLimit());
 
 			return new GithubAndToken(installationGithub, token);
+		} catch (GHFileNotFoundException e) {
+			throw new UncheckedIOException("Invalid installationId, or no actual access to it?", e);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

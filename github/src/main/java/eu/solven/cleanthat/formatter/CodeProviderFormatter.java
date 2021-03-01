@@ -219,6 +219,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			}
 		}
 
+		// Once here, we are guaranteed all tasks has been pushed: we can poll until null.
 		while (true) {
 			try {
 				Future<Boolean> polled = cs.poll();

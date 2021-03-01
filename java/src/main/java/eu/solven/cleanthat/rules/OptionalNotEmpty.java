@@ -20,7 +20,6 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Benoit Lacelle
  */
 public class OptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
 
 	// Optional exists since 8
@@ -50,7 +49,6 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 			Optional<Node> optParent = methodCall.getParentNode();
 			// on cherche le '!' logique
 			if (methodCall.getScope().isPresent() && optParent.isPresent() && optParent.get() instanceof UnaryExpr) {
-
 				UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
 				if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
 					return;

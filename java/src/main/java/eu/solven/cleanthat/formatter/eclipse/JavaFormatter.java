@@ -3,6 +3,7 @@ package eu.solven.cleanthat.formatter.eclipse;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ public class JavaFormatter implements IStringFormatter {
 
 	// Prevents parsing/loading remote configuration on each parse
 	// We expect a low number of different configurations
+	// Beware this can lead to race-conditions/thread-safety issues into EclipseJavaFormatter
 	final LoadingCache<Map.Entry<ILanguageProperties, EclipseJavaFormatterProcessorProperties>, EclipseJavaFormatter> configToEngine =
 			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build(CacheLoader.from(config -> {
 				return new EclipseJavaFormatter(config.getKey(), config.getValue());
@@ -69,6 +71,11 @@ public class JavaFormatter implements IStringFormatter {
 			try {
 				String input = outputRef.get();
 				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, input);
+
+				if (output == null) {
+					throw new IllegalStateException("Null code. TODO");
+				}
+
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step clean all previous not relevant changes)
@@ -84,9 +91,10 @@ public class JavaFormatter implements IStringFormatter {
 		return outputRef.get();
 	}
 
-	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate,
-			Map<String, ?> rawProcessor,
-			String input) throws IOException {
+	protected String applyProcessor(Map<String, ?> languagePropertiesTemplate, Map<String, ?> rawProcessor, String code)
+			throws IOException {
+		Objects.requireNonNull(code, "code should not be null");
+
 		Map<String, Object> languagePropertiesAsMap = new LinkedHashMap<>(languagePropertiesTemplate);
 
 		// As we are processing a single processor, we can get ride of the processors field
@@ -109,6 +117,12 @@ public class JavaFormatter implements IStringFormatter {
 		}
 		ILanguageProperties languageProperties =
 				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
+		ISourceCodeFormatter processor = makeFormatter(rawProcessor, languageProperties);
+		LineEnding lineEnding = languageProperties.getSourceCodeProperties().getLineEnding();
+		return processor.doFormat(code, lineEnding);
+	}
+
+	private ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor, ILanguageProperties languageProperties) {
 		ISourceCodeFormatter processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
 
@@ -138,7 +152,6 @@ public class JavaFormatter implements IStringFormatter {
 		} else {
 			throw new IllegalArgumentException("Unknown engine: " + engine);
 		}
-		LineEnding lineEnding = languageProperties.getSourceCodeProperties().getLineEnding();
-		return processor.doFormat(input, lineEnding);
+		return processor;
 	}
 }

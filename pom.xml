@@ -67,7 +67,7 @@
 		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
 		<formatter-maven-plugin.version>2.14.0</formatter-maven-plugin.version>
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
-		<impsort-maven-plugin.version>1.5.0</impsort-maven-plugin.version>
+		<impsort-maven-plugin.version>1.6.0</impsort-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
 		<frontend-maven-plugin.version>1.11.2</frontend-maven-plugin.version>
 

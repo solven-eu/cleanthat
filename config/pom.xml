@@ -11,6 +11,11 @@
 
 	<artifactId>config</artifactId>
 
+	<properties>
+		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
+		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.github.cormoran-io.pepper</groupId>

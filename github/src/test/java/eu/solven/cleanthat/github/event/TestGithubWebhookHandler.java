@@ -11,6 +11,7 @@ import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -55,6 +56,9 @@ public class TestGithubWebhookHandler {
 		GHAppInstallationToken installToken = Mockito.mock(GHAppInstallationToken.class);
 		Mockito.when(tokenBuilder.create()).thenReturn(installToken);
 		Mockito.when(installGithub.getRepositoryById(Mockito.anyString())).thenReturn(repo);
+
+		// Mockito.when(appInstall.getGith)
+		Mockito.when(installGithub.getRateLimit()).thenReturn(Mockito.mock(GHRateLimit.class));
 	}
 
 	@Ignore("Issue with GitHub mocking")

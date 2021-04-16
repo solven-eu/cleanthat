@@ -135,8 +135,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	 * @param properties
 	 */
 	private void migrateConfigurationCode(CleanthatRepositoryProperties properties) {
-		// TODO Auto-generated method stub
-
+		LOGGER.info("TODO: {}", properties);
 	}
 
 	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {

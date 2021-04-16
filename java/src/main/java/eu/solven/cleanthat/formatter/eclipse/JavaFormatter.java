@@ -135,10 +135,10 @@ public class JavaFormatter implements IStringFormatter {
 		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filepath);
 
 		if (!matchingInclude.isPresent()) {
-			LOGGER.info("File {} was initially included but not included for processor: {}", processor);
+			LOGGER.info("File {} was initially included but not included for processor: {}", filepath, processor);
 			return code;
 		} else if (matchingExclude.isPresent()) {
-			LOGGER.info("File {} was initially not-excluded but excluded for processor: {}", processor);
+			LOGGER.info("File {} was initially not-excluded but excluded for processor: {}", filepath, processor);
 			return code;
 		}
 

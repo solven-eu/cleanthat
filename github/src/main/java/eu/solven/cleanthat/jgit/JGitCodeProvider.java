@@ -47,6 +47,7 @@ import eu.solven.cleanthat.github.event.AGithubCodeProvider;
  *
  * @author Benoit Lacelle
  */
+@SuppressWarnings("PMD.GodClass")
 public class JGitCodeProvider extends AGithubCodeProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JGitCodeProvider.class);
@@ -214,14 +215,14 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 			jgit.commit().setMessage(prComments.stream().collect(Collectors.joining("\r\n"))).call();
 			LOGGER.info("Committed");
 		} catch (GitAPIException e) {
-			throw new RuntimeException("Issue committing");
+			throw new RuntimeException("Issue committing", e);
 		}
 
 		try {
 			jgit.push().call();
 			LOGGER.info("Pushed");
 		} catch (GitAPIException e) {
-			throw new RuntimeException("Issue pushing");
+			throw new RuntimeException("Issue pushing", e);
 		}
 	}
 

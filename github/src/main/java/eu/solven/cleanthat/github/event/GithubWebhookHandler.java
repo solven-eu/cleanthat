@@ -5,6 +5,7 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -145,17 +146,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GitHub githubAsInst = githubAuthAsInst.getGithub();
 		{
 			GHRateLimit rateLimit;
-			int rateLimitRemaining;
 			try {
 				rateLimit = githubAsInst.getRateLimit();
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue checking rateLimit", e);
 			}
-			rateLimitRemaining = rateLimit.getRemaining();
+			int rateLimitRemaining = rateLimit.getRemaining();
 
 			if (rateLimitRemaining == 0) {
-				Object resetIn = PepperLogHelper
-						.humanDuration(rateLimit.getResetEpochSeconds() * 1000 - System.currentTimeMillis());
+				Object resetIn = PepperLogHelper.humanDuration(
+						rateLimit.getResetEpochSeconds() * TimeUnit.SECONDS.toMillis(1) - System.currentTimeMillis());
 				// throw new IllegalStateException("This installation has no remaining rateLimit. Reset in: " +
 				// resetIn);
 

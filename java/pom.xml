@@ -81,6 +81,7 @@
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
+			<!-- Beware, changing this version often lead to a change of actual formatting -->
 			<version>3.24.0</version>
 		</dependency>
 		<dependency>

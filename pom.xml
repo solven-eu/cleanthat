@@ -27,6 +27,8 @@
 		<module>lambda</module>
 
 		<module>test-helpers</module>
+		
+		<module>maven</module>
 	</modules>
 
 	<properties>
@@ -613,6 +615,32 @@
 						<injectAllReactorProjects>false</injectAllReactorProjects>
 
 						<abbrevLength>7</abbrevLength>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>eu.solven.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>${project.version}</version>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+							<phase>process-sources</phase>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<phase>verify</phase>
+						</execution>
+					</executions>
+
+					<configuration>
+						<configUrl>${project.basedir}/cleanthat.json</configUrl>
 					</configuration>
 				</plugin>
 			</plugins>

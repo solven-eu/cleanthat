@@ -30,6 +30,13 @@
 		</dependency>
 
 		<dependency>
+			<!-- Enable processing YAMLs -->
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+
+		<dependency>
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>

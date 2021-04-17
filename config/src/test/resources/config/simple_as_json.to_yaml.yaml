@@ -1,0 +1,23 @@
+syntax_version: "2"
+meta:
+  clean_pull_requests: true
+  clean_main_branch: true
+  clean_orphan_branches: false
+  labels:
+  - "cleanthat"
+languages:
+- language: "java"
+  language_version: "11"
+  processors:
+  - engine: "revelc_imports"
+    parameters:
+      remove_unused: true
+      groups: "java.,javax.,org.,com."
+      static_groups: "java,*"
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  includes:
+  - "regex:.*\\.java"
+  encoding: "UTF-8"
+  line_ending: "LF"

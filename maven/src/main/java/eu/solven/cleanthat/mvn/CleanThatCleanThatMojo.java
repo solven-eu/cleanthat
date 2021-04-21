@@ -14,6 +14,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "cleanthat", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true)
 public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	// Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/pmd-mojo.html
+	@Override
 	public void execute() throws MojoExecutionException {
 		getLog().info("Hello, world.");
 		getLog().info("Path: " + getConfigPath());

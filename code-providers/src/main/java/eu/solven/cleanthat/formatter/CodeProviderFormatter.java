@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -26,16 +25,16 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import cormoran.pepper.thread.PepperExecutorsHelper;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.github.ISourceCodeProperties;
 import eu.solven.cleanthat.github.IStringFormatter;
-import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 
 /**
  * Unclear what is the point of this class
@@ -43,7 +42,7 @@ import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
  * @author Benoit Lacelle
  */
 public class CodeProviderFormatter implements ICodeProviderFormatter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderFormatter.class);
+	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final String EOL = "\r\n";
 	private static final int CORES_FORMATTER = 16;
@@ -68,11 +67,11 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		List<String> prComments = new ArrayList<>();
 
-		if (pr instanceof GithubPRCodeProvider) {
+		if (pr instanceof IListOnlyModifiedFiles) {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				pr.listFiles(fileChanged -> {
-					if (GithubPullRequestCleaner.PATH_CLEANTHAT_JSON.equals(fileChanged.getFilePath(pr))) {
+					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getFilePath(pr))) {
 						configIsChanged.set(true);
 						prComments.add("Configuration has changed");
 					}
@@ -80,16 +79,17 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue while checking for config change", e);
 			}
+		} else {
+			// We are in a branch: all files are candidates, which makes too many files to iterate over them here
+			// https://www.baeldung.com/jgit
+			// try {
+			// Git git = pr.makeGitRepo();
+			// } catch (RuntimeException e) {
+			// throw new IllegalStateException("Issue while cloning the repository");
+			// }
+
+			throw new IllegalStateException("TODO");
 		}
-		// else {
-		// // We are in a branch: all files are candidates, which makes too many files to iterate over them here
-		// // https://www.baeldung.com/jgit
-		// try {
-		// Git git = pr.makeGitRepo();
-		// } catch (RuntimeException e) {
-		// throw new IllegalStateException("Issue while cloning the repository");
-		// }
-		// }
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
@@ -120,13 +120,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoPR(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			pr.commitIntoRef(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		} else {
 			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoPR(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			pr.commitIntoRef(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		}
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}

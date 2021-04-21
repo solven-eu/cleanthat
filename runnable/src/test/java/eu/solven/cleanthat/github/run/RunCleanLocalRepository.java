@@ -15,9 +15,9 @@ import org.springframework.context.event.EventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
 
@@ -41,7 +41,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxFunction {
 
 		ApplicationContext appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
-		File pathToConfig = repoFolder.resolve(GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON).toFile();
+		File pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);

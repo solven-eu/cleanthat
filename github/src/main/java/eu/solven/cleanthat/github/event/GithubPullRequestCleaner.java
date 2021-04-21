@@ -22,12 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
@@ -44,13 +44,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 	private static final String KEY_SKIPPED = "skipped";
 
-	private static final String TEMPLATE_MISS_FILE = "We miss a '{}' file";
-
 	// private static final String KEY_JAVA = "java";
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
-
-	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
-	public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
 	final ObjectMapper objectMapper;
 
@@ -96,19 +91,21 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			LOGGER.warn("There is no configuration ({}) on {}", PATH_CLEANTHAT_JSON, prUrl);
-			return Collections.singletonMap(KEY_SKIPPED, "missing '" + PATH_CLEANTHAT_JSON + "'");
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, prUrl);
+			return Collections.singletonMap(KEY_SKIPPED, "missing '" + CodeProviderHelpers.PATH_CLEANTHAT + "'");
 		} else {
 			optConfigurationToUse = optPrConfig;
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 		if (version.isEmpty()) {
 			LOGGER.info("No version on configuration applying to PR {}", prUrl);
-			return Collections.singletonMap(KEY_SKIPPED, "missing 'version' in '" + PATH_CLEANTHAT_JSON + "'");
+			return Collections.singletonMap(KEY_SKIPPED,
+					"missing 'version' in '" + CodeProviderHelpers.PATH_CLEANTHAT + "'");
 		} else if (!"2".equals(version.get())) {
 			LOGGER.info("Version '{}' on configuration is not valid {}", version.get(), prUrl);
 			return Collections.singletonMap(KEY_SKIPPED,
-					"Not handled 'version' in '" + PATH_CLEANTHAT_JSON + "' (we accept only '2' for now)");
+					"Not handled 'version' in '" + CodeProviderHelpers.PATH_CLEANTHAT
+							+ "' (we accept only '2' for now)");
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
@@ -144,46 +141,11 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 
 	private Optional<Map<String, ?>> safeConfig(ICodeProvider codeProvider) {
 		try {
-			return unsafeConfig(codeProvider);
+			return new CodeProviderHelpers(objectMapper).unsafeConfig(codeProvider);
 		} catch (RuntimeException e) {
 			LOGGER.warn("Issue loading the configuration", e);
 			return Optional.empty();
 		}
-	}
-
-	// TODO Get the merged configuration head -> base
-	// It will enable cleaning a PR given the configuration of the base branch
-	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
-		Optional<String> optContent;
-		try {
-			optContent = codeProvider.loadContentForPath(PATH_CLEANTHAT_JSON);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
-		}
-		return optContent.map(content -> {
-			try {
-				return objectMapper.readValue(content, Map.class);
-			} catch (JsonProcessingException e) {
-				throw new IllegalArgumentException("Invalid json", e);
-			}
-		});
-	}
-
-	@Override
-	public Optional<Map<String, ?>> branchConfig(GHBranch branch) {
-		Optional<Map<String, ?>> defaultBranchConfig;
-		try {
-			String asString =
-					GithubPRCodeProvider.loadContent(branch.getOwner(), PATH_CLEANTHAT_JSON, branch.getSHA1());
-			defaultBranchConfig = Optional.of(objectMapper.readValue(asString, Map.class));
-		} catch (GHFileNotFoundException e) {
-			LOGGER.trace(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON, e);
-			LOGGER.debug(TEMPLATE_MISS_FILE, PATH_CLEANTHAT_JSON);
-			defaultBranchConfig = Optional.empty();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		return defaultBranchConfig;
 	}
 
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {

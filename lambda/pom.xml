@@ -12,7 +12,7 @@
 	<artifactId>lambda</artifactId>
 
 	<properties>
-		<wrapper.version>1.0.17.RELEASE</wrapper.version>
+		<!-- <wrapper.version>1.0.17.RELEASE</wrapper.version> -->
 	</properties>
 
 	<dependencies>
@@ -122,7 +122,6 @@
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin -->
 				<groupId>com.github.seanroy</groupId>
 				<artifactId>lambda-maven-plugin</artifactId>
-				<!-- 2.3.3 is KO -->
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin/issues/104 -->
 				<version>2.3.3</version>
 				<dependencies>
@@ -137,8 +136,9 @@
 					<functionCode>${project.build.directory}/${project.build.finalName}-aws.jar</functionCode>
 					<version>${project.version}</version>
 					<alias>development</alias>
-					<!-- <vpcSecurityGroupIds>sg-123456</vpcSecurityGroupIds> -->
-					<!-- <vpcSubnetIds>subnet-123456,subnet-123456,subnet-123456</vpcSubnetIds> -->
+
+					<!-- Used to deploy different versions for different eclipse -->
+					<functionNameSuffix>${lambda.functionNameSuffix}</functionNameSuffix>
 
 					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/users/circleci-olapless -->
 					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/roles/hello-lambda-role -->
@@ -149,18 +149,8 @@
 
 					<runtime>java11</runtime>
 
-					<!-- <keyPrefix>my/awesome/prefix</keyPrefix> -->
 					<publish>true</publish>
 					<forceUpdate>true</forceUpdate>
-					<functionNameSuffix>${lambda.functionNameSuffix}</functionNameSuffix>
-					<!-- <environmentVariables> -->
-					<!-- <key0>value0</key0> -->
-					<!-- </environmentVariables> -->
-					<!-- <clientConfiguration> -->
-					<!-- <protocol>https</protocol> -->
-					<!-- <proxyHost>proxy-host.net</proxyHost> -->
-					<!-- <proxyPort>1234</proxyPort> -->
-					<!-- </clientConfiguration> -->
 					<lambdaFunctions>
 						<lambdaFunction>
 							<functionName>upperCase</functionName>

@@ -15,7 +15,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +22,14 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
-public class GithubPRCodeProvider extends AGithubCodeProvider {
+public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOnlyModifiedFiles {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
@@ -68,7 +68,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent,
+	public void commitIntoRef(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// ,
@@ -80,15 +80,10 @@ public class GithubPRCodeProvider extends AGithubCodeProvider {
 
 		String refName = pr.getHead().getRef();
 		GHRepository repo = pr.getRepository();
-		GHRef ref;
-		try {
-			ref = repo.getRef("heads/" + refName);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue fetching the head-ref for: " + pr, e);
-		}
 
-		LOGGER.debug("Processing head={} for pr={}", ref, pr);
-		commitIntoRef(pathToMutatedContent, prComments, repo, ref);
+		String fullRefName = "heads/" + refName;
+		LOGGER.debug("Processing head={} for pr={}", fullRefName, pr);
+		commitIntoRef(pathToMutatedContent, prComments, repo, fullRefName);
 	}
 
 	@Override

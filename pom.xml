@@ -16,6 +16,7 @@
 	<modules>
 		<module>parent</module>
 
+		<module>code-providers</module>
 		<module>github</module>
 
 		<module>config</module>
@@ -27,7 +28,7 @@
 		<module>lambda</module>
 
 		<module>test-helpers</module>
-		
+
 		<module>maven</module>
 	</modules>
 
@@ -86,6 +87,9 @@
 
 		<!-- By default, there is no additional argument -->
 		<surefire.additionalArgument />
+
+		<!--This may be overriden to enable deploying older version of Eclipse, which may format different -->
+		<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -107,6 +111,32 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<profiles>
+		<!-- Given each EclipseJDTCore version may lead to a different formatting, we enable a project to choose its own version, and we need a lambda per version -->
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
+		<profile>
+			<id>eclipseJdt3_25_0</id>
+			<properties>
+				<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
+				<lambda.functionNameSuffix>eclipseJdt3_25_0</lambda.functionNameSuffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>eclipseJdt3_24_0</id>
+			<properties>
+				<eclipse.jt.core.version>3.24.0</eclipse.jt.core.version>
+				<lambda.functionNameSuffix>eclipseJdt3_24_0</lambda.functionNameSuffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>eclipseJdt3_23_0</id>
+			<properties>
+				<eclipse.jt.core.version>3.23.0</eclipse.jt.core.version>
+				<lambda.functionNameSuffix>eclipseJdt3_23_0</lambda.functionNameSuffix>
+			</properties>
+		</profile>
+	</profiles>
 
 	<build>
 		<pluginManagement>
@@ -617,7 +647,7 @@
 						<abbrevLength>7</abbrevLength>
 					</configuration>
 				</plugin>
-				
+
 				<plugin>
 					<groupId>eu.solven.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>

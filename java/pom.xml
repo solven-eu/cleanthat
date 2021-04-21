@@ -11,6 +11,27 @@
 
 	<artifactId>java</artifactId>
 
+	<properties>
+		<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
+	</properties>
+
+	<profiles>
+		<!-- Given each EclipseJDTCore version may lead to a different formatting, we enable a project to choose its own version, and we need a lambda per version -->
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
+		<profile>
+			<id>eclipseJdt3_24_0</id>
+			<properties>
+				<eclipse.jt.core.version>3.24.0</eclipse.jt.core.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>eclipseJdt3_23_0</id>
+			<properties>
+				<eclipse.jt.core.version>3.23.0</eclipse.jt.core.version>
+			</properties>
+		</profile>
+	</profiles>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
@@ -82,7 +103,7 @@
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
 			<!-- Beware, changing this version often lead to a change of actual formatting -->
-			<version>3.25.0</version>
+			<version>${eclipse.jt.core.version}</version>
 		</dependency>
 		<dependency>
 			<!-- Used to parse Eclipse XML config files -->

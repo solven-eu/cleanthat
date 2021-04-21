@@ -254,7 +254,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 						checkRun.update().withStatus(Status.COMPLETED);
 					} catch (IOException e) {
-						LOGGER.warn("Issue creating the CheckRun");
+						// TODO Should we check we have the proper permission anyway?
+						LOGGER.warn("Issue creating the CheckRun", e);
 					}
 				}
 			}

@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
@@ -61,19 +62,9 @@ public class RunCleanLocalFolder extends ACleanThatXxxFunction {
 		LOGGER.info("About to process {}", localFolder);
 		ApplicationContext appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
-		File pathToConfig = pathToConfig(localFolder);
+		File pathToConfig = CodeProviderHelpers.pathToConfig(localFolder);
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
 		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(localFolder));
-	}
-
-	private File pathToConfig(Path localFolder) {
-		File pathToConfig = localFolder.resolve(GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON).toFile();
-		// We prefer to test with a different configuration
-		// String overridePackage = "/eu.solven/mitrust-datasharing/";
-		// pathToConfig =
-		// new ClassPathResource("/overrides" + overridePackage + GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON)
-		// .getFile();
-		return pathToConfig;
 	}
 }

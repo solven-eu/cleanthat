@@ -1,7 +1,6 @@
 package eu.solven.cleanthat.mvn;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
@@ -11,7 +10,6 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = "cleanthat")
 public abstract class ACleanThatMojo extends AbstractMojo {
 	@Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
 	private String configPath;

@@ -22,9 +22,13 @@ import org.springframework.context.event.EventListener;
 import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.event.GithubAndToken;
+import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
+import eu.solven.cleanthat.github.event.GithubRefCodeProvider;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.jgit.CommitContext;
@@ -75,8 +79,12 @@ public class RunCleanGithubBranch extends ACleanThatXxxFunction {
 		}
 		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
 		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
+		GHBranch consideredBranch = defaultBranch;
 
-		Optional<Map<String, ?>> mainBranchConfig = cleaner.branchConfig(defaultBranch);
+		ICodeProvider codeProvider = new GithubBranchCodeProvider(githubAndToken.getToken(), repo, defaultBranch);
+
+		CodeProviderHelpers codeProviderHelpers = appContext.getBean(CodeProviderHelpers.class);
+		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
 
 		if (mainBranchConfig.isEmpty()) {
 			String configureRef = GithubPullRequestCleaner.REF_CONFIGURE;
@@ -84,15 +92,21 @@ public class RunCleanGithubBranch extends ACleanThatXxxFunction {
 					defaultBranch.getName(),
 					configureRef);
 
-			defaultBranch = repo.getBranch(configureRef);
-			mainBranchConfig = cleaner.branchConfig(defaultBranch);
+			consideredBranch = repo.getBranch(configureRef);
+
+			ICodeProvider configureBranchCodeProvider =
+					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, consideredBranch);
+			mainBranchConfig = codeProviderHelpers.unsafeConfig(configureBranchCodeProvider);
 		}
 
 		if (mainBranchConfig.isEmpty()) {
 			LOGGER.info("CleanThat is not configured in the main/configure branch ({})", defaultBranch.getName());
 
-			Optional<GHBranch> branchWithConfig =
-					repo.getBranches().values().stream().filter(b -> cleaner.branchConfig(b).isPresent()).findAny();
+			Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
+				ICodeProvider configureBranchCodeProvider =
+						new GithubBranchCodeProvider(githubAndToken.getToken(), repo, b);
+				return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
+			}).findAny();
 			boolean configExistsAnywhere = branchWithConfig.isPresent();
 			if (!configExistsAnywhere) {
 				// At some point, we could prefer remaining silent if we understand the repository tried to integrate

@@ -48,14 +48,30 @@ public abstract class AGithubCodeProvider implements ICodeProvider {
 	protected void commitIntoRef(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			GHRepository repo,
-			GHRef ref) {
-		String sha = ref.getObject().getSha();
+			String refName) {
+		GHRef ref;
+		try {
+			ref = repo.getRef(refName);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
+		commitIntoRef(pathToMutatedContent, prComments, repo, ref);
+	}
+
+	protected void commitIntoRef(Map<String, String> pathToMutatedContent,
+			List<String> prComments,
+			GHRepository repo,
+			GHRef ref) {
 		GHTreeBuilder createTree = repo.createTree();
 		pathToMutatedContent.forEach((path, content) -> {
 			// TODO isExecutable isn't a parameter from the original file?
 			createTree.add(path, content, false);
 		});
+
+		// TODO What if the ref has moved to another sha1 in the meantime?
+		String sha = ref.getObject().getSha();
+
 		try {
 			GHTree createdTree = createTree.baseTree(sha).create();
 			String commitMessage = prComments.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
@@ -64,6 +80,7 @@ public abstract class AGithubCodeProvider implements ICodeProvider {
 
 			String newHead = commit.getSHA1();
 			LOGGER.info("Update {} ({}) to {} ({})", getTitle(), getHtmlUrl(), newHead, commit.getHtmlUrl());
+
 			ref.updateTo(newHead);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

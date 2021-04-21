@@ -11,6 +11,7 @@
 
 	<!-- This is the standard name template for unofficial plugins -->
 	<artifactId>cleanthat-maven-plugin</artifactId>
+	<packaging>maven-plugin</packaging>
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
@@ -32,5 +33,32 @@
 			<version>3.4</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>runnable</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
+
+
+	<build>
+		<plugins>
+			<!-- mvn com.github.cormoran-io.cleanthat:cleanthat-maven-plugin:cleanthat -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<id>mojo-descriptor</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

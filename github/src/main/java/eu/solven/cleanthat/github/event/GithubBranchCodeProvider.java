@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.jgit.api.Git;
+import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
@@ -20,36 +21,36 @@ import eu.solven.cleanthat.jgit.JGitCodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCodeProvider.class);
+public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubBranchCodeProvider.class);
 
-	final GHRef ref;
+	final GHBranch branch;
 
 	final AtomicReference<JGitCodeProvider> localClone = new AtomicReference<>();
 
-	public GithubRefCodeProvider(String token, GHRepository repo, GHRef ref) {
+	public GithubBranchCodeProvider(String token, GHRepository repo, GHBranch branch) {
 		super(token, repo);
-
-		this.ref = ref;
-	}
-
-	@Override
-	protected String getSha1() {
-		return ref.getObject().getSha();
-	}
-
-	@Override
-	protected String getRef() {
-		return ref.getRef();
+		this.branch = branch;
 	}
 
 	@Override
 	public String getHtmlUrl() {
-		return ref.getUrl().toExternalForm();
+		return "TODO Branch URL";
 	}
 
 	@Override
 	public String getTitle() {
-		return getRef();
+		return branch.getName();
 	}
+
+	@Override
+	protected String getSha1() {
+		return branch.getSHA1();
+	}
+
+	@Override
+	protected String getRef() {
+		return branch.getName();
+	}
+
 }

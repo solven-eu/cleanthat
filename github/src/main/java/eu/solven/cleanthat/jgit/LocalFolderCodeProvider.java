@@ -80,7 +80,7 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent,
+	public void commitIntoRef(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((path, content) -> {

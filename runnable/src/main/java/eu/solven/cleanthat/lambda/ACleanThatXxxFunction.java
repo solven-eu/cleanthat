@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
@@ -23,7 +24,7 @@ import io.sentry.Sentry;
  *
  */
 @SpringBootApplication(scanBasePackages = "none")
-@Import({ GithubSpringConfig.class, JavaFormatter.class })
+@Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
 public class ACleanThatXxxFunction {
 	public static void main(String[] args) {
 		SpringApplication.run(ACleanThatXxxFunction.class, args);
@@ -37,8 +38,9 @@ public class ACleanThatXxxFunction {
 			// TODO Cache the Github instance for the JWT duration
 			return githubFactory.makeWithFreshJwt().processWebhookBody(input, cleaner);
 		} catch (IOException | JOSEException | RuntimeException e) {
-			Sentry.captureException(e, "Lambda");
-			throw new RuntimeException(e);
+			RuntimeException wrapped = new RuntimeException(e);
+			Sentry.captureException(wrapped, "Lambda");
+			throw wrapped;
 		}
 	}
 }

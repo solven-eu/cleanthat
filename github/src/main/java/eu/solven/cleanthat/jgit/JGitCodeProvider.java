@@ -186,7 +186,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoPR(Map<String, String> pathToMutatedContent,
+	public void commitIntoRef(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// , Optional<String> targetBranch
@@ -263,6 +263,14 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 		}
 	}
 
+	/**
+	 * 
+	 * @param dir
+	 * @param authTransportUrl
+	 * @param branch
+	 *            refname or branchName or tagName
+	 * @return
+	 */
 	public static Git makeGitRepo(Path dir, String authTransportUrl, String branch) {
 		// https://stackoverflow.com/questions/11475263/shallow-clone-with-jgit
 		CloneCommand builder = Git.cloneRepository()

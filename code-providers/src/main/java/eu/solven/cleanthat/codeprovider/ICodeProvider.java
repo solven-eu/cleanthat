@@ -29,7 +29,7 @@ public interface ICodeProvider {
 
 	String getTitle();
 
-	void commitIntoPR(Map<String, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
+	void commitIntoRef(Map<String, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
 
 	Optional<String> loadContentForPath(String path) throws IOException;
 

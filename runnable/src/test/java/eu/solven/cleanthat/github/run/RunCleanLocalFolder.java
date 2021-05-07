@@ -20,7 +20,6 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
 import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
 

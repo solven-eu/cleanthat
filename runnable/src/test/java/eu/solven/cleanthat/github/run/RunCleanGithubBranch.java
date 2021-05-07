@@ -28,7 +28,6 @@ import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
 import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
-import eu.solven.cleanthat.github.event.GithubRefCodeProvider;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.jgit.CommitContext;

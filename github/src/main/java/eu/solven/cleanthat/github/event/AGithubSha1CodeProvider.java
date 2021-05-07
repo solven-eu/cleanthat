@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 
 import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;

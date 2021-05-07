@@ -28,18 +28,26 @@ import cormoran.pepper.collection.PepperMapHelper;
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
-public class CleanThatLambdaFunction extends ACleanThatXxxFunction {
+public class CleanThatWebhookLambdaFunction extends ACleanThatXxxFunction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatLambdaFunction.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatWebhookLambdaFunction.class);
 
 	public static void main(String[] args) {
-		SpringApplication.run(CleanThatLambdaFunction.class, args);
+		SpringApplication.run(CleanThatWebhookLambdaFunction.class, args);
 	}
 
 	@Bean
 	public Function<Map<String, ?>, Map<String, ?>> uppercase(ApplicationContext appContext) {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 
+		// https://aws.amazon.com/fr/premiumsupport/knowledge-center/custom-headers-api-gateway-lambda/
+		// We would benefit from seeing the headers from Github:
+		// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#webhook-payload-object-common-properties
+		// X-GitHub-Delivery: 77cc35f0-aea9-11eb-8dcd-63becf50aa7e
+		// X-GitHub-Event: pull_request
+		// X-GitHub-Hook-ID: 212898303
+		// X-GitHub-Hook-Installation-Target-ID: 65550
+		// X-GitHub-Hook-Installation-Target-Type: integration
 		return input -> {
 			Map<String, ?> functionOutput;
 

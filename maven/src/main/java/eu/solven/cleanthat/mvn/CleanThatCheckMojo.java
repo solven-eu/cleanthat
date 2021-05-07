@@ -34,7 +34,6 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 
 		ObjectMapper om = new ObjectMapper();
 
-		CodeProviderFormatter codeProviderFormatter = new CodeProviderFormatter(om, new JavaFormatter(om));
 		File pathToConfig = CodeProviderHelpers.pathToConfig(Paths.get("."));
 		CleanthatRepositoryProperties properties;
 		try {
@@ -42,6 +41,8 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Issue with configuration at " + pathToConfig, e);
 		}
+
+		CodeProviderFormatter codeProviderFormatter = new CodeProviderFormatter(om, new JavaFormatter(om));
 		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(Paths.get(".")));
 	}
 }

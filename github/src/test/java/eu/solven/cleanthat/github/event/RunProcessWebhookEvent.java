@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
@@ -13,7 +12,6 @@ import org.kohsuke.github.GHAppInstallationToken;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
@@ -22,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+// https://github.com/organizations/solven-eu/settings/apps/cleanthat/advanced
 public class RunProcessWebhookEvent {
 
 	// Relevant to rely on GitHub.offline()?
@@ -61,26 +60,10 @@ public class RunProcessWebhookEvent {
 		Mockito.when(installGithub.getRateLimit()).thenReturn(Mockito.mock(GHRateLimit.class));
 	}
 
-	@Ignore("Issue with GitHub mocking")
-	@Test
-	public void processTestOpenPR() throws JsonParseException, JsonMappingException, IOException {
-		GHUser ghUser = Mockito.mock(GHUser.class);
-		Mockito.doReturn(123456789L).when(ghUser).getId();
-		Mockito.when(pr.getUser()).thenReturn(ghUser);
-
-		Map<String, ?> input = objectMapper
-				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
-		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(pr);
-		handler.processWebhookBody(input, prCleaner);
-		Mockito.verify(repo).getPullRequest(2);
-		// Mockito.verify(prCleaner)
-		// .formatPR(Mockito.any(Optional.class), Mockito.eq(new AtomicInteger()), Mockito.eq(pr));
-	}
-
 	@Test
 	public void processTestPush() throws JsonParseException, JsonMappingException, IOException {
-		Map<String, ?> input =
-				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
+		Map<String, ?> input = objectMapper
+				.readValue(new ClassPathResource("/github/webhook/oneshot.json").getInputStream(), Map.class);
 		handler.processWebhookBody(input, prCleaner);
 	}
 }

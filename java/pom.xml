@@ -82,7 +82,7 @@
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
 			<!-- Beware, changing this version often lead to a change of actual formatting -->
-			<version>3.25.0</version>
+			<version>3.26.0</version>
 		</dependency>
 		<dependency>
 			<!-- Used to parse Eclipse XML config files -->

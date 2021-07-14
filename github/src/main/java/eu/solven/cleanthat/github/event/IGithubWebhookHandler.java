@@ -37,11 +37,11 @@ public interface IGithubWebhookHandler {
 	GithubWebhookRelevancyResult isWebhookEventRelevant(I3rdPartyWebhookEvent input);
 
 	/**
-	 * Online rejection of unrelevant events (e.g. there is no configuration file in the concerned branch). This can
+	 * Online rejection of irrelevant events (e.g. there is no configuration file in the concerned branch). This can
 	 * rely on the CodeProvider API to checkout single specific files (e.g. cleanthat configuration). It shall not clone
 	 * the report (or checkout a large number of individual files).
 	 * 
-	 * @param cleaner
+	 * @param codeCleanerFactory
 	 * 
 	 * @param input
 	 * @return

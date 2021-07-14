@@ -2,6 +2,12 @@ package eu.solven.cleanthat.github.event.pojo;
 
 import java.util.Optional;
 
+/**
+ * POJO indicating if an event has to be processed or not
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class WebhookRelevancyResult {
 	// If present, it means the webhook is relevant and here we provide the essence of the commit (e.g. is this a push
 	// to a ref, or a PR being open, or...)

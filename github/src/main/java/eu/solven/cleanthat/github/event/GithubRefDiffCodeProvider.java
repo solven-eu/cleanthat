@@ -2,8 +2,6 @@ package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +9,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -38,6 +33,8 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
  */
 public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 		implements IListOnlyModifiedFiles, ICodeProviderWriter {
+
+	private static final int LIMIT_COMMIT_IN_COMPARE = 250;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefDiffCodeProvider.class);
 
@@ -69,7 +66,7 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		GHCompare diff = diffSupplier.get();
 
-		if (diff.getTotalCommits() >= 250) {
+		if (diff.getTotalCommits() >= LIMIT_COMMIT_IN_COMPARE) {
 			// https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
 			LOGGER.warn("We are considering a diff of more than 250 Commits ({})", diff.getTotalCommits());
 		}

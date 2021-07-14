@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public interface ICodeProviderWriter extends ICodeProvider {
 
-	void commitIntoBranch(Map<String, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
+	void commitIntoBranch(Map<String, String> pathToMutatedContent,
+			List<String> prComments,
+			Collection<String> prLabels);
 
 }

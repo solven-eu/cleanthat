@@ -20,7 +20,6 @@ public interface IGithubRefCleaner {
 
 	/**
 	 * 
-	 * @param token
 	 * @param offlineResult
 	 * @param theRef
 	 * @return the ref to clean. Typically different to the input ref when we want to clean through a PR (e.g. not to

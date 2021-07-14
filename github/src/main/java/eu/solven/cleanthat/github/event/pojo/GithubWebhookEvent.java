@@ -9,6 +9,12 @@ import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
+/**
+ * a POJO holding details about Github webhooks
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 	final String xGithubEvent;
 	final String xGithubDelivery;

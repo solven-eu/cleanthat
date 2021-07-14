@@ -2,6 +2,12 @@ package eu.solven.cleanthat.github.event.pojo;
 
 import java.util.Optional;
 
+/**
+ * Holds details about a filter over an Event
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
 	final boolean prOpen;
 	final boolean pushBranch;

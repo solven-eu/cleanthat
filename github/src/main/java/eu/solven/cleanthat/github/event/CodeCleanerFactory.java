@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
+/**
+ * Factory for {@link IGithubRefCleaner}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class CodeCleanerFactory implements ICodeCleanerFactory {
 
 	final ObjectMapper objectMapper;

@@ -1,5 +1,11 @@
 package eu.solven.cleanthat.github.event.pojo;
 
+/**
+ * Details about events being filtered through cleanthat pipeline
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public interface IExternalWebhookRelevancyResult {
 
 	/**

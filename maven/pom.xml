@@ -26,6 +26,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<!-- Enables MavenProject and MavenSession -->
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<version>3.2.5</version>
+		</dependency>
+
 		<!-- dependencies to annotations -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
@@ -38,6 +45,15 @@
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>runnable</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<!-- https://maven.apache.org/plugin-testing/maven-plugin-testing-harness/getting-started/index.html -->
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>3.3.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -1,8 +1,13 @@
 package eu.solven.cleanthat.mvn;
 
+import java.io.File;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
 
 /**
  * The mojo doing actual cleaning
@@ -20,7 +25,18 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 
-		// SpringApplication.run(getClass(), null)
+		// getSession().getBas.getProjects().get(0).getBasedir()B
+
+		File baseFir = getProject().getBasedir();
+
+		// SpringApplication.run(getClass(), null);
+
+		// IGithubRefCleaner cleaner = new LocalCleaner();
+
+		// Process the root of current module
+		ICodeProviderWriter codeProvider = new LocalFolderCodeProvider(baseFir.toPath());
+
+		String configPath = getConfigPath();
 
 		// CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
 		// File pathToConfig = CodeProviderHelpers.pathToConfig(localFolder);

@@ -22,6 +22,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+
 public class TestGithubWebhookHandler {
 
 	// Relevant to rely on GitHub.offline()?
@@ -33,7 +35,7 @@ public class TestGithubWebhookHandler {
 
 	final GHPullRequest pr = Mockito.mock(GHPullRequest.class);
 
-	final IGithubPullRequestCleaner prCleaner = Mockito.mock(IGithubPullRequestCleaner.class);
+	final IGithubRefCleaner prCleaner = Mockito.mock(IGithubRefCleaner.class);
 
 	final GithubWebhookHandler handler = new GithubWebhookHandler(github, new ObjectMapper()) {
 
@@ -71,8 +73,8 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
 		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(pr);
-		handler.processWebhookBody(input, prCleaner);
-		Mockito.verify(repo).getPullRequest(2);
+		handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
+		// Mockito.verify(repo).getPullRequest(2);
 		// Mockito.verify(prCleaner)
 		// .formatPR(Mockito.any(Optional.class), Mockito.eq(new AtomicInteger()), Mockito.eq(pr));
 	}
@@ -81,6 +83,6 @@ public class TestGithubWebhookHandler {
 	public void processTestPush() throws JsonParseException, JsonMappingException, IOException {
 		Map<String, ?> input =
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
-		handler.processWebhookBody(input, prCleaner);
+		handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
 	}
 }

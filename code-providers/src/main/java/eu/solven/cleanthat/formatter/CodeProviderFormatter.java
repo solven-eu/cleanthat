@@ -28,6 +28,7 @@ import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
@@ -58,7 +59,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	@Override
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties, ICodeProvider pr) {
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties, ICodeProviderWriter pr) {
 		// A config change may be cleanthat.json
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
@@ -120,13 +121,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoRef(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		} else {
 			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoRef(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 		}
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}

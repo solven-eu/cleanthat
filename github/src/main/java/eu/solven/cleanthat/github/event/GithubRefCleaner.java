@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -29,101 +31,174 @@ import com.google.common.io.CharStreams;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.jgit.CommitContext;
+import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
 
 /**
- * Default for {@link IGithubPullRequestCleaner}
+ * Default for {@link IGithubRefCleaner}
  *
  * @author Benoit Lacelle
  */
-public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
-	public static final String REF_CONFIGURE = "cleanthat/configure";
+public class GithubRefCleaner implements IGithubRefCleaner {
+	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
 
-	private static final String KEY_SKIPPED = "skipped";
+	public static final String BRANCH_NAME_CONFIGURE = REF_DOMAIN_CLEANTHAT + "/configure";
+	public static final String PREFIX_REF_CLEANTHAT = "refs/heads/" + REF_DOMAIN_CLEANTHAT + "/";
+
+	// private static final String KEY_SKIPPED = "skipped";
 
 	// private static final String KEY_JAVA = "java";
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPullRequestCleaner.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	final ObjectMapper objectMapper;
+	final GithubAndToken githubAndToken;
 
 	final ICodeProviderFormatter formatterProvider;
 
-	public GithubPullRequestCleaner(ObjectMapper objectMapper, ICodeProviderFormatter formatterProvider) {
+	public GithubRefCleaner(ObjectMapper objectMapper,
+			ICodeProviderFormatter formatterProvider,
+			GithubAndToken githubAndToken) {
 		this.objectMapper = objectMapper;
 		this.formatterProvider = formatterProvider;
+		this.githubAndToken = githubAndToken;
+	}
+
+	// We may have no ref to clean (e.g. there is no cleanthat configuration, or the ref is excluded)
+	// We may have to clean current ref (e.g. a PR is open, and we want to clean the PR head)
+	// We may have to clean a different ref (e.g. a push to the main branch needs to be cleaned through a PR)
+	@Override
+	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result, GitRepoBranchSha1 theRef) {
+		String refUrl;
+
+		ICodeProvider codeProvider;
+		String ref = theRef.getRef();
+		try {
+			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
+			GHRef refObject = repo.getRef(ref);
+
+			refUrl = refObject.getUrl().toExternalForm();
+			codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+
+		Optional<Map<String, ?>> optConfigurationToUse;
+		if (optPrConfig.isEmpty()) {
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, refUrl);
+			return Optional.empty();
+		} else {
+			optConfigurationToUse = optPrConfig;
+		}
+		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
+		if (version.isEmpty()) {
+			LOGGER.warn("No version on configuration applying to PR {}", refUrl);
+			return Optional.empty();
+		} else if (!"2".equals(version.get())) {
+			LOGGER.warn("Version '{}' on configuration is not valid {}", version.get(), refUrl);
+			return Optional.empty();
+		}
+		Map<String, ?> prConfig = optConfigurationToUse.get();
+		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
+
+		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
+		// json/yaml/etc formatting)
+		migrateConfigurationCode(properties);
+
+		List<String> branchesToClean = properties.getMeta().getRefs().getBranches();
+
+		Optional<String> matchingRule =
+				branchesToClean.stream().filter(branchToClean -> Pattern.matches(branchToClean, ref)).findAny();
+
+		if (!matchingRule.isPresent()) {
+			return Optional.empty();
+		}
+		LOGGER.info("We want to clean {} due to rule {}", ref, matchingRule.get());
+
+		if (result.isPrOpen()) {
+			LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event", ref);
+			return Optional.of(ref);
+		} else if (result.isPushBranch()) {
+			// We never clean inplace: we'll have to open a dedicated ReviewRequest if necessary
+			String newBranchRef = PREFIX_REF_CLEANTHAT + UUID.randomUUID();
+
+			// We may open a branch later if it appears this branch is relevant
+			// String refToClean = codeProvider.openBranch(ref);
+			// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
+			return Optional.of(newBranchRef);
+		} else {
+			throw new IllegalStateException("Illegal state");
+		}
 	}
 
 	@Override
-	public Map<String, ?> formatPR(String token, CommitContext commitContext, Supplier<GHPullRequest> prSupplier) {
+	public Map<String, ?> formatPR(Supplier<GHPullRequest> prSupplier) {
 		GHPullRequest pr = prSupplier.get();
 
 		String prUrl = pr.getUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
 
-		ICodeProvider codeProvider = new GithubPRCodeProvider(token, pr);
+		ICodeProviderWriter codeProvider = new GithubPRCodeProvider(githubAndToken.getToken(), pr);
 
-		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
+		return formatCodeGivenConfig(codeProvider);
 	}
 
 	@Override
-	public Map<String, ?> formatRef(String token,
-			CommitContext commitContext,
-			GHRepository repo,
-			Supplier<GHRef> refSupplier) {
+	public Map<String, ?> formatRefDiff(GHRepository repo, Supplier<GHRef> baseSupplier, Supplier<GHRef> headSupplier) {
+		GHRef base = baseSupplier.get();
+		GHRef head = headSupplier.get();
+
+		LOGGER.info("Base: {} Head: {}", base.getRef(), head.getRef());
+
+		ICodeProviderWriter codeProvider = new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo, base, head);
+
+		return formatCodeGivenConfig(codeProvider);
+	}
+
+	@Override
+	public Map<String, ?> formatRef(GHRepository repo, Supplier<GHRef> refSupplier) {
 		GHRef ref = refSupplier.get();
 
 		String prUrl = ref.getUrl().toExternalForm();
 		LOGGER.info("Ref: {}", prUrl);
 
-		ICodeProvider codeProvider = new GithubRefCodeProvider(token, repo, ref);
+		ICodeProviderWriter codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, ref);
 
-		return formatCodeGivenConfig(commitContext, prUrl, codeProvider);
+		return formatCodeGivenConfig(codeProvider);
 	}
 
-	private Map<String, ?> formatCodeGivenConfig(CommitContext commitContext,
-			String prUrl,
-			ICodeProvider codeProvider) {
+	private Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider) {
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, prUrl);
-			return Collections.singletonMap(KEY_SKIPPED, "missing '" + CodeProviderHelpers.PATH_CLEANTHAT + "'");
+			throw new IllegalStateException("We should have thrown earlier");
 		} else {
 			optConfigurationToUse = optPrConfig;
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 		if (version.isEmpty()) {
-			LOGGER.info("No version on configuration applying to PR {}", prUrl);
-			return Collections.singletonMap(KEY_SKIPPED,
-					"missing 'version' in '" + CodeProviderHelpers.PATH_CLEANTHAT + "'");
+			throw new IllegalStateException("We should have thrown earlier");
 		} else if (!"2".equals(version.get())) {
-			LOGGER.info("Version '{}' on configuration is not valid {}", version.get(), prUrl);
-			return Collections.singletonMap(KEY_SKIPPED,
-					"Not handled 'version' in '" + CodeProviderHelpers.PATH_CLEANTHAT
-							+ "' (we accept only '2' for now)");
+			throw new IllegalStateException("We should have thrown earlier");
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
 
-		migrateConfigurationCode(properties);
-
-		if (commitContext.isCommitOnMainBranch() && !properties.getMeta().isCleanMainBranch()) {
-			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
-			return Map.of(KEY_SKIPPED, "Commit on main banch, but not allowed to mutate main_branch by configuration");
-		} else if (commitContext.isBranchWithoutPR() && properties.getMeta().isCleanOrphanBranches()) {
-			LOGGER.info("Skip this commit on main branch as configuration does not allow changes on main branch");
-			return Map.of(KEY_SKIPPED,
-					"Commit on orphan banch, but not allowed to mutate orphan_branch by configuration");
-		} else if (!properties.getMeta().isCleanPullRequests()) {
-			return Map.of(KEY_SKIPPED, "Commit on PR, but not allowed to mutate PR by configuration");
+		if (codeProvider instanceof IListOnlyModifiedFiles) {
+			// We are on a PR event, or a commit_push over a branch which is head of an open PR
+			LOGGER.info("About to clean a limitted set of files");
 		} else {
-			return formatCode(properties, codeProvider);
+			LOGGER.info("About to clean the whole repo");
 		}
+		return formatCode(properties, codeProvider);
 	}
 
 	/**
@@ -151,7 +226,7 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
 
-		String refName = REF_CONFIGURE;
+		String refName = BRANCH_NAME_CONFIGURE;
 		String fullRefName = "refs/heads/" + refName;
 
 		boolean refAlreadyExists;
@@ -243,7 +318,8 @@ public class GithubPullRequestCleaner implements IGithubPullRequestCleaner {
 		return body;
 	}
 
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProvider pr) {
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter pr) {
 		return formatterProvider.formatCode(properties, pr);
 	}
+
 }

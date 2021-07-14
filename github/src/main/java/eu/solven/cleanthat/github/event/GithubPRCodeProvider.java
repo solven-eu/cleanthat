@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 
 /**
@@ -29,7 +30,7 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
  *
  * @author Benoit Lacelle
  */
-public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOnlyModifiedFiles {
+public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOnlyModifiedFiles, ICodeProviderWriter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
@@ -68,7 +69,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	}
 
 	@Override
-	public void commitIntoRef(Map<String, String> pathToMutatedContent,
+	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// ,

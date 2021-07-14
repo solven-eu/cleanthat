@@ -1,16 +1,16 @@
 package eu.solven.cleanthat.github;
 
-import eu.solven.cleanthat.lambda.CleanThatWebhookLambdaFunction;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
 
 /**
- * Equivalent of {@link CleanThatWebhookLambdaFunction}, but in the test classpath, which has
+ * Equivalent of {@link CheckWebhooksLambdaFunction}, but in the test classpath, which has
  * spring-cloud-function-starter-web in addition
  *
  * @author Benoit Lacelle
  */
-public class DebugCleanThatLambdaFunction extends CleanThatWebhookLambdaFunction {
+public class DebugCleanThatLambdaFunction extends CheckWebhooksLambdaFunction {
 
 	public static void main(String[] args) {
-		CleanThatWebhookLambdaFunction.main(args);
+		CheckWebhooksLambdaFunction.main(args);
 	}
 }

@@ -19,5 +19,12 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		getLog().info("Hello, world.");
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
+
+		// SpringApplication.run(getClass(), null)
+
+		// CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
+		// File pathToConfig = CodeProviderHelpers.pathToConfig(localFolder);
+		// CleanthatRepositoryProperties properties =
+		// appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
 	}
 }

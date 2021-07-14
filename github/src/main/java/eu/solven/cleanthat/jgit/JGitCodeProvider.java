@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.github.event.AGithubCodeProvider;
 
 /**
@@ -48,7 +49,7 @@ import eu.solven.cleanthat.github.event.AGithubCodeProvider;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class JGitCodeProvider extends AGithubCodeProvider {
+public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProviderWriter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JGitCodeProvider.class);
 
@@ -186,7 +187,7 @@ public class JGitCodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoRef(Map<String, String> pathToMutatedContent,
+	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// , Optional<String> targetBranch

@@ -1,20 +1,10 @@
 package eu.solven.cleanthat.lambda;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 
-import com.nimbusds.jose.JOSEException;
-
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
-import eu.solven.cleanthat.github.GithubSpringConfig;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
-import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import io.sentry.Sentry;
 
 /**
@@ -23,24 +13,18 @@ import io.sentry.Sentry;
  * @author Benoit Lacelle
  *
  */
-@SpringBootApplication(scanBasePackages = "none")
-@Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
-public class ACleanThatXxxFunction {
-	public static void main(String[] args) {
-		SpringApplication.run(ACleanThatXxxFunction.class, args);
-	}
+public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 
-	protected Map<String, ?> processOneMessage(ApplicationContext appContext, Map<String, ?> input) {
-		GithubWebhookHandlerFactory githubFactory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
-
+	protected final Map<String, ?> processOneEvent(ApplicationContext appContext, IWebhookEvent input) {
 		try {
-			// TODO Cache the Github instance for the JWT duration
-			return githubFactory.makeWithFreshJwt().processWebhookBody(input, cleaner);
-		} catch (IOException | JOSEException | RuntimeException e) {
+			return unsafeProcessOneEvent(appContext, input);
+		} catch (RuntimeException e) {
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");
 			throw wrapped;
 		}
 	}
+
+	protected abstract Map<String, ?> unsafeProcessOneEvent(ApplicationContext appContext, IWebhookEvent input);
+
 }

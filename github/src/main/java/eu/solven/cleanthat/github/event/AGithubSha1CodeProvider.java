@@ -25,6 +25,7 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 
 /**
@@ -32,7 +33,7 @@ import eu.solven.cleanthat.jgit.JGitCodeProvider;
  *
  * @author Benoit Lacelle
  */
-public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider {
+public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implements ICodeProviderWriter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProvider.class);
 
 	private static final int MAX_FILE_BEFORE_CLONING = 512;
@@ -118,7 +119,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider {
 	}
 
 	@Override
-	public void commitIntoRef(Map<String, String> pathToMutatedContent,
+	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// ,

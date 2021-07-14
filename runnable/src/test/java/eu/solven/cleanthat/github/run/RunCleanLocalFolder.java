@@ -21,9 +21,9 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
-import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
+import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
-public class RunCleanLocalFolder extends ACleanThatXxxFunction {
+public class RunCleanLocalFolder extends ACleanThatXxxApplication {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanLocalFolder.class);
 
 	final Resource currentRepoSomeFile = new ClassPathResource("/logback.xml");

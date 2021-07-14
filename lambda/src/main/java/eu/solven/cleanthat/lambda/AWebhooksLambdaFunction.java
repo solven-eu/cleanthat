@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +18,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -28,16 +30,12 @@ import cormoran.pepper.collection.PepperMapHelper;
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
-public class CleanThatWebhookLambdaFunction extends ACleanThatXxxFunction {
+public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatWebhookLambdaFunction.class);
-
-	public static void main(String[] args) {
-		SpringApplication.run(CleanThatWebhookLambdaFunction.class, args);
-	}
+	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	@Bean
-	public Function<Map<String, ?>, Map<String, ?>> uppercase(ApplicationContext appContext) {
+	public Function<Map<String, ?>, Map<String, ?>> ingressRawWebhook(ApplicationContext appContext) {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 
 		// https://aws.amazon.com/fr/premiumsupport/knowledge-center/custom-headers-api-gateway-lambda/
@@ -62,6 +60,11 @@ public class CleanThatWebhookLambdaFunction extends ACleanThatXxxFunction {
 				List<?> output = records.stream().map(r -> {
 					String body = PepperMapHelper.getRequiredString(r, "body");
 
+					Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
+					if (messageAttributes.isPresent()) {
+						LOGGER.info("Attributes: {}", messageAttributes);
+					}
+
 					// SQS transfer the body 'as is'
 					try {
 						return (Map<String, ?>) objectMapper.readValue(body, Map.class);
@@ -70,10 +73,25 @@ public class CleanThatWebhookLambdaFunction extends ACleanThatXxxFunction {
 						LOGGER.warn("Issue while parsing body", e);
 						return Collections.<String, Object>emptyMap();
 					}
-				}).filter(m -> !m.isEmpty()).map(r -> processOneMessage(appContext, r)).collect(Collectors.toList());
+				}).filter(m -> !m.isEmpty()).map(r -> {
+					try {
+						return processOneEvent(appContext, new GithubWebhookEvent(r));
+					} catch (RuntimeException e) {
+						LOGGER.warn("Issue with one message of a batch of " + records.size() + " messages", e);
+						return Collections.singletonMap("ARG", e.getMessage());
+					}
+				}).collect(Collectors.toList());
 				functionOutput = Map.of("sqs", output);
 			} else {
-				functionOutput = processOneMessage(appContext, input);
+				IWebhookEvent event;
+				if (input.containsKey("body") && input.containsKey("headers")) {
+					// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
+					event = null;
+				} else {
+					event = new GithubWebhookEvent(input);
+				}
+
+				functionOutput = processOneEvent(appContext, event);
 			}
 
 			LOGGER.info("Output: {}", functionOutput);

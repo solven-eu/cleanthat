@@ -9,8 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
+import eu.solven.cleanthat.github.event.CodeCleanerFactory;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.github.event.ICodeCleanerFactory;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}
@@ -37,8 +38,7 @@ public class GithubSpringConfig {
 	}
 
 	@Bean
-	public GithubPullRequestCleaner githubPullRequestCleaner(ObjectMapper objectMapper,
-			ICodeProviderFormatter formatterProvider) {
-		return new GithubPullRequestCleaner(objectMapper, formatterProvider);
+	public ICodeCleanerFactory codeCleanerFactory(ObjectMapper objectMapper, ICodeProviderFormatter formatterProvider) {
+		return new CodeCleanerFactory(objectMapper, formatterProvider);
 	}
 }

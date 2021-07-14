@@ -27,13 +27,13 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
-import eu.solven.cleanthat.github.event.GithubPullRequestCleaner;
+import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.jgit.CommitContext;
-import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
+import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
-public class RunCleanGithubPullRequest extends ACleanThatXxxFunction {
+public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPullRequest.class);
 
@@ -68,7 +68,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxFunction {
 		GitHub github = githubAndToken.getGithub();
 		GitHub userToServerGithub = handler.getGithubAsApp();
 
-		GithubPullRequestCleaner cleaner = appContext.getBean(GithubPullRequestCleaner.class);
+		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHRepository repo;
 		try {
 			repo = github.getRepository(repoFullName);
@@ -86,7 +86,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxFunction {
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
 
 		if (mainBranchConfig.isEmpty()) {
-			String configureRef = GithubPullRequestCleaner.REF_CONFIGURE;
+			String configureRef = GithubRefCleaner.BRANCH_NAME_CONFIGURE;
 			LOGGER.info("CleanThat is not configured in the main branch ({}). Try switching to {}",
 					defaultBranch.getName(),
 					configureRef);
@@ -121,14 +121,11 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxFunction {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			Map<String, ?> output = cleaner.formatRef(githubAndToken.getToken(),
-					new CommitContext(false, false),
-					repo,
-					Suppliers.memoize(() -> {
-						GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
-						createdPr.set(pr);
-						return pr;
-					}));
+			Map<String, ?> output = cleaner.formatRef(repo, Suppliers.memoize(() -> {
+				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
+				createdPr.set(pr);
+				return pr;
+			}));
 
 			if (createdPr.get() == null) {
 				LOGGER.info("Not a single file has been impacted");

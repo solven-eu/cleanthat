@@ -17,7 +17,9 @@
 		<module>parent</module>
 
 		<module>code-providers</module>
+		<module>git</module>
 		<module>github</module>
+		<module>gitlab</module>
 
 		<module>config</module>
 

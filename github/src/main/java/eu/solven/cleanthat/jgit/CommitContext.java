@@ -5,6 +5,7 @@ package eu.solven.cleanthat.jgit;
  *
  * @author Benoit Lacelle
  */
+@Deprecated
 public class CommitContext {
 
 	final boolean commitOnMainBranch;

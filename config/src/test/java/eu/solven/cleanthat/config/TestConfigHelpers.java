@@ -1,7 +1,9 @@
 package eu.solven.cleanthat.config;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,22 +28,28 @@ public class TestConfigHelpers {
 		ObjectMapper jsonObjectMapper = new ObjectMapper();
 		ConfigHelpers configHelpers = new ConfigHelpers(jsonObjectMapper);
 
-		CleanthatRepositoryProperties config =
-				configHelpers.loadRepoConfig(new ClassPathResource("/config/simple_as_json.json"));
+		// 'default_as_json' case is not satisfying as we have null in its yaml version
+		Stream.of("simple_as_json", "default_as_json").forEach(name -> {
+			try {
+				CleanthatRepositoryProperties config =
+						configHelpers.loadRepoConfig(new ClassPathResource("/config/" + name + ".json"));
+				ObjectMapper yamlObjectMapper =
+						new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER));
+				String asYaml = yamlObjectMapper.writeValueAsString(config);
 
-		ObjectMapper yamlObjectMapper = new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER));
-		String asYaml = yamlObjectMapper.writeValueAsString(config);
+				LOGGER.debug("Config as yaml: {}{}{}{}{}",
+						System.lineSeparator(),
+						"------",
+						asYaml,
+						System.lineSeparator(),
+						"------");
 
-		LOGGER.debug("Config as yaml: {}{}{}{}{}",
-				System.lineSeparator(),
-				"------",
-				asYaml,
-				System.lineSeparator(),
-				"------");
-
-		Assert.assertEquals(
-				StreamUtils.copyToString(new ClassPathResource("/config/simple_as_json.to_yaml.yaml").getInputStream(),
-						StandardCharsets.UTF_8),
-				asYaml);
+				Assert.assertEquals(StreamUtils.copyToString(
+						new ClassPathResource("/config/" + name + ".to_yaml.yaml").getInputStream(),
+						StandardCharsets.UTF_8), asYaml);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue with: " + name, e);
+			}
+		});
 	}
 }

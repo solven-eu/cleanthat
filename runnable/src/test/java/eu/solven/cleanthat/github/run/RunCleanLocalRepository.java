@@ -19,9 +19,9 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
-import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
+import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
-public class RunCleanLocalRepository extends ACleanThatXxxFunction {
+public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 	public static void main(String[] args) {
 		SpringApplication springApp = new SpringApplication(RunCleanLocalRepository.class);
 

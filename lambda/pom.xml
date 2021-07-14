@@ -34,6 +34,12 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dynamodb -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-dynamodb</artifactId>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
 			<!-- Else failure in SimpleFunctionRegistry$FunctionInvocationWrapper.isJson(SimpleFunctionRegistry.java:850) -->
@@ -45,6 +51,12 @@
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Used to trigger Lambda from Lambda -->
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-lambda</artifactId>
 		</dependency>
 
 		<dependency>
@@ -153,7 +165,26 @@
 					<forceUpdate>true</forceUpdate>
 					<lambdaFunctions>
 						<lambdaFunction>
-							<functionName>webhookReceiver</functionName>
+							<functionName>checkEventIsRelevant</functionName>
+							<handler>eu.solven.cleanthat.lambda.step0_checkWebhook.CheckWebhooksHandler</handler>
+							<!-- MB -->
+							<memorySize>512</memorySize>
+							<!-- Startup can take up to 30 seconds -->
+							<!-- Filtering for valid webhook should be quite fast -->
+							<timeout>60</timeout>
+						</lambdaFunction>
+
+						<lambdaFunction>
+							<functionName>checkRepositoryIsConfigured</functionName>
+							<handler>eu.solven.cleanthat.lambda.CleanThatWebhookHandler</handler>
+							<!-- MB -->
+							<memorySize>512</memorySize>
+							<!-- Startup can take up to 30 seconds -->
+							<timeout>90</timeout>
+						</lambdaFunction>
+
+						<lambdaFunction>
+							<functionName>cleanGivenConfiguration</functionName>
 							<handler>eu.solven.cleanthat.lambda.CleanThatWebhookHandler</handler>
 							<!-- MB -->
 							<memorySize>512</memorySize>

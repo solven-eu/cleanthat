@@ -3,7 +3,6 @@ package eu.solven.cleanthat.github;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -15,55 +14,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CleanthatMetaProperties {
 
-	// Are we allowed to mutate pull-requests, or should we wait for a merge in master before cleaning master?
-	// This option will clean ONLY the files modified within the PR (or all files if cleanthat configuration is
-	// modified)
-	// Default: it is OK to mutate PR before they are merged
-	private boolean cleanPullRequests = true;
-
-	// TODO We could offer to input a list of branches to keep clean
-	// Are we allowed to mutate the main branch, or should we create a pull-request/merge-request
-	// private boolean commitMainBranch = false;
-	// Should we create pull-requests/merge-requests to clean the main branch?
-	private boolean cleanMainBranch = true;
-
-	// Are we allowed to mutate the branches which has not PR, or should we wait for a PR?
-	// We prefer not to open PR to clean (not-main) branches, to prevent opening too many PRs, which may be out of the
-	// branch committer radar
-	// Default: false as, as of 2020-10, the feature is not implemented yet
-	private boolean cleanOrphanBranches = false;
-
 	// The labels to apply to created PRs
 	private List<String> labels = Arrays.asList();
 
-	// https://stackoverflow.com/questions/19564711/json-jackson-parse-different-keys-into-same-field
-	// TODO Enable update of these deprecated aliases dring the PR
-	@JsonAlias({ "commit_pull_requests" })
-	public boolean isCleanPullRequests() {
-		return cleanPullRequests;
-	}
-
-	public void setCleanPullRequests(boolean cleanPullRequests) {
-		this.cleanPullRequests = cleanPullRequests;
-	}
-
-	@JsonAlias({ "commit_main_branch" })
-	public boolean isCleanMainBranch() {
-		return cleanMainBranch;
-	}
-
-	// TODO It is unclear if we will clean in-place, or through a PR
-	public void setCleanMainBranch(boolean cleanMainBranch) {
-		this.cleanMainBranch = cleanMainBranch;
-	}
-
-	public boolean isCleanOrphanBranches() {
-		return cleanOrphanBranches;
-	}
-
-	public void setCleanOrphanBranches(boolean cleanOrphanBranches) {
-		this.cleanOrphanBranches = cleanOrphanBranches;
-	}
+	private CleanthatRefFilterProperties refs;
 
 	public List<String> getLabels() {
 		return labels;
@@ -72,4 +26,13 @@ public class CleanthatMetaProperties {
 	public void setLabels(List<String> labels) {
 		this.labels = List.copyOf(labels);
 	}
+
+	public CleanthatRefFilterProperties getRefs() {
+		return refs;
+	}
+
+	public void setRefs(CleanthatRefFilterProperties refs) {
+		this.refs = refs;
+	}
+
 }

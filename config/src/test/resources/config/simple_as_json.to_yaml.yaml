@@ -1,10 +1,10 @@
 syntax_version: "2"
 meta:
-  clean_pull_requests: true
-  clean_main_branch: true
-  clean_orphan_branches: false
   labels:
   - "cleanthat"
+  refs:
+    branches:
+    - "master"
 languages:
 - language: "java"
   language_version: "11"

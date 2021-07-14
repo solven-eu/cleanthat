@@ -20,6 +20,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
+
 // https://github.com/organizations/solven-eu/settings/apps/cleanthat/advanced
 public class RunProcessWebhookEvent {
 
@@ -32,7 +35,7 @@ public class RunProcessWebhookEvent {
 
 	final GHPullRequest pr = Mockito.mock(GHPullRequest.class);
 
-	final IGithubPullRequestCleaner prCleaner = Mockito.mock(IGithubPullRequestCleaner.class);
+	final IGithubRefCleaner prCleaner = Mockito.mock(IGithubRefCleaner.class);
 
 	final GithubWebhookHandler handler = new GithubWebhookHandler(github, new ObjectMapper()) {
 
@@ -64,6 +67,7 @@ public class RunProcessWebhookEvent {
 	public void processTestPush() throws JsonParseException, JsonMappingException, IOException {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook/oneshot.json").getInputStream(), Map.class);
-		handler.processWebhookBody(input, prCleaner);
+
+		GithubWebhookRelevancyResult result = handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
 	}
 }

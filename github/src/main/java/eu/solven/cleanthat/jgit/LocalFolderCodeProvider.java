@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 
 /**
@@ -29,7 +30,7 @@ import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class LocalFolderCodeProvider implements ICodeProvider {
+public class LocalFolderCodeProvider implements ICodeProviderWriter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
@@ -80,7 +81,7 @@ public class LocalFolderCodeProvider implements ICodeProvider {
 	}
 
 	@Override
-	public void commitIntoRef(Map<String, String> pathToMutatedContent,
+	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((path, content) -> {

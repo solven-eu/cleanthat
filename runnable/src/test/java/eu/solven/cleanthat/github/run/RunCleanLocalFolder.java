@@ -64,6 +64,6 @@ public class RunCleanLocalFolder extends ACleanThatXxxApplication {
 		File pathToConfig = CodeProviderHelpers.pathToConfig(localFolder);
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
-		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(localFolder));
+		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(localFolder), false);
 	}
 }

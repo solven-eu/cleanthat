@@ -49,17 +49,19 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private static final int CORES_FORMATTER = 16;
 	private static final int MAX_LOG_MANY_FILES = 128;
 
-	final ObjectMapper objectMapper;
+	final List<ObjectMapper> objectMappers;
 
 	final IStringFormatter formatter;
 
-	public CodeProviderFormatter(ObjectMapper objectMapper, IStringFormatter formatter) {
-		this.objectMapper = objectMapper;
+	public CodeProviderFormatter(List<ObjectMapper> objectMappers, IStringFormatter formatter) {
+		this.objectMappers = objectMappers;
 		this.formatter = formatter;
 	}
 
 	@Override
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties, ICodeProviderWriter pr) {
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties,
+			ICodeProviderWriter pr,
+			boolean dryRun) {
 		// A config change may be cleanthat.json
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
@@ -81,15 +83,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				throw new UncheckedIOException("Issue while checking for config change", e);
 			}
 		} else {
-			// We are in a branch: all files are candidates, which makes too many files to iterate over them here
-			// https://www.baeldung.com/jgit
-			// try {
-			// Git git = pr.makeGitRepo();
-			// } catch (RuntimeException e) {
-			// throw new IllegalStateException("Issue while cloning the repository");
-			// }
-
-			throw new IllegalStateException("TODO");
+			// We are in a branch (but no base-branch as reference): meaningless to check for config change, and anyway
+			// we will clean everything
 		}
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
@@ -121,20 +116,28 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			if (dryRun) {
+				LOGGER.info("Skip persisting changes as dryRun=true");
+			} else {
+				pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			}
 		} else {
 			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
 					pr.getHtmlUrl(),
 					pr.getTitle());
-			pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			if (dryRun) {
+				LOGGER.info("Skip persisting changes as dryRun=true");
+			} else {
+				pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			}
 		}
 		return new LinkedHashMap<>(languagesCounters.asMap());
 	}
 
 	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
 			Map<String, ?> dirtyLanguageConfig) {
-		ConfigHelpers configHelpers = new ConfigHelpers(objectMapper);
+		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
 		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
 

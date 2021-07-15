@@ -52,10 +52,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 
 	final GithubAndToken githubAndToken;
 
-	public GithubRefCleaner(ObjectMapper objectMapper,
+	public GithubRefCleaner(List<ObjectMapper> objectMappers,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken) {
-		super(objectMapper, formatterProvider);
+		super(objectMappers, formatterProvider);
 		this.githubAndToken = githubAndToken;
 	}
 
@@ -138,7 +138,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 
 		ICodeProviderWriter codeProvider = new GithubPRCodeProvider(githubAndToken.getToken(), pr);
 
-		return formatCodeGivenConfig(codeProvider);
+		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	@Override
@@ -150,7 +150,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 
 		ICodeProviderWriter codeProvider = new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo, base, head);
 
-		return formatCodeGivenConfig(codeProvider);
+		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 
 		ICodeProviderWriter codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, ref);
 
-		return formatCodeGivenConfig(codeProvider);
+		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {

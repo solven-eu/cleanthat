@@ -3,6 +3,7 @@ package eu.solven.cleanthat.github.event;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GitHub;
@@ -37,11 +38,11 @@ public class GithubWebhookHandlerFactory {
 
 	final Environment env;
 
-	final ObjectMapper objectMapper;
+	final List<ObjectMapper> objectMappers;
 
-	public GithubWebhookHandlerFactory(Environment env, ObjectMapper objectMapper) {
+	public GithubWebhookHandlerFactory(Environment env, List<ObjectMapper> objectMappers) {
 		this.env = env;
-		this.objectMapper = objectMapper;
+		this.objectMappers = objectMappers;
 	}
 
 	public IGithubWebhookHandler makeWithFreshJwt() throws IOException, JOSEException {
@@ -49,7 +50,7 @@ public class GithubWebhookHandlerFactory {
 				// This leads to 401. Why?
 				// .withRateLimitChecker(new NoWaitRateLimitChecker())
 				.build();
-		return new GithubWebhookHandler(github, objectMapper);
+		return new GithubWebhookHandler(github, objectMappers);
 	}
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature

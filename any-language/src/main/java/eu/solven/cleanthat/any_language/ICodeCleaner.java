@@ -6,6 +6,6 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 public interface ICodeCleaner {
 
-	Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider);
+	Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun);
 
 }

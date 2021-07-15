@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
@@ -11,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.env.MockEnvironment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 
 // https://github-api.kohsuke.org/githubappjwtauth.html
@@ -38,7 +39,8 @@ public class RunGenerateGithubJwt {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("github.app.app-id", GithubWebhookHandlerFactory.GITHUB_DEFAULT_APP_ID);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
-		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env, new ObjectMapper());
+		GithubWebhookHandlerFactory factory =
+				new GithubWebhookHandlerFactory(env, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()));
 		GitHub gitHubApp = factory.makeWithFreshJwt().getGithubAsApp();
 		GHApp app = gitHubApp.getApp();
 		app.listInstallations().forEach(install -> {

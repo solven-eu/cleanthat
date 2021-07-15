@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -42,13 +43,13 @@ public class TestJavaFormatter_Revelc {
 	final JavaFormatter formatter = new JavaFormatter(objectMapper);
 
 	private ILanguageProperties getLanguageProperties() throws IOException, JsonParseException, JsonMappingException {
-		CleanthatRepositoryProperties properties = new ConfigHelpers(objectMapper)
+		CleanthatRepositoryProperties properties = new ConfigHelpers(Arrays.asList(objectMapper))
 				.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
 
 		List<Map<String, ?>> languages = properties.getLanguages();
 		Assert.assertEquals(1, languages.size());
 		ILanguageProperties languageP =
-				new ConfigHelpers(objectMapper).mergeLanguageProperties(properties, languages.get(0));
+				new ConfigHelpers(Arrays.asList(objectMapper)).mergeLanguageProperties(properties, languages.get(0));
 		return languageP;
 	}
 

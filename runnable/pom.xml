@@ -14,7 +14,9 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<!-- Unclear if we do need a webServer (i.e. Tomcat) or not -->
+			<!-- <artifactId>spring-boot-starter-web</artifactId> -->
+			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
 		<!-- https://docs.sentry.io/platforms/java/guides/spring-boot/ -->

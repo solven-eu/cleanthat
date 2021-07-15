@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.any_language;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,20 +26,20 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 public abstract class ACodeCleaner implements ICodeCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
 
-	final ObjectMapper objectMapper;
+	final List<ObjectMapper> objectMappers;
 	final ICodeProviderFormatter formatterProvider;
 
-	public ACodeCleaner(ObjectMapper objectMapper, ICodeProviderFormatter formatterProvider) {
-		this.objectMapper = objectMapper;
+	public ACodeCleaner(List<ObjectMapper> objectMappers, ICodeProviderFormatter formatterProvider) {
+		this.objectMappers = objectMappers;
 		this.formatterProvider = formatterProvider;
 	}
 
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter pr) {
-		return formatterProvider.formatCode(properties, pr);
+	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter pr, boolean dryRun) {
+		return formatterProvider.formatCode(properties, pr, dryRun);
 	}
 
 	@Override
-	public Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider) {
+	public Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 
 		Optional<Map<String, ?>> optConfigurationToUse;
@@ -62,7 +63,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		} else {
 			LOGGER.info("About to clean the whole repo");
 		}
-		return formatCode(properties, codeProvider);
+		return formatCode(properties, codeProvider, dryRun);
 	}
 
 	/**
@@ -75,12 +76,15 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	protected CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
+		// Whatever objectMapper is OK as we do not transcode into json/yaml
+		ObjectMapper objectMapper = objectMappers.get(0);
+
 		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
 	}
 
 	protected Optional<Map<String, ?>> safeConfig(ICodeProvider codeProvider) {
 		try {
-			return new CodeProviderHelpers(objectMapper).unsafeConfig(codeProvider);
+			return new CodeProviderHelpers(objectMappers).unsafeConfig(codeProvider);
 		} catch (RuntimeException e) {
 			LOGGER.warn("Issue loading the configuration", e);
 			return Optional.empty();

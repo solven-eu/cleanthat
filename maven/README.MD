@@ -5,3 +5,8 @@ Can be tested with:
 Can be rebuild through:
 
     mvn install -pl :cleanthat-maven-plugin
+    
+If cleanthat dependencies are outdates:
+
+    mvn install -PskipStyle -DskipITs -pl :cleanthat-maven-plugin -am -DskipTests
+

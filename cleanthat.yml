@@ -1,15 +1,10 @@
 syntax_version: "2"
 meta:
-  clean_pull_requests: true
-  clean_main_branch: true
-  clean_orphan_branches: false
   labels:
   - "cleanthat"
-  references:
-    - if_open_review_request_head: true
-      then_clean: in_place
-    - if_reference_matches: 'refs/heads/*'
-      then_clean: in_review_request
+  refs:
+    branches:
+      - master
 source_code:
   excludes:
   - "regex:.*/generated/.*"

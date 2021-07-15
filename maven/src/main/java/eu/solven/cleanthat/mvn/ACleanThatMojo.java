@@ -20,11 +20,16 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
 	private MavenSession session;
 
-	@Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
+	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
+	@Parameter(property = "cleanthat.configPath", defaultValue = "${maven.multiModuleProjectDirectory}/cleanthat.yaml")
 	private String configPath;
 
 	@Parameter(property = "cleanthat.configUrl")
 	private String configUrl;
+
+	// Useful to check what are the expected impacts without actually changing project files
+	@Parameter(property = "cleanthat.dryRun", defaultValue = "false")
+	private boolean dryRun;
 
 	public MavenProject getProject() {
 		return project;
@@ -40,5 +45,9 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	public String getConfigUrl() {
 		return configUrl;
+	}
+
+	public boolean isDryRun() {
+		return dryRun;
 	}
 }

@@ -3,6 +3,7 @@ package eu.solven.cleanthat.mvn;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -11,6 +12,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -32,7 +34,7 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 
-		ObjectMapper om = new ObjectMapper();
+		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 
 		File pathToConfig = CodeProviderHelpers.pathToConfig(Paths.get("."));
 		CleanthatRepositoryProperties properties;
@@ -42,7 +44,8 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 			throw new IllegalArgumentException("Issue with configuration at " + pathToConfig, e);
 		}
 
-		CodeProviderFormatter codeProviderFormatter = new CodeProviderFormatter(om, new JavaFormatter(om));
-		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(Paths.get(".")));
+		CodeProviderFormatter codeProviderFormatter =
+				new CodeProviderFormatter(Arrays.asList(om), new JavaFormatter(om));
+		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(Paths.get(".")), false);
 	}
 }

@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.event.pojo.GitPrHeadRef;
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
@@ -49,11 +51,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
 
 	final GitHub github;
-	final ObjectMapper objectMapper;
+	final List<ObjectMapper> objectMappers;
 
-	public GithubWebhookHandler(GitHub github, ObjectMapper objectMapper) {
+	public GithubWebhookHandler(GitHub github, List<ObjectMapper> objectMappers) {
 		this.github = github;
-		this.objectMapper = objectMapper;
+		this.objectMappers = objectMappers;
 	}
 
 	@Override
@@ -267,7 +269,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// We log the payload temporarily, in order to have easy access to metadata
 		if (!GCInspector.inUnitTest()) {
 			try {
-				LOGGER.info("TMP payload: {}", objectMapper.writeValueAsString(input));
+				LOGGER.info("TMP payload: {}", ConfigHelpers.getJson(objectMappers).writeValueAsString(input));
 			} catch (JsonProcessingException e) {
 				LOGGER.warn("Issue while printing the json of the webhook", e);
 			}

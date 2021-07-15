@@ -65,12 +65,29 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
+					<!-- We dropped the web aspect in this dependency: REMOVE THIS EXCLUSION -->
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-web</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- Excluded as we rely on a org.slf4j.impl.MavenSimpleLogger -->
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<!-- Excluded as we rely on a org.slf4j.impl.MavenSimpleLogger -->
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
 			<!-- https://maven.apache.org/plugin-testing/maven-plugin-testing-harness/getting-started/index.html -->

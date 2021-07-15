@@ -1,6 +1,7 @@
 package github.it;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class ITGithubPullRequestCleaner {
 	GithubWebhookHandlerFactory factory;
 
 	@Autowired
-	ObjectMapper objectMapper;
+	List<ObjectMapper> objectMappers;
 	@Autowired
 	ICodeProviderFormatter codeProviderFormatter;
 
@@ -49,7 +50,7 @@ public class ITGithubPullRequestCleaner {
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getAppId());
 
-		cleaner = new GithubRefCleaner(objectMapper, codeProviderFormatter, githubForRepo);
+		cleaner = new GithubRefCleaner(objectMappers, codeProviderFormatter, githubForRepo);
 
 		GitHub installationGithub = githubForRepo.getGithub();
 		cleaner.openPRWithCleanThatStandardConfiguration(installationGithub,

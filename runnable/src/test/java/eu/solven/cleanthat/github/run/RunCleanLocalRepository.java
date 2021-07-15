@@ -45,7 +45,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
-		codeProviderFormatter.formatCode(properties, codeProvider);
+		codeProviderFormatter.formatCode(properties, codeProvider, false);
 	}
 
 }

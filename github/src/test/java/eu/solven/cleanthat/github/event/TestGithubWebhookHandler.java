@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Before;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
 
 public class TestGithubWebhookHandler {
@@ -37,13 +39,14 @@ public class TestGithubWebhookHandler {
 
 	final IGithubRefCleaner prCleaner = Mockito.mock(IGithubRefCleaner.class);
 
-	final GithubWebhookHandler handler = new GithubWebhookHandler(github, new ObjectMapper()) {
+	final GithubWebhookHandler handler =
+			new GithubWebhookHandler(github, Arrays.asList(ConfigHelpers.makeJsonObjectMapper())) {
 
-		@Override
-		protected GitHub makeInstallationGithub(String token) throws IOException {
-			return installGithub;
-		}
-	};
+				@Override
+				protected GitHub makeInstallationGithub(String token) throws IOException {
+					return installGithub;
+				}
+			};
 
 	final ObjectMapper objectMapper = new ObjectMapper();
 

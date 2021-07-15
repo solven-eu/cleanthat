@@ -7,10 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.config.ConfigHelpers;
 
 /**
  * Helpers working for any {@link ICodeProvider}
@@ -32,23 +35,34 @@ public class CodeProviderHelpers {
 
 	// public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
-	protected ObjectMapper objectMapper;
+	protected List<ObjectMapper> objectMappers;
 
-	public CodeProviderHelpers(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+	public CodeProviderHelpers(List<ObjectMapper> objectMappers) {
+		this.objectMappers = objectMappers;
 	}
 
 	// TODO Get the merged configuration head -> base
 	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
 		Optional<String> optContent;
+		AtomicReference<String> name = new AtomicReference<>();
 		optContent = PATH_CLEANTHAT.stream().map(p -> {
 			try {
 				return codeProvider.loadContentForPath(p);
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e);
+			} finally {
+				name.set(p);
 			}
 		}).flatMap(Optional::stream).findFirst();
+
+		ObjectMapper objectMapper;
+		if (name.get().endsWith("json")) {
+			objectMapper = ConfigHelpers.getJson(objectMappers);
+		} else {
+			objectMapper = ConfigHelpers.getYaml(objectMappers);
+		}
+
 		return optContent.map(content -> {
 			try {
 				return objectMapper.readValue(content, Map.class);

@@ -12,6 +12,8 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
  */
 public interface ICodeProviderFormatter {
 
-	Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter codeProvider);
+	Map<String, ?> formatCode(CleanthatRepositoryProperties properties,
+			ICodeProviderWriter codeProvider,
+			boolean dryRun);
 
 }

@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.github.event;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -12,18 +14,18 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
  */
 public class CodeCleanerFactory implements ICodeCleanerFactory {
 
-	final ObjectMapper objectMapper;
+	final List<ObjectMapper> objectMappers;
 	final ICodeProviderFormatter formatterProvider;
 
-	public CodeCleanerFactory(ObjectMapper objectMapper, ICodeProviderFormatter formatterProvider) {
-		this.objectMapper = objectMapper;
+	public CodeCleanerFactory(List<ObjectMapper> objectMappers, ICodeProviderFormatter formatterProvider) {
+		this.objectMappers = objectMappers;
 		this.formatterProvider = formatterProvider;
 	}
 
 	@Override
 	public IGithubRefCleaner makeCleaner(Object somethingInteresting) {
 		if (somethingInteresting instanceof GithubAndToken) {
-			return new GithubRefCleaner(objectMapper, formatterProvider, (GithubAndToken) somethingInteresting);
+			return new GithubRefCleaner(objectMappers, formatterProvider, (GithubAndToken) somethingInteresting);
 		}
 		throw new IllegalArgumentException("Invalid argument:" + somethingInteresting);
 	}

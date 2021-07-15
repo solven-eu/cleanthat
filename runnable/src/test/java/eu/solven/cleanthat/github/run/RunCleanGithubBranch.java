@@ -30,7 +30,6 @@ import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
 import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.jgit.CommitContext;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 public class RunCleanGithubBranch extends ACleanThatXxxApplication {

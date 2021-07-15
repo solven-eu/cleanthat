@@ -1,8 +1,11 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -61,29 +64,44 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		getLog().info("Hello, world.");
 
 		if (CURRENT_MOJO.compareAndSet(null, this)) {
-			SpringApplication.run(MavenSpringConfig.class);
+			try {
+				SpringApplication.run(MavenSpringConfig.class);
+			} finally {
+				// Beware to clean so that it is OK in a multiModule reactor
+				CURRENT_MOJO.set(null);
+			}
 		} else {
 			throw new IllegalStateException("We have a leftover Mojo");
 		}
 	}
 
 	public void doClean(ApplicationContext appContext) {
-		getLog().info("Path: " + getConfigPath());
+		String configPath = getConfigPath();
+		getLog().info("Path: " + configPath);
 		getLog().info("URL: " + getConfigUrl());
 
 		// getLog().info("parentFile: " + getProject().getParentFile());
 		// getLog().info("parent.file: " + getProject().getParent().getFile());
 
+		Path configPathFile = Paths.get(configPath);
+
 		File baseFir = getProject().getBasedir();
+
+		Path configPathFileParent = configPathFile.getParent();
+		if (!configPathFileParent.equals(baseFir.toPath())) {
+			LOGGER.info("We'll clean only in a module containing the configuration: {}", configPathFileParent);
+			return;
+		}
+
+		getLog().info("project.baseDir: " + baseFir);
 
 		// Process the root of current module
 		ICodeProviderWriter codeProvider = new LocalFolderCodeProvider(baseFir.toPath());
 
-		String configPath = getConfigPath();
-
-		ICodeCleaner codeCleaner = new MavenCodeCleaner(appContext.getBean(ObjectMapper.class),
+		ICodeCleaner codeCleaner = new MavenCodeCleaner(
+				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList()),
 				appContext.getBean(ICodeProviderFormatter.class));
 
-		codeCleaner.formatCodeGivenConfig(codeProvider);
+		codeCleaner.formatCodeGivenConfig(codeProvider, isDryRun());
 	}
 }

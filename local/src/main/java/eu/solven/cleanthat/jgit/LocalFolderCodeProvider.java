@@ -35,6 +35,7 @@ public class LocalFolderCodeProvider implements ICodeProviderWriter {
 	final Path root;
 
 	public LocalFolderCodeProvider(Path root) {
+		LOGGER.info("root={}", root);
 		this.root = root;
 	}
 
@@ -105,7 +106,18 @@ public class LocalFolderCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		return Optional.of(Files.readString(Path.of(path)));
+		if (!path.startsWith("/")) {
+			throw new IllegalArgumentException(
+					"We expect only absolute path, consider the root of the git repository as the root (path=" + path
+							+ ")");
+		}
+
+		Path resolved = root.resolve("." + path);
+		if (resolved.toFile().isFile()) {
+			return Optional.of(Files.readString(resolved));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Override

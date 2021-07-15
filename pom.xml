@@ -81,7 +81,7 @@
 
 		<sentry-spring.version>5.0.1</sentry-spring.version>
 
-		<spring-cloud.version>Hoxton.SR10</spring-cloud.version>
+		<spring-cloud.version>2020.0.3</spring-cloud.version>
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>

@@ -1,22 +1,17 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.anything.event;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
-
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
 
 /**
- * Holds the logic to clean a Ref (e.g. a PR, a Ref, a Branch, etc)
+ * Holds the logic to clean a code poointer (e.g. local folder, or Git ref, ...)
  *
  * @author Benoit Lacelle
  */
-public interface IGithubRefCleaner {
+public interface ICodePointerCleaner {
 
 	/**
 	 * 
@@ -27,11 +22,7 @@ public interface IGithubRefCleaner {
 	 */
 	Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult offlineResult, GitRepoBranchSha1 theRef);
 
-	@Deprecated
-	Map<String, ?> formatPR(Supplier<GHPullRequest> prSupplier);
+	Map<String, ?> formatRef(String ref);
 
-	Map<String, ?> formatRef(GHRepository repo, Supplier<GHRef> refSupplier);
-
-	Map<String, ?> formatRefDiff(GHRepository repo, Supplier<GHRef> baseSupplier, Supplier<GHRef> headSupplier);
-
+	Map<String, ?> formatRefDiff(String baseRef, String headRef);
 }

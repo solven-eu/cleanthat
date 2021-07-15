@@ -1,21 +1,19 @@
 import java.io.File;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.junit.Ignore;
 
 import eu.solven.cleanthat.mvn.CleanThatCleanThatMojo;
 
-public class MyMojoTest extends AbstractMojoTestCase {
-	/** {@inheritDoc} */
+@Ignore("ProjetModel is not injected")
+public class TestCleanThatCleanThatMojo extends AbstractMojoTestCase {
 	protected void setUp() throws Exception {
-		// required
 		super.setUp();
 
 		// ...
 	}
 
-	/** {@inheritDoc} */
 	protected void tearDown() throws Exception {
-		// required
 		super.tearDown();
 
 		// ...

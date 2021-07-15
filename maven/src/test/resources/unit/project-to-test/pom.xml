@@ -22,9 +22,16 @@
 			<plugin>
 				<groupId>com.github.cormoran-io.cleanthat</groupId>
 				<artifactId>cleanthat-maven-plugin</artifactId>
-				<configuration>
-
-				</configuration>
+				<version>${project.version}</version>
+				<configuration></configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>cleanthat</goal>
+						</goals>
+						<configuration></configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

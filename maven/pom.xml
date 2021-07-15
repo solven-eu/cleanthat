@@ -20,9 +20,27 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>local</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>any-language</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>java</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>3.0</version>
+			<version>3.8.1</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -30,14 +48,14 @@
 			<!-- Enables MavenProject and MavenSession -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
-			<version>3.2.5</version>
+			<version>3.8.1</version>
 		</dependency>
 
 		<!-- dependencies to annotations -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.4</version>
+			<version>3.6.1</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -45,6 +63,12 @@
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>runnable</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-web</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 
@@ -54,6 +78,18 @@
 			<artifactId>maven-plugin-testing-harness</artifactId>
 			<version>3.3.0</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- component-lookup-exception-with-org-apache-maven-repository-repositorysystem-in -->
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-compat</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-api</artifactId>
+			<version>1.7.1</version>
 		</dependency>
 	</dependencies>
 

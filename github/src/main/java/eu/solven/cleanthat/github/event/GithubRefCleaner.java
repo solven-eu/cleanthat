@@ -28,12 +28,11 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
@@ -43,27 +42,20 @@ import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCleaner implements IGithubRefCleaner {
+public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner {
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
+
 	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
 
 	public static final String BRANCH_NAME_CONFIGURE = REF_DOMAIN_CLEANTHAT + "/configure";
 	public static final String PREFIX_REF_CLEANTHAT = "refs/heads/" + REF_DOMAIN_CLEANTHAT + "/";
 
-	// private static final String KEY_SKIPPED = "skipped";
-
-	// private static final String KEY_JAVA = "java";
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
-
-	final ObjectMapper objectMapper;
 	final GithubAndToken githubAndToken;
-
-	final ICodeProviderFormatter formatterProvider;
 
 	public GithubRefCleaner(ObjectMapper objectMapper,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken) {
-		this.objectMapper = objectMapper;
-		this.formatterProvider = formatterProvider;
+		super(objectMapper, formatterProvider);
 		this.githubAndToken = githubAndToken;
 	}
 
@@ -173,55 +165,6 @@ public class GithubRefCleaner implements IGithubRefCleaner {
 		return formatCodeGivenConfig(codeProvider);
 	}
 
-	private Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider) {
-		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
-
-		Optional<Map<String, ?>> optConfigurationToUse;
-		if (optPrConfig.isEmpty()) {
-			throw new IllegalStateException("We should have thrown earlier");
-		} else {
-			optConfigurationToUse = optPrConfig;
-		}
-		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
-		if (version.isEmpty()) {
-			throw new IllegalStateException("We should have thrown earlier");
-		} else if (!"2".equals(version.get())) {
-			throw new IllegalStateException("We should have thrown earlier");
-		}
-		Map<String, ?> prConfig = optConfigurationToUse.get();
-		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
-
-		if (codeProvider instanceof IListOnlyModifiedFiles) {
-			// We are on a PR event, or a commit_push over a branch which is head of an open PR
-			LOGGER.info("About to clean a limitted set of files");
-		} else {
-			LOGGER.info("About to clean the whole repo");
-		}
-		return formatCode(properties, codeProvider);
-	}
-
-	/**
-	 * Used to migrate the configuration file automatically. Typically to handle changes of keys.
-	 * 
-	 * @param properties
-	 */
-	private void migrateConfigurationCode(CleanthatRepositoryProperties properties) {
-		LOGGER.info("TODO: {}", properties);
-	}
-
-	private CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
-		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
-	}
-
-	private Optional<Map<String, ?>> safeConfig(ICodeProvider codeProvider) {
-		try {
-			return new CodeProviderHelpers(objectMapper).unsafeConfig(codeProvider);
-		} catch (RuntimeException e) {
-			LOGGER.warn("Issue loading the configuration", e);
-			return Optional.empty();
-		}
-	}
-
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
 
@@ -315,10 +258,6 @@ public class GithubRefCleaner implements IGithubRefCleaner {
 			throw new UncheckedIOException(e);
 		}
 		return body;
-	}
-
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter pr) {
-		return formatterProvider.formatCode(properties, pr);
 	}
 
 }

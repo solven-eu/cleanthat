@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-spring-boot-starter</artifactId>
-			<version>4.3.0</version>
+			<version>${sentry-spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-logback</artifactId>
-			<version>4.3.0</version>
+			<version>${sentry-spring.version}</version>
 		</dependency>
 
 		<dependency>
@@ -37,23 +37,31 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- TODO Remove these 2 dependencies as this module should be agnostic of the language and code-provider -->
 		<dependency>
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>github</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- <dependency> -->
+		<!-- https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java-aop-spring.html -->
+		<!-- <groupId>com.amazonaws</groupId> -->
+		<!-- <artifactId>aws-xray-recorder-sdk-spring</artifactId> -->
+		<!-- <version>2.9.0</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
-			<!-- https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java-aop-spring.html -->
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-xray-recorder-sdk-spring</artifactId>
-			<version>2.9.0</version>
+			<!-- Enable processing a local folder -->
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>local</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

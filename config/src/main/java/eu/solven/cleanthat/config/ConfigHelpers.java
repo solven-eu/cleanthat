@@ -1,14 +1,13 @@
 package eu.solven.cleanthat.config;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -32,9 +31,14 @@ public class ConfigHelpers {
 		this.objectMapper = objectMapper;
 	}
 
-	public CleanthatRepositoryProperties loadRepoConfig(Resource resource)
-			throws JsonParseException, JsonMappingException, IOException {
-		return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
+	public CleanthatRepositoryProperties loadRepoConfig(Resource resource) {
+		try {
+			return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue loading: " + resource, e);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Issue loading: " + resource, e);
+		}
 	}
 
 	protected ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,

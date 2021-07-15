@@ -23,7 +23,6 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
 
 /**
  * An {@link ICodeProvider} for local folders
@@ -31,8 +30,7 @@ import eu.solven.cleanthat.github.event.GithubPRCodeProvider;
  * @author Benoit Lacelle
  */
 public class LocalFolderCodeProvider implements ICodeProviderWriter {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LocalFolderCodeProvider.class);
 
 	final Path root;
 

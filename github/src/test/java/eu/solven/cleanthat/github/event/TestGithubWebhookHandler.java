@@ -79,6 +79,7 @@ public class TestGithubWebhookHandler {
 		// .formatPR(Mockito.any(Optional.class), Mockito.eq(new AtomicInteger()), Mockito.eq(pr));
 	}
 
+	@Ignore("Issue with GitHub mocking. Needs to add an abstract layer on top of Github")
 	@Test
 	public void processTestPush() throws JsonParseException, JsonMappingException, IOException {
 		Map<String, ?> input =

@@ -3,9 +3,7 @@
     "meta": {
         "labels": [
             "cleanthat"
-        ],
-        "clean_pull_requests": true,
-        "clean_main_branch": true
+        ]
     },
     "source_code": {
         "includes": [

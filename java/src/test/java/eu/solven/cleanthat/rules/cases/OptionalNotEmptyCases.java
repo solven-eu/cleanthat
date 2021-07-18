@@ -1,9 +1,11 @@
 package eu.solven.cleanthat.rules.cases;
 
+import java.util.Map;
 import java.util.Optional;
 
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
@@ -33,5 +35,16 @@ public class OptionalNotEmptyCases extends ACases {
 		public Object post(Optional<?> input) {
 			return input.isEmpty();
 		}
+	}
+
+	@UnchangedMethod
+	public static class CaseOnMap {
+		public Object post(Map<?, ?> input) {
+			return !input.isEmpty();
+		}
+
+		// public Object post(Map<?, ?> input) {
+		// return !input.isEmpty();
+		// }
 	}
 }

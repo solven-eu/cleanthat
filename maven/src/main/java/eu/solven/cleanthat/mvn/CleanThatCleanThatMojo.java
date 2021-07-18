@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
+import io.sentry.IHub;
 
 /**
  * The mojo doing actual cleaning
@@ -42,6 +44,12 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 
 	protected static final AtomicReference<CleanThatCleanThatMojo> CURRENT_MOJO = new AtomicReference<>();
 
+	/**
+	 * The SpringBoot application started within maven Mojo
+	 * 
+	 * @author Benoit Lacelle
+	 *
+	 */
 	@SpringBootApplication(scanBasePackages = "none")
 	@Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
 	public static class MavenSpringConfig implements CommandLineRunner {
@@ -53,7 +61,12 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		public void run(String... args) throws Exception {
 			LOGGER.info("Processing arguments: {}", Arrays.asList(args));
 
+			// Ensure events are sent to Sentry
+			IHub sentryHub = appContext.getBean(IHub.class);
+			sentryHub.captureMessage("Maven is OK");
+
 			CURRENT_MOJO.get().doClean(appContext);
+			sentryHub.flush(TimeUnit.SECONDS.toMillis(1));
 		}
 
 	}
@@ -67,6 +80,7 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 			try {
 				SpringApplication.run(MavenSpringConfig.class);
 			} finally {
+				LOGGER.info("Closed applicationContext");
 				// Beware to clean so that it is OK in a multiModule reactor
 				CURRENT_MOJO.set(null);
 			}

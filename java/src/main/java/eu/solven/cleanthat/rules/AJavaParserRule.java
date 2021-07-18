@@ -24,6 +24,7 @@ import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
  * @author Benoit Lacelle
  */
 public abstract class AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserRule.class);
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
@@ -39,7 +40,6 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 	@Override
 	public boolean walkNode(Node tree) {
 		AtomicBoolean transformed = new AtomicBoolean();
-
 		tree.walk(node -> {
 			if (processNotRecursively(node)) {
 				transformed.set(true);
@@ -58,7 +58,6 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		} catch (RuntimeException e) {
 			// This will happens often as, as of 2021-01, we solve types only given current class context,
 			// neither other classes of the project, nor its maven/gradle dependencies
-
 			// UnsolvedSymbolException
 			// https://github.com/javaparser/javaparser/issues/1491
 			LOGGER.debug("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
@@ -70,13 +69,12 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		if (node instanceof MethodCallExpr && methodName.equals(((MethodCallExpr) node).getName().getIdentifier())) {
 			MethodCallExpr methodCall = (MethodCallExpr) node;
 			Optional<Expression> optScope = methodCall.getScope();
-			if (!optScope.isPresent()) {
+			if (optScope.isEmpty()) {
 				// TODO Document when this would happen
 				return;
 			}
 			Expression scope = optScope.get();
 			Optional<ResolvedType> type = optResolvedType(scope);
-
 			if (type.isPresent()) {
 				consumer.onMethodName(node, scope, type.get());
 			}

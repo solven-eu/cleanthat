@@ -12,6 +12,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
+import cormoran.pepper.memory.IPepperMemoryConstants;
 
 /**
  * This LogBack {@link Appender} shall help enabling a log to be produced for each run.
@@ -22,7 +23,7 @@ import ch.qos.logback.core.encoder.Encoder;
 public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocalDumperAppender.class);
 
-	private static ThreadLocal<List<byte[]>> TL_LOGS = new ThreadLocal<>() {
+	private static final ThreadLocal<List<byte[]>> TL_LOGS = new ThreadLocal<>() {
 		@Override
 		protected List<byte[]> initialValue() {
 			// Collections.synchronizedList is not necessary as AppenderBase is ThreadSafe
@@ -34,11 +35,12 @@ public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
 	 */
 	protected Encoder<ILoggingEvent> encoder;
 
+	@Override
 	protected void append(ILoggingEvent event) {
 		byte[] byteArray = this.encoder.encode(event);
 		TL_LOGS.get().add(byteArray);
 
-		if (TL_LOGS.get().size() >= 1024) {
+		if (TL_LOGS.get().size() >= IPepperMemoryConstants.KB_INT) {
 			LOGGER.warn("We cleared the log buffer as grown too big");
 			TL_LOGS.get().clear();
 			TL_LOGS.get().add("We encountered too many logs".getBytes(StandardCharsets.UTF_8));

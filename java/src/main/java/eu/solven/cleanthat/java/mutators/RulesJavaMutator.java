@@ -77,7 +77,7 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 		}).collect(Collectors.toList());
 
 		this.transformers.forEach(ct -> {
-			LOGGER.info("Using transformer: {}", ct.getId());
+			LOGGER.debug("Using transformer: {}", ct.getId());
 		});
 	}
 

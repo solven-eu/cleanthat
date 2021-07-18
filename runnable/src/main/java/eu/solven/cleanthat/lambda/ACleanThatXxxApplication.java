@@ -17,14 +17,11 @@ import eu.solven.cleanthat.github.GithubSpringConfig;
  */
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class ACleanThatXxxApplication {
 
 	@Autowired
 	ApplicationContext appContext;
-
-	// protected abstract boolean isAccepted(IGithubWebhookHandler makeWithFreshJwt, Map<String, ?> input);
-	//
-	// protected abstract void onAccepted(IGithubWebhookHandler makeWithFreshJwt, Map<String, ?> input);
 
 	public ApplicationContext getAppContext() {
 		return appContext;

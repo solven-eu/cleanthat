@@ -43,11 +43,13 @@ import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
  * @author Benoit Lacelle
  */
 public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
 
 	public static final String BRANCH_NAME_CONFIGURE = REF_DOMAIN_CLEANTHAT + "/configure";
+
 	public static final String PREFIX_REF_CLEANTHAT = "refs/heads/" + REF_DOMAIN_CLEANTHAT + "/";
 
 	final GithubAndToken githubAndToken;
@@ -65,21 +67,17 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	@Override
 	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result, GitRepoBranchSha1 theRef) {
 		String refUrl;
-
 		ICodeProvider codeProvider;
 		String ref = theRef.getRef();
 		try {
 			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
 			GHRef refObject = repo.getRef(ref);
-
 			refUrl = refObject.getUrl().toExternalForm();
 			codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
-
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, refUrl);
@@ -97,28 +95,22 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
-
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-
 		List<String> branchesToClean = properties.getMeta().getRefs().getBranches();
-
 		Optional<String> matchingRule =
 				branchesToClean.stream().filter(branchToClean -> Pattern.matches(branchToClean, ref)).findAny();
-
-		if (!matchingRule.isPresent()) {
+		if (matchingRule.isEmpty()) {
 			return Optional.empty();
 		}
 		LOGGER.info("We want to clean {} due to rule {}", ref, matchingRule.get());
-
 		if (result.isPrOpen()) {
 			LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event", ref);
 			return Optional.of(ref);
 		} else if (result.isPushBranch()) {
 			// We never clean inplace: we'll have to open a dedicated ReviewRequest if necessary
 			String newBranchRef = PREFIX_REF_CLEANTHAT + UUID.randomUUID();
-
 			// We may open a branch later if it appears this branch is relevant
 			// String refToClean = codeProvider.openBranch(ref);
 			// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
@@ -131,13 +123,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	@Override
 	public Map<String, ?> formatPR(Supplier<GHPullRequest> prSupplier) {
 		GHPullRequest pr = prSupplier.get();
-
 		String prUrl = pr.getUrl().toExternalForm();
 		// TODO Log if PR is public
 		LOGGER.info("PR: {}", prUrl);
-
 		ICodeProviderWriter codeProvider = new GithubPRCodeProvider(githubAndToken.getToken(), pr);
-
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
@@ -145,32 +134,24 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	public Map<String, ?> formatRefDiff(GHRepository repo, Supplier<GHRef> baseSupplier, Supplier<GHRef> headSupplier) {
 		GHRef base = baseSupplier.get();
 		GHRef head = headSupplier.get();
-
 		LOGGER.info("Base: {} Head: {}", base.getRef(), head.getRef());
-
 		ICodeProviderWriter codeProvider = new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo, base, head);
-
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	@Override
 	public Map<String, ?> formatRef(GHRepository repo, Supplier<GHRef> refSupplier) {
 		GHRef ref = refSupplier.get();
-
 		String prUrl = ref.getUrl().toExternalForm();
 		LOGGER.info("Ref: {}", prUrl);
-
 		ICodeProviderWriter codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, ref);
-
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
-
 		String refName = BRANCH_NAME_CONFIGURE;
 		String fullRefName = "refs/heads/" + refName;
-
 		boolean refAlreadyExists;
 		Optional<GHRef> refToPR;
 		try {
@@ -188,13 +169,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
 			throw new UncheckedIOException(e);
 		}
-
 		try {
 			if (refAlreadyExists) {
 				LOGGER.info(
 						"There is already a ref about to introduce a cleanthat.json ; do not open a new PR (url={})",
 						refToPR.get().getUrl().toExternalForm());
-
 				repo.listPullRequests(GHIssueState.ALL).forEach(pr -> {
 					if (refName.equals(pr.getHead().getRef())) {
 						LOGGER.info("Related PR: {}", pr.getHtmlUrl());
@@ -202,17 +181,13 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 				});
 			} else {
 				GHCommit commit = commitConfig(defaultBranch, repo);
-
 				refToPR = Optional.of(repo.createRef(fullRefName, commit.getSHA1()));
-
 				boolean force = false;
 				refToPR.get().updateTo(commit.getSHA1(), force);
-
 				// Let's follow Renovate and its configuration PR
 				// https://github.com/solven-eu/agilea/pull/1
 				String body = readResource("/templates/onboarding-body.md");
 				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
-
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
 				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
 				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
@@ -259,5 +234,4 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 		}
 		return body;
 	}
-
 }

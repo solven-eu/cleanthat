@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.rules;
+package io.cormoran.cleanthat.rules.it;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,4 +57,5 @@ public class ITTestLocalFile {
 		LOGGER.info("Diff:");
 		diff.forEach(d -> LOGGER.info("{}", d));
 	}
+
 }

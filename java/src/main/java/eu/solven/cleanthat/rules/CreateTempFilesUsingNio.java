@@ -24,7 +24,6 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  *
  * @author Sébastien Collard
  */
-
 public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
@@ -52,33 +51,25 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-
 		MethodCallExpr methodCallExpr = (MethodCallExpr) node;
 		if (!"createTempFile".equals(methodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
-
 		Optional<Boolean> optIsStatic = mayStaticCall(methodCallExpr);
-
 		if (optIsStatic.isPresent() && !optIsStatic.get()) {
 			return false;
 		}
-
 		Optional<Expression> optScope = methodCallExpr.getScope();
-
 		if (optScope.isPresent()) {
 			Optional<ResolvedType> type = optResolvedType(optScope.get());
-
-			if (!type.isPresent() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
+			if (type.isEmpty() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
 				return false;
 			}
-
 			LOGGER.debug("Trouvé : {}", node.toString());
 			if (process(methodCallExpr)) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -90,16 +81,13 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 			// 'java.lang.IllegalStateException: Symbol resolution not configured: to configure consider setting a
 			// SymbolResolver in the ParserConfiguration'
 			LOGGER.debug("arg", e);
-
 			return Optional.empty();
 		}
 	}
 
 	private boolean process(MethodCallExpr methodExp) {
 		List<Expression> arguments = methodExp.getArguments();
-
 		Optional<MethodCallExpr> optToPath;
-
 		NameExpr newStaticClass = new NameExpr("Files");
 		String newStaticMethod = "createTempFile";
 		int minArgSize = 2;
@@ -107,7 +95,6 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 			// Create in default tmp directory
 			LOGGER.debug("Add java.nio.file.Files to import");
 			methodExp.tryAddImportToParentCompilationUnit(Files.class);
-
 			optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, methodExp.getArguments()));
 		} else if (arguments.size() == minArgSize + 1) {
 			Expression arg0 = methodExp.getArgument(0);
@@ -115,41 +102,31 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 			Expression arg3 = methodExp.getArgument(2);
 			if (arg3.isObjectCreationExpr()) {
 				methodExp.tryAddImportToParentCompilationUnit(Paths.class);
-
 				ObjectCreationExpr objectCreation = (ObjectCreationExpr) methodExp.getArgument(minArgSize);
 				NodeList<Expression> objectCreationArguments = objectCreation.getArguments();
 				NodeList<Expression> replaceArguments =
 						new NodeList<>(new MethodCallExpr(new NameExpr("Paths"), "get", objectCreationArguments),
 								arg0,
 								arg1);
-
 				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
 			} else if (arg3.isNameExpr()) {
 				NodeList<Expression> replaceArguments = new NodeList<>(new MethodCallExpr(arg3, "toPath"), arg0, arg1);
-
 				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
 			} else if (arg3.isNullLiteralExpr()) {
 				// 'null' is managed specifically as Files.createTempFile does not accept a null as directory
 				NodeList<Expression> replaceArguments = new NodeList<>(arg0, arg1);
-
 				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
-
 			} else {
 				optToPath = Optional.empty();
 			}
-
 		} else {
 			optToPath = Optional.empty();
 		}
-
 		optToPath.ifPresent(toPath -> {
 			methodExp.tryAddImportToParentCompilationUnit(Files.class);
-
 			LOGGER.info("Turning {} into {}", methodExp, toPath);
 			methodExp.replace(new MethodCallExpr(toPath, "toFile"));
 		});
-
 		return optToPath.isPresent();
 	}
-
 }

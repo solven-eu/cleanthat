@@ -22,7 +22,9 @@ import eu.solven.cleanthat.rules.meta.IRuleDescriber;
  * @author Benoit Lacelle
  */
 public class VariableEqualsConstant extends AJavaParserRule implements IRuleDescriber {
+
 	private static final String METHOD_EQUALS = "equals";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsConstant.class);
 
 	@Override
@@ -53,21 +55,15 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-
 		MethodCallExpr methodCall = (MethodCallExpr) node;
-
 		if (methodCall.getArguments().size() != 1) {
 			return false;
 		}
-
 		Expression singleArgument = methodCall.getArgument(0);
-
 		String methodCallName = methodCall.getName().getIdentifier();
-
 		boolean stringScopeOnly;
 		if (singleArgument instanceof ObjectCreationExpr && METHOD_EQUALS.equals(methodCallName)) {
 			LOGGER.debug("This is a !String method which can be swapped");
@@ -81,28 +77,24 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		} else {
 			return false;
 		}
-
 		// recover argument of equals
 		Expression argument = singleArgument;
 		// hardocoded string seems to be instance of StringLiteralExpr
 		LOGGER.debug("Find a hardcoded string : {}", argument);
 		// argument is hard coded we need scope to inverse the two
 		Optional<Expression> optScope = methodCall.getScope();
-		if (!optScope.isPresent()) {
+		if (optScope.isEmpty()) {
 			// equals must be called by something
 			return false;
 		}
 		Expression scope = optScope.get();
-
 		if (scope instanceof StringLiteralExpr || scope instanceof ObjectCreationExpr) {
 			// There is no point in switching a constant with another constant
 			return false;
 		}
-
 		if (stringScopeOnly && !isStringScope(scope)) {
 			return false;
 		}
-
 		MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
 		LOGGER.info("Turning {} into {}", node, replacement);
 		return node.replace(replacement);
@@ -110,7 +102,6 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 
 	private boolean isStringScope(Expression scope) {
 		Optional<ResolvedType> type = optResolvedType(scope);
-
 		boolean isString = type.isPresent() && type.get().isReferenceType()
 				&& type.get().asReferenceType().getQualifiedName().equals(String.class.getName());
 		return isString;

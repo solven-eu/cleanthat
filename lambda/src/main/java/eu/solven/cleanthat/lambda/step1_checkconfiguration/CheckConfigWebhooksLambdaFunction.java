@@ -18,7 +18,7 @@ import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 /**
@@ -31,7 +31,32 @@ public class CheckConfigWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigWebhooksLambdaFunction.class);
 
 	@Override
-	protected Map<String, ?> unsafeProcessOneEvent(ApplicationContext appContext, IWebhookEvent input) {
+	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
+		IGithubWebhookHandler makeWithFreshJwt = extracted(getAppContext());
+
+		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
+
+		WebhookRelevancyResult processAnswer =
+				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
+
+		if (processAnswer.getOptBranchToClean().isPresent()) {
+			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();
+
+			Map<String, Object> acceptedEvent = new LinkedHashMap<>(input.getBody());
+
+			acceptedEvent.put("refToClean", processAnswer.getOptBranchToClean().get());
+
+			SaveToDynamoDb.saveToDynamoDb("cleanthat_accepted_events",
+					new CleanThatWebhookEvent(input.getHeaders(), acceptedEvent),
+					client);
+		} else {
+			LOGGER.info("Rejected due to: {}", processAnswer.getOptRejectedReason().get());
+		}
+
+		return Map.of("whatever", "done");
+	}
+
+	public static IGithubWebhookHandler extracted(ApplicationContext appContext) {
 		GithubWebhookHandlerFactory githubFactory = appContext.getBean(GithubWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
@@ -43,27 +68,7 @@ public class CheckConfigWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		} catch (JOSEException e) {
 			throw new RuntimeException(e);
 		}
-
-		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
-
-		WebhookRelevancyResult processAnswer =
-				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
-
-		if (processAnswer.getOptBranchToClean().isPresent()) {
-			AmazonDynamoDB client = CheckWebhooksLambdaFunction.makeDynamoDbClient();
-
-			Map<String, Object> acceptedEvent = new LinkedHashMap<>(input.getBody());
-
-			acceptedEvent.put("refToClean", processAnswer.getOptBranchToClean().get());
-
-			CheckWebhooksLambdaFunction.saveToDynamoDb("cleanthat_accepted_events",
-					new CleanThatWebhookEvent(input.getHeaders(), acceptedEvent),
-					client);
-		} else {
-			LOGGER.info("Rejected due to: {}", processAnswer.getOptRejectedReason().get());
-		}
-
-		return Map.of("whatever", "done");
+		return makeWithFreshJwt;
 	}
 
 }

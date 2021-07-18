@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.lambda.step2_executeClean;
+package eu.solven.cleanthat.lambda.step2_executeclean;
 
 import java.util.Map;
 

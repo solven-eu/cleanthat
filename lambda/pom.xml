@@ -66,6 +66,12 @@
 			<artifactId>spring-cloud-starter-function-web</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<!-- https://github.com/spring-cloud/spring-cloud-function/blob/master/spring-cloud-function-samples/function-sample-aws/pom.xml -->

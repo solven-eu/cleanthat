@@ -43,19 +43,17 @@ public class TestCreateTempFilesUsingNio extends ATestCases {
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
-
 			// Check if 'pre' transformation into 'post' add the good library
 			// TODO not yet testing import of Paths
 			{
 				compilationUnit.getImports()
-						.removeIf(im -> im.equals(new ImportDeclaration("java.nio.file.Files", false, false)));
+						.removeIf(im -> new ImportDeclaration("java.nio.file.Files", false, false).equals(im));
 				transformer.walkNode(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertTrue(compilationUnit.getImports()
 						.contains(new ImportDeclaration("java.nio.file.Files", false, false)));
 			}
-
 		});
 	}
 }

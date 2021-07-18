@@ -18,7 +18,7 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	// This is a compatible base: trivial in case of PR event, implicit in case of commit_push (i.e. we take the base of
 	// the first PR matching the head). We may prefer taking the latest matching PR (supposing older PR will not be
 	// merged soon). However, it would mean a single head is being merged into different base: edge-case.
-	final Optional<GitRepoBranchSha1> optBaseRef;
+	final Optional<GitRepoBranchSha1> baseRef;
 
 	public GithubWebhookRelevancyResult(boolean prOpen,
 			boolean pushBranch,
@@ -31,7 +31,7 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 		this.hasReviewRequest = hasReviewRequest;
 		this.ref = optRef;
 		this.openPr = optOpenPr;
-		this.optBaseRef = optBaseRef;
+		this.baseRef = optBaseRef;
 	}
 
 	@Override
@@ -58,6 +58,6 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	}
 
 	public Optional<GitRepoBranchSha1> optBaseRef() {
-		return optBaseRef;
+		return baseRef;
 	}
 }

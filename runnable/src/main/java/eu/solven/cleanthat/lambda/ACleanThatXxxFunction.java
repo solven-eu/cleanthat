@@ -2,8 +2,6 @@ package eu.solven.cleanthat.lambda;
 
 import java.util.Map;
 
-import org.springframework.context.ApplicationContext;
-
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import io.sentry.Sentry;
 
@@ -15,9 +13,9 @@ import io.sentry.Sentry;
  */
 public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 
-	protected final Map<String, ?> processOneEvent(ApplicationContext appContext, IWebhookEvent input) {
+	protected final Map<String, ?> processOneEvent(IWebhookEvent input) {
 		try {
-			return unsafeProcessOneEvent(appContext, input);
+			return unsafeProcessOneEvent(input);
 		} catch (RuntimeException e) {
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");
@@ -25,6 +23,6 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 		}
 	}
 
-	protected abstract Map<String, ?> unsafeProcessOneEvent(ApplicationContext appContext, IWebhookEvent input);
+	protected abstract Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input);
 
 }

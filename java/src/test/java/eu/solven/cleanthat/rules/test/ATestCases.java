@@ -153,7 +153,7 @@ public class ATestCases {
 	protected MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
 		List<MethodDeclaration> preMethods = oneCase.getMethodsByName(name);
 		if (preMethods.size() != 1) {
-			throw new IllegalStateException("Expected a single '" + name + "' method in " + oneCase);
+			throw new IllegalStateException("Expected one and only one '" + name + "' method in " + oneCase);
 		}
 		MethodDeclaration pre = preMethods.get(0);
 		return pre;

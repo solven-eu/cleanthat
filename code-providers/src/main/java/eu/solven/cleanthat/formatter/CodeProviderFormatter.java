@@ -84,7 +84,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			}
 		} else {
 			// We are in a branch (but no base-branch as reference): meaningless to check for config change, and anyway
-			// we will clean everything
+			LOGGER.debug("We will clean everything");
 		}
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();

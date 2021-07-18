@@ -27,8 +27,7 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 
 	@Override
 	public String getId() {
-		// PMD
-		return "LiteralsFirstInComparisons";
+		return pmdId();
 	}
 
 	@Override
@@ -39,6 +38,10 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 	@Override
 	public String pmdUrl() {
 		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons";
+	}
+
+	public String pmdId() {
+		return "LiteralsFirstInComparisons";
 	}
 
 	@Override

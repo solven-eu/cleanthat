@@ -71,6 +71,6 @@ public class RunProcessWebhookEvent {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook/oneshot.json").getInputStream(), Map.class);
 
-		GithubWebhookRelevancyResult result = handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
+		GithubWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
 	}
 }

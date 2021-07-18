@@ -58,7 +58,7 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			throw new RuntimeException(e);
 		}
 
-		GithubWebhookRelevancyResult processAnswer = makeWithFreshJwt.isWebhookEventRelevant(githubEvent);
+		GithubWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
 		if (processAnswer.isPrOpen() || processAnswer.isPushBranch()) {
 			AmazonDynamoDB client = makeDynamoDbClient();

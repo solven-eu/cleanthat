@@ -33,8 +33,12 @@ import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.IJdkVersionConstants;
+import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.rules.UseDiamondOperator;
+import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.rules.VariableEqualsConstant;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.VersionWrapper;
 
@@ -51,10 +55,14 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 	private final ILanguageProperties languageProperties;
 	private final CleanthatJavaProcessorProperties properties;
 
-	private static final List<IClassTransformer> ALL_TRANSFORMERS = Arrays.asList(new EnumsWithoutEquals(),
+	private static final List<IClassTransformer> ALL_TRANSFORMERS = Arrays.asList(new CreateTempFilesUsingNio(),
+			new EnumsWithoutEquals(),
 			new PrimitiveBoxedForString(),
+			new OptionalNotEmpty(),
+			new UseDiamondOperator(),
+			new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
-			new CreateTempFilesUsingNio());
+			new VariableEqualsConstant());
 
 	private final List<IClassTransformer> transformers;
 
@@ -67,6 +75,10 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
 			return languageVersion.compareTo(transformerVersion) >= 0;
 		}).collect(Collectors.toList());
+
+		this.transformers.forEach(ct -> {
+			LOGGER.info("Using transformer: {}", ct.getId());
+		});
 	}
 
 	public List<IClassTransformer> getTransformers() {

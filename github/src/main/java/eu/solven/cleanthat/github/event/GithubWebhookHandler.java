@@ -107,7 +107,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings({ "PMD.ExcessiveMethodLength", "checkstyle:MethodLength", "PMD.NPathComplexity" })
 	@Override
-	public GithubWebhookRelevancyResult isWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
+	public GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
 
@@ -285,12 +285,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
 	// the base branch?
+	@SuppressWarnings("PMD.NPathComplexity")
 	@Override
-	public WebhookRelevancyResult isWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
+	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 
-		GithubWebhookRelevancyResult offlineResult = isWebhookEventRelevant(githubEvent);
+		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
 
 		if (!offlineResult.isPrOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
@@ -333,11 +334,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repo.getDefaultBranch()));
 		// final boolean isMainBranchCommit;
 
-		Optional<String> optSha1 = Optional.empty();
 		GitRepoBranchSha1 theRef;
 
-		Optional<GHPullRequest> optPr;
 		if (offlineResult.optOpenPr().isPresent()) {
+			Optional<GHPullRequest> optPr;
 			try {
 				String rawPrId = String.valueOf(offlineResult.optOpenPr().get().getId());
 				int prIdAsInteger = Integer.parseInt(rawPrId);
@@ -358,14 +358,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			theRef = new GitRepoBranchSha1(headRepoFullname, prHead.getRef(), prHead.getSha());
 		} else {
-			optPr = Optional.empty();
+			// optPr = Optional.empty();
 
 			// No PR: we are guaranteed to have a ref
 			theRef = offlineResult.optPushedRef().get();
 		}
 
-		optSha1 = Optional.of(theRef.getSha());
-
+		Optional<String> optSha1 = Optional.of(theRef.getSha());
 		if (optSha1.isEmpty()) {
 			throw new IllegalStateException("Should not happen");
 		}
@@ -407,14 +406,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 
-		GithubWebhookRelevancyResult offlineResult = isWebhookEventRelevant(externalCodeEvent);
+		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
 
 		if (!offlineResult.isPrOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 
 		WebhookRelevancyResult relevancyResult =
-				isWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
+				filterWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
 
 		if (relevancyResult.getOptBranchToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime

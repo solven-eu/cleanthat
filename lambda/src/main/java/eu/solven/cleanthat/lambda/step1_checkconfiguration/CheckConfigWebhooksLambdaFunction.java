@@ -47,7 +47,7 @@ public class CheckConfigWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
 
 		WebhookRelevancyResult processAnswer =
-				makeWithFreshJwt.isWebhookEventTargetRelevantBranch(cleanerFactory, input);
+				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
 
 		if (processAnswer.getOptBranchToClean().isPresent()) {
 			AmazonDynamoDB client = CheckWebhooksLambdaFunction.makeDynamoDbClient();

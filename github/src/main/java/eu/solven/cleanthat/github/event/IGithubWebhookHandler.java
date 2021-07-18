@@ -34,7 +34,7 @@ public interface IGithubWebhookHandler {
 	 * @param input
 	 * @return
 	 */
-	GithubWebhookRelevancyResult isWebhookEventRelevant(I3rdPartyWebhookEvent input);
+	GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent input);
 
 	/**
 	 * Online rejection of irrelevant events (e.g. there is no configuration file in the concerned branch). This can
@@ -46,7 +46,7 @@ public interface IGithubWebhookHandler {
 	 * @param input
 	 * @return
 	 */
-	WebhookRelevancyResult isWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
+	WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
 			IWebhookEvent input);
 
 	void doExecuteWebhookEvent(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input);

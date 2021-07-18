@@ -12,8 +12,8 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	final boolean prOpen;
 	final boolean pushBranch;
 	final boolean hasReviewRequest;
-	final Optional<GitRepoBranchSha1> optRef;
-	final Optional<GitPrHeadRef> optOpenPr;
+	final Optional<GitRepoBranchSha1> ref;
+	final Optional<GitPrHeadRef> openPr;
 
 	// This is a compatible base: trivial in case of PR event, implicit in case of commit_push (i.e. we take the base of
 	// the first PR matching the head). We may prefer taking the latest matching PR (supposing older PR will not be
@@ -29,8 +29,8 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 		this.prOpen = prOpen;
 		this.pushBranch = pushBranch;
 		this.hasReviewRequest = hasReviewRequest;
-		this.optRef = optRef;
-		this.optOpenPr = optOpenPr;
+		this.ref = optRef;
+		this.openPr = optOpenPr;
 		this.optBaseRef = optBaseRef;
 	}
 
@@ -50,11 +50,11 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	}
 
 	public Optional<GitRepoBranchSha1> optPushedRef() {
-		return optRef;
+		return ref;
 	}
 
 	public Optional<GitPrHeadRef> optOpenPr() {
-		return optOpenPr;
+		return openPr;
 	}
 
 	public Optional<GitRepoBranchSha1> optBaseRef() {

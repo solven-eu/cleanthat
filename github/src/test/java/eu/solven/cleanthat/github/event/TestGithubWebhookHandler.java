@@ -76,7 +76,7 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook.pull_request.json").getInputStream(), Map.class);
 		Mockito.when(repo.getPullRequest(Mockito.anyInt())).thenReturn(pr);
-		handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
+		handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
 		// Mockito.verify(repo).getPullRequest(2);
 		// Mockito.verify(prCleaner)
 		// .formatPR(Mockito.any(Optional.class), Mockito.eq(new AtomicInteger()), Mockito.eq(pr));
@@ -87,6 +87,6 @@ public class TestGithubWebhookHandler {
 	public void processTestPush() throws JsonParseException, JsonMappingException, IOException {
 		Map<String, ?> input =
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
-		handler.isWebhookEventRelevant(new GithubWebhookEvent(input));
+		handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
 	}
 }

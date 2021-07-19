@@ -1,12 +1,32 @@
 package eu.solven.cleanthat.rules.cases;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.rules.VariableEqualsConstant;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
+import io.cormoran.cleanthat.rules.it.ITGetType;
 
 public class VariableEqualsConstantCases extends ACases {
 
@@ -139,6 +159,53 @@ public class VariableEqualsConstantCases extends ACases {
 
 		public Object post(LikeString input) {
 			return input.contentEquals("hardcoded");
+		}
+	}
+
+	@CompareMethods
+	public static class InLambda {
+		public Object pre(List<String> input) {
+			return input.stream().filter(s -> s.equals("someString")).findAny();
+		}
+
+		public Object post(List<String> input) {
+			return input.stream().filter(s -> "someString".equals(s)).findAny();
+		}
+	}
+
+	@CompareMethods
+	public static class ConstantIsStaticField {
+		public Object pre(String x) {
+			return x.equals(JsonFactory.FORMAT_NAME_JSON);
+		}
+
+		public Object post(String x) {
+			return JsonFactory.FORMAT_NAME_JSON.equals(x);
+		}
+	}
+
+	@UnchangedMethod
+	public static class CheckStartsWith {
+		public Object post(String o) {
+			return o.startsWith(JsonFactory.FORMAT_NAME_JSON);
+		}
+	}
+
+	// TODO This is a bug as we switch due to the field name mislead supposing it is a constant
+	@CompareMethods
+	public static class ConstantIsIllNamedObjectField {
+		private static class LikeString {
+			public final String FORMAT_NAME_JSON = "someString";
+		}
+
+		final LikeString o = new LikeString();
+
+		public Object pre(String x) {
+			return x.equals(o.FORMAT_NAME_JSON);
+		}
+
+		public Object post(String x) {
+			return o.FORMAT_NAME_JSON.equals(x);
 		}
 	}
 

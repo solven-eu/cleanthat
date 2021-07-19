@@ -66,14 +66,14 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 			boolean localTransformed = false;
 			if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
 				MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_PRESENT);
-				LOGGER.info("Turning {} into {}", node, replacement);
-				if (optParent.get().replace(replacement)) {
+				LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+				if (unaryExpr.replace(replacement)) {
 					localTransformed = true;
 				}
 			} else {
 				MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
-				LOGGER.info("Turning {} into {}", node, replacement);
-				if (optParent.get().replace(replacement)) {
+				LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+				if (unaryExpr.replace(replacement)) {
 					localTransformed = true;
 				}
 			}

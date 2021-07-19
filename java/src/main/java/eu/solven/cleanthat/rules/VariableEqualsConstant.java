@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
@@ -71,6 +73,15 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		} else if (singleArgument instanceof StringLiteralExpr && isSwitchableStringMethod(methodCallName)) {
 			LOGGER.debug("This is a String method which can be swapped");
 			stringScopeOnly = true;
+		} else if (singleArgument instanceof FieldAccessExpr && METHOD_EQUALS.equals(methodCallName)
+				&& isConstant(((FieldAccessExpr) singleArgument).getName())) {
+			// TODO Think deeper about relying on the field name to suppose it is constant. We should at least check
+			// the object is a class and not an object
+			Expression scope = ((FieldAccessExpr) singleArgument).getScope();
+			LOGGER.debug("TODO Check scope is a class");
+
+			LOGGER.debug("We prefer having the constant at the left");
+			stringScopeOnly = true;
 		} else if (singleArgument instanceof StringLiteralExpr && isCompareStringMethod(methodCallName)) {
 			LOGGER.debug("TODO replace x.compareTo('bar')<0 by 'bar'.compareTo(x)>0");
 			return false;
@@ -100,11 +111,28 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		return node.replace(replacement);
 	}
 
+	private static boolean isConstant(SimpleName name) {
+		return name.asString().matches("[A-Z_]+");
+	}
+
 	private boolean isStringScope(Expression scope) {
-		Optional<ResolvedType> type = optResolvedType(scope);
-		boolean isString = type.isPresent() && type.get().isReferenceType()
-				&& type.get().asReferenceType().getQualifiedName().equals(String.class.getName());
-		return isString;
+		Optional<ResolvedType> optType = optResolvedType(scope);
+
+		if (!optType.isPresent()) {
+			return false;
+		}
+
+		ResolvedType type = optType.get();
+
+		if (type.isConstraint()) {
+			// This happens on lambda expression: the type we're looking for is the Lambda bound-type
+			type = type.asConstraintType().getBound();
+		}
+
+		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
+			return true;
+		}
+		return false;
 	}
 
 	private boolean isSwitchableStringMethod(String methodCallName) {

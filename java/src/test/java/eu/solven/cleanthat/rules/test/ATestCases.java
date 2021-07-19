@@ -90,10 +90,13 @@ public class ATestCases {
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
-				MethodDeclaration postPost = post.clone();
-				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + postPost,
-						transformer.walkNode(postPost));
-				Assert.assertEquals(post, postPost);
+				// https://github.com/javaparser/javaparser/issues/3322
+				// We prefer not-processing clones as it may lead to dirty issues
+				MethodDeclaration clonedPost = post.clone();
+
+				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost,
+						transformer.walkNode(post));
+				Assert.assertEquals(clonedPost, post);
 			}
 		});
 	}

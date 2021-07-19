@@ -49,7 +49,7 @@
 			<!-- https://github.com/INRIA/spoon -->
 			<groupId>fr.inria.gforge.spoon</groupId>
 			<artifactId>spoon-core</artifactId>
-			<version>8.3.0</version>
+			<version>9.0.0</version>
 		</dependency>
 		<dependency>
 			<!-- https://github.com/javaparser/javaparser -->
@@ -67,6 +67,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
 		</dependency>
 
 		<dependency>
@@ -95,7 +96,7 @@
 		<dependency>
 			<groupId>net.revelc.code</groupId>
 			<artifactId>impsort-maven-plugin</artifactId>
-			<version>1.6.0</version>
+			<version>1.6.2</version>
 		</dependency>
 
 		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->

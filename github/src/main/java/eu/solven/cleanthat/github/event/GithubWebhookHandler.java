@@ -71,15 +71,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("Permissions: {}", installationById.getPermissions());
 			LOGGER.info("RepositorySelection: {}", installationById.getRepositorySelection());
 			// https://github.com/hub4j/github-api/issues/570
-			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken(Map.of(// Required to open
-																									// new pull-requests
-					"pull_requests",
-					GHPermissionType.WRITE, // Required to access a repository without having to list all available
-											// repositories
-					"metadata",
-					GHPermissionType.READ, // Required to read files, and commit new versions
-					"contents",
-					GHPermissionType.WRITE));
+			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken(// Required to open
+					Map.of(// new pull-requests
+							"pull_requests", // Required to access a repository without having to list all available
+							GHPermissionType.WRITE, // repositories
+							"metadata", // Required to read files, and commit new versions
+							GHPermissionType.READ,
+							"contents",
+							GHPermissionType.WRITE));
 			// https://github.com/hub4j/github-api/issues/570
 			String token = installationGithubBuilder.create().getToken();
 			GitHub installationGithub = makeInstallationGithub(token);
@@ -149,7 +148,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 							Optional.empty(),
 							Optional.empty());
 				}
-
 				// Some dirty commits may have been pushed while the PR was closed
 				prOpen = true;
 				refHasOpenReviewRequest = true;

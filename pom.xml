@@ -15,7 +15,7 @@
 
 	<modules>
 		<module>parent</module>
-		
+
 		<module>any-language</module>
 
 		<module>code-providers</module>
@@ -57,9 +57,9 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
-		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-		<spotbugs.version>4.2.3</spotbugs.version>
+		<spotbugs.version>4.3.0</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
@@ -67,7 +67,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
 		<maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
-		<pmd.version>6.34.0</pmd.version>
+		<pmd.version>6.36.0</pmd.version>
 		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
 		<git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
@@ -81,7 +81,7 @@
 
 		<sentry-spring.version>5.0.1</sentry-spring.version>
 
-		<spring-cloud.version>Hoxton.SR10</spring-cloud.version>
+		<spring-cloud.version>2020.0.3</spring-cloud.version>
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
@@ -94,7 +94,7 @@
 		<surefire.additionalArgument />
 
 		<!--This may be overriden to enable deploying older version of Eclipse, which may format different -->
-		<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
+		<eclipse.jt.core.version>3.26.0</eclipse.jt.core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -107,12 +107,21 @@
 				<scope>import</scope>
 			</dependency>
 
+			<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-bom -->
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-bom</artifactId>
+				<version>1.12.26</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<!-- https://mvnrepository.com/artifact/org.checkerframework/checker-qual -->
 			<dependency>
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
 				<groupId>org.checkerframework</groupId>
 				<artifactId>checker-qual</artifactId>
-				<version>3.12.0</version>
+				<version>3.16.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -47,43 +47,57 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 
 		Optional<Node> optParent = methodCall.getParentNode();
 		// We looks for a negated expression '!optional.isEmpty()'
-		if (methodCall.getScope().isPresent() && optParent.isPresent() && optParent.get() instanceof UnaryExpr) {
-			UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
-			if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
-				return false;
-			}
+		if (!methodCall.getScope().isPresent() || !optParent.isPresent() || !(optParent.get() instanceof UnaryExpr)) {
+			return false;
+		}
+		UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
+		if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
+			return false;
+		}
 
-			Optional<Expression> optScope = methodCall.getScope();
-			Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
-			if (optType.isEmpty() || optType.isPresent() && optType.get().isReferenceType()
-					&& !optType.get().asReferenceType().getQualifiedName().equals(Optional.class.getName())) {
-				// We are calling 'isEmpty' not on an Optional object
-				return false;
-			}
+		Optional<Expression> optScope = methodCall.getScope();
+		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
+		if (optType.isEmpty()) {
+			return false;
+		}
+		ResolvedType type = optType.get();
 
-			Expression scope = optScope.get();
+		boolean isCorrectClass = false;
 
-			boolean localTransformed = false;
-			if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
-				MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_PRESENT);
-				LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-				if (unaryExpr.replace(replacement)) {
-					localTransformed = true;
-				}
-			} else {
-				MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
-				LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-				if (unaryExpr.replace(replacement)) {
-					localTransformed = true;
-				}
-			}
+		if (type.isConstraint()) {
+			// Happens on Lambda
+			type = type.asConstraintType().getBound();
+		}
 
-			// TODO Add a rule to replace such trivial 'if else return'
-			if (localTransformed) {
-				return true;
-			} else {
-				return false;
+		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(Optional.class.getName())) {
+			// We are calling 'isEmpty' not on an Optional object
+			isCorrectClass = true;
+		}
+
+		if (!isCorrectClass) {
+			return false;
+		}
+
+		Expression scope = optScope.get();
+
+		boolean localTransformed = false;
+		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
+			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_PRESENT);
+			LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+			if (unaryExpr.replace(replacement)) {
+				localTransformed = true;
 			}
+		} else {
+			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
+			LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+			if (unaryExpr.replace(replacement)) {
+				localTransformed = true;
+			}
+		}
+
+		// TODO Add a rule to replace such trivial 'if else return'
+		if (localTransformed) {
+			return true;
 		} else {
 			return false;
 		}

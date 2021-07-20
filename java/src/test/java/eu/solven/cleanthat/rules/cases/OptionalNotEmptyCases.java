@@ -1,7 +1,10 @@
 package eu.solven.cleanthat.rules.cases;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
@@ -42,9 +45,19 @@ public class OptionalNotEmptyCases extends ACases {
 		public Object post(Map<?, ?> input) {
 			return !input.isEmpty();
 		}
+	}
 
-		// public Object post(Map<?, ?> input) {
-		// return !input.isEmpty();
-		// }
+	@UnchangedMethod
+	public static class CaseOnHashMap {
+		public Object post(HashMap<?, ?> input) {
+			return !input.isEmpty();
+		}
+	}
+
+	@UnchangedMethod
+	public static class CaseOnLambda {
+		public Object post(List<Map<?, ?>> input) {
+			return input.stream().filter(m -> !m.isEmpty()).collect(Collectors.toList());
+		}
 	}
 }

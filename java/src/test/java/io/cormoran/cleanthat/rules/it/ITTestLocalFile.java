@@ -26,7 +26,8 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class ITTestLocalFile {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ITTestLocalFile.class);
 
-	final String path = "./github/src/main/java/eu/solven/cleanthat/github/event/GithubWebhookHandler.java";
+	final String path =
+			"./config/src/main/java/" + "eu.solven.cleanthat.config.ConfigHelpers".replace('.', '/') + ".java";
 
 	@Test
 	public void testCleanLocalFile() throws IOException {

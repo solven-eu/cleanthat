@@ -22,9 +22,8 @@ import eu.solven.cleanthat.github.SourceCodeProperties;
 
 /**
  * Helps working with configuration files
- * 
- * @author Benoit Lacelle
  *
+ * @author Benoit Lacelle
  */
 public class ConfigHelpers {
 
@@ -49,7 +48,6 @@ public class ConfigHelpers {
 		} else {
 			objectMapper = ConfigHelpers.getYaml(objectMappers);
 		}
-
 		try {
 			return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
 		} catch (IOException e) {
@@ -85,26 +83,23 @@ public class ConfigHelpers {
 
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
 		Map<String, Object> languageAsMap = objectMappers.get(0).convertValue(languageP, Map.class);
-
 		Map<String, Object> sourceCodeAsMap =
 				objectMappers.get(0).convertValue(languageP.getSourceCodeProperties(), Map.class);
 		sourceCodeAsMap.put("includes", includes);
-
 		languageAsMap.put("source_code", sourceCodeAsMap);
-
 		return objectMappers.get(0).convertValue(languageAsMap, CleanthatLanguageProperties.class);
 	}
 
 	public static ObjectMapper getJson(List<ObjectMapper> objectMappers) {
 		return objectMappers.stream()
-				.filter(om -> om.getFactory().getFormatName().equals(JsonFactory.FORMAT_NAME_JSON))
+				.filter(om -> JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
 				.findAny()
 				.get();
 	}
 
 	public static ObjectMapper getYaml(List<ObjectMapper> objectMappers) {
 		return objectMappers.stream()
-				.filter(om -> !om.getFactory().getFormatName().equals(JsonFactory.FORMAT_NAME_JSON))
+				.filter(om -> !JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
 				.findAny()
 				.get();
 	}

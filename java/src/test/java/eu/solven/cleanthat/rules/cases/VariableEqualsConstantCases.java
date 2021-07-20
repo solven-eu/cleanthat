@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Ignore;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.rules.VariableEqualsConstant;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
@@ -165,6 +166,17 @@ public class VariableEqualsConstantCases extends ACases {
 
 		public Object post(String x) {
 			return JsonFactory.FORMAT_NAME_JSON.equals(x);
+		}
+	}
+
+	@CompareMethods
+	public static class CustomObjectFieldIsStaticField {
+		public Object pre(ObjectMapper o) {
+			return o.getFactory().getFormatName().equals(JsonFactory.FORMAT_NAME_JSON);
+		}
+
+		public Object post(ObjectMapper o) {
+			return JsonFactory.FORMAT_NAME_JSON.equals(o.getFactory().getFormatName());
 		}
 	}
 

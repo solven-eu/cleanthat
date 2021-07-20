@@ -78,8 +78,7 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			// TODO Think deeper about relying on the field name to suppose it is constant. We should at least check
 			// the object is a class and not an object
 			Expression scope = ((FieldAccessExpr) singleArgument).getScope();
-			LOGGER.debug("TODO Check scope is a class");
-
+			LOGGER.debug("TODO Check scope is a class ({})", scope);
 			LOGGER.debug("We prefer having the constant at the left");
 			stringScopeOnly = true;
 		} else if (singleArgument instanceof StringLiteralExpr && isCompareStringMethod(methodCallName)) {
@@ -117,18 +116,14 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 
 	private boolean isStringScope(Expression scope) {
 		Optional<ResolvedType> optType = optResolvedType(scope);
-
-		if (!optType.isPresent()) {
+		if (optType.isEmpty()) {
 			return false;
 		}
-
 		ResolvedType type = optType.get();
-
 		if (type.isConstraint()) {
 			// This happens on lambda expression: the type we're looking for is the Lambda bound-type
 			type = type.asConstraintType().getBound();
 		}
-
 		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
 			return true;
 		}

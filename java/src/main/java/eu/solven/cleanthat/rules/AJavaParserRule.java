@@ -29,7 +29,11 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
-		ts.add(new ReflectionTypeSolver());
+
+		// We allow processing any types available to default classLoader
+		boolean jreOnly = false;
+
+		ts.add(new ReflectionTypeSolver(jreOnly));
 		return JavaParserFacade.get(ts);
 	});
 

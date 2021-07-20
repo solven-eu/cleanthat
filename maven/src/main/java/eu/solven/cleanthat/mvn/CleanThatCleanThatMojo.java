@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,11 @@ import io.sentry.IHub;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = "cleanthat", defaultPhase = LifecyclePhase.PROCESS_SOURCES, threadSafe = true)
+@Mojo(name = "cleanthat",
+		defaultPhase = LifecyclePhase.PROCESS_SOURCES,
+		threadSafe = true,
+		// Used to enable symbolSolving based on project dependencies
+		requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
 

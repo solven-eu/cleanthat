@@ -22,6 +22,7 @@ import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class ATestCases {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
 	protected void testCasesIn(ACases cases) throws IOException {
@@ -33,7 +34,6 @@ public class ATestCases {
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
 		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
-
 		checkMethodCases(transformer, compilationUnit);
 		checkMethodUnchangedCases(transformer, compilationUnit);
 		checkTypeCases(transformer, compilationUnit);
@@ -42,17 +42,13 @@ public class ATestCases {
 	private void checkMethodCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> methodCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareMethods.class).isPresent());
-
 		methodCases.forEach(oneCase -> {
 			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
 				return;
 			}
-
 			LOGGER.info("Processing the case: {}", oneCase.getName());
-
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
-
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
@@ -60,11 +56,9 @@ public class ATestCases {
 				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertEquals(post, pre);
-
-				// We check this after checking comparison with 'post' for greater test result readibility
+				// We check this after checking comparison with 'post' for greater test result readability
 				Assert.assertTrue("We miss a transformation flag for: " + pre, transformed);
 			}
-
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
@@ -82,18 +76,14 @@ public class ATestCases {
 			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
 				return;
 			}
-
 			LOGGER.info("Processing the case: {}", oneCase.getName());
-
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
-
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
 				// https://github.com/javaparser/javaparser/issues/3322
 				// We prefer not-processing clones as it may lead to dirty issues
 				MethodDeclaration clonedPost = post.clone();
-
 				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost,
 						transformer.walkNode(post));
 				Assert.assertEquals(clonedPost, post);
@@ -108,24 +98,21 @@ public class ATestCases {
 			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
 				return;
 			}
-
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 			TypeDeclaration<?> pre = oneCase.getMembers()
 					.stream()
 					.filter(n -> n instanceof TypeDeclaration)
 					.map(n -> (TypeDeclaration<?>) n)
-					.filter(n -> n.getNameAsString().equals("Pre"))
+					.filter(n -> "Pre".equals(n.getNameAsString()))
 					.findAny()
 					.get();
-
 			TypeDeclaration<?> post = oneCase.getMembers()
 					.stream()
 					.filter(n -> n instanceof TypeDeclaration)
 					.map(n -> (TypeDeclaration<?>) n)
-					.filter(n -> n.getNameAsString().equals("Post"))
+					.filter(n -> "Post".equals(n.getNameAsString()))
 					.findAny()
 					.get();
-
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
@@ -134,7 +121,6 @@ public class ATestCases {
 				pre.setName("Post");
 				Assert.assertEquals(post, pre);
 			}
-
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{

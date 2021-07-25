@@ -89,7 +89,7 @@ public class ITGetType {
 					if (resolved instanceof JavaParserVariableDeclaration) {
 						VariableDeclarator declarator =
 								((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
-						
+
 						// 'constant = ITGetType.SOME_CONSTANT'
 						System.out.println(declarator);
 						declarator.getInitializer().ifPresent(expr -> {

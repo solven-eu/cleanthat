@@ -12,6 +12,7 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import cormoran.pepper.logging.PepperLogHelper;
@@ -35,6 +36,7 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 		return IJdkVersionConstants.JDK_6;
 	}
 
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
@@ -74,19 +76,21 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 		return false;
 	}
 
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	private boolean process(Node node, Expression lengthScope, ResolvedType type) {
 		boolean transformed;
 		if (type.isReferenceType()) {
 			LOGGER.info("scope={} type={}", lengthScope, type);
 			boolean doIt = false;
-			if (type.asReferenceType().getQualifiedName().equals(Collection.class.getName())
-					|| type.asReferenceType().getQualifiedName().equals(Map.class.getName())
-					|| type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
+			ResolvedReferenceType referenceType = type.asReferenceType();
+			if (referenceType.getQualifiedName().equals(Collection.class.getName())
+					|| referenceType.getQualifiedName().equals(Map.class.getName())
+					|| referenceType.getQualifiedName().equals(String.class.getName())) {
 				doIt = true;
 			} else {
 				// Try to load the Class to check if it is a matching sub-type
 				try {
-					Class<?> clazz = Class.forName(type.asReferenceType().getQualifiedName());
+					Class<?> clazz = Class.forName(referenceType.getQualifiedName());
 					if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
 							|| String.class.isAssignableFrom(clazz)) {
 						doIt = true;

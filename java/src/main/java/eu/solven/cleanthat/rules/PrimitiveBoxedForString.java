@@ -54,7 +54,7 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 		return transformed.get();
 	}
 
-	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
+	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.CognitiveComplexity" })
 	private boolean process(Node node, Expression scope, ResolvedType type) {
 		if (!type.isReferenceType()) {
 			return false;

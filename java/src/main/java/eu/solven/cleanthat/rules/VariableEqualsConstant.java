@@ -53,7 +53,7 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		return true;
 	}
 
-	@SuppressWarnings("PMD.NPathComplexity")
+	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));

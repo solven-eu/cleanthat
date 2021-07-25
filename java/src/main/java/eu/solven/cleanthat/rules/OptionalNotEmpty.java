@@ -34,6 +34,7 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 		return IJdkVersionConstants.JDK_11;
 	}
 
+	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));

@@ -34,6 +34,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Bean
 	public Function<Map<String, ?>, Map<String, ?>> ingressRawWebhook() {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);

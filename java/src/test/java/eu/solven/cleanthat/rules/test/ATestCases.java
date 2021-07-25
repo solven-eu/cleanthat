@@ -10,12 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
+import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.CompareTypes;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
@@ -33,7 +34,10 @@ public class ATestCases {
 		Path srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = casesClass.getName().replaceAll("\\.", "/") + ".java";
-		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
+
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser();
+		CompilationUnit compilationUnit = javaParser.parse(srcMainJava.resolve(path)).getResult().get();
+
 		checkMethodCases(transformer, compilationUnit);
 		checkMethodUnchangedCases(transformer, compilationUnit);
 		checkTypeCases(transformer, compilationUnit);

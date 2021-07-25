@@ -23,8 +23,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
@@ -33,6 +37,7 @@ import eu.solven.cleanthat.github.ILanguageProperties;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.IJdkVersionConstants;
+import eu.solven.cleanthat.rules.ModifierOrder;
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
 import eu.solven.cleanthat.rules.UseDiamondOperator;
@@ -59,6 +64,7 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			new EnumsWithoutEquals(),
 			new PrimitiveBoxedForString(),
 			new OptionalNotEmpty(),
+			new ModifierOrder(),
 			new UseDiamondOperator(),
 			new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
@@ -93,6 +99,8 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 		// Ensure we compute the compilation-unit only once per String
 		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
 
+		JavaParser parser = makeDefaultJavaParser();
+
 		transformers.forEach(ct -> {
 			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
 			int codeVersion = IJdkVersionConstants.ORDERED.indexOf(languageProperties.getLanguageVersion());
@@ -114,13 +122,13 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			// Fill cache
 			if (optCompilationUnit.get() == null) {
 				// Synchronized until: https://github.com/javaparser/javaparser/issues/3050
-				synchronized (StaticJavaParser.class) {
-					try {
-						optCompilationUnit.set(StaticJavaParser.parse(codeRef.get()));
-					} catch (RuntimeException e) {
-						throw new RuntimeException("Issue parsing the code", e);
-					}
+				// synchronized (StaticJavaParser.class) {
+				try {
+					optCompilationUnit.set(parser.parse(codeRef.get()).getResult().get());
+				} catch (RuntimeException e) {
+					throw new RuntimeException("Issue parsing the code", e);
 				}
+				// }
 			}
 
 			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST
@@ -142,5 +150,12 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			}
 		});
 		return codeRef.get();
+	}
+
+	public static JavaParser makeDefaultJavaParser() {
+		ParserConfiguration configuration = new ParserConfiguration()
+				.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
+		JavaParser parser = new JavaParser(configuration);
+		return parser;
 	}
 }

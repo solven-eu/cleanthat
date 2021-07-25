@@ -78,6 +78,11 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			// TODO Think deeper about relying on the field name to suppose it is constant. We should at least check
 			// the object is a class and not an object
 			Expression scope = ((FieldAccessExpr) singleArgument).getScope();
+
+			// TODO Do not switch if both the scope and the argument are constants
+			// https://github.com/javaparser/javaparser/issues/3330
+			// optResolvedType(scope);
+			// scope.calculateResolvedType()
 			LOGGER.debug("TODO Check scope is a class ({})", scope);
 			LOGGER.debug("We prefer having the constant at the left");
 			stringScopeOnly = true;

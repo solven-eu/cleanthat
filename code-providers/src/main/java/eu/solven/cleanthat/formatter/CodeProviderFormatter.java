@@ -58,6 +58,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		this.formatter = formatter;
 	}
 
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties,
 			ICodeProviderWriter pr,
@@ -165,7 +166,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		return languageP;
 	}
 
-	private AtomicLongMap<String> processFiles(ICodeProvider pr,
+	@SuppressWarnings("PMD.CognitiveComplexity")
+	protected AtomicLongMap<String> processFiles(ICodeProvider pr,
 			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP) {

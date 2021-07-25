@@ -96,7 +96,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return new GitHubBuilder().withAppInstallationToken(token).build();
 	}
 
-	@SuppressWarnings({ "PMD.ExcessiveMethodLength", "checkstyle:MethodLength", "PMD.NPathComplexity" })
+	@SuppressWarnings({ "PMD.ExcessiveMethodLength",
+			"checkstyle:MethodLength",
+			"PMD.NPathComplexity",
+			"PMD.CognitiveComplexity" })
 	@Override
 	public GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
@@ -248,7 +251,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
 	// the base branch?
-	@SuppressWarnings("PMD.NPathComplexity")
+	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
 	@Override
 	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
@@ -341,6 +344,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return WebhookRelevancyResult.relevant(refToClean.get(), offlineResult.optBaseRef());
 	}
 
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);

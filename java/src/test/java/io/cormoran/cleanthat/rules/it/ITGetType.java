@@ -5,19 +5,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
@@ -28,18 +33,29 @@ import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
  *
  * @author Benoit Lacelle
  */
+// https://github.com/javaparser/javaparser/issues/3322
+// https://github.com/javaparser/javaparser/issues/3330
+// TODO ENsure this is trivial to execute
 public class ITGetType {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITGetType.class);
+	private static final String SOME_CONSTANT = "magic";
 
 	@UnchangedMethod
 	public static class CheckStartsWith {
 
-		public Object post(String o) {
-			return o.startsWith("Youpi");
+		public Object post(String lang) {
+			String constant = ITGetType.SOME_CONSTANT;
+			return lang.equals(constant);
 		}
 	}
 
+	// Setup symbol solver
+	final ParserConfiguration configuration = new ParserConfiguration()
+			.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
+	// Setup parser
+	final JavaParser parser = new JavaParser(configuration);
+
+	// https://github.com/javaparser/javaparser/issues/1439
+	// https://github.com/javaparser/javaparser/issues/1506
 	@Test
 	public void testResolveType() throws IOException {
 		File file = new File("src/test/java/" + ITGetType.class.getName().replace(".", "/") + ".java");
@@ -47,29 +63,79 @@ public class ITGetType {
 			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
 		}
 		String pathAsString = Files.readString(file.toPath());
-		CompilationUnit tree = StaticJavaParser.parse(pathAsString);
-		CombinedTypeSolver ts = new CombinedTypeSolver();
-		ts.add(new ReflectionTypeSolver());
-		JavaParserFacade parser = JavaParserFacade.get(ts);
+		CompilationUnit tree = parser.parse(pathAsString).getResult().get();
+
 		tree.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
 			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
 			if (preMethods.size() != 1) {
 				return;
 			}
 			MethodDeclaration pre = preMethods.get(0);
-			pre = pre.clone();
 			pre.walk(node -> {
 				if (!(node instanceof MethodCallExpr)) {
 					return;
 				}
 				MethodCallExpr methodCall = (MethodCallExpr) node;
-				if (!"o.startsWith(\"Youpi\")".equals(methodCall.toString())) {
+				if (!methodCall.toString().contains("equals")) {
 					return;
 				}
+
+				Expression arg0 = methodCall.getArgument(0);
+				if (arg0.isNameExpr()) {
+					NameExpr nameExpr = arg0.asNameExpr();
+					ResolvedValueDeclaration resolved = nameExpr.resolve();
+					System.out.println(resolved);
+
+					if (resolved instanceof JavaParserVariableDeclaration) {
+						VariableDeclarator declarator =
+								((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
+						
+						// 'constant = ITGetType.SOME_CONSTANT'
+						System.out.println(declarator);
+						declarator.getInitializer().ifPresent(expr -> {
+							// 'ITGetType.SOME_CONSTANT'
+							System.out.println(expr);
+						});
+					}
+				}
+			});
+		});
+	}
+
+	@Test
+	public void testResolveType_LeanerStyle() {
+		// Source code
+		String sourceCode = Stream.of("public class A {                                                     ",
+				"            public Object post(String lang) {",
+				"                return o.startsWith(Locale.FRANCE.getCountry());",
+				"        }",
+				"    }").collect(Collectors.joining(System.lineSeparator()));
+
+		CompilationUnit cu = parser.parse(sourceCode).getResult().get();
+
+		cu.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
+			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
+			if (preMethods.size() != 1) {
+				return;
+			}
+			MethodDeclaration md = preMethods.get(0);
+
+			md.walk(node -> {
+				if (!(node instanceof MethodCallExpr)) {
+					return;
+				}
+				MethodCallExpr methodCall = (MethodCallExpr) node;
+				if (!methodCall.getOrphanComments().toString().contains("Locale.FRANCE")) {
+					return;
+				}
+
 				Optional<Expression> optScope = methodCall.getScope();
+
 				Expression scope = optScope.get();
-				ResolvedType type = parser.getType(scope);
-				LOGGER.info("Type: {}", type);
+
+				ResolvedType type = scope.calculateResolvedType(); // 2 - this is how to solve the type
+
+				System.out.println(type.describe());
 			});
 		});
 	}

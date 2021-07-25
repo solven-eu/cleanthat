@@ -57,8 +57,27 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 	}
 
 	protected Optional<ResolvedType> optResolvedType(Expression scope) {
+		ResolvedType calculateResolvedType;
 		try {
-			return Optional.of(getThreadJavaParser().getType(scope));
+			calculateResolvedType = scope.calculateResolvedType();
+		} catch (RuntimeException e) {
+			// TODO Is this related to code-modifications?
+			try {
+				return Optional.of(getThreadJavaParser().getType(scope));
+			} catch (RuntimeException ee) {
+				LOGGER.debug("Issue with JavaParser: {} {}", ee.getClass().getName(), ee.getMessage());
+				return Optional.empty();
+			}
+		}
+		try {
+			ResolvedType manualResolvedType = getThreadJavaParser().getType(scope);
+
+			if (!manualResolvedType.toString().equals(calculateResolvedType.toString())) {
+				throw new IllegalStateException(
+						manualResolvedType.toString() + " not equals to " + calculateResolvedType.toString());
+			}
+			// return Optional.of(calculateResolvedType);
+			return Optional.of(manualResolvedType);
 		} catch (RuntimeException e) {
 			// This will happens often as, as of 2021-01, we solve types only given current class context,
 			// neither other classes of the project, nor its maven/gradle dependencies

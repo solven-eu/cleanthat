@@ -172,7 +172,7 @@
 					<lambdaFunctions>
 						<lambdaFunction>
 							<functionName>checkEventIsRelevant</functionName>
-							<handler>eu.solven.cleanthat.lambda.step0_checkWebhook.CheckWebhooksHandler</handler>
+							<handler>eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksHandler</handler>
 							<!-- MB -->
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->
@@ -182,7 +182,7 @@
 
 						<lambdaFunction>
 							<functionName>checkRepositoryIsConfigured</functionName>
-							<handler>eu.solven.cleanthat.lambda.CleanThatWebhookHandler</handler>
+							<handler>eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksHandler</handler>
 							<!-- MB -->
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->
@@ -191,7 +191,7 @@
 
 						<lambdaFunction>
 							<functionName>cleanGivenConfiguration</functionName>
-							<handler>eu.solven.cleanthat.lambda.CleanThatWebhookHandler</handler>
+							<handler>eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksHandler</handler>
 							<!-- MB -->
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->

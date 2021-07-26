@@ -32,6 +32,7 @@ import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.event.pojo.GitPrHeadRef;
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
@@ -209,11 +210,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 									optSha.get());
 					optHeadRef = Optional.of(value);
 					try {
-						Optional<GHPullRequest> prMatchingHead = github.getRepository(value.getRepoName())
-								.getPullRequests(GHIssueState.OPEN)
-								.stream()
-								.filter(pr -> ref.equals("refs/heads/" + pr.getHead().getRef()))
-								.findAny();
+
+						Optional<GHPullRequest> prMatchingHead =
+								new GithubFacade(github, value.getRepoName()).findFirstPrHeadMatchingRef(ref);
 						optBaseRef = prMatchingHead.map(pr -> {
 							GHCommitPointer base = pr.getBase();
 							return new GitRepoBranchSha1(base.getRepository().getName(), base.getRef(), base.getSha());
@@ -222,7 +221,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					} catch (IOException e) {
 						throw new UncheckedIOException(e);
 					}
-					// if (ref)
 				} else {
 					// TODO Unclear which case this can be (no pull_request and no action)
 					LOGGER.warn("WTF We miss at least one of sha1 and refName");

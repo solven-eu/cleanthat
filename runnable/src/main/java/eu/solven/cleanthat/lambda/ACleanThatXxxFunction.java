@@ -2,6 +2,13 @@ package eu.solven.cleanthat.lambda;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import io.sentry.Sentry;
 
@@ -12,11 +19,24 @@ import io.sentry.Sentry;
  *
  */
 public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ACleanThatXxxFunction.class);
 
 	protected final Map<String, ?> processOneEvent(IWebhookEvent input) {
 		try {
 			return unsafeProcessOneEvent(input);
 		} catch (RuntimeException e) {
+			if (input instanceof GithubWebhookEvent) {
+				Map<String, ?> body = input.getBody();
+
+				try {
+					LOGGER.warn("Issue with GithubWebhookEvent. body={}", new ObjectMapper().writeValueAsString(body));
+				} catch (JsonProcessingException e1) {
+					LOGGER.warn("Issue printing as json. body: {}", body);
+				}
+			} else {
+				LOGGER.warn("Issue with {}", input.getClass());
+			}
+
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");
 			throw wrapped;

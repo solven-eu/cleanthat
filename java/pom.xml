@@ -12,7 +12,7 @@
 	<artifactId>java</artifactId>
 
 	<properties>
-		<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
+		<eclipse.jt.core.version>3.26.0</eclipse.jt.core.version>
 	</properties>
 
 	<profiles>

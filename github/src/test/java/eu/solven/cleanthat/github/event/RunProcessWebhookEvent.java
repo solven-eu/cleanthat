@@ -29,7 +29,7 @@ import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
 public class RunProcessWebhookEvent {
 
 	// Relevant to rely on GitHub.offline()?
-	final GitHub github = Mockito.mock(GitHub.class);
+	final GHApp ghApp = Mockito.mock(GHApp.class);
 
 	final GitHub installGithub = Mockito.mock(GitHub.class);
 
@@ -40,7 +40,7 @@ public class RunProcessWebhookEvent {
 	final IGithubRefCleaner prCleaner = Mockito.mock(IGithubRefCleaner.class);
 
 	final GithubWebhookHandler handler =
-			new GithubWebhookHandler(github, Arrays.asList(ConfigHelpers.makeJsonObjectMapper())) {
+			new GithubWebhookHandler(ghApp, Arrays.asList(ConfigHelpers.makeJsonObjectMapper())) {
 
 				@Override
 				protected GitHub makeInstallationGithub(String token) throws IOException {
@@ -52,8 +52,8 @@ public class RunProcessWebhookEvent {
 
 	@Before
 	public void initMocks() throws IOException {
-		GHApp ghApp = Mockito.mock(GHApp.class);
-		Mockito.when(github.getApp()).thenReturn(ghApp);
+		// GHApp ghApp = Mockito.mock(GHApp.class);
+		// Mockito.when(github.getApp()).thenReturn(ghApp);
 		GHAppInstallation appInstall = Mockito.mock(GHAppInstallation.class);
 		Mockito.when(ghApp.getInstallationById(Mockito.anyLong())).thenReturn(appInstall);
 		GHAppCreateTokenBuilder tokenBuilder = Mockito.mock(GHAppCreateTokenBuilder.class);

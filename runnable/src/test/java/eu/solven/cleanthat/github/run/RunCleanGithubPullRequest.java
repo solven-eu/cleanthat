@@ -59,13 +59,12 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
 
 		GHAppInstallation installation = handler.getGithubAsApp()
-				.getApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
 		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
 		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId());
 		GitHub github = githubAndToken.getGithub();
-		GitHub userToServerGithub = handler.getGithubAsApp();
+		// GitHub userToServerGithub = handler.getGithubAsApp();
 
 		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHRepository repo;
@@ -109,7 +108,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			if (!configExistsAnywhere) {
 				// At some point, we could prefer remaining silent if we understand the repository tried to integrate
 				// us, but did not completed.
-				cleaner.openPRWithCleanThatStandardConfiguration(userToServerGithub, defaultBranch);
+				// cleaner.openPRWithCleanThatStandardConfiguration(userToServerGithub, defaultBranch);
 			} else {
 				LOGGER.info("There is at least one branch with CleanThat configured ({})",
 						branchWithConfig.get().getName());

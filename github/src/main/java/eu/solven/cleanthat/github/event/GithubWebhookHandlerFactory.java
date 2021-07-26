@@ -50,7 +50,7 @@ public class GithubWebhookHandlerFactory {
 				// This leads to 401. Why?
 				// .withRateLimitChecker(new NoWaitRateLimitChecker())
 				.build();
-		return new GithubWebhookHandler(github, objectMappers);
+		return new GithubWebhookHandler(github.getApp(), objectMappers);
 	}
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature

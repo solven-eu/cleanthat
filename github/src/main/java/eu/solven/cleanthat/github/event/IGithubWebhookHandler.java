@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.github.event;
 
+import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
 
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
@@ -18,7 +19,7 @@ public interface IGithubWebhookHandler {
 	 * 
 	 * @return a {@link GitHub} instance authenticated as the Github Application.
 	 */
-	GitHub getGithubAsApp();
+	GHApp getGithubAsApp();
 
 	/**
 	 * 

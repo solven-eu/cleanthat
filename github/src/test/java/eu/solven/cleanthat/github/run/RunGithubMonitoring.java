@@ -59,8 +59,7 @@ public class RunGithubMonitoring {
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
 
-		GitHub github = handler.getGithubAsApp();
-		GHApp app = github.getApp();
+		GHApp app = handler.getGithubAsApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());
 		app.listInstallations().forEach(installation -> {
 			long appId = installation.getAppId();

@@ -73,7 +73,7 @@
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
-		<formatter-maven-plugin.version>2.15.0</formatter-maven-plugin.version>
+		<formatter-maven-plugin.version>2.16.0</formatter-maven-plugin.version>
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.6.0</impsort-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->

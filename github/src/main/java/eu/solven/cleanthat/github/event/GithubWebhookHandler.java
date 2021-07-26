@@ -204,10 +204,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					}
 					pushBranch = true;
 					String ref = optFullRefName.get();
-					GitRepoBranchSha1 value =
-							new GitRepoBranchSha1(PepperMapHelper.getRequiredAs(input, "repository", "full_name"),
-									ref,
-									optSha.get());
+					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
+					GitRepoBranchSha1 value = new GitRepoBranchSha1(repoName, ref, optSha.get());
 					optHeadRef = Optional.of(value);
 					try {
 

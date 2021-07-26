@@ -1,10 +1,14 @@
 To rebuild with dependencies from root:
 
-     mvn clean install -pl :lambda -am
+    mvn install -pl :lambda -am
+	
+Or safer:
+	
+    mvn clean install -pl :lambda -am
 
 To deploy:
 
-     mvn lambda:deploy-lambda -pl :lambda
+    mvn lambda:deploy-lambda -pl :lambda
     
 Issue with startup on Lambda? Start by testing in local:
 

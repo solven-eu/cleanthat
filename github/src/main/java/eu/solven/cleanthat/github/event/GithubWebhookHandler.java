@@ -47,6 +47,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
  * @author Benoit Lacelle
  */
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
+@SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
@@ -100,7 +101,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	@SuppressWarnings({ "PMD.ExcessiveMethodLength",
 			"checkstyle:MethodLength",
 			"PMD.NPathComplexity",
-			"PMD.CognitiveComplexity" })
+			"PMD.CognitiveComplexity",
+			"PMD.ExcessiveMethodLength" })
 	@Override
 	public GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
@@ -256,7 +258,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
 	// the base branch?
-	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
+	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity", "PMD.ExcessiveMethodLength" })
 	@Override
 	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {

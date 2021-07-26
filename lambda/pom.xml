@@ -71,6 +71,7 @@
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -169,6 +170,7 @@
 
 					<publish>true</publish>
 					<forceUpdate>true</forceUpdate>
+
 					<lambdaFunctions>
 						<lambdaFunction>
 							<functionName>checkEventIsRelevant</functionName>
@@ -178,6 +180,14 @@
 							<!-- Startup can take up to 30 seconds -->
 							<!-- Filtering for valid webhook should be quite fast -->
 							<timeout>60</timeout>
+
+							<triggers>
+								<trigger>
+									<enabled>true</enabled>
+									<integration>SQS</integration>
+									<standardQueue>FromGithub</standardQueue>
+								</trigger>
+							</triggers>
 						</lambdaFunction>
 
 						<lambdaFunction>

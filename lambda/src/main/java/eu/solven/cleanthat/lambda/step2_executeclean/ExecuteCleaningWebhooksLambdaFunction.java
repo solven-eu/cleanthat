@@ -4,7 +4,7 @@ import java.util.Map;
 
 import eu.solven.cleanthat.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
+import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
 
@@ -14,7 +14,7 @@ import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLa
  * @author Benoit Lacelle
  *
  */
-public class ExecuteCleaningWebhooksLambdaFunction extends ACleanThatXxxFunction {
+public class ExecuteCleaningWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	// private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteCleaningWebhooksLambdaFunction.class);
 
 	@Override

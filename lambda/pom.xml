@@ -159,9 +159,8 @@
 					<!-- Used to deploy different versions for different eclipse -->
 					<functionNameSuffix>${lambda.functionNameSuffix}</functionNameSuffix>
 
-					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/users/circleci-olapless -->
-					<!-- https://console.aws.amazon.com/iam/home?region=us-east-1#/roles/hello-lambda-role -->
-					<lambdaRoleArn>arn:aws:iam::144657973876:role/hello-lambda-role</lambdaRoleArn>
+					<!-- https://console.aws.amazon.com/iam/home#/roles/cleanthat-lambda-role -->
+					<lambdaRoleArn>arn:aws:iam::144657973876:role/cleanthat-lambda-role</lambdaRoleArn>
 
 					<!-- olapless-us-east-1-unittests -->
 					<s3Bucket>olapless-lambda-us-east-1</s3Bucket>

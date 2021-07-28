@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github.event;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.kohsuke.github.GHPullRequest;
@@ -22,10 +23,13 @@ public interface IGithubRefCleaner {
 	 * 
 	 * @param offlineResult
 	 * @param theRef
+	 * @param relevantBaseBranches
 	 * @return the ref to clean. Typically different to the input ref when we want to clean through a PR (e.g. not to
 	 *         modify directly the dirty branch).
 	 */
-	Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult offlineResult, GitRepoBranchSha1 theRef);
+	Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult offlineResult,
+			GitRepoBranchSha1 theRef,
+			Set<String> relevantBaseBranches);
 
 	@Deprecated
 	Map<String, ?> formatPR(Supplier<GHPullRequest> prSupplier);

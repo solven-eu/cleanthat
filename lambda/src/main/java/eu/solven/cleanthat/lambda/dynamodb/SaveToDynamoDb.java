@@ -3,6 +3,7 @@ package eu.solven.cleanthat.lambda.dynamodb;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +46,14 @@ public class SaveToDynamoDb {
 	public static AmazonDynamoDB makeDynamoDbClient() {
 		AmazonDynamoDB client = AmazonDynamoDBClient.builder()
 				// The region is meaningless for local DynamoDb but required for client builder validation
-				.withRegion(Regions.US_EAST_2)
+				.withRegion(Regions.US_EAST_1)
 				// .credentialsProvider( new DefaultAWSCredentialsProviderChain())
 				.build();
 		return client;
 	}
 
 	public static void saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
-		LOGGER.info("Save something into DynamoDB");
+		LOGGER.info("Save something into DynamoDB table={}", table);
 
 		DynamoDB dynamodb = new DynamoDB(client);
 		Table myTable = dynamodb.getTable(table);
@@ -61,6 +62,8 @@ public class SaveToDynamoDb {
 		Map<String, Object> inputAsMap = new LinkedHashMap<>();
 		inputAsMap.put("body", input.getBody());
 		inputAsMap.put("headers", input.getHeaders());
+
+		inputAsMap.put("X-GitHub-Delivery", "random-" + UUID.randomUUID());
 
 		myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
 	}

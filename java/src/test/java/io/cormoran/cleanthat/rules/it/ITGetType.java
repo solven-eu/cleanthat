@@ -17,6 +17,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
@@ -37,13 +38,32 @@ import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 // https://github.com/javaparser/javaparser/issues/3330
 // TODO ENsure this is trivial to execute
 public class ITGetType {
-	private static final String SOME_CONSTANT = "magic";
+	private static final String SOME_STATIC_CONSTANT = "magic";
+	private final String someConstant = "magic";
 
 	@UnchangedMethod
-	public static class CheckStartsWith {
+	public static class ReferStaticFieldAsStatic {
 
 		public Object post(String lang) {
-			String constant = ITGetType.SOME_CONSTANT;
+			String constant = ITGetType.SOME_STATIC_CONSTANT;
+			return lang.equals(constant);
+		}
+	}
+
+	@UnchangedMethod
+	public static class ReferStaticFieldAsField {
+
+		public Object post(String lang) {
+			String constant = new ITGetType().SOME_STATIC_CONSTANT;
+			return lang.equals(constant);
+		}
+	}
+
+	@UnchangedMethod
+	public static class ReferFieldAsField {
+
+		public Object post(String lang) {
+			String constant = new ITGetType().someConstant;
 			return lang.equals(constant);
 		}
 	}
@@ -70,34 +90,43 @@ public class ITGetType {
 			if (preMethods.size() != 1) {
 				return;
 			}
-			MethodDeclaration pre = preMethods.get(0);
-			pre.walk(node -> {
-				if (!(node instanceof MethodCallExpr)) {
-					return;
-				}
-				MethodCallExpr methodCall = (MethodCallExpr) node;
-				if (!methodCall.toString().contains("equals")) {
-					return;
-				}
 
-				Expression arg0 = methodCall.getArgument(0);
-				if (arg0.isNameExpr()) {
-					NameExpr nameExpr = arg0.asNameExpr();
-					ResolvedValueDeclaration resolved = nameExpr.resolve();
-					System.out.println(resolved);
-
-					if (resolved instanceof JavaParserVariableDeclaration) {
-						VariableDeclarator declarator =
-								((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
-
-						// 'constant = ITGetType.SOME_CONSTANT'
-						System.out.println(declarator);
-						declarator.getInitializer().ifPresent(expr -> {
-							// 'ITGetType.SOME_CONSTANT'
-							System.out.println(expr);
-						});
+			preMethods.forEach(pre -> {
+				System.out.println(pre);
+				pre.walk(node -> {
+					if (!(node instanceof MethodCallExpr)) {
+						return;
 					}
-				}
+					MethodCallExpr methodCall = (MethodCallExpr) node;
+					if (!methodCall.toString().contains("equals")) {
+						return;
+					}
+
+					Expression arg0 = methodCall.getArgument(0);
+					if (arg0.isNameExpr()) {
+						NameExpr nameExpr = arg0.asNameExpr();
+						ResolvedValueDeclaration resolved = nameExpr.resolve();
+						System.out.println(resolved);
+
+						if (resolved instanceof JavaParserVariableDeclaration) {
+							VariableDeclarator declarator =
+									((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
+
+							// 'constant = ITGetType.SOME_CONSTANT'
+							System.out.println(declarator);
+							declarator.getInitializer().ifPresent(expr -> {
+								// 'ITGetType.SOME_CONSTANT'
+								System.out.println(expr);
+
+								FieldAccessExpr fae = (FieldAccessExpr) expr;
+
+								ResolvedValueDeclaration rvd = fae.resolve();
+
+								System.out.println(rvd.asField().isStatic());
+							});
+						}
+					}
+				});
 			});
 		});
 	}

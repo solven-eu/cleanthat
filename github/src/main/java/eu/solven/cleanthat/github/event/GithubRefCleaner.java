@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -65,7 +67,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	// We may have to clean current ref (e.g. a PR is open, and we want to clean the PR head)
 	// We may have to clean a different ref (e.g. a push to the main branch needs to be cleaned through a PR)
 	@Override
-	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result, GitRepoBranchSha1 theRef) {
+	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result,
+			GitRepoBranchSha1 theRef,
+			Set<String> relevantBaseBranches) {
 		String refUrl;
 		ICodeProvider codeProvider;
 		String ref = theRef.getRef();
@@ -102,7 +106,28 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 		Optional<String> matchingRule =
 				branchesToClean.stream().filter(branchToClean -> Pattern.matches(branchToClean, ref)).findAny();
 		if (matchingRule.isEmpty()) {
-			return Optional.empty();
+			LOGGER.info(
+					"The head branch is not allowed to be clean. Let's check if there is a ReviewRequest targetting a cleanable branch");
+
+			matchingRule = branchesToClean.stream().filter(branchToClean -> {
+				Optional<String> matchingBase = relevantBaseBranches.stream().filter(base -> {
+
+					return Pattern.matches(branchToClean, base);
+				}).findAny();
+
+				if (matchingBase.isEmpty()) {
+					LOGGER.info("Not a single base with open RR matches cleanable branches");
+					return false;
+				}
+				// else {
+				// LOGGER.info("ref={} is head of a RR with a cleanable branch as base (base={})",
+				// ref,
+				// matchingBase.get());
+				// }
+
+				return true;
+			}).findAny();
+
 		}
 		LOGGER.info("We want to clean {} due to rule {}", ref, matchingRule.get());
 		if (result.isPrOpen()) {

@@ -2,10 +2,12 @@ package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHApp;
@@ -70,7 +72,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public GithubAndToken makeInstallationGithub(long installationId) {
 		try {
 			GHAppInstallation installationById = getGithubAsApp().getInstallationById(installationId);
-			LOGGER.info("Permissions: {}", installationById.getPermissions());
+			Map<String, GHPermissionType> permissions = installationById.getPermissions();
+			LOGGER.info("Permissions: {}", permissions);
 			LOGGER.info("RepositorySelection: {}", installationById.getRepositorySelection());
 			// https://github.com/hub4j/github-api/issues/570
 			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken(// Required to open
@@ -86,7 +89,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GitHub installationGithub = makeInstallationGithub(token);
 			// https://stackoverflow.com/questions/45427275/how-to-check-my-github-current-rate-limit
 			LOGGER.info("Initialized an installation github. RateLimit status: {}", installationGithub.getRateLimit());
-			return new GithubAndToken(installationGithub, token);
+			return new GithubAndToken(installationGithub, token, permissions);
 		} catch (GHFileNotFoundException e) {
 			throw new UncheckedIOException("Invalid installationId, or no actual access to it?", e);
 		} catch (IOException e) {
@@ -160,8 +163,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				String baseRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
 				String baseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
-				long prId = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "id").longValue();
-				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prId));
+				long prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
+				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prNumber));
 				String headRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
 				String baseSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "sha");
@@ -295,6 +298,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new UncheckedIOException(e);
 		}
 
+		Set<String> relevantBaseBranches = new HashSet<>();
+
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 		if (offlineResult.isPushBranch() && !offlineResult.refHasOpenReviewRequest()) {
 			assert optOpenPr.isEmpty();
@@ -323,15 +328,23 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// final boolean isMainBranchCommit;
 		GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
-			Optional<GHPullRequest> optPr;
+			String rawPrId = String.valueOf(optOpenPr.get().getId());
+
+			GHPullRequest optPr;
 			try {
-				String rawPrId = String.valueOf(optOpenPr.get().getId());
 				int prIdAsInteger = Integer.parseInt(rawPrId);
-				optPr = Optional.of(baseRepo.getPullRequest(prIdAsInteger));
+				optPr = baseRepo.getPullRequest(prIdAsInteger);
+			} catch (GHFileNotFoundException e) {
+				LOGGER.debug("PR does not exists. Closed?", e);
+				LOGGER.warn("PR={} does not exists. Closed?", rawPrId);
+				throw new UncheckedIOException(e);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-			GHCommitPointer prHead = optPr.get().getHead();
+
+			relevantBaseBranches.add(optPr.getBase().getRef());
+
+			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
 			if (baseRepoId != prHeadRepository.getId()) {
@@ -339,7 +352,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname);
 			}
-			theRef = new GitRepoBranchSha1(headRepoFullname, prHead.getRef(), prHead.getSha());
+			theRef = new GitRepoBranchSha1(headRepoFullname, "refs/heads/" + prHead.getRef(), prHead.getSha());
 		} else {
 			// optPr = Optional.empty();
 			// No PR: we are guaranteed to have a ref
@@ -350,16 +363,25 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new IllegalStateException("Should not happen");
 		}
 		if (optSha1.isPresent()) {
-			// TODO Go into this only if we have 'checks:write' permission
-			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", optSha1.get());
-			try {
-				GHCheckRun checkRun = checkRunBuilder.create();
-				checkRun.update().withStatus(Status.COMPLETED);
-			} catch (IOException e) {
-				// TODO Should we check we have the proper permission anyway?
-				LOGGER.warn("Issue creating the CheckRun", e);
+			if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get("checks")) {
+				// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
+				// https://docs.github.com/en/rest/reference/checks#runs
+				// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
+				GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", optSha1.get());
+				try {
+					GHCheckRun checkRun = checkRunBuilder.create();
+					checkRun.update().withStatus(Status.COMPLETED);
+				} catch (IOException e) {
+					// TODO Should we check we have the proper permission anyway?
+					LOGGER.warn("Issue creating the CheckRun", e);
+				}
+			} else {
+				// Invite users to go into:
+				// https://github.com/organizations/solven-eu/settings/installations/9086720
+				LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
 			}
 		}
+
 		// //
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
 		// // git clone https://x-access-token:<token>@github.com/owner/repo.git
@@ -367,7 +389,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
-		Optional<String> refToClean = cleaner.prepareRefToClean(offlineResult, theRef);
+		Optional<String> refToClean = cleaner.prepareRefToClean(offlineResult, theRef, relevantBaseBranches);
 		// offlineResult.
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(

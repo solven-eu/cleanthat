@@ -17,8 +17,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 /**
@@ -80,7 +80,9 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				IWebhookEvent event;
 				if (input.containsKey("body") && input.containsKey("headers")) {
 					// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
-					event = SaveToDynamoDb.NONE;
+					// event = SaveToDynamoDb.NONE;
+					event = new CleanThatWebhookEvent((Map<String, ?>) input.get("headers"),
+							(Map<String, ?>) input.get("body"));
 				} else {
 					event = new GithubWebhookEvent(input);
 				}

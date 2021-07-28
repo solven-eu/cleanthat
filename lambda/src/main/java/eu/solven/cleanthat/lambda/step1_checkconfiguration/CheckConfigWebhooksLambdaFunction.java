@@ -17,7 +17,7 @@ import eu.solven.cleanthat.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.lambda.ACleanThatXxxFunction;
+import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
@@ -27,7 +27,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
  * @author Benoit Lacelle
  *
  */
-public class CheckConfigWebhooksLambdaFunction extends ACleanThatXxxFunction {
+public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigWebhooksLambdaFunction.class);
 
 	@Override

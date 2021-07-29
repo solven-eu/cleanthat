@@ -298,8 +298,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new UncheckedIOException(e);
 		}
 
-		Set<String> relevantBaseBranches = new HashSet<>();
-
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 		if (offlineResult.isPushBranch() && !offlineResult.refHasOpenReviewRequest()) {
 			assert optOpenPr.isEmpty();
@@ -323,6 +321,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				throw new UncheckedIOException(e);
 			}
 		}
+
+		Set<String> relevantBaseBranches = new HashSet<>();
 
 		// String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repo.getDefaultBranch()));
 		// final boolean isMainBranchCommit;

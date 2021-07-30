@@ -32,6 +32,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
 public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
+	private static final String KEY_BODY = "body";
 	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -55,9 +56,9 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
 					String body;
-					if (r.containsKey("body")) {
+					if (r.containsKey(KEY_BODY)) {
 						// SQS
-						body = PepperMapHelper.getRequiredString(r, "body");
+						body = PepperMapHelper.getRequiredString(r, KEY_BODY);
 						Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
 						if (messageAttributes.isPresent()) {
 							LOGGER.info("Attributes: {}", messageAttributes);
@@ -89,11 +90,11 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				functionOutput = Map.of("sqs", output);
 			} else {
 				IWebhookEvent event;
-				if (input.containsKey("body") && input.containsKey("headers")) {
+				if (input.containsKey(KEY_BODY) && input.containsKey("headers")) {
 					// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
 					// event = SaveToDynamoDb.NONE;
 					event = new CleanThatWebhookEvent((Map<String, ?>) input.get("headers"),
-							(Map<String, ?>) input.get("body"));
+							(Map<String, ?>) input.get(KEY_BODY));
 				} else {
 					event = new GithubWebhookEvent(input);
 				}

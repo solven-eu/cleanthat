@@ -74,3 +74,10 @@ Here is an example configuration:
     }
     
 "java.excludes": an array to 
+
+
+
+
+Deploy into Production (AWS):
+
+    git push origin master:deploy-prd

@@ -14,11 +14,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.ILanguageProperties;
-import eu.solven.cleanthat.github.ISourceCodeProperties;
-import eu.solven.cleanthat.github.SourceCodeProperties;
+import eu.solven.cleanthat.language.CleanthatLanguageProperties;
+import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
  * Helps working with configuration files

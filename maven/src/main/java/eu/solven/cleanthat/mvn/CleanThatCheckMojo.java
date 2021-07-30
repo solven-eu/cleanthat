@@ -14,9 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
+import eu.solven.cleanthat.language.IStringFormatterFactory;
+import eu.solven.cleanthat.language.java.JavaFormatter;
 
 /**
  * The mojo checking the code is clean
@@ -44,8 +46,10 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 			throw new IllegalArgumentException("Issue with configuration at " + pathToConfig, e);
 		}
 
+		IStringFormatterFactory stringFormatterFactory =
+				new GithubSpringConfig().stringFormatterFactory(Arrays.asList(new JavaFormatter(om)));
 		CodeProviderFormatter codeProviderFormatter =
-				new CodeProviderFormatter(Arrays.asList(om), new JavaFormatter(om));
+				new CodeProviderFormatter(Arrays.asList(om), stringFormatterFactory);
 		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(Paths.get(".")), false);
 	}
 }

@@ -1,6 +1,8 @@
 package eu.solven.cleanthat.github;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +19,9 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.event.CodeCleanerFactory;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.language.IStringFormatter;
+import eu.solven.cleanthat.language.IStringFormatterFactory;
+import eu.solven.cleanthat.language.StringFormatterFactory;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}
@@ -48,8 +53,18 @@ public class GithubSpringConfig {
 	}
 
 	@Bean
-	public ICodeProviderFormatter codeProviderFormatter(List<ObjectMapper> objectMappers, IStringFormatter formatter) {
-		return new CodeProviderFormatter(objectMappers, formatter);
+	public IStringFormatterFactory stringFormatterFactory(List<IStringFormatter> stringFormatters) {
+		Map<String, IStringFormatter> asMap = new LinkedHashMap<>();
+
+		stringFormatters.forEach(sf -> asMap.put(sf.getLanguage(), sf));
+
+		return new StringFormatterFactory(asMap);
+	}
+
+	@Bean
+	public ICodeProviderFormatter codeProviderFormatter(List<ObjectMapper> objectMappers,
+			IStringFormatterFactory formatterFactory) {
+		return new CodeProviderFormatter(objectMappers, formatterFactory);
 	}
 
 	@Bean

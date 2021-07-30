@@ -19,11 +19,11 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.GithubSpringConfig;
-import eu.solven.cleanthat.github.IStringFormatter;
 import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.language.IStringFormatter;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })

@@ -27,9 +27,9 @@ import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
+import eu.solven.cleanthat.language.java.JavaFormatter;
 import io.sentry.IHub;
 
 /**

@@ -33,7 +33,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
-import eu.solven.cleanthat.github.ILanguageProperties;
+import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.IJdkVersionConstants;

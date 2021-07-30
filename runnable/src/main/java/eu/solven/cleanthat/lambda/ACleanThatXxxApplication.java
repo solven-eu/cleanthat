@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.formatter.eclipse.JavaFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 
 /**
@@ -16,7 +15,7 @@ import eu.solven.cleanthat.github.GithubSpringConfig;
  *
  */
 @SpringBootApplication(scanBasePackages = "none")
-@Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
+@Import({ GithubSpringConfig.class, AllLanguagesSpringConfig.class, CodeProviderHelpers.class })
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class ACleanThatXxxApplication {
 

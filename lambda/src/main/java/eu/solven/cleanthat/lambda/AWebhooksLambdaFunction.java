@@ -54,10 +54,21 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				LOGGER.info("About to process a batch of {} events from SQS", records.size());
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
-					String body = PepperMapHelper.getRequiredString(r, "body");
-					Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
-					if (messageAttributes.isPresent()) {
-						LOGGER.info("Attributes: {}", messageAttributes);
+					String body;
+					if (r.containsKey("body")) {
+						// SQS
+						body = PepperMapHelper.getRequiredString(r, "body");
+						Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
+						if (messageAttributes.isPresent()) {
+							LOGGER.info("Attributes: {}", messageAttributes);
+						}
+					} else {
+						// DynamoDB
+						// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html
+						// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
+						LOGGER.warn("TODO Learn how to process me: {}", r);
+						// throw new RuntimeException("TODO");
+						body = PepperMapHelper.getRequiredString(r, "dynamodb", "NewImage");
 					}
 					// SQS transfer the body 'as is'
 					try {

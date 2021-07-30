@@ -8,6 +8,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import eu.solven.cleanthat.language.CleanthatMetaProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.cleanthat.language.SourceCodeProperties;
+
 /**
  * The configuration of a formatting job
  *

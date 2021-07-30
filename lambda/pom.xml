@@ -196,6 +196,18 @@
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->
 							<timeout>90</timeout>
+
+							<triggers>
+								<trigger>
+									<enabled>true</enabled>
+									<integration>DynamoDB</integration>
+									<dynamoDBTable>cleanthat_webhooks_github</dynamoDBTable>
+									<batchSize>100</batchSize>
+									<!-- https://stackoverflow.com/questions/38280958/dynamodb-triggers-streams-lambda-details-on-trim-horizon -->
+									<!-- https://github.com/awslabs/amazon-kinesis-client/issues/327 -->
+									<startingPosition>TRIM_HORIZON</startingPosition>
+								</trigger>
+							</triggers>
 						</lambdaFunction>
 
 						<lambdaFunction>
@@ -205,6 +217,18 @@
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->
 							<timeout>90</timeout>
+
+							<triggers>
+								<trigger>
+									<enabled>true</enabled>
+									<integration>DynamoDB</integration>
+									<dynamoDBTable>cleanthat_accepted_events</dynamoDBTable>
+									<batchSize>100</batchSize>
+									<!-- https://stackoverflow.com/questions/38280958/dynamodb-triggers-streams-lambda-details-on-trim-horizon -->
+									<!-- https://github.com/awslabs/amazon-kinesis-client/issues/327 -->
+									<startingPosition>TRIM_HORIZON</startingPosition>
+								</trigger>
+							</triggers>
 						</lambdaFunction>
 					</lambdaFunctions>
 				</configuration>

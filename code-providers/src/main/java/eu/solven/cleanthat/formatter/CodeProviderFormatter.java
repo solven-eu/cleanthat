@@ -33,9 +33,9 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.ILanguageProperties;
-import eu.solven.cleanthat.github.ISourceCodeProperties;
-import eu.solven.cleanthat.github.IStringFormatter;
+import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.cleanthat.language.IStringFormatterFactory;
 
 /**
  * Unclear what is the point of this class
@@ -51,11 +51,11 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	final List<ObjectMapper> objectMappers;
 
-	final IStringFormatter formatter;
+	final IStringFormatterFactory formatterFactory;
 
-	public CodeProviderFormatter(List<ObjectMapper> objectMappers, IStringFormatter formatter) {
+	public CodeProviderFormatter(List<ObjectMapper> objectMappers, IStringFormatterFactory formatterFactory) {
 		this.objectMappers = objectMappers;
-		this.formatter = formatter;
+		this.formatterFactory = formatterFactory;
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -278,6 +278,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private String doFormat(ILanguageProperties properties, String filepath, String code) throws IOException {
-		return formatter.format(properties, filepath, code);
+		return formatterFactory.makeStringFormatter(properties).format(properties, filepath, code);
 	}
 }

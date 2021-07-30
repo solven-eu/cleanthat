@@ -6,8 +6,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
-import eu.solven.cleanthat.github.CleanthatLanguageProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
+import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.rules.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 

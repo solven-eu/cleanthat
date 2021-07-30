@@ -9,12 +9,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
+import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.rules.cases.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -34,7 +35,10 @@ public class TestCreateTempFilesUsingNio extends ATestCases {
 		Path srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
 		String path = CreateTempFilesUsingNioCases.class.getName().replaceAll("\\.", "/") + ".java";
-		CompilationUnit compilationUnit = StaticJavaParser.parse(srcMainJava.resolve(path));
+
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser();
+		CompilationUnit compilationUnit = javaParser.parse(srcMainJava.resolve(path)).getResult().get();
+
 		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 		});

@@ -1,9 +1,16 @@
 package eu.solven.cleanthat.rules;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -14,7 +21,6 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Benoit Lacelle
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
-@Deprecated(since = "Not-Ready: how can we infer a Type is an Enum?")
 public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
@@ -25,16 +31,66 @@ public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransfo
 	}
 
 	// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-		onMethodName(node, "equals", (methodNode, scope, type) -> {
+
+		AtomicBoolean mutated = new AtomicBoolean(false);
+		onMethodName(node, "equals", (methodCall, scope, type) -> {
 			if (type.isReferenceType()) {
-				LOGGER.debug("scope={} type={}", scope, type);
+				boolean isEnum = false;
+				ResolvedReferenceType referenceType = type.asReferenceType();
+
+				referenceType.isJavaLangEnum();
+
+				String className = referenceType.getQualifiedName();
+
+				try {
+					Class<?> clazz = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+
+					isEnum = Enum.class.isAssignableFrom(clazz);
+				} catch (ClassNotFoundException e) {
+					LOGGER.debug("Class is not available", e);
+				}
+
+				if (isEnum && methodCall.getArguments().size() == 1) {
+					Expression singleArgument = methodCall.getArgument(0);
+
+					Optional<Node> optParentNode = methodCall.getParentNode();
+
+					boolean isNegated;
+					if (optParentNode.isPresent()) {
+						Node parent = optParentNode.get();
+
+						if (parent instanceof UnaryExpr
+								&& ((UnaryExpr) parent).getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+							isNegated = true;
+						} else {
+							isNegated = false;
+						}
+					} else {
+						isNegated = false;
+					}
+
+					if (isNegated) {
+						BinaryExpr replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.NOT_EQUALS);
+
+						if (tryReplace(optParentNode.get(), replacement)) {
+							mutated.set(true);
+						}
+					} else {
+						BinaryExpr replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.EQUALS);
+
+						if (tryReplace(node, replacement)) {
+							mutated.set(true);
+						}
+					}
+				}
 			}
 		});
 
-		return false;
+		return mutated.get();
 	}
 
 }

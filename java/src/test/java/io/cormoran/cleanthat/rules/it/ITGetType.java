@@ -123,6 +123,8 @@ public class ITGetType {
 								ResolvedValueDeclaration rvd = fae.resolve();
 
 								System.out.println(rvd.asField().isStatic());
+
+								fae.getScope().calculateResolvedType().asReferenceType().getTypeDeclaration();
 							});
 						}
 					}

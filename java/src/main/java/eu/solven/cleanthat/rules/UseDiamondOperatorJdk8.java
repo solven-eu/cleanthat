@@ -7,6 +7,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  *
  * @author Benoit Lacelle
  */
+@Deprecated(since = "Not-ready")
 public class UseDiamondOperatorJdk8 extends ATodoJavaParserRule implements IClassTransformer {
 	@Override
 	public String minimalJavaVersion() {

@@ -111,8 +111,7 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			return false;
 		}
 		MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
-		LOGGER.info("Turning {} into {}", node, replacement);
-		return node.replace(replacement);
+		return tryReplace(node, replacement);
 	}
 
 	private static boolean isConstant(SimpleName name) {

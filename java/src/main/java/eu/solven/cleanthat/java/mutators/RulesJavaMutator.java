@@ -40,8 +40,6 @@ import eu.solven.cleanthat.rules.IJdkVersionConstants;
 import eu.solven.cleanthat.rules.ModifierOrder;
 import eu.solven.cleanthat.rules.OptionalNotEmpty;
 import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
-import eu.solven.cleanthat.rules.UseDiamondOperator;
-import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.rules.VariableEqualsConstant;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
@@ -65,8 +63,8 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			new PrimitiveBoxedForString(),
 			new OptionalNotEmpty(),
 			new ModifierOrder(),
-			new UseDiamondOperator(),
-			new UseDiamondOperatorJdk8(),
+			// new UseDiamondOperator(),
+			// new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
 			new VariableEqualsConstant());
 

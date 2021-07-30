@@ -66,9 +66,10 @@ public class ATestCases {
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
-				MethodDeclaration postPost = post.clone();
-				Assert.assertFalse(transformer.walkNode(postPost));
-				Assert.assertEquals(post, postPost);
+				// We do not walk the clone as JavaParser has issues inferring types over clones
+				MethodDeclaration postBeforeWalk = post.clone();
+				Assert.assertFalse(transformer.walkNode(post));
+				Assert.assertEquals(postBeforeWalk, post);
 			}
 		});
 	}

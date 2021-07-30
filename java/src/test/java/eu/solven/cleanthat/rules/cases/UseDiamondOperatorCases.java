@@ -1,12 +1,12 @@
 package eu.solven.cleanthat.rules.cases;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import eu.solven.cleanthat.rules.UseDiamondOperator;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
@@ -22,8 +22,22 @@ public class UseDiamondOperatorCases extends ACases {
 			return new HashMap<String, List<String>>();
 		}
 
-		public Map<String, List<String>> post(Collection<?> input) {
+		public Map<String, List<String>> post() {
 			return new HashMap<>();
+		}
+	}
+
+	@UnchangedMethod
+	public static class CaseAnonymousClass {
+
+		public Map<String, List<String>> post() {
+			return new HashMap<String, List<String>>() {
+				private static final long serialVersionUID = 1L;
+
+				{
+					this.put("k", List.of());
+				}
+			};
 		}
 	}
 

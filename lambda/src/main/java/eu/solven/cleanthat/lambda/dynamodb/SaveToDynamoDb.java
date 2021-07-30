@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.lambda.dynamodb;
 
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -60,6 +61,7 @@ public class SaveToDynamoDb {
 		// https://stackoverflow.com/questions/31813868/aws-dynamodb-on-android-inserting-json-directly
 
 		Map<String, Object> inputAsMap = new LinkedHashMap<>();
+		inputAsMap.put("datetime", OffsetDateTime.now().toString());
 		inputAsMap.put("body", input.getBody());
 		inputAsMap.put("headers", input.getHeaders());
 

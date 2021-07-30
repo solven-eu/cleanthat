@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,30 +57,38 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				LOGGER.info("About to process a batch of {} events from SQS", records.size());
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
-					String body;
+					Map<String, ?> asMap;
 					if (r.containsKey(KEY_BODY)) {
 						// SQS
-						body = PepperMapHelper.getRequiredString(r, KEY_BODY);
+						String body = PepperMapHelper.getRequiredString(r, KEY_BODY);
 						Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
 						if (messageAttributes.isPresent()) {
 							LOGGER.info("Attributes: {}", messageAttributes);
 						}
+
+						// SQS transfer the body 'as is'
+						try {
+							asMap = (Map<String, ?>) objectMapper.readValue(body, Map.class);
+						} catch (JsonProcessingException e) {
+							LOGGER.warn("Issue while parsing: {}", body);
+							LOGGER.warn("Issue while parsing body", e);
+							asMap = Collections.<String, Object>emptyMap();
+						}
+
 					} else {
 						// DynamoDB
 						// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html
 						// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
+						// see StreamRecord
 						LOGGER.warn("TODO Learn how to process me: {}", r);
-						// throw new RuntimeException("TODO");
-						body = PepperMapHelper.getRequiredString(r, "dynamodb", "NewImage");
+
+						Map<String, AttributeValue> dynamoDbMap =
+								PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
+
+						asMap = InternalUtils.toSimpleMapValue(dynamoDbMap);
 					}
-					// SQS transfer the body 'as is'
-					try {
-						return (Map<String, ?>) objectMapper.readValue(body, Map.class);
-					} catch (JsonProcessingException e) {
-						LOGGER.warn("Issue while parsing: {}", body);
-						LOGGER.warn("Issue while parsing body", e);
-						return Collections.<String, Object>emptyMap();
-					}
+
+					return asMap;
 				}).filter(m -> !m.isEmpty()).map(r -> {
 					try {
 						return processOneEvent(new GithubWebhookEvent(r));

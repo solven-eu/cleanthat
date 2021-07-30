@@ -53,6 +53,23 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 	}
 
 	protected boolean processNotRecursively(Node node) {
+		Optional<Node> optReplacement = replaceNode(node);
+
+		if (optReplacement.isPresent()) {
+			Node replacement = optReplacement.get();
+			return tryReplace(node, replacement);
+		} else {
+			return false;
+		}
+	}
+
+	public boolean tryReplace(Node node, Node replacement) {
+		LOGGER.info("Turning {} into {}", node, replacement);
+
+		return node.replace(replacement);
+	}
+
+	protected Optional<Node> replaceNode(Node node) {
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 
@@ -99,7 +116,7 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 			Expression scope = optScope.get();
 			Optional<ResolvedType> type = optResolvedType(scope);
 			if (type.isPresent()) {
-				consumer.onMethodName(node, scope, type.get());
+				consumer.onMethodName(methodCall, scope, type.get());
 			}
 		}
 	}

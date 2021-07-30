@@ -1,7 +1,7 @@
 package eu.solven.cleanthat.rules.function;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 /**
@@ -11,5 +11,5 @@ import com.github.javaparser.resolution.types.ResolvedType;
  *
  */
 public interface OnMethodName {
-	void onMethodName(Node node, Expression scope, ResolvedType type);
+	void onMethodName(MethodCallExpr node, Expression scope, ResolvedType type);
 }

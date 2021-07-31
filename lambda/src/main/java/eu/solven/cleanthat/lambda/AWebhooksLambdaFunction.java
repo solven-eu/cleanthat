@@ -85,7 +85,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 						String eventName = PepperMapHelper.getRequiredString(r, "eventName");
 
-						if (!"INSERT".equals(eventName) || !"MODIFY".equals(eventName)) {
+						if (!"INSERT".equals(eventName) && !"MODIFY".equals(eventName)) {
 							// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
 							// We are in a REMOVE event
 							LOGGER.info("We discard eventName={}", eventName);

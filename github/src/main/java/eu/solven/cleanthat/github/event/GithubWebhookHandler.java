@@ -299,14 +299,19 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
+		GitRepoBranchSha1 gitRepoBranchSha1 = offlineResult.optPushedRef().get();
 		if (offlineResult.isPushBranch() && !offlineResult.refHasOpenReviewRequest()) {
 			assert optOpenPr.isEmpty();
 
-			LOGGER.info("Search for a PR merging the commited branch");
+			String ref = gitRepoBranchSha1.getRef();
+			LOGGER.info("Search for a PR merging the commited branch (head={})", ref);
 			try {
-				String repoName = offlineResult.optPushedRef().get().getRepoName();
-				Optional<GHPullRequest> prMatchingHead = new GithubFacade(githubAsInst, repoName)
-						.findFirstPrHeadMatchingRef(offlineResult.optPushedRef().get().getRef());
+				String repoName = gitRepoBranchSha1.getRepoName();
+
+				// TODO We should register any matching base in relevantBaseBranches, as the first one may not be
+				// cleanable
+				Optional<GHPullRequest> prMatchingHead =
+						new GithubFacade(githubAsInst, repoName).findFirstPrHeadMatchingRef(ref);
 
 				if (prMatchingHead.isPresent()) {
 					optOpenPr = prMatchingHead.map(b -> new GitPrHeadRef(repoName, prMatchingHead.get().getNumber()));
@@ -362,7 +367,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			// optPr = Optional.empty();
 			// No PR: we are guaranteed to have a ref
-			theRef = offlineResult.optPushedRef().get();
+			theRef = gitRepoBranchSha1;
 		}
 		Optional<String> optSha1 = Optional.of(theRef.getSha());
 		if (optSha1.isEmpty()) {

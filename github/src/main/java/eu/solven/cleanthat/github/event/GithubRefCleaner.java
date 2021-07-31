@@ -68,7 +68,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	@Override
 	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 theRef,
-			Set<String> relevantBaseBranches) {
+			Set<String> eventBaseBranches) {
 		String refUrl;
 		ICodeProvider codeProvider;
 		String ref = theRef.getRef();
@@ -104,50 +104,57 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			// TODO Send a notification, or open a PR requesting to fix the documentation
 			throw new IllegalArgumentException("The configuration file seems invalid");
 		}
-		
+
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		List<String> branchesToClean = properties.getMeta().getRefs().getBranches();
-		Optional<String> matchingRule =
-				branchesToClean.stream().filter(branchToClean -> Pattern.matches(branchToClean, ref)).findAny();
-		if (matchingRule.isEmpty()) {
-			LOGGER.info(
-					"The head branch is not allowed to be clean. Let's check if there is a ReviewRequest targetting a cleanable branch");
+		List<String> cleanableBranchRegexes = properties.getMeta().getRefs().getBranches();
 
-			matchingRule = branchesToClean.stream().filter(branchToClean -> {
-				Optional<String> matchingBase = relevantBaseBranches.stream().filter(base -> {
-
-					return Pattern.matches(branchToClean, base);
-				}).findAny();
-
-				if (matchingBase.isEmpty()) {
-					LOGGER.info("Not a single base with open RR matches cleanable branches");
-					return false;
-				}
-				// else {
-				// LOGGER.info("ref={} is head of a RR with a cleanable branch as base (base={})",
-				// ref,
-				// matchingBase.get());
-				// }
-
-				return true;
+		Optional<String> optBaseMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {
+			Optional<String> matchingBase = eventBaseBranches.stream().filter(base -> {
+				return Pattern.matches(cleanableBranchRegex, base);
 			}).findAny();
 
+			if (matchingBase.isEmpty()) {
+				LOGGER.info("Not a single base with open RR matches cleanable branches");
+				return false;
+			} else {
+				LOGGER.info("We have a match for eventBaseBranch={}", matchingBase.get());
+			}
+
+			return true;
+		}).findAny();
+
+		if (optBaseMatchingRule.isPresent()) {
+			if (result.isPrOpen()) {
+				LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event (rule={})",
+						ref,
+						optBaseMatchingRule.get());
+				return Optional.of(ref);
+			} else {
+				throw new IllegalStateException("???");
+			}
 		}
-		LOGGER.info("We want to clean {} due to rule {}", ref, matchingRule.get());
-		if (result.isPrOpen()) {
-			LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event", ref);
-			return Optional.of(ref);
-		} else if (result.isPushBranch()) {
+
+		Optional<String> optHeadMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {
+			return Pattern.matches(cleanableBranchRegex, ref);
+		}).findAny();
+
+		if (optHeadMatchingRule.isPresent()) {
+			LOGGER.info(
+					"We have an event over a branch which is cleanable, but not head of an open PR to a cleanable base: we shall clean this through a new PR");
+
 			// We never clean inplace: we'll have to open a dedicated ReviewRequest if necessary
 			String newBranchRef = PREFIX_REF_CLEANTHAT + UUID.randomUUID();
 			// We may open a branch later if it appears this branch is relevant
 			// String refToClean = codeProvider.openBranch(ref);
 			// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
+			// In case of concurrent events, we may end opening multiple PR to clean the same branch
+			// TODO Should we handle this specifically when opening the actual branch?
 			return Optional.of(newBranchRef);
 		} else {
-			throw new IllegalStateException("Illegal state");
+			LOGGER.info("This branch seems not cleanable: {}", ref);
+			return Optional.empty();
 		}
 	}
 

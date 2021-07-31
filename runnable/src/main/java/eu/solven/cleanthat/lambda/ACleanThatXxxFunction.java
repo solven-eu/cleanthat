@@ -39,6 +39,7 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");
+
 			throw wrapped;
 		}
 	}

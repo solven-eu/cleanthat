@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -82,10 +83,17 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 						// see StreamRecord
 						LOGGER.warn("TODO Learn how to process me: {}", r);
 
-						Map<String, AttributeValue> dynamoDbMap =
-								PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
+						Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
 
-						asMap = InternalUtils.toSimpleMapValue(dynamoDbMap);
+						// We receive from DynamoDb a json in a special format
+						// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
+						// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
+						Map<String, AttributeValue> dynamoDbAttributes = objectMapper.convertValue(dynamoDbMap,
+								new TypeReference<Map<String, AttributeValue>>() {
+
+								});
+
+						asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
 					}
 
 					return asMap;

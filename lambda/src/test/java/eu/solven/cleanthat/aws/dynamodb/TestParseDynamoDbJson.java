@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.aws.dynamodb;
 
-import static org.mockito.Mockito.only;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 

@@ -83,17 +83,26 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 						// see StreamRecord
 						LOGGER.warn("TODO Learn how to process me: {}", r);
 
-						Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
+						String eventName = PepperMapHelper.getRequiredString(r, "eventName");
 
-						// We receive from DynamoDb a json in a special format
-						// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
-						// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
-						Map<String, AttributeValue> dynamoDbAttributes = objectMapper.convertValue(dynamoDbMap,
-								new TypeReference<Map<String, AttributeValue>>() {
+						if (!"INSERT".equals(eventName) || !"MODIFY".equals(eventName)) {
+							// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
+							// We are in a REMOVE event
+							LOGGER.info("We discard eventName={}", eventName);
+							asMap = Collections.emptyMap();
+						} else {
+							Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
 
-								});
+							// We receive from DynamoDb a json in a special format
+							// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
+							// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
+							Map<String, AttributeValue> dynamoDbAttributes = objectMapper.convertValue(dynamoDbMap,
+									new TypeReference<Map<String, AttributeValue>>() {
 
-						asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
+									});
+
+							asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
+						}
 					}
 
 					return asMap;

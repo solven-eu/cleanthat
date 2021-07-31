@@ -97,7 +97,14 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			return Optional.empty();
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
-		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
+		CleanthatRepositoryProperties properties;
+		try {
+			properties = prepareConfiguration(prConfig);
+		} catch (RuntimeException e) {
+			// TODO Send a notification, or open a PR requesting to fix the documentation
+			throw new IllegalArgumentException("The configuration file seems invalid");
+		}
+		
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);

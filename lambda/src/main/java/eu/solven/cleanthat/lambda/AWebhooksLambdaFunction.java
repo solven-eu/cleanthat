@@ -87,7 +87,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 						// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html
 						// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
 						// see StreamRecord
-						LOGGER.warn("TODO Learn how to process me: {}", r);
+						LOGGER.debug("TODO Learn how to process me: {}", r);
 
 						String eventName = PepperMapHelper.getRequiredString(r, "eventName");
 

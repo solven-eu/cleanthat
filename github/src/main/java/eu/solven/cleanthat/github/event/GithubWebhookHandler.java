@@ -307,16 +307,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				String repoName = offlineResult.optPushedRef().get().getRepoName();
 				Optional<GHPullRequest> prMatchingHead = new GithubFacade(githubAsInst, repoName)
 						.findFirstPrHeadMatchingRef(offlineResult.optPushedRef().get().getRef());
-				// Optional<GitRepoBranchSha1> optBaseRef = prMatchingHead.map(pr -> {
-				// GHCommitPointer base = pr.getBase();
-				// return new GitRepoBranchSha1(base.getRepository().getName(), base.getRef(), base.getSha());
-				// });
 
 				if (prMatchingHead.isPresent()) {
-					optOpenPr = prMatchingHead.map(b -> new GitPrHeadRef(repoName, prMatchingHead.get().getId()));
+					optOpenPr = prMatchingHead.map(b -> new GitPrHeadRef(repoName, prMatchingHead.get().getNumber()));
 				}
-
-				// refHasOpenReviewRequest = prMatchingHead.isPresent();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -328,16 +322,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// final boolean isMainBranchCommit;
 		GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
-			String rawPrId = String.valueOf(optOpenPr.get().getId());
+			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
 
 			GHPullRequest optPr;
 			try {
-				int prIdAsInteger = Integer.parseInt(rawPrId);
-				optPr = baseRepo.getPullRequest(prIdAsInteger);
+				int prNumberAsInteger = Integer.parseInt(rawPrNumber);
+				optPr = baseRepo.getPullRequest(prNumberAsInteger);
 			} catch (GHFileNotFoundException e) {
 				LOGGER.debug("PR does not exists. Closed?", e);
-				LOGGER.warn("PR={} does not exists. Closed?", rawPrId);
-				throw new UncheckedIOException(e);
+				LOGGER.warn("PR={} does not exists. Closed?", rawPrNumber);
+				return WebhookRelevancyResult.dismissed("PR does not exists. Closed? pr=" + rawPrNumber);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -352,7 +346,19 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname);
 			}
-			theRef = new GitRepoBranchSha1(headRepoFullname, "refs/heads/" + prHead.getRef(), prHead.getSha());
+			String fullRef = "refs/heads/" + prHead.getRef();
+
+			try {
+				baseRepo.getRef(fullRef);
+			} catch (GHFileNotFoundException e) {
+				LOGGER.debug("Ref does not exists. Deleted?", e);
+				LOGGER.warn("Ref does not exists. Deleted?={} does not exists. Deleted?", fullRef);
+				return WebhookRelevancyResult.dismissed("Ref does not exists. Deleted? ref=" + fullRef);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			theRef = new GitRepoBranchSha1(headRepoFullname, fullRef, prHead.getSha());
 		} else {
 			// optPr = Optional.empty();
 			// No PR: we are guaranteed to have a ref

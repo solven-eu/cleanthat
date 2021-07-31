@@ -15,6 +15,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
+
 public class TestParseDynamoDbJson {
 	final ObjectMapper om = new ObjectMapper();
 
@@ -22,6 +24,8 @@ public class TestParseDynamoDbJson {
 	public void testReadWriteJson() throws JsonMappingException, JsonProcessingException {
 		// DynamoDB exclude null from AttributeValue fields
 		om.setSerializationInclusion(Include.NON_NULL);
+
+		om.setPropertyNamingStrategy(new CustomSnakeCase());
 
 		Map<String, Object> originalMap = new LinkedHashMap<>();
 
@@ -32,9 +36,7 @@ public class TestParseDynamoDbJson {
 		Map<String, AttributeValue> dynamoDbFormat = ItemUtils.fromSimpleMap(originalMap);
 
 		{
-			AttributeValue vDynamoDb = new AttributeValue();
-			vDynamoDb.setS("v");
-			Assert.assertEquals(vDynamoDb, dynamoDbFormat.get("k"));
+			Assert.assertEquals(new AttributeValue().withS("v"), dynamoDbFormat.get("k"));
 		}
 
 		Map<String, ?> backToMap = InternalUtils.toSimpleMapValue(dynamoDbFormat);
@@ -46,7 +48,7 @@ public class TestParseDynamoDbJson {
 		Map<String, ?> dynamoDbPureJson = om.readValue(dynamoDbFormatAsJson, Map.class);
 
 		{
-			Assert.assertEquals(Map.of("s", "v"), dynamoDbPureJson.get("k"));
+			Assert.assertEquals(Map.of("S", "v"), dynamoDbPureJson.get("k"));
 		}
 
 		Map<String, AttributeValue> dynamoDbAsAttributeValue =
@@ -64,6 +66,5 @@ public class TestParseDynamoDbJson {
 		{
 			Assert.assertEquals(dynamoDbFormat, dynamoDbAsAttributeValueFromJsonAsMap);
 		}
-
 	}
 }

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 /**
@@ -42,6 +43,11 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	@Bean
 	public Function<Map<String, ?>, Map<String, ?>> ingressRawWebhook() {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
+
+		// DynamoDB prints json as 'S' for AttributeValue.getS(), while default jackson would name this field 's'
+		ObjectMapper dynamoDbObjectMapper = objectMapper.copy();
+		dynamoDbObjectMapper.setPropertyNamingStrategy(new CustomSnakeCase());
+
 		// https://aws.amazon.com/fr/premiumsupport/knowledge-center/custom-headers-api-gateway-lambda/
 		// We would benefit from seeing the headers from Github:
 		// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#webhook-payload-object-common-properties
@@ -96,8 +102,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 							// We receive from DynamoDb a json in a special format
 							// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
 							// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
-							Map<String, AttributeValue> dynamoDbAttributes = objectMapper.convertValue(dynamoDbMap,
-									new TypeReference<Map<String, AttributeValue>>() {
+							Map<String, AttributeValue> dynamoDbAttributes = dynamoDbObjectMapper
+									.convertValue(dynamoDbMap, new TypeReference<Map<String, AttributeValue>>() {
 
 									});
 

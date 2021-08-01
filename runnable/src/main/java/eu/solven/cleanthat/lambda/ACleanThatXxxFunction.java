@@ -28,7 +28,7 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 			Map<String, ?> body = input.getBody();
 
 			try {
-				LOGGER.warn("Issue with GithubWebhookEvent. body={}", new ObjectMapper().writeValueAsString(body));
+				LOGGER.warn("Issue with IWebhookEvent. body={}", new ObjectMapper().writeValueAsString(body));
 			} catch (JsonProcessingException e1) {
 				LOGGER.warn("Issue printing as json. body: {}", body);
 			}

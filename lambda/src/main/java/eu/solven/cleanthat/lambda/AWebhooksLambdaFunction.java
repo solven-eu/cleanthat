@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,18 +36,16 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
 public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	private static final String KEY_BODY = "body";
-	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Bean
 	public Function<Map<String, ?>, Map<String, ?>> ingressRawWebhook() {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 
-		// DynamoDB prints json as 'S' for AttributeValue.getS(), while default jackson would name this field 's'
-		ObjectMapper dynamoDbObjectMapper = objectMapper.copy();
-		dynamoDbObjectMapper.setPropertyNamingStrategy(new CustomSnakeCase());
+		ObjectMapper dynamoDbObjectMapper = configureForDynamoDb(objectMapper);
 
 		// https://aws.amazon.com/fr/premiumsupport/knowledge-center/custom-headers-api-gateway-lambda/
 		// We would benefit from seeing the headers from Github:
@@ -108,6 +107,17 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			return functionOutput;
 		};
 
+	}
+
+	public static ObjectMapper configureForDynamoDb(ObjectMapper objectMapper) {
+		// DynamoDB prints json as 'S' for AttributeValue.getS(), while default jackson would name this field 's'
+		ObjectMapper dynamoDbObjectMapper = objectMapper.copy();
+
+		// DynamoDB exclude null from AttributeValue fields
+		dynamoDbObjectMapper.setSerializationInclusion(Include.NON_NULL);
+
+		dynamoDbObjectMapper.setPropertyNamingStrategy(new CustomSnakeCase());
+		return dynamoDbObjectMapper;
 	}
 
 	public IWebhookEvent wrapAsEvent(Map<String, ?> input) {

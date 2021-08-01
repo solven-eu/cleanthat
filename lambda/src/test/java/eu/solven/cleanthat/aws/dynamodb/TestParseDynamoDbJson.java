@@ -15,18 +15,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 
 public class TestParseDynamoDbJson {
-	final ObjectMapper om = new ObjectMapper();
+	final ObjectMapper om = AWebhooksLambdaFunction.configureForDynamoDb(new ObjectMapper());
 
 	@Test
 	public void testReadWriteJson() throws JsonMappingException, JsonProcessingException {
-		// DynamoDB exclude null from AttributeValue fields
-		om.setSerializationInclusion(Include.NON_NULL);
-
-		om.setPropertyNamingStrategy(new CustomSnakeCase());
-
 		Map<String, Object> originalMap = new LinkedHashMap<>();
 
 		originalMap.put("k", "v");

@@ -6,6 +6,7 @@ import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 
 /**

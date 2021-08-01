@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Enable writing/commiting code in addition of reading it
+ * Enable writing/commiting code
  *
  * @author Benoit Lacelle
  */
-public interface ICodeProviderWriter extends ICodeProvider, ICodeProviderWriterLogic {
+public interface ICodeProviderWriterLogic {
 
 	void commitIntoBranch(Map<String, String> pathToMutatedContent,
 			List<String> prComments,

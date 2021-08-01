@@ -9,6 +9,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
@@ -46,10 +48,15 @@ public class SaveToDynamoDb {
 	};
 
 	public static AmazonDynamoDB makeDynamoDbClient() {
+		DefaultAWSCredentialsProviderChain defaultCredentials = DefaultAWSCredentialsProviderChain.getInstance();
+		return makeDynamoDbClient(defaultCredentials);
+	}
+
+	public static AmazonDynamoDB makeDynamoDbClient(AWSCredentialsProvider defaultCredentials) {
 		AmazonDynamoDB client = AmazonDynamoDBClient.builder()
 				// The region is meaningless for local DynamoDb but required for client builder validation
 				.withRegion(Regions.US_EAST_1)
-				// .credentialsProvider( new DefaultAWSCredentialsProviderChain())
+				.withCredentials(defaultCredentials)
 				.build();
 		return client;
 	}

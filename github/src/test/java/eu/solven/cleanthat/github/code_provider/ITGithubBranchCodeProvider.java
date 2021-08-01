@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.github.code_provider;
 
 import java.io.IOException;
 
@@ -17,6 +17,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.GithubSpringConfig;
+import eu.solven.cleanthat.github.event.GithubAndToken;
+import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
+import eu.solven.cleanthat.github.event.GithubRefCleaner;
+import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.language.IStringFormatter;
 
 @RunWith(SpringRunner.class)

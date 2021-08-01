@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import eu.solven.cleanthat.jgit.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
 
 public class TestLocalFolderCodeProvider {
 	final File tmpFolder = org.assertj.core.util.Files.newTemporaryFolder();

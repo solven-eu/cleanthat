@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.github.code_provider;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

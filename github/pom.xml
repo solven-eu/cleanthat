@@ -30,6 +30,13 @@
 		</dependency>
 
 		<dependency>
+			<!-- Used to download a ZIP of a ref, and process it given local FS -->
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>local</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.github.cormoran-io.cleanthat</groupId>
 			<artifactId>any-language</artifactId>
 			<version>${project.version}</version>

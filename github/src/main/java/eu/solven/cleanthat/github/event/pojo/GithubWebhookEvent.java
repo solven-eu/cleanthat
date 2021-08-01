@@ -74,7 +74,16 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 	}
 
 	public static GithubWebhookEvent fromCleanThatEvent(IWebhookEvent githubAcceptedEvent) {
-		return new GithubWebhookEvent(
-				PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), "body", "github", "body"));
+		Map<String, ?> body = githubAcceptedEvent.getBody();
+
+		while (!body.containsKey("github") && body.containsKey("body")) {
+			body = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), "body");
+		}
+
+		if (!body.containsKey("github")) {
+			throw new IllegalArgumentException("This does not hold a github event");
+		}
+
+		return new GithubWebhookEvent(PepperMapHelper.getRequiredMap(body, "github", "body"));
 	}
 }

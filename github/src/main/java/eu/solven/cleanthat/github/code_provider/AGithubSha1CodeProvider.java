@@ -1,16 +1,22 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.github.code_provider;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHFileNotFoundException;
@@ -22,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
 
+import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -38,10 +46,12 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	private static final int MAX_FILE_BEFORE_CLONING = 512;
 
+	private static final boolean zipElseClone = true;
+
 	final String token;
 	final GHRepository repo;
 
-	final AtomicReference<JGitCodeProvider> localClone = new AtomicReference<>();
+	final AtomicReference<ICodeProvider> localClone = new AtomicReference<>();
 
 	public AGithubSha1CodeProvider(String token, GHRepository repo) {
 		this.token = token;
@@ -62,7 +72,12 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 		// https://docs.github.com/en/developers/apps/rate-limits-for-github-apps#server-to-server-requests
 		// At best, we will be limited at queries 12,500
-		if (tree.getTree().size() >= MAX_FILE_BEFORE_CLONING || localClone.get() != null) {
+		// TODO What is the Tree here? The total number of files in given sha1? Or some diff with parent sha1?
+		int treeSize = tree.getTree().size();
+		if (treeSize >= MAX_FILE_BEFORE_CLONING || localClone.get() != null) {
+			LOGGER.info(
+					"Tree.size()=={} -> We will not rely on API to fetch each files, but rather create a local copy (wget zip, git clone, ...)",
+					treeSize);
 			ensureLocalClone();
 
 			localClone.get().listFiles(consumer);
@@ -88,8 +103,15 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 				throw new UncheckedIOException(e);
 			}
 
-			Git jgit = makeGitRepo(workingDir);
-			return localClone.compareAndSet(null, new JGitCodeProvider(workingDir, jgit, getSha1()));
+			ICodeProvider localCodeProvider;
+			if (zipElseClone) {
+				ICodeProvider zippedLocalRef = downloadGitRefLocally(workingDir);
+				localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, this);
+			} else {
+				Git jgit = cloneGitRepoLocally(workingDir);
+				localCodeProvider = new JGitCodeProvider(workingDir, jgit, getSha1());
+			}
+			return localClone.compareAndSet(null, localCodeProvider);
 		}
 	}
 
@@ -121,7 +143,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	@Override
 	public boolean deprecatedFileIsRemoved(Object file) {
-		throw new UnsupportedOperationException("TODO");
+		throw new UnsupportedOperationException("TODO: " + PepperLogHelper.getObjectAndClass(file));
 	}
 
 	@Override
@@ -170,7 +192,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		return repo.getGitTransportUrl();
 	}
 
-	protected Git makeGitRepo(Path tmpDir) {
+	protected Git cloneGitRepoLocally(Path tmpDir) {
 		LOGGER.info("Cloning the repo {} into {}", repo.getFullName(), tmpDir);
 
 		String rawTransportUrl = repo.getHttpTransportUrl();
@@ -179,5 +201,55 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 		// It seems we are not allowed to give a sha1 as name
 		return JGitCodeProvider.makeGitRepo(tmpDir, authTransportUrl, getRef());
+	}
+
+	protected ICodeProvider downloadGitRefLocally(Path tmpDir) {
+		String ref = getSha1();
+		Path zipPath = tmpDir.resolve("repo.zip");
+		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
+
+		try {
+			repo.readZip(inputStream -> {
+				long nbBytes = Files.copy(inputStream, zipPath, StandardCopyOption.REPLACE_EXISTING);
+				LOGGER.info("We written a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
+				return tmpDir;
+			}, ref);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue downloading a ZIP for " + ref, e);
+		}
+
+		Path repoPath = tmpDir.resolve("repo_unzipped");
+
+		// TODO We may want not to unzip the file, but it would probably lead to terrible performance
+		LOGGER.info("Unzipping the repo={} ref={} into {}", repo.getFullName(), ref, repoPath);
+		try (FileInputStream fis = new FileInputStream(zipPath.toFile())) {
+			unzip(fis, repoPath);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Issue with " + tmpDir, e);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return new LocalFolderCodeProvider(tmpDir);
+	}
+
+	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder
+	private static void unzip(InputStream is, Path targetDir) throws IOException {
+		targetDir = targetDir.toAbsolutePath();
+		try (ZipInputStream zipIn = new ZipInputStream(is)) {
+			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
+				Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
+				if (!resolvedPath.startsWith(targetDir)) {
+					// see: https://snyk.io/research/zip-slip-vulnerability
+					throw new RuntimeException("Entry with an illegal path: " + ze.getName());
+				}
+				if (ze.isDirectory()) {
+					Files.createDirectories(resolvedPath);
+				} else {
+					Files.createDirectories(resolvedPath.getParent());
+					Files.copy(zipIn, resolvedPath);
+				}
+			}
+		}
 	}
 }

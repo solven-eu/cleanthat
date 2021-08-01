@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.jgit;
+package eu.solven.cleanthat.code_provider.local;
 
 import java.io.File;
 import java.io.IOException;

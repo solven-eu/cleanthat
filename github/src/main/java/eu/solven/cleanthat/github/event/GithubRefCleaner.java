@@ -132,10 +132,13 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 				LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event (rule={})",
 						ref,
 						optBaseMatchingRule.get());
-				return Optional.of(ref);
 			} else {
-				throw new IllegalStateException("???");
+				LOGGER.info(
+						"We will clean {} in place as this event is due to a push over a branch with a PR with a cleanable base (rule={})",
+						ref,
+						optBaseMatchingRule.get());
 			}
+			return Optional.of(ref);
 		}
 
 		Optional<String> optHeadMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {

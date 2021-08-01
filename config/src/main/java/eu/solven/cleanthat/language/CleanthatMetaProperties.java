@@ -2,6 +2,7 @@ package eu.solven.cleanthat.language;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -21,7 +22,7 @@ public class CleanthatMetaProperties {
 	// The labels to apply to created PRs
 	private List<String> labels = Arrays.asList();
 
-	private CleanthatRefFilterProperties refs;
+	private CleanthatRefFilterProperties refs = new CleanthatRefFilterProperties();
 
 	public List<String> getLabels() {
 		return labels;
@@ -37,6 +38,26 @@ public class CleanthatMetaProperties {
 
 	public void setRefs(CleanthatRefFilterProperties refs) {
 		this.refs = refs;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(labels, refs);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		CleanthatMetaProperties other = (CleanthatMetaProperties) obj;
+		return Objects.equals(labels, other.labels) && Objects.equals(refs, other.refs);
 	}
 
 }

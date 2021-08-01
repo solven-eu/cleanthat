@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -26,4 +27,25 @@ public class CleanthatRefFilterProperties {
 	public void setBranches(List<String> labels) {
 		this.branches = List.copyOf(labels);
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(branches);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		CleanthatRefFilterProperties other = (CleanthatRefFilterProperties) obj;
+		return Objects.equals(branches, other.branches);
+	}
+
 }

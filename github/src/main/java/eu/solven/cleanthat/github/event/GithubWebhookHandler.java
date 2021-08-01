@@ -246,7 +246,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// We log the payload temporarily, in order to have easy access to metadata
 		if (!GCInspector.inUnitTest()) {
 			try {
-				LOGGER.info("TMP payload: {}", ConfigHelpers.getJson(objectMappers).writeValueAsString(input));
+				LOGGER.debug("TMP payload: {}", ConfigHelpers.getJson(objectMappers).writeValueAsString(input));
 			} catch (JsonProcessingException e) {
 				LOGGER.warn("Issue while printing the json of the webhook", e);
 			}

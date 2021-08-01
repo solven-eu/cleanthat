@@ -57,6 +57,12 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		// X-GitHub-Hook-Installation-Target-ID: 65550
 		// X-GitHub-Hook-Installation-Target-Type: integration
 		return input -> {
+			try {
+				LOGGER.info("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
+			} catch (JsonProcessingException e) {
+				LOGGER.warn("Issue printing JSON", e);
+			}
+
 			Map<String, ?> functionOutput;
 			if (input.containsKey("Records")) {
 				// This comes from SQS, which pushes SQSEvent
@@ -66,49 +72,9 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				List<?> output = records.stream().map(r -> {
 					Map<String, ?> asMap;
 					if (r.containsKey(KEY_BODY)) {
-						// SQS
-						String body = PepperMapHelper.getRequiredString(r, KEY_BODY);
-						Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
-						if (messageAttributes.isPresent()) {
-							LOGGER.info("Attributes: {}", messageAttributes);
-						}
-
-						// SQS transfer the body 'as is'
-						try {
-							asMap = (Map<String, ?>) objectMapper.readValue(body, Map.class);
-						} catch (JsonProcessingException e) {
-							LOGGER.warn("Issue while parsing: {}", body);
-							LOGGER.warn("Issue while parsing body", e);
-							asMap = Collections.<String, Object>emptyMap();
-						}
-
+						asMap = parseSqsEvent(objectMapper, r);
 					} else {
-						// DynamoDB
-						// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html
-						// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
-						// see StreamRecord
-						LOGGER.debug("TODO Learn how to process me: {}", r);
-
-						String eventName = PepperMapHelper.getRequiredString(r, "eventName");
-
-						if (!"INSERT".equals(eventName) && !"MODIFY".equals(eventName)) {
-							// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
-							// We are in a REMOVE event
-							LOGGER.info("We discard eventName={}", eventName);
-							asMap = Collections.emptyMap();
-						} else {
-							Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
-
-							// We receive from DynamoDb a json in a special format
-							// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
-							// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
-							Map<String, AttributeValue> dynamoDbAttributes = dynamoDbObjectMapper
-									.convertValue(dynamoDbMap, new TypeReference<Map<String, AttributeValue>>() {
-
-									});
-
-							asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
-						}
+						asMap = parseDynamoDbEvent(dynamoDbObjectMapper, r);
 					}
 
 					return asMap;
@@ -136,5 +102,56 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			LOGGER.info("Output: {}", functionOutput);
 			return functionOutput;
 		};
+	}
+
+	public Map<String, ?> parseDynamoDbEvent(ObjectMapper dynamoDbObjectMapper, Map<String, ?> r) {
+		Map<String, ?> asMap;
+		// DynamoDB
+		// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html
+		// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
+		// see StreamRecord
+		LOGGER.debug("TODO Learn how to process me: {}", r);
+
+		String eventName = PepperMapHelper.getRequiredString(r, "eventName");
+
+		if (!"INSERT".equals(eventName) && !"MODIFY".equals(eventName)) {
+			// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
+			// We are in a REMOVE event
+			LOGGER.info("We discard eventName={}", eventName);
+			asMap = Collections.emptyMap();
+		} else {
+			Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
+
+			// We receive from DynamoDb a json in a special format
+			// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
+			// https://stackoverflow.com/questions/37655755/how-to-get-the-pure-json-string-from-dynamodb-stream-new-image
+			Map<String, AttributeValue> dynamoDbAttributes =
+					dynamoDbObjectMapper.convertValue(dynamoDbMap, new TypeReference<Map<String, AttributeValue>>() {
+
+					});
+
+			asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
+		}
+		return asMap;
+	}
+
+	public Map<String, ?> parseSqsEvent(ObjectMapper objectMapper, Map<String, ?> r) {
+		Map<String, ?> asMap;
+		// SQS
+		String body = PepperMapHelper.getRequiredString(r, KEY_BODY);
+		Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
+		if (messageAttributes.isPresent()) {
+			LOGGER.info("Attributes: {}", messageAttributes);
+		}
+
+		// SQS transfer the body 'as is'
+		try {
+			asMap = (Map<String, ?>) objectMapper.readValue(body, Map.class);
+		} catch (JsonProcessingException e) {
+			LOGGER.warn("Issue while parsing: {}", body);
+			LOGGER.warn("Issue while parsing body", e);
+			asMap = Collections.<String, Object>emptyMap();
+		}
+		return asMap;
 	}
 }

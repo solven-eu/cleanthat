@@ -43,6 +43,8 @@ public class LocalFolderCodeProvider implements ICodeProviderWriter {
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		File gitIgnore = root.resolve(".gitignore").toFile();
 		Predicate<Path> gitIgnorePredicate;
+
+		// TODO Beware there could be .gitignore in subfolders
 		if (gitIgnore.isFile()) {
 			Set<String> lines = ImmutableSet.copyOf(Files.readAllLines(gitIgnore.toPath(), StandardCharsets.UTF_8));
 			gitIgnorePredicate = p -> {
@@ -57,17 +59,21 @@ public class LocalFolderCodeProvider implements ICodeProviderWriter {
 		} else {
 			gitIgnorePredicate = p -> true;
 		}
-		Files.walk(root)
-				.filter(p -> p.toFile().isFile())
-				.filter(gitIgnorePredicate)
-				.forEach(f -> consumer.accept(new DummyCodeProviderFile(f)));
+		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(f -> {
+			if (!f.startsWith(root)) {
+				throw new IllegalStateException("Issue given root=" + root + " and path=" + f);
+			}
+
+			Path relativized = root.relativize(f);
+			consumer.accept(new DummyCodeProviderFile("/" + relativized.toString(), f));
+		});
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object file) {
-		// This class sees only existing files
-		return false;
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object file) {
+	// // This class sees only existing files
+	// return false;
+	// }
 
 	@Override
 	public String getHtmlUrl() {

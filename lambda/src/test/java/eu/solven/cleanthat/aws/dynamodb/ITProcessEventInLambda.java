@@ -47,7 +47,6 @@ public class ITProcessEventInLambda {
 						new AttributeValue().withS("random-01be8d8f-fde0-4895-8689-70288ace3819"))));
 
 		Map<String, AttributeValue> dynamoDbItem = item.getItem();
-		Map<String, ?> rawEvent = dynamoDbItem;
 		Map<String, ?> dynamoDbPureJson = InternalUtils.toSimpleMapValue(dynamoDbItem);
 
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

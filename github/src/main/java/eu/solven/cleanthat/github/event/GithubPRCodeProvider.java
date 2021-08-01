@@ -45,13 +45,19 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
-		pr.listFiles().forEach(prFile -> consumer.accept(new DummyCodeProviderFile(prFile)));
+		pr.listFiles().forEach(prFile -> {
+			if ("deleted".equals(prFile.getStatus())) {
+				LOGGER.debug("Skip a deleted file: {}", prFile.getFilename());
+			} else {
+				consumer.accept(new DummyCodeProviderFile(prFile.getFilename(), prFile));
+			}
+		});
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object file) {
-		return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object file) {
+	// return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
+	// }
 
 	public static String loadContent(GHPullRequest pr, String filename) throws IOException {
 		GHRepository repository = pr.getRepository();

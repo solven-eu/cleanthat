@@ -133,7 +133,7 @@ public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProvid
 
 	private void acceptLocalTreeWalk(Consumer<ICodeProviderFile> consumer, TreeWalk treeWalk) {
 		String path = treeWalk.getPathString();
-		consumer.accept(new DummyCodeProviderFile(path));
+		consumer.accept(new DummyCodeProviderFile(path, path));
 	}
 
 	private static RevCommit buildRevCommit(Repository repository, String commit) throws IOException {
@@ -154,18 +154,18 @@ public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProvid
 		return treeWalk;
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object file) {
-		String relativePath = (String) file;
-		Path path = workingDir.resolve(relativePath);
-
-		if (!path.startsWith(workingDir)) {
-			// https://stackoverflow.com/questions/53157337/validate-to-prevent-a-path-string-to-go-up-to-parent-folder
-			throw new IllegalArgumentException("Can not move out of the parent folder");
-		}
-
-		return !path.toFile().exists();
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object file) {
+	// String relativePath = (String) file;
+	// Path path = workingDir.resolve(relativePath);
+	//
+	// if (!path.startsWith(workingDir)) {
+	// // https://stackoverflow.com/questions/53157337/validate-to-prevent-a-path-string-to-go-up-to-parent-folder
+	// throw new IllegalArgumentException("Can not move out of the parent folder");
+	// }
+	//
+	// return !path.toFile().exists();
+	// }
 
 	public static String loadContent(GHRepository repository, GHRef ref, String filename) throws IOException {
 		String sha1 = ref.getObject().getSha();

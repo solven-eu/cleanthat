@@ -75,7 +75,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				pr.listFiles(fileChanged -> {
-					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getFilePath(pr))) {
+					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getPath())) {
 						configIsChanged.set(true);
 						prComments.add("Configuration has changed");
 					}
@@ -184,11 +184,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		try {
 			pr.listFiles(file -> {
-				if (file.fileIsRemoved(pr)) {
-					// Skip files deleted within PR
-					return;
-				}
-				String filePath = file.getFilePath(pr);
+				String filePath = file.getPath();
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
@@ -248,7 +244,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		return languageCounters;
 	}
 
-	private boolean doFormat(ICodeProvider pr,
+	private boolean doFormat(ICodeProvider codeProvider,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP,
 			ICodeProviderFile file,
@@ -256,7 +252,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
 		String code = optAlreadyMutated.orElseGet(() -> {
 			try {
-				return file.loadContent(pr);
+				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
+				return optContent.get();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}

@@ -74,14 +74,18 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 		}
 
 		Stream.of(diff.getFiles()).forEach(prFile -> {
-			consumer.accept(new DummyCodeProviderFile(prFile));
+			if ("removed".equals(prFile.getStatus())) {
+				LOGGER.debug("Skip a removed file: {}", prFile.getFileName());
+			} else {
+				consumer.accept(new DummyCodeProviderFile(prFile.getFileName(), prFile));
+			}
 		});
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object file) {
-		return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object file) {
+	// return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
+	// }
 
 	@Override
 	public String getHtmlUrl() {

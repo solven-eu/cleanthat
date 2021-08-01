@@ -13,8 +13,8 @@ public interface ICodeProvider {
 
 	void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException;
 
-	@Deprecated
-	boolean deprecatedFileIsRemoved(Object raw);
+	// @Deprecated
+	// boolean deprecatedFileIsRemoved(Object raw);
 
 	@Deprecated
 	String deprecatedLoadContent(Object file) throws IOException;

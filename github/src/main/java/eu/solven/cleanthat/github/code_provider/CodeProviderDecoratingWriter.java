@@ -34,10 +34,10 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 		codeProvider.listFiles(consumer);
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object raw) {
-		return codeProvider.deprecatedFileIsRemoved(raw);
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object raw) {
+	// return codeProvider.deprecatedFileIsRemoved(raw);
+	// }
 
 	@Override
 	public String deprecatedLoadContent(Object file) throws IOException {

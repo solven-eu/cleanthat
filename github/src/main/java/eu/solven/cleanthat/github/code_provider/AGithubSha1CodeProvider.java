@@ -7,6 +7,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
@@ -122,7 +123,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		tree.getTree().forEach(ghTreeEntry -> {
 			if ("blob".equals(ghTreeEntry.getType())) {
-				consumer.accept(new DummyCodeProviderFile(ghTreeEntry));
+				consumer.accept(new DummyCodeProviderFile("/" + ghTreeEntry.getPath(), ghTreeEntry));
 			} else if ("tree".equals(ghTreeEntry.getType())) {
 				LOGGER.debug("Discard tree as original call for tree was recursive: {}", ghTreeEntry);
 
@@ -140,10 +141,10 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		});
 	}
 
-	@Override
-	public boolean deprecatedFileIsRemoved(Object file) {
-		throw new UnsupportedOperationException("TODO: " + PepperLogHelper.getObjectAndClass(file));
-	}
+	// @Override
+	// public boolean deprecatedFileIsRemoved(Object file) {
+	// throw new UnsupportedOperationException("TODO: " + PepperLogHelper.getObjectAndClass(file));
+	// }
 
 	@Override
 	public void commitIntoBranch(Map<String, String> pathToMutatedContent,

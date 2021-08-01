@@ -216,7 +216,8 @@
 							<!-- MB -->
 							<memorySize>512</memorySize>
 							<!-- Startup can take up to 30 seconds -->
-							<timeout>90</timeout>
+							<!-- Repo cloning can take minutes -->
+							<timeout>300</timeout>
 
 							<triggers>
 								<trigger>

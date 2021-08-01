@@ -14,6 +14,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
@@ -54,19 +55,25 @@ public class SaveToDynamoDb {
 	}
 
 	public static void saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
-		LOGGER.info("Save something into DynamoDB table={}", table);
+		String primaryKey = "random-" + UUID.randomUUID();
+		LOGGER.info("Save something into DynamoDB table={} primaryKey={}", table, primaryKey);
 
 		DynamoDB dynamodb = new DynamoDB(client);
 		Table myTable = dynamodb.getTable(table);
 		// https://stackoverflow.com/questions/31813868/aws-dynamodb-on-android-inserting-json-directly
 
 		Map<String, Object> inputAsMap = new LinkedHashMap<>();
+		inputAsMap.put("X-GitHub-Delivery", primaryKey);
+
 		inputAsMap.put("datetime", OffsetDateTime.now().toString());
 		inputAsMap.put("body", input.getBody());
 		inputAsMap.put("headers", input.getHeaders());
 
-		inputAsMap.put("X-GitHub-Delivery", "random-" + UUID.randomUUID());
+		PutItemOutcome outcome = myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
+		LOGGER.info("PUT metdata for table={} primaryKey={}: {}",
+				table,
+				primaryKey,
+				outcome.getPutItemResult().getSdkHttpMetadata());
 
-		myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
 	}
 }

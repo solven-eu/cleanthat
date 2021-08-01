@@ -273,6 +273,8 @@ public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProvid
 	 * @return
 	 */
 	public static Git makeGitRepo(Path dir, String authTransportUrl, String branch) {
+		LOGGER.info("Cloning a repo into {}", dir);
+
 		// https://stackoverflow.com/questions/11475263/shallow-clone-with-jgit
 		CloneCommand builder = Git.cloneRepository()
 				.setURI(authTransportUrl)

@@ -72,18 +72,24 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@SuppressWarnings("PMD.CloseResource")
-	private void ensureLocalClone() {
-		// https://github.community/t/cloning-private-repo-with-a-github-app-private-key/14726
-		Path workingDir;
-		try {
-			workingDir = Files.createTempDirectory("cleanthat-clone");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
+	protected boolean ensureLocalClone() {
+		// TODO Tests against multiple calls: the repo shall be cloned only once
 		synchronized (this) {
+			if (localClone.get() != null) {
+				// The repo is already cloned
+				return false;
+			}
+
+			// https://github.community/t/cloning-private-repo-with-a-github-app-private-key/14726
+			Path workingDir;
+			try {
+				workingDir = Files.createTempDirectory("cleanthat-clone");
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
 			Git jgit = makeGitRepo(workingDir);
-			localClone.compareAndSet(null, new JGitCodeProvider(workingDir, jgit, getSha1()));
+			return localClone.compareAndSet(null, new JGitCodeProvider(workingDir, jgit, getSha1()));
 		}
 	}
 
@@ -164,7 +170,9 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		return repo.getGitTransportUrl();
 	}
 
-	public Git makeGitRepo(Path tmpDir) {
+	protected Git makeGitRepo(Path tmpDir) {
+		LOGGER.info("Cloning the repo {} into {}", repo.getFullName(), tmpDir);
+
 		String rawTransportUrl = repo.getHttpTransportUrl();
 		String authTransportUrl =
 				"https://x-access-token:" + token + "@" + rawTransportUrl.substring("https://".length());

@@ -43,10 +43,12 @@ public abstract class ALanguageFormatter implements IStringFormatter {
 	@Override
 	public String format(ILanguageProperties languageProperties, String filepath, String code) throws IOException {
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
+
+		// TODO Is this really a deep-copy?
+		Map<String, ?> languagePropertiesTemplate =
+				ImmutableMap.copyOf(objectMapper.convertValue(languageProperties, Map.class));
+
 		languageProperties.getProcessors().forEach(rawProcessor -> {
-			// TODO Is this really a deep-copy?
-			Map<String, ?> languagePropertiesTemplate =
-					ImmutableMap.copyOf(objectMapper.convertValue(languageProperties, Map.class));
 			try {
 				String input = outputRef.get();
 				String output = applyProcessor(languagePropertiesTemplate, rawProcessor, filepath, input);

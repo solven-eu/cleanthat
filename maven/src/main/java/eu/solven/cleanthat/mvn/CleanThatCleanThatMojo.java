@@ -29,7 +29,7 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
-import eu.solven.cleanthat.language.java.JavaFormatter;
+import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 import io.sentry.IHub;
 
 /**
@@ -56,7 +56,7 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	 *
 	 */
 	@SpringBootApplication(scanBasePackages = "none")
-	@Import({ GithubSpringConfig.class, JavaFormatter.class, CodeProviderHelpers.class })
+	@Import({ GithubSpringConfig.class, AllLanguagesSpringConfig.class, CodeProviderHelpers.class })
 	public static class MavenSpringConfig implements CommandLineRunner {
 
 		@Autowired
@@ -79,7 +79,7 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	// Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/pmd-mojo.html
 	@Override
 	public void execute() throws MojoExecutionException {
-		getLog().info("Hello, world.");
+		getLog().debug("Hello, world.");
 
 		if (CURRENT_MOJO.compareAndSet(null, this)) {
 			try {
@@ -98,9 +98,6 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		String configPath = getConfigPath();
 		getLog().info("Path: " + configPath);
 		getLog().info("URL: " + getConfigUrl());
-
-		// getLog().info("parentFile: " + getProject().getParentFile());
-		// getLog().info("parent.file: " + getProject().getParent().getFile());
 
 		Path configPathFile = Paths.get(configPath);
 

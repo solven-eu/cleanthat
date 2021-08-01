@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.kohsuke.github.GitHub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +33,7 @@ import eu.solven.cleanthat.language.StringFormatterFactory;
  */
 @Configuration
 public class GithubSpringConfig {
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubSpringConfig.class);
 
 	// Primary as most situations to write something is to write JSON
 	@Bean
@@ -56,7 +59,11 @@ public class GithubSpringConfig {
 	public IStringFormatterFactory stringFormatterFactory(List<IStringFormatter> stringFormatters) {
 		Map<String, IStringFormatter> asMap = new LinkedHashMap<>();
 
-		stringFormatters.forEach(sf -> asMap.put(sf.getLanguage(), sf));
+		stringFormatters.forEach(sf -> {
+			String language = sf.getLanguage();
+			LOGGER.info("Formatter registered for language={}: {}", language, sf);
+			asMap.put(language, sf);
+		});
 
 		return new StringFormatterFactory(asMap);
 	}

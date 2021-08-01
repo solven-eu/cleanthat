@@ -9,14 +9,12 @@ import org.junit.Test;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 
 public class TestParseDynamoDbJson {
 	final ObjectMapper om = AWebhooksLambdaFunction.configureForDynamoDb(new ObjectMapper());

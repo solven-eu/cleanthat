@@ -18,7 +18,15 @@ public class StringFormatterFactory implements IStringFormatterFactory {
 
 	@Override
 	public IStringFormatter makeStringFormatter(ILanguageProperties languageProperties) {
-		return languageToFormatter.get(languageProperties.getLanguage());
+		String language = languageProperties.getLanguage();
+		IStringFormatter formatter = languageToFormatter.get(language);
+
+		if (formatter == null) {
+			throw new IllegalArgumentException(
+					"There is no formatter for language=" + language + " languages=" + languageToFormatter.keySet());
+		}
+
+		return formatter;
 	}
 
 }

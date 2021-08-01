@@ -46,7 +46,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	private static final int MAX_FILE_BEFORE_CLONING = 512;
 
-	private static final boolean zipElseClone = true;
+	private static final boolean ZIP_ELSE_CLONE = true;
 
 	final String token;
 	final GHRepository repo;
@@ -104,7 +104,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 			}
 
 			ICodeProvider localCodeProvider;
-			if (zipElseClone) {
+			if (ZIP_ELSE_CLONE) {
 				ICodeProvider zippedLocalRef = downloadGitRefLocally(workingDir);
 				localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, this);
 			} else {
@@ -234,6 +234,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder
+	@SuppressWarnings("PMD.AssignmentInOperand")
 	private static void unzip(InputStream is, Path targetDir) throws IOException {
 		targetDir = targetDir.toAbsolutePath();
 		try (ZipInputStream zipIn = new ZipInputStream(is)) {

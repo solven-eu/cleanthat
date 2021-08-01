@@ -65,6 +65,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	// We may have no ref to clean (e.g. there is no cleanthat configuration, or the ref is excluded)
 	// We may have to clean current ref (e.g. a PR is open, and we want to clean the PR head)
 	// We may have to clean a different ref (e.g. a push to the main branch needs to be cleaned through a PR)
+	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 theRef,
@@ -102,7 +103,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			properties = prepareConfiguration(prConfig);
 		} catch (RuntimeException e) {
 			// TODO Send a notification, or open a PR requesting to fix the documentation
-			throw new IllegalArgumentException("The configuration file seems invalid");
+			throw new IllegalArgumentException("The configuration file seems invalid", e);
 		}
 
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just

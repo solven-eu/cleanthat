@@ -12,6 +12,13 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
 
+/**
+ * Typically used to be able to read from one {@link ICodeProvider} and write into a different
+ * {@link ICodeProviderWriterLogic}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	protected final ICodeProvider codeProvider;
 

@@ -2,6 +2,7 @@ package eu.solven.cleanthat.git_abstraction;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
@@ -22,10 +23,10 @@ public class GithubFacade {
 		this.repoName = repoName;
 	}
 
-	public Optional<GHPullRequest> findFirstPrHeadMatchingRef(String ref) throws IOException {
+	public Stream<GHPullRequest> findAnyPrHeadMatchingRef(String ref) throws IOException {
 		return github.getRepository(repoName).getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
 			return ref.equals("refs/heads/" + pr.getHead().getRef());
-		}).findAny();
+		});
 	}
 
 	public Optional<GHPullRequest> findFirstPrBaseMatchingRef(String ref) throws IOException {

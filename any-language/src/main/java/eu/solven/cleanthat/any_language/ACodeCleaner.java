@@ -72,7 +72,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	 * @param properties
 	 */
 	protected void migrateConfigurationCode(CleanthatRepositoryProperties properties) {
-		LOGGER.info("TODO: {}", properties);
+		LOGGER.debug("TODO Migration (if necessary) of configuration: {}", properties);
 	}
 
 	protected CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {

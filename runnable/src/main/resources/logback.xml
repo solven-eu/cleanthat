@@ -20,7 +20,7 @@
 			<!-- '%highlight' works under unix even if withJansi==false -->
 			<!-- Not a '.' between class and method in order to easily double-click to select the class and dreictly poaste in IDE -->
 			<pattern>
-				<![CDATA[%date %-5level[%thread] %logger{36}|%method\(%line\) - %msg%n]]>
+				<![CDATA[%date{"yyyy-MM-dd'T'HH:mm:ss,SSS", Europe/Paris} %-5level[%thread] %logger{36}|%method\(%line\) - %msg%n]]>
 			</pattern>
 		</encoder>
 

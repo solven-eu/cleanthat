@@ -116,10 +116,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			}).findAny();
 
 			if (matchingBase.isEmpty()) {
-				LOGGER.info("Not a single base with open RR matches cleanable branches");
+				LOGGER.info("Not a single base with open RR matches cleanable branch={}", cleanableBranchRegex);
 				return false;
 			} else {
-				LOGGER.info("We have a match for eventBaseBranch={}", matchingBase.get());
+				LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}",
+						cleanableBranchRegex,
+						matchingBase.get());
 			}
 
 			return true;

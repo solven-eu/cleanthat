@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import io.sentry.Sentry;
 
@@ -25,17 +24,17 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 		try {
 			return unsafeProcessOneEvent(input);
 		} catch (RuntimeException e) {
-			if (input instanceof GithubWebhookEvent) {
-				Map<String, ?> body = input.getBody();
+			// if (input instanceof GithubWebhookEvent) {
+			Map<String, ?> body = input.getBody();
 
-				try {
-					LOGGER.warn("Issue with GithubWebhookEvent. body={}", new ObjectMapper().writeValueAsString(body));
-				} catch (JsonProcessingException e1) {
-					LOGGER.warn("Issue printing as json. body: {}", body);
-				}
-			} else {
-				LOGGER.warn("Issue with {}", input.getClass());
+			try {
+				LOGGER.warn("Issue with GithubWebhookEvent. body={}", new ObjectMapper().writeValueAsString(body));
+			} catch (JsonProcessingException e1) {
+				LOGGER.warn("Issue printing as json. body: {}", body);
 			}
+			// } else {
+			// LOGGER.warn("Issue with {}", input.getClass());
+			// }
 
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");

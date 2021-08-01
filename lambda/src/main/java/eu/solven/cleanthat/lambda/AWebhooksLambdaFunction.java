@@ -57,13 +57,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		// X-GitHub-Hook-Installation-Target-ID: 65550
 		// X-GitHub-Hook-Installation-Target-Type: integration
 		return input -> {
-			try {
-				LOGGER.info("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
-			} catch (JsonProcessingException e) {
-				LOGGER.warn("Issue printing JSON", e);
-			}
-
 			Map<String, ?> functionOutput;
+
 			if (input.containsKey("Records")) {
 				// This comes from SQS, which pushes SQSEvent
 				Collection<Map<String, ?>> records = PepperMapHelper.getRequiredAs(input, "Records");
@@ -71,10 +66,19 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
 					Map<String, ?> asMap;
-					if (r.containsKey(KEY_BODY)) {
-						asMap = parseSqsEvent(objectMapper, r);
-					} else {
-						asMap = parseDynamoDbEvent(dynamoDbObjectMapper, r);
+					try {
+						if (r.containsKey(KEY_BODY)) {
+							asMap = parseSqsEvent(objectMapper, r);
+						} else {
+							asMap = parseDynamoDbEvent(dynamoDbObjectMapper, r);
+						}
+					} catch (RuntimeException e) {
+						try {
+							LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
+						} catch (JsonProcessingException ee) {
+							LOGGER.warn("Issue printing JSON", ee);
+						}
+						throw new RuntimeException("Issue parsing AWS message", e);
 					}
 
 					return asMap;
@@ -88,6 +92,12 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				}).collect(Collectors.toList());
 				functionOutput = Map.of("sqs", output);
 			} else {
+				try {
+					LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
+				} catch (JsonProcessingException ee) {
+					LOGGER.warn("Issue printing JSON", ee);
+				}
+
 				IWebhookEvent event;
 				if (input.containsKey(KEY_BODY) && input.containsKey("headers")) {
 					// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
@@ -102,6 +112,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			LOGGER.info("Output: {}", functionOutput);
 			return functionOutput;
 		};
+
 	}
 
 	public Map<String, ?> parseDynamoDbEvent(ObjectMapper dynamoDbObjectMapper, Map<String, ?> r) {

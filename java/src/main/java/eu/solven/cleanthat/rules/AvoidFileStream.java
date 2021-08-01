@@ -1,0 +1,34 @@
+package eu.solven.cleanthat.rules;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+import eu.solven.cleanthat.rules.meta.IClassTransformer;
+
+/**
+ * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+@Deprecated(since = "Not-ready")
+public class AvoidFileStream extends ATodoJavaParserRule implements IClassTransformer {
+	@Override
+	public String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_7;
+	}
+
+	@Override
+	public String sonarUrl() {
+		return "";
+	}
+
+	@Override
+	public String pmdUrl() {
+		// PMD.AvoidFileStream
+		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream";
+	}
+
+}

@@ -1,6 +1,5 @@
 package eu.solven.cleanthat.github.code_provider;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -209,6 +208,8 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
 
 		try {
+			// https://stackoverflow.com/questions/8377081/github-api-download-zip-or-tarball-link
+			// https://docs.github.com/en/rest/reference/repos#download-a-repository-archive-zip
 			repo.readZip(inputStream -> {
 				long nbBytes = Files.copy(inputStream, zipPath, StandardCopyOption.REPLACE_EXISTING);
 				LOGGER.info("We written a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
@@ -222,7 +223,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 		// TODO We may want not to unzip the file, but it would probably lead to terrible performance
 		LOGGER.info("Unzipping the repo={} ref={} into {}", repo.getFullName(), ref, repoPath);
-		try (FileInputStream fis = new FileInputStream(zipPath.toFile())) {
+		try (InputStream fis = Files.newInputStream(zipPath)) {
 			unzip(fis, repoPath);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Issue with " + tmpDir, e);

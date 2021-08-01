@@ -65,7 +65,7 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 			if (type.isEmpty() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
 				return false;
 			}
-			LOGGER.debug("Trouvé : {}", node.toString());
+			LOGGER.debug("Found : {}", node);
 			if (process(methodCallExpr)) {
 				return true;
 			}

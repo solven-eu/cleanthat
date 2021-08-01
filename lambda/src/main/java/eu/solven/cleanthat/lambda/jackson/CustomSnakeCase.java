@@ -16,8 +16,9 @@ public class CustomSnakeCase extends PropertyNamingStrategies.NamingBase {
 
 	@Override
 	public String translate(String input) {
-		if (input == null)
+		if (input == null) {
 			return input; // garbage in, garbage out
+		}
 
 		return input.toUpperCase(Locale.US);
 	}

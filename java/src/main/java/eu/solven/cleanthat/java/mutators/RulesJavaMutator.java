@@ -66,8 +66,7 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 			// new UseDiamondOperator(),
 			// new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
-			new VariableEqualsConstant(),
-			new CreateTempFilesUsingNio());
+			new VariableEqualsConstant());
 
 	private final List<IClassTransformer> transformers;
 

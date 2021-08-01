@@ -62,7 +62,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			if (input.containsKey("Records")) {
 				// This comes from SQS, which pushes SQSEvent
 				Collection<Map<String, ?>> records = PepperMapHelper.getRequiredAs(input, "Records");
-				LOGGER.info("About to process a batch of {} events from SQS", records.size());
+				LOGGER.info("About to process a batch of {} events from AWS", records.size());
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
 					Map<String, ?> asMap;
@@ -83,8 +83,9 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 					return asMap;
 				}).filter(m -> !m.isEmpty()).map(r -> {
+					IWebhookEvent event = wrapAsEvent(r);
 					try {
-						return processOneEvent(new GithubWebhookEvent(r));
+						return processOneEvent(event);
 					} catch (RuntimeException e) {
 						LOGGER.warn("Issue with one message of a batch of " + records.size() + " messages", e);
 						return Collections.singletonMap("ARG", e.getMessage());
@@ -92,27 +93,34 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				}).collect(Collectors.toList());
 				functionOutput = Map.of("sqs", output);
 			} else {
+				// This would happen on Lambda direct invocation
+				// But we always try to rely on events(SQS, DynamoDB, ...)
 				try {
 					LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
 				} catch (JsonProcessingException ee) {
 					LOGGER.warn("Issue printing JSON", ee);
 				}
 
-				IWebhookEvent event;
-				if (input.containsKey(KEY_BODY) && input.containsKey("headers")) {
-					// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
-					// event = SaveToDynamoDb.NONE;
-					event = new CleanThatWebhookEvent((Map<String, ?>) input.get("headers"),
-							(Map<String, ?>) input.get(KEY_BODY));
-				} else {
-					event = new GithubWebhookEvent(input);
-				}
+				IWebhookEvent event = wrapAsEvent(input);
 				functionOutput = processOneEvent(event);
 			}
 			LOGGER.info("Output: {}", functionOutput);
 			return functionOutput;
 		};
 
+	}
+
+	public IWebhookEvent wrapAsEvent(Map<String, ?> input) {
+		IWebhookEvent event;
+		if (input.containsKey(KEY_BODY) && input.containsKey("headers")) {
+			// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
+			// event = SaveToDynamoDb.NONE;
+			event = new CleanThatWebhookEvent((Map<String, ?>) input.get("headers"),
+					(Map<String, ?>) input.get(KEY_BODY));
+		} else {
+			event = new GithubWebhookEvent(input);
+		}
+		return event;
 	}
 
 	public Map<String, ?> parseDynamoDbEvent(ObjectMapper dynamoDbObjectMapper, Map<String, ?> r) {

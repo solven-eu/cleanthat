@@ -17,6 +17,7 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * Asbtract for {@link IGithubRefCleaner}
@@ -38,31 +39,52 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		return formatterProvider.formatCode(properties, pr, dryRun);
 	}
 
-	@Override
-	public Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
-		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+	protected ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(
+			ICodeProvider codeProvider) {
+		String codeUrl = codeProvider.getHtmlUrl();
 
+		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			// In Maven, we do not check earlier the presence of a configuration file
-			throw new IllegalStateException(
-					"We lack a configuration file (" + CodeProviderHelpers.FILENAME_CLEANTHAT_YAML + ")");
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeUrl);
+			return ResultOrError.error("No configuration");
 		} else {
 			optConfigurationToUse = optPrConfig;
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 		if (version.isEmpty()) {
-			throw new IllegalStateException("The configuration lacks a 'syntax_version' property");
+			LOGGER.warn("No version on configuration applying to PR {}", codeUrl);
+			return ResultOrError.error("No syntax_version in configuration");
 		} else if (!CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION.equals(version.get())) {
-			throw new IllegalStateException("syntax_version=" + version.get()
-					+ " is not supported (only syntax_version='"
+			LOGGER.warn("Version '{}' on configuration is not supported {}" + "(only syntax_version='"
 					+ CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION
-					+ "')");
+					+ "')", version.get(), codeUrl);
+			return ResultOrError.error("Invalid syntax_version in configuration");
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
-		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);
+		CleanthatRepositoryProperties properties;
+		try {
+			properties = prepareConfiguration(prConfig);
+		} catch (RuntimeException e) {
+			// TODO Send a notification, or open a PR requesting to fix the documentation
+			throw new IllegalArgumentException("The configuration file seems invalid", e);
+		}
+		return ResultOrError.result(properties);
+	}
 
-		if (codeProvider instanceof IListOnlyModifiedFiles) {
+	@Override
+	public Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
+		ResultOrError<CleanthatRepositoryProperties, String> optResult = loadAndCheckConfiguration(codeProvider);
+
+		if (optResult.getOptError().isPresent()) {
+			throw new IllegalArgumentException("Issue with configuration: " + optResult.getOptError().get());
+		}
+
+		CleanthatRepositoryProperties properties = optResult.getOptResult().get();
+
+		if (codeProvider instanceof IListOnlyModifiedFiles)
+
+		{
 			// We are on a PR event, or a commit_push over a branch which is head of an open PR
 			LOGGER.info("About to clean a limitted set of files");
 		} else {

@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.utils;
 
 import java.util.Optional;
 

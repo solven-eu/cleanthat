@@ -37,6 +37,7 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * Default for {@link IGithubRefCleaner}
@@ -70,41 +71,22 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 theRef,
 			Set<String> eventBaseBranches) {
-		String refUrl;
 		ICodeProvider codeProvider;
 		String ref = theRef.getRef();
 		try {
 			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
 			GHRef refObject = repo.getRef(ref);
-			refUrl = refObject.getUrl().toExternalForm();
 			codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
-		Optional<Map<String, ?>> optConfigurationToUse;
-		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, refUrl);
-			return Optional.empty();
-		} else {
-			optConfigurationToUse = optPrConfig;
-		}
-		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
-		if (version.isEmpty()) {
-			LOGGER.warn("No version on configuration applying to PR {}", refUrl);
-			return Optional.empty();
-		} else if (!"2".equals(version.get())) {
-			LOGGER.warn("Version '{}' on configuration is not valid {}", version.get(), refUrl);
+		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
+
+		if (optConfig.getOptError().isPresent()) {
 			return Optional.empty();
 		}
-		Map<String, ?> prConfig = optConfigurationToUse.get();
-		CleanthatRepositoryProperties properties;
-		try {
-			properties = prepareConfiguration(prConfig);
-		} catch (RuntimeException e) {
-			// TODO Send a notification, or open a PR requesting to fix the documentation
-			throw new IllegalArgumentException("The configuration file seems invalid", e);
-		}
+
+		CleanthatRepositoryProperties properties = optConfig.getOptResult().get();
 
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)

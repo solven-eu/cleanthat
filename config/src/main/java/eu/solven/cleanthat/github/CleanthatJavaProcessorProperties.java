@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public class CleanthatJavaProcessorProperties {
 
 	// private ILanguageProperties languageProperties;
-	private Map<String, ?> parameters;
+	private Map<String, ?> parameters = Map.of();
 
 	// @JsonIgnore
 	// public ILanguageProperties getLanguageProperties() {

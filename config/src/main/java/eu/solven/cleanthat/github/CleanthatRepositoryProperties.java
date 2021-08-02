@@ -19,10 +19,11 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CleanthatRepositoryProperties {
-	public static final String LATEST_SYNTAX_VERSION = "2021-08";
+	public static final String LATEST_SYNTAX_VERSION = "2021-08-02";
 
 	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config
 	// version
+	// AWS IAM policy relies on a field named 'Version' with a localDate as value: it is a source of inspiration
 	private String syntaxVersion = LATEST_SYNTAX_VERSION;
 
 	private CleanthatMetaProperties meta = new CleanthatMetaProperties();

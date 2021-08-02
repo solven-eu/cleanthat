@@ -44,15 +44,20 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
-			throw new IllegalStateException("We should have thrown earlier");
+			// In Maven, we do not check earlier the presence of a configuration file
+			throw new IllegalStateException(
+					"We lack a configuration file (" + CodeProviderHelpers.FILENAME_CLEANTHAT_YAML + ")");
 		} else {
 			optConfigurationToUse = optPrConfig;
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
 		if (version.isEmpty()) {
-			throw new IllegalStateException("We should have thrown earlier");
-		} else if (!"2".equals(version.get())) {
-			throw new IllegalStateException("We should have thrown earlier");
+			throw new IllegalStateException("The configuration lacks a 'syntax_version' property");
+		} else if (!CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION.equals(version.get())) {
+			throw new IllegalStateException("syntax_version=" + version.get()
+					+ " is not supported (only syntax_version='"
+					+ CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION
+					+ "')");
 		}
 		Map<String, ?> prConfig = optConfigurationToUse.get();
 		CleanthatRepositoryProperties properties = prepareConfiguration(prConfig);

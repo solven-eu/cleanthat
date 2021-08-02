@@ -24,7 +24,7 @@ import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLamb
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
-public class ITProcessEventInLambda {
+public class ITProcessLocallyEventInDynamoDb {
 	GithubRefCleaner cleaner;
 
 	@Autowired
@@ -42,11 +42,15 @@ public class ITProcessEventInLambda {
 
 		AmazonDynamoDB dynamoDbClient = SaveToDynamoDb.makeDynamoDbClient();
 
+		String key = "random-01be8d8f-fde0-4895-8689-70288ace3819";
 		GetItemResult item = dynamoDbClient.getItem(new GetItemRequest().withTableName("cleanthat_accepted_events")
-				.withKey(Map.of("X-GitHub-Delivery",
-						new AttributeValue().withS("random-01be8d8f-fde0-4895-8689-70288ace3819"))));
+				.withKey(Map.of("X-GitHub-Delivery", new AttributeValue().withS(key))));
 
 		Map<String, AttributeValue> dynamoDbItem = item.getItem();
+		if (dynamoDbItem == null) {
+			throw new IllegalArgumentException("There is no item with key=" + key);
+		}
+
 		Map<String, ?> dynamoDbPureJson = InternalUtils.toSimpleMapValue(dynamoDbItem);
 
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

@@ -19,15 +19,18 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CleanthatRepositoryProperties {
+	public static final String LATEST_SYNTAX_VERSION = "2021-08";
 
-	private String syntaxVersion;
+	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config
+	// version
+	private String syntaxVersion = LATEST_SYNTAX_VERSION;
 
-	private CleanthatMetaProperties meta;
-
-	private List<Map<String, ?>> languages = Arrays.asList();
+	private CleanthatMetaProperties meta = new CleanthatMetaProperties();
 
 	// Properties to apply to each children
-	private ISourceCodeProperties sourceCodeProperties;
+	private ISourceCodeProperties sourceCodeProperties = new SourceCodeProperties();
+
+	private List<Map<String, ?>> languages = Arrays.asList();
 
 	public String getSyntaxVersion() {
 		return syntaxVersion;
@@ -45,14 +48,6 @@ public class CleanthatRepositoryProperties {
 		this.meta = meta;
 	}
 
-	public List<Map<String, ?>> getLanguages() {
-		return languages;
-	}
-
-	public void setLanguages(List<Map<String, ?>> languages) {
-		this.languages = languages;
-	}
-
 	public ISourceCodeProperties getSourceCodeProperties() {
 		return sourceCodeProperties;
 	}
@@ -61,4 +56,13 @@ public class CleanthatRepositoryProperties {
 	public void setSourceCodeProperties(SourceCodeProperties sourceCodeProperties) {
 		this.sourceCodeProperties = sourceCodeProperties;
 	}
+
+	public List<Map<String, ?>> getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(List<Map<String, ?>> languages) {
+		this.languages = languages;
+	}
+
 }

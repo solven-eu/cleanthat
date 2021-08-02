@@ -99,7 +99,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			}).findAny();
 
 			if (matchingBase.isEmpty()) {
-				LOGGER.info("Not a single base with open RR matches cleanable branch={}", cleanableBranchRegex);
+				LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", cleanableBranchRegex);
 				return false;
 			} else {
 				LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}",
@@ -141,7 +141,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			// TODO Should we handle this specifically when opening the actual branch?
 			return Optional.of(newBranchRef);
 		} else {
-			LOGGER.info("This branch seems not cleanable: {}", ref);
+			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
+					ref,
+					cleanableBranchRegexes,
+					eventBaseBranches);
 			return Optional.empty();
 		}
 	}

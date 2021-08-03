@@ -22,10 +22,10 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 
 	private ISourceCodeProperties sourceCodeProperties;
 
-	private String language;
+	private String language = "none";
 
 	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-	private String languageVersion;
+	private String languageVersion = "0";
 
 	// The (ordered) processors to apply
 	// @JsonDeserialize(using = ProcessorsDeseralizer.class)

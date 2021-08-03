@@ -41,6 +41,17 @@ public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		// This matches multiple CleanThat rules
+		return Optional.of("UnnecessaryWrapperObjectCreation");
+	}
+
+	@Override
 	protected boolean processNotRecursively(Node node) {
 		AtomicBoolean transformed = new AtomicBoolean();
 

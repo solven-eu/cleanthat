@@ -36,6 +36,16 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 		return IJdkVersionConstants.JDK_6;
 	}
 
+	@Override
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty";
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("UseCollectionIsEmpty");
+	}
+
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {

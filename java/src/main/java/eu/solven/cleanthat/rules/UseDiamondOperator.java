@@ -24,6 +24,11 @@ public class UseDiamondOperator extends AJavaParserRule implements IClassTransfo
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override
+	public boolean isProductionReady() {
+		return false;
+	}
+
+	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
 	}
@@ -36,6 +41,11 @@ public class UseDiamondOperator extends AJavaParserRule implements IClassTransfo
 	@Override
 	public String pmdUrl() {
 		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator";
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("UseDiamondOperator");
 	}
 
 	@Override

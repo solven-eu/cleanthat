@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.rules;
 
+import java.util.Optional;
+
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
@@ -22,6 +24,11 @@ public class UseDiamondOperatorJdk8 extends ATodoJavaParserRule implements IClas
 	@Override
 	public String pmdUrl() {
 		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator";
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("UseDiamondOperator");
 	}
 
 	@Override

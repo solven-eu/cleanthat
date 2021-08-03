@@ -13,8 +13,12 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Benoit Lacelle
  */
 public abstract class ATodoJavaParserRule extends AJavaParserRule implements IClassTransformer {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserRule.class);
+
+	@Override
+	public boolean isProductionReady() {
+		return false;
+	}
 
 	@Override
 	public String minimalJavaVersion() {

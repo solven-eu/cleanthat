@@ -45,6 +45,11 @@ public class CreateTempFilesUsingNio extends AJavaParserRule implements IClassTr
 	}
 
 	@Override
+	public String getId() {
+		return "CreateTempFilesUsingNio";
+	}
+
+	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		// ResolvedMethodDeclaration test;

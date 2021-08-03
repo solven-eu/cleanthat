@@ -59,4 +59,15 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 			return input.isEmpty();
 		}
 	}
+
+	@CompareMethods
+	public static class CaseCollection_NotEmpty {
+		public Object pre(Collection<?> input) {
+			return input.size() != 0;
+		}
+
+		public Object post(Collection<?> input) {
+			return !input.isEmpty();
+		}
+	}
 }

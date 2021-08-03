@@ -343,23 +343,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new IllegalStateException("Should not happen");
 		}
 		if (optSha1.isPresent()) {
-			if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get("checks")) {
-				// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
-				// https://docs.github.com/en/rest/reference/checks#runs
-				// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
-				GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", optSha1.get());
-				try {
-					GHCheckRun checkRun = checkRunBuilder.create();
-					checkRun.update().withStatus(Status.COMPLETED);
-				} catch (IOException e) {
-					// TODO Should we check we have the proper permission anyway?
-					LOGGER.warn("Issue creating the CheckRun", e);
-				}
-			} else {
-				// Invite users to go into:
-				// https://github.com/organizations/solven-eu/settings/installations/9086720
-				LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
-			}
+			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get());
 		}
 
 		// //
@@ -376,6 +360,27 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
 		}
 		return WebhookRelevancyResult.relevant(refToClean.get(), offlineResult.optBaseRef());
+	}
+
+	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1) {
+		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get("checks")) {
+			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
+			// https://docs.github.com/en/rest/reference/checks#runs
+			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
+			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1);
+			try {
+				// baseRepo.getCheckRuns("master").asList();
+				GHCheckRun checkRun = checkRunBuilder.create();
+				checkRun.update().withStatus(Status.COMPLETED);
+			} catch (IOException e) {
+				// TODO Should we check we have the proper permission anyway?
+				LOGGER.warn("Issue creating the CheckRun", e);
+			}
+		} else {
+			// Invite users to go into:
+			// https://github.com/organizations/solven-eu/settings/installations/9086720
+			LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
+		}
 	}
 
 	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> prepareTheRef(long baseRepoId,

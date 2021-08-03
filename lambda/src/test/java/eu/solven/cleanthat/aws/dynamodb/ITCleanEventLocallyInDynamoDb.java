@@ -19,27 +19,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.event.GithubRefCleaner;
+import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
-import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
-public class ITProcessLocallyEventInDynamoDb {
+@ContextConfiguration(classes = { CheckConfigWebhooksLambdaFunction.class })
+public class ITCleanEventLocallyInDynamoDb {
 	GithubRefCleaner cleaner;
 
 	@Autowired
 	ObjectMapper objectMapper;
 
 	@Autowired
-	ExecuteCleaningWebhooksLambdaFunction lambdaFunction;
+	AWebhooksLambdaFunction lambdaFunction;
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		// SystemPropertiesCredentialsProvider credentialsProvider = new SystemPropertiesCredentialsProvider();
-		//
-		// System.getenv()"AWS_ACCESS_KEY_ID");
-		// credentialsProvider.getCredentials();
-
 		AmazonDynamoDB dynamoDbClient = SaveToDynamoDb.makeDynamoDbClient();
 
 		String key = "random-01be8d8f-fde0-4895-8689-70288ace3819";
@@ -51,6 +47,7 @@ public class ITProcessLocallyEventInDynamoDb {
 			throw new IllegalArgumentException("There is no item with key=" + key);
 		}
 
+		@SuppressWarnings("deprecation")
 		Map<String, ?> dynamoDbPureJson = InternalUtils.toSimpleMapValue(dynamoDbItem);
 
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

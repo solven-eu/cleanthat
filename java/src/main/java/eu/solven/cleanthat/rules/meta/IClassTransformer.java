@@ -1,5 +1,10 @@
 package eu.solven.cleanthat.rules.meta;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.github.javaparser.ast.Node;
 
 /**
@@ -10,11 +15,36 @@ import com.github.javaparser.ast.Node;
 public interface IClassTransformer {
 
 	// For java, prefer Checkstyle name, else PMD name
+	@Deprecated
 	default String getId() {
 		return "TODO";
 	}
 
+	default Set<String> getIds() {
+		Set<String> ids = Stream.of(Optional.of(getId()), getPmdId(), getCheckstyleId())
+				.flatMap(Optional::stream)
+				.filter(s -> !s.equals("TODO"))
+				.collect(Collectors.toSet());
+
+		if (ids.isEmpty()) {
+			throw new IllegalStateException("We miss an id for : " + this.getClass());
+		}
+		return ids;
+	}
+
+	default Optional<String> getPmdId() {
+		return Optional.empty();
+	}
+
+	default Optional<String> getCheckstyleId() {
+		return Optional.empty();
+	}
+
 	String minimalJavaVersion();
+
+	default boolean isProductionReady() {
+		return true;
+	}
 
 	/**
 	 * 

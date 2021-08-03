@@ -14,8 +14,8 @@ import com.google.common.cache.LoadingCache;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.ALanguageFormatter;
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
-import eu.solven.cleanthat.github.CleanthatJavaProcessorProperties;
 import eu.solven.cleanthat.github.EclipseJavaFormatterProcessorProperties;
+import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.IStringFormatter;
@@ -94,8 +94,8 @@ public class JavaFormatter extends ALanguageFormatter implements IStringFormatte
 		}
 			break;
 		case "rules": {
-			CleanthatJavaProcessorProperties processorConfig =
-					objectMapper.convertValue(parameters, CleanthatJavaProcessorProperties.class);
+			JavaRulesMutatorProperties processorConfig =
+					objectMapper.convertValue(parameters, JavaRulesMutatorProperties.class);
 			processor = new RulesJavaMutator(languageProperties, processorConfig);
 		}
 			break;

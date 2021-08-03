@@ -21,6 +21,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
  * @author Benoit Lacelle
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
+// https://stackoverflow.com/questions/1750435/comparing-java-enum-members-or-equals
 public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransformer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
@@ -28,6 +29,16 @@ public class EnumsWithoutEquals extends AJavaParserRule implements IClassTransfo
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_5;
+	}
+
+	@Override
+	public String getId() {
+		return "EnumsWithoutEquals";
+	}
+
+	@Override
+	public String jsparrowUrl() {
+		return "https://jsparrow.github.io/rules/enums-without-equals.html";
 	}
 
 	// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast

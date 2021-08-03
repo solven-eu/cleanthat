@@ -22,7 +22,6 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 public class OptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
 
 	private static final String METHOD_IS_PRESENT = "isPresent";
-
 	private static final String METHOD_IS_EMPTY = "isEmpty";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
@@ -32,6 +31,11 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_11;
+	}
+
+	@Override
+	public String getId() {
+		return "OptionalNotEmpty";
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })

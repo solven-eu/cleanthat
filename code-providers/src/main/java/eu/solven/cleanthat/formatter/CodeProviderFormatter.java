@@ -27,7 +27,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -192,7 +191,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					if (matchingExclude.isEmpty()) {
 						cs.submit(() -> {
 							try {
-								return doFormat(pr, pathToMutatedContent, languageP, file, filePath);
+								return doFormat(pr, pathToMutatedContent, languageP, filePath);
 							} catch (IOException e) {
 								throw new UncheckedIOException("Issue with file: " + filePath, e);
 							} catch (RuntimeException e) {
@@ -247,7 +246,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private boolean doFormat(ICodeProvider codeProvider,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP,
-			ICodeProviderFile file,
 			String filePath) throws IOException {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
 		String code = optAlreadyMutated.orElseGet(() -> {

@@ -27,6 +27,8 @@
 		<module>config</module>
 
 		<module>java</module>
+		<module>scala</module>
+		<module>json</module>
 		<!-- <module>python</module> -->
 
 		<module>runnable</module>

@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.language.java.JavaFormatter;
-import eu.solven.cleanthat.language.json.JsonFormatter;
+import eu.solven.cleanthat.language.scala.ScalaFormatter;
 
 /**
  * Spring configuration wrapping all available languages
@@ -13,7 +13,7 @@ import eu.solven.cleanthat.language.json.JsonFormatter;
  *
  */
 @Configuration
-@Import({ JavaFormatter.class, JsonFormatter.class })
+@Import({ JavaFormatter.class, ScalaFormatter.class })
 public class AllLanguagesSpringConfig {
 
 }

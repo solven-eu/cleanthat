@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.util.List;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Diff;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +53,7 @@ public class ITTestLocalFile {
 		String newAsString = node.toString();
 
 		// TODO We may need to reformat to have a nice diff
-		List<Diff> diff = dmp.diffMain(pathAsString, newAsString, false);
-		LOGGER.info("Diff:");
+		List<DiffMatchPatch.Diff> diff = dmp.diffMain(pathAsString, newAsString, false);
 		diff.forEach(d -> LOGGER.info("{}", d));
 	}
 

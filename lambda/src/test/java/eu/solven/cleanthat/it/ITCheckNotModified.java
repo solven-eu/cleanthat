@@ -59,8 +59,7 @@ public class ITCheckNotModified {
 		LOGGER.info("----NEW---------END--------------");
 
 		// TODO We may need to reformat to have a nice diff
-		List<Diff> diff = dmp.diffMain(pathAsString, newAsString, false);
-		LOGGER.info("Diff:");
-		// diff.forEach(d -> LOGGER.info("{}", d));
+		List<DiffMatchPatch.Diff> diff = dmp.diffMain(pathAsString, newAsString, false);
+		diff.forEach(d -> LOGGER.info("{}", d));
 	}
 }

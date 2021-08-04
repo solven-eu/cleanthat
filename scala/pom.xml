@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<artifactId>aggregator-cleanthat</artifactId>
+	</parent>
+
+	<artifactId>scala</artifactId>
+
+	<properties>
+		<scala.version>2.13</scala.version>
+
+		<scalafmt.version>3.0.0-RC6</scalafmt.version>
+		<scalafix.version>0.9.29</scalafix.version>
+		<scalafix-scala.version>${scala.version}.6</scalafix-scala.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>any-language</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.scalameta/scalafmt-core -->
+		<dependency>
+			<groupId>org.scalameta</groupId>
+			<artifactId>scalafmt-core_${scala.version}</artifactId>
+			<version>${scalafmt.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.scalameta/scalafmt-interfaces -->
+		<dependency>
+			<groupId>org.scalameta</groupId>
+			<artifactId>scalafmt-interfaces</artifactId>
+			<version>${scalafmt.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.scalameta/scalafmt-dynamic -->
+		<dependency>
+			<groupId>org.scalameta</groupId>
+			<artifactId>scalafmt-dynamic_${scala.version}</artifactId>
+			<version>${scalafmt.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/ch.epfl.scala/scalafix-interfaces -->
+		<dependency>
+			<groupId>ch.epfl.scala</groupId>
+			<artifactId>scalafix-interfaces</artifactId>
+			<version>${scalafix.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/ch.epfl.scala/scalafix-core -->
+		<dependency>
+			<groupId>ch.epfl.scala</groupId>
+			<artifactId>scalafix-core_${scala.version}</artifactId>
+			<version>${scalafix.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/ch.epfl.scala/scalafix-reflect -->
+		<dependency>
+			<groupId>ch.epfl.scala</groupId>
+			<artifactId>scalafix-reflect_${scalafix-scala.version}</artifactId>
+			<version>${scalafix.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/ch.epfl.scala/scalafix-cli -->
+		<dependency>
+			<groupId>ch.epfl.scala</groupId>
+			<artifactId>scalafix-cli_${scalafix-scala.version}</artifactId>
+			<version>${scalafix.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.thesamet.scalapb/scalapb-runtime -->
+		<dependency>
+			<!-- Unclear why Scalafix does not bring this transitively -->
+			<groupId>com.thesamet.scalapb</groupId>
+			<artifactId>scalapb-runtime_${scala.version}</artifactId>
+			<version>0.11.4</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

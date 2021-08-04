@@ -38,11 +38,10 @@
 			<artifactId>config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.github.cormoran-io.pepper</groupId>
-			<artifactId>pepper</artifactId>
-			<version>${pepper.version}</version>
+			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<artifactId>any-language</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -84,15 +83,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-
-		<!-- This hacks many Eclipse classes -->
-		<!-- <dependency> -->
-		<!-- https://github.com/spring-io/spring-javaformat -->
-		<!-- <groupId>io.spring.javaformat</groupId> -->
-		<!-- <artifactId>spring-javaformat-formatter-eclipse-runtime</artifactId> -->
-		<!-- <version>0.0.22</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>net.revelc.code</groupId>
 			<artifactId>impsort-maven-plugin</artifactId>
@@ -132,13 +122,6 @@
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<!-- https://www.baeldung.com/java-difference-between-two-strings -->
-			<groupId>org.bitbucket.cowwoc</groupId>
-			<artifactId>diff-match-patch</artifactId>
-			<version>1.2</version>
 		</dependency>
 	</dependencies>
 </project>

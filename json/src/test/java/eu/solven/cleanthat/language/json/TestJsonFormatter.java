@@ -2,6 +2,7 @@ package eu.solven.cleanthat.language.json;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,8 @@ public class TestJsonFormatter {
 	@Test
 	public void testFormatJson() throws IOException {
 		ILanguageProperties languageProperties = new CleanthatLanguageProperties();
-		formatter.format(languageProperties, "/somePath", "{   }");
+		String formatted = formatter.format(languageProperties, "/somePath", "{   }");
+
+		Assert.assertEquals("{}", formatted);
 	}
 }

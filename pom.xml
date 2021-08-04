@@ -41,7 +41,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/cormoran-io/pepper/releases -->
-		<pepper.version>2.0</pepper.version>
+		<pepper.version>2.1</pepper.version>
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<guava.version>30.1.1-jre</guava.version>
 		<!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-keyvault-secrets-spring-boot-starter -->

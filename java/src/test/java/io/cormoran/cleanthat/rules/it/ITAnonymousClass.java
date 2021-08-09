@@ -113,6 +113,11 @@ public class ITAnonymousClass {
 								return;
 							}
 
+							if (objectCreationExpr.getAnonymousClassBody().isPresent()) {
+								// https://github.com/javaparser/javaparser/issues/3333#issuecomment-893572693
+								LOGGER.info("Anonymous Class");
+							}
+
 							ResolvedReferenceTypeDeclaration typeDecl = optTypeDeclaration.get();
 							if (typeDecl.isAnonymousClass()) {
 								ResolvedClassDeclaration asClass = typeDecl.asClass();

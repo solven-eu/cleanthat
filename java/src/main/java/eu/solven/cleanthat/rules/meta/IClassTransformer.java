@@ -23,7 +23,7 @@ public interface IClassTransformer {
 	default Set<String> getIds() {
 		Set<String> ids = Stream.of(Optional.of(getId()), getPmdId(), getCheckstyleId())
 				.flatMap(Optional::stream)
-				.filter(s -> !s.equals("TODO"))
+				.filter(s -> !"TODO".equals(s))
 				.collect(Collectors.toSet());
 
 		if (ids.isEmpty()) {

@@ -32,6 +32,7 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.language.IStringFormatterFactory;
@@ -136,16 +137,17 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
-			Map<String, ?> dirtyLanguageConfig) {
+			CleanthatLanguageProperties dirtyLanguageConfig) {
 		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
-		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
+		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties,
+				objectMappers.get(0).convertValue(dirtyLanguageConfig, Map.class));
 
 		String language = languageP.getLanguage();
 		LOGGER.info("About to prepare files for language: {}", language);
 
-		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
-		List<String> includes = languageP.getSourceCodeProperties().getIncludes();
+		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCode();
+		List<String> includes = languageP.getSourceCode().getIncludes();
 		if (includes.isEmpty()) {
 			if ("java".equals(languageP.getLanguage())) {
 				List<String> defaultIncludes = IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA;
@@ -153,8 +155,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
 				// .../src/main/java/io/spring/format/maven/FormatMojo.java#L47
 				languageP = configHelpers.forceIncludes(languageP, defaultIncludes);
-				sourceCodeProperties = languageP.getSourceCodeProperties();
-				includes = languageP.getSourceCodeProperties().getIncludes();
+				sourceCodeProperties = languageP.getSourceCode();
+				includes = languageP.getSourceCode().getIncludes();
 			} else {
 				LOGGER.warn("No includes and no default for language={}", language);
 			}
@@ -170,7 +172,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP) {
-		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCodeProperties();
+		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCode();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
@@ -204,7 +206,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				} else if (matchingExclude.isPresent()) {
 					languageCounters.incrementAndGet("nb_files_excluded_not_included");
 				} else {
-					languageCounters.incrementAndGet("nb_files_neither_included_nor_included");
+					languageCounters.incrementAndGet("nb_files_neither_included_nor_excluded");
 				}
 			});
 		} catch (IOException e) {

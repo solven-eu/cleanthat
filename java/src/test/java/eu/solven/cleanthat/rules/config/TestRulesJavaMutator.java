@@ -65,7 +65,7 @@ public class TestRulesJavaMutator {
 
 	@Test
 	public void testFilterOnExcluded() {
-		languageProperties.setLanguageVersion(IJdkVersionConstants.JDK_1);
+		languageProperties.setLanguageVersion(IJdkVersionConstants.JDK_11);
 
 		UseIsEmptyOnCollections oneRule = new UseIsEmptyOnCollections();
 		String oneRuleId = oneRule.getIds().stream().findFirst().get();
@@ -73,7 +73,7 @@ public class TestRulesJavaMutator {
 		{
 			List<IClassTransformer> allTransformers =
 					new RulesJavaMutator(languageProperties, properties).getTransformers();
-			Assertions.assertThat(allTransformers).map(IClassTransformer::getId).contains(oneRuleId);
+			Assertions.assertThat(allTransformers).flatMap(IClassTransformer::getIds).contains(oneRuleId);
 		}
 
 		{
@@ -81,7 +81,7 @@ public class TestRulesJavaMutator {
 
 			List<IClassTransformer> fileredTransformers =
 					new RulesJavaMutator(languageProperties, properties).getTransformers();
-			Assertions.assertThat(fileredTransformers).map(IClassTransformer::getId).doesNotContain(oneRuleId);
+			Assertions.assertThat(fileredTransformers).flatMap(IClassTransformer::getIds).doesNotContain(oneRuleId);
 		}
 	}
 }

@@ -95,7 +95,7 @@ public abstract class ALanguageFormatter implements IStringFormatter {
 		ILanguageProperties languageProperties =
 				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
 		ISourceCodeFormatter processor = makeFormatter(rawProcessor, languageProperties);
-		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCodeProperties();
+		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCode();
 		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
 		List<PathMatcher> excludeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getExcludes());
 		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filepath);
@@ -107,7 +107,7 @@ public abstract class ALanguageFormatter implements IStringFormatter {
 			LOGGER.debug("File {} was initially not-excluded but excluded for processor: {}", filepath, processor);
 			return code;
 		}
-		LineEnding lineEnding = languageProperties.getSourceCodeProperties().getLineEnding();
+		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
 		return processor.doFormat(code, lineEnding);
 	}
 

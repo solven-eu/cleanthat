@@ -48,7 +48,7 @@ public class JsonFormatter extends ALanguageFormatter implements IStringFormatte
 		case "jackson":
 			JacksonJsonFormatterProperties processorConfig =
 					getObjectMapper().convertValue(parameters, JacksonJsonFormatterProperties.class);
-			processor = new JacksonJsonFormatter(languageProperties.getSourceCodeProperties(), processorConfig);
+			processor = new JacksonJsonFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
 

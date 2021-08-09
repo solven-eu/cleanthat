@@ -3,14 +3,16 @@ package eu.solven.cleanthat.language;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.formatter.LineEnding;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The configuration of what is not related to a language.
@@ -19,6 +21,7 @@ import eu.solven.cleanthat.formatter.LineEnding;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
+@Data
 public class SourceCodeProperties implements ISourceCodeProperties {
 
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
@@ -36,73 +39,30 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	// The encoding of files
 	private String encoding = DEFAULT_ENCODING;
 
+	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
 	private String lineEnding = DEFAULT_LINE_ENDING;
 
-	@Override
-	public List<String> getExcludes() {
-		return excludes;
-	}
-
-	public void setExcludes(List<String> excludes) {
-		this.excludes = excludes;
-	}
-
-	@Override
-	public List<String> getIncludes() {
-		return includes;
-	}
-
-	public void setIncludes(List<String> includes) {
-		this.includes = includes;
-	}
-
-	@Override
-	public String getEncoding() {
-		return encoding;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
+	private LineEnding parseLineEnding(String lineEnding) {
+		return LineEnding.valueOf(lineEnding);
 	}
 
 	// Git has some preference to committing LF
 	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
 	@JsonIgnore
 	@Override
-	public LineEnding getLineEnding() {
-		return LineEnding.valueOf(lineEnding);
+	public LineEnding getLineEndingAsEnum() {
+		return parseLineEnding(lineEnding);
 	}
 
-	@JsonProperty("line_ending")
-	public String getRawLineEnding() {
+	public String getLineEnding() {
 		return lineEnding;
 	}
 
-	@JsonProperty("line_ending")
 	public void setLineEnding(String lineEnding) {
+		parseLineEnding(lineEnding);
+
 		this.lineEnding = lineEnding;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(encoding, excludes, includes, lineEnding);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		SourceCodeProperties other = (SourceCodeProperties) obj;
-		return Objects.equals(encoding, other.encoding) && Objects.equals(excludes, other.excludes)
-				&& Objects.equals(includes, other.includes)
-				&& Objects.equals(lineEnding, other.lineEnding);
-	}
-
 }

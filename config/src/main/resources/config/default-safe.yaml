@@ -7,6 +7,11 @@ meta:
     - "refs/heads/develop"
     - "refs/heads/main"
     - "refs/heads/master"
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  encoding: "UTF-8"
+  line_ending: "LF"
 languages:
 - language: "java"
   language_version: "11"
@@ -16,8 +21,7 @@ languages:
   processors:
   - engine: "rules"
     parameters:
-      excluded: 
-      - 
+      production_ready_only: true
   - engine: "revelc_imports"
     parameters:
       # Organize imports like in Eclipse
@@ -26,8 +30,4 @@ languages:
       static_groups: "java,*"
   # Use Spring formatting convention
   - engine: "spring_formatter"
-source_code:
-  excludes:
-  - "regex:.*/generated/.*"
-  encoding: "UTF-8"
-  line_ending: "LF"
+    parameters: {}

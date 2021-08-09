@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface ILanguageProperties {
 
-	ISourceCodeProperties getSourceCodeProperties();
+	ISourceCodeProperties getSourceCode();
 
 	String getLanguage();
 

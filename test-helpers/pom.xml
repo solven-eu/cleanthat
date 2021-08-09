@@ -18,6 +18,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<version>3.7</version>
+		</dependency>
+
+		<dependency>
 			<!-- https://www.baeldung.com/java-difference-between-two-strings -->
 			<groupId>org.bitbucket.cowwoc</groupId>
 			<artifactId>diff-match-patch</artifactId>

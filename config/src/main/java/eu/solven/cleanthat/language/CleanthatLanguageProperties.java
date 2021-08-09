@@ -3,12 +3,12 @@ package eu.solven.cleanthat.language;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import lombok.Data;
 
 /**
  * The configuration of what is not related to a language.
@@ -18,9 +18,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuppressWarnings("PMD.ImmutableField")
+@Data
 public class CleanthatLanguageProperties implements ILanguageProperties {
 
-	private ISourceCodeProperties sourceCodeProperties;
+	private SourceCodeProperties sourceCode;
 
 	private String language = "none";
 
@@ -30,65 +31,5 @@ public class CleanthatLanguageProperties implements ILanguageProperties {
 	// The (ordered) processors to apply
 	// @JsonDeserialize(using = ProcessorsDeseralizer.class)
 	private List<Map<String, ?>> processors = Arrays.asList();
-
-	@Override
-	@JsonProperty("source_code")
-	public ISourceCodeProperties getSourceCodeProperties() {
-		return sourceCodeProperties;
-	}
-
-	@JsonProperty("source_code")
-	public void setSourceCodeProperties(SourceCodeProperties sourceCodeProperties) {
-		this.sourceCodeProperties = sourceCodeProperties;
-	}
-
-	@Override
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	@Override
-	public String getLanguageVersion() {
-		return languageVersion;
-	}
-
-	public void setLanguageVersion(String languageVersion) {
-		this.languageVersion = languageVersion;
-	}
-
-	@Override
-	public List<Map<String, ?>> getProcessors() {
-		return processors;
-	}
-
-	public void setProcessors(List<Map<String, ?>> processors) {
-		this.processors = processors;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(language, languageVersion, processors, sourceCodeProperties);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		CleanthatLanguageProperties other = (CleanthatLanguageProperties) obj;
-		return Objects.equals(language, other.language) && Objects.equals(languageVersion, other.languageVersion)
-				&& Objects.equals(processors, other.processors)
-				&& Objects.equals(sourceCodeProperties, other.sourceCodeProperties);
-	}
 
 }

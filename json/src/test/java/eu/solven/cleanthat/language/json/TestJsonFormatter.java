@@ -5,19 +5,20 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
-import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.language.SourceCodeProperties;
+import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatter;
+import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
 
 public class TestJsonFormatter {
-	final JsonFormatter formatter = new JsonFormatter(new ObjectMapper());
+	final ISourceCodeFormatter formatter =
+			new JacksonJsonFormatter(new SourceCodeProperties(), new JacksonJsonFormatterProperties());
 
 	@Test
 	public void testFormatJson() throws IOException {
-		ILanguageProperties languageProperties = new CleanthatLanguageProperties();
-		String formatted = formatter.format(languageProperties, "/somePath", "{   }");
+		String formatted = formatter.doFormat("{\r}", LineEnding.LF);
 
-		Assert.assertEquals("{}", formatted);
+		Assert.assertEquals("{ }", formatted);
 	}
 }

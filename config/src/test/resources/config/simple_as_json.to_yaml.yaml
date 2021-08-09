@@ -4,7 +4,14 @@ meta:
   - "cleanthat"
   refs:
     branches:
-    - "master"
+    - "refs/heads/master"
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  includes:
+  - "regex:.*\\.java"
+  encoding: "UTF-8"
+  line_ending: "LF"
 languages:
 - language: "java"
   language_version: "11"
@@ -14,10 +21,3 @@ languages:
       remove_unused: true
       groups: "java.,javax.,org.,com."
       static_groups: "java,*"
-source_code:
-  excludes:
-  - "regex:.*/generated/.*"
-  includes:
-  - "regex:.*\\.java"
-  encoding: "UTF-8"
-  line_ending: "LF"

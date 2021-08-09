@@ -82,9 +82,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 		CleanthatRepositoryProperties properties = optResult.getOptResult().get();
 
-		if (codeProvider instanceof IListOnlyModifiedFiles)
-
-		{
+		if (codeProvider instanceof IListOnlyModifiedFiles) {
 			// We are on a PR event, or a commit_push over a branch which is head of an open PR
 			LOGGER.info("About to clean a limitted set of files");
 		} else {

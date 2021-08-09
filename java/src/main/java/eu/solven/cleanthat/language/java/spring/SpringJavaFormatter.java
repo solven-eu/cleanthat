@@ -49,6 +49,7 @@ public class SpringJavaFormatter implements ISourceCodeFormatter {
 	public String doFormat(String code, LineEnding eol) throws IOException {
 		try {
 			Formatter formatter = new Formatter();
+
 			TextEdit edit = formatter.format(code);
 
 			String output;

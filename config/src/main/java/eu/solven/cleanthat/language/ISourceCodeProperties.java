@@ -17,5 +17,5 @@ public interface ISourceCodeProperties {
 
 	String getEncoding();
 
-	LineEnding getLineEnding();
+	LineEnding getLineEndingAsEnum();
 }

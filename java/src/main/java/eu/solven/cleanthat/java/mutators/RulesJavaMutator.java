@@ -82,6 +82,8 @@ public class RulesJavaMutator implements ISourceCodeFormatter {
 
 		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
 			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
+
+			// Ensure the code has lower version than the rule minimalVersion
 			return languageVersion.compareTo(transformerVersion) >= 0;
 		}).filter(ct -> {
 			boolean isExclusion = excludedRules.stream()

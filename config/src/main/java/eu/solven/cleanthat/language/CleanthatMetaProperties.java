@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import lombok.Data;
 
 /**
  * The configuration of what is not related to a language.
@@ -17,10 +18,11 @@ import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
  */
 @JsonIgnoreProperties({ "commit_pull_requests", "commit_main_branch" })
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class CleanthatMetaProperties {
+@Data
+public final class CleanthatMetaProperties {
 
 	// The labels to apply to created PRs
-	private List<String> labels = Arrays.asList();
+	private List<String> labels = Arrays.asList("cleanthat");
 
 	private CleanthatRefFilterProperties refs = new CleanthatRefFilterProperties();
 

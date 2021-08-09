@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import io.cleanthat.do_not_format_me.CleanClass;
 import io.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
@@ -46,10 +47,10 @@ public class TestJavaFormatter_Revelc {
 		CleanthatRepositoryProperties properties = new ConfigHelpers(Arrays.asList(objectMapper))
 				.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
 
-		List<Map<String, ?>> languages = properties.getLanguages();
+		List<CleanthatLanguageProperties> languages = properties.getLanguages();
 		Assert.assertEquals(1, languages.size());
-		ILanguageProperties languageP =
-				new ConfigHelpers(Arrays.asList(objectMapper)).mergeLanguageProperties(properties, languages.get(0));
+		ILanguageProperties languageP = new ConfigHelpers(Arrays.asList(objectMapper))
+				.mergeLanguageProperties(properties, objectMapper.convertValue(languages.get(0), Map.class));
 		return languageP;
 	}
 

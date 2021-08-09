@@ -83,14 +83,14 @@ public class JavaFormatter extends ALanguageFormatter implements IStringFormatte
 		case "revelc_imports": {
 			JavaRevelcImportsCleanerProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
-			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCodeProperties(), processorConfig);
+			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCode(), processorConfig);
 		}
 			break;
 
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
 					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
-			processor = new SpringJavaFormatter(languageProperties.getSourceCodeProperties(), processorConfig);
+			processor = new SpringJavaFormatter(languageProperties.getSourceCode(), processorConfig);
 		}
 			break;
 		case "rules": {

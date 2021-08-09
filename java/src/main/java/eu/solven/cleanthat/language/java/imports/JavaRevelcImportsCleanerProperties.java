@@ -3,44 +3,28 @@ package eu.solven.cleanthat.language.java.imports;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import lombok.Data;
+
 /**
  * Configuration for Java Revelc imports cleaner
  *
  * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@Data
 public class JavaRevelcImportsCleanerProperties {
 
+	private static final boolean DEFAULT_REMOVED_UNUSED = true;
+	private static final String DEFAULT_ECLIPSE_GROUPS = "java.,javax.,org.,com.";
+	private static final String DEFAULT_ECLIPSE_STATIC_GROUPS = "java,*";
+
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#removeUnused
-	boolean removeUnused = true;
+	private boolean removeUnused = DEFAULT_REMOVED_UNUSED;
 
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#groups
-	String groups = "java.,javax.,org.,com.";
+	private String groups = DEFAULT_ECLIPSE_GROUPS;
 
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#staticGroups
-	String staticGroups = "java,*";
+	private String staticGroups = DEFAULT_ECLIPSE_STATIC_GROUPS;
 
-	public String getGroups() {
-		return groups;
-	}
-
-	public void setGroups(String groups) {
-		this.groups = groups;
-	}
-
-	public String getStaticGroups() {
-		return staticGroups;
-	}
-
-	public void setStaticGroups(String staticGroups) {
-		this.staticGroups = staticGroups;
-	}
-
-	public boolean isRemoveUnused() {
-		return removeUnused;
-	}
-
-	public void setRemoveUnusedImports(boolean removeUnusedImports) {
-		this.removeUnused = removeUnusedImports;
-	}
 }

@@ -13,12 +13,17 @@
  */
 package eu.solven.cleanthat.language.java.spring;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Spring Java formatter configuration
  *
  * @author Benoit Lacelle
  */
-// TODO What would be the options?
+// TODO An option would be to switch from tabs to whiteapaces
+// see io.spring.javaformat.formatter.eclipse.DefaultCodeFormatter.initOptions
+@Deprecated
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SpringJavaFormatterProperties {
 
 }

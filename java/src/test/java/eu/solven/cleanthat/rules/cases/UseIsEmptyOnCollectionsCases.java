@@ -60,7 +60,8 @@ public class UseIsEmptyOnCollectionsCases extends ACases {
 		}
 	}
 
-	@CompareMethods
+	// TODO
+	// @CompareMethods
 	public static class CaseCollection_NotEmpty {
 		public Object pre(Collection<?> input) {
 			return input.size() != 0;

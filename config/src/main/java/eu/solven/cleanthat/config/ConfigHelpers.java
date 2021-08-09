@@ -61,7 +61,7 @@ public class ConfigHelpers {
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, Object> sourceConfig = new LinkedHashMap<>();
 		// Apply defaults from parent
-		sourceConfig.putAll(objectMappers.get(0).convertValue(properties.getSourceCodeProperties(), Map.class));
+		sourceConfig.putAll(objectMappers.get(0).convertValue(properties.getSourceCode(), Map.class));
 		// Apply explicit configuration
 		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
 		if (explicitSourceCodeProperties != null) {
@@ -83,8 +83,7 @@ public class ConfigHelpers {
 
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
 		Map<String, Object> languageAsMap = objectMappers.get(0).convertValue(languageP, Map.class);
-		Map<String, Object> sourceCodeAsMap =
-				objectMappers.get(0).convertValue(languageP.getSourceCodeProperties(), Map.class);
+		Map<String, Object> sourceCodeAsMap = objectMappers.get(0).convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put("includes", includes);
 		languageAsMap.put("source_code", sourceCodeAsMap);
 		return objectMappers.get(0).convertValue(languageAsMap, CleanthatLanguageProperties.class);

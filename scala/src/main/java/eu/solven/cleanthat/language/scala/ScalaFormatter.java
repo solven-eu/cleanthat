@@ -49,12 +49,12 @@ public class ScalaFormatter extends ALanguageFormatter implements IStringFormatt
 		switch (engine) {
 		case "scalafmt":
 			ScalafmtProperties scalafmtConfig = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
-			processor = new ScalafmtFormatter(languageProperties.getSourceCodeProperties(), scalafmtConfig);
+			processor = new ScalafmtFormatter(languageProperties.getSourceCode(), scalafmtConfig);
 
 			break;
 		case "scalafix":
 			ScalafixProperties scalafixConfig = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
-			processor = new ScalafixFormatter(languageProperties.getSourceCodeProperties(), scalafixConfig);
+			processor = new ScalafixFormatter(languageProperties.getSourceCode(), scalafixConfig);
 
 			break;
 

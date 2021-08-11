@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<version>1.0-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
 	</parent>
@@ -46,22 +46,22 @@
 
 		<!-- TODO Remove these 2 dependencies as this module should be agnostic of the language and code-provider -->
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>github</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>scala</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -75,7 +75,7 @@
 
 		<dependency>
 			<!-- Enable processing a local folder -->
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>local</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -102,7 +102,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 		</dependency>

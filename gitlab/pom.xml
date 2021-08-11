@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<version>1.0-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
 	</parent>
@@ -24,7 +24,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -37,7 +37,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -56,7 +56,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.cormoran-io.cleanthat</groupId>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 		</dependency>

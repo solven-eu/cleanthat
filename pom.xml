@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.cormoran-io.cleanthat</groupId>
+		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>parent</relativePath>
@@ -736,7 +736,7 @@
 			</plugin>
 
 			<!-- <plugin> -->
-			<!-- <groupId>com.github.cormoran-io.cleanthat</groupId> -->
+			<!-- <groupId>io.github.solven-eu.cleanthat</groupId> -->
 			<!-- <artifactId>cleanthat-maven-plugin</artifactId> -->
 			<!-- ${project.version} would lead to cyclic reference -->
 			<!-- <version>1.0-SNAPSHOT</version> -->

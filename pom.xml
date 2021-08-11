@@ -44,14 +44,7 @@
 
 		<!-- https://github.com/cormoran-io/pepper/releases -->
 		<pepper.version>2.1</pepper.version>
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-		<guava.version>30.1.1-jre</guava.version>
-		<!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-keyvault-secrets-spring-boot-starter -->
 
-		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
-		<nimbus-jose-jwt.version>8.9</nimbus-jose-jwt.version>
-		<!-- https://mvnrepository.com/artifact/org.jooq/jool -->
-		<jool.version>0.9.14</jool.version>
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
 		<springfox-swagger2.version>2.10.5</springfox-swagger2.version>
@@ -78,8 +71,6 @@
 		<formatter-maven-plugin.version>2.16.0</formatter-maven-plugin.version>
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.6.2</impsort-maven-plugin.version>
-		<!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
-		<frontend-maven-plugin.version>1.12.0</frontend-maven-plugin.version>
 
 		<sentry-spring.version>5.0.1</sentry-spring.version>
 
@@ -622,11 +613,6 @@
 							</goals>
 						</execution>
 					</executions>
-				</plugin>
-				<plugin>
-					<groupId>com.github.eirslett</groupId>
-					<artifactId>frontend-maven-plugin</artifactId>
-					<version>${frontend-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<!-- Generate a git.properties file only in this 'helpers' jar -->

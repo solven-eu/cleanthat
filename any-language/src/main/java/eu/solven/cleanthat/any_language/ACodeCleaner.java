@@ -20,7 +20,7 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
- * Asbtract for {@link IGithubRefCleaner}
+ * Asbtract for {@link ICodeCleaner}
  *
  * @author Benoit Lacelle
  */

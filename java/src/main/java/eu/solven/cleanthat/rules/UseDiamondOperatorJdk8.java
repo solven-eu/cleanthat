@@ -5,7 +5,7 @@ import java.util.Optional;
 import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 /**
- * Use the diamond operation '<>' whenever possible. Some cases are available only since JDK8
+ * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8
  *
  * @author Benoit Lacelle
  */

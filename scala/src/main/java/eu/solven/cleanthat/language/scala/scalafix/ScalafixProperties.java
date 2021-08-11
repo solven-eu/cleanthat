@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 /**
  * Configuration for ScalaFmt formatter
+ * 
+ * See https://github.com/scalameta/scalafmt
  *
  * @author Benoit Lacelle
- * @see https://github.com/scalameta/scalafmt
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ScalafixProperties {

@@ -22,9 +22,10 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
 
 /**
  * Formatter for Scala
+ * 
+ * See https://github.com/scalameta/scalafmt
  *
  * @author Benoit Lacelle
- * @see https://github.com/scalameta/scalafmt
  */
 public class ScalafmtFormatter implements ISourceCodeFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScalafmtFormatter.class);

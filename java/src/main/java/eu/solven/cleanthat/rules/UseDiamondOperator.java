@@ -15,7 +15,7 @@ import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
 
 /**
- * Use the diamond operation '<>' whenever possible.
+ * Use the diamond operation {@code <>} whenever possible.
  *
  * @author Benoit Lacelle
  */

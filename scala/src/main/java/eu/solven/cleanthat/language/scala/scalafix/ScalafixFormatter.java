@@ -22,9 +22,10 @@ import scalafix.interfaces.ScalafixException;
 
 /**
  * Formatter for Scala
+ * 
+ * See https://github.com/scalameta/scalafmt
  *
  * @author Benoit Lacelle
- * @see https://github.com/scalameta/scalafmt
  */
 public class ScalafixFormatter implements ISourceCodeFormatter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScalafixFormatter.class);
@@ -33,8 +34,6 @@ public class ScalafixFormatter implements ISourceCodeFormatter {
 	final ScalafixProperties properties;
 
 	final Scalafix scalafix;
-
-	// final Supplier<Path> configPath;
 
 	public ScalafixFormatter(ISourceCodeProperties sourceCodeProperties, ScalafixProperties properties) {
 		this.sourceCodeProperties = sourceCodeProperties;
@@ -45,27 +44,6 @@ public class ScalafixFormatter implements ISourceCodeFormatter {
 		} catch (ScalafixException e) {
 			throw new RuntimeException("Issue loading Scalafix", e);
 		}
-
-		// configPath = Suppliers.memoize(() -> {
-		// Path tmpPath;
-		// try {
-		// tmpPath = Files.createTempFile("cleanthat", ".scalafmt.conf");
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
-		//
-		// File file = tmpPath.toFile();
-		// try (FileOutputStream fis = new FileOutputStream(file)) {
-		// ByteStreams.copy(new ClassPathResource("/scala/scalafmt.conf").getInputStream(), fis);
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
-		//
-		// LOGGER.info("File.deleteOnExit() over {}", file);
-		// file.deleteOnExit();
-		//
-		// return tmpPath;
-		// });
 	}
 
 	@Override
@@ -78,12 +56,6 @@ public class ScalafixFormatter implements ISourceCodeFormatter {
 		}
 
 		Files.write(tmpPath, code.getBytes(StandardCharsets.UTF_8));
-		// File file = tmpPath.toFile();
-		// try (FileOutputStream fis = new FileOutputStream(file)) {
-		// ByteStreams.copy(new ClassPathResource("/scala/scalafmt.conf").getInputStream(), fis);
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
 
 		File file = tmpPath.toFile();
 		LOGGER.info("File.deleteOnExit() over {}", file);

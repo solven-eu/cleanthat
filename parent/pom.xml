@@ -65,8 +65,8 @@
 	</properties>
 
 	<scm>
-		<url>https://github.com/cormoran-io/agilea</url>
-		<connection>scm:git:ssh://git@github.com/cormoran-io/agilea.git</connection>
+		<url>https://github.com/solven-eu/cleanthat</url>
+		<connection>scm:git:ssh://git@github.com/solven-eu/cleanthat.git</connection>
 		<!-- developperConnection is in top module, where maven release plugin 
 			is called -->
 		<tag>HEAD</tag>

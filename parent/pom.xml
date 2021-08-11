@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -19,7 +18,7 @@
 	<packaging>pom</packaging>
 
 	<inceptionYear>2020</inceptionYear>
-    
+
 	<developers>
 		<developer>
 			<id>blacelle</id>
@@ -51,27 +50,19 @@
 		<!-- Execute license-check manually, only before doing a release -->
 		<license.skip>true</license.skip>
 
-		<!-- By default (i.e. in local environments), check for code formatting 
-			AFTER trying automatic fixes. -->
-		<!-- We suppose the developper would see the fixed and include them in 
-			his commit. -->
-		<!-- In the CI, we check BEFORE automatic fixes as the CI should report 
-			early invalid code -->
+		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
+		<!-- We suppose the developper would see the fixed and include them in his commit. -->
+		<!-- In the CI, we check BEFORE automatic fixes as the CI should report early invalid code -->
 		<staticChecks>process-sources</staticChecks>
 
-		<!-- By default (i.e. in local environments), check for code linting AFTER 
-			trying automatic fixes. -->
+		<!-- By default (i.e. in local environments), check for code linting AFTER trying automatic fixes. -->
 		<lintGoal>lint-autofix</lintGoal>
-	</properties>
 
-	<scm>
-		<url>https://github.com/solven-eu/cleanthat</url>
 		<!-- https://stackoverflow.com/questions/20581427/using-maven-release-plugin-with-github-you-cant-push-to-git-github-com -->
-		<connection>scm:git:git@github.com:solven-eu/cleanthat.git</connection>
-		<!-- developperConnection is in top module, where maven release plugin 
-			is called -->
-		<tag>HEAD</tag>
-	</scm>
+		<scm.developerConnection>scm:git:ssh://git@github.com/solven-eu/cleanthat.git</scm.developerConnection>
+		<scm.connection>scm:git:ssh://github.com/solven-eu/cleanthat.git</scm.connection>
+		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
+	</properties>
 
 	<build>
 		<plugins>
@@ -93,8 +84,7 @@
 								<banDuplicatePomDependencyVersions />
 								<!-- TODO Activate this rule requiring to force quite many dependencies -->
 								<!-- <dependencyConvergence /> -->
-								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. 
-									from SpringBoot) -->
+								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
 								<!-- <reactorModuleConvergence /> -->
 								<requireMavenVersion>
 									<version>3.0</version>
@@ -158,8 +148,7 @@
 		<profile>
 			<id>skipITs</id>
 			<activation>
-				<!-- Integration-tests are heavy, and should not be triggered by a simple 
-					'mvn install' -->
+				<!-- Integration-tests are heavy, and should not be triggered by a simple 'mvn install' -->
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
@@ -190,33 +179,92 @@
 				</property>
 			</activation>
 			<properties>
-				<!-- In CI environments, we should check code formatting before trying 
-					to autofix it -->
+				<!-- In CI environments, we should check code formatting before trying to autofix it -->
 				<staticChecks>validate</staticChecks>
 				<!-- In CI, we should not auto-fix, but only checking/linting -->
 				<lintGoal>lint</lintGoal>
 			</properties>
 		</profile>
+
+
+		<profile>
+			<!-- https://central.sonatype.org/publish/publish-maven/#deploying-to-ossrh-with-apache-maven-introduction -->
+			<id>Sonatype</id>
+
+			<!--Requires in settings.xml: <settings> <servers> <server> <id>ossrh</id> <username>your-jira-id</username> <password>your-jira-pwd</password> </server> 
+				</servers> </settings> -->
+			<distributionManagement>
+				<snapshotRepository>
+					<id>ossrh</id>
+					<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+				</snapshotRepository>
+				<repository>
+					<id>ossrh</id>
+					<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+
+			<build>
+				<plugins>
+					<!-- http://central.sonatype.org/pages/working-with-pgp-signatures.html -->
+					<!-- http://stackoverflow.com/questions/14114528/avoid-gpg-signing-prompt-when-using-maven-release-plugin -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.2.0</version>
+						<configuration>
+							<!-- http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html -->
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin -->
+					<!-- http://www.sonatype.org/nexus/2014/10/08/distribute-project-artifacts-in-maven-central-with-nexus-oss/ -->
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<!-- https://mvnrepository.com/artifact/org.sonatype.plugins/nexus-staging-maven-plugin -->
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
-	<!-- Add Spring repositories -->
-	<!-- (you don't need this if you are using a .RELEASE version) -->
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-milestones</id>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+	<scm>
+		<!-- SCM is in properties as we can't configure it directly in profile -->
+		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
+		<connection>${scm.connection}</connection>
+		<url>${scm.url}</url>
+		<tag>HEAD</tag>
+	</scm>
 </project>

@@ -190,14 +190,20 @@
 						<!-- All modules shall have the same version -->
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 
-						<!-- By default, mvn:release will deploy but we have nothing to deploy here -->
-						<goals>install</goals>
+						<!-- On each release, we want to deploy jars to Sonatype -->
+						<goals>deploy</goals>
 
 						<!-- Same convention as Spring -->
 						<tagNameFormat>v@{project.version}.${release.suffix}</tagNameFormat>
 
-						<!-- Skip NPM as JS apps are very slow to compile -->
-						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipJs</arguments>
+						<!-- Skip style for faster process -->
+						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle</arguments>
+
+						<useReleaseProfile>false</useReleaseProfile>
+
+						<!-- http://central.sonatype.org/pages/apache-maven.html -->
+						<!-- Sonatype profile is defined in cleanthat-parent -->
+						<releaseProfiles>Sonatype</releaseProfiles>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -732,4 +738,10 @@
 			<!-- </plugin> -->
 		</plugins>
 	</build>
+
+	<scm>
+		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
+		<developerConnection>${scm.developerConnection}</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 </project>

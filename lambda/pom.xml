@@ -13,6 +13,7 @@
 
 	<properties>
 		<!-- <wrapper.version>1.0.17.RELEASE</wrapper.version> -->
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<dependencies>

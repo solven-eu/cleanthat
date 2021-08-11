@@ -197,7 +197,8 @@
 						<tagNameFormat>v@{project.version}.${release.suffix}</tagNameFormat>
 
 						<!-- Skip style for faster process -->
-						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle</arguments>
+						<!-- We need javadoc to deploy to Sonatype -->
+						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle -Dmaven.javadoc.skip=false</arguments>
 
 						<useReleaseProfile>false</useReleaseProfile>
 

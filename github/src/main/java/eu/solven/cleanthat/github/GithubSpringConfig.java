@@ -16,13 +16,15 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.event.CodeCleanerFactory;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.language.IStringFormatter;
-import eu.solven.cleanthat.language.IStringFormatterFactory;
+import eu.solven.cleanthat.language.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.ILanguageFormatterFactory;
+import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.StringFormatterFactory;
 
 /**
@@ -56,8 +58,13 @@ public class GithubSpringConfig {
 	}
 
 	@Bean
-	public IStringFormatterFactory stringFormatterFactory(List<IStringFormatter> stringFormatters) {
-		Map<String, IStringFormatter> asMap = new LinkedHashMap<>();
+	public ICodeFormatterApplier codeFormatterApplier() {
+		return new CodeFormatterApplier();
+	}
+
+	@Bean
+	public ILanguageFormatterFactory stringFormatterFactory(List<ISourceCodeFormatterFactory> stringFormatters) {
+		Map<String, ISourceCodeFormatterFactory> asMap = new LinkedHashMap<>();
 
 		stringFormatters.forEach(sf -> {
 			String language = sf.getLanguage();
@@ -70,8 +77,9 @@ public class GithubSpringConfig {
 
 	@Bean
 	public ICodeProviderFormatter codeProviderFormatter(List<ObjectMapper> objectMappers,
-			IStringFormatterFactory formatterFactory) {
-		return new CodeProviderFormatter(objectMappers, formatterFactory);
+			ILanguageFormatterFactory formatterFactory,
+			ICodeFormatterApplier formatterApplier) {
+		return new CodeProviderFormatter(objectMappers, formatterFactory, formatterApplier);
 	}
 
 	@Bean

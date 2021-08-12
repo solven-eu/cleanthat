@@ -3,8 +3,8 @@ package eu.solven.cleanthat.lambda;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import eu.solven.cleanthat.language.java.JavaFormatter;
-import eu.solven.cleanthat.language.scala.ScalaFormatter;
+import eu.solven.cleanthat.language.java.JavaFormattersFactory;
+import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
 
 /**
  * Spring configuration wrapping all available languages
@@ -13,7 +13,7 @@ import eu.solven.cleanthat.language.scala.ScalaFormatter;
  *
  */
 @Configuration
-@Import({ JavaFormatter.class, ScalaFormatter.class })
+@Import({ JavaFormattersFactory.class, ScalaFormattersFactory.class })
 public class AllLanguagesSpringConfig {
 
 }

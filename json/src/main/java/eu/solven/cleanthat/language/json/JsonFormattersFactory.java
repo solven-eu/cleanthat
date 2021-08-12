@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.formatter.ALanguageFormatter;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.IStringFormatter;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatter;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
 
@@ -20,10 +20,10 @@ import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
  *
  * @author Benoit Lacelle
  */
-public class JsonFormatter extends ALanguageFormatter implements IStringFormatter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JsonFormatter.class);
+public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(JsonFormattersFactory.class);
 
-	public JsonFormatter(ObjectMapper objectMapper) {
+	public JsonFormattersFactory(ObjectMapper objectMapper) {
 		super(objectMapper);
 	}
 
@@ -34,7 +34,9 @@ public class JsonFormatter extends ALanguageFormatter implements IStringFormatte
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	protected ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor, ILanguageProperties languageProperties) {
+	public ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor,
+			ILanguageProperties languageProperties,
+			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
 		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
 		if (parameters == null) {

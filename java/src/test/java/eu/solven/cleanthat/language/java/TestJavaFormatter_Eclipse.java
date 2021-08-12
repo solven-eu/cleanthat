@@ -22,8 +22,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.formatter.CodeFormatterApplier;
+import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.CleanthatLanguageProperties;
+import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import io.cleanthat.do_not_format_me.CleanClass;
 import io.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
@@ -41,7 +44,9 @@ public class TestJavaFormatter_Eclipse {
 		}
 	}
 
-	final JavaFormatter formatter = new JavaFormatter(objectMapper);
+	final JavaFormattersFactory formatter = new JavaFormattersFactory(objectMapper);
+	final ICodeFormatterApplier applier = new CodeFormatterApplier();
+	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper(objectMapper);
 
 	private ILanguageProperties getLanguageProperties() throws IOException, JsonParseException, JsonMappingException {
 		CleanthatRepositoryProperties properties = new ConfigHelpers(Arrays.asList(objectMapper))
@@ -61,7 +66,8 @@ public class TestJavaFormatter_Eclipse {
 		URL location = CleanClass.class.getProtectionDomain().getCodeSource().getLocation();
 		String classAsString = asString(new UrlResource(location));
 
-		String cleaned = formatter.format(languageP, "someFilePath", classAsString);
+		String cleaned =
+				applier.applyProcessors(helper.compile(languageP, null, formatter), "someFilePath", classAsString);
 		Assert.assertEquals(cleaned, classAsString);
 
 		Assert.assertEquals(1, formatter.getCacheSize());
@@ -74,7 +80,8 @@ public class TestJavaFormatter_Eclipse {
 		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
 		String classAsString = asString(new UrlResource(location));
 
-		String cleaned = formatter.format(languageP, "someFilePath", classAsString);
+		String cleaned =
+				applier.applyProcessors(helper.compile(languageP, null, formatter), "someFilePath", classAsString);
 		Assert.assertEquals(cleaned, classAsString);
 
 		Assert.assertEquals(1, formatter.getCacheSize());
@@ -88,8 +95,8 @@ public class TestJavaFormatter_Eclipse {
 		String classAsString = asString(new UrlResource(location));
 
 		// Format twice
-		formatter.format(languageP, "someFilePath", classAsString);
-		formatter.format(languageP, "someFilePath", classAsString);
+		applier.applyProcessors(helper.compile(languageP, null, formatter), "someFilePath", classAsString);
+		applier.applyProcessors(helper.compile(languageP, null, formatter), "someFilePath", classAsString);
 
 		// Check the cache is used properly
 		Assert.assertEquals(1, formatter.getCacheSize());

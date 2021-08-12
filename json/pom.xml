@@ -17,7 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>any-language</artifactId>
+			<artifactId>code-cleaners</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

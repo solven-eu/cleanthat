@@ -31,3 +31,25 @@ languages:
   # Use Spring formatting convention
   - engine: "spring_formatter"
     parameters: {}
+- language: "scala"
+  language_version: "2.12"
+  source_code:
+    includes:
+    - "regex:.*\\.scala"
+  processors:
+  - engine: "scalafix"
+    parameters: {}
+  - engine: "scalafmt"
+    parameters: {}
+- language: "json"
+  source_code:
+    includes:
+    - "regex:.*\\.json"
+  processors:
+  - engine: "jackson"
+    parameters:
+      indent: 4
+      lineending: LF
+      space_before_separator: true
+      alphabetical_order: false
+      eol_at_eof: false

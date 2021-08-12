@@ -27,6 +27,11 @@
 			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>code-cleaners</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<!-- Used to download a ZIP of a ref, and process it given local FS -->

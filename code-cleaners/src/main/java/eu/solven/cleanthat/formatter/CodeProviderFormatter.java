@@ -33,9 +33,12 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.CleanthatLanguageProperties;
+import eu.solven.cleanthat.language.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.ILanguageFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.cleanthat.language.IStringFormatterFactory;
+import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
 
 /**
  * Unclear what is the point of this class
@@ -51,11 +54,15 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	final List<ObjectMapper> objectMappers;
 
-	final IStringFormatterFactory formatterFactory;
+	final ILanguageFormatterFactory formatterFactory;
+	final ICodeFormatterApplier formatterApplier;
 
-	public CodeProviderFormatter(List<ObjectMapper> objectMappers, IStringFormatterFactory formatterFactory) {
+	public CodeProviderFormatter(List<ObjectMapper> objectMappers,
+			ILanguageFormatterFactory formatterFactory,
+			ICodeFormatterApplier formatterApplier) {
 		this.objectMappers = objectMappers;
 		this.formatterFactory = formatterFactory;
+		this.formatterApplier = formatterApplier;
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -249,17 +256,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP,
 			String filePath) throws IOException {
-		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
-		String code = optAlreadyMutated.orElseGet(() -> {
-			try {
-				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
-				return optContent.get();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		});
+		String code = loadCodeOptMutated(codeProvider, pathToMutatedContent, filePath);
 		LOGGER.info("Processing {}", filePath);
-		String output = doFormat(languageP, filePath, code);
+		String output = doFormat(languageP, codeProvider, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
 			pathToMutatedContent.put(filePath, output);
 
@@ -274,7 +273,29 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 	}
 
-	private String doFormat(ILanguageProperties properties, String filepath, String code) throws IOException {
-		return formatterFactory.makeStringFormatter(properties).format(properties, filepath, code);
+	public String loadCodeOptMutated(ICodeProvider codeProvider,
+			Map<String, String> pathToMutatedContent,
+			String filePath) {
+		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
+		String code = optAlreadyMutated.orElseGet(() -> {
+			try {
+				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
+				return optContent.get();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
+		return code;
+	}
+
+	private String doFormat(ILanguageProperties properties, ICodeProvider codeProvider, String filepath, String code)
+			throws IOException {
+		ISourceCodeFormatterFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
+
+		LanguagePropertiesAndBuildProcessors compiledProcessors =
+				new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers))
+						.compile(properties, codeProvider, formattersFactory);
+
+		return formatterApplier.applyProcessors(compiledProcessors, filepath, code);
 	}
 }

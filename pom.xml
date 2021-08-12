@@ -24,6 +24,10 @@
 		<module>gitlab</module>
 
 		<module>config</module>
+		
+		<module>prettier</module>
+		
+		<module>code-cleaners</module>
 
 		<module>java</module>
 		<module>scala</module>

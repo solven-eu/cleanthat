@@ -23,11 +23,11 @@ import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.language.IStringFormatter;
+import eu.solven.cleanthat.language.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
-@MockBean({ IStringFormatter.class })
+@MockBean({ ICodeFormatterApplier.class })
 public class ITGithubPullRequestCleaner {
 	GithubRefCleaner cleaner;
 

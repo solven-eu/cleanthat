@@ -21,6 +21,9 @@ import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
+import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
+import eu.solven.cleanthat.language.scala.scalafix.ScalafixProperties;
+import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtProperties;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -55,8 +58,9 @@ public class TestDefaultConfig {
 			// Ensure mutability
 			configFromEmpty.setLanguages(new ArrayList<>());
 
-			CleanthatLanguageProperties javaProperties = new CleanthatLanguageProperties();
 			{
+				CleanthatLanguageProperties javaProperties = new CleanthatLanguageProperties();
+
 				javaProperties.setLanguage("java");
 				javaProperties.setLanguageVersion("11");
 				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
@@ -83,15 +87,56 @@ public class TestDefaultConfig {
 								.put("engine", "spring_formatter")
 								.put("parameters", new SpringJavaFormatterProperties())
 								.build());
-				//
-				// javaProperties.getProcessors().forEach(processor -> {
-				// Object parameters = PepperMapHelper.getRequiredAs(processor, "parameters");
-				//
-				// processor.set
-				// });
+				configFromEmpty.getLanguages().add(javaProperties);
 			}
 
-			configFromEmpty.getLanguages().add(javaProperties);
+			{
+				CleanthatLanguageProperties lProperties = new CleanthatLanguageProperties();
+
+				lProperties.setLanguage("scala");
+				lProperties.setLanguageVersion("2.12");
+				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
+				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.scala"));
+				lProperties.setSourceCode(javaSourceCodeProperties);
+
+				Assertions.assertThat(lProperties.getProcessors()).isEmpty();
+				lProperties.setProcessors(new ArrayList<>());
+
+				lProperties.getProcessors()
+						.add(ImmutableMap.<String, Object>builder()
+								.put("engine", "scalafix")
+								.put("parameters", new ScalafixProperties())
+								.build());
+
+				lProperties.getProcessors()
+						.add(ImmutableMap.<String, Object>builder()
+								.put("engine", "scalafmt")
+								.put("parameters", new ScalafmtProperties())
+								.build());
+
+				configFromEmpty.getLanguages().add(lProperties);
+			}
+
+			{
+				CleanthatLanguageProperties lProperties = new CleanthatLanguageProperties();
+
+				lProperties.setLanguage("json");
+				// javaProperties.setLanguageVersion("11");
+				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
+				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.json"));
+				lProperties.setSourceCode(javaSourceCodeProperties);
+
+				Assertions.assertThat(lProperties.getProcessors()).isEmpty();
+				lProperties.setProcessors(new ArrayList<>());
+
+				lProperties.getProcessors()
+						.add(ImmutableMap.<String, Object>builder()
+								.put("engine", "jackson")
+								.put("parameters", new JacksonJsonFormatterProperties())
+								.build());
+				configFromEmpty.getLanguages().add(lProperties);
+			}
+
 		}
 
 		// This is useful to convert the Java class of processors into Map (like it will happen when loading from the

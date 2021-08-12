@@ -3,6 +3,8 @@ package eu.solven.cleanthat.language.json.jackson;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import eu.solven.cleanthat.language.SourceCodeProperties;
+
 /**
  * Configuration for Jackson Json formatter
  *
@@ -15,7 +17,7 @@ public class JacksonJsonFormatterProperties {
 
 	int indent = DEFAULT_INDENT_WHITESPACES;
 
-	String lineending = "java.,javax.,org.,com.";
+	String lineending = SourceCodeProperties.DEFAULT_LINE_ENDING;
 
 	boolean spaceBeforeSeparator = true;
 	boolean alphabeticalOrder = false;

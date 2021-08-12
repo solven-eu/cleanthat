@@ -32,52 +32,48 @@ Contributions are welcome.
 
 CleanThat is configured through a cleanthat.json file at the root of the repository.
 
-The file should map a Map, with 1+N entries (1 entry for language-agnostic configuration (meta), and N entries for the N configured languages).
-
-ps: CleanThat handles only Java for now.
-
 Here is an example configuration:
 
-    {
-    "java": {
-        "excludes": [
-            "regex:.*/generated/.*"
-        ],
-        "encoding": "UTF-8",
-        "processors": [
-            {
-                "engine": "eclipse_formatter",
-                "configuration": "https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml"
-            },
-            {
-                "engine": "revelc_imports",
-                "configuration": {
-                    "remove_unused": true,
-                    "groups": "java.,javax.,org.,com.",
-                    "staticGroups": "java,*"
-                }
-            },
-            {
-                "engine": "rules",
-                "configuration": {
-                }
-            }
-        ]
-    },
-    "meta": {
-        "labels": [
-            "cleanthat"
-        ],
-        "mutate_pull_requests": true,
-        "mutate_main_branch": true
-    }
-    }
-    
-"java.excludes": an array to 
-
-
-
+```yaml
+syntax_version: "2021-08-02"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    branches:
+    - "refs/heads/develop"
+    - "refs/heads/main"
+    - "refs/heads/master"
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  encoding: "UTF-8"
+  line_ending: "LF"
+languages:
+- language: "java"
+  language_version: "11"
+  source_code:
+    includes:
+    - "regex:.*\\.java"
+  processors:
+  - engine: "rules"
+    parameters:
+      production_ready_only: true
+  - engine: "revelc_imports"
+    parameters:
+      # Organize imports like in Eclipse
+      remove_unused: true
+      groups: "java.,javax.,org.,com."
+      static_groups: "java,*"
+  # Use Spring formatting convention
+  - engine: "spring_formatter"
+    parameters: {}
+```
 
 Deploy into Production (AWS):
 
     git push origin master:deploy-prd
+
+Release a new version (and deploy jars to Sonatype m2central):
+
+    mvn release:clean release:prepare release:perform

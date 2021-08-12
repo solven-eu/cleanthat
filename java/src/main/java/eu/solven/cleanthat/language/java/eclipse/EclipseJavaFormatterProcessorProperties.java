@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github;
+package eu.solven.cleanthat.language.java.eclipse;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

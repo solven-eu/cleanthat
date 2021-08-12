@@ -9,11 +9,11 @@
 		<artifactId>aggregator-cleanthat</artifactId>
 	</parent>
 
-	<artifactId>any-language</artifactId>
+	<artifactId>prettier</artifactId>
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
-		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
+		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
 	</properties>
 
 	<dependencies>
@@ -23,36 +23,17 @@
 			<version>${pepper.version}</version>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>io.github.solven-eu.cleanthat</groupId> -->
-		<!-- <artifactId>code-providers</artifactId> -->
-		<!-- <version>${project.version}</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
-			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>config</artifactId>
-			<version>${project.version}</version>
+			<!-- https://github.com/eirslett/frontend-maven-plugin -->
+			<groupId>com.github.eirslett</groupId>
+			<artifactId>frontend-maven-plugin</artifactId>
+			<version>1.12.0</version>
 		</dependency>
-
-		<dependency>
-			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- Enable processing YAMLs -->
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
-
 
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

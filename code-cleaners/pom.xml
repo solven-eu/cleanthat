@@ -9,7 +9,7 @@
 		<artifactId>aggregator-cleanthat</artifactId>
 	</parent>
 
-	<artifactId>any-language</artifactId>
+	<artifactId>code-cleaners</artifactId>
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
@@ -23,15 +23,9 @@
 			<version>${pepper.version}</version>
 		</dependency>
 
-		<!-- <dependency> -->
-		<!-- <groupId>io.github.solven-eu.cleanthat</groupId> -->
-		<!-- <artifactId>code-providers</artifactId> -->
-		<!-- <version>${project.version}</version> -->
-		<!-- </dependency> -->
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>config</artifactId>
+			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

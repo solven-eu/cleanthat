@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.github.run;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
@@ -26,11 +27,13 @@ import org.springframework.context.event.EventListener;
 import com.google.common.base.Strings;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.IStringFormatter;
+import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })
@@ -43,11 +46,13 @@ public class RunGithubMonitoring {
 	}
 
 	@Bean
-	public IStringFormatter stringFormatter() {
-		return new IStringFormatter() {
+	public ISourceCodeFormatterFactory stringFormatter() {
+		return new ISourceCodeFormatterFactory() {
 
 			@Override
-			public String format(ILanguageProperties config, String filePath, String code) throws IOException {
+			public ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor,
+					ILanguageProperties languageProperties,
+					ICodeProvider codeProvider) {
 				throw new UnsupportedOperationException("Should not format anything");
 			}
 

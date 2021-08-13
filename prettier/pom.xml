@@ -30,10 +30,75 @@
 			<version>1.12.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+		<dependency>
+			<!-- Used to UnTarGz NodeJs -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.21</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- To install node, we may also rely on -->
+			<!-- https://github.com/eirslett/frontend-maven-plugin/blob/master/frontend-maven-plugin/src/main/java/com/github/eirslett/maven/plugins/frontend/mojo/InstallNodeAndNpmMojo.java -->
+			<plugin>
+				<!-- https://github.com/maven-download-plugin/maven-download-plugin/issues/93 -->
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.6.6</version>
+				<executions>
+					<execution>
+						<id>download-node14-windows-32_bit</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-win-x86.zip</url>
+							<outputDirectory>src/main/resources/binaries</outputDirectory>
+							<!-- Will be zipped in the jar -->
+							<unpack>false</unpack>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-node14-macos-64_bit</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-darwin-x64.tar.gz</url>
+							<outputDirectory>src/main/resources/binaries</outputDirectory>
+							<!-- Will be zipped in the jar -->
+							<unpack>false</unpack>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-node14-linux-64_bit</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-linux-x64.tar.xz</url>
+							<outputDirectory>src/main/resources/binaries</outputDirectory>
+							<!-- Will be zipped in the jar -->
+							<unpack>false</unpack>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

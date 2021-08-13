@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules.function;
+package eu.solven.cleanthat.language.java.rules.function;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;

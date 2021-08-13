@@ -2,9 +2,9 @@ package eu.solven.cleanthat.rules.cases;
 
 import java.math.RoundingMode;
 
-import eu.solven.cleanthat.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.language.java.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties

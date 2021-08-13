@@ -1,11 +1,12 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}

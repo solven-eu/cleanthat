@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Collection;
 import java.util.Map;
@@ -16,7 +16,8 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * Prefer 'm.isEmpty()' over 'm.size() == 0'

@@ -31,6 +31,15 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	@Parameter(property = "cleanthat.dryRun", defaultValue = "false")
 	private boolean dryRun;
 
+	/**
+	 * Runs the plugin only if the current project is the execution root.
+	 *
+	 * This is helpful, if the plugin is defined in a profile and should only run once to download a shared file.
+	 */
+	// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java
+	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
+	private boolean runOnlyAtRoot;
+
 	public MavenProject getProject() {
 		return project;
 	}
@@ -49,5 +58,9 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	public boolean isDryRun() {
 		return dryRun;
+	}
+
+	public boolean isRunOnlyAtRoot() {
+		return runOnlyAtRoot;
 	}
 }

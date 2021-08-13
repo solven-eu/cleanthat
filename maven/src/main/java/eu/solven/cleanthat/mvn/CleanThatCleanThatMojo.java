@@ -103,6 +103,12 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 
 		File baseFir = getProject().getBasedir();
 
+		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
+		if (isRunOnlyAtRoot() && !getProject().isExecutionRoot()) {
+			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
+			return;
+		}
+
 		Path configPathFileParent = configPathFile.getParent();
 		if (!configPathFileParent.equals(baseFir.toPath())) {
 			LOGGER.info("We'll clean only in a module containing the configuration: {}", configPathFileParent);

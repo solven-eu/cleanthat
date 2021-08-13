@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,8 +13,9 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.IRuleExternalUrls;
 
 /**
  * Order modifiers according the the Java specification.

@@ -33,18 +33,18 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.rules.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.rules.EnumsWithoutEquals;
-import eu.solven.cleanthat.rules.IJdkVersionConstants;
-import eu.solven.cleanthat.rules.ModifierOrder;
-import eu.solven.cleanthat.rules.OptionalNotEmpty;
-import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
-import eu.solven.cleanthat.rules.UseDiamondOperator;
-import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
-import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.rules.VariableEqualsConstant;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.VersionWrapper;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.CreateTempFilesUsingNio;
+import eu.solven.cleanthat.language.java.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.language.java.rules.ModifierOrder;
+import eu.solven.cleanthat.language.java.rules.OptionalNotEmpty;
+import eu.solven.cleanthat.language.java.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.language.java.rules.UseDiamondOperator;
+import eu.solven.cleanthat.language.java.rules.UseDiamondOperatorJdk8;
+import eu.solven.cleanthat.language.java.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.language.java.rules.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.VersionWrapper;
 
 /**
  * Bridges to Eclipse formatting engine

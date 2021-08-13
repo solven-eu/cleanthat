@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Benoit Lacelle
  */
+// https://www.java.com/releases/
 public interface IJdkVersionConstants {
 
 	String JDK_1 = "1";
@@ -21,8 +22,9 @@ public interface IJdkVersionConstants {
 
 	String JDK_7 = "1.7";
 
-	String JDK_8 = "8";
+	String JDK_8 = "1.8";
 
+	// https://www.infoq.com/news/2015/12/java-version-strings-evolve/
 	String JDK_9 = "9";
 
 	String JDK_11 = "11";

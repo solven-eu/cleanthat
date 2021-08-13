@@ -1,8 +1,8 @@
-package eu.solven.cleanthat.rules.meta;
+package eu.solven.cleanthat.language.java.rules.meta;
 
-import eu.solven.cleanthat.rules.IJdkVersionConstants;
-import eu.solven.cleanthat.rules.NumberToValueOf;
-import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.NumberToValueOf;
+import eu.solven.cleanthat.language.java.rules.UseIsEmptyOnCollections;
 
 /**
  * Helpers knowing what could be the impact of given rule

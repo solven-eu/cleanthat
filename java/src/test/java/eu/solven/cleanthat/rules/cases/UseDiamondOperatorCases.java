@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.solven.cleanthat.rules.UseDiamondOperator;
+import eu.solven.cleanthat.language.java.rules.UseDiamondOperator;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class UseDiamondOperatorCases extends ACases {

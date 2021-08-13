@@ -1,8 +1,9 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8

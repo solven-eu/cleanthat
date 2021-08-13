@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,9 +14,9 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import eu.solven.cleanthat.rules.function.OnMethodName;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.language.java.rules.function.OnMethodName;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.IRuleExternalUrls;
 
 /**
  * Enables common behavior to JavaParser-based rules

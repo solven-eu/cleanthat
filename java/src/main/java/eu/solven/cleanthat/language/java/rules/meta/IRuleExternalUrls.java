@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules.meta;
+package eu.solven.cleanthat.language.java.rules.meta;
 
 /**
  * Helps understand why a rule is relevant, given other systems implementing the rule

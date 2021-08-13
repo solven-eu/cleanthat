@@ -25,9 +25,9 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import io.cleanthat.do_not_format_me.CleanClass;
 import io.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
 
@@ -52,7 +52,7 @@ public class TestJavaFormatter_Revelc {
 		CleanthatRepositoryProperties properties = new ConfigHelpers(Arrays.asList(objectMapper))
 				.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
 
-		List<CleanthatLanguageProperties> languages = properties.getLanguages();
+		List<LanguageProperties> languages = properties.getLanguages();
 		Assert.assertEquals(1, languages.size());
 		ILanguageProperties languageP = new ConfigHelpers(Arrays.asList(objectMapper))
 				.mergeLanguageProperties(properties, objectMapper.convertValue(languages.get(0), Map.class));

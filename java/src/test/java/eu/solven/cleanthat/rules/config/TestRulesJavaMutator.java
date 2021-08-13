@@ -8,14 +8,14 @@ import org.junit.Test;
 
 import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
-import eu.solven.cleanthat.rules.IJdkVersionConstants;
-import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
-import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.UseDiamondOperatorJdk8;
+import eu.solven.cleanthat.language.java.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 public class TestRulesJavaMutator {
-	final CleanthatLanguageProperties languageProperties = new CleanthatLanguageProperties();
+	final LanguageProperties languageProperties = new LanguageProperties();
 	final JavaRulesMutatorProperties properties = new JavaRulesMutatorProperties();
 
 	@Test

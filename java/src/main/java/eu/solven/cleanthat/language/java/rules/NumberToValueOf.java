@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 /**
  * Switch new Double(d) to Double.valueOf(d)

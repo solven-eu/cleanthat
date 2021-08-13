@@ -17,7 +17,7 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
@@ -59,7 +59,7 @@ public class TestDefaultConfig {
 			configFromEmpty.setLanguages(new ArrayList<>());
 
 			{
-				CleanthatLanguageProperties javaProperties = new CleanthatLanguageProperties();
+				LanguageProperties javaProperties = new LanguageProperties();
 
 				javaProperties.setLanguage("java");
 				javaProperties.setLanguageVersion("11");
@@ -91,7 +91,7 @@ public class TestDefaultConfig {
 			}
 
 			{
-				CleanthatLanguageProperties lProperties = new CleanthatLanguageProperties();
+				LanguageProperties lProperties = new LanguageProperties();
 
 				lProperties.setLanguage("scala");
 				lProperties.setLanguageVersion("2.12");
@@ -118,7 +118,7 @@ public class TestDefaultConfig {
 			}
 
 			{
-				CleanthatLanguageProperties lProperties = new CleanthatLanguageProperties();
+				LanguageProperties lProperties = new LanguageProperties();
 
 				lProperties.setLanguage("json");
 				// javaProperties.setLanguageVersion("11");

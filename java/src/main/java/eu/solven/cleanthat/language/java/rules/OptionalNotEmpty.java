@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 
@@ -12,7 +12,8 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'

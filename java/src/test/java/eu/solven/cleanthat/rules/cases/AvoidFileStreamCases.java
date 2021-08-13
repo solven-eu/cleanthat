@@ -15,9 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import eu.solven.cleanthat.rules.AvoidFileStream;
+import eu.solven.cleanthat.language.java.rules.AvoidFileStream;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties

@@ -2,10 +2,10 @@ package eu.solven.cleanthat.rules.cases;
 
 import java.util.Collection;
 
-import eu.solven.cleanthat.rules.ModifierOrder;
+import eu.solven.cleanthat.language.java.rules.ModifierOrder;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.CompareTypes;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class ReorderModifiersCases extends ACases {

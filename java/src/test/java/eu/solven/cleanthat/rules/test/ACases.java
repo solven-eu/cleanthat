@@ -1,6 +1,6 @@
 package eu.solven.cleanthat.rules.test;
 
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 public abstract class ACases {
 	public String getId() {

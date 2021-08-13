@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.CleanthatMetaProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 import lombok.Data;
 
@@ -36,6 +36,6 @@ public final class CleanthatRepositoryProperties {
 
 	// @JsonProperty(index = -999)
 	// private List<Map<String, ?>> languages = Arrays.asList();
-	private List<CleanthatLanguageProperties> languages = Arrays.asList();
+	private List<LanguageProperties> languages = Arrays.asList();
 
 }

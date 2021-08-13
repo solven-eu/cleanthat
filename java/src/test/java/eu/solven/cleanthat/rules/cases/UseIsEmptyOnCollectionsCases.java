@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import eu.solven.cleanthat.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.language.java.rules.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class UseIsEmptyOnCollectionsCases extends ACases {

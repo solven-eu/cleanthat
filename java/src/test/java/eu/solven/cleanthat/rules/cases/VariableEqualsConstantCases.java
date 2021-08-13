@@ -7,10 +7,10 @@ import org.junit.Ignore;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.rules.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.rules.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class VariableEqualsConstantCases extends ACases {

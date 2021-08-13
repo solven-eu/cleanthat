@@ -19,7 +19,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
-public class CleanthatLanguageProperties implements ILanguageProperties {
+public class LanguageProperties implements ILanguageProperties {
 
 	private SourceCodeProperties sourceCode;
 

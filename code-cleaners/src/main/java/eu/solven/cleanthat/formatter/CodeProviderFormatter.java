@@ -32,12 +32,12 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
 
 /**
@@ -144,7 +144,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
-			CleanthatLanguageProperties dirtyLanguageConfig) {
+			LanguageProperties dirtyLanguageConfig) {
 		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
 		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties,

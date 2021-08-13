@@ -1,8 +1,8 @@
 package eu.solven.cleanthat.rules.cases;
 
-import eu.solven.cleanthat.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.language.java.rules.PrimitiveBoxedForString;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class PrimitiveBoxedForStringCases extends ACases {

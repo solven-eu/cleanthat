@@ -39,7 +39,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	// Prevents parsing/loading remote configuration on each parse
 	// We expect a low number of different configurations
 	// Beware this can lead to race-conditions/thread-safety issues into EclipseJavaFormatter
-	final Cache<Map.Entry<ILanguageProperties, EclipseJavaFormatterProcessorProperties>, EclipseJavaFormatterConfiguration> configToEngine =
+	final Cache<EclipseFormatterCacheKey, EclipseJavaFormatterConfiguration> configToEngine =
 			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build();
 
 	public JavaFormattersFactory(ObjectMapper objectMapper) {
@@ -80,12 +80,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			EclipseJavaFormatterConfiguration configuration;
 			try {
 				configuration = configToEngine
-						.get(Map.<ILanguageProperties, EclipseJavaFormatterProcessorProperties>entry(languageProperties,
-								processorConfig), () -> {
-									// CacheLoader.from(config -> {
-									return new EclipseJavaFormatterConfiguration(languageProperties, processorConfig);
-									// })
-								});
+						.get(new EclipseFormatterCacheKey(codeProvider, languageProperties, processorConfig), () -> {
+							return EclipseJavaFormatterConfiguration
+									.load(codeProvider, languageProperties, processorConfig);
+						});
 			} catch (ExecutionException e) {
 				throw new RuntimeException(e);
 			}

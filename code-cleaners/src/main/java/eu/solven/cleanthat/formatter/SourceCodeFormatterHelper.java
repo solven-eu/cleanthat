@@ -11,9 +11,9 @@ import com.google.common.collect.Maps;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
 
 /**
@@ -68,7 +68,7 @@ public class SourceCodeFormatterHelper {
 			languagePropertiesAsMap.put("source_code", sourcePropertiesAsMap);
 		}
 		ILanguageProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, CleanthatLanguageProperties.class);
+				objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
 		return languageProperties;
 	}
 }

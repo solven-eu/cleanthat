@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import eu.solven.cleanthat.rules.UseDiamondOperatorJdk8;
+import eu.solven.cleanthat.language.java.rules.UseDiamondOperatorJdk8;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 //TODO Have a maven module per version of Java, to ensure the post is valid

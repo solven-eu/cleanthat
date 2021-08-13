@@ -15,9 +15,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.CleanthatLanguageProperties;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
@@ -76,8 +76,7 @@ public class ConfigHelpers {
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageConfig);
 		languageConfig.put("source_code", sourceConfig);
-		ILanguageProperties languageP =
-				objectMappers.get(0).convertValue(languageConfig, CleanthatLanguageProperties.class);
+		ILanguageProperties languageP = objectMappers.get(0).convertValue(languageConfig, LanguageProperties.class);
 		return languageP;
 	}
 
@@ -86,7 +85,7 @@ public class ConfigHelpers {
 		Map<String, Object> sourceCodeAsMap = objectMappers.get(0).convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put("includes", includes);
 		languageAsMap.put("source_code", sourceCodeAsMap);
-		return objectMappers.get(0).convertValue(languageAsMap, CleanthatLanguageProperties.class);
+		return objectMappers.get(0).convertValue(languageAsMap, LanguageProperties.class);
 	}
 
 	public static ObjectMapper getJson(List<ObjectMapper> objectMappers) {

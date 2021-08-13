@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import eu.solven.cleanthat.rules.EnumsWithoutEquals;
+import eu.solven.cleanthat.language.java.rules.EnumsWithoutEquals;
 import eu.solven.cleanthat.rules.cases.EnumsWithoutEqualsCases;
 import eu.solven.cleanthat.rules.test.ATestCases;
 

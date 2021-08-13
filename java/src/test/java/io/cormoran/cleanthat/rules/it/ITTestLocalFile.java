@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 
-import eu.solven.cleanthat.rules.VariableEqualsConstant;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * This is useful to investigate a misbehavior over current project file

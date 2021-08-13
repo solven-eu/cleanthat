@@ -24,12 +24,14 @@ import java.util.Map;
 import org.eclipse.jdt.core.JavaCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.language.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.java.eclipse.revelc.ConfigReadException;
 import eu.solven.cleanthat.language.java.eclipse.revelc.ConfigReader;
@@ -48,17 +50,22 @@ public class EclipseJavaFormatterConfiguration {
 
 	private final Map<String, String> options;
 
-	public EclipseJavaFormatterConfiguration(ILanguageProperties languageProperties,
+	public EclipseJavaFormatterConfiguration(Map<String, String> options) {
+		this.options = ImmutableMap.copyOf(options);
+	}
+
+	public static EclipseJavaFormatterConfiguration load(ICodeProvider codeProvider,
+			ILanguageProperties languageProperties,
 			EclipseJavaFormatterProcessorProperties processorConfig) {
 		Map<String, String> options = new LinkedHashMap<>();
 
 		String javaConfigFile = processorConfig.getUrl();
+
 		// Eclipse default
 		if (Strings.isNullOrEmpty(javaConfigFile)) {
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
-			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			String jdkVersion = languageProperties.getLanguageVersion();
 			// if (optJdkVersion.isEmpty()) {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
@@ -70,7 +77,7 @@ public class EclipseJavaFormatterConfiguration {
 		} else {
 			LOGGER.info("Loading Eclipse java formatting configuration from {}", javaConfigFile);
 
-			Resource resource = new DefaultResourceLoader().getResource(javaConfigFile);
+			Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, javaConfigFile);
 
 			try (InputStream is = resource.getInputStream()) {
 				try {
@@ -85,6 +92,6 @@ public class EclipseJavaFormatterConfiguration {
 			}
 		}
 
-		this.options = new LinkedHashMap<>(options);
+		return new EclipseJavaFormatterConfiguration(options);
 	}
 }

@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 
@@ -11,8 +11,9 @@ import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
 import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.IRuleExternalUrls;
 
 /**
  * Use the diamond operation {@code <>} whenever possible.

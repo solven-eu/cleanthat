@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,7 +13,8 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
  * Prevent relying .equals on {@link Enum} types

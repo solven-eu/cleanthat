@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.solven.cleanthat.rules.OptionalNotEmpty;
+import eu.solven.cleanthat.language.java.rules.OptionalNotEmpty;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.test.ACases;
 
 public class OptionalNotEmptyCases extends ACases {

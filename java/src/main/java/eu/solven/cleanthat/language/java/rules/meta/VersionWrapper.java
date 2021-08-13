@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules.meta;
+package eu.solven.cleanthat.language.java.rules.meta;
 
 import java.util.Objects;
 

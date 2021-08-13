@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.rules;
+package eu.solven.cleanthat.language.java.rules;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,8 +16,8 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.rules.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.rules.meta.IRuleExternalUrls;
 
 /**
  * Clean the way of converting primitives into {@link String}.

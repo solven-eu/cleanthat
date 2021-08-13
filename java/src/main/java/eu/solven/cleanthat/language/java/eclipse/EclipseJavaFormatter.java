@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.language.ILanguageProperties;
 
 /**
  * Bridges to Eclipse formatting engine
@@ -44,12 +43,6 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 
 	private final Map<String, String> defaultOptions;
 
-	@Deprecated
-	public EclipseJavaFormatter(ILanguageProperties languageProperties,
-			EclipseJavaFormatterProcessorProperties processorConfig) {
-		defaultOptions = new EclipseJavaFormatterConfiguration(languageProperties, processorConfig).getOptions();
-	}
-
 	public EclipseJavaFormatter(EclipseJavaFormatterConfiguration configuration) {
 		defaultOptions = configuration.getOptions();
 	}
@@ -64,11 +57,11 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 			te = formatter.format(CodeFormatter.K_COMPILATION_UNIT
 					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, ending.getChars());
 			if (te == null) {
-				LOGGER.debug("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
+				LOGGER.warn("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
 				return null;
 			}
 		} catch (RuntimeException e) {
-			LOGGER.debug("Code cannot be formatted for text -->" + code + "<--", e);
+			LOGGER.warn("Code cannot be formatted for text -->" + code + "<--", e);
 			return null;
 		}
 		IDocument doc = new Document(code);

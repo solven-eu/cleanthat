@@ -17,10 +17,10 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
+import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.rules.cases.annotations.CompareTypes;
 import eu.solven.cleanthat.rules.cases.annotations.UnchangedMethod;
-import eu.solven.cleanthat.rules.meta.IClassTransformer;
 
 public class ATestCases {
 

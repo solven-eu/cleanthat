@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.ByteStreams;
 
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -204,7 +204,9 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	protected ICodeProvider downloadGitRefLocally(Path tmpDir) {
 		String ref = getSha1();
-		Path zipPath = tmpDir.resolve("repo.zip");
+
+		// We save the repository zip in this hardcoded file
+		Path zipPath = tmpDir.resolve("repository.zip");
 		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
 
 		try {
@@ -212,14 +214,14 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 			// https://docs.github.com/en/rest/reference/repos#download-a-repository-archive-zip
 			repo.readZip(inputStream -> {
 				long nbBytes = Files.copy(inputStream, zipPath, StandardCopyOption.REPLACE_EXISTING);
-				LOGGER.info("We written a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
+				LOGGER.info("We wrote a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
 				return tmpDir;
 			}, ref);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue downloading a ZIP for " + ref, e);
 		}
 
-		Path repoPath = tmpDir.resolve("repo_unzipped");
+		Path repoPath = tmpDir.resolve("repository");
 
 		// TODO We may want not to unzip the file, but it would probably lead to terrible performance
 		LOGGER.info("Unzipping the repo={} ref={} into {}", repo.getFullName(), ref, repoPath);
@@ -231,7 +233,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 			throw new UncheckedIOException(e);
 		}
 
-		return new LocalFolderCodeProvider(tmpDir);
+		return new FileSystemCodeProvider(repoPath);
 	}
 
 	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder

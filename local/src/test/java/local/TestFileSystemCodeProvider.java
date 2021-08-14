@@ -9,15 +9,15 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 
-public class TestLocalFolderCodeProvider {
+public class TestFileSystemCodeProvider {
 	final File tmpFolder = org.assertj.core.util.Files.newTemporaryFolder();
 
 	@Test
 	public void testLoadAbsolutePathAsRelative() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		LocalFolderCodeProvider codeProvider = new LocalFolderCodeProvider(tmpFolderAsPath);
+		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
@@ -30,7 +30,7 @@ public class TestLocalFolderCodeProvider {
 	@Test
 	public void testLoadRelativePath() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		LocalFolderCodeProvider codeProvider = new LocalFolderCodeProvider(tmpFolderAsPath);
+		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
@@ -45,7 +45,7 @@ public class TestLocalFolderCodeProvider {
 	@Test
 	public void testLoadNotExistingFile() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		LocalFolderCodeProvider codeProvider = new LocalFolderCodeProvider(tmpFolderAsPath);
+		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");

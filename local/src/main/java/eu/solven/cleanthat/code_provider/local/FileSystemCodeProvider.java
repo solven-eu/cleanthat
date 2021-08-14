@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -25,23 +26,33 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 /**
- * An {@link ICodeProvider} for local folders
+ * An {@link ICodeProvider} for {@link FileSystem}
  *
  * @author Benoit Lacelle
  */
-public class LocalFolderCodeProvider implements ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LocalFolderCodeProvider.class);
+public class FileSystemCodeProvider implements ICodeProviderWriter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCodeProvider.class);
 
+	final FileSystem fs;
 	final Path root;
 
-	public LocalFolderCodeProvider(Path root) {
-		LOGGER.info("root={}", root);
+	// public FileSystemCodeProvider(FileSystem fs) {
+	// this(fs,fs.getPath("/"));
+	// }
+
+	public FileSystemCodeProvider(FileSystem fs, Path root) {
+		// LOGGER.info("root={}", root);
+		this.fs = fs;
 		this.root = root;
+	}
+
+	public FileSystemCodeProvider(Path root) {
+		this(root.getFileSystem(), root);
 	}
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
-		File gitIgnore = root.resolve(".gitignore").toFile();
+		File gitIgnore = root.resolve(fs.getPath(".gitignore")).toFile();
 		Predicate<Path> gitIgnorePredicate;
 
 		// TODO Beware there could be .gitignore in subfolders

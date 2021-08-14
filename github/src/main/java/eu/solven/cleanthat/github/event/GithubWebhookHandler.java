@@ -113,6 +113,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
+
 		Optional<Object> organizationUrl = PepperMapHelper.getOptionalAs(input, "organization", "url");
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,

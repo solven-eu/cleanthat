@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -64,6 +64,6 @@ public class RunCleanLocalFolder extends ACleanThatXxxApplication {
 		File pathToConfig = CodeProviderHelpers.pathToConfig(localFolder);
 		CleanthatRepositoryProperties properties =
 				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
-		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(localFolder), false);
+		codeProviderFormatter.formatCode(properties, new FileSystemCodeProvider(localFolder), false);
 	}
 }

@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
-import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -95,19 +95,18 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	}
 
 	public void doClean(ApplicationContext appContext) {
-		String configPath = getConfigPath();
-		getLog().info("Path: " + configPath);
-		getLog().info("URL: " + getConfigUrl());
-
-		Path configPathFile = Paths.get(configPath);
-
-		File baseFir = getProject().getBasedir();
-
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
 		if (isRunOnlyAtRoot() && !getProject().isExecutionRoot()) {
 			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
 			return;
 		}
+
+		String configPath = getConfigPath();
+		getLog().info("Path: " + configPath);
+		getLog().info("URL: " + getConfigUrl());
+
+		Path configPathFile = Paths.get(configPath);
+		File baseFir = getProject().getBasedir();
 
 		Path configPathFileParent = configPathFile.getParent();
 		if (!configPathFileParent.equals(baseFir.toPath())) {
@@ -118,7 +117,7 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 		getLog().info("project.baseDir: " + baseFir);
 
 		// Process the root of current module
-		ICodeProviderWriter codeProvider = new LocalFolderCodeProvider(baseFir.toPath());
+		ICodeProviderWriter codeProvider = new FileSystemCodeProvider(baseFir.toPath());
 
 		ICodeCleaner codeCleaner = new MavenCodeCleaner(
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList()),

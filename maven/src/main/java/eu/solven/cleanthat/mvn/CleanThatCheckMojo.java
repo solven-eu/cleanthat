@@ -11,7 +11,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.code_provider.local.LocalFolderCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
@@ -51,6 +51,6 @@ public class CleanThatCheckMojo extends ACleanThatMojo {
 				new GithubSpringConfig().stringFormatterFactory(Arrays.asList(new JavaFormattersFactory(om)));
 		CodeProviderFormatter codeProviderFormatter =
 				new CodeProviderFormatter(Arrays.asList(om), stringFormatterFactory, new CodeFormatterApplier());
-		codeProviderFormatter.formatCode(properties, new LocalFolderCodeProvider(Paths.get(".")), false);
+		codeProviderFormatter.formatCode(properties, new FileSystemCodeProvider(Paths.get(".")), false);
 	}
 }

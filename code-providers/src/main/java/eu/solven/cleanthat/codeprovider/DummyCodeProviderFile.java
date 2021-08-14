@@ -22,9 +22,9 @@ public class DummyCodeProviderFile implements ICodeProviderFile {
 		if (raw instanceof DummyCodeProviderFile) {
 			throw new IllegalArgumentException("input can not be an instance of " + this.getClass());
 		} else if (!path.startsWith("/")) {
-			throw new IllegalArgumentException("Invalid path: " + path);
-		} else if (!path.startsWith("//")) {
-			throw new IllegalArgumentException("Invalid path: " + path);
+			throw new IllegalArgumentException("Invalid path: " + path + " (missing '/' at the beginning)");
+		} else if (path.startsWith("//")) {
+			throw new IllegalArgumentException("Invalid path: " + path + " ('//' at the beginning)");
 		}
 
 		this.path = path;

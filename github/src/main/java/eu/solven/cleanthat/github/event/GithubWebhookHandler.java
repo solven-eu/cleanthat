@@ -373,8 +373,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				GHCheckRun checkRun = checkRunBuilder.create();
 				checkRun.update().withStatus(Status.COMPLETED);
 			} catch (IOException e) {
-				// TODO Should we check we have the proper permission anyway?
-				LOGGER.warn("Issue creating the CheckRun", e);
+				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.warn("Issue creating the CheckRun", e);
+				} else {
+					// As this occurs very often, skip the stacktrace in the logs
+					LOGGER.warn("Issue creating the CheckRun");
+				}
 			}
 		} else {
 			// Invite users to go into:

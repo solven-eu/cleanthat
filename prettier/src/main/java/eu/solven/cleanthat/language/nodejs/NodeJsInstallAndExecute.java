@@ -32,6 +32,8 @@ public class NodeJsInstallAndExecute {
 		// hidden
 	}
 
+	// See
+	// https://github.com/eirslett/frontend-maven-plugin/blob/master/frontend-maven-plugin/src/main/java/com/github/eirslett/maven/plugins/frontend/mojo/InstallNodeAndNpmMojo.java
 	public static void main(String[] args) throws IOException {
 		String url = "https://nodejs.org/dist/v14.17.5/node-v14.17.5-darwin-x64.tar.gz";
 		Path urlAsPath = Paths.get(url);

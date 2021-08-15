@@ -41,6 +41,8 @@ import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
 import eu.solven.cleanthat.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.github.refs.IGithubRefCleaner;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;

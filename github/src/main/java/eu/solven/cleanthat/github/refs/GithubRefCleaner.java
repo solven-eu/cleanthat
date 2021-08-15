@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.github.refs;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +32,9 @@ import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.event.GithubAndToken;
 import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -69,15 +71,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	public Optional<String> prepareRefToClean(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 theRef,
 			Set<String> eventBaseBranches) {
-		ICodeProvider codeProvider;
-		String ref = theRef.getRef();
-		try {
-			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
-			GHRef refObject = repo.getRef(ref);
-			codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		ICodeProvider codeProvider = getCodeProviderForRef(theRef);
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
 
 		if (optConfig.getOptError().isPresent()) {
@@ -108,22 +102,23 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			return true;
 		}).findAny();
 
+		String fullRef = theRef.getRef();
 		if (optBaseMatchingRule.isPresent()) {
 			if (result.isPrOpen()) {
 				LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event (rule={})",
-						ref,
+						fullRef,
 						optBaseMatchingRule.get());
 			} else {
 				LOGGER.info(
 						"We will clean {} in place as this event is due to a push over a branch with a PR with a cleanable base (rule={})",
-						ref,
+						fullRef,
 						optBaseMatchingRule.get());
 			}
-			return Optional.of(ref);
+			return Optional.of(fullRef);
 		}
 
 		Optional<String> optHeadMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {
-			return Pattern.matches(cleanableBranchRegex, ref);
+			return Pattern.matches(cleanableBranchRegex, fullRef);
 		}).findAny();
 
 		if (optHeadMatchingRule.isPresent()) {
@@ -140,10 +135,28 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 			return Optional.of(newBranchRef);
 		} else {
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
-					ref,
+					fullRef,
 					cleanableBranchRegexes,
 					eventBaseBranches);
 			return Optional.empty();
+		}
+	}
+
+	public ICodeProvider getCodeProviderForRef(GitRepoBranchSha1 theRef) {
+		String fullRef = theRef.getRef();
+		if (!fullRef.startsWith(CleanthatRefFilterProperties.REFS_PREFIX)) {
+			throw new IllegalArgumentException("Invalid ref: " + fullRef);
+		}
+
+		try {
+			String githubRef = fullRef.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
+
+			// Github expects as ref something like 'heads/someRef'
+			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
+			GHRef refObject = repo.getRef(githubRef);
+			return new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue with ref: " + fullRef, e);
 		}
 	}
 

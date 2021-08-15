@@ -1,5 +1,6 @@
-package eu.solven.cleanthat.github.event;
+package eu.solven.cleanthat.github.refs;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.kohsuke.github.GHRef;
@@ -21,6 +22,8 @@ public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 
 	public GithubRefCodeProvider(String token, GHRepository repo, GHRef ref) {
 		super(token, repo);
+
+		Objects.requireNonNull(ref, "ref is null");
 
 		this.ref = ref;
 	}

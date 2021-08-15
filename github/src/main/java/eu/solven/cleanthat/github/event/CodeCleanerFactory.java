@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import eu.solven.cleanthat.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.github.refs.IGithubRefCleaner;
 
 /**
  * Factory for {@link IGithubRefCleaner}

@@ -26,10 +26,10 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.github.GithubHelper;
 import eu.solven.cleanthat.github.event.GithubAndToken;
-import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
-import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.github.refs.GithubBranchCodeProvider;
+import eu.solven.cleanthat.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {

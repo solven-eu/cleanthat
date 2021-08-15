@@ -18,10 +18,10 @@ import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.github.event.GithubAndToken;
-import eu.solven.cleanthat.github.event.GithubBranchCodeProvider;
-import eu.solven.cleanthat.github.event.GithubRefCleaner;
 import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.github.refs.GithubBranchCodeProvider;
+import eu.solven.cleanthat.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.github.refs.IGithubRefCleaner;
 
 public class TestGithubWebhookHandler {
 

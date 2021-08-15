@@ -28,7 +28,8 @@ public final class CleanthatRefFilterProperties {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanthatRefFilterProperties.class);
 
 	// https://git-scm.com/book/en/v2/Git-Internals-Git-References
-	private static final String REFS_PREFIX = "refs/";
+	// In a local Git repository, refs are available at 'refs/heads/XXX'
+	public static final String REFS_PREFIX = "refs/";
 	private static final String BRANCHES_PREFIX = REFS_PREFIX + "heads/";
 
 	// By default, we clean a set of standard default branch names

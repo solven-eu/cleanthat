@@ -17,8 +17,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.aws.dynamodb.TestAWebhooksLambdaFunction.FortestsWebhooksLambdaFunction;
-import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 

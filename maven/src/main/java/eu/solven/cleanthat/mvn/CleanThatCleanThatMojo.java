@@ -24,11 +24,11 @@ import org.springframework.context.annotation.Import;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 import io.sentry.IHub;
 

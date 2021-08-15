@@ -21,8 +21,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
-import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 

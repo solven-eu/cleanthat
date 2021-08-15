@@ -11,13 +11,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.github.GithubSpringConfig;
 import eu.solven.cleanthat.language.ILanguageFormatterFactory;
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 

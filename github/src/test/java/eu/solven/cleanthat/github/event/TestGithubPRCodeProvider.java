@@ -13,7 +13,7 @@ import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
 
-import eu.solven.cleanthat.github.refs.GithubPRCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.GithubPRCodeProvider;
 
 public class TestGithubPRCodeProvider {
 

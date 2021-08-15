@@ -37,11 +37,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.github.code_provider.AGithubCodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

@@ -3,8 +3,8 @@ package eu.solven.cleanthat.anything.event;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.solven.cleanthat.github.event.pojo.GitRepoBranchSha1;
-import eu.solven.cleanthat.github.event.pojo.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.code_provider.github.event.pojo.IExternalWebhookRelevancyResult;
 
 /**
  * Holds the logic to clean a code poointer (e.g. local folder, or Git ref, ...)

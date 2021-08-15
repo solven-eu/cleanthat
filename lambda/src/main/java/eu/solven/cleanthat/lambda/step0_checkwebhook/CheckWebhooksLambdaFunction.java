@@ -12,11 +12,11 @@ import org.springframework.boot.SpringApplication;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 

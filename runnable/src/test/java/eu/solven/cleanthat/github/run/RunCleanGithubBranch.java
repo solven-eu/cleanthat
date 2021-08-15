@@ -22,14 +22,14 @@ import org.springframework.context.event.EventListener;
 import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.github.GithubHelper;
-import eu.solven.cleanthat.github.event.GithubAndToken;
-import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.github.refs.GithubBranchCodeProvider;
-import eu.solven.cleanthat.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 public class RunCleanGithubBranch extends ACleanThatXxxApplication {

@@ -21,10 +21,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
-import eu.solven.cleanthat.github.refs.IGithubRefCleaner;
 
 // https://github.com/organizations/solven-eu/settings/apps/cleanthat/advanced
 public class RunProcessWebhookEvent {

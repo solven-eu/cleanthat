@@ -21,14 +21,14 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 
+import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
-import eu.solven.cleanthat.github.event.GithubAndToken;
-import eu.solven.cleanthat.github.event.GithubWebhookHandler;
-import eu.solven.cleanthat.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.github.event.pojo.GithubWebhookRelevancyResult;
 
 //https://github-api.kohsuke.org/githubappjwtauth.html
 public class ITGithubWebhookHandlerFactory {

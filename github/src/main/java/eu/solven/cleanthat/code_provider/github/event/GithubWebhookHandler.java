@@ -484,6 +484,49 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
+		Supplier<GHRef> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
+
+		CodeFormatResult result;
+		if (relevancyResult.optBaseForHead().isPresent()) {
+			// If the base does not exist, then something is wrong: let's check right away it is available
+			GHRef base;
+			try {
+				base = repo.getRef(facade.toFullGitRef(relevancyResult.optBaseForHead().get().getRef()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			result = cleaner.formatRefDiff(repo, base, headSupplier);
+		} else {
+			result = cleaner.formatRef(repo, headSupplier);
+		}
+
+		if (refLazyRefCreated.get() != null) {
+			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
+			if (!relevancyResult.optBaseForHead().isPresent()) {
+				LOGGER.warn("We created a tmpRef but there is no base");
+			} else {
+				if (result.isEmpty()) {
+					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed",
+							lazyRefCreated);
+					try {
+						facade.removeRef(lazyRefCreated);
+					} catch (IOException e) {
+						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
+					}
+				} else {
+					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
+					doOpenPr(relevancyResult, facade, lazyRefCreated);
+				}
+			}
+		} else {
+			LOGGER.debug("The changes would have been committed directly in the head branch");
+		}
+	}
+
+	public Supplier<GHRef> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
+			GHRepository repo,
+			GithubFacade facade,
+			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
 		Supplier<GHRef> headSupplier = () -> {
 			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
 			String refName = refToProcess.getRef();
@@ -506,41 +549,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}
 		};
-
-		CodeFormatResult result;
-		if (relevancyResult.optBaseForHead().isPresent()) {
-			// If the base does not exist, then something is wrong: let's check right away it is available
-			GHRef base;
-			try {
-				base = repo.getRef(facade.toFullGitRef(relevancyResult.optBaseForHead().get().getRef()));
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-			result = cleaner.formatRefDiff(repo, base, headSupplier);
-		} else {
-			result = cleaner.formatRef(repo, headSupplier);
-		}
-
-		if (refLazyRefCreated.get() != null) {
-			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
-			if (!relevancyResult.optBaseForHead().isPresent()) {
-				LOGGER.warn("We created a tmpRef but there is no base");
-			} else {
-				if (result.isEmpty()) {
-					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed");
-					try {
-						facade.removeRef(lazyRefCreated);
-					} catch (IOException e) {
-						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
-					}
-				} else {
-					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
-					doOpenPr(relevancyResult, facade, lazyRefCreated);
-				}
-			}
-		} else {
-			LOGGER.debug("The changes would have been committed directly in the head branch");
-		}
+		return headSupplier;
 	}
 
 	public void doOpenPr(WebhookRelevancyResult relevancyResult,

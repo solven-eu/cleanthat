@@ -10,12 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.nimbusds.jose.JOSEException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
@@ -30,6 +31,10 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigWebhooksLambdaFunction.class);
 
+	public AmazonDynamoDB makeDynamoDbClient() {
+		return SaveToDynamoDb.makeDynamoDbClient();
+	}
+
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
 		IGithubWebhookHandler makeWithFreshJwt = extracted(getAppContext());
@@ -40,11 +45,14 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
 
 		if (processAnswer.optHeadToClean().isPresent()) {
-			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();
+			AmazonDynamoDB client = makeDynamoDbClient();
 
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>(input.getBody());
 
-			acceptedEvent.put("refToClean", processAnswer.optHeadToClean().get());
+			GitRepoBranchSha1 headToClean = processAnswer.optHeadToClean().get();
+
+			ObjectMapper objectMapper = getAppContext().getBean(ObjectMapper.class);
+			acceptedEvent.put("refToClean", objectMapper.convertValue(headToClean, Map.class));
 
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_accepted_events",
 					new CleanThatWebhookEvent(input.getHeaders(), acceptedEvent),
@@ -57,7 +65,7 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	}
 
 	public static IGithubWebhookHandler extracted(ApplicationContext appContext) {
-		GithubWebhookHandlerFactory githubFactory = appContext.getBean(GithubWebhookHandlerFactory.class);
+		IGithubWebhookHandlerFactory githubFactory = appContext.getBean(IGithubWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
 		IGithubWebhookHandler makeWithFreshJwt;
@@ -65,8 +73,6 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			makeWithFreshJwt = githubFactory.makeWithFreshJwt();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (JOSEException e) {
-			throw new RuntimeException(e);
 		}
 		return makeWithFreshJwt;
 	}

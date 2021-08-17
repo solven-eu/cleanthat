@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -46,8 +45,6 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			makeWithFreshJwt = githubFactory.makeWithFreshJwt();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (JOSEException e) {
-			throw new RuntimeException(e);
 		}
 
 		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;

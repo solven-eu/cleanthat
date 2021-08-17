@@ -73,6 +73,9 @@ public class SaveToDynamoDb {
 		inputAsMap.put("X-GitHub-Delivery", primaryKey);
 
 		inputAsMap.put("datetime", OffsetDateTime.now().toString());
+
+		// TODO We should convert to pure Map, as DynamoDb does not accept custom POJO here
+		// see com.amazonaws.services.dynamodbv2.document.internal.ItemValueConformer.transform(Object)
 		inputAsMap.put("body", input.getBody());
 		inputAsMap.put("headers", input.getHeaders());
 

@@ -1,8 +1,8 @@
 package eu.solven.cleanthat.lambda;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
@@ -17,10 +17,14 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class, AllLanguagesSpringConfig.class, CodeProviderHelpers.class })
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class ACleanThatXxxApplication {
+public abstract class ACleanThatXxxApplication implements ApplicationContextAware {
 
-	@Autowired
 	ApplicationContext appContext;
+
+	@Override
+	public void setApplicationContext(ApplicationContext appContext) {
+		this.appContext = appContext;
+	}
 
 	public ApplicationContext getAppContext() {
 		return appContext;

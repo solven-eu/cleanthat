@@ -25,7 +25,7 @@ import com.nimbusds.jwt.SignedJWT;
  *
  * @author Benoit Lacelle
  */
-public class GithubWebhookHandlerFactory {
+public class GithubWebhookHandlerFactory implements IGithubWebhookHandlerFactory {
 
 	// https://github.com/organizations/solven-eu/settings/apps/cleanthat
 	// https://github.com/apps/cleanthat
@@ -45,8 +45,15 @@ public class GithubWebhookHandlerFactory {
 		this.objectMappers = objectMappers;
 	}
 
-	public IGithubWebhookHandler makeWithFreshJwt() throws IOException, JOSEException {
-		GitHub github = new GitHubBuilder().withJwtToken(makeJWT())
+	@Override
+	public IGithubWebhookHandler makeWithFreshJwt() throws IOException {
+		String jwt;
+		try {
+			jwt = makeJWT();
+		} catch (JOSEException e) {
+			throw new IllegalStateException("Issue with configuration?", e);
+		}
+		GitHub github = new GitHubBuilder().withJwtToken(jwt)
 				// This leads to 401. Why?
 				// .withRateLimitChecker(new NoWaitRateLimitChecker())
 				.build();

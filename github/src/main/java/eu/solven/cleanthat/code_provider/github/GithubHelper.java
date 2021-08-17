@@ -11,6 +11,8 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+
 /**
  * Helps working with Github
  * 
@@ -18,23 +20,18 @@ import org.kohsuke.github.GHRepository;
  *
  */
 public class GithubHelper {
-
-	// https://stackoverflow.com/questions/1526471/git-difference-between-branchname-and-refs-heads-branchname
-	private static final String REF_HEADS = "refs/heads/";
-	static final String REF_REMOTES = "refs/remotes/";
-	static final String REF_TAGS = "refs/tags/";
-
 	protected GithubHelper() {
 		// hidden
 	}
 
 	public static GHBranch getDefaultBranch(GHRepository repo) {
+		// TODO master may not be the default default
 		String defaultBranchName = Optional.ofNullable(repo.getDefaultBranch()).orElse("master");
 		GHBranch defaultBranch;
 		try {
 			defaultBranch = repo.getBranch(defaultBranchName);
 		} catch (GHFileNotFoundException e) {
-			throw new IllegalStateException("We can not find as default branch: " + defaultBranchName, e);
+			throw new IllegalStateException("We can not find default branch: " + defaultBranchName, e);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -42,11 +39,11 @@ public class GithubHelper {
 	}
 
 	public static GHRef openEmptyRef(GHRepository repo, GHBranch base) {
-		// https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-reference
-		// If it doesn't start with 'refs' and have at least two slashes, it will be rejected.
 		String cleanThatPrId = UUID.randomUUID().toString();
-		String refName = REF_HEADS + "CleanThat_" + cleanThatPrId;
+		String refName = GithubRefCleaner.PREFIX_REF_CLEANTHAT_MANUAL + cleanThatPrId;
 		try {
+			// https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-reference
+			// If it doesn't start with 'refs' and have at least two slashes, it will be rejected.
 			return repo.createRef(refName, base.getSHA1());
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue opening ref=" + refName, e);

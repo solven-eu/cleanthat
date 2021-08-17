@@ -1,23 +1,13 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
@@ -27,41 +17,46 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
 
-import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
-import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.jgit.JGitCodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
-public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implements ICodeProviderWriter {
+public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
+		implements ICodeProviderWriter, IGithubSha1CodeProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProvider.class);
-
-	private static final int MAX_FILE_BEFORE_CLONING = 512;
-
-	private static final boolean ZIP_ELSE_CLONE = true;
 
 	final String token;
 	final GHRepository repo;
 
-	final AtomicReference<ICodeProvider> localClone = new AtomicReference<>();
+	final GithubSha1CodeProviderHelper helper;
 
 	public AGithubSha1CodeProvider(String token, GHRepository repo) {
 		this.token = token;
 
 		this.repo = repo;
+
+		this.helper = new GithubSha1CodeProviderHelper(this);
 	}
 
-	protected abstract String getSha1();
+	@Override
+	public GHRepository getRepo() {
+		return repo;
+	}
 
-	protected abstract String getRef();
+	@Override
+	public String getToken() {
+		return token;
+	}
+
+	public GithubSha1CodeProviderHelper getHelper() {
+		return helper;
+	}
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
@@ -74,44 +69,13 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		// At best, we will be limited at queries 12,500
 		// TODO What is the Tree here? The total number of files in given sha1? Or some diff with parent sha1?
 		int treeSize = tree.getTree().size();
-		if (treeSize >= MAX_FILE_BEFORE_CLONING || localClone.get() != null) {
+		if (treeSize >= helper.getMaxFileBeforeCloning() || helper.hasLocalClone()) {
 			LOGGER.info(
 					"Tree.size()=={} -> We will not rely on API to fetch each files, but rather create a local copy (wget zip, git clone, ...)",
 					treeSize);
-			ensureLocalClone();
-
-			localClone.get().listFiles(consumer);
+			helper.listFiles(consumer);
 		} else {
 			processTree(tree, consumer);
-		}
-	}
-
-	@SuppressWarnings("PMD.CloseResource")
-	protected boolean ensureLocalClone() {
-		// TODO Tests against multiple calls: the repo shall be cloned only once
-		synchronized (this) {
-			if (localClone.get() != null) {
-				// The repo is already cloned
-				return false;
-			}
-
-			// https://github.community/t/cloning-private-repo-with-a-github-app-private-key/14726
-			Path workingDir;
-			try {
-				workingDir = Files.createTempDirectory("cleanthat-clone");
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-
-			ICodeProvider localCodeProvider;
-			if (ZIP_ELSE_CLONE) {
-				ICodeProvider zippedLocalRef = downloadGitRefLocally(workingDir);
-				localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, this);
-			} else {
-				Git jgit = cloneGitRepoLocally(workingDir);
-				localCodeProvider = new JGitCodeProvider(workingDir, jgit, getSha1());
-			}
-			return localClone.compareAndSet(null, localCodeProvider);
 		}
 	}
 
@@ -141,22 +105,10 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		});
 	}
 
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object file) {
-	// throw new UnsupportedOperationException("TODO: " + PepperLogHelper.getObjectAndClass(file));
-	// }
-
 	@Override
-	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
-			Collection<String> prLabels
-	// ,
-	// Optional<String> targetBranch
-	) {
-		// if (targetBranch.isPresent()) {
-		// throw new UnsupportedOperationException("TODO");
-		// }
-
+			Collection<String> prLabels) {
 		commitIntoRef(pathToMutatedContent, prComments, repo, getRef());
 	}
 
@@ -192,69 +144,4 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		return repo.getGitTransportUrl();
 	}
 
-	protected Git cloneGitRepoLocally(Path tmpDir) {
-		LOGGER.info("Cloning the repo {} into {}", repo.getFullName(), tmpDir);
-
-		String rawTransportUrl = repo.getHttpTransportUrl();
-		String authTransportUrl =
-				"https://x-access-token:" + token + "@" + rawTransportUrl.substring("https://".length());
-
-		// It seems we are not allowed to give a sha1 as name
-		return JGitCodeProvider.makeGitRepo(tmpDir, authTransportUrl, getRef());
-	}
-
-	protected ICodeProvider downloadGitRefLocally(Path tmpDir) {
-		String ref = getSha1();
-
-		// We save the repository zip in this hardcoded file
-		Path zipPath = tmpDir.resolve("repository.zip");
-		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
-
-		try {
-			// https://stackoverflow.com/questions/8377081/github-api-download-zip-or-tarball-link
-			// https://docs.github.com/en/rest/reference/repos#download-a-repository-archive-zip
-			repo.readZip(inputStream -> {
-				long nbBytes = Files.copy(inputStream, zipPath, StandardCopyOption.REPLACE_EXISTING);
-				LOGGER.info("We wrote a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
-				return tmpDir;
-			}, ref);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue downloading a ZIP for " + ref, e);
-		}
-
-		Path repoPath = tmpDir.resolve("repository");
-
-		// TODO We may want not to unzip the file, but it would probably lead to terrible performance
-		LOGGER.info("Unzipping the repo={} ref={} into {}", repo.getFullName(), ref, repoPath);
-		try (InputStream fis = Files.newInputStream(zipPath)) {
-			unzip(fis, repoPath);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Issue with " + tmpDir, e);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
-		return new FileSystemCodeProvider(repoPath);
-	}
-
-	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder
-	@SuppressWarnings("PMD.AssignmentInOperand")
-	private static void unzip(InputStream is, Path targetDir) throws IOException {
-		targetDir = targetDir.toAbsolutePath();
-		try (ZipInputStream zipIn = new ZipInputStream(is)) {
-			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
-				Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
-				if (!resolvedPath.startsWith(targetDir)) {
-					// see: https://snyk.io/research/zip-slip-vulnerability
-					throw new RuntimeException("Entry with an illegal path: " + ze.getName());
-				}
-				if (ze.isDirectory()) {
-					Files.createDirectories(resolvedPath);
-				} else {
-					Files.createDirectories(resolvedPath.getParent());
-					Files.copy(zipIn, resolvedPath);
-				}
-			}
-		}
-	}
 }

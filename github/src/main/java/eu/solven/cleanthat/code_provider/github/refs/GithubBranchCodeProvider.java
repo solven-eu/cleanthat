@@ -35,12 +35,12 @@ public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
 	}
 
 	@Override
-	protected String getSha1() {
+	public String getSha1() {
 		return branch.getSHA1();
 	}
 
 	@Override
-	protected String getRef() {
+	public String getRef() {
 		return branch.getName();
 	}
 

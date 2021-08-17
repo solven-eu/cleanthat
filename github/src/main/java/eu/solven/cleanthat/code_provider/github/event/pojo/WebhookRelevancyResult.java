@@ -9,41 +9,37 @@ import java.util.Optional;
  *
  */
 public class WebhookRelevancyResult {
-	// If present, it means the webhook is relevant and here we provide the essence of the commit (e.g. is this a push
-	// to a ref, or a PR being open, or...)
-	// final Optional<CommitContext> optCommitContext;
-	final Optional<String> optBranchToClean;
+	final Optional<HeadAndOptionalBase> oHeadAndOptBase;
 
-	// If we have a base: it needs we should clean only the diff between the base and the branch
-	final Optional<GitRepoBranchSha1> optBaseToConsider;
+	final Optional<String> oRejectedReason;
 
-	final Optional<String> optRejectedReason;
-
-	public WebhookRelevancyResult(Optional<String> optBranchToClean,
-			Optional<GitRepoBranchSha1> optBaseToConsider,
-			Optional<String> rejectedReason) {
-		this.optBranchToClean = optBranchToClean;
-		this.optBaseToConsider = optBaseToConsider;
-		this.optRejectedReason = rejectedReason;
+	public WebhookRelevancyResult(Optional<HeadAndOptionalBase> optHeadAndOptBase, Optional<String> rejectedReason) {
+		this.oHeadAndOptBase = optHeadAndOptBase;
+		this.oRejectedReason = rejectedReason;
 	}
 
-	public Optional<String> getOptBranchToClean() {
-		return optBranchToClean;
+	public Optional<GitRepoBranchSha1> optHeadToClean() {
+		return oHeadAndOptBase.map(HeadAndOptionalBase::getHeadToClean);
 	}
 
-	public Optional<String> getOptRejectedReason() {
-		return optRejectedReason;
+	/**
+	 * If present, this event shall be rejected
+	 * 
+	 * @return
+	 */
+	public Optional<String> optRejectedReason() {
+		return oRejectedReason;
 	}
 
-	public Optional<GitRepoBranchSha1> getOptBaseToConsider() {
-		return optBaseToConsider;
+	public Optional<GitRepoBranchSha1> optBaseForHead() {
+		return oHeadAndOptBase.flatMap(HeadAndOptionalBase::optBaseForHead);
 	}
 
-	public static WebhookRelevancyResult relevant(String branchToClean, Optional<GitRepoBranchSha1> optBase) {
-		return new WebhookRelevancyResult(Optional.of(branchToClean), optBase, Optional.empty());
+	public static WebhookRelevancyResult relevant(HeadAndOptionalBase headAndBase) {
+		return new WebhookRelevancyResult(Optional.of(headAndBase), Optional.empty());
 	}
 
 	public static WebhookRelevancyResult dismissed(String reason) {
-		return new WebhookRelevancyResult(Optional.empty(), Optional.empty(), Optional.of(reason));
+		return new WebhookRelevancyResult(Optional.empty(), Optional.of(reason));
 	}
 }

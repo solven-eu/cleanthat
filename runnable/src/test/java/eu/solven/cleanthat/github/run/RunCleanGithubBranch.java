@@ -30,6 +30,7 @@ import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 public class RunCleanGithubBranch extends ACleanThatXxxApplication {
@@ -84,7 +85,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication {
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
 
 		if (mainBranchConfig.isEmpty()) {
-			String configureRef = GithubRefCleaner.BRANCH_NAME_CONFIGURE;
+			String configureRef = GithubRefCleaner.REF_NAME_CONFIGURE;
 			LOGGER.info("CleanThat is not configured in the main branch ({}). Try switching to {}",
 					defaultBranch.getName(),
 					configureRef);
@@ -120,14 +121,11 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			Map<String, ?> output = cleaner.formatRef(
-					// new CommitContext(false, false),
-					repo,
-					Suppliers.memoize(() -> {
-						GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
-						createdPr.set(pr);
-						return pr;
-					}));
+			CodeFormatResult output = cleaner.formatRef(repo, Suppliers.memoize(() -> {
+				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
+				createdPr.set(pr);
+				return pr;
+			}));
 
 			if (createdPr.get() == null) {
 				LOGGER.info("Not a single file has been impacted");

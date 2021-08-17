@@ -87,7 +87,7 @@ public class ITGithubWebhookHandlerFactory {
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
-			Assertions.assertThat(result.isPrOpen()).isTrue();
+			Assertions.assertThat(result.isReviewRequestOpen()).isTrue();
 			Assertions.assertThat(result.isPushBranch()).isFalse();
 		}
 		{
@@ -98,7 +98,7 @@ public class ITGithubWebhookHandlerFactory {
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
-			Assertions.assertThat(result.isPrOpen()).isFalse();
+			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
 			Assertions.assertThat(result.isPushBranch()).isTrue();
 		}
 		{
@@ -109,7 +109,7 @@ public class ITGithubWebhookHandlerFactory {
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
-			Assertions.assertThat(result.isPrOpen()).isFalse();
+			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
 			Assertions.assertThat(result.isPushBranch()).isTrue();
 		}
 	}

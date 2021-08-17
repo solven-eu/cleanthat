@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.formatter;
 
-import java.util.Map;
-
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 
@@ -12,7 +10,7 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
  */
 public interface ICodeProviderFormatter {
 
-	Map<String, ?> formatCode(CleanthatRepositoryProperties properties,
+	CodeFormatResult formatCode(CleanthatRepositoryProperties properties,
 			ICodeProviderWriter codeProvider,
 			boolean dryRun);
 

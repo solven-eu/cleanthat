@@ -30,7 +30,11 @@ public final class CleanthatRefFilterProperties {
 	// https://git-scm.com/book/en/v2/Git-Internals-Git-References
 	// In a local Git repository, refs are available at 'refs/heads/XXX'
 	public static final String REFS_PREFIX = "refs/";
-	private static final String BRANCHES_PREFIX = REFS_PREFIX + "heads/";
+	public static final String BRANCHES_PREFIX = REFS_PREFIX + "heads/";
+
+	// https://stackoverflow.com/questions/1526471/git-difference-between-branchname-and-refs-heads-branchname
+	static final String REF_REMOTES = REFS_PREFIX + "remotes/";
+	static final String REF_TAGS = REFS_PREFIX + "tags/";
 
 	// By default, we clean a set of standard default branch names
 	// https://docs.github.com/en/github/administering-a-repository/managing-branches-in-your-repository/changing-the-default-branch
@@ -44,7 +48,6 @@ public final class CleanthatRefFilterProperties {
 	private List<String> branches =
 			Stream.of("develop", "main", "master").map(s -> BRANCHES_PREFIX + s).collect(Collectors.toList());
 
-	// TODO If a ref does not starts with 'refs/heads', add automatically 'refs/heads/' as prefix?
 	public void setBranches(List<String> labels) {
 		labels = labels.stream().map(branch -> {
 			if (!branch.startsWith(REFS_PREFIX)) {
@@ -61,5 +64,4 @@ public final class CleanthatRefFilterProperties {
 
 		this.branches = List.copyOf(labels);
 	}
-
 }

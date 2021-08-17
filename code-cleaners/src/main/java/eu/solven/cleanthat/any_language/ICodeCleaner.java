@@ -1,8 +1,7 @@
 package eu.solven.cleanthat.any_language;
 
-import java.util.Map;
-
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
 
 /**
  * Knows how to clean code
@@ -12,6 +11,6 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
  */
 public interface ICodeCleaner {
 
-	Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun);
+	CodeFormatResult formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun);
 
 }

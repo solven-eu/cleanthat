@@ -39,18 +39,18 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		WebhookRelevancyResult processAnswer =
 				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
 
-		if (processAnswer.getOptBranchToClean().isPresent()) {
+		if (processAnswer.optHeadToClean().isPresent()) {
 			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();
 
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>(input.getBody());
 
-			acceptedEvent.put("refToClean", processAnswer.getOptBranchToClean().get());
+			acceptedEvent.put("refToClean", processAnswer.optHeadToClean().get());
 
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_accepted_events",
 					new CleanThatWebhookEvent(input.getHeaders(), acceptedEvent),
 					client);
 		} else {
-			LOGGER.info("Rejected due to: {}", processAnswer.getOptRejectedReason().get());
+			LOGGER.info("Rejected due to: {}", processAnswer.optRejectedReason().get());
 		}
 
 		return Map.of("whatever", "done");

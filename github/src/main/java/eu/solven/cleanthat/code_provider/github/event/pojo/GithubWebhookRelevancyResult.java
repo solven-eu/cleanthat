@@ -35,7 +35,7 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	}
 
 	@Override
-	public boolean isPrOpen() {
+	public boolean isReviewRequestOpen() {
 		return prOpen;
 	}
 
@@ -57,6 +57,7 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 		return openPr;
 	}
 
+	@Override
 	public Optional<GitRepoBranchSha1> optBaseRef() {
 		return baseRef;
 	}

@@ -54,7 +54,7 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 		GithubWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
-		if (processAnswer.isPrOpen() || processAnswer.isPushBranch()) {
+		if (processAnswer.isReviewRequestOpen() || processAnswer.isPushBranch()) {
 			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();
 
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>();
@@ -66,7 +66,7 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 					new CleanThatWebhookEvent(Map.of(), acceptedEvent),
 					client);
 		} else {
-			LOGGER.info("Nothing to persist");
+			LOGGER.info("Neither a PR-open event, nor a push-branch event");
 		}
 
 		return Map.of("whatever", "done");

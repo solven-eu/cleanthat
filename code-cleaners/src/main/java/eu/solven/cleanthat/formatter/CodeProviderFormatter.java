@@ -67,10 +67,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties repoProperties,
-			ICodeProviderWriter pr,
+	public CodeFormatResult formatCode(CleanthatRepositoryProperties repoProperties,
+			ICodeProviderWriter codeWriter,
 			boolean dryRun) {
-		// A config change may be cleanthat.json
+		// A config change may be cleanthat.json, or a processor configuration file
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
 		// version upgrade led to a change of some engine, which should trigger a full re-compute)
@@ -78,10 +78,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		List<String> prComments = new ArrayList<>();
 
-		if (pr instanceof IListOnlyModifiedFiles) {
+		if (codeWriter instanceof IListOnlyModifiedFiles) {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
-				pr.listFiles(fileChanged -> {
+				codeWriter.listFiles(fileChanged -> {
 					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getPath())) {
 						configIsChanged.set(true);
 						prComments.add("Configuration has changed");
@@ -103,8 +103,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			ILanguageProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
+			// Beware about concurrency as multiple processors/languages may impact the same file
 			AtomicLongMap<String> languageCounters =
-					processFiles(pr, languageToNbAddedFiles, pathToMutatedContent, languageP);
+					processFiles(codeWriter, languageToNbAddedFiles, pathToMutatedContent, languageP);
 
 			String details = languageCounters.asMap()
 					.entrySet()
@@ -118,29 +119,34 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			});
 		});
 
+		boolean isEmpty;
 		if (languageToNbAddedFiles.isEmpty() && !configIsChanged.get()) {
-			LOGGER.info("Not a single file to commit ({})", pr.getHtmlUrl());
-		} else if (configIsChanged.get()) {
-			LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
-					pr.getHtmlUrl(),
-					pr.getTitle());
-			if (dryRun) {
-				LOGGER.info("Skip persisting changes as dryRun=true");
-			} else {
-				pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
-			}
+			LOGGER.info("Not a single file to commit ({})", codeWriter.getHtmlUrl());
+			isEmpty = true;
+			// } else if (configIsChanged.get()) {
+			// LOGGER.info("(Config change) About to check and possibly commit any files into {} ({})",
+			// codeWriter.getHtmlUrl(),
+			// codeWriter.getTitle());
+			// if (dryRun) {
+			// LOGGER.info("Skip persisting changes as dryRun=true");
+			// isEmpty = true;
+			// } else {
+			// codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+			// }
 		} else {
 			LOGGER.info("(No config change) About to check and possibly commit {} files into {} ({})",
 					languageToNbAddedFiles.sum(),
-					pr.getHtmlUrl(),
-					pr.getTitle());
+					codeWriter.getHtmlUrl(),
+					codeWriter.getTitle());
 			if (dryRun) {
 				LOGGER.info("Skip persisting changes as dryRun=true");
+				isEmpty = true;
 			} else {
-				pr.commitIntoBranch(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+				codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+				isEmpty = false;
 			}
 		}
-		return new LinkedHashMap<>(languagesCounters.asMap());
+		return new CodeFormatResult(isEmpty, new LinkedHashMap<>(languagesCounters.asMap()));
 	}
 
 	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,

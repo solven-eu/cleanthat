@@ -20,7 +20,6 @@ import org.kohsuke.github.function.InputStreamFunction;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 public class TestAGithubSha1CodeProvider {
@@ -43,12 +42,12 @@ public class TestAGithubSha1CodeProvider {
 			}
 
 			@Override
-			protected String getSha1() {
+			public String getSha1() {
 				return someSha1;
 			}
 
 			@Override
-			protected String getRef() {
+			public String getRef() {
 				return someRef;
 			}
 		};
@@ -86,14 +85,13 @@ public class TestAGithubSha1CodeProvider {
 		}
 
 		Mockito.when(ghRepo.readZip(Mockito.any(InputStreamFunction.class), Mockito.eq(someSha1))).then(invok -> {
-			InputStreamFunction isf = invok.getArgument(0);
+			InputStreamFunction<Object> isf = invok.getArgument(0);
 
-			isf.apply(new FileSystemResource(tmpZipFile).getInputStream());
-			return null;
+			return isf.apply(new FileSystemResource(tmpZipFile).getInputStream());
 		});
 
 		Path tmpDir = Files.createTempDirectory("cleanthat-TestAGithubSha1CodeProvider");
-		ICodeProvider localCodeProvider = codeProvider.downloadGitRefLocally(tmpDir);
+		ICodeProvider localCodeProvider = codeProvider.getHelper().downloadGitRefLocally(tmpDir);
 
 		Set<String> paths = new HashSet<>();
 		localCodeProvider.listFiles(file -> {

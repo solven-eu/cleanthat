@@ -81,11 +81,12 @@ public class ConfigHelpers {
 	}
 
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
-		Map<String, Object> languageAsMap = objectMappers.get(0).convertValue(languageP, Map.class);
-		Map<String, Object> sourceCodeAsMap = objectMappers.get(0).convertValue(languageP.getSourceCode(), Map.class);
+		ObjectMapper firstObjectMapper = objectMappers.get(0);
+		Map<String, Object> languageAsMap = firstObjectMapper.convertValue(languageP, Map.class);
+		Map<String, Object> sourceCodeAsMap = firstObjectMapper.convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put("includes", includes);
 		languageAsMap.put("source_code", sourceCodeAsMap);
-		return objectMappers.get(0).convertValue(languageAsMap, LanguageProperties.class);
+		return firstObjectMapper.convertValue(languageAsMap, LanguageProperties.class);
 	}
 
 	public static ObjectMapper getJson(List<ObjectMapper> objectMappers) {

@@ -47,8 +47,8 @@ public class ITGithubBranchCodeProvider {
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = cleanthatRepo.getBranch("master");
 
-		GithubBranchCodeProvider codeProvider =
-				new GithubBranchCodeProvider(githubForRepo.getToken(), cleanthatRepo, masterBranch);
+		GithubSha1CodeProviderHelper codeProvider =
+				new GithubBranchCodeProvider(githubForRepo.getToken(), cleanthatRepo, masterBranch).getHelper();
 
 		// First call: we do clone
 		Assert.assertTrue(codeProvider.ensureLocalClone());

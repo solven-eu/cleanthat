@@ -14,6 +14,7 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -35,7 +36,9 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		this.formatterProvider = formatterProvider;
 	}
 
-	public Map<String, ?> formatCode(CleanthatRepositoryProperties properties, ICodeProviderWriter pr, boolean dryRun) {
+	public CodeFormatResult formatCode(CleanthatRepositoryProperties properties,
+			ICodeProviderWriter pr,
+			boolean dryRun) {
 		return formatterProvider.formatCode(properties, pr, dryRun);
 	}
 
@@ -73,7 +76,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	@Override
-	public Map<String, ?> formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
+	public CodeFormatResult formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
 		ResultOrError<CleanthatRepositoryProperties, String> optResult = loadAndCheckConfiguration(codeProvider);
 
 		if (optResult.getOptError().isPresent()) {

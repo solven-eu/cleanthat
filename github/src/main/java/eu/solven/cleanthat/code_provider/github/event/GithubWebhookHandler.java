@@ -9,12 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHCheckRun;
+import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHCommitPointer;
@@ -22,6 +25,7 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -38,11 +42,14 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GitPrHeadRef;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -150,7 +157,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			pushBranch = false;
 			if (optAction.isEmpty()) {
 				throw new IllegalStateException("We miss an action for a webhook holding a pull_request");
-			} else if ("opened".equals(optAction.get()) || "reopened".equals(optAction.get())) {
+			}
+
+			String githubAction = optAction.get();
+			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
 				String headRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
 					// Do not process CleanThat own PR open events
@@ -177,6 +187,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
 				optHeadRef = Optional.of(new GitRepoBranchSha1(headRepoName, headRef, headSha));
 			} else {
+				LOGGER.info("action={}", githubAction);
 				prOpen = false;
 				refHasOpenReviewRequest = false;
 				optOpenPr = Optional.empty();
@@ -187,6 +198,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			prOpen = false;
 			optOpenPr = Optional.empty();
 			if (optAction.isPresent()) {
+				LOGGER.info("action={}", optAction.get());
 				// Anything but a push
 				// i.e. a push event has no action
 				pushBranch = false;
@@ -272,7 +284,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
-		if (!offlineResult.isPrOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		// https://developer.github.com/webhooks/event-payloads/
@@ -321,7 +333,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					LOGGER.info("This a single open RR matching a head ref={}", ref);
 				} else {
 					prMatchingHead.forEach(pr -> {
-						relevantBaseBranches.add("refs/heads/" + pr.getBase().getRef());
+						relevantBaseBranches.add(facade.toFullGitRef(pr.getBase()));
 					});
 
 					optOpenPr = Optional.of(new GitPrHeadRef(repoName, prMatchingHead.get(0).getNumber()));
@@ -349,20 +361,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get());
 		}
 
-		// //
-		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#http-based-git-access-by-an-installation
-		// // git clone https://x-access-token:<token>@github.com/owner/repo.git
-		//
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
-		Optional<String> refToClean = cleaner.prepareRefToClean(offlineResult, theRef, relevantBaseBranches);
+		Optional<HeadAndOptionalBase> refToClean =
+				cleaner.prepareRefToClean(offlineResult, theRef, relevantBaseBranches);
 		// offlineResult.
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
 		}
-		return WebhookRelevancyResult.relevant(refToClean.get(), offlineResult.optBaseRef());
+		return WebhookRelevancyResult.relevant(refToClean.get());
 	}
 
 	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1) {
@@ -374,7 +383,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			try {
 				// baseRepo.getCheckRuns("master").asList();
 				GHCheckRun checkRun = checkRunBuilder.create();
-				checkRun.update().withStatus(Status.COMPLETED);
+				checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED);
 			} catch (IOException e) {
 				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
 				if (LOGGER.isDebugEnabled()) {
@@ -420,7 +429,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname));
 			}
-			String fullRef = "refs/heads/" + prHead.getRef();
+			String fullRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + prHead.getRef();
 
 			try {
 				baseRepo.getRef(fullRef);
@@ -435,7 +444,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			theRef = new GitRepoBranchSha1(headRepoFullname, fullRef, prHead.getSha());
 		} else {
-			// optPr = Optional.empty();
 			// No PR: we are guaranteed to have a ref
 			theRef = gitRepoBranchSha1;
 		}
@@ -447,13 +455,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
-		if (!offlineResult.isPrOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		WebhookRelevancyResult relevancyResult =
 				filterWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
 
-		if (relevancyResult.getOptBranchToClean().isEmpty()) {
+		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -470,28 +478,92 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new UncheckedIOException(e);
 		}
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
-		if (relevancyResult.getOptBaseToConsider().isPresent()) {
-			cleaner.formatRefDiff(repo, () -> {
+
+		GithubFacade facade = new GithubFacade(github, repo.getName());
+
+		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
+
+		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
+		Supplier<GHRef> headSupplier = () -> {
+			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
+			String refName = refToProcess.getRef();
+
+			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
 				try {
-					return repo.getRef(relevancyResult.getOptBaseToConsider().get().getRef());
+					String sha = refToProcess.getSha();
+					repo.createRef(refName, sha);
+					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
+					refLazyRefCreated.set(new GitRepoBranchSha1(repo.getName(), refName, sha));
 				} catch (IOException e) {
-					throw new UncheckedIOException(e);
+					// TODO If already exists, should we stop the process, and continue?
+					// Another process may be already working on this ref
+					throw new UncheckedIOException("Issue creating ref=" + refName, e);
 				}
-			}, () -> {
-				try {
-					return repo.getRef(relevancyResult.getOptBranchToClean().get());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
+			}
+			try {
+				return repo.getRef(facade.toFullGitRef(refName));
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
+			}
+		};
+
+		CodeFormatResult result;
+		if (relevancyResult.optBaseForHead().isPresent()) {
+			// If the base does not exist, then something is wrong: let's check right away it is available
+			GHRef base;
+			try {
+				base = repo.getRef(facade.toFullGitRef(relevancyResult.optBaseForHead().get().getRef()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			result = cleaner.formatRefDiff(repo, base, headSupplier);
 		} else {
-			cleaner.formatRef(repo, () -> {
-				try {
-					return repo.getRef(relevancyResult.getOptBranchToClean().get());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
+			result = cleaner.formatRef(repo, headSupplier);
+		}
+
+		if (refLazyRefCreated.get() != null) {
+			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
+			if (!relevancyResult.optBaseForHead().isPresent()) {
+				LOGGER.warn("We created a tmpRef but there is no base");
+			} else {
+				if (result.isEmpty()) {
+					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed");
+					try {
+						facade.removeRef(lazyRefCreated);
+					} catch (IOException e) {
+						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
+					}
+				} else {
+					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
+					doOpenPr(relevancyResult, facade, lazyRefCreated);
 				}
-			});
+			}
+		} else {
+			LOGGER.debug("The changes would have been committed directly in the head branch");
+		}
+	}
+
+	public void doOpenPr(WebhookRelevancyResult relevancyResult,
+			GithubFacade facade,
+			GitRepoBranchSha1 lazyRefCreated) {
+		// TODO We may want to open a PR in a different repository, in case the original repository does not
+		// accept new branches
+		Optional<?> optOpenPr;
+		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
+		try {
+			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", "Cleanthat <body>");
+
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		if (optOpenPr.isPresent()) {
+			LOGGER.info("We succeeded opening a PR open to merge {} into {}: {}",
+					lazyRefCreated,
+					base,
+					optOpenPr.get());
+		} else {
+			LOGGER.info("There is already a PR open to merge {} into {}", lazyRefCreated, base);
 		}
 	}
 }

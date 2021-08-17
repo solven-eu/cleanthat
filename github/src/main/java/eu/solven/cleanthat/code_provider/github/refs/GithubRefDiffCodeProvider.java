@@ -98,7 +98,7 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 	}
 
 	@Override
-	public void commitIntoBranch(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels
 	// ,

@@ -29,12 +29,12 @@ public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 	}
 
 	@Override
-	protected String getSha1() {
+	public String getSha1() {
 		return ref.getObject().getSha();
 	}
 
 	@Override
-	protected String getRef() {
+	public String getRef() {
 		return ref.getRef();
 	}
 

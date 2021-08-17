@@ -11,8 +11,6 @@ import java.util.Map;
  */
 public interface ICodeProviderWriterLogic {
 
-	void commitIntoBranch(Map<String, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels);
+	void persistChanges(Map<String, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
 
 }

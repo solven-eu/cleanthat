@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -24,9 +25,9 @@
 		<module>gitlab</module>
 
 		<module>config</module>
-		
+
 		<module>prettier</module>
-		
+
 		<module>code-cleaners</module>
 
 		<module>java</module>
@@ -67,7 +68,7 @@
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
 		<pmd.version>6.37.0</pmd.version>
 		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
-		<git-commit-id-plugin.version>3.0.0</git-commit-id-plugin.version>
+		<git-commit-id-plugin.version>5.0.0</git-commit-id-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
@@ -626,42 +627,30 @@
 				</plugin>
 				<plugin>
 					<!-- Generate a git.properties file only in this 'helpers' jar -->
-					<!-- https://github.com/ktoso/maven-git-commit-id-plugin -->
-					<groupId>pl.project13.maven</groupId>
-					<artifactId>git-commit-id-plugin</artifactId>
+					<!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
+					<groupId>io.github.git-commit-id</groupId>
+					<artifactId>git-commit-id-maven-plugin</artifactId>
 					<executions>
 						<execution>
 							<id>get-the-git-infos</id>
 							<goals>
 								<goal>revision</goal>
 							</goals>
-						</execution>
-						<execution>
-							<id>validate-the-git-infos</id>
-							<goals>
-								<goal>validateRevision</goal>
-							</goals>
-							<phase>package</phase>
+							<phase>process-resources</phase>
 						</execution>
 					</executions>
-
 					<configuration>
-						<!-- If you'd like to tell the plugin where your .git directory is, -->
-						<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-
-						<dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
+						<format>json</format>
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
-						<format>properties</format>
+						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.json</generateGitPropertiesFilename>
 
 						<!-- https://github.com/ktoso/maven-git-commit-id-plugin/pull/65 -->
 						<injectAllReactorProjects>false</injectAllReactorProjects>
-
-						<abbrevLength>7</abbrevLength>
 					</configuration>
 				</plugin>
 
 				<plugin>
-					<groupId>eu.solven.cleanthat</groupId>
+					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
 					<version>${project.version}</version>
 					<executions>

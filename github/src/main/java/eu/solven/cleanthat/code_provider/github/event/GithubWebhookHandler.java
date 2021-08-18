@@ -49,6 +49,7 @@ import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
@@ -317,7 +318,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		GitRepoBranchSha1 gitRepoBranchSha1 = offlineResult.optPushedRef().get();
 		String repoName = gitRepoBranchSha1.getRepoName();
-		GithubFacade facade = new GithubFacade(githubAsInst, repoName);
+		GithubFacade facade;
+		try {
+			facade = new GithubFacade(githubAsInst, repoName);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 		Set<String> relevantBaseBranches = new HashSet<>();
@@ -432,7 +438,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			String fullRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + prHead.getRef();
 
 			try {
-				baseRepo.getRef(fullRef);
+				new GithubRepositoryFacade(baseRepo).getRef(fullRef);
 			} catch (GHFileNotFoundException e) {
 				LOGGER.debug("Ref does not exists. Deleted?", e);
 				LOGGER.warn("Ref does not exists. Deleted?={} does not exists. Deleted?", fullRef);
@@ -479,7 +485,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 
-		GithubFacade facade = new GithubFacade(github, repo.getName());
+		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 
@@ -491,7 +497,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// If the base does not exist, then something is wrong: let's check right away it is available
 			GHRef base;
 			try {
-				base = repo.getRef(facade.toFullGitRef(relevancyResult.optBaseForHead().get().getRef()));
+				base = facade.getRef(relevancyResult.optBaseForHead().get().getRef());
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -525,7 +531,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	public Supplier<GHRef> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
 			GHRepository repo,
-			GithubFacade facade,
+			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
 		Supplier<GHRef> headSupplier = () -> {
 			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
@@ -545,7 +551,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 			try {
-				return facade.getRef(repoName, refName);
+				return facade.getRef(refName);
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}
@@ -554,7 +560,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	public void doOpenPr(WebhookRelevancyResult relevancyResult,
-			GithubFacade facade,
+			GithubRepositoryFacade facade,
 			GitRepoBranchSha1 lazyRefCreated) {
 		// TODO We may want to open a PR in a different repository, in case the original repository does not
 		// accept new branches

@@ -37,6 +37,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -158,20 +159,15 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	}
 
 	public ICodeProvider getCodeProviderForRef(GitRepoBranchSha1 theRef) {
-		String fullRef = theRef.getRef();
-		if (!fullRef.startsWith(CleanthatRefFilterProperties.REFS_PREFIX)) {
-			throw new IllegalArgumentException("Invalid ref: " + fullRef);
-		}
+		String ref = theRef.getRef();
 
 		try {
-			String githubRef = fullRef.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
-
-			// Github expects as ref something like 'heads/someRef'
-			GHRepository repo = githubAndToken.getGithub().getRepository(theRef.getRepoName());
-			GHRef refObject = repo.getRef(githubRef);
-			return new GithubRefCodeProvider(githubAndToken.getToken(), repo, refObject);
+			String repoName = theRef.getRepoName();
+			GithubFacade facade = new GithubFacade(githubAndToken.getGithub(), repoName);
+			GHRef refObject = facade.getRef(ref);
+			return new GithubRefCodeProvider(githubAndToken.getToken(), facade.getRepository(), refObject);
 		} catch (IOException e) {
-			throw new UncheckedIOException("Issue with ref: " + fullRef, e);
+			throw new UncheckedIOException("Issue with ref: " + ref, e);
 		}
 	}
 
@@ -198,12 +194,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
 		GHRepository repo = defaultBranch.getOwner();
 		String refName = REF_NAME_CONFIGURE;
-		String fullRefName = new GithubFacade(userToServerGithub, repo.getName()).toFullGitRef(refName);
+		String fullRefName = GithubFacade.toFullGitRef(refName);
 		boolean refAlreadyExists;
 		Optional<GHRef> refToPR;
 		try {
 			try {
-				refToPR = Optional.of(repo.getRef(fullRefName));
+				refToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(fullRefName));
 				LOGGER.info("There is already a ref: " + fullRefName);
 				refAlreadyExists = true;
 			} catch (GHFileNotFoundException e) {

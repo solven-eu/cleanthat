@@ -20,7 +20,7 @@ public class TestGithubFacade implements IGitTestConstants {
 
 		GithubFacade facade = new GithubFacade(github, someRepoName);
 
-		facade.getRef(someRepoName, someBranchRef);
+		facade.getRef(someBranchRef);
 
 		Mockito.verify(repo).getRef("head/someBranchName");
 	}

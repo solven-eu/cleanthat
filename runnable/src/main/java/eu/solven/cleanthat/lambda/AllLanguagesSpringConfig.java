@@ -3,6 +3,7 @@ package eu.solven.cleanthat.lambda;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import eu.solven.cleanthat.config.GitService;
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
 
@@ -13,7 +14,11 @@ import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
  *
  */
 @Configuration
-@Import({ JavaFormattersFactory.class, ScalaFormattersFactory.class })
+@Import({ JavaFormattersFactory.class,
+		ScalaFormattersFactory.class,
+
+		// technical Beans
+		GitService.class })
 public class AllLanguagesSpringConfig {
 
 }

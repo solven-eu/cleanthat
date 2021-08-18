@@ -23,6 +23,7 @@ import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 
 /**
  * An {@link ICodeProvider} for Github code. Sub-classes manages PR, ref/branches/...
@@ -51,7 +52,7 @@ public abstract class AGithubCodeProvider implements ICodeProvider {
 			String refName) {
 		GHRef ref;
 		try {
-			ref = repo.getRef(refName);
+			ref = new GithubRepositoryFacade(repo).getRef(refName);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

@@ -531,12 +531,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
 			String refName = refToProcess.getRef();
 
+			String repoName = repo.getName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
 				try {
 					String sha = refToProcess.getSha();
 					repo.createRef(refName, sha);
 					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
-					refLazyRefCreated.set(new GitRepoBranchSha1(repo.getName(), refName, sha));
+					refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 				} catch (IOException e) {
 					// TODO If already exists, should we stop the process, and continue?
 					// Another process may be already working on this ref
@@ -544,7 +545,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 			try {
-				return repo.getRef(facade.toFullGitRef(refName));
+				return facade.getRef(repoName, refName);
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}

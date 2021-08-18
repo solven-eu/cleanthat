@@ -93,11 +93,24 @@ public class GithubFacade {
 	}
 
 	public void removeRef(GitRepoBranchSha1 ref) throws IOException {
-		GHRef remoteRef = github.getRepository(ref.getRepoName()).getRef(toFullGitRef(ref.getRef()));
+		GHRef remoteRef = getRef(ref.getRepoName(), ref.getRef());
 		URL remoteRefUrl = remoteRef.getUrl();
 		LOGGER.info("About to delete {}", remoteRefUrl);
 		remoteRef.delete();
 		LOGGER.info("Deleted {}", remoteRefUrl);
+	}
+
+	public GHRef getRef(String repoName, String refName) throws IOException {
+		GHRepository repo = github.getRepository(repoName);
+
+		if (!refName.startsWith(CleanthatRefFilterProperties.REFS_PREFIX)) {
+			throw new IllegalArgumentException("Invalid ref: " + refName);
+		}
+
+		// repository.getRef expects a ref name without the leading 'refs/'
+		String githubRefName = refName.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
+
+		return repo.getRef(githubRefName);
 	}
 
 }

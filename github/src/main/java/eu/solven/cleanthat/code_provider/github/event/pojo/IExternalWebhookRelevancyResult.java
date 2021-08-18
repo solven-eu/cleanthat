@@ -20,8 +20,8 @@ public interface IExternalWebhookRelevancyResult {
 	 * 
 	 * @return true if given ref has at least one active review_request (e.g. a Github pull_request)
 	 */
-	@Deprecated
-	boolean refHasOpenReviewRequest();
+	// @Deprecated
+	// boolean refHasOpenReviewRequest();
 
 	/**
 	 * 
@@ -31,7 +31,7 @@ public interface IExternalWebhookRelevancyResult {
 	boolean isReviewRequestOpen();
 
 	/**
-	 * This is filled only for ReviewRequest specific events.
+	 * For ReviewRequest events, this is the base. For push, this is the sha1 before the push.
 	 * 
 	 * @return the privileged base Ref for given event
 	 */

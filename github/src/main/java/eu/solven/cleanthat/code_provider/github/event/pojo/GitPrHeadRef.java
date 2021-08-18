@@ -12,9 +12,14 @@ public class GitPrHeadRef {
 	final String repoName;
 	final Object id;
 
-	public GitPrHeadRef(String repoName, Object id) {
+	final String baseRef;
+	final String headRef;
+
+	public GitPrHeadRef(String repoName, Object id, String baseRef, String headRef) {
 		this.repoName = repoName;
 		this.id = id;
+		this.baseRef = baseRef;
+		this.headRef = headRef;
 	}
 
 	public String getRepoName() {
@@ -23,5 +28,13 @@ public class GitPrHeadRef {
 
 	public Object getId() {
 		return id;
+	}
+
+	public String getBaseRef() {
+		return baseRef;
+	}
+
+	public String getHeadRef() {
+		return headRef;
 	}
 }

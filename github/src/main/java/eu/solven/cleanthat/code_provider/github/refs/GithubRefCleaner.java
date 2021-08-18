@@ -75,6 +75,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	@Override
 	public Optional<HeadAndOptionalBase> prepareRefToClean(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 theRef,
+			// There can be multiple eventBaseBranches in case of push events
 			Set<String> eventBaseBranches) {
 		ICodeProvider codeProvider = getCodeProviderForRef(theRef);
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
@@ -109,15 +110,16 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 
 		String fullRef = theRef.getRef();
 		if (optBaseMatchingRule.isPresent()) {
-			// The base is cleanable: we are allowed to clean its head
+			// The base is cleanable: we are allowed to clean its head in-place
 			String baseMatchingRule = optBaseMatchingRule.get();
 			if (result.isReviewRequestOpen()) {
-				LOGGER.info("We will clean {} in place as this event is due to a PR (re)open event (rule={})",
+				LOGGER.info(
+						"We will clean {} in place as this event is due to a RR (re)open event with cleanable base (rule={})",
 						fullRef,
 						baseMatchingRule);
 			} else {
 				LOGGER.info(
-						"We will clean {} in place as this event is due to a push over a branch with a PR with a cleanable base (rule={})",
+						"We will clean {} in place as this event is due to a push over a branch, itself head of a RR with a cleanable base (rule={})",
 						fullRef,
 						baseMatchingRule);
 			}

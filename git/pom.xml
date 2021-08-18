@@ -16,5 +16,17 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>code-providers</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+
+		<dependency>
+			<!-- Used to clone a repo -->
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+		</dependency>
 	</dependencies>
 </project>

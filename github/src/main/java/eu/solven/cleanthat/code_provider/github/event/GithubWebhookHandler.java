@@ -2,12 +2,12 @@ package eu.solven.cleanthat.code_provider.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -50,7 +50,6 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -146,7 +145,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// We are notified of a commit: its branch may be explicitly keep_cleaned (e.g. master) or implicitly (e.g. it
 		// has a PR)
 		boolean pushBranch;
-		boolean refHasOpenReviewRequest;
+		// boolean refHasOpenReviewRequest;
 		// baseRef is optional: in case of PR even, it is trivial, but in case of commitPush event, we have to scan for
 		// a compatible
 		Optional<GitRepoBranchSha1> optBaseRef;
@@ -168,29 +167,35 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					LOGGER.info("We discard as headRef is: {}", headRef);
 					return new GithubWebhookRelevancyResult(false,
 							false,
-							false,
+							// false,
 							Optional.empty(),
 							Optional.empty(),
 							Optional.empty());
 				}
 				// Some dirty commits may have been pushed while the PR was closed
 				prOpen = true;
-				refHasOpenReviewRequest = true;
+				// refHasOpenReviewRequest = true;
 				String baseRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
 				String baseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
 				long prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
-				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prNumber));
 				String headRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
 				String baseSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "sha");
-				optBaseRef = Optional.of(new GitRepoBranchSha1(baseRepoName, baseRef, baseSha));
+				GitRepoBranchSha1 base = new GitRepoBranchSha1(baseRepoName, baseRef, baseSha);
+				optBaseRef = Optional.of(base);
 				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
-				optHeadRef = Optional.of(new GitRepoBranchSha1(headRepoName, headRef, headSha));
+				GitRepoBranchSha1 head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
+				optHeadRef = Optional.of(head);
+
+				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName,
+						prNumber,
+						GithubFacade.toFullGitRef(base.getRef()),
+						GithubFacade.toFullGitRef(head.getRef())));
 			} else {
 				LOGGER.info("action={}", githubAction);
 				prOpen = false;
-				refHasOpenReviewRequest = false;
+				// refHasOpenReviewRequest = false;
 				optOpenPr = Optional.empty();
 				optBaseRef = Optional.empty();
 				optHeadRef = Optional.empty();
@@ -205,7 +210,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				pushBranch = false;
 				optBaseRef = Optional.empty();
 				optHeadRef = Optional.empty();
-				refHasOpenReviewRequest = false;
+				// refHasOpenReviewRequest = false;
 			} else {
 				// 'ref' holds the branch name, but it would lead to issues in case on multiple commits: we prefer to
 				// point directly to the sha1. Some codeProvider/events may have events leading to a branch reference,
@@ -214,15 +219,27 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				// to a branch, not a commit.
 				// In fact, keeping only a sha1 is not relevant, as we need a ref/branch to record our cleaning anyway.
 				// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-				Optional<String> optSha = PepperMapHelper.getOptionalString(input, "after");
+				Optional<String> optBeforeSha = PepperMapHelper.getOptionalString(input, "before");
+				Optional<String> optAfterSha = PepperMapHelper.getOptionalString(input, "after");
 				Optional<String> optFullRefName = PepperMapHelper.getOptionalString(input, "ref");
-				if (optSha.isPresent() && optFullRefName.isPresent()) {
+				if (optAfterSha.isPresent() && optFullRefName.isPresent()) {
+					String afterSha = optAfterSha.get();
+					if (afterSha.matches("0+")) {
+						LOGGER.info("We discard as deleted refs (after={})", afterSha);
+						return new GithubWebhookRelevancyResult(false,
+								false,
+								// false,
+								Optional.empty(),
+								Optional.empty(),
+								Optional.empty());
+					}
+
 					String pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
 						return new GithubWebhookRelevancyResult(false,
 								false,
-								false,
+								// false,
 								Optional.empty(),
 								Optional.empty(),
 								Optional.empty());
@@ -230,8 +247,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					pushBranch = true;
 					String ref = optFullRefName.get();
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
-					GitRepoBranchSha1 value = new GitRepoBranchSha1(repoName, ref, optSha.get());
-					optHeadRef = Optional.of(value);
+					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
+					optHeadRef = Optional.of(after);
 
 					// We need a Github installation instance to check for this, while current call has to be offline
 					// (i.e. just analyzing the event)
@@ -246,18 +263,25 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					// } catch (IOException e) {
 					// throw new UncheckedIOException(e);
 					// }
-					optBaseRef = Optional.empty();
+
+					String beforeSha = optBeforeSha.get();
+					if (beforeSha.matches("0+")) {
+						// 0000000000000000000000000000000000000000
+						// AKA z40 is a special reference, meaning no_ref
+						optBaseRef = Optional.empty();
+					} else {
+						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, beforeSha));
+					}
 
 					// TODO We could set a 'maybe' instead of 'false'
-					refHasOpenReviewRequest = false;
-
+					// refHasOpenReviewRequest = false;
 				} else {
 					// TODO Unclear which case this can be (no pull_request and no action)
 					LOGGER.warn("WTF We miss at least one of sha1 and refName");
 					pushBranch = false;
 					optBaseRef = Optional.empty();
 					optHeadRef = Optional.empty();
-					refHasOpenReviewRequest = false;
+					// refHasOpenReviewRequest = false;
 				}
 			}
 		}
@@ -271,7 +295,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		return new GithubWebhookRelevancyResult(prOpen,
 				pushBranch,
-				refHasOpenReviewRequest,
+				// refHasOpenReviewRequest,
 				optHeadRef,
 				optOpenPr,
 				optBaseRef);
@@ -316,50 +340,63 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new UncheckedIOException(e);
 		}
 
-		GitRepoBranchSha1 gitRepoBranchSha1 = offlineResult.optPushedRef().get();
-		String repoName = gitRepoBranchSha1.getRepoName();
-		GithubFacade facade;
-		try {
-			facade = new GithubFacade(githubAsInst, repoName);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
+		// String repoName = pushedRefOrRrHead.getRepoName();
+		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
 
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
-		Set<String> relevantBaseBranches = new HashSet<>();
-		if (offlineResult.isPushBranch() && !offlineResult.refHasOpenReviewRequest()) {
+		Set<String> relevantBaseBranches = new TreeSet<>();
+		if (offlineResult.isPushBranch()
+		// && !offlineResult.refHasOpenReviewRequest()
+		) {
+			// This is assumed to be empty as we should not list for RR, before current step
 			assert optOpenPr.isEmpty();
 
-			String ref = gitRepoBranchSha1.getRef();
+			// TODO Is this a valid behavior at all?
+			// Why would we impact an open PR with cleaning stuff for the head PR?
+			// e.g. a given RR may want to remain neat, and not impacted by a change of configuration in the head
+			// WRONG: Here, we are looking for PR merging the pushed branch into some cleanable branch
+			// i.e. this is a push to a PR head, we are looking for the PR reference.
+			String ref = pushedRefOrRrHead.getRef();
 			LOGGER.info("Search for a PR merging the commited branch (head={})", ref);
 			try {
 				List<GHPullRequest> prMatchingHead = facade.findAnyPrHeadMatchingRef(ref).collect(Collectors.toList());
 
 				if (prMatchingHead.isEmpty()) {
-					LOGGER.info("This a single open RR matching a head ref={}", ref);
+					LOGGER.info("There is no open RR with head={}", ref);
 				} else {
 					prMatchingHead.forEach(pr -> {
-						relevantBaseBranches.add(facade.toFullGitRef(pr.getBase()));
+						relevantBaseBranches.add(GithubFacade.toFullGitRef(pr.getBase()));
 					});
 
-					optOpenPr = Optional.of(new GitPrHeadRef(repoName, prMatchingHead.get(0).getNumber()));
+					// There is no point in forcing to get a RR, as this is used later only to check the RR is still
+					// open, or to append a comment: given N compatible RR< none should be impacted on a push event
+					// GHPullRequest firstRr = prMatchingHead.get(0);
+					// LOGGER.info("We spot an open RR with head={}: {}", ref, firstRr.getHtmlUrl());
+					// optOpenPr = Optional.of(new GitPrHeadRef(repoName,
+					// firstRr.getNumber(),
+					// GithubFacade.toFullGitRef(firstRr.getBase()),
+					// GithubFacade.toFullGitRef(firstRr.getHead())));
 				}
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		} else {
+			assert offlineResult.isReviewRequestOpen();
+			assert offlineResult.optOpenPr().isPresent();
+
+			relevantBaseBranches.add(offlineResult.optOpenPr().get().getBaseRef());
 		}
 
-		// String defaultBranch = GitHelper.getDefaultBranch(Optional.ofNullable(repo.getDefaultBranch()));
-		// final boolean isMainBranchCommit;
 		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optTheRef =
-				prepareTheRef(baseRepoId, baseRepo, gitRepoBranchSha1, optOpenPr);
+				checkRefCleanability(baseRepo, pushedRefOrRrHead, optOpenPr);
 
 		if (optTheRef.getOptError().isPresent()) {
 			return optTheRef.getOptError().get();
 		}
 
-		GitRepoBranchSha1 theRef = optTheRef.getOptResult().get();
-		Optional<String> optSha1 = Optional.of(theRef.getSha());
+		GitRepoBranchSha1 dirtyRef = optTheRef.getOptResult().get();
+		Optional<String> optSha1 = Optional.of(dirtyRef.getSha());
 		if (optSha1.isEmpty()) {
 			throw new IllegalStateException("Should not happen");
 		}
@@ -371,8 +408,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(offlineResult, theRef, relevantBaseBranches);
-		// offlineResult.
+				cleaner.prepareRefToClean(offlineResult, dirtyRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
@@ -406,18 +442,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 	}
 
-	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> prepareTheRef(long baseRepoId,
-			GHRepository baseRepo,
-			GitRepoBranchSha1 gitRepoBranchSha1,
+	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanability(GHRepository eventRepo,
+			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
-		GitRepoBranchSha1 theRef;
+		// GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
 			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
 
 			GHPullRequest optPr;
 			try {
 				int prNumberAsInteger = Integer.parseInt(rawPrNumber);
-				optPr = baseRepo.getPullRequest(prNumberAsInteger);
+				optPr = eventRepo.getPullRequest(prNumberAsInteger);
 			} catch (GHFileNotFoundException e) {
 				LOGGER.debug("PR does not exists. Closed?", e);
 				LOGGER.warn("PR={} does not exists. Closed?", rawPrNumber);
@@ -430,30 +465,35 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
-			if (baseRepoId != prHeadRepository.getId()) {
+			if (eventRepo.getId() != prHeadRepository.getId()) {
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname));
 			}
-			String fullRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + prHead.getRef();
 
-			try {
-				new GithubRepositoryFacade(baseRepo).getRef(fullRef);
-			} catch (GHFileNotFoundException e) {
-				LOGGER.debug("Ref does not exists. Deleted?", e);
-				LOGGER.warn("Ref does not exists. Deleted?={} does not exists. Deleted?", fullRef);
-				return ResultOrError
-						.error(WebhookRelevancyResult.dismissed("Ref does not exists. Deleted? ref=" + fullRef));
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-
-			theRef = new GitRepoBranchSha1(headRepoFullname, fullRef, prHead.getSha());
+			// If some codeProvider does not provide a clear ref in the case of a RR, this would be the place to get it.
+			// However, this is not the case for GitHub. Else, it seems to early to switch pushedRefOrRrHead as an
+			// Optional
+			// String fullRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + prHead.getRef();
+			// theRef = new GitRepoBranchSha1(headRepoFullname, fullRef, prHead.getSha());
 		} else {
 			// No PR: we are guaranteed to have a ref
-			theRef = gitRepoBranchSha1;
+			// theRef = pushedRefOrRrHead;
 		}
-		return ResultOrError.result(theRef);
+
+		String refToClean = pushedRefOrRrHead.getRef();
+		try {
+			new GithubRepositoryFacade(eventRepo).getRef(refToClean);
+		} catch (GHFileNotFoundException e) {
+			LOGGER.debug("Ref does not exists. Deleted?", e);
+			LOGGER.warn("Ref does not exists. Deleted?={} does not exists. Deleted?", refToClean);
+			return ResultOrError
+					.error(WebhookRelevancyResult.dismissed("Ref does not exists. Deleted? ref=" + refToClean));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		return ResultOrError.result(pushedRefOrRrHead);
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")

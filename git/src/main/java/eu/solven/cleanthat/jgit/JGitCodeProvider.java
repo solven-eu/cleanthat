@@ -30,14 +30,11 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -49,7 +46,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProviderWriter {
+public class JGitCodeProvider implements ICodeProviderWriter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JGitCodeProvider.class);
 
@@ -154,24 +151,6 @@ public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProvid
 		return treeWalk;
 	}
 
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object file) {
-	// String relativePath = (String) file;
-	// Path path = workingDir.resolve(relativePath);
-	//
-	// if (!path.startsWith(workingDir)) {
-	// // https://stackoverflow.com/questions/53157337/validate-to-prevent-a-path-string-to-go-up-to-parent-folder
-	// throw new IllegalArgumentException("Can not move out of the parent folder");
-	// }
-	//
-	// return !path.toFile().exists();
-	// }
-
-	public static String loadContent(GHRepository repository, GHRef ref, String filename) throws IOException {
-		String sha1 = ref.getObject().getSha();
-		return loadContent(repository, filename, sha1);
-	}
-
 	@Override
 	public String getHtmlUrl() {
 		try {
@@ -189,13 +168,9 @@ public class JGitCodeProvider extends AGithubCodeProvider implements ICodeProvid
 	@Override
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
-			Collection<String> prLabels
-	// , Optional<String> targetBranch
-	) {
-		// targetBranch
-
+			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((k, v) -> {
-			Path resolvedPath = workingDir.resolve((String) k);
+			Path resolvedPath = workingDir.resolve(k);
 
 			try {
 				Files.writeString(resolvedPath, v, StandardOpenOption.TRUNCATE_EXISTING);

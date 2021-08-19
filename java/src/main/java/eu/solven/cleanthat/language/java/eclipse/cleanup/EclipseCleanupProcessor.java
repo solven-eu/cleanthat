@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.eclipse.cleamup;
+package eu.solven.cleanthat.language.java.eclipse.cleanup;
 
 import java.util.Map;
 

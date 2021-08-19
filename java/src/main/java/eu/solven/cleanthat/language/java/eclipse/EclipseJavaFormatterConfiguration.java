@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jdt.core.JavaCore;
 import org.slf4j.Logger;
@@ -51,14 +52,13 @@ public class EclipseJavaFormatterConfiguration {
 	private final Map<String, String> options;
 
 	public EclipseJavaFormatterConfiguration(Map<String, String> options) {
-		this.options = ImmutableMap.copyOf(options);
+		// Sorted for human-friendliness
+		this.options = ImmutableMap.copyOf(new TreeMap<>(options));
 	}
 
 	public static EclipseJavaFormatterConfiguration load(ICodeProvider codeProvider,
 			ILanguageProperties languageProperties,
 			EclipseJavaFormatterProcessorProperties processorConfig) {
-		Map<String, String> options = new LinkedHashMap<>();
-
 		String javaConfigFile = processorConfig.getUrl();
 
 		// Eclipse default
@@ -71,27 +71,37 @@ public class EclipseJavaFormatterConfiguration {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
 			// }
 			// String jdkVersion = optJdkVersion.orElse();
+			Map<String, String> options = new LinkedHashMap<>();
 			options.put(JavaCore.COMPILER_SOURCE, jdkVersion);
 			options.put(JavaCore.COMPILER_COMPLIANCE, jdkVersion);
 			options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, jdkVersion);
+
+			return new EclipseJavaFormatterConfiguration(options);
 		} else {
 			LOGGER.info("Loading Eclipse java formatting configuration from {}", javaConfigFile);
 
 			Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, javaConfigFile);
 
-			try (InputStream is = resource.getInputStream()) {
-				try {
-					options = new ConfigReader().read(is);
-				} catch (SAXException | ConfigReadException e) {
-					throw new RuntimeException("Issue parsing config: " + javaConfigFile, e);
-				}
-			} catch (MalformedURLException e) {
-				throw new IllegalArgumentException("Invalid java.config_uri: + javaConfigFile", e);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+			try {
+				return loadResource(resource);
+			} catch (RuntimeException e) {
+				throw new RuntimeException("Issue processing: " + javaConfigFile, e);
 			}
 		}
+	}
 
-		return new EclipseJavaFormatterConfiguration(options);
+	public static EclipseJavaFormatterConfiguration loadResource(Resource resource) {
+		try (InputStream is = resource.getInputStream()) {
+			try {
+				Map<String, String> options = new ConfigReader().read(is);
+				return new EclipseJavaFormatterConfiguration(options);
+			} catch (SAXException | ConfigReadException e) {
+				throw new RuntimeException("Issue parsing config", e);
+			}
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException("Invalid java.config_uri: + javaConfigFile", e);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

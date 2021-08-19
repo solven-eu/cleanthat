@@ -52,21 +52,21 @@ public class EclipseJavaFormatter implements ISourceCodeFormatter {
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 
-		TextEdit te;
+		TextEdit textEdit;
 		try {
-			te = formatter.format(CodeFormatter.K_COMPILATION_UNIT
+			textEdit = formatter.format(CodeFormatter.K_COMPILATION_UNIT
 					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, ending.getChars());
-			if (te == null) {
+			if (textEdit == null) {
 				LOGGER.warn("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
 				return null;
 			}
 		} catch (RuntimeException e) {
-			LOGGER.warn("Code cannot be formatted for text -->" + code + "<--", e);
+			LOGGER.warn("Code cannot be formatted", e);
 			return null;
 		}
 		IDocument doc = new Document(code);
 		try {
-			te.apply(doc);
+			textEdit.apply(doc);
 		} catch (MalformedTreeException | BadLocationException e) {
 			throw new IllegalArgumentException(e);
 		}

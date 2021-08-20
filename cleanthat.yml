@@ -26,7 +26,7 @@ languages:
       - "regex:.*/src/test/java/eu/solven/cleanthat/rules/cases/.*"
   - engine: "eclipse_formatter"
     parameters:
-      url: "https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml"
+      url: https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
   - engine: "revelc_imports"
     parameters:
       remove_unused: true

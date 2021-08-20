@@ -70,10 +70,30 @@ languages:
     parameters: {}
 ```
 
-Deploy into Production (AWS):
+# Using Eclipse Formatter
+
+An alternative to spring_formatter is eclipse_formatter. It takes as parameter an url like:
+
+A public http(s) URL:
+
+    https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+    
+A file in local repository (root being assumed based on Git root/Maven top module)
+    
+    code:/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+
+Eclipse Stylesheets can exported to XML through:
+
+- Go into Preferences
+- Select Java > Code Style > Formatter
+- Click on 'Export All'
+
+CleanThat will accept only configuration with a single profile in them. If multiple profiles are found, we will rely on the first profile.
+
+# Deploy into Production (AWS):
 
     git push origin master:deploy-prd
 
-Release a new version (and deploy jars to Sonatype m2central):
+# Release a new version (and deploy jars to Sonatype m2central):
 
     mvn release:clean release:prepare release:perform

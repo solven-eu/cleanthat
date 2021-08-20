@@ -36,12 +36,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	final FileSystem fs;
 	final Path root;
 
-	// public FileSystemCodeProvider(FileSystem fs) {
-	// this(fs,fs.getPath("/"));
-	// }
-
 	public FileSystemCodeProvider(FileSystem fs, Path root) {
-		// LOGGER.info("root={}", root);
 		this.fs = fs;
 		this.root = root;
 	}
@@ -80,12 +75,6 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		});
 	}
 
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object file) {
-	// // This class sees only existing files
-	// return false;
-	// }
-
 	@Override
 	public String getHtmlUrl() {
 		return root.toAbsolutePath().toString();
@@ -96,16 +85,27 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		return root.getFileName().toString();
 	}
 
+	protected Path resolvePath(String path) {
+		if (!path.startsWith("/")) {
+			throw new IllegalArgumentException(
+					"We expect only absolute path, consider the root of the git repository as the root (path=" + path
+							+ ")");
+		}
+
+		return root.resolve("." + path);
+	}
+
 	@Override
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((path, content) -> {
+			Path resolved = resolvePath(path);
 			try {
 				LOGGER.info("Write file: {}", path);
-				Files.write(root.resolve(path), content.getBytes(StandardCharsets.UTF_8));
+				Files.write(resolved, content.getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e) {
-				throw new UncheckedIOException("Issue on: " + path, e);
+				throw new UncheckedIOException("Issue on: " + path + " (resolved into " + resolved + ")", e);
 			}
 		});
 	}
@@ -123,13 +123,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		if (!path.startsWith("/")) {
-			throw new IllegalArgumentException(
-					"We expect only absolute path, consider the root of the git repository as the root (path=" + path
-							+ ")");
-		}
-
-		Path resolved = root.resolve("." + path);
+		Path resolved = resolvePath(path);
 		if (resolved.toFile().isFile()) {
 			return Optional.of(Files.readString(resolved));
 		} else {

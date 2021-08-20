@@ -69,7 +69,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			parameters = Map.of();
 		}
 
-		LOGGER.info("Processing: {}", LOGGER);
+		LOGGER.debug("Processing: {}", engine);
 
 		ObjectMapper objectMapper = getObjectMapper();
 

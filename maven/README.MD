@@ -1,6 +1,6 @@
 Can be tested with:
 
-    mvn com.github.cormoran-io.cleanthat:cleanthat-maven-plugin:1.0-SNAPSHOT:cleanthat
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
 
 Can be rebuild through:
 

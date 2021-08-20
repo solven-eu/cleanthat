@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.config.GitService;
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
+import eu.solven.cleanthat.language.json.JsonFormattersFactory;
 import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
 
 /**
@@ -16,6 +17,7 @@ import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
 @Configuration
 @Import({ JavaFormattersFactory.class,
 		ScalaFormattersFactory.class,
+		JsonFormattersFactory.class,
 
 		// technical Beans
 		GitService.class })

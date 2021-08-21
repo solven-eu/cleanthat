@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
@@ -62,8 +63,9 @@ import eu.solven.cleanthat.utils.ResultOrError;
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
+
+	private static final String PERMISSION_CHECKS = "checks";
 
 	final GHApp githubApp;
 
@@ -87,14 +89,18 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("Permissions: {}", permissions);
 			LOGGER.info("RepositorySelection: {}", installationById.getRepositorySelection());
 			// https://github.com/hub4j/github-api/issues/570
-			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken(// Required to open
-					Map.of(// new pull-requests
-							"pull_requests", // Required to access a repository without having to list all available
-							GHPermissionType.WRITE, // repositories
-							"metadata", // Required to read files, and commit new versions
-							GHPermissionType.READ,
-							"contents",
-							GHPermissionType.WRITE));
+			// Required to open new pull-requests
+			GHAppCreateTokenBuilder installationGithubBuilder = installationById.createToken()
+					.permissions(ImmutableMap.<String, GHPermissionType>builder()
+							// Required to access a repository without having to list all availablerepositories
+							.put("pull_requests", GHPermissionType.WRITE)
+							// Required to read files, and commit new versions
+							.put("metadata", GHPermissionType.READ)
+							// Required to commit cleaned files
+							.put("contents", GHPermissionType.WRITE)
+							// Required to commit cleaned files
+							.put(PERMISSION_CHECKS, GHPermissionType.WRITE)
+							.build());
 			// https://github.com/hub4j/github-api/issues/570
 			String token = installationGithubBuilder.create().getToken();
 			GitHub installationGithub = makeInstallationGithub(token);
@@ -122,7 +128,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
-
 		Optional<Object> organizationUrl = PepperMapHelper.getOptionalAs(input, "organization", "url");
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
@@ -158,7 +163,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			if (optAction.isEmpty()) {
 				throw new IllegalStateException("We miss an action for a webhook holding a pull_request");
 			}
-
 			String githubAction = optAction.get();
 			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
 				String headRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
@@ -166,8 +170,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					// Do not process CleanThat own PR open events
 					LOGGER.info("We discard as headRef is: {}", headRef);
 					return new GithubWebhookRelevancyResult(false,
-							false,
-							// false,
+							false, // false,
 							Optional.empty(),
 							Optional.empty(),
 							Optional.empty());
@@ -187,7 +190,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
 				GitRepoBranchSha1 head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
 				optHeadRef = Optional.of(head);
-
 				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName,
 						prNumber,
 						GithubFacade.toFullGitRef(base.getRef()),
@@ -228,18 +230,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						LOGGER.info("We discard as deleted refs (after={})", afterSha);
 						return new GithubWebhookRelevancyResult(false,
 								false,
-								// false,
 								Optional.empty(),
 								Optional.empty(),
 								Optional.empty());
 					}
-
 					String pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
 						return new GithubWebhookRelevancyResult(false,
 								false,
-								// false,
 								Optional.empty(),
 								Optional.empty(),
 								Optional.empty());
@@ -249,21 +248,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
 					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
-
-					// We need a Github installation instance to check for this, while current call has to be offline
-					// (i.e. just analyzing the event)
-					// try {
-					// Optional<GHPullRequest> prMatchingHead =
-					// new GithubFacade(github, value.getRepoName()).findFirstPrHeadMatchingRef(ref);
-					// optBaseRef = prMatchingHead.map(pr -> {
-					// GHCommitPointer base = pr.getBase();
-					// return new GitRepoBranchSha1(base.getRepository().getName(), base.getRef(), base.getSha());
-					// });
-					// refHasOpenReviewRequest = prMatchingHead.isPresent();
-					// } catch (IOException e) {
-					// throw new UncheckedIOException(e);
-					// }
-
 					String beforeSha = optBeforeSha.get();
 					if (beforeSha.matches("0+")) {
 						// 0000000000000000000000000000000000000000
@@ -272,16 +256,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					} else {
 						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, beforeSha));
 					}
-
-					// TODO We could set a 'maybe' instead of 'false'
-					// refHasOpenReviewRequest = false;
 				} else {
 					// TODO Unclear which case this can be (no pull_request and no action)
 					LOGGER.warn("WTF We miss at least one of sha1 and refName");
 					pushBranch = false;
 					optBaseRef = Optional.empty();
 					optHeadRef = Optional.empty();
-					// refHasOpenReviewRequest = false;
 				}
 			}
 		}
@@ -293,12 +273,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.warn("Issue while printing the json of the webhook", e);
 			}
 		}
-		return new GithubWebhookRelevancyResult(prOpen,
-				pushBranch,
-				// refHasOpenReviewRequest,
-				optHeadRef,
-				optOpenPr,
-				optBaseRef);
+		return new GithubWebhookRelevancyResult(prOpen, pushBranch, optHeadRef, optOpenPr, optBaseRef);
 	}
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
@@ -339,19 +314,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
 		// String repoName = pushedRefOrRrHead.getRepoName();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
-
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 		Set<String> relevantBaseBranches = new TreeSet<>();
-		if (offlineResult.isPushBranch()
-		// && !offlineResult.refHasOpenReviewRequest()
-		) {
+		if (offlineResult.isPushBranch()) // && !offlineResult.refHasOpenReviewRequest()
+		{
 			// This is assumed to be empty as we should not list for RR, before current step
 			assert optOpenPr.isEmpty();
-
 			// TODO Is this a valid behavior at all?
 			// Why would we impact an open PR with cleaning stuff for the head PR?
 			// e.g. a given RR may want to remain neat, and not impacted by a change of configuration in the head
@@ -361,14 +332,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.info("Search for a PR merging the commited branch (head={})", ref);
 			try {
 				List<GHPullRequest> prMatchingHead = facade.findAnyPrHeadMatchingRef(ref).collect(Collectors.toList());
-
 				if (prMatchingHead.isEmpty()) {
 					LOGGER.info("There is no open RR with head={}", ref);
 				} else {
 					prMatchingHead.forEach(pr -> {
 						relevantBaseBranches.add(GithubFacade.toFullGitRef(pr.getBase()));
 					});
-
 					// There is no point in forcing to get a RR, as this is used later only to check the RR is still
 					// open, or to append a comment: given N compatible RR< none should be impacted on a push event
 					// GHPullRequest firstRr = prMatchingHead.get(0);
@@ -384,17 +353,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			assert offlineResult.isReviewRequestOpen();
 			assert offlineResult.optOpenPr().isPresent();
-
 			relevantBaseBranches.add(offlineResult.optOpenPr().get().getBaseRef());
 		}
-
 		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optTheRef =
 				checkRefCleanability(baseRepo, pushedRefOrRrHead, optOpenPr);
-
 		if (optTheRef.getOptError().isPresent()) {
 			return optTheRef.getOptError().get();
 		}
-
 		GitRepoBranchSha1 dirtyRef = optTheRef.getOptResult().get();
 		Optional<String> optSha1 = Optional.of(dirtyRef.getSha());
 		if (optSha1.isEmpty()) {
@@ -403,7 +368,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		if (optSha1.isPresent()) {
 			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get());
 		}
-
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
@@ -417,7 +381,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1) {
-		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get("checks")) {
+		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get(PERMISSION_CHECKS)) {
 			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 			// https://docs.github.com/en/rest/reference/checks#runs
 			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
@@ -448,7 +412,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
 			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
-
 			GHPullRequest optPr;
 			try {
 				int prNumberAsInteger = Integer.parseInt(rawPrNumber);
@@ -461,7 +424,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
@@ -470,7 +432,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname));
 			}
-
 			// If some codeProvider does not provide a clear ref in the case of a RR, this would be the place to get it.
 			// However, this is not the case for GitHub. Else, it seems to early to switch pushedRefOrRrHead as an
 			// Optional
@@ -480,7 +441,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// No PR: we are guaranteed to have a ref
 			// theRef = pushedRefOrRrHead;
 		}
-
 		String refToClean = pushedRefOrRrHead.getRef();
 		try {
 			new GithubRepositoryFacade(eventRepo).getRef(refToClean);
@@ -492,7 +452,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 		return ResultOrError.result(pushedRefOrRrHead);
 	}
 
@@ -506,7 +465,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		WebhookRelevancyResult relevancyResult =
 				filterWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
-
 		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
 			throw new IllegalArgumentException("We should have rejected this earlier");
@@ -524,14 +482,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new UncheckedIOException(e);
 		}
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
-
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
-
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
-
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
 		Supplier<GHRef> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-
 		CodeFormatResult result;
 		if (relevancyResult.optBaseForHead().isPresent()) {
 			// If the base does not exist, then something is wrong: let's check right away it is available
@@ -545,10 +499,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			result = cleaner.formatRef(repo, headSupplier);
 		}
-
 		if (refLazyRefCreated.get() != null) {
 			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
-			if (!relevancyResult.optBaseForHead().isPresent()) {
+			if (relevancyResult.optBaseForHead().isEmpty()) {
 				LOGGER.warn("We created a tmpRef but there is no base");
 			} else {
 				if (result.isEmpty()) {
@@ -576,7 +529,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Supplier<GHRef> headSupplier = () -> {
 			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
 			String refName = refToProcess.getRef();
-
 			String repoName = repo.getName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
 				try {
@@ -608,11 +560,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
 		try {
 			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", "Cleanthat <body>");
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 		if (optOpenPr.isPresent()) {
 			LOGGER.info("We succeeded opening a PR open to merge {} into {}: {}",
 					lazyRefCreated,

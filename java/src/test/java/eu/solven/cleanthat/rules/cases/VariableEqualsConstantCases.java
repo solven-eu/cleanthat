@@ -15,6 +15,7 @@ import eu.solven.cleanthat.rules.test.ACases;
 
 public class VariableEqualsConstantCases extends ACases {
 
+	@Override
 	public IClassTransformer getTransformer() {
 		return new VariableEqualsConstant();
 	}
@@ -34,6 +35,17 @@ public class VariableEqualsConstantCases extends ACases {
 	public static class CaseConstantStringWithAnotherConstant {
 		public Object post() {
 			return "hardcoded".equals("input");
+		}
+	}
+
+	@CompareMethods
+	public static class CaseConstantStringAgainstObject {
+		public Object pre(Object input) {
+			return input.equals("hardcoded");
+		}
+
+		public Object post(Object input) {
+			return "hardcoded".equals(input);
 		}
 	}
 

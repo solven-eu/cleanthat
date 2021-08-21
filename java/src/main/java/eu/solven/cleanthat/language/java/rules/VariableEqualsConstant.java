@@ -71,9 +71,16 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		if (singleArgument instanceof ObjectCreationExpr && METHOD_EQUALS.equals(methodCallName)) {
 			LOGGER.debug("This is a !String method which can be swapped");
 			stringScopeOnly = false;
-		} else if (singleArgument instanceof StringLiteralExpr && isSwitchableStringMethod(methodCallName)) {
+		} else if (singleArgument instanceof StringLiteralExpr) {
 			LOGGER.debug("This is a String method which can be swapped");
-			stringScopeOnly = true;
+			if (METHOD_EQUALS.equals(methodCallName)) {
+				// We may be comparing a String with an Object
+				stringScopeOnly = false;
+			} else if (isSwitchableStringMethod(methodCallName)) {
+				stringScopeOnly = true;
+			} else {
+				return false;
+			}
 		} else if (singleArgument instanceof FieldAccessExpr && METHOD_EQUALS.equals(methodCallName)
 				&& isConstant(((FieldAccessExpr) singleArgument).getName())) {
 			// TODO Think deeper about relying on the field name to suppose it is constant. We should at least check

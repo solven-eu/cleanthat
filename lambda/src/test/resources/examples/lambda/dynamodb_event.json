@@ -1,859 +1,820 @@
 {
-    "Records": [
-        {
-            "eventID": "7ada7e33dc7d0cdc16ea5dea8accac98",
-            "eventName": "INSERT",
-            "eventVersion": "1.1",
-            "eventSource": "aws:dynamodb",
-            "awsRegion": "us-east-1",
-            "dynamodb": {
-                "ApproximateCreationDateTime": 1627803228,
-                "Keys": {
-                    "X-GitHub-Delivery": {
-                        "S": "random-f9e9bec1-21aa-4c13-8853-67899fe68756"
-                    }
-                },
-                "NewImage": {
-                    "X-GitHub-Delivery": {
-                        "S": "random-f9e9bec1-21aa-4c13-8853-67899fe68756"
-                    },
-                    "headers": {
-                        "M": {}
-                    },
-                    "datetime": {
-                        "S": "2021-08-01T07:33:46.107415Z"
-                    },
-                    "body": {
-                        "M": {
-                            "github": {
-                                "M": {
-                                    "headers": {
-                                        "M": {}
-                                    },
-                                    "body": {
-                                        "M": {
-                                            "pusher": {
-                                                "M": {
-                                                    "name": {
-                                                        "S": "blacelle"
-                                                    },
-                                                    "email": {
-                                                        "S": "benoit.lacelle@gmail.com"
-                                                    }
-                                                }
-                                            },
-                                            "compare": {
-                                                "S": "https://github.com/solven-eu/mitrust-datasharing/compare/c331af6c051b...e9aec8114cf2"
-                                            },
-                                            "head_commit": {
-                                                "M": {
-                                                    "committer": {
-                                                        "M": {
-                                                            "name": {
-                                                                "S": "Benoit Lacelle"
-                                                            },
-                                                            "email": {
-                                                                "S": "benoit.lacelle@gmail.com"
-                                                            },
-                                                            "username": {
-                                                                "S": "blacelle"
-                                                            }
-                                                        }
-                                                    },
-                                                    "removed": {
-                                                        "L": []
-                                                    },
-                                                    "tree_id": {
-                                                        "S": "deb3327edbf042cd978a05b2f378eea9c43299f1"
-                                                    },
-                                                    "added": {
-                                                        "L": []
-                                                    },
-                                                    "author": {
-                                                        "M": {
-                                                            "name": {
-                                                                "S": "Benoit Lacelle"
-                                                            },
-                                                            "email": {
-                                                                "S": "benoit.lacelle@gmail.com"
-                                                            },
-                                                            "username": {
-                                                                "S": "blacelle"
-                                                            }
-                                                        }
-                                                    },
-                                                    "distinct": {
-                                                        "BOOL": true
-                                                    },
-                                                    "modified": {
-                                                        "L": [
-                                                            {
-                                                                "S": "exec/demo/demo-client-commons/package-lock.json"
-                                                            },
-                                                            {
-                                                                "S": "exec/demo/demo-client-commons/package.json"
-                                                            },
-                                                            {
-                                                                "S": "exec/sp-asaservice/web/package-lock.json"
-                                                            },
-                                                            {
-                                                                "S": "exec/sp-asaservice/web/package.json"
-                                                            },
-                                                            {
-                                                                "S": "pom.xml"
-                                                            },
-                                                            {
-                                                                "S": "satellites/gui-back/package-lock.json"
-                                                            },
-                                                            {
-                                                                "S": "satellites/gui-back/package.json"
-                                                            },
-                                                            {
-                                                                "S": "ui/web/package-lock.json"
-                                                            },
-                                                            {
-                                                                "S": "ui/web/package.json"
-                                                            }
-                                                        ]
-                                                    },
-                                                    "id": {
-                                                        "S": "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
-                                                    },
-                                                    "message": {
-                                                        "S": "Merge remote-tracking branch 'origin/master' into SPrint46_ImproveDocumentation"
-                                                    },
-                                                    "url": {
-                                                        "S": "https://github.com/solven-eu/mitrust-datasharing/commit/e9aec8114cf26d42156ddcbf8961c92b15c484c1"
-                                                    },
-                                                    "timestamp": {
-                                                        "S": "2021-07-31T23:13:58+02:00"
-                                                    }
-                                                }
-                                            },
-                                            "before": {
-                                                "S": "c331af6c051bc53306751e10b5ab90d272769dc6"
-                                            },
-                                            "created": {
-                                                "BOOL": false
-                                            },
-                                            "forced": {
-                                                "BOOL": false
-                                            },
-                                            "repository": {
-                                                "M": {
-                                                    "stargazers_count": {
-                                                        "N": "4"
-                                                    },
-                                                    "pushed_at": {
-                                                        "N": "1627766045"
-                                                    },
-                                                    "subscription_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/subscription"
-                                                    },
-                                                    "language": {
-                                                        "S": "Java"
-                                                    },
-                                                    "branches_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/branches{/branch}"
-                                                    },
-                                                    "issue_comment_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues/comments{/number}"
-                                                    },
-                                                    "labels_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/labels{/name}"
-                                                    },
-                                                    "subscribers_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/subscribers"
-                                                    },
-                                                    "releases_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/releases{/id}"
-                                                    },
-                                                    "svn_url": {
-                                                        "S": "https://github.com/solven-eu/mitrust-datasharing"
-                                                    },
-                                                    "id": {
-                                                        "N": "130345492"
-                                                    },
-                                                    "master_branch": {
-                                                        "S": "master"
-                                                    },
-                                                    "forks": {
-                                                        "N": "0"
-                                                    },
-                                                    "archive_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/{archive_format}{/ref}"
-                                                    },
-                                                    "git_refs_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/refs{/sha}"
-                                                    },
-                                                    "forks_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/forks"
-                                                    },
-                                                    "statuses_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/statuses/{sha}"
-                                                    },
-                                                    "ssh_url": {
-                                                        "S": "git@github.com:solven-eu/mitrust-datasharing.git"
-                                                    },
-                                                    "license": {
-                                                        "NULL": true
-                                                    },
-                                                    "full_name": {
-                                                        "S": "solven-eu/mitrust-datasharing"
-                                                    },
-                                                    "size": {
-                                                        "N": "77978"
-                                                    },
-                                                    "languages_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/languages"
-                                                    },
-                                                    "html_url": {
-                                                        "S": "https://github.com/solven-eu/mitrust-datasharing"
-                                                    },
-                                                    "collaborators_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/collaborators{/collaborator}"
-                                                    },
-                                                    "clone_url": {
-                                                        "S": "https://github.com/solven-eu/mitrust-datasharing.git"
-                                                    },
-                                                    "name": {
-                                                        "S": "mitrust-datasharing"
-                                                    },
-                                                    "pulls_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/pulls{/number}"
-                                                    },
-                                                    "default_branch": {
-                                                        "S": "master"
-                                                    },
-                                                    "hooks_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/hooks"
-                                                    },
-                                                    "trees_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/trees{/sha}"
-                                                    },
-                                                    "tags_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/tags"
-                                                    },
-                                                    "private": {
-                                                        "BOOL": true
-                                                    },
-                                                    "contributors_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/contributors"
-                                                    },
-                                                    "has_downloads": {
-                                                        "BOOL": true
-                                                    },
-                                                    "notifications_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/notifications{?since,all,participating}"
-                                                    },
-                                                    "open_issues_count": {
-                                                        "N": "81"
-                                                    },
-                                                    "description": {
-                                                        "NULL": true
-                                                    },
-                                                    "created_at": {
-                                                        "N": "1524218929"
-                                                    },
-                                                    "watchers": {
-                                                        "N": "4"
-                                                    },
-                                                    "keys_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/keys{/key_id}"
-                                                    },
-                                                    "deployments_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/deployments"
-                                                    },
-                                                    "has_projects": {
-                                                        "BOOL": true
-                                                    },
-                                                    "archived": {
-                                                        "BOOL": false
-                                                    },
-                                                    "has_wiki": {
-                                                        "BOOL": true
-                                                    },
-                                                    "updated_at": {
-                                                        "S": "2021-07-31T18:52:53Z"
-                                                    },
-                                                    "comments_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/comments{/number}"
-                                                    },
-                                                    "stargazers_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/stargazers"
-                                                    },
-                                                    "disabled": {
-                                                        "BOOL": false
-                                                    },
-                                                    "git_url": {
-                                                        "S": "git://github.com/solven-eu/mitrust-datasharing.git"
-                                                    },
-                                                    "has_pages": {
-                                                        "BOOL": false
-                                                    },
-                                                    "owner": {
-                                                        "M": {
-                                                            "gists_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/gists{/gist_id}"
-                                                            },
-                                                            "repos_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/repos"
-                                                            },
-                                                            "following_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/following{/other_user}"
-                                                            },
-                                                            "starred_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/starred{/owner}{/repo}"
-                                                            },
-                                                            "login": {
-                                                                "S": "solven-eu"
-                                                            },
-                                                            "followers_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/followers"
-                                                            },
-                                                            "type": {
-                                                                "S": "Organization"
-                                                            },
-                                                            "url": {
-                                                                "S": "https://api.github.com/users/solven-eu"
-                                                            },
-                                                            "subscriptions_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/subscriptions"
-                                                            },
-                                                            "received_events_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/received_events"
-                                                            },
-                                                            "avatar_url": {
-                                                                "S": "https://avatars.githubusercontent.com/u/34552197?v=4"
-                                                            },
-                                                            "events_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/events{/privacy}"
-                                                            },
-                                                            "html_url": {
-                                                                "S": "https://github.com/solven-eu"
-                                                            },
-                                                            "name": {
-                                                                "S": "solven-eu"
-                                                            },
-                                                            "site_admin": {
-                                                                "BOOL": false
-                                                            },
-                                                            "id": {
-                                                                "N": "34552197"
-                                                            },
-                                                            "gravatar_id": {
-                                                                "S": ""
-                                                            },
-                                                            "email": {
-                                                                "S": "benoit.lacelle@solven.eu"
-                                                            },
-                                                            "node_id": {
-                                                                "S": "MDEyOk9yZ2FuaXphdGlvbjM0NTUyMTk3"
-                                                            },
-                                                            "organizations_url": {
-                                                                "S": "https://api.github.com/users/solven-eu/orgs"
-                                                            }
-                                                        }
-                                                    },
-                                                    "commits_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/commits{/sha}"
-                                                    },
-                                                    "compare_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/compare/{base}...{head}"
-                                                    },
-                                                    "git_commits_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/commits{/sha}"
-                                                    },
-                                                    "blobs_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/blobs{/sha}"
-                                                    },
-                                                    "git_tags_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/tags{/sha}"
-                                                    },
-                                                    "merges_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/merges"
-                                                    },
-                                                    "downloads_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/downloads"
-                                                    },
-                                                    "has_issues": {
-                                                        "BOOL": true
-                                                    },
-                                                    "url": {
-                                                        "S": "https://github.com/solven-eu/mitrust-datasharing"
-                                                    },
-                                                    "contents_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/contents/{+path}"
-                                                    },
-                                                    "mirror_url": {
-                                                        "NULL": true
-                                                    },
-                                                    "milestones_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/milestones{/number}"
-                                                    },
-                                                    "teams_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/teams"
-                                                    },
-                                                    "fork": {
-                                                        "BOOL": false
-                                                    },
-                                                    "issues_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues{/number}"
-                                                    },
-                                                    "stargazers": {
-                                                        "N": "4"
-                                                    },
-                                                    "events_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/events"
-                                                    },
-                                                    "issue_events_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues/events{/number}"
-                                                    },
-                                                    "organization": {
-                                                        "S": "solven-eu"
-                                                    },
-                                                    "assignees_url": {
-                                                        "S": "https://api.github.com/repos/solven-eu/mitrust-datasharing/assignees{/user}"
-                                                    },
-                                                    "open_issues": {
-                                                        "N": "81"
-                                                    },
-                                                    "watchers_count": {
-                                                        "N": "4"
-                                                    },
-                                                    "node_id": {
-                                                        "S": "MDEwOlJlcG9zaXRvcnkxMzAzNDU0OTI="
-                                                    },
-                                                    "homepage": {
-                                                        "NULL": true
-                                                    },
-                                                    "forks_count": {
-                                                        "N": "0"
-                                                    }
-                                                }
-                                            },
-                                            "base_ref": {
-                                                "NULL": true
-                                            },
-                                            "ref": {
-                                                "S": "refs/heads/SPrint46_ImproveDocumentation"
-                                            },
-                                            "deleted": {
-                                                "BOOL": false
-                                            },
-                                            "sender": {
-                                                "M": {
-                                                    "gists_url": {
-                                                        "S": "https://api.github.com/users/blacelle/gists{/gist_id}"
-                                                    },
-                                                    "repos_url": {
-                                                        "S": "https://api.github.com/users/blacelle/repos"
-                                                    },
-                                                    "following_url": {
-                                                        "S": "https://api.github.com/users/blacelle/following{/other_user}"
-                                                    },
-                                                    "starred_url": {
-                                                        "S": "https://api.github.com/users/blacelle/starred{/owner}{/repo}"
-                                                    },
-                                                    "login": {
-                                                        "S": "blacelle"
-                                                    },
-                                                    "followers_url": {
-                                                        "S": "https://api.github.com/users/blacelle/followers"
-                                                    },
-                                                    "type": {
-                                                        "S": "User"
-                                                    },
-                                                    "url": {
-                                                        "S": "https://api.github.com/users/blacelle"
-                                                    },
-                                                    "subscriptions_url": {
-                                                        "S": "https://api.github.com/users/blacelle/subscriptions"
-                                                    },
-                                                    "received_events_url": {
-                                                        "S": "https://api.github.com/users/blacelle/received_events"
-                                                    },
-                                                    "avatar_url": {
-                                                        "S": "https://avatars.githubusercontent.com/u/2117911?v=4"
-                                                    },
-                                                    "events_url": {
-                                                        "S": "https://api.github.com/users/blacelle/events{/privacy}"
-                                                    },
-                                                    "html_url": {
-                                                        "S": "https://github.com/blacelle"
-                                                    },
-                                                    "site_admin": {
-                                                        "BOOL": false
-                                                    },
-                                                    "id": {
-                                                        "N": "2117911"
-                                                    },
-                                                    "gravatar_id": {
-                                                        "S": ""
-                                                    },
-                                                    "node_id": {
-                                                        "S": "MDQ6VXNlcjIxMTc5MTE="
-                                                    },
-                                                    "organizations_url": {
-                                                        "S": "https://api.github.com/users/blacelle/orgs"
-                                                    }
-                                                }
-                                            },
-                                            "organization": {
-                                                "M": {
-                                                    "issues_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/issues"
-                                                    },
-                                                    "repos_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/repos"
-                                                    },
-                                                    "avatar_url": {
-                                                        "S": "https://avatars.githubusercontent.com/u/34552197?v=4"
-                                                    },
-                                                    "events_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/events"
-                                                    },
-                                                    "members_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/members{/member}"
-                                                    },
-                                                    "description": {
-                                                        "S": ""
-                                                    },
-                                                    "id": {
-                                                        "N": "34552197"
-                                                    },
-                                                    "hooks_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/hooks"
-                                                    },
-                                                    "login": {
-                                                        "S": "solven-eu"
-                                                    },
-                                                    "url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu"
-                                                    },
-                                                    "node_id": {
-                                                        "S": "MDEyOk9yZ2FuaXphdGlvbjM0NTUyMTk3"
-                                                    },
-                                                    "public_members_url": {
-                                                        "S": "https://api.github.com/orgs/solven-eu/public_members{/member}"
-                                                    }
-                                                }
-                                            },
-                                            "installation": {
-                                                "M": {
-                                                    "id": {
-                                                        "N": "9086720"
-                                                    },
-                                                    "node_id": {
-                                                        "S": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uOTA4NjcyMA=="
-                                                    }
-                                                }
-                                            },
-                                            "commits": {
-                                                "L": [
-                                                    {
-                                                        "M": {
-                                                            "committer": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "GitHub"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "noreply@github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "web-flow"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "removed": {
-                                                                "L": []
-                                                            },
-                                                            "tree_id": {
-                                                                "S": "acf21d92f00b04b15f67ca12c51e8e2853a8384f"
-                                                            },
-                                                            "added": {
-                                                                "L": []
-                                                            },
-                                                            "author": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "renovate[bot]"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "29139614+renovate[bot]@users.noreply.github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "renovate[bot]"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "distinct": {
-                                                                "BOOL": false
-                                                            },
-                                                            "modified": {
-                                                                "L": [
-                                                                    {
-                                                                        "S": "exec/demo/demo-client-commons/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "exec/demo/demo-client-commons/package.json"
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "id": {
-                                                                "S": "d141dc6e806f150e6d6e284f17acf745893623a6"
-                                                            },
-                                                            "message": {
-                                                                "S": "Update dependency webpack to v5.47.1 (#9069)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
-                                                            },
-                                                            "url": {
-                                                                "S": "https://github.com/solven-eu/mitrust-datasharing/commit/d141dc6e806f150e6d6e284f17acf745893623a6"
-                                                            },
-                                                            "timestamp": {
-                                                                "S": "2021-07-31T10:45:14+02:00"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        "M": {
-                                                            "committer": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "GitHub"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "noreply@github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "web-flow"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "removed": {
-                                                                "L": []
-                                                            },
-                                                            "tree_id": {
-                                                                "S": "9c41456dcfeb9b98ef4e48e3bd650ce1e740fed1"
-                                                            },
-                                                            "added": {
-                                                                "L": []
-                                                            },
-                                                            "author": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "renovate[bot]"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "29139614+renovate[bot]@users.noreply.github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "renovate[bot]"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "distinct": {
-                                                                "BOOL": false
-                                                            },
-                                                            "modified": {
-                                                                "L": [
-                                                                    {
-                                                                        "S": "exec/sp-asaservice/web/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "exec/sp-asaservice/web/package.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "satellites/gui-back/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "satellites/gui-back/package.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "ui/web/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "ui/web/package.json"
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "id": {
-                                                                "S": "48b7d4b7addd6cddcae4cdfe3215c8b3df326199"
-                                                            },
-                                                            "message": {
-                                                                "S": "Update dependency eslint-plugin-vue to v7.15.0 (#9068)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
-                                                            },
-                                                            "url": {
-                                                                "S": "https://github.com/solven-eu/mitrust-datasharing/commit/48b7d4b7addd6cddcae4cdfe3215c8b3df326199"
-                                                            },
-                                                            "timestamp": {
-                                                                "S": "2021-07-31T10:45:20+02:00"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        "M": {
-                                                            "committer": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "GitHub"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "noreply@github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "web-flow"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "removed": {
-                                                                "L": []
-                                                            },
-                                                            "tree_id": {
-                                                                "S": "bc95186b90e3e4f1a61a5c772066d4e52d1d4f85"
-                                                            },
-                                                            "added": {
-                                                                "L": []
-                                                            },
-                                                            "author": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "renovate[bot]"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "29139614+renovate[bot]@users.noreply.github.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "renovate[bot]"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "distinct": {
-                                                                "BOOL": false
-                                                            },
-                                                            "modified": {
-                                                                "L": [
-                                                                    {
-                                                                        "S": "pom.xml"
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "id": {
-                                                                "S": "a43994ab00c4509d6964dcea3ff598e9423f5065"
-                                                            },
-                                                            "message": {
-                                                                "S": "Update pmd.version to v6.37.0 (#9073)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
-                                                            },
-                                                            "url": {
-                                                                "S": "https://github.com/solven-eu/mitrust-datasharing/commit/a43994ab00c4509d6964dcea3ff598e9423f5065"
-                                                            },
-                                                            "timestamp": {
-                                                                "S": "2021-07-31T20:52:49+02:00"
-                                                            }
-                                                        }
-                                                    },
-                                                    {
-                                                        "M": {
-                                                            "committer": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "Benoit Lacelle"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "benoit.lacelle@gmail.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "blacelle"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "removed": {
-                                                                "L": []
-                                                            },
-                                                            "tree_id": {
-                                                                "S": "deb3327edbf042cd978a05b2f378eea9c43299f1"
-                                                            },
-                                                            "added": {
-                                                                "L": []
-                                                            },
-                                                            "author": {
-                                                                "M": {
-                                                                    "name": {
-                                                                        "S": "Benoit Lacelle"
-                                                                    },
-                                                                    "email": {
-                                                                        "S": "benoit.lacelle@gmail.com"
-                                                                    },
-                                                                    "username": {
-                                                                        "S": "blacelle"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "distinct": {
-                                                                "BOOL": true
-                                                            },
-                                                            "modified": {
-                                                                "L": [
-                                                                    {
-                                                                        "S": "exec/demo/demo-client-commons/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "exec/demo/demo-client-commons/package.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "exec/sp-asaservice/web/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "exec/sp-asaservice/web/package.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "pom.xml"
-                                                                    },
-                                                                    {
-                                                                        "S": "satellites/gui-back/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "satellites/gui-back/package.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "ui/web/package-lock.json"
-                                                                    },
-                                                                    {
-                                                                        "S": "ui/web/package.json"
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "id": {
-                                                                "S": "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
-                                                            },
-                                                            "message": {
-                                                                "S": "Merge remote-tracking branch 'origin/master' into SPrint46_ImproveDocumentation"
-                                                            },
-                                                            "url": {
-                                                                "S": "https://github.com/solven-eu/mitrust-datasharing/commit/e9aec8114cf26d42156ddcbf8961c92b15c484c1"
-                                                            },
-                                                            "timestamp": {
-                                                                "S": "2021-07-31T23:13:58+02:00"
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            "after": {
-                                                "S": "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "SequenceNumber": "288196500000000050828511775",
-                "SizeBytes": 10424,
-                "StreamViewType": "NEW_AND_OLD_IMAGES"
-            },
-            "eventSourceARN": "arn:aws:dynamodb:us-east-1:144657973876:table/cleanthat_webhooks_github/stream/2021-07-30T10:41:23.715"
+  "Records" : [ {
+    "eventID" : "7ada7e33dc7d0cdc16ea5dea8accac98",
+    "eventName" : "INSERT",
+    "eventVersion" : "1.1",
+    "eventSource" : "aws:dynamodb",
+    "awsRegion" : "us-east-1",
+    "dynamodb" : {
+      "ApproximateCreationDateTime" : 1627803228,
+      "Keys" : {
+        "X-GitHub-Delivery" : {
+          "S" : "random-f9e9bec1-21aa-4c13-8853-67899fe68756"
         }
-    ]
+      },
+      "NewImage" : {
+        "X-GitHub-Delivery" : {
+          "S" : "random-f9e9bec1-21aa-4c13-8853-67899fe68756"
+        },
+        "headers" : {
+          "M" : { }
+        },
+        "datetime" : {
+          "S" : "2021-08-01T07:33:46.107415Z"
+        },
+        "body" : {
+          "M" : {
+            "github" : {
+              "M" : {
+                "headers" : {
+                  "M" : { }
+                },
+                "body" : {
+                  "M" : {
+                    "pusher" : {
+                      "M" : {
+                        "name" : {
+                          "S" : "blacelle"
+                        },
+                        "email" : {
+                          "S" : "benoit.lacelle@gmail.com"
+                        }
+                      }
+                    },
+                    "compare" : {
+                      "S" : "https://github.com/solven-eu/mitrust-datasharing/compare/c331af6c051b...e9aec8114cf2"
+                    },
+                    "head_commit" : {
+                      "M" : {
+                        "committer" : {
+                          "M" : {
+                            "name" : {
+                              "S" : "Benoit Lacelle"
+                            },
+                            "email" : {
+                              "S" : "benoit.lacelle@gmail.com"
+                            },
+                            "username" : {
+                              "S" : "blacelle"
+                            }
+                          }
+                        },
+                        "removed" : {
+                          "L" : [ ]
+                        },
+                        "tree_id" : {
+                          "S" : "deb3327edbf042cd978a05b2f378eea9c43299f1"
+                        },
+                        "added" : {
+                          "L" : [ ]
+                        },
+                        "author" : {
+                          "M" : {
+                            "name" : {
+                              "S" : "Benoit Lacelle"
+                            },
+                            "email" : {
+                              "S" : "benoit.lacelle@gmail.com"
+                            },
+                            "username" : {
+                              "S" : "blacelle"
+                            }
+                          }
+                        },
+                        "distinct" : {
+                          "BOOL" : true
+                        },
+                        "modified" : {
+                          "L" : [ {
+                            "S" : "exec/demo/demo-client-commons/package-lock.json"
+                          }, {
+                            "S" : "exec/demo/demo-client-commons/package.json"
+                          }, {
+                            "S" : "exec/sp-asaservice/web/package-lock.json"
+                          }, {
+                            "S" : "exec/sp-asaservice/web/package.json"
+                          }, {
+                            "S" : "pom.xml"
+                          }, {
+                            "S" : "satellites/gui-back/package-lock.json"
+                          }, {
+                            "S" : "satellites/gui-back/package.json"
+                          }, {
+                            "S" : "ui/web/package-lock.json"
+                          }, {
+                            "S" : "ui/web/package.json"
+                          } ]
+                        },
+                        "id" : {
+                          "S" : "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
+                        },
+                        "message" : {
+                          "S" : "Merge remote-tracking branch 'origin/master' into SPrint46_ImproveDocumentation"
+                        },
+                        "url" : {
+                          "S" : "https://github.com/solven-eu/mitrust-datasharing/commit/e9aec8114cf26d42156ddcbf8961c92b15c484c1"
+                        },
+                        "timestamp" : {
+                          "S" : "2021-07-31T23:13:58+02:00"
+                        }
+                      }
+                    },
+                    "before" : {
+                      "S" : "c331af6c051bc53306751e10b5ab90d272769dc6"
+                    },
+                    "created" : {
+                      "BOOL" : false
+                    },
+                    "forced" : {
+                      "BOOL" : false
+                    },
+                    "repository" : {
+                      "M" : {
+                        "stargazers_count" : {
+                          "N" : "4"
+                        },
+                        "pushed_at" : {
+                          "N" : "1627766045"
+                        },
+                        "subscription_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/subscription"
+                        },
+                        "language" : {
+                          "S" : "Java"
+                        },
+                        "branches_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/branches{/branch}"
+                        },
+                        "issue_comment_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues/comments{/number}"
+                        },
+                        "labels_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/labels{/name}"
+                        },
+                        "subscribers_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/subscribers"
+                        },
+                        "releases_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/releases{/id}"
+                        },
+                        "svn_url" : {
+                          "S" : "https://github.com/solven-eu/mitrust-datasharing"
+                        },
+                        "id" : {
+                          "N" : "130345492"
+                        },
+                        "master_branch" : {
+                          "S" : "master"
+                        },
+                        "forks" : {
+                          "N" : "0"
+                        },
+                        "archive_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/{archive_format}{/ref}"
+                        },
+                        "git_refs_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/refs{/sha}"
+                        },
+                        "forks_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/forks"
+                        },
+                        "statuses_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/statuses/{sha}"
+                        },
+                        "ssh_url" : {
+                          "S" : "git@github.com:solven-eu/mitrust-datasharing.git"
+                        },
+                        "license" : {
+                          "NULL" : true
+                        },
+                        "full_name" : {
+                          "S" : "solven-eu/mitrust-datasharing"
+                        },
+                        "size" : {
+                          "N" : "77978"
+                        },
+                        "languages_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/languages"
+                        },
+                        "html_url" : {
+                          "S" : "https://github.com/solven-eu/mitrust-datasharing"
+                        },
+                        "collaborators_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/collaborators{/collaborator}"
+                        },
+                        "clone_url" : {
+                          "S" : "https://github.com/solven-eu/mitrust-datasharing.git"
+                        },
+                        "name" : {
+                          "S" : "mitrust-datasharing"
+                        },
+                        "pulls_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/pulls{/number}"
+                        },
+                        "default_branch" : {
+                          "S" : "master"
+                        },
+                        "hooks_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/hooks"
+                        },
+                        "trees_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/trees{/sha}"
+                        },
+                        "tags_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/tags"
+                        },
+                        "private" : {
+                          "BOOL" : true
+                        },
+                        "contributors_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/contributors"
+                        },
+                        "has_downloads" : {
+                          "BOOL" : true
+                        },
+                        "notifications_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/notifications{?since,all,participating}"
+                        },
+                        "open_issues_count" : {
+                          "N" : "81"
+                        },
+                        "description" : {
+                          "NULL" : true
+                        },
+                        "created_at" : {
+                          "N" : "1524218929"
+                        },
+                        "watchers" : {
+                          "N" : "4"
+                        },
+                        "keys_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/keys{/key_id}"
+                        },
+                        "deployments_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/deployments"
+                        },
+                        "has_projects" : {
+                          "BOOL" : true
+                        },
+                        "archived" : {
+                          "BOOL" : false
+                        },
+                        "has_wiki" : {
+                          "BOOL" : true
+                        },
+                        "updated_at" : {
+                          "S" : "2021-07-31T18:52:53Z"
+                        },
+                        "comments_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/comments{/number}"
+                        },
+                        "stargazers_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/stargazers"
+                        },
+                        "disabled" : {
+                          "BOOL" : false
+                        },
+                        "git_url" : {
+                          "S" : "git://github.com/solven-eu/mitrust-datasharing.git"
+                        },
+                        "has_pages" : {
+                          "BOOL" : false
+                        },
+                        "owner" : {
+                          "M" : {
+                            "gists_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/gists{/gist_id}"
+                            },
+                            "repos_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/repos"
+                            },
+                            "following_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/following{/other_user}"
+                            },
+                            "starred_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/starred{/owner}{/repo}"
+                            },
+                            "login" : {
+                              "S" : "solven-eu"
+                            },
+                            "followers_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/followers"
+                            },
+                            "type" : {
+                              "S" : "Organization"
+                            },
+                            "url" : {
+                              "S" : "https://api.github.com/users/solven-eu"
+                            },
+                            "subscriptions_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/subscriptions"
+                            },
+                            "received_events_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/received_events"
+                            },
+                            "avatar_url" : {
+                              "S" : "https://avatars.githubusercontent.com/u/34552197?v=4"
+                            },
+                            "events_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/events{/privacy}"
+                            },
+                            "html_url" : {
+                              "S" : "https://github.com/solven-eu"
+                            },
+                            "name" : {
+                              "S" : "solven-eu"
+                            },
+                            "site_admin" : {
+                              "BOOL" : false
+                            },
+                            "id" : {
+                              "N" : "34552197"
+                            },
+                            "gravatar_id" : {
+                              "S" : ""
+                            },
+                            "email" : {
+                              "S" : "benoit.lacelle@solven.eu"
+                            },
+                            "node_id" : {
+                              "S" : "MDEyOk9yZ2FuaXphdGlvbjM0NTUyMTk3"
+                            },
+                            "organizations_url" : {
+                              "S" : "https://api.github.com/users/solven-eu/orgs"
+                            }
+                          }
+                        },
+                        "commits_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/commits{/sha}"
+                        },
+                        "compare_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/compare/{base}...{head}"
+                        },
+                        "git_commits_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/commits{/sha}"
+                        },
+                        "blobs_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/blobs{/sha}"
+                        },
+                        "git_tags_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/git/tags{/sha}"
+                        },
+                        "merges_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/merges"
+                        },
+                        "downloads_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/downloads"
+                        },
+                        "has_issues" : {
+                          "BOOL" : true
+                        },
+                        "url" : {
+                          "S" : "https://github.com/solven-eu/mitrust-datasharing"
+                        },
+                        "contents_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/contents/{+path}"
+                        },
+                        "mirror_url" : {
+                          "NULL" : true
+                        },
+                        "milestones_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/milestones{/number}"
+                        },
+                        "teams_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/teams"
+                        },
+                        "fork" : {
+                          "BOOL" : false
+                        },
+                        "issues_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues{/number}"
+                        },
+                        "stargazers" : {
+                          "N" : "4"
+                        },
+                        "events_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/events"
+                        },
+                        "issue_events_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/issues/events{/number}"
+                        },
+                        "organization" : {
+                          "S" : "solven-eu"
+                        },
+                        "assignees_url" : {
+                          "S" : "https://api.github.com/repos/solven-eu/mitrust-datasharing/assignees{/user}"
+                        },
+                        "open_issues" : {
+                          "N" : "81"
+                        },
+                        "watchers_count" : {
+                          "N" : "4"
+                        },
+                        "node_id" : {
+                          "S" : "MDEwOlJlcG9zaXRvcnkxMzAzNDU0OTI="
+                        },
+                        "homepage" : {
+                          "NULL" : true
+                        },
+                        "forks_count" : {
+                          "N" : "0"
+                        }
+                      }
+                    },
+                    "base_ref" : {
+                      "NULL" : true
+                    },
+                    "ref" : {
+                      "S" : "refs/heads/SPrint46_ImproveDocumentation"
+                    },
+                    "deleted" : {
+                      "BOOL" : false
+                    },
+                    "sender" : {
+                      "M" : {
+                        "gists_url" : {
+                          "S" : "https://api.github.com/users/blacelle/gists{/gist_id}"
+                        },
+                        "repos_url" : {
+                          "S" : "https://api.github.com/users/blacelle/repos"
+                        },
+                        "following_url" : {
+                          "S" : "https://api.github.com/users/blacelle/following{/other_user}"
+                        },
+                        "starred_url" : {
+                          "S" : "https://api.github.com/users/blacelle/starred{/owner}{/repo}"
+                        },
+                        "login" : {
+                          "S" : "blacelle"
+                        },
+                        "followers_url" : {
+                          "S" : "https://api.github.com/users/blacelle/followers"
+                        },
+                        "type" : {
+                          "S" : "User"
+                        },
+                        "url" : {
+                          "S" : "https://api.github.com/users/blacelle"
+                        },
+                        "subscriptions_url" : {
+                          "S" : "https://api.github.com/users/blacelle/subscriptions"
+                        },
+                        "received_events_url" : {
+                          "S" : "https://api.github.com/users/blacelle/received_events"
+                        },
+                        "avatar_url" : {
+                          "S" : "https://avatars.githubusercontent.com/u/2117911?v=4"
+                        },
+                        "events_url" : {
+                          "S" : "https://api.github.com/users/blacelle/events{/privacy}"
+                        },
+                        "html_url" : {
+                          "S" : "https://github.com/blacelle"
+                        },
+                        "site_admin" : {
+                          "BOOL" : false
+                        },
+                        "id" : {
+                          "N" : "2117911"
+                        },
+                        "gravatar_id" : {
+                          "S" : ""
+                        },
+                        "node_id" : {
+                          "S" : "MDQ6VXNlcjIxMTc5MTE="
+                        },
+                        "organizations_url" : {
+                          "S" : "https://api.github.com/users/blacelle/orgs"
+                        }
+                      }
+                    },
+                    "organization" : {
+                      "M" : {
+                        "issues_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/issues"
+                        },
+                        "repos_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/repos"
+                        },
+                        "avatar_url" : {
+                          "S" : "https://avatars.githubusercontent.com/u/34552197?v=4"
+                        },
+                        "events_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/events"
+                        },
+                        "members_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/members{/member}"
+                        },
+                        "description" : {
+                          "S" : ""
+                        },
+                        "id" : {
+                          "N" : "34552197"
+                        },
+                        "hooks_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/hooks"
+                        },
+                        "login" : {
+                          "S" : "solven-eu"
+                        },
+                        "url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu"
+                        },
+                        "node_id" : {
+                          "S" : "MDEyOk9yZ2FuaXphdGlvbjM0NTUyMTk3"
+                        },
+                        "public_members_url" : {
+                          "S" : "https://api.github.com/orgs/solven-eu/public_members{/member}"
+                        }
+                      }
+                    },
+                    "installation" : {
+                      "M" : {
+                        "id" : {
+                          "N" : "9086720"
+                        },
+                        "node_id" : {
+                          "S" : "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uOTA4NjcyMA=="
+                        }
+                      }
+                    },
+                    "commits" : {
+                      "L" : [ {
+                        "M" : {
+                          "committer" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "GitHub"
+                              },
+                              "email" : {
+                                "S" : "noreply@github.com"
+                              },
+                              "username" : {
+                                "S" : "web-flow"
+                              }
+                            }
+                          },
+                          "removed" : {
+                            "L" : [ ]
+                          },
+                          "tree_id" : {
+                            "S" : "acf21d92f00b04b15f67ca12c51e8e2853a8384f"
+                          },
+                          "added" : {
+                            "L" : [ ]
+                          },
+                          "author" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "renovate[bot]"
+                              },
+                              "email" : {
+                                "S" : "29139614+renovate[bot]@users.noreply.github.com"
+                              },
+                              "username" : {
+                                "S" : "renovate[bot]"
+                              }
+                            }
+                          },
+                          "distinct" : {
+                            "BOOL" : false
+                          },
+                          "modified" : {
+                            "L" : [ {
+                              "S" : "exec/demo/demo-client-commons/package-lock.json"
+                            }, {
+                              "S" : "exec/demo/demo-client-commons/package.json"
+                            } ]
+                          },
+                          "id" : {
+                            "S" : "d141dc6e806f150e6d6e284f17acf745893623a6"
+                          },
+                          "message" : {
+                            "S" : "Update dependency webpack to v5.47.1 (#9069)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
+                          },
+                          "url" : {
+                            "S" : "https://github.com/solven-eu/mitrust-datasharing/commit/d141dc6e806f150e6d6e284f17acf745893623a6"
+                          },
+                          "timestamp" : {
+                            "S" : "2021-07-31T10:45:14+02:00"
+                          }
+                        }
+                      }, {
+                        "M" : {
+                          "committer" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "GitHub"
+                              },
+                              "email" : {
+                                "S" : "noreply@github.com"
+                              },
+                              "username" : {
+                                "S" : "web-flow"
+                              }
+                            }
+                          },
+                          "removed" : {
+                            "L" : [ ]
+                          },
+                          "tree_id" : {
+                            "S" : "9c41456dcfeb9b98ef4e48e3bd650ce1e740fed1"
+                          },
+                          "added" : {
+                            "L" : [ ]
+                          },
+                          "author" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "renovate[bot]"
+                              },
+                              "email" : {
+                                "S" : "29139614+renovate[bot]@users.noreply.github.com"
+                              },
+                              "username" : {
+                                "S" : "renovate[bot]"
+                              }
+                            }
+                          },
+                          "distinct" : {
+                            "BOOL" : false
+                          },
+                          "modified" : {
+                            "L" : [ {
+                              "S" : "exec/sp-asaservice/web/package-lock.json"
+                            }, {
+                              "S" : "exec/sp-asaservice/web/package.json"
+                            }, {
+                              "S" : "satellites/gui-back/package-lock.json"
+                            }, {
+                              "S" : "satellites/gui-back/package.json"
+                            }, {
+                              "S" : "ui/web/package-lock.json"
+                            }, {
+                              "S" : "ui/web/package.json"
+                            } ]
+                          },
+                          "id" : {
+                            "S" : "48b7d4b7addd6cddcae4cdfe3215c8b3df326199"
+                          },
+                          "message" : {
+                            "S" : "Update dependency eslint-plugin-vue to v7.15.0 (#9068)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
+                          },
+                          "url" : {
+                            "S" : "https://github.com/solven-eu/mitrust-datasharing/commit/48b7d4b7addd6cddcae4cdfe3215c8b3df326199"
+                          },
+                          "timestamp" : {
+                            "S" : "2021-07-31T10:45:20+02:00"
+                          }
+                        }
+                      }, {
+                        "M" : {
+                          "committer" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "GitHub"
+                              },
+                              "email" : {
+                                "S" : "noreply@github.com"
+                              },
+                              "username" : {
+                                "S" : "web-flow"
+                              }
+                            }
+                          },
+                          "removed" : {
+                            "L" : [ ]
+                          },
+                          "tree_id" : {
+                            "S" : "bc95186b90e3e4f1a61a5c772066d4e52d1d4f85"
+                          },
+                          "added" : {
+                            "L" : [ ]
+                          },
+                          "author" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "renovate[bot]"
+                              },
+                              "email" : {
+                                "S" : "29139614+renovate[bot]@users.noreply.github.com"
+                              },
+                              "username" : {
+                                "S" : "renovate[bot]"
+                              }
+                            }
+                          },
+                          "distinct" : {
+                            "BOOL" : false
+                          },
+                          "modified" : {
+                            "L" : [ {
+                              "S" : "pom.xml"
+                            } ]
+                          },
+                          "id" : {
+                            "S" : "a43994ab00c4509d6964dcea3ff598e9423f5065"
+                          },
+                          "message" : {
+                            "S" : "Update pmd.version to v6.37.0 (#9073)\n\nCo-authored-by: Renovate Bot <bot@renovateapp.com>"
+                          },
+                          "url" : {
+                            "S" : "https://github.com/solven-eu/mitrust-datasharing/commit/a43994ab00c4509d6964dcea3ff598e9423f5065"
+                          },
+                          "timestamp" : {
+                            "S" : "2021-07-31T20:52:49+02:00"
+                          }
+                        }
+                      }, {
+                        "M" : {
+                          "committer" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "Benoit Lacelle"
+                              },
+                              "email" : {
+                                "S" : "benoit.lacelle@gmail.com"
+                              },
+                              "username" : {
+                                "S" : "blacelle"
+                              }
+                            }
+                          },
+                          "removed" : {
+                            "L" : [ ]
+                          },
+                          "tree_id" : {
+                            "S" : "deb3327edbf042cd978a05b2f378eea9c43299f1"
+                          },
+                          "added" : {
+                            "L" : [ ]
+                          },
+                          "author" : {
+                            "M" : {
+                              "name" : {
+                                "S" : "Benoit Lacelle"
+                              },
+                              "email" : {
+                                "S" : "benoit.lacelle@gmail.com"
+                              },
+                              "username" : {
+                                "S" : "blacelle"
+                              }
+                            }
+                          },
+                          "distinct" : {
+                            "BOOL" : true
+                          },
+                          "modified" : {
+                            "L" : [ {
+                              "S" : "exec/demo/demo-client-commons/package-lock.json"
+                            }, {
+                              "S" : "exec/demo/demo-client-commons/package.json"
+                            }, {
+                              "S" : "exec/sp-asaservice/web/package-lock.json"
+                            }, {
+                              "S" : "exec/sp-asaservice/web/package.json"
+                            }, {
+                              "S" : "pom.xml"
+                            }, {
+                              "S" : "satellites/gui-back/package-lock.json"
+                            }, {
+                              "S" : "satellites/gui-back/package.json"
+                            }, {
+                              "S" : "ui/web/package-lock.json"
+                            }, {
+                              "S" : "ui/web/package.json"
+                            } ]
+                          },
+                          "id" : {
+                            "S" : "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
+                          },
+                          "message" : {
+                            "S" : "Merge remote-tracking branch 'origin/master' into SPrint46_ImproveDocumentation"
+                          },
+                          "url" : {
+                            "S" : "https://github.com/solven-eu/mitrust-datasharing/commit/e9aec8114cf26d42156ddcbf8961c92b15c484c1"
+                          },
+                          "timestamp" : {
+                            "S" : "2021-07-31T23:13:58+02:00"
+                          }
+                        }
+                      } ]
+                    },
+                    "after" : {
+                      "S" : "e9aec8114cf26d42156ddcbf8961c92b15c484c1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "SequenceNumber" : "288196500000000050828511775",
+      "SizeBytes" : 10424,
+      "StreamViewType" : "NEW_AND_OLD_IMAGES"
+    },
+    "eventSourceARN" : "arn:aws:dynamodb:us-east-1:144657973876:table/cleanthat_webhooks_github/stream/2021-07-30T10:41:23.715"
+  } ]
 }

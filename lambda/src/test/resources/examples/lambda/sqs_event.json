@@ -1,28 +1,26 @@
 {
-    "Records": [
-        {
-            "messageId": "335764e2-2604-45e1-9d88-58280daa7c85",
-            "receiptHandle": "AQEBGNx5EJ+tuXXNS1d6goshoQvpItjYU6s5ybJDCB9CPvt6xNFUjgg5xdQE+aqJhQl2F7JUyWnf7vTDf/y0O/sSSrp1UMfz2JHPJ0JfgQILLS2XG+Or1tKRqEUMvVfGlM+gNY/W5KBKZJEPW0GLRYEBuRU+1KIts4PtUBZv9zgIi1Krk1uZuOl0uIV1pIsfBFTnw87SENnHcZ/GaTdaqkKjcQNIkMCZiwve+FMSsCX2J8M2a2WwpmwbxMj+PrIHgbAkU2vYN3WBwv8I/UYmj2pCQreX9uiRTF70JujZK03Fng+69o/955UVEctJU4b71wH6L0kVveaGepjbOAlpL0HkJ0pAAxJL+rYQIL4NqxBd4Ru/ZVm9gGYmX87xGYqEDvin",
-            "body": "{\"action\":\"completed\"}",
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "SentTimestamp": "1627803026672",
-                "SenderId": "AROASDLSJQJ2GFKJY2LSU:1627803026633067705",
-                "ApproximateFirstReceiveTimestamp": "1627803026673"
-            },
-            "messageAttributes": {
-                "CUSTOM-ATTRIBUTE-NAME": {
-                    "stringValue": "Hardcoded",
-                    "stringListValues": [],
-                    "binaryListValues": [],
-                    "dataType": "String"
-                }
-            },
-            "md5OfMessageAttributes": "432a9bf0e8673f3fc313669bbac86af5",
-            "md5OfBody": "c1f956e2eb5a5b1db6d84641d403eead",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:us-east-1:144657973876:FromGithub",
-            "awsRegion": "us-east-1"
-        }
-    ]
+  "Records" : [ {
+    "messageId" : "335764e2-2604-45e1-9d88-58280daa7c85",
+    "receiptHandle" : "AQEBGNx5EJ+tuXXNS1d6goshoQvpItjYU6s5ybJDCB9CPvt6xNFUjgg5xdQE+aqJhQl2F7JUyWnf7vTDf/y0O/sSSrp1UMfz2JHPJ0JfgQILLS2XG+Or1tKRqEUMvVfGlM+gNY/W5KBKZJEPW0GLRYEBuRU+1KIts4PtUBZv9zgIi1Krk1uZuOl0uIV1pIsfBFTnw87SENnHcZ/GaTdaqkKjcQNIkMCZiwve+FMSsCX2J8M2a2WwpmwbxMj+PrIHgbAkU2vYN3WBwv8I/UYmj2pCQreX9uiRTF70JujZK03Fng+69o/955UVEctJU4b71wH6L0kVveaGepjbOAlpL0HkJ0pAAxJL+rYQIL4NqxBd4Ru/ZVm9gGYmX87xGYqEDvin",
+    "body" : "{\"action\":\"completed\"}",
+    "attributes" : {
+      "ApproximateReceiveCount" : "1",
+      "SentTimestamp" : "1627803026672",
+      "SenderId" : "AROASDLSJQJ2GFKJY2LSU:1627803026633067705",
+      "ApproximateFirstReceiveTimestamp" : "1627803026673"
+    },
+    "messageAttributes" : {
+      "CUSTOM-ATTRIBUTE-NAME" : {
+        "stringValue" : "Hardcoded",
+        "stringListValues" : [ ],
+        "binaryListValues" : [ ],
+        "dataType" : "String"
+      }
+    },
+    "md5OfMessageAttributes" : "432a9bf0e8673f3fc313669bbac86af5",
+    "md5OfBody" : "c1f956e2eb5a5b1db6d84641d403eead",
+    "eventSource" : "aws:sqs",
+    "eventSourceARN" : "arn:aws:sqs:us-east-1:144657973876:FromGithub",
+    "awsRegion" : "us-east-1"
+  } ]
 }

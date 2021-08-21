@@ -1,4 +1,4 @@
-package io.cormoran.cleanthat.rules;
+package io.cormoran.cleanthat.rules.java;
 
 import java.io.IOException;
 import java.nio.file.Path;

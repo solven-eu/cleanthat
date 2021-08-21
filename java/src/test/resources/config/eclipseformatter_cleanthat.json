@@ -1,31 +1,21 @@
 {
-    "syntax_version": "2021-08-02",
-    "meta": {
-        "labels": [
-            "cleanthat"
-        ]
-    },
-    "source_code": {
-        "includes": [
-            "regex:.*\\.java"
-        ],
-        "excludes": [
-            "regex:.*/generated/.*"
-        ],
-        "encoding": "UTF-8"
-    },
-    "languages": [
-        {
-            "language": "java",
-            "language_version": "11",
-            "processors": [
-                {
-                    "engine": "eclipse_formatter",
-                    "parameters": {
-                        "url": "classpath:config/eclipse_java_code_formatter.xml"
-                    }
-                }
-            ]
-        }
-    ]
+  "syntax_version" : "2021-08-02",
+  "meta" : {
+    "labels" : [ "cleanthat" ]
+  },
+  "source_code" : {
+    "includes" : [ "regex:.*\\.java" ],
+    "excludes" : [ "regex:.*/generated/.*" ],
+    "encoding" : "UTF-8"
+  },
+  "languages" : [ {
+    "language" : "java",
+    "language_version" : "11",
+    "processors" : [ {
+      "engine" : "eclipse_formatter",
+      "parameters" : {
+        "url" : "classpath:config/eclipse_java_code_formatter.xml"
+      }
+    } ]
+  } ]
 }

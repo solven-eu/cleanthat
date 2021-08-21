@@ -97,6 +97,8 @@ public class CleanThatCleanThatMojo extends ACleanThatMojo {
 	public void doClean(ApplicationContext appContext) {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
 		if (isRunOnlyAtRoot() && !getProject().isExecutionRoot()) {
+			// This will check it is called only if the command is run from the project root.
+			// However, it will not prevent the plugin to be called on each module
 			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
 			return;
 		}

@@ -319,8 +319,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 		Set<String> relevantBaseBranches = new TreeSet<>();
-		if (offlineResult.isPushBranch()) // && !offlineResult.refHasOpenReviewRequest()
-		{
+		if (offlineResult.isPushBranch()) {
 			// This is assumed to be empty as we should not list for RR, before current step
 			assert optOpenPr.isEmpty();
 			// TODO Is this a valid behavior at all?
@@ -427,19 +426,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
-			if (eventRepo.getId() != prHeadRepository.getId()) {
+			if (Long.compare(eventRepo.getId(), prHeadRepository.getId()) == 0) {
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
 								+ headRepoFullname));
 			}
-			// If some codeProvider does not provide a clear ref in the case of a RR, this would be the place to get it.
-			// However, this is not the case for GitHub. Else, it seems to early to switch pushedRefOrRrHead as an
-			// Optional
-			// String fullRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + prHead.getRef();
-			// theRef = new GitRepoBranchSha1(headRepoFullname, fullRef, prHead.getSha());
-		} else {
-			// No PR: we are guaranteed to have a ref
-			// theRef = pushedRefOrRrHead;
 		}
 		String refToClean = pushedRefOrRrHead.getRef();
 		try {

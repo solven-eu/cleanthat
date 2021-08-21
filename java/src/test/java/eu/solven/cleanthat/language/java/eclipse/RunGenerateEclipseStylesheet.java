@@ -61,7 +61,8 @@ public class RunGenerateEclipseStylesheet {
 		GenerateEclipseStylesheet stylesheetGenerator = new GenerateEclipseStylesheet();
 		// Path writtenPath = stylesheetGenerator.writeInTmp();
 		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/cleanthat");
-		Pattern fileMatcher = Pattern.compile(".*\\.java");
+		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
+		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
 		Map<Path, String> pathToFile = loadConcernedFiles(rootForFiles, fileMatcher);
 		{
 			ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultOption(pathToFile);
@@ -74,6 +75,9 @@ public class RunGenerateEclipseStylesheet {
 					"org.eclipse.jdt.core.formatter.lineSplit")) {
 				bestOption = optimizeOption(pathToFile, bestOption, option);
 			}
+
+			logDiffWithPepper(pathToFile, bestOption);
+
 			Set<String> parametersToSwitch = new TreeSet<>(bestOption.getOption().keySet());
 			// This is a greedy algorithm, trying to find the Set of options minimizing the diff with existing files
 			boolean hasMutated = false;
@@ -94,7 +98,29 @@ public class RunGenerateEclipseStylesheet {
 					LOGGER.info(
 							"The configuration has muted: we will go again through all options to look for a better set of options");
 				}
-			} while (hasMutated);
+			} while (hasMutated && bestOption.getScore() > 0);
+
+			if (bestOption.getScore() > 0) {
+				LOGGER.info("We did not succeed crafting a configuration matching perfectly existing code");
+
+				EclipseJavaFormatterConfiguration config =
+						new EclipseJavaFormatterConfiguration(bestOption.getOption());
+				EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
+
+				pathToFile.entrySet().stream().filter(entry -> {
+					long tweakedDiffScoreDiff;
+					try {
+						tweakedDiffScoreDiff = computeDiffScore(formatter, entry.getValue());
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+
+					return tweakedDiffScoreDiff > 0;
+				}).forEach(entry -> {
+					LOGGER.info("Path to be adjusted with 'optimized' configuration: {}", entry.getKey());
+				});
+			}
+
 			logDiffWithPepper(pathToFile, bestOption);
 			stylesheetGenerator.writeConfigurationToTmpPath(bestOption.getOption());
 		}
@@ -223,6 +249,10 @@ public class RunGenerateEclipseStylesheet {
 			if (path.toFile().isFile() && fileMatcher.matcher(path.toString()).matches()) {
 				try {
 					String pathAsString = Files.readString(path);
+
+					if (pathAsString.contains("package net.revelc.code.impsort.ex;")) {
+						System.out.println();
+					}
 					pathToFile.put(path, pathAsString);
 				} catch (IOException e) {
 					LOGGER.warn("Issue loading " + path, e);

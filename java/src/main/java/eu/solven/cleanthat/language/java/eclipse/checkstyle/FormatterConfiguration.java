@@ -25,23 +25,22 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class containing all configurations for a eclipse-formatter-profile.
  * 
  * @author Lukas Frena
  */
 public class FormatterConfiguration {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterConfiguration.class);
+
 	/** Map containing all eclipse editor-settings. */
 	private final Map<String, String> mCleanupSettings = new HashMap<>();
 
 	/** Map containing all eclipse formatter-settings. */
 	private final Map<String, String> mFormatterSettings = new HashMap<>();
-
-	/**
-	 * Creates new instance of class FormatterConfiguration.
-	 */
-	public FormatterConfiguration() {
-	}
 
 	/**
 	 * Method for adding a new global setting.
@@ -99,11 +98,9 @@ public class FormatterConfiguration {
 		String local;
 		while (localIt.hasNext()) {
 			local = localIt.next();
-			if (mFormatterSettings.containsKey(local)) {
-				if (!mFormatterSettings.get(local).equals(localSettings.get(local))) {
-					// Logger.writeln("already containing local rule " + local
-					// + " with other attributes, it gets overwritten!");
-				}
+			if (mFormatterSettings.containsKey(local)
+					&& !mFormatterSettings.get(local).equals(localSettings.get(local))) {
+				LOGGER.debug("already containing local rule {} with other attributes, it gets overwritten!", local);
 			}
 			addFormatterSetting(local, localSettings.get(local));
 		}
@@ -115,11 +112,9 @@ public class FormatterConfiguration {
 		String global;
 		while (globalIt.hasNext()) {
 			global = globalIt.next();
-			if (mCleanupSettings.containsKey(global)) {
-				if (!getCleanupSettings().get(global).equals(globalSettings.get(global))) {
-					// Logger.writeln("already containing global rule " + global
-					// + " with other attributes, it gets overwritten!");
-				}
+			if (mCleanupSettings.containsKey(global)
+					&& !getCleanupSettings().get(global).equals(globalSettings.get(global))) {
+				LOGGER.debug("already containing global rule {} with other attributes, it gets overwritten!", global);
 			}
 			addCleanupSetting(global, settings.getCleanupSettings().get(global));
 		}

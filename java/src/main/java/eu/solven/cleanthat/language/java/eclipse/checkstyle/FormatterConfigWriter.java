@@ -20,6 +20,7 @@
 
 package eu.solven.cleanthat.language.java.eclipse.checkstyle;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class FormatterConfigWriter {
 	/** A eclipse-configuration. */
 	private final FormatterConfiguration mConfiguration;
 
-	private IProject mProject;
+	private final IProject mProject;
 
 	/**
 	 * Constructor to create a new instance of class FormatterConfigWriter.
@@ -82,12 +83,11 @@ public class FormatterConfigWriter {
 	 */
 	private void writeCleanupSettings(final Map<String, String> settings) {
 		final IFile settingsFile = mProject.getFile(mProject.getName() + "-cs-cleanup.xml");
-		try {
-			final InputStream stream =
-					XmlProfileWriter.writeCleanupProfileToStream(CS_GENERATED + mProject.getName(), settings);
+		try (InputStream stream =
+				XmlProfileWriter.writeCleanupProfileToStream(CS_GENERATED + mProject.getName(), settings)) {
 			createOrUpdateFile(settingsFile, stream);
-		} catch (CoreException | TransformerException | ParserConfigurationException exc) {
-			LOGGER.warn("Error saving cleanup profile", exc);
+		} catch (CoreException | TransformerException | ParserConfigurationException | IOException e) {
+			LOGGER.warn("Error saving cleanup profile", e);
 		}
 	}
 
@@ -99,12 +99,11 @@ public class FormatterConfigWriter {
 	 */
 	private void writeFormatterSettings(final Map<String, String> settings) {
 		final IFile settingsFile = mProject.getFile(mProject.getName() + "-cs-formatter.xml");
-		try {
-			final InputStream stream =
-					XmlProfileWriter.writeFormatterProfileToStream(CS_GENERATED + mProject.getName(), settings);
+		try (InputStream stream =
+				XmlProfileWriter.writeFormatterProfileToStream(CS_GENERATED + mProject.getName(), settings)) {
 			createOrUpdateFile(settingsFile, stream);
-		} catch (CoreException | TransformerException | ParserConfigurationException exc) {
-			LOGGER.warn("Error saving formatter profile", exc);
+		} catch (CoreException | TransformerException | ParserConfigurationException | IOException e) {
+			LOGGER.warn("Error saving formatter profile", e);
 		}
 	}
 

@@ -138,7 +138,7 @@ public class ATestCases {
 
 	public Path getProjectTestSourceCode() throws IOException {
 		Path srcMainResource = new ClassPathResource("empty").getFile().getParentFile().toPath();
-		Assert.assertEquals("classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
+		Assert.assertEquals("test-classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
 		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
 		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();

@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.do_not_format_me.CleanClass;
+import eu.solven.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
-import io.cleanthat.do_not_format_me.CleanClass;
-import io.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
 
 public class TestJavaFormatter_Eclipse {
 

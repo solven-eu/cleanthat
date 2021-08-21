@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Benoit Lacelle
  */
-public abstract class ASourceCodeFormatterFactory implements ISourceCodeFormatterFactory {
+public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerFactory {
 	final ObjectMapper objectMapper;
 
 	public ASourceCodeFormatterFactory(ObjectMapper objectMapper) {

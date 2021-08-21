@@ -9,13 +9,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.scala.scalafix.ScalafixFormatter;
 import eu.solven.cleanthat.language.scala.scalafix.ScalafixProperties;
-import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtFormatter;
 import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtProperties;
+import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtStyleEnforcer;
 
 /**
  * Formatter for Scala
@@ -36,22 +36,20 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor,
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
-		if (parameters == null) {
-			// Some engine takes no parameter
-			parameters = Map.of();
-		}
+		// Some engine takes no parameter
+		Map<String, ?> parameters =
+				PepperMapHelper.<Map<String, ?>>getOptionalAs(rawProcessor, "parameters").orElse(Map.of());
 		LOGGER.info("Processing: {}", engine);
 
-		ISourceCodeFormatter processor;
+		ILintFixer processor;
 		switch (engine) {
 		case "scalafmt":
 			ScalafmtProperties scalafmtConfig = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
-			processor = new ScalafmtFormatter(languageProperties.getSourceCode(), scalafmtConfig);
+			processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), scalafmtConfig);
 
 			break;
 		case "scalafix":

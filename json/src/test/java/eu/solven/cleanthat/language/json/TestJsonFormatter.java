@@ -5,14 +5,14 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatter;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
 
 public class TestJsonFormatter {
-	final ISourceCodeFormatter formatter =
+	final ILintFixer formatter =
 			new JacksonJsonFormatter(new SourceCodeProperties(), new JacksonJsonFormatterProperties());
 
 	@Test

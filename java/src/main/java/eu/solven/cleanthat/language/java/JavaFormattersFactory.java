@@ -13,7 +13,7 @@ import com.google.common.cache.CacheBuilder;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
@@ -23,8 +23,8 @@ import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfigurati
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterProcessorProperties;
 import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleaner;
 import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
-import eu.solven.cleanthat.language.java.spring.SpringJavaFormatter;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
+import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
 
 /**
  * Formatter for Java
@@ -57,10 +57,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor,
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
-		ISourceCodeFormatter processor;
+		ILintFixer processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
 		// override with explicit configuration
 		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
@@ -101,7 +101,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
 					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
-			processor = new SpringJavaFormatter(languageProperties.getSourceCode(), processorConfig);
+			processor = new SpringJavaStyleEnforcer(languageProperties.getSourceCode(), processorConfig);
 		}
 			break;
 		case "rules": {

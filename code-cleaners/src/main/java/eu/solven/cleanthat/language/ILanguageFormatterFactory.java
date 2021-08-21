@@ -7,5 +7,5 @@ package eu.solven.cleanthat.language;
  *
  */
 public interface ILanguageFormatterFactory {
-	ISourceCodeFormatterFactory makeLanguageFormatter(ILanguageProperties languageProperties);
+	ILanguageLintFixerFactory makeLanguageFormatter(ILanguageProperties languageProperties);
 }

@@ -51,7 +51,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	}
 
 	protected String applyProcessor(ILanguageProperties languageProperties,
-			ISourceCodeFormatter formatter,
+			ILintFixer formatter,
 			String filepath,
 			String code) throws IOException {
 		Objects.requireNonNull(code, "code should not be null");

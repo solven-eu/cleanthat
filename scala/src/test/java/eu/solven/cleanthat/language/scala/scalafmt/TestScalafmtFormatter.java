@@ -19,7 +19,7 @@ public class TestScalafmtFormatter {
 	public void testScala() throws IOException {
 		ISourceCodeProperties sourceCodeProperties = new SourceCodeProperties();
 		ScalafmtProperties scalaFmtProperties = new ScalafmtProperties();
-		final ScalafmtFormatter formatter = new ScalafmtFormatter(sourceCodeProperties, scalaFmtProperties);
+		final ScalafmtStyleEnforcer formatter = new ScalafmtStyleEnforcer(sourceCodeProperties, scalaFmtProperties);
 		String scalaCode =
 				new String(ByteStreams.toByteArray(new ClassPathResource("/scala/Hello.scala").getInputStream()),
 						StandardCharsets.UTF_8);

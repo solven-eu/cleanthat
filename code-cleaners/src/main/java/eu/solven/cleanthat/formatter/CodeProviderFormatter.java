@@ -34,8 +34,8 @@ import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageFormatterFactory;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
@@ -296,7 +296,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	private String doFormat(ILanguageProperties properties, ICodeProvider codeProvider, String filepath, String code)
 			throws IOException {
-		ISourceCodeFormatterFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
+		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
 		LanguagePropertiesAndBuildProcessors compiledProcessors =
 				new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers))

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatter;
@@ -34,7 +34,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public ISourceCodeFormatter makeFormatter(Map<String, ?> rawProcessor,
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
@@ -45,7 +45,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 		LOGGER.info("Processing: {}", engine);
 
-		ISourceCodeFormatter processor;
+		ILintFixer processor;
 		switch (engine) {
 		case "jackson":
 			JacksonJsonFormatterProperties processorConfig =

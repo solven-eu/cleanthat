@@ -24,7 +24,7 @@ import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.ILanguageFormatterFactory;
-import eu.solven.cleanthat.language.ISourceCodeFormatterFactory;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.StringFormatterFactory;
 
 /**
@@ -63,8 +63,8 @@ public class GithubSpringConfig {
 	}
 
 	@Bean
-	public ILanguageFormatterFactory stringFormatterFactory(List<ISourceCodeFormatterFactory> stringFormatters) {
-		Map<String, ISourceCodeFormatterFactory> asMap = new LinkedHashMap<>();
+	public ILanguageFormatterFactory stringFormatterFactory(List<ILanguageLintFixerFactory> stringFormatters) {
+		Map<String, ILanguageLintFixerFactory> asMap = new LinkedHashMap<>();
 
 		stringFormatters.forEach(sf -> {
 			String language = sf.getLanguage();

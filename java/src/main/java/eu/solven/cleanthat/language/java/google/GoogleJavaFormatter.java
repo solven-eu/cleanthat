@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 
@@ -30,7 +30,7 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  *
  * @author Benoit Lacelle
  */
-public class GoogleJavaFormatter implements ISourceCodeFormatter {
+public class GoogleJavaFormatter implements IStyleEnforcer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoogleJavaFormatter.class);
 
 	final ISourceCodeProperties sourceCodeProperties;

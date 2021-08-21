@@ -15,7 +15,7 @@ package eu.solven.cleanthat.language.java.google.intellij;
 
 import java.io.IOException;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 
@@ -24,7 +24,7 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  *
  * @author Benoit Lacelle
  */
-public class IntelliJJavaFormatter implements ISourceCodeFormatter {
+public class IntelliJJavaFormatter implements ILintFixer {
 	final ISourceCodeProperties sourceCodeProperties;
 	final IntellijJavaFormatterProperties processorConfig;
 

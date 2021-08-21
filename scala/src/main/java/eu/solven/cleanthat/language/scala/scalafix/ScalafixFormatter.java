@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import scalafix.interfaces.Scalafix;
@@ -27,7 +27,7 @@ import scalafix.interfaces.ScalafixException;
  *
  * @author Benoit Lacelle
  */
-public class ScalafixFormatter implements ISourceCodeFormatter {
+public class ScalafixFormatter implements ILintFixer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScalafixFormatter.class);
 
 	final ISourceCodeProperties sourceCodeProperties;

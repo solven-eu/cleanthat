@@ -26,7 +26,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
@@ -38,7 +38,7 @@ import eu.solven.cleanthat.formatter.LineEnding;
 // Example configurations:
 // https://raw.githubusercontent.com/spring-io/spring-javaformat/master/.eclipse/eclipse-code-formatter.xml
 // https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
-public class EclipseJavaFormatter implements ISourceCodeFormatter {
+public class EclipseJavaFormatter implements IStyleEnforcer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
 	private final Map<String, String> defaultOptions;

@@ -22,7 +22,7 @@ import java.nio.file.StandardOpenOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.solven.cleanthat.formatter.ISourceCodeFormatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import net.revelc.code.impsort.Grouper;
@@ -35,7 +35,7 @@ import net.revelc.code.impsort.Result;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRevelcImportsCleaner implements ISourceCodeFormatter {
+public class JavaRevelcImportsCleaner implements ILintFixer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRevelcImportsCleaner.class);
 

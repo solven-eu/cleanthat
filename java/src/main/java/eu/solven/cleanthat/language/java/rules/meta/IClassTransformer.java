@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 
 import com.github.javaparser.ast.Node;
 
+import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+
 /**
  * For classes knowing how to modify code
  *
@@ -40,7 +42,14 @@ public interface IClassTransformer {
 		return Optional.empty();
 	}
 
-	String minimalJavaVersion();
+	/**
+	 * 
+	 * @return the minimal JDK for which this rule is applicable. For instance, any rule related with diamond operator
+	 *         requires JDK1.5
+	 */
+	default String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_1;
+	}
 
 	default boolean isProductionReady() {
 		return true;

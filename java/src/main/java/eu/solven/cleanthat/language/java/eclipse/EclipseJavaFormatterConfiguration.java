@@ -49,11 +49,11 @@ public class EclipseJavaFormatterConfiguration {
 
 	private static final String KEY_URL = "url";
 
-	private final Map<String, String> options;
+	private final Map<String, String> settings;
 
-	public EclipseJavaFormatterConfiguration(Map<String, String> options) {
+	public EclipseJavaFormatterConfiguration(Map<String, String> settings) {
 		// Sorted for human-friendliness
-		this.options = ImmutableMap.copyOf(new TreeMap<>(options));
+		this.settings = ImmutableMap.copyOf(new TreeMap<>(settings));
 	}
 
 	public static EclipseJavaFormatterConfiguration load(ICodeProvider codeProvider,
@@ -71,12 +71,12 @@ public class EclipseJavaFormatterConfiguration {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
 			// }
 			// String jdkVersion = optJdkVersion.orElse();
-			Map<String, String> options = new LinkedHashMap<>();
-			options.put(JavaCore.COMPILER_SOURCE, jdkVersion);
-			options.put(JavaCore.COMPILER_COMPLIANCE, jdkVersion);
-			options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, jdkVersion);
+			Map<String, String> settings = new LinkedHashMap<>();
+			settings.put(JavaCore.COMPILER_SOURCE, jdkVersion);
+			settings.put(JavaCore.COMPILER_COMPLIANCE, jdkVersion);
+			settings.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, jdkVersion);
 
-			return new EclipseJavaFormatterConfiguration(options);
+			return new EclipseJavaFormatterConfiguration(settings);
 		} else {
 			LOGGER.info("Loading Eclipse java formatting configuration from {}", javaConfigFile);
 
@@ -93,8 +93,8 @@ public class EclipseJavaFormatterConfiguration {
 	public static EclipseJavaFormatterConfiguration loadResource(Resource resource) {
 		try (InputStream is = resource.getInputStream()) {
 			try {
-				Map<String, String> options = new ConfigReader().read(is);
-				return new EclipseJavaFormatterConfiguration(options);
+				Map<String, String> settings = new ConfigReader().read(is);
+				return new EclipseJavaFormatterConfiguration(settings);
 			} catch (SAXException | ConfigReadException e) {
 				throw new RuntimeException("Issue parsing config", e);
 			}

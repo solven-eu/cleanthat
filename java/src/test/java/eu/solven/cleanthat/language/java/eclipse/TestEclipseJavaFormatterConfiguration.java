@@ -24,7 +24,7 @@ public class TestEclipseJavaFormatterConfiguration {
 		EclipseJavaFormatterConfiguration config =
 				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
 
-		Assertions.assertThat(config.getOptions())
+		Assertions.assertThat(config.getSettings())
 				.hasSize(3)
 				.containsEntry(JavaCore.COMPILER_SOURCE, "0")
 				.containsEntry(JavaCore.COMPILER_COMPLIANCE, "0")
@@ -45,7 +45,7 @@ public class TestEclipseJavaFormatterConfiguration {
 		EclipseJavaFormatterConfiguration config =
 				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
 
-		Assertions.assertThat(config.getOptions())
+		Assertions.assertThat(config.getSettings())
 				.hasSize(308)
 				// .containsEntry(JavaCore.COMPILER_SOURCE, IJdkVersionConstants.JDK_8)
 				// .containsEntry(JavaCore.COMPILER_COMPLIANCE, IJdkVersionConstants.JDK_8)

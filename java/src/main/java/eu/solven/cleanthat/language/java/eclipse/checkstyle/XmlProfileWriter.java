@@ -121,7 +121,7 @@ public final class XmlProfileWriter {
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		final StringWriter writer = new StringWriter();
 		transformer.transform(new DOMSource(document), new StreamResult(writer));
-		return new ByteArrayInputStream(writer.toString().getBytes());
+		return new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
 	}
 
 }

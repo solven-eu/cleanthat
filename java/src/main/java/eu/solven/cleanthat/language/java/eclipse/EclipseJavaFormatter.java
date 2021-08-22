@@ -41,10 +41,10 @@ import eu.solven.cleanthat.formatter.LineEnding;
 public class EclipseJavaFormatter implements IStyleEnforcer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
-	private final Map<String, String> defaultOptions;
+	private final Map<String, String> defaultSettings;
 
 	public EclipseJavaFormatter(EclipseJavaFormatterConfiguration configuration) {
-		defaultOptions = configuration.getOptions();
+		defaultSettings = configuration.getSettings();
 	}
 
 	@Override
@@ -80,6 +80,6 @@ public class EclipseJavaFormatter implements IStyleEnforcer {
 	}
 
 	private CodeFormatter makeFormatter() {
-		return ToolFactory.createCodeFormatter(defaultOptions, ToolFactory.M_FORMAT_EXISTING);
+		return ToolFactory.createCodeFormatter(defaultSettings, ToolFactory.M_FORMAT_EXISTING);
 	}
 }

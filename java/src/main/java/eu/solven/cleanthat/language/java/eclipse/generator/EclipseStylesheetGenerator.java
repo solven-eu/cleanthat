@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.eclipse;
+package eu.solven.cleanthat.language.java.eclipse.generator;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,7 +6,6 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -22,9 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jdt.internal.formatter.DefaultCodeFormatterOptions;
@@ -37,117 +33,108 @@ import com.github.difflib.algorithm.myers.MyersDiff;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
+import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
 
 /**
- * Execute the procedure to generate a minifying Eclipse Formatter configuration
- *
+ * This helps generating a proper Eclipse Stylesheet, based on the existing codebase: it will generate a stylesheet
+ * minimizing impacts over the codebase (supposing the codebase is well formatted)
+ * 
  * @author Benoit Lacelle
+ *
  */
-public class RunGenerateEclipseStylesheet {
+// Convert from Checkstyle
+// https://github.com/checkstyle/eclipse-cs/blob/master/net.sf.eclipsecs.core/src/net/sf/eclipsecs/core/jobs/TransformCheckstyleRulesJob.java
+public class EclipseStylesheetGenerator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseStylesheetGenerator.class);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEclipseStylesheet.class);
-
-	protected RunGenerateEclipseStylesheet() {
-		// hidden
+	// This is useful to start optimizing these parameters, before optimizing other parameters which behavior
+	// depends on these first parameters
+	protected List<String> getMainSettings() {
+		return Arrays.asList("org.eclipse.jdt.core.formatter.tabulation.char",
+				"org.eclipse.jdt.core.formatter.tabulation.size",
+				"org.eclipse.jdt.core.formatter.tabulation.char",
+				"org.eclipse.jdt.core.formatter.comment.line_length",
+				"org.eclipse.jdt.core.formatter.lineSplit");
 	}
 
-	public static void main(String[] args)
-			throws TransformerException, ParserConfigurationException, IOException, PatchFailedException {
-		GenerateEclipseStylesheet stylesheetGenerator = new GenerateEclipseStylesheet();
-		// Path writtenPath = stylesheetGenerator.writeInTmp();
-		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/cleanthat");
-		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
-		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
-		Map<Path, String> pathToFile = loadConcernedFiles(rootForFiles, fileMatcher);
-		{
-			ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultOption(pathToFile);
-			ScoredOption<Map<String, String>> bestOption = bestDefaultConfig;
-			// Start optimizing some crucial parameters
-			for (String option : Arrays.asList("org.eclipse.jdt.core.formatter.tabulation.char",
-					"org.eclipse.jdt.core.formatter.tabulation.size",
-					"org.eclipse.jdt.core.formatter.tabulation.char",
-					"org.eclipse.jdt.core.formatter.comment.line_length",
-					"org.eclipse.jdt.core.formatter.lineSplit")) {
-				bestOption = optimizeOption(pathToFile, bestOption, option);
-			}
+	/**
+	 * This method is useful to generate automatically an Eclipse configuration which match an existing code-base. It is
+	 * especially useful for people NOT using Eclipse IDE.
+	 * 
+	 * @param pathToFile
+	 *            a {@link Map} of {@link Path} to the content of the {@link File}.
+	 * @return the Set of options which minimizes the modifications over input contents.
+	 */
+	public Map<String, String> generateSettings(Map<Path, String> pathToFile) {
+		ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultSetting(pathToFile);
+		ScoredOption<Map<String, String>> bestSettings = bestDefaultConfig;
 
-			logDiffWithPepper(pathToFile, bestOption);
-
-			Set<String> parametersToSwitch = new TreeSet<>(bestOption.getOption().keySet());
-			// This is a greedy algorithm, trying to find the Set of options minimizing the diff with existing files
-			boolean hasMutated = false;
-			do {
-				hasMutated = false;
-				for (String parameterToSwitch : parametersToSwitch) {
-					ScoredOption<Map<String, String>> newBestOption =
-							optimizeOption(pathToFile, bestOption, parameterToSwitch);
-					if (!bestOption.getOption().equals(newBestOption.getOption())) {
-						bestOption = newBestOption;
-						hasMutated = true;
-					}
-				}
-				if (hasMutated) {
-					// We go through another pass as it is possible a new tweak lead to other tweaks having different
-					// impacts
-					// e.g. changing the max length of rows leads many other rules to behave differently
-					LOGGER.info(
-							"The configuration has muted: we will go again through all options to look for a better set of options");
-				}
-			} while (hasMutated && bestOption.getScore() > 0);
-
-			if (bestOption.getScore() > 0) {
-				LOGGER.info("We did not succeed crafting a configuration matching perfectly existing code");
-
-				EclipseJavaFormatterConfiguration config =
-						new EclipseJavaFormatterConfiguration(bestOption.getOption());
-				EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
-
-				pathToFile.entrySet().stream().filter(entry -> {
-					long tweakedDiffScoreDiff;
-					try {
-						tweakedDiffScoreDiff = computeDiffScore(formatter, entry.getValue());
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
-					}
-
-					return tweakedDiffScoreDiff > 0;
-				}).forEach(entry -> {
-					LOGGER.info("Path to be adjusted with 'optimized' configuration: {}", entry.getKey());
-				});
-			}
-
-			logDiffWithPepper(pathToFile, bestOption);
-			stylesheetGenerator.writeConfigurationToTmpPath(bestOption.getOption());
+		// Start optimizing some crucial parameters
+		for (String option : getMainSettings()) {
+			bestSettings = pickOptimalOption(pathToFile.values(), bestSettings, option);
 		}
+
+		Set<String> settingsToSwitch = new TreeSet<>(bestSettings.getOption().keySet());
+		// This is a greedy algorithm, trying to find the Set of options minimizing the diff with existing files
+		boolean hasMutated = false;
+		do {
+			hasMutated = false;
+			for (String settingToSwitch : settingsToSwitch) {
+				ScoredOption<Map<String, String>> newBestSettings =
+						pickOptimalOption(pathToFile.values(), bestSettings, settingToSwitch);
+				if (!bestSettings.getOption().equals(newBestSettings.getOption())) {
+					bestSettings = newBestSettings;
+					hasMutated = true;
+				}
+			}
+			if (hasMutated) {
+				// We go through another pass as it is possible a new tweak lead to other tweaks having different
+				// impacts
+				// e.g. changing the max length of rows leads many other rules to behave differently
+				LOGGER.info(
+						"The configuration has muted: we will go again through all options to look for a better set of settings");
+			}
+		} while (hasMutated && bestSettings.getScore() > 0);
+
+		logPathsImpactedByConfiguration(pathToFile, bestSettings);
+
+		// logDiffWithPepper(pathToFile, bestOption);
+		return bestSettings.getOption();
 	}
 
-	public static void logDiffWithPepper(Map<Path, String> pathToFile, ScoredOption<Map<String, String>> bestOption) {
-		Map<String, String> pepperConvention;
-		{
-			pepperConvention = EclipseJavaFormatterConfiguration
-					.loadResource(new ClassPathResource("/eclipse/pepper-eclipse-code-formatter.xml"))
-					.getOptions();
+	protected void logPathsImpactedByConfiguration(Map<Path, String> pathToFile,
+			ScoredOption<Map<String, String>> bestOption) {
+		if (bestOption.getScore() > 0) {
+			LOGGER.info("We did not succeed crafting a configuration matching perfectly existing code");
+
+			EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(bestOption.getOption());
+			EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
+
+			pathToFile.entrySet().stream().filter(entry -> {
+				long tweakedDiffScoreDiff;
+				try {
+					tweakedDiffScoreDiff = computeDiffScore(formatter, entry.getValue());
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+
+				return tweakedDiffScoreDiff > 0;
+			}).forEach(entry -> {
+				LOGGER.info("Path needing formatting with 'optimal' configuration: {}", entry.getKey());
+			});
 		}
-		MapDifference<String, String> diff = Maps.difference(pepperConvention, bestOption.getOption());
-		diff.entriesDiffering().forEach((k, v) -> {
-			LOGGER.info("{} -> {}", k, v);
-		});
-		EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(pepperConvention);
-		EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
-		long pepperDiffScoreDiff = computeDiffScore(formatter, pathToFile.values());
-		LOGGER.info("Pepper diff: {}", pepperDiffScoreDiff);
 	}
 
 	/**
 	 * @param pathToFile
 	 * @return the best configuration amongst a small set of standard configurations
 	 */
-	public static ScoredOption<Map<String, String>> findBestDefaultOption(Map<Path, String> pathToFile) {
+	public ScoredOption<Map<String, String>> findBestDefaultSetting(Map<Path, String> pathToFile) {
 		Map<String, String> eclipseDefault;
 		{
 			DefaultCodeFormatterOptions defaultSettings = DefaultCodeFormatterOptions.getDefaultSettings();
@@ -167,13 +154,13 @@ public class RunGenerateEclipseStylesheet {
 		{
 			googleConvention = EclipseJavaFormatterConfiguration
 					.loadResource(new ClassPathResource("/eclipse/eclipse-java-google-style.xml"))
-					.getOptions();
+					.getSettings();
 		}
 		Map<String, String> springConvention;
 		{
 			springConvention = EclipseJavaFormatterConfiguration
 					.loadResource(new ClassPathResource("/eclipse/spring-eclipse-code-formatter.xml"))
-					.getOptions();
+					.getSettings();
 		}
 		ScoredOption<Map<String, String>> bestDefaultConfig = Stream
 				.of(eclipseDefault, eclipseEclipseDefault, eclipseJavaConventions, googleConvention, springConvention)
@@ -194,7 +181,7 @@ public class RunGenerateEclipseStylesheet {
 		return bestDefaultConfig;
 	}
 
-	public static void logBestDefaultConfig(Map<String, String> eclipseDefault,
+	public void logBestDefaultConfig(Map<String, String> eclipseDefault,
 			Map<String, String> eclipseEclipseDefault,
 			Map<String, String> eclipseJavaConventions,
 			Map<String, String> googleConvention,
@@ -218,7 +205,7 @@ public class RunGenerateEclipseStylesheet {
 		LOGGER.info("Best default configuration: {}", bestOptionName);
 	}
 
-	public static ScoredOption<Map<String, String>> optimizeOption(Map<Path, String> pathToFile,
+	public ScoredOption<Map<String, String>> pickOptimalOption(Collection<String> contents,
 			ScoredOption<Map<String, String>> bestOption,
 			String parameterToSwitch) {
 		Set<String> possibleOptions = possibleOptions(parameterToSwitch);
@@ -232,7 +219,7 @@ public class RunGenerateEclipseStylesheet {
 			}
 			EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(tweakedConfiguration);
 			EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
-			long tweakedDiffScoreDiff = computeDiffScore(formatter, pathToFile.values());
+			long tweakedDiffScoreDiff = computeDiffScore(formatter, contents);
 			return Optional.of(new ScoredOption<Map<String, String>>(tweakedConfiguration, tweakedDiffScoreDiff));
 		}).flatMap(Optional::stream).min(Comparator.comparingLong(ScoredOption::getScore));
 		if (optMin.isPresent() && optMin.get().getScore() < bestOption.getScore()) {
@@ -242,18 +229,15 @@ public class RunGenerateEclipseStylesheet {
 		return bestOption;
 	}
 
-	public static Map<Path, String> loadConcernedFiles(Path rootForFiles, Pattern fileMatcher) throws IOException {
+	public Map<Path, String> loadFilesContent(Path rootForFiles, Pattern fileMatcher) throws IOException {
 		LOGGER.info("Loading files content");
 		Map<Path, String> pathToFile = new ConcurrentHashMap<>();
 		Files.walk(rootForFiles).forEach(path -> {
 			if (path.toFile().isFile() && fileMatcher.matcher(path.toString()).matches()) {
 				try {
-					String pathAsString = Files.readString(path);
+					String content = Files.readString(path);
 
-					if (pathAsString.contains("package net.revelc.code.impsort.ex;")) {
-						System.out.println();
-					}
-					pathToFile.put(path, pathAsString);
+					pathToFile.put(path, content);
 				} catch (IOException e) {
 					LOGGER.warn("Issue loading " + path, e);
 				}
@@ -265,8 +249,13 @@ public class RunGenerateEclipseStylesheet {
 		return pathToFile;
 	}
 
+	/**
+	 * 
+	 * @param parameterToSwitch
+	 * @return the different values to consider for given Eclipse {@link IStyleEnforcer} option
+	 */
 	// see DefaultCodeFormatterOptions
-	private static Set<String> possibleOptions(String parameterToSwitch) {
+	private Set<String> possibleOptions(String parameterToSwitch) {
 		if ("org.eclipse.jdt.core.formatter.enabling_tag".equals(parameterToSwitch)
 				|| "org.eclipse.jdt.core.formatter.disabling_tag".equals(parameterToSwitch)) {
 			// This parameters are left to their default value
@@ -399,24 +388,15 @@ public class RunGenerateEclipseStylesheet {
 					}
 				}
 			}
+
+			// If this happens, it may be due to an update of Eclipse engine
 			LOGGER.warn("Parameter not managed: {}", parameterToSwitch);
 			return Set.of();
 		}
 	}
 
-	@Deprecated
-	public static long computeDiffScore(EclipseJavaFormatter formatter) throws IOException, PatchFailedException {
-		File file = new File("src/main/java/" + GenerateEclipseStylesheet.class.getName().replace(".", "/") + ".java");
-		LOGGER.debug("Process: {}", file);
-		if (!file.isFile()) {
-			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
-		}
-		String pathAsString = Files.readString(file.toPath());
-		return computeDiffScore(formatter, pathAsString);
-	}
-
-	private static long computeDiffScore(EclipseJavaFormatter formatter, Collection<String> values) {
-		return values.parallelStream().mapToLong(content -> {
+	protected long computeDiffScore(EclipseJavaFormatter formatter, Collection<String> contents) {
+		return contents.parallelStream().mapToLong(content -> {
 			try {
 				return computeDiffScore(formatter, content);
 			} catch (IOException e) {
@@ -425,8 +405,16 @@ public class RunGenerateEclipseStylesheet {
 		}).sum();
 	}
 
-	public static long computeDiffScore(EclipseJavaFormatter formatter, String pathAsString) throws IOException {
-		String formatted = formatter.doFormat(pathAsString, LineEnding.KEEP);
+	/**
+	 * 
+	 * @param stylEnforcer
+	 * @param pathAsString
+	 * @return a score indicating how much this formatter impacts given content. If 0, the formatter has no impacts. A
+	 *         higher score means a bigger difference
+	 * @throws IOException
+	 */
+	protected long computeDiffScore(IStyleEnforcer stylEnforcer, String pathAsString) throws IOException {
+		String formatted = stylEnforcer.doFormat(pathAsString, LineEnding.KEEP);
 		List<String> originalRows = Arrays.asList(pathAsString.split("[\r\n]+"));
 		List<String> formattedRows = Arrays.asList(formatted.split("[\r\n]+"));
 		Patch<String> diff = DiffUtils.diff(originalRows, formattedRows, new MyersDiff<String>());

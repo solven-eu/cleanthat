@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.eclipse;
+package eu.solven.cleanthat.language.java.eclipse.generator;
 
 /**
  * Couple an option with its score

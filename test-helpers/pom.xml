@@ -28,7 +28,7 @@
 			<artifactId>diff-match-patch</artifactId>
 			<version>1.2</version>
 		</dependency>
-
+		
 		<!-- https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.4-Release-Notes#junit-5s-vintage-engine-removed-from-spring-boot-starter-test -->
 		<dependency>
 			<groupId>org.junit.vintage</groupId>

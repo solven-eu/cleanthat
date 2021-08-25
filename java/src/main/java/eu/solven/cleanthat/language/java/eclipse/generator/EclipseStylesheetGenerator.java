@@ -41,15 +41,14 @@ import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
 
 /**
- * This helps generating a proper Eclipse Stylesheet, based on the existing codebase: it will generate a stylesheet
- * minimizing impacts over the codebase (supposing the codebase is well formatted)
+ * Default implementation for {@link IEclipseStylesheetGenerator}
  * 
  * @author Benoit Lacelle
  *
  */
 // Convert from Checkstyle
 // https://github.com/checkstyle/eclipse-cs/blob/master/net.sf.eclipsecs.core/src/net/sf/eclipsecs/core/jobs/TransformCheckstyleRulesJob.java
-public class EclipseStylesheetGenerator {
+public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseStylesheetGenerator.class);
 
 	// This is useful to start optimizing these parameters, before optimizing other parameters which behavior
@@ -70,6 +69,7 @@ public class EclipseStylesheetGenerator {
 	 *            a {@link Map} of {@link Path} to the content of the {@link File}.
 	 * @return the Set of options which minimizes the modifications over input contents.
 	 */
+	@Override
 	public Map<String, String> generateSettings(Map<Path, String> pathToFile) {
 		ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultSetting(pathToFile);
 		ScoredOption<Map<String, String>> bestSettings = bestDefaultConfig;
@@ -80,8 +80,11 @@ public class EclipseStylesheetGenerator {
 		}
 
 		Set<String> settingsToSwitch = new TreeSet<>(bestSettings.getOption().keySet());
+
 		// This is a greedy algorithm, trying to find the Set of options minimizing the diff with existing files
-		boolean hasMutated = false;
+		// We iterate targeting to reach a score of 0 (meaning we spot a configuration matching exactly current
+		// code-style)
+		boolean hasMutated;
 		do {
 			hasMutated = false;
 			for (String settingToSwitch : settingsToSwitch) {
@@ -134,7 +137,7 @@ public class EclipseStylesheetGenerator {
 	 * @param pathToFile
 	 * @return the best configuration amongst a small set of standard configurations
 	 */
-	public ScoredOption<Map<String, String>> findBestDefaultSetting(Map<Path, String> pathToFile) {
+	protected ScoredOption<Map<String, String>> findBestDefaultSetting(Map<Path, String> pathToFile) {
 		Map<String, String> eclipseDefault;
 		{
 			DefaultCodeFormatterOptions defaultSettings = DefaultCodeFormatterOptions.getDefaultSettings();
@@ -202,7 +205,7 @@ public class EclipseStylesheetGenerator {
 		} else {
 			bestOptionName = "???";
 		}
-		LOGGER.info("Best default configuration: {}", bestOptionName);
+		LOGGER.info("Best standard configuration: {}", bestOptionName);
 	}
 
 	public ScoredOption<Map<String, String>> pickOptimalOption(Collection<String> contents,
@@ -229,8 +232,9 @@ public class EclipseStylesheetGenerator {
 		return bestOption;
 	}
 
+	@Override
 	public Map<Path, String> loadFilesContent(Path rootForFiles, Pattern fileMatcher) throws IOException {
-		LOGGER.info("Loading files content");
+		LOGGER.debug("Loading files content from {}", rootForFiles);
 		Map<Path, String> pathToFile = new ConcurrentHashMap<>();
 		Files.walk(rootForFiles).forEach(path -> {
 			if (path.toFile().isFile() && fileMatcher.matcher(path.toString()).matches()) {
@@ -245,7 +249,7 @@ public class EclipseStylesheetGenerator {
 				LOGGER.debug("Rejected: {}", path);
 			}
 		});
-		LOGGER.info("Loaded files content");
+		LOGGER.debug("Loaded files content from {}", rootForFiles);
 		return pathToFile;
 	}
 
@@ -255,6 +259,7 @@ public class EclipseStylesheetGenerator {
 	 * @return the different values to consider for given Eclipse {@link IStyleEnforcer} option
 	 */
 	// see DefaultCodeFormatterOptions
+	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.ExcessiveMethodLength", "PMD.CognitiveComplexity" })
 	private Set<String> possibleOptions(String parameterToSwitch) {
 		if ("org.eclipse.jdt.core.formatter.enabling_tag".equals(parameterToSwitch)
 				|| "org.eclipse.jdt.core.formatter.disabling_tag".equals(parameterToSwitch)) {
@@ -360,17 +365,19 @@ public class EclipseStylesheetGenerator {
 				// 'org.eclipse.jdt.core.formatter.comment.align_tags_descriptions_grouped'
 				String parameterName =
 						parameterToSwitch.substring("org.eclipse.jdt.core.formatter.".length()).replace('.', '_');
+
+				String logPrefix = "Introspection strategy failed for ";
 				try {
 					Field field = DefaultCodeFormatterOptions.class.getField(parameterName);
 					if (field.getType() == boolean.class) {
 						return Set.of(DefaultCodeFormatterConstants.TRUE, DefaultCodeFormatterConstants.FALSE);
 					}
 				} catch (NoSuchFieldException | SecurityException e) {
-					LOGGER.debug("Introspection strategy failed for " + parameterToSwitch, e);
+					LOGGER.debug(logPrefix + parameterToSwitch, e);
 					if (parameterName.endsWith("_comments")) {
 						LOGGER.debug("Many fields ending with 'comments' are misspelled");
 					} else {
-						LOGGER.info("Introspection strategy failed for " + parameterToSwitch);
+						LOGGER.info(logPrefix + parameterToSwitch);
 					}
 				}
 				if (parameterName.endsWith("_comments")) {
@@ -383,8 +390,8 @@ public class EclipseStylesheetGenerator {
 							return Set.of(DefaultCodeFormatterConstants.TRUE, DefaultCodeFormatterConstants.FALSE);
 						}
 					} catch (NoSuchFieldException | SecurityException e) {
-						LOGGER.debug("Introspection strategy failed for " + parameterToSwitch, e);
-						LOGGER.info("Introspection strategy failed for " + parameterToSwitch);
+						LOGGER.debug(logPrefix + parameterToSwitch, e);
+						LOGGER.info(logPrefix + parameterToSwitch);
 					}
 				}
 			}

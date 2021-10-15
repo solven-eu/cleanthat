@@ -64,7 +64,8 @@ public class TestAGithubSha1CodeProvider {
 			// Create the zip file if it doesn't exist
 			env.put("create", "true");
 
-			URI uri = URI.create("jar:file:" + tmpZipFile.toAbsolutePath());
+			// The 'jar:' prefix is necessary to enable the use of FileSystems.newFileSystem over a .zip
+			URI uri = URI.create("jar:" + tmpZipFile.toUri());
 
 			try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
 				// Path externalTxtFile = Paths.get("/codeSamples/zipfs/SomeTextFile.txt");

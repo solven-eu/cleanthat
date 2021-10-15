@@ -70,8 +70,11 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				throw new IllegalStateException("Issue given root=" + root + " and path=" + f);
 			}
 
+			// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
 			Path relativized = root.relativize(f);
-			consumer.accept(new DummyCodeProviderFile("/" + relativized.toString(), f));
+			// We get '\' under Windows
+			String pathWithSlash = "/" + relativized.toString().replaceAll("\\\\", "/");
+			consumer.accept(new DummyCodeProviderFile(pathWithSlash, f));
 		});
 	}
 

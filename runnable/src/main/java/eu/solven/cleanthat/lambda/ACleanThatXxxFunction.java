@@ -24,7 +24,6 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 		try {
 			return unsafeProcessOneEvent(input);
 		} catch (RuntimeException e) {
-			// if (input instanceof GithubWebhookEvent) {
 			Map<String, ?> body = input.getBody();
 
 			try {
@@ -32,9 +31,6 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 			} catch (JsonProcessingException e1) {
 				LOGGER.warn("Issue printing as json. body: {}", body);
 			}
-			// } else {
-			// LOGGER.warn("Issue with {}", input.getClass());
-			// }
 
 			RuntimeException wrapped = new RuntimeException(e);
 			Sentry.captureException(wrapped, "Lambda");

@@ -125,7 +125,8 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 
 	@Override
 	public void registerCodeStyleFixer(IStyleEnforcer codeStyleFixer) {
-		LOGGER.info("We register {} into {}", codeStyleFixer, this);
+		// TODO This could be in INFO, but it is called once per file (unexpectedly)
+		LOGGER.debug("We register {} into {}", codeStyleFixer, this);
 		this.optCodeStyleFixer = Optional.of(codeStyleFixer);
 	}
 

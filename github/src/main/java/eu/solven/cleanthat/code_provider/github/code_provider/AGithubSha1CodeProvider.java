@@ -130,12 +130,17 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		try {
-			return Optional.of(loadContent(repo, path, getSha1()));
-		} catch (GHFileNotFoundException e) {
-			LOGGER.trace("We miss: {}", path, e);
-			LOGGER.debug("We miss: {}", path);
-			return Optional.empty();
+		if (helper.localClone.get() != null) {
+			// We have a local clone: load the file from it
+			return helper.localClone.get().loadContentForPath(path);
+		} else {
+			try {
+				return Optional.of(loadContent(repo, path, getSha1()));
+			} catch (GHFileNotFoundException e) {
+				LOGGER.trace("We miss: {}", path, e);
+				LOGGER.debug("We miss: {}", path);
+				return Optional.empty();
+			}
 		}
 	}
 

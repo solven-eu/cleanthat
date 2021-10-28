@@ -251,7 +251,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				Thread.currentThread().interrupt();
 				throw new RuntimeException(e);
 			} catch (ExecutionException e) {
-				throw new RuntimeException("Arg", e);
+				throw new RuntimeException("Issue while one of the asynchronous tasks", e);
 			}
 		}
 
@@ -286,7 +286,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		String code = optAlreadyMutated.orElseGet(() -> {
 			try {
 				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
-				return optContent.get();
+
+				return optContent
+						.orElseThrow(() -> new IllegalStateException("Issue fiding code for path=" + filePath));
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}

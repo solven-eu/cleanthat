@@ -32,6 +32,7 @@ import eu.solven.cleanthat.jgit.JGitCodeProvider;
 public class GithubSha1CodeProviderHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubSha1CodeProviderHelper.class);
 
+	// To be compared with the limit of 5000 calls per hour per installation
 	private static final int MAX_FILE_BEFORE_CLONING = 512;
 
 	private static final boolean ZIP_ELSE_CLONE = true;
@@ -58,6 +59,10 @@ public class GithubSha1CodeProviderHelper {
 		localClone.get().listFiles(consumer);
 	}
 
+	/**
+	 * 
+	 * @return true if we indeed clone locally. False if already cloned locally
+	 */
 	@SuppressWarnings("PMD.CloseResource")
 	protected boolean ensureLocalClone() {
 		// TODO Tests against multiple calls: the repo shall be cloned only once

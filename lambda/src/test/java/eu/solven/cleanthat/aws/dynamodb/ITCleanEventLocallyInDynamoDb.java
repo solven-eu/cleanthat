@@ -21,10 +21,10 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
-import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { CheckConfigWebhooksLambdaFunction.class })
+@ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
 public class ITCleanEventLocallyInDynamoDb {
 	GithubRefCleaner cleaner;
 
@@ -38,7 +38,9 @@ public class ITCleanEventLocallyInDynamoDb {
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
 		AmazonDynamoDB dynamoDbClient = SaveToDynamoDb.makeDynamoDbClient();
 
-		String key = "random-01be8d8f-fde0-4895-8689-70288ace3819";
+		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
+		// You can search logs for this key, in order to process given event locally
+		String key = "random-6787961d-e2b6-4ec2-8df5-7a3db5722b82";
 		GetItemResult item = dynamoDbClient.getItem(new GetItemRequest().withTableName("cleanthat_accepted_events")
 				.withKey(Map.of("X-GitHub-Delivery", new AttributeValue().withS(key))));
 

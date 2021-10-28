@@ -511,6 +511,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			LOGGER.debug("The changes would have been committed directly in the head branch");
 		}
+
+		// This is useful to investigate unexpected rateLimitHit
+		{
+			try {
+				GHRateLimit rateLimit = github.getRateLimit();
+				LOGGER.info("After process, rateLimit={} for installationId={}", rateLimit, installationId);
+			} catch (IOException e) {
+				LOGGER.warn("Issue with RateLimit", e);
+			}
+		}
 	}
 
 	public Supplier<GHRef> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,

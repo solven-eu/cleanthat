@@ -94,6 +94,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			} else {
 				// This would happen on Lambda direct invocation
 				// But we always try to rely on events(SQS, DynamoDB, ...)
+				// It may also happens in localhot invocation (e.g. ITCleanEventLocallyInDynamoDb)
 				try {
 					LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
 				} catch (JsonProcessingException ee) {
@@ -178,7 +179,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 		// SQS transfer the body 'as is'
 		try {
-			asMap = (Map<String, ?>) objectMapper.readValue(body, Map.class);
+			asMap = objectMapper.readValue(body, Map.class);
 		} catch (JsonProcessingException e) {
 			LOGGER.warn("Issue while parsing: {}", body);
 			LOGGER.warn("Issue while parsing body", e);

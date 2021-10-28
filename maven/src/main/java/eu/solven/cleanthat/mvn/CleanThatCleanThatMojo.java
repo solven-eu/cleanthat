@@ -3,23 +3,16 @@ package eu.solven.cleanthat.mvn;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +23,6 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
-import io.sentry.IHub;
 
 /**
  * The mojo doing actual cleaning
@@ -44,59 +36,22 @@ import io.sentry.IHub;
 		threadSafe = true,
 		// Used to enable symbolSolving based on project dependencies
 		requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class CleanThatCleanThatMojo extends ACleanThatMojo {
+public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
 
-	protected static final AtomicReference<CleanThatCleanThatMojo> CURRENT_MOJO = new AtomicReference<>();
-
-	/**
-	 * The SpringBoot application started within maven Mojo
-	 * 
-	 * @author Benoit Lacelle
-	 *
-	 */
-	@SpringBootApplication(scanBasePackages = "none")
-	@Import({ GithubSpringConfig.class, AllLanguagesSpringConfig.class, CodeProviderHelpers.class })
-	public static class MavenSpringConfig implements CommandLineRunner {
-
-		@Autowired
-		ApplicationContext appContext;
-
-		@Override
-		public void run(String... args) throws Exception {
-			LOGGER.info("Processing arguments: {}", Arrays.asList(args));
-
-			// Ensure events are sent to Sentry
-			IHub sentryHub = appContext.getBean(IHub.class);
-			sentryHub.captureMessage("Maven is OK");
-
-			CURRENT_MOJO.get().doClean(appContext);
-			sentryHub.flush(TimeUnit.SECONDS.toMillis(1));
-		}
-
-	}
-
-	// Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/pmd-mojo.html
 	@Override
-	public void execute() throws MojoExecutionException {
-		getLog().debug("Hello, world.");
+	protected List<Class<?>> springClasses() {
+		List<Class<?>> classes = new ArrayList<>();
 
-		if (CURRENT_MOJO.compareAndSet(null, this)) {
-			try {
-				SpringApplication.run(MavenSpringConfig.class);
-			} finally {
-				LOGGER.info("Closed applicationContext");
-				// Beware to clean so that it is OK in a multiModule reactor
-				CURRENT_MOJO.set(null);
-			}
-		} else {
-			throw new IllegalStateException("We have a leftover Mojo");
-		}
+		classes.add(GithubSpringConfig.class);
+		classes.add(AllLanguagesSpringConfig.class);
+		classes.add(CodeProviderHelpers.class);
+
+		return classes;
 	}
 
 	public void doClean(ApplicationContext appContext) {
-		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
-		if (isRunOnlyAtRoot() && !getProject().isExecutionRoot()) {
+		if (isRunOnlyAtRoot() && !isThisTheExecutionRoot()) {
 			// This will check it is called only if the command is run from the project root.
 			// However, it will not prevent the plugin to be called on each module
 			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");

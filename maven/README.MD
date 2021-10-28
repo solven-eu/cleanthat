@@ -10,6 +10,10 @@ If cleanthat dependencies are outdates:
 
     mvn install -PskipStyle -DskipITs -pl :cleanthat-maven-plugin -am -DskipTests
 
+# Default cleanthat configuration
+
+mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.1-SNAPSHOT:init
+
 # Eclipse Stylesheet Generation
 
-mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
+mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.1-SNAPSHOT:eclipse_formatter-stylesheet

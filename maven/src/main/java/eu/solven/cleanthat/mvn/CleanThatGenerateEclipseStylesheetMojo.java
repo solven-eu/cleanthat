@@ -14,8 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,19 +21,13 @@ import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Import;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
@@ -43,7 +35,6 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
 import eu.solven.cleanthat.language.java.eclipse.generator.EclipseStylesheetGenerator;
 import eu.solven.cleanthat.language.java.eclipse.generator.IEclipseStylesheetGenerator;
-import io.sentry.IHub;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.
@@ -57,16 +48,13 @@ import io.sentry.IHub;
 		threadSafe = true,
 		aggregator = true,
 		requiresProject = false)
-public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatMojo {
+public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
 
 	// ".*/src/[main|test]/java/.*/.*\\.java"
 	public static final String DEFAULT_JAVA_REGEX = ".*\\.java";
 
 	public static final String GOAL_ECLIPSE = "eclipse_formatter-stylesheet";
-
-	protected static final AtomicReference<CleanThatGenerateEclipseStylesheetMojo> CURRENT_MOJO =
-			new AtomicReference<>();
 
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
 	@Parameter(property = "eclipse_formatter.url",
@@ -86,51 +74,13 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatMojo {
 		this.javaRegex = javaRegex;
 	}
 
-	/**
-	 * The SpringBoot application started within maven Mojo
-	 * 
-	 * @author Benoit Lacelle
-	 *
-	 */
-	@SpringBootApplication(scanBasePackages = "none")
-	@Import({ EclipseStylesheetGenerator.class })
-	public static class MavenSpringConfig implements CommandLineRunner {
-
-		@Autowired
-		ApplicationContext appContext;
-
-		@Override
-		public void run(String... args) throws Exception {
-			LOGGER.info("Processing arguments: {}", Arrays.asList(args));
-
-			// Ensure events are sent to Sentry
-			IHub sentryHub = appContext.getBean(IHub.class);
-			sentryHub.captureMessage("Executing cleanthat:" + CleanThatGenerateEclipseStylesheetMojo.GOAL_ECLIPSE);
-
-			CURRENT_MOJO.get().doGenerate(appContext);
-			sentryHub.flush(TimeUnit.SECONDS.toMillis(1));
-		}
-	}
-
-	// Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/pmd-mojo.html
 	@Override
-	public void execute() throws MojoExecutionException {
-		getLog().debug("Hello, world.");
-
-		if (CURRENT_MOJO.compareAndSet(null, this)) {
-			try {
-				SpringApplication.run(new Class<?>[] { MavenSpringConfig.class }, new String[0]);
-			} finally {
-				LOGGER.info("Closed applicationContext");
-				// Beware to clean so that it is OK in a multiModule reactor
-				CURRENT_MOJO.set(null);
-			}
-		} else {
-			throw new IllegalStateException("We have a leftover Mojo");
-		}
+	protected List<? extends Class<?>> springClasses() {
+		return Arrays.asList(EclipseStylesheetGenerator.class);
 	}
 
-	public void doGenerate(ApplicationContext appContext) throws IOException {
+	@Override
+	public void doClean(ApplicationContext appContext) throws IOException {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
 		MavenProject mavenProject = getProject();
 		if (isRunOnlyAtRoot() && !mavenProject.isExecutionRoot()) {

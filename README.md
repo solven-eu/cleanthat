@@ -70,6 +70,10 @@ languages:
     parameters: {}
 ```
 
+This can be generated into an existing repository with:
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
+
 # Using Eclipse Formatter
 
 An alternative to spring_formatter is eclipse_formatter. It takes as parameter an url like:
@@ -89,6 +93,14 @@ Eclipse Stylesheets can exported to XML through:
 - Click on 'Export All'
 
 CleanThat will accept only configuration with a single profile in them. If multiple profiles are found, we will rely on the first profile.
+
+## Automatic generation of Eclipse Stylesheet
+
+The maven plugin enables generating an Eclipse Stylesheet minimizing changes over a clean repository:
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
+
+see maven/README.MD
 
 # Deploy into Production (AWS):
 

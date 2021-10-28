@@ -13,12 +13,16 @@
  */
 package eu.solven.cleanthat.formatter;
 
+import java.util.Optional;
+
 /**
  * @author marvin.froeder
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/LineEnding.java
 public enum LineEnding {
-
+	// https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+	AUTO(System.lineSeparator()),
+	//
 	KEEP(null), LF("\n"), CRLF("\r\n"), CR("\r"), UNKNOWN(null);
 
 	private final String chars;
@@ -35,7 +39,7 @@ public enum LineEnding {
 	 * Returns the most occurring line-ending characters in the file text or null if no line-ending occurs the most.
 	 */
 	@SuppressWarnings({ "PMD.AvoidReassigningLoopVariables", "PMD.CognitiveComplexity" })
-	public static LineEnding determineLineEnding(String fileDataString) {
+	public static Optional<LineEnding> determineLineEnding(String fileDataString) {
 		int lfCount = 0;
 		int crCount = 0;
 		int crlfCount = 0;
@@ -53,12 +57,12 @@ public enum LineEnding {
 			}
 		}
 		if (lfCount > crCount && lfCount > crlfCount) {
-			return LF;
+			return Optional.of(LF);
 		} else if (crlfCount > lfCount && crlfCount > crCount) {
-			return CRLF;
+			return Optional.of(CRLF);
 		} else if (crCount > lfCount && crCount > crlfCount) {
-			return CR;
+			return Optional.of(CR);
 		}
-		return UNKNOWN;
+		return Optional.empty();
 	}
 }

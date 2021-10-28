@@ -189,13 +189,14 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 			return dirtyCode;
 		}
 
-		LineEnding lineEnding = LineEnding.determineLineEnding(dirtyCode);
+		Optional<LineEnding> optLineEnding = LineEnding.determineLineEnding(dirtyCode);
 
-		if (lineEnding != LineEnding.CR && lineEnding != LineEnding.LF && lineEnding != LineEnding.CRLF) {
+		if (optLineEnding.isEmpty()) {
 			// Unable to guess the lineEnding: it may be a very small file
 			return cleanCode;
 		}
 
+		LineEnding lineEnding = optLineEnding.get();
 		if (optCodeStyleFixer.isPresent()) {
 			// We are provided a way to format the code early
 			cleanCode = optCodeStyleFixer.get().doFormat(cleanCode, lineEnding);

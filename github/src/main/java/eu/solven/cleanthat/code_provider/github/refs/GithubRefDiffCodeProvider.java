@@ -34,10 +34,9 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
  */
 public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 		implements IListOnlyModifiedFiles, ICodeProviderWriter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefDiffCodeProvider.class);
 
 	private static final int LIMIT_COMMIT_IN_COMPARE = 250;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefDiffCodeProvider.class);
 
 	final String token;
 	final GHRepository baseRepository;
@@ -82,11 +81,6 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 		});
 	}
 
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object file) {
-	// return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
-	// }
-
 	@Override
 	public String getHtmlUrl() {
 		return diffSupplier.get().getHtmlUrl().toExternalForm();
@@ -100,14 +94,7 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 	@Override
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
-			Collection<String> prLabels
-	// ,
-	// Optional<String> targetBranch
-	) {
-		// if (targetBranch.isPresent()) {
-		// throw new UnsupportedOperationException("TODO");
-		// }
-
+			Collection<String> prLabels) {
 		String refName = head.getRef();
 		GHRepository repo = baseRepository;
 

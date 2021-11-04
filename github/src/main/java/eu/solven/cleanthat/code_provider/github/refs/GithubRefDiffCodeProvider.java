@@ -130,4 +130,9 @@ public class GithubRefDiffCodeProvider extends AGithubCodeProvider
 		return baseRepository.getGitTransportUrl();
 	}
 
+	@Override
+	public void cleanTmpFiles() {
+		LOGGER.info("Nothing to delete for {}", this);
+	}
+
 }

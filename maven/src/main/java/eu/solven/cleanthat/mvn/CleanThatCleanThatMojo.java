@@ -50,6 +50,7 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 		return classes;
 	}
 
+	@Override
 	public void doClean(ApplicationContext appContext) {
 		if (isRunOnlyAtRoot() && !isThisTheExecutionRoot()) {
 			// This will check it is called only if the command is run from the project root.

@@ -149,4 +149,9 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
 		return repo.getGitTransportUrl();
 	}
 
+	@Override
+	public void cleanTmpFiles() {
+		helper.cleanTmpFiles();
+	}
+
 }

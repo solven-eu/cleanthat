@@ -69,15 +69,10 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 			throw new IllegalArgumentException("We expect to work on a clean repository");
 		}
 
-		// try {
-		// String fullBranchName = jgit.getRepository().getFullBranch();
 		String head = getHeadName(jgit.getRepository());
 		if (!commit.equals(head)) {
 			throw new IllegalArgumentException("Invalid current sh1: " + head + " (expected: " + commit + ")");
 		}
-		// } catch (IOException e) {
-		// throw new UncheckedIOException("Issue getting current branch name", e);
-		// }
 	}
 
 	@Override
@@ -274,6 +269,11 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		} catch (GitAPIException e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	@Override
+	public void cleanTmpFiles() {
+		LOGGER.info("Nothing to delete for {}", this);
 	}
 
 }

@@ -27,7 +27,6 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
  * @author Benoit Lacelle
  */
 public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOnlyModifiedFiles, ICodeProviderWriter {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
 	final String token;
@@ -101,5 +100,10 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	@Override
 	public String getRepoUri() {
 		return pr.getRepository().getGitTransportUrl();
+	}
+
+	@Override
+	public void cleanTmpFiles() {
+		LOGGER.info("Nothing to delete for {}", this);
 	}
 }

@@ -16,6 +16,7 @@ import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.FileSystemUtils;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
@@ -38,6 +39,7 @@ public class GithubSha1CodeProviderHelper {
 	private static final boolean ZIP_ELSE_CLONE = true;
 
 	final AtomicReference<ICodeProvider> localClone = new AtomicReference<>();
+	final AtomicReference<Path> localTmpFolder = new AtomicReference<>();
 
 	final IGithubSha1CodeProvider sha1CodeProvider;
 
@@ -79,6 +81,7 @@ public class GithubSha1CodeProviderHelper {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+			localTmpFolder.set(workingDir);
 
 			ICodeProvider localCodeProvider;
 			if (ZIP_ELSE_CLONE) {
@@ -158,6 +161,21 @@ public class GithubSha1CodeProviderHelper {
 					Files.createDirectories(resolvedPath.getParent());
 					Files.copy(zipIn, resolvedPath);
 				}
+			}
+		}
+	}
+
+	public void cleanTmpFiles() {
+		Path workingDir = localTmpFolder.get();
+		if (workingDir != null) {
+			LOGGER.info("Removing recursively the folder: {}", workingDir);
+
+			// In Amazon Lambda, we are limited to 500MB in /tmp
+			// https://stackoverflow.com/questions/48347350/aws-lambda-no-space-left-on-device-error
+			try {
+				FileSystemUtils.deleteRecursively(workingDir);
+			} catch (IOException e) {
+				LOGGER.info("Issue removing path: " + workingDir, e);
 			}
 		}
 	}

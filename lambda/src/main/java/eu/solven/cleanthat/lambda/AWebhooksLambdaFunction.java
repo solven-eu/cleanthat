@@ -40,6 +40,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	private static final String KEY_BODY = "body";
+	private static final String KEY_HEADERS = "headers";
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Bean
@@ -124,7 +125,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 	public IWebhookEvent wrapAsEvent(Map<String, ?> input) {
 		IWebhookEvent event;
-		if (input.containsKey(KEY_BODY) && input.containsKey("headers")) {
+		if (input.containsKey(KEY_BODY) && input.containsKey(KEY_HEADERS)) {
 			// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
 			// event = SaveToDynamoDb.NONE;
 
@@ -133,23 +134,23 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			if (rootBody.containsKey("github")) {
 				Map<String, Object> github = PepperMapHelper.getRequiredMap(rootBody, "github");
 
-				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(github, "headers");
+				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(github, KEY_HEADERS);
 
 				// Headers is typically empty as we fails fetching headers from API Gateway
-				if (!githubHeaders.containsKey("X-GitHub-Delivery")) {
+				if (!githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
 					githubHeaders = new LinkedHashMap<>(githubHeaders);
 
 					// TODO We should push this to the headers next to the actual github body, which may be deeper
 					// We should also push it when the initial event is received
-					String eventKey = PepperMapHelper.getRequiredString(input, "X-GitHub-Delivery");
-					githubHeaders.put("X-GitHub-Delivery", eventKey);
+					String eventKey = PepperMapHelper.getRequiredString(input, GithubWebhookEvent.X_GIT_HUB_DELIVERY);
+					githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
 
 					// Install the updated headers
-					github.put("headers", githubHeaders);
+					github.put(KEY_HEADERS, githubHeaders);
 				}
 			}
 
-			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, "headers");
+			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, KEY_HEADERS);
 			event = new CleanThatWebhookEvent(headers, rootBody);
 		} else {
 			event = new GithubWebhookEvent(input);
@@ -184,8 +185,9 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
 
-			LOGGER.info("Processing X-GitHub-Delivery={}",
-					PepperMapHelper.getRequiredString(asMap, "X-GitHub-Delivery"));
+			LOGGER.info("Processing {}={}",
+					GithubWebhookEvent.X_GIT_HUB_DELIVERY,
+					PepperMapHelper.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY));
 		} else {
 			// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
 			// We are in a REMOVE event

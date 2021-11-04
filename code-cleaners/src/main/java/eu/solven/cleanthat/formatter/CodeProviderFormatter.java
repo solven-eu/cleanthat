@@ -146,6 +146,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				isEmpty = false;
 			}
 		}
+
+		codeWriter.cleanTmpFiles();
+
 		return new CodeFormatResult(isEmpty, new LinkedHashMap<>(languagesCounters.asMap()));
 	}
 

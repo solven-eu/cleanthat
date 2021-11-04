@@ -7,4 +7,6 @@ package eu.solven.cleanthat.codeprovider;
  */
 public interface ICodeProviderWriter extends ICodeProvider, ICodeProviderWriterLogic {
 
+	void cleanTmpFiles();
+
 }

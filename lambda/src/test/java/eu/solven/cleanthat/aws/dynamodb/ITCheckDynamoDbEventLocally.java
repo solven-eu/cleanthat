@@ -25,7 +25,7 @@ import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLamb
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
-public class ITCheckRepoLocallyInDynamoDb {
+public class ITCheckDynamoDbEventLocally {
 	GithubRefCleaner cleaner;
 
 	@Autowired

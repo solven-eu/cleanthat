@@ -365,7 +365,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new IllegalStateException("Should not happen");
 		}
 		if (optSha1.isPresent()) {
-			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get());
+			String eventKey = githubEvent.getxGithubDelivery();
+			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get(), eventKey);
 		}
 		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
@@ -379,16 +380,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return WebhookRelevancyResult.relevant(refToClean.get());
 	}
 
-	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1) {
+	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1, String eventKey) {
 		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get(PERMISSION_CHECKS)) {
 			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 			// https://docs.github.com/en/rest/reference/checks#runs
 			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
-			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1);
+			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1).withExternalID(eventKey);
 			try {
-				// baseRepo.getCheckRuns("master").asList();
-				GHCheckRun checkRun = checkRunBuilder.create();
-				checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED);
+				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
+
+				// We complete right now, until we are able to complete this properly
+				checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED).create();
 			} catch (IOException e) {
 				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
 				if (LOGGER.isDebugEnabled()) {
@@ -510,6 +512,18 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 		} else {
 			LOGGER.debug("The changes would have been committed directly in the head branch");
+		}
+
+		logAfterCleaning(installationId, github);
+	}
+
+	public void logAfterCleaning(long installationId, GitHub github) {
+		try {
+			// This is useful to investigate unexpected rateLimitHit
+			GHRateLimit rateLimit = github.getRateLimit();
+			LOGGER.info("After process, rateLimit={} for installationId={}", rateLimit, installationId);
+		} catch (IOException e) {
+			LOGGER.warn("Issue with RateLimit", e);
 		}
 	}
 

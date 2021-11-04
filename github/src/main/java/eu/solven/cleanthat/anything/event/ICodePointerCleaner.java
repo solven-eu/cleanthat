@@ -7,10 +7,11 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.event.pojo.IExternalWebhookRelevancyResult;
 
 /**
- * Holds the logic to clean a code poointer (e.g. local folder, or Git ref, ...)
+ * Holds the logic to clean a code pointer (e.g. local folder, or Git ref, ...)
  *
  * @author Benoit Lacelle
  */
+// TODO Related to IGithubRefCleaner
 public interface ICodePointerCleaner {
 
 	/**

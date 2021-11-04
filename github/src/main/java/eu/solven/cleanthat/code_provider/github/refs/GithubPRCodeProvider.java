@@ -1,17 +1,12 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
@@ -54,11 +49,6 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 		});
 	}
 
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object file) {
-	// return "removed".equals(((GHPullRequestFileDetail) file).getStatus());
-	// }
-
 	public static String loadContent(GHPullRequest pr, String filename) throws IOException {
 		GHRepository repository = pr.getRepository();
 		String sha1 = pr.getHead().getSha();
@@ -78,14 +68,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	@Override
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
-			Collection<String> prLabels
-	// ,
-	// Optional<String> targetBranch
-	) {
-		// if (targetBranch.isPresent()) {
-		// throw new UnsupportedOperationException("TODO");
-		// }
-
+			Collection<String> prLabels) {
 		String refName = pr.getHead().getRef();
 		GHRepository repo = pr.getRepository();
 
@@ -118,28 +101,5 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	@Override
 	public String getRepoUri() {
 		return pr.getRepository().getGitTransportUrl();
-	}
-
-	// @Override
-	public Git makeGitRepo() {
-		Path tmpDir;
-		try {
-			tmpDir = Files.createTempDirectory("cleanthat-clone");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
-		try {
-			GHRepository repo = pr.getRepository();
-			return Git.cloneRepository()
-					.setURI(repo.getGitTransportUrl())
-					.setDirectory(tmpDir.toFile())
-					.setBranch(pr.getHead().getRef())
-					.setCloneAllBranches(false)
-					.setCloneSubmodules(false)
-					.call();
-		} catch (GitAPIException e) {
-			throw new IllegalArgumentException(e);
-		}
 	}
 }

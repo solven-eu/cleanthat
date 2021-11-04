@@ -1,14 +1,12 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.jgit.JGitCodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -17,8 +15,6 @@ import eu.solven.cleanthat.jgit.JGitCodeProvider;
  */
 public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 	final GHRef ref;
-
-	final AtomicReference<JGitCodeProvider> localClone = new AtomicReference<>();
 
 	public GithubRefCodeProvider(String token, GHRepository repo, GHRef ref) {
 		super(token, repo);

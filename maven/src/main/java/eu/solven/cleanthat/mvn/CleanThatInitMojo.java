@@ -21,11 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 
 /**
  * This mojo will generate a relevant cleanthat configuration in current folder
@@ -46,8 +44,8 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	protected List<Class<?>> springClasses() {
 		List<Class<?>> classes = new ArrayList<>();
 
-		classes.add(GithubSpringConfig.class);
-		classes.add(AllLanguagesSpringConfig.class);
+		// classes.add(GithubSpringConfig.class);
+		// classes.add(AllLanguagesSpringConfig.class);
 		classes.add(CodeProviderHelpers.class);
 
 		return classes;

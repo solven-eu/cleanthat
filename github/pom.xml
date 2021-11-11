@@ -52,7 +52,7 @@
 			<!-- https://github-api.kohsuke.org/ -->
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
-			<version>1.132</version>
+			<version>1.135</version>
 		</dependency>
 
 		<dependency>

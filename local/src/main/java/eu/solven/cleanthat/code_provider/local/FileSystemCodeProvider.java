@@ -139,4 +139,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		throw new IllegalArgumentException("No repository URI");
 	}
 
+	@Override
+	public void cleanTmpFiles() {
+		LOGGER.info("Nothing to delete for {}", this);
+	}
 }

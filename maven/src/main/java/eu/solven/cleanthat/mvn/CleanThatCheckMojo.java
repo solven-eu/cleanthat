@@ -30,10 +30,13 @@ import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 @Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
 public class CleanThatCheckMojo extends ACleanThatMojo {
+
 	// TODO Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
 	@Override
 	public void execute() throws MojoExecutionException {
 		getLog().info("Hello, world.");
+		checkParameters();
+
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 

@@ -16,6 +16,10 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
  *
  */
 public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
+	public static final String X_GIT_HUB_DELIVERY = "X-GitHub-Delivery";
+
+	private static final String KEY_BODY = "body";
+	private static final String KEY_GITHUB = "github";
 	final String xGithubEvent;
 	final String xGithubDelivery;
 	final String xHubSignature256;
@@ -64,7 +68,7 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 			headers.put("X-GitHub-Event", xGithubEvent);
 		}
 		if (!Strings.isNullOrEmpty(xGithubDelivery)) {
-			headers.put("X-GitHub-Delivery", xGithubDelivery);
+			headers.put(X_GIT_HUB_DELIVERY, xGithubDelivery);
 		}
 		if (!Strings.isNullOrEmpty(xHubSignature256)) {
 			headers.put("X-Hub-Signature-256", xHubSignature256);
@@ -76,22 +80,22 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 	public static GithubWebhookEvent fromCleanThatEvent(IWebhookEvent githubAcceptedEvent) {
 		Map<String, ?> body = githubAcceptedEvent.getBody();
 
-		while (!body.containsKey("github") && body.containsKey("body")) {
-			body = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), "body");
+		while (!body.containsKey(KEY_GITHUB) && body.containsKey(KEY_BODY)) {
+			body = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_BODY);
 		}
 
-		if (!body.containsKey("github")) {
+		if (!body.containsKey(KEY_GITHUB)) {
 			throw new IllegalArgumentException("This does not hold a github event");
 		}
 
-		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, "github", "headers");
+		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, KEY_GITHUB, "headers");
 		String xGithubEvent = PepperMapHelper.getOptionalString(headers, "X-GitHub-Event").orElse("");
-		String xGithubDelivery = PepperMapHelper.getOptionalString(headers, "X-GitHub-Delivery").orElse("");
+		String xGithubDelivery = PepperMapHelper.getOptionalString(headers, X_GIT_HUB_DELIVERY).orElse("");
 		String xGithubSignature256 = PepperMapHelper.getOptionalString(headers, "X-GitHub-Signature-256").orElse("");
 
 		return new GithubWebhookEvent(xGithubEvent,
 				xGithubDelivery,
 				xGithubSignature256,
-				PepperMapHelper.getRequiredMap(body, "github", "body"));
+				PepperMapHelper.getRequiredMap(body, KEY_GITHUB, KEY_BODY));
 	}
 }

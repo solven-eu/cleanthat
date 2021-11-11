@@ -72,4 +72,10 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 
 	}
 
+	@Override
+	public void cleanTmpFiles() {
+		// TODO Auto-generated method stub
+
+	}
+
 }

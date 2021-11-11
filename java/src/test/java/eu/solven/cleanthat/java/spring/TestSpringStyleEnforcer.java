@@ -3,7 +3,9 @@ package eu.solven.cleanthat.java.spring;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -31,7 +33,8 @@ public class TestSpringStyleEnforcer {
 		IStyleEnforcer styleEnforcer =
 				new SpringJavaStyleEnforcer(new SourceCodeProperties(), new SpringJavaFormatterProperties());
 
-		LineEnding lineEnding = LineEnding.determineLineEnding(dirtyCode);
-		styleEnforcer.doFormat(dirtyCode, lineEnding);
+		Optional<LineEnding> lineEnding = LineEnding.determineLineEnding(dirtyCode);
+		Assertions.assertThat(lineEnding).isPresent();
+		styleEnforcer.doFormat(dirtyCode, lineEnding.get());
 	}
 }

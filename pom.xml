@@ -78,7 +78,7 @@
 
 		<sentry-spring.version>5.4.0</sentry-spring.version>
 
-		<spring-cloud.version>2020.0.3</spring-cloud.version>
+		<spring-cloud.version>2020.0.4</spring-cloud.version>
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>

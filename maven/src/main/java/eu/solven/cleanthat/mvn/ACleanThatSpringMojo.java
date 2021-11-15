@@ -26,7 +26,7 @@ import io.sentry.IHub;
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ACleanThatSpringMojo.class);
 
 	protected static final AtomicReference<ACleanThatSpringMojo> CURRENT_MOJO = new AtomicReference<>();
 
@@ -62,7 +62,7 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 		checkParameters();
 
 		if (CURRENT_MOJO.compareAndSet(null, this)) {
-			LOGGER.info("Start applicationContext");
+			LOGGER.debug("Start applicationContext");
 			try {
 				List<Class<?>> classes = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 
 				SpringApplication.run(classes.toArray(Class<?>[]::new), new String[0]);
 			} finally {
-				LOGGER.info("Closed applicationContext");
+				LOGGER.debug("Closed applicationContext");
 				// Beware to clean so that it is OK in a multiModule reactor
 				CURRENT_MOJO.set(null);
 			}

@@ -9,6 +9,7 @@ import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 /**
@@ -29,7 +30,11 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	private MavenSession session;
 
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
-	@Parameter(property = "cleanthat.configPath", defaultValue = "${maven.multiModuleProjectDirectory}/cleanthat.yaml")
+	// It seems not possible to rely on 'maven.XXX' (hence not '${maven.multiModuleProjectDirectory}') in plugin
+	// parameters. See PluginParameterExpressionEvaluator
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.basedir}/cleanthat.yaml")
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
+	@Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
 	private String configPath;
 
 	@Parameter(property = "cleanthat.configUrl")
@@ -79,10 +84,22 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	}
 
 	public String getConfigPath() {
+		if (configPath != null && configPath.contains("${")) {
+			throw new IllegalStateException("Issue with configPath: '" + configPath + "'");
+		}
+
 		return configPath;
 	}
 
+	@VisibleForTesting
+	public void setConfigUrl(String configUrl) {
+		this.configUrl = configUrl;
+	}
+
 	public String getConfigUrl() {
+		if (configUrl != null && configUrl.contains("${")) {
+			throw new IllegalStateException("Issue with configUrl: '" + configUrl + "'");
+		}
 		return configUrl;
 	}
 

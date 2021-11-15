@@ -44,8 +44,6 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	protected List<Class<?>> springClasses() {
 		List<Class<?>> classes = new ArrayList<>();
 
-		// classes.add(GithubSpringConfig.class);
-		// classes.add(AllLanguagesSpringConfig.class);
 		classes.add(CodeProviderHelpers.class);
 
 		return classes;
@@ -54,11 +52,17 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	@Override
 	public void doClean(ApplicationContext appContext) {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
-		if (isRunOnlyAtRoot() && !getProject().isExecutionRoot()) {
-			// This will check it is called only if the command is run from the project root.
-			// However, it will not prevent the plugin to be called on each module
-			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
-			return;
+		if (isRunOnlyAtRoot()) {
+			if (getProject().isExecutionRoot()) {
+				getLog().debug("We are, as expected, at executionRoot");
+			} else {
+				// This will check it is called only if the command is run from the project root.
+				// However, it will not prevent the plugin to be called on each module
+				getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
+				return;
+			}
+		} else {
+			getLog().debug("Not required to be executed at root");
 		}
 
 		String configPath = getConfigPath();
@@ -95,6 +99,10 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 
 		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
 
+		writeConfiguration(configPathFile, properties);
+	}
+
+	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) {
 		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 		String asYaml;
 		try {
@@ -104,7 +112,8 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		}
 
 		try {
-			Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+			// StandardOpenOption.TRUNCATE_EXISTING
+			Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue writing YAML into: " + configPathFile, e);
 		}

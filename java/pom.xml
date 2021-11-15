@@ -87,6 +87,7 @@
 		</dependency>
 
 		<dependency>
+			<!-- Beware this is a Maven plugin: it may conflicts wth other plugins due to META-INF files -->
 			<groupId>net.revelc.code</groupId>
 			<artifactId>impsort-maven-plugin</artifactId>
 			<version>1.6.2</version>

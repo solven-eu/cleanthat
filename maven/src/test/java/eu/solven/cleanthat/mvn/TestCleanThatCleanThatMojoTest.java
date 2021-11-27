@@ -1,57 +1,33 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.Mojo;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
-import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
-public class TestCleanThatCleanThatMojoTest extends AbstractMojoTestCase {
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		// ...
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
-		// ...
-	}
-
-	/**
-	 * @throws Exception
-	 *             if any
-	 */
+public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 	@Test
-	public void testSomething() throws Exception {
-		getContainer().getComponentDescriptorMap(Mojo.class.getName());
+	public void testCleanthat() throws Exception {
+		String relativePathToParent = "/unit/project-to-test";
+		File readWriteFolder = temporaryFolder(relativePathToParent);
 
-		File pom = getTestFile("src/test/resources/unit/project-to-test/pom.xml");
-		assertNotNull(pom);
-		assertTrue(pom.exists());
+		// Ensure the test resources does not hold a cleanthat.yaml
+		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
-		// https://stackoverflow.com/questions/9496534/test-default-values-and-expressions-of-mojos-using-maven-plugin-testing-harness
-		MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-		// executionRequest.setRepo
-		ProjectBuildingRequest buildingRequest = executionRequest.getProjectBuildingRequest();
-		buildingRequest.setRepositorySession(new DefaultRepositorySystemSession());
-		ProjectBuilder projectBuilder = this.lookup(ProjectBuilder.class);
-		MavenProject project = projectBuilder.build(pom, buildingRequest).getProject();
+		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
+
+		Resource defaultConfig = new ClassPathResource("/config/default-safe.yaml");
+		Files.copy(defaultConfig.getInputStream(), cleanthatYaml.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 		CleanThatCleanThatMojo myMojo = (CleanThatCleanThatMojo) lookupConfiguredMojo(project, "cleanthat");
 		assertNotNull(myMojo);
 
 		myMojo.execute();
-
-		// ...
 	}
 }

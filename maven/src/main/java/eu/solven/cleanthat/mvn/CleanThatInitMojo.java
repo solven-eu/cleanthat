@@ -36,7 +36,9 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 @Mojo(name = "init",
 		// This would be called once and for all
 		defaultPhase = LifecyclePhase.NONE,
-		threadSafe = true)
+		threadSafe = true,
+		// One may rely on the mvn plugin to initialize a configuration, even if no pom.xml is available
+		requiresProject = false)
 public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
 

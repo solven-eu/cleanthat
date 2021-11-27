@@ -34,7 +34,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// parameters. See PluginParameterExpressionEvaluator
 	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.basedir}/cleanthat.yaml")
 	// @Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
-	@Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
+	// The following is not compatible with goals executable without a pom.xml
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
+	// The following is not compatible with UnitTests
+	@Parameter(property = "cleanthat.configPath", defaultValue = "${session.executionRootDirectory}/cleanthat.yaml")
 	private String configPath;
 
 	@Parameter(property = "cleanthat.configUrl")
@@ -49,8 +52,8 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 */
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L214
 	// Is this the same as 'getProject().getBasedir()'?
-	@Parameter(defaultValue = "${project.basedir}", required = true, readonly = true)
-	private File basedir;
+	// @Parameter(defaultValue = "${project.basedir}", required = true, readonly = true)
+	// private File basedir;
 
 	/**
 	 * Runs the plugin only if the current project is the execution root.
@@ -85,6 +88,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	public String getConfigPath() {
 		if (configPath != null && configPath.contains("${")) {
+			// session.get
+			project.getBasedir();
+			session.getExecutionRootDirectory();
+			// session.getBas
 			throw new IllegalStateException("Issue with configPath: '" + configPath + "'");
 		}
 
@@ -119,17 +126,19 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// https://blog.sonatype.com/2009/05/how-to-make-a-plugin-run-once-during-a-build/
 	protected boolean isThisTheExecutionRoot() {
 		LOGGER.debug("Root Folder: {}", session.getExecutionRootDirectory());
-		LOGGER.debug("Current Folder: {}", basedir);
-		boolean result = session.getExecutionRootDirectory().equalsIgnoreCase(basedir.toString());
+
+		File baseDir = getProject().getBasedir();
+		LOGGER.debug("Current Folder: {}", baseDir);
+		boolean result = session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
 		if (result) {
 			LOGGER.debug("This is the execution root.");
 			if (!getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", basedir, getProject());
+				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
 			}
 		} else {
 			LOGGER.debug("This is NOT the execution root.");
 			if (getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", basedir, getProject());
+				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
 			}
 		}
 		return result;

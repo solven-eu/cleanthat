@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -75,33 +76,48 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		getLog().info("Path: " + configPath);
 
 		Path configPathFile = Paths.get(configPath);
-		File baseFir = getProject().getBasedir();
 
-		Path configPathFileParent = configPathFile.getParent();
-		if (!configPathFileParent.equals(baseFir.toPath())) {
-			LOGGER.info("We'll init only in a module containing the configuration at its root: {}",
-					configPathFileParent);
+		if (!checkIfValidToInit(configPathFile)) {
 			return;
+		}
+
+		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
+		writeConfiguration(configPathFile, properties);
+	}
+
+	public boolean checkIfValidToInit(Path configPathFile) {
+		boolean isValid = true;
+
+		MavenProject project = getProject();
+		if (project == null || project.getBasedir() == null) {
+			// This happens on folder which has no pom.xml
+			// Useful to projects not integrating maven, but wishing to be initialized through the mvn plugin
+			LOGGER.info("You are initializing cleanthat without a pom.xml to contextualize it");
+		} else {
+			File baseFir = project.getBasedir();
+
+			Path configPathFileParent = configPathFile.getParent();
+			if (!configPathFileParent.equals(baseFir.toPath())) {
+				LOGGER.info("We'll init only in a module containing the configuration at its root: {}",
+						configPathFileParent);
+				isValid = false;
+			}
 		}
 
 		if (configPathFile.toFile().isDirectory()) {
 			LOGGER.error("The path of the configuration is a folder: '{}'", configPathFile);
-			return;
+			isValid = false;
 		} else if (configPathFile.toFile().exists()) {
 			if (configPathFile.toFile().isFile()) {
 				LOGGER.error("There is already a configuration: '{}'", configPathFile);
-				return;
 			} else {
 				LOGGER.error("There is something but not a file at configuration: '{}'", configPathFile);
-				return;
 			}
+			isValid = false;
 		} else {
 			LOGGER.info("We are about to init a configuration at: '{}'", configPathFile);
 		}
-
-		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
-
-		writeConfiguration(configPathFile, properties);
+		return isValid;
 	}
 
 	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) {

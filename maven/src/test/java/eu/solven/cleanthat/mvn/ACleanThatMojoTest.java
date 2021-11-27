@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -21,7 +23,9 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 		File temporaryFolder = getTestFile("target/test-classes" + relativePathToParent);
 
 		if (!FileSystemUtils.deleteRecursively(temporaryFolder)) {
-			throw new IllegalArgumentException("Issue deleting: " + temporaryFolder);
+			if (temporaryFolder.exists()) {
+				throw new IllegalArgumentException("Issue deleting: " + temporaryFolder);
+			}
 		}
 
 		return temporaryFolder;
@@ -45,5 +49,15 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 		ProjectBuilder projectBuilder = this.lookup(ProjectBuilder.class);
 		MavenProject project = projectBuilder.build(pom, buildingRequest).getProject();
 		return project;
+	}
+
+	@Override
+	protected Mojo lookupConfiguredMojo(MavenProject project, String goal) throws Exception {
+		MavenSession session = newMavenSession(project);
+
+		// This enable the use of ${session.executionRootDirectory}
+		session.getRequest().setBaseDirectory(project.getBasedir());
+
+		return lookupConfiguredMojo(session, newMojoExecution(goal));
 	}
 }

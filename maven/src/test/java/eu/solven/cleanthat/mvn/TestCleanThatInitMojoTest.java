@@ -18,8 +18,6 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, "init");
 		assertNotNull(myMojo);
 
-		// myMojo.getSession().getRe
-
 		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 

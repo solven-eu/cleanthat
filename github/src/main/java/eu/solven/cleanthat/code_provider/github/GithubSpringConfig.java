@@ -7,10 +7,9 @@ import java.util.Map;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.CodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -34,23 +33,9 @@ import eu.solven.cleanthat.language.StringFormatterFactory;
  *
  */
 @Configuration
+@Import({ ConfigSpringConfig.class })
 public class GithubSpringConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubSpringConfig.class);
-
-	// Primary as most situations to write something is to write JSON
-	@Bean
-	@Primary
-	@Qualifier("json")
-	public ObjectMapper jsonObjectMapper() {
-		return ConfigHelpers.makeJsonObjectMapper();
-	}
-
-	// YAML is still very useful to read configuration
-	@Bean
-	@Qualifier("yaml")
-	public ObjectMapper yamlObjectMapper() {
-		return ConfigHelpers.makeYamlObjectMapper();
-	}
 
 	@Bean
 	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env, List<ObjectMapper> objectMappers) {

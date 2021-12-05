@@ -1,17 +1,21 @@
 package eu.solven.cleanthat.language.json;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatter;
 import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
 
@@ -37,8 +41,8 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
 		if (parameters == null) {
 			// Some engine takes no parameter
 			parameters = Map.of();
@@ -59,5 +63,28 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 
 		return processor;
+	}
+
+	public LanguageProperties makeDefaultProperties() {
+		LanguageProperties languageProperties = new LanguageProperties();
+
+		languageProperties.setLanguage(getLanguage());
+
+		List<Map<String, ?>> processors = new ArrayList<>();
+
+		{
+			JacksonJsonFormatterProperties engineParameters = new JacksonJsonFormatterProperties();
+			JacksonJsonFormatter engine =
+					new JacksonJsonFormatter(languageProperties.getSourceCode(), engineParameters);
+
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, engine.getId())
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
+
+		languageProperties.setProcessors(processors);
+
+		return languageProperties;
 	}
 }

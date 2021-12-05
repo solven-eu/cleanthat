@@ -1,6 +1,6 @@
 package eu.solven.cleanthat.github;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,6 +36,6 @@ public final class CleanthatRepositoryProperties {
 
 	// @JsonProperty(index = -999)
 	// private List<Map<String, ?>> languages = Arrays.asList();
-	private List<LanguageProperties> languages = Arrays.asList();
+	private List<LanguageProperties> languages = new ArrayList<>();
 
 }

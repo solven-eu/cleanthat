@@ -11,6 +11,9 @@ import eu.solven.cleanthat.formatter.ILintFixer;
  * @author Benoit Lacelle
  */
 public interface ILanguageLintFixerFactory {
+	String KEY_ENGINE = "engine";
+	String KEY_PARAMETERS = "parameters";
+
 	String getLanguage();
 
 	ILintFixer makeLintFixer(Map<String, ?> rawProcessor,

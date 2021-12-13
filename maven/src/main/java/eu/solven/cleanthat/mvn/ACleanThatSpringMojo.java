@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 		}
 	}
 
-	protected abstract void doClean(ApplicationContext appContext) throws IOException;
+	protected abstract void doClean(ApplicationContext appContext) throws IOException, MojoFailureException;
 
 	protected abstract List<? extends Class<?>> springClasses();
 }

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,8 +35,11 @@ import com.github.difflib.algorithm.myers.MyersDiff;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 
+import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
@@ -72,6 +77,37 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	@Override
 	public Map<String, String> generateSettings(Map<Path, String> pathToFile) {
 		ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultSetting(pathToFile);
+
+		if (pathToFile.isEmpty()) {
+			return bestDefaultConfig.getOption();
+		}
+
+		// Search for an optimal configuration given the biggest file
+		{
+			Map.Entry<Path, String> biggestFile =
+					pathToFile.entrySet().stream().max(Comparator.comparingLong(e -> e.getValue().length())).get();
+
+			LOGGER.info("Prepare the configuration over the (biggest) file: {} ({})",
+					biggestFile.getKey(),
+					PepperLogHelper.humanBytes(biggestFile.getValue().length()));
+
+			Map<Path, String> biggestFileAsMap = Collections.singletonMap(biggestFile.getKey(), biggestFile.getValue());
+
+			EclipseJavaFormatter formatter =
+					new EclipseJavaFormatter(new EclipseJavaFormatterConfiguration(bestDefaultConfig.getOption()));
+			long singleFileScore = computeDiffScore(formatter, biggestFileAsMap.values());
+			LOGGER.info("On this biggest file, the score for the best default configuration is {}", singleFileScore);
+
+			bestDefaultConfig = searchForOptimalConfiguration(biggestFileAsMap,
+					new ScoredOption<Map<String, String>>(bestDefaultConfig.getOption(), singleFileScore));
+		}
+
+		// Now we have an optimal configuration for the biggest file, try processing all other files
+		return searchForOptimalConfiguration(pathToFile, bestDefaultConfig).getOption();
+	}
+
+	public ScoredOption<Map<String, String>> searchForOptimalConfiguration(Map<Path, String> pathToFile,
+			ScoredOption<Map<String, String>> bestDefaultConfig) {
 		ScoredOption<Map<String, String>> bestSettings = bestDefaultConfig;
 
 		// Start optimizing some crucial parameters
@@ -84,36 +120,43 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		// This is a greedy algorithm, trying to find the Set of options minimizing the diff with existing files
 		// We iterate targeting to reach a score of 0 (meaning we spot a configuration matching exactly current
 		// code-style)
-		boolean hasMutated;
+		Set<String> hasMutated = new TreeSet<>();
 		do {
-			hasMutated = false;
+			// Set<String> previousHasMutated = new TreeSet<>(hasMutated);
+			hasMutated.clear();
+
+			// This assumes there is no N-tuple impacting the code, where each individual change would impact the code
+			// Hence, we can process each parameter independently
 			for (String settingToSwitch : settingsToSwitch) {
+				LOGGER.debug("Setting about to be optimized: {}", settingToSwitch);
 				ScoredOption<Map<String, String>> newBestSettings =
 						pickOptimalOption(pathToFile.values(), bestSettings, settingToSwitch);
 				if (!bestSettings.getOption().equals(newBestSettings.getOption())) {
 					bestSettings = newBestSettings;
-					hasMutated = true;
+					hasMutated.add(settingToSwitch);
 				}
 			}
-			if (hasMutated) {
+			if (!hasMutated.isEmpty()) {
 				// We go through another pass as it is possible a new tweak lead to other tweaks having different
 				// impacts
 				// e.g. changing the max length of rows leads many other rules to behave differently
 				LOGGER.info(
-						"The configuration has muted: we will go again through all options to look for a better set of settings");
+						"The configuration has mutated: we will go again through all options to look for a better set of settings");
 			}
-		} while (hasMutated && bestSettings.getScore() > 0);
+		} while (!hasMutated.isEmpty()
+				// If score is 0, we found a perfect configuration
+				&& bestSettings.getScore() > 0);
 
 		logPathsImpactedByConfiguration(pathToFile, bestSettings);
 
 		// logDiffWithPepper(pathToFile, bestOption);
-		return bestSettings.getOption();
+		return bestSettings;
 	}
 
 	protected void logPathsImpactedByConfiguration(Map<Path, String> pathToFile,
 			ScoredOption<Map<String, String>> bestOption) {
 		if (bestOption.getScore() > 0) {
-			LOGGER.info("We did not succeed crafting a configuration matching perfectly existing code");
+			LOGGER.warn("We did not succeed crafting a configuration matching perfectly existing code");
 
 			EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(bestOption.getOption());
 			EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
@@ -128,7 +171,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 
 				return tweakedDiffScoreDiff > 0;
 			}).forEach(entry -> {
-				LOGGER.info("Path needing formatting with 'optimal' configuration: {}", entry.getKey());
+				LOGGER.warn("Path needing formatting with 'optimal' configuration: {}", entry.getKey());
 			});
 		}
 	}
@@ -167,10 +210,13 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		}
 		ScoredOption<Map<String, String>> bestDefaultConfig = Stream
 				.of(eclipseDefault, eclipseEclipseDefault, eclipseJavaConventions, googleConvention, springConvention)
+				.parallel()
 				.map(config -> {
 					EclipseJavaFormatter formatter =
 							new EclipseJavaFormatter(new EclipseJavaFormatterConfiguration(config));
 					long score = computeDiffScore(formatter, pathToFile.values());
+					// System.out.println(score);
+					// System.out.println(config);
 					return new ScoredOption<>(config, score);
 				})
 				.min(Comparator.comparingLong(ScoredOption::getScore))
@@ -205,16 +251,17 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		} else {
 			bestOptionName = "???";
 		}
-		LOGGER.info("Best standard configuration: {}", bestOptionName);
+		LOGGER.info("Best standard configuration: {} (score={})", bestOptionName, bestDefaultConfig.getScore());
 	}
 
 	public ScoredOption<Map<String, String>> pickOptimalOption(Collection<String> contents,
-			ScoredOption<Map<String, String>> bestOption,
+			ScoredOption<Map<String, String>> initialOptions,
 			String parameterToSwitch) {
 		Set<String> possibleOptions = possibleOptions(parameterToSwitch);
+
 		LOGGER.debug("Considering parameter: {} ({} candidates)", parameterToSwitch, possibleOptions.size());
 		Optional<ScoredOption<Map<String, String>>> optMin = possibleOptions.parallelStream().map(possibleValue -> {
-			Map<String, String> tweakedConfiguration = new TreeMap<>(bestOption.getOption());
+			Map<String, String> tweakedConfiguration = new TreeMap<>(initialOptions.getOption());
 			String currentBestOption = tweakedConfiguration.put(parameterToSwitch, possibleValue);
 			if (currentBestOption.equals(possibleValue)) {
 				// No-need to check with current value
@@ -225,11 +272,24 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 			long tweakedDiffScoreDiff = computeDiffScore(formatter, contents);
 			return Optional.of(new ScoredOption<Map<String, String>>(tweakedConfiguration, tweakedDiffScoreDiff));
 		}).flatMap(Optional::stream).min(Comparator.comparingLong(ScoredOption::getScore));
-		if (optMin.isPresent() && optMin.get().getScore() < bestOption.getScore()) {
-			LOGGER.info("Tweaked diff improves score: {} ({})", optMin.get().getScore(), parameterToSwitch);
-			return optMin.get();
+		long initialScore = initialOptions.getScore();
+		if (optMin.isPresent()) {
+			long optimizedScore = optMin.get().getScore();
+			if (optimizedScore < initialScore) {
+				// System.out.println(initialOptions.getOption());
+				// System.out.println(optMin.get().getOption());
+				String oldValue = initialOptions.getOption().get(parameterToSwitch);
+				String newValue = optMin.get().getOption().get(parameterToSwitch);
+				LOGGER.info("Score optimized from {} to {} ({} from '{}' to '{}')",
+						initialScore,
+						optimizedScore,
+						parameterToSwitch,
+						oldValue,
+						newValue);
+				return optMin.get();
+			}
 		}
-		return bestOption;
+		return initialOptions;
 	}
 
 	@Override
@@ -412,16 +472,30 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		}).sum();
 	}
 
+	// Compute the diff can be expensive. However, we expect to encounter many times files formatted exactly the same
+	// way
+	protected final Cache<List<String>, Long> cache = CacheBuilder.newBuilder().build();
+
 	/**
 	 * 
-	 * @param stylEnforcer
+	 * @param styleEnforcer
 	 * @param pathAsString
 	 * @return a score indicating how much this formatter impacts given content. If 0, the formatter has no impacts. A
 	 *         higher score means a bigger difference
 	 * @throws IOException
 	 */
-	protected long computeDiffScore(IStyleEnforcer stylEnforcer, String pathAsString) throws IOException {
-		String formatted = stylEnforcer.doFormat(pathAsString, LineEnding.KEEP);
+	protected long computeDiffScore(IStyleEnforcer styleEnforcer, String pathAsString) throws IOException {
+		String formatted = styleEnforcer.doFormat(pathAsString, LineEnding.KEEP);
+		long deltaDiff;
+		try {
+			deltaDiff = cache.get(Arrays.asList(pathAsString, formatted), () -> deltaDiff(pathAsString, formatted));
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+		return deltaDiff;
+	}
+
+	public long deltaDiff(String pathAsString, String formatted) {
 		List<String> originalRows = Arrays.asList(pathAsString.split("[\r\n]+"));
 		List<String> formattedRows = Arrays.asList(formatted.split("[\r\n]+"));
 		Patch<String> diff = DiffUtils.diff(originalRows, formattedRows, new MyersDiff<String>());

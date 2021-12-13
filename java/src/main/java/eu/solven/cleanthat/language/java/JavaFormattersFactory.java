@@ -85,6 +85,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			try {
 				configuration = configToEngine
 						.get(new EclipseFormatterCacheKey(codeProvider, languageProperties, processorConfig), () -> {
+							LOGGER.info("Loading for cache: {} {} {}",
+									codeProvider,
+									languageProperties,
+									processorConfig);
 							return EclipseJavaFormatterConfiguration
 									.load(codeProvider, languageProperties, processorConfig);
 						});
@@ -92,28 +96,28 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 				throw new RuntimeException(e);
 			}
 			processor = new EclipseJavaFormatter(configuration);
-		}
 			break;
+		}
 
 		case "revelc_imports": {
 			JavaRevelcImportsCleanerProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
 			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCode(), processorConfig);
-		}
 			break;
+		}
 
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
 					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
 			processor = new SpringJavaStyleEnforcer(languageProperties.getSourceCode(), processorConfig);
-		}
 			break;
+		}
 		case "rules": {
 			JavaRulesMutatorProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRulesMutatorProperties.class);
 			processor = new RulesJavaMutator(languageProperties, processorConfig);
-		}
 			break;
+		}
 
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);

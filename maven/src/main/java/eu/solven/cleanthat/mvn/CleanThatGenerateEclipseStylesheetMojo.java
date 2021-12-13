@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,14 +60,14 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
 	@Parameter(property = "eclipse_formatter.url",
 			defaultValue = "${maven.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml")
-	private String configPath;
+	private String eclipseConfigPath;
 
 	@Parameter(property = "java.regex", defaultValue = DEFAULT_JAVA_REGEX)
 	private String javaRegex;
 
 	@VisibleForTesting
-	protected void setConfigPath(String configPath) {
-		this.configPath = configPath;
+	protected void setConfigPath(String eclipseConfigPath) {
+		this.eclipseConfigPath = eclipseConfigPath;
 	}
 
 	@VisibleForTesting
@@ -81,34 +82,40 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	@Override
 	public void doClean(ApplicationContext appContext) throws IOException {
-		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
-		MavenProject mavenProject = getProject();
-		if (isRunOnlyAtRoot() && !mavenProject.isExecutionRoot()) {
-			// This will check it is called only if the command is run from the project root.
-			// However, it will not prevent the plugin to be called on each module
-			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
-			return;
-		}
 		IEclipseStylesheetGenerator generator = appContext.getBean(IEclipseStylesheetGenerator.class);
 
-		Map<Path, String> pathToContent = loadAnyJavaFile(mavenProject, generator);
+		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
 
 		Map<String, String> settings = generator.generateSettings(pathToContent);
 		writeSettings(settings);
 	}
 
-	protected Map<Path, String> loadAnyJavaFile(MavenProject mavenProject, IEclipseStylesheetGenerator generator) {
-		Set<Path> roots = mavenProject.getCollectedProjects().stream().flatMap(p -> {
-			Path projectBaseDir = p.getBasedir().toPath();
-			List<String> sourceRoots = p.getCompileSourceRoots();
-			List<String> testRoots = p.getTestCompileSourceRoots();
+	protected Map<Path, String> loadAnyJavaFile(IEclipseStylesheetGenerator generator) {
+		MavenProject mavenProject = getProject();
 
-			LOGGER.debug("Consider for baseDir '{}': {} and {}", projectBaseDir, sourceRoots, testRoots);
+		List<MavenProject> collectedProjects = mavenProject.getCollectedProjects();
 
-			// We make path relative to the baseDir, even through it seems mvn provides absolute paths is default case
-			return Stream.concat(sourceRoots.stream(), testRoots.stream())
-					.map(sourceFolder -> projectBaseDir.resolve(sourceFolder));
-		}).collect(Collectors.toSet());
+		Set<Path> roots;
+		if (collectedProjects == null) {
+			Path executionRoot = getBaseDir().toPath();
+			LOGGER.info("Processing a folder with no 'pom.xml'. We will then process anything in '{}' matching '{}'",
+					executionRoot,
+					javaRegex);
+			roots = Collections.singleton(executionRoot);
+		} else {
+			roots = collectedProjects.stream().flatMap(p -> {
+				Path projectBaseDir = p.getBasedir().toPath();
+				List<String> sourceRoots = p.getCompileSourceRoots();
+				List<String> testRoots = p.getTestCompileSourceRoots();
+
+				LOGGER.debug("Consider for baseDir '{}': {} and {}", projectBaseDir, sourceRoots, testRoots);
+
+				// We make path relative to the baseDir, even through it seems mvn provides absolute paths is default
+				// case
+				return Stream.concat(sourceRoots.stream(), testRoots.stream())
+						.map(sourceFolder -> projectBaseDir.resolve(sourceFolder));
+			}).collect(Collectors.toSet());
+		}
 
 		return loadAnyJavaFile(generator, roots);
 	}
@@ -134,7 +141,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	}
 
 	protected void writeSettings(Map<String, String> settings) throws IOException {
-		Path whereToWrite = Paths.get(configPath);
+		Path whereToWrite = Paths.get(eclipseConfigPath);
 		File whereToWriteAsFile = whereToWrite.toFile().getAbsoluteFile();
 		if (whereToWriteAsFile.exists()) {
 			if (whereToWriteAsFile.isFile()) {

@@ -65,6 +65,24 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
 	private boolean runOnlyAtRoot;
 
+	@VisibleForTesting
+	protected void setProject(MavenProject project) {
+		this.project = project;
+	}
+
+	public MavenProject getProject() {
+		return project;
+	}
+
+	@VisibleForTesting
+	protected void setSession(MavenSession session) {
+		this.session = session;
+	}
+
+	public MavenSession getSession() {
+		return session;
+	}
+
 	protected void checkParameters() {
 		String configPath = getConfigPath();
 		String configUrl = getConfigUrl();
@@ -78,19 +96,23 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		}
 	}
 
-	public MavenProject getProject() {
-		return project;
-	}
-
-	public MavenSession getSession() {
-		return session;
+	public File getBaseDir() {
+		File baseDir = getProject().getBasedir();
+		if (baseDir == null) {
+			// We are processing a folder with no pom.xml
+			baseDir = new File(getSession().getExecutionRootDirectory());
+			LOGGER.info("Current folder has no pom.xml");
+			LOGGER.info("Consider as baseDir: {}", baseDir);
+		}
+		getLog().info("baseDir: " + baseDir);
+		return baseDir;
 	}
 
 	public String getConfigPath() {
 		if (configPath != null && configPath.contains("${")) {
 			// session.get
-			project.getBasedir();
-			session.getExecutionRootDirectory();
+			// project.getBasedir();
+			// session.getExecutionRootDirectory();
 			// session.getBas
 			throw new IllegalStateException("Issue with configPath: '" + configPath + "'");
 		}

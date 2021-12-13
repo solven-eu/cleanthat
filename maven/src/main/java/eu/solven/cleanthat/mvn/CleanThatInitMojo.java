@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
@@ -65,7 +66,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	}
 
 	@Override
-	public void doClean(ApplicationContext appContext) {
+	public void doClean(ApplicationContext appContext) throws MojoFailureException {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
 		if (isRunOnlyAtRoot()) {
 			if (getProject().isExecutionRoot()) {
@@ -90,7 +91,9 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		Path configPathFile = Paths.get(configPath);
 
 		if (!checkIfValidToInit(configPathFile)) {
-			return;
+			throw new MojoFailureException(configPathFile,
+					"Configuration cannot be generated",
+					"Something prevents the generation of a configuration");
 		}
 
 		CleanthatRepositoryProperties properties =

@@ -32,8 +32,7 @@ import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
  * @author Benoit Lacelle
  */
 public class RunGenerateEclipseStylesheet {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseStylesheetGenerator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RunGenerateEclipseStylesheet.class);
 
 	protected RunGenerateEclipseStylesheet() {
 		// hidden
@@ -42,7 +41,7 @@ public class RunGenerateEclipseStylesheet {
 	public static void main(String[] args)
 			throws TransformerException, ParserConfigurationException, IOException, PatchFailedException {
 		// Path writtenPath = stylesheetGenerator.writeInTmp();
-		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/cleanthat");
+		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/RoaringBitmap");
 		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
 		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
 
@@ -67,6 +66,8 @@ public class RunGenerateEclipseStylesheet {
 					.loadResource(new ClassPathResource("/eclipse/pepper-eclipse-code-formatter.xml"))
 					.getSettings();
 		}
+
+		LOGGER.info("Difference with Pepper:");
 		MapDifference<String, String> diff = Maps.difference(pepperConvention, selectedOptions);
 		diff.entriesDiffering().forEach((k, v) -> {
 			LOGGER.info("{} -> {}", k, v);

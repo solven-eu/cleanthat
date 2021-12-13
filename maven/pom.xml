@@ -36,12 +36,12 @@
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
-				<exclusion>
-					<!-- We exclude this artifact as this is a maven plugin: it conflicts with META-INF -->
-					<!-- TODO We would exclude only in unit-tests -->
-					<groupId>net.revelc.code</groupId>
-					<artifactId>impsort-maven-plugin</artifactId>
-				</exclusion>
+				<!-- <exclusion> -->
+				<!-- We exclude this artifact as this is a maven plugin: it conflicts with META-INF -->
+				<!-- TODO We would exclude only in unit-tests -->
+				<!-- <groupId>net.revelc.code</groupId> -->
+				<!-- <artifactId>impsort-maven-plugin</artifactId> -->
+				<!-- </exclusion> -->
 			</exclusions>
 		</dependency>
 

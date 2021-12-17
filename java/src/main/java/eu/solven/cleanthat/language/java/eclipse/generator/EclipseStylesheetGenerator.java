@@ -83,7 +83,8 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		}
 
 		// Search for an optimal configuration given the biggest file
-		{
+		// If there is only 1 or 2 files to process, skip the single_file preparation step
+		if (pathToFile.size() >= 2) {
 			Map.Entry<Path, String> biggestFile =
 					pathToFile.entrySet().stream().max(Comparator.comparingLong(e -> e.getValue().length())).get();
 
@@ -103,6 +104,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		}
 
 		// Now we have an optimal configuration for the biggest file, try processing all other files
+		LOGGER.info("Prepare the configuration over all files: {}", pathToFile.size());
 		return searchForOptimalConfiguration(pathToFile, bestDefaultConfig).getOption();
 	}
 
@@ -513,8 +515,10 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				return 0L;
 			}
 			// We count the number of impacted characters
-			long sourceSize = d.getSource().getLines().stream().mapToLong(String::length).sum();
-			long targetSize = d.getTarget().getLines().stream().mapToLong(String::length).sum();
+			List<String> sourceLines = d.getSource().getLines();
+			long sourceSize = sourceLines.stream().mapToLong(String::length).sum();
+			List<String> targetLines = d.getTarget().getLines();
+			long targetSize = targetLines.stream().mapToLong(String::length).sum();
 			// Given a diff, we consider the biggest square between the source and the target
 			return Math.max(sourceSize, targetSize);
 		}).sum();

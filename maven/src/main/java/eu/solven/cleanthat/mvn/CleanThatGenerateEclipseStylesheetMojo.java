@@ -80,6 +80,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			defaultValue = "${maven.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml")
 	private String eclipseConfigPath;
 
+	// Generate the stylesheet can be very slow: make it faster by considering a subset of files
+	// e.g. -Djava.regex=MyClass\.java
 	@Parameter(property = "java.regex", defaultValue = DEFAULT_JAVA_REGEX)
 	private String javaRegex;
 
@@ -114,77 +116,77 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			return;
 		}
 
-		{
-			ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
-			MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-			ResultOrError<CleanthatRepositoryProperties, String> optResult =
-					codeCleaner.loadAndCheckConfiguration(codeProvider);
+		LOGGER.warn("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
+		injectStylesheetInConfig(appContext, eclipseConfigPath, rawConfigPath);
+	}
 
-			if (optResult.getOptError().isPresent()) {
-				String error = optResult.getOptError().get();
-				throw new MojoFailureException("ARG", error, error);
-			}
+	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, String rawConfigPath)
+			throws MojoFailureException {
+		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
+		MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
+		ResultOrError<CleanthatRepositoryProperties, String> optResult =
+				codeCleaner.loadAndCheckConfiguration(codeProvider);
 
-			CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
+		if (optResult.getOptError().isPresent()) {
+			String error = optResult.getOptError().get();
+			throw new MojoFailureException("ARG", error, error);
+		}
 
-			Optional<LanguageProperties> optJavaProperties =
-					loadedConfig.getLanguages().stream().filter(lp -> "java".equals(lp.getLanguage())).findAny();
+		CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
 
-			List<ObjectMapper> objectMappers =
-					appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
-			ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
+		Optional<LanguageProperties> optJavaProperties =
+				loadedConfig.getLanguages().stream().filter(lp -> "java".equals(lp.getLanguage())).findAny();
 
-			LanguageProperties javaProperties = optJavaProperties.orElseGet(() -> {
-				// There is no java language properties
-				LOGGER.info("We introduce the java language properties");
+		List<ObjectMapper> objectMappers =
+				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
+		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
 
-				// Enable mutations
-				List<LanguageProperties> mutableLanguages = new ArrayList<>(loadedConfig.getLanguages());
-				loadedConfig.setLanguages(mutableLanguages);
+		LanguageProperties javaProperties = optJavaProperties.orElseGet(() -> {
+			// There is no java language properties
+			LOGGER.info("We introduce the java language properties");
 
-				LanguageProperties languageProperties =
-						new JavaFormattersFactory(yamlObjectMapper).makeDefaultProperties();
-				mutableLanguages.add(languageProperties);
+			// Enable mutations
+			List<LanguageProperties> mutableLanguages = new ArrayList<>(loadedConfig.getLanguages());
+			loadedConfig.setLanguages(mutableLanguages);
 
-				return languageProperties;
-			});
+			LanguageProperties languageProperties = new JavaFormattersFactory(yamlObjectMapper).makeDefaultProperties();
+			mutableLanguages.add(languageProperties);
 
-			Optional<Map<String, ?>> optEclipseProperties = javaProperties.getProcessors()
-					.stream()
-					.filter(p -> EclipseJavaFormatter.ID.equals(p.get("engine")))
-					.findAny();
+			return languageProperties;
+		});
 
-			Map<String, ?> eclipseProperties;
-			if (optEclipseProperties.isPresent()) {
-				eclipseProperties = optEclipseProperties.get();
-			} else {
-				eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
-				javaProperties.getProcessors().add(eclipseProperties);
-			}
+		Optional<Map<String, ?>> optEclipseProperties = javaProperties.getProcessors()
+				.stream()
+				.filter(p -> EclipseJavaFormatter.ID.equals(p.get("engine")))
+				.findAny();
 
-			Optional<Map<String, Object>> optEclipseParameters =
-					PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
+		Map<String, ?> eclipseProperties;
+		if (optEclipseProperties.isPresent()) {
+			eclipseProperties = optEclipseProperties.get();
+		} else {
+			eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
+			javaProperties.getProcessors().add(eclipseProperties);
+		}
 
-			Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
+		Optional<Map<String, Object>> optEclipseParameters =
+				PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
 
-			eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + eclipseConfigPath);
+		Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
+		eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + eclipseConfigPath);
 
-			String asYaml;
-			try {
-				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
-			}
+		// Prepare the configuration as yaml
+		String asYaml;
+		try {
+			asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
+		}
 
-			try {
-				// StandardOpenOption.TRUNCATE_EXISTING
-				Files.writeString(Paths.get(rawConfigPath),
-						asYaml,
-						Charsets.UTF_8,
-						StandardOpenOption.TRUNCATE_EXISTING);
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue writing YAML into: " + rawConfigPath, e);
-			}
+		// Write at given path
+		try {
+			Files.writeString(Paths.get(rawConfigPath), asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue writing YAML into: " + rawConfigPath, e);
 		}
 	}
 

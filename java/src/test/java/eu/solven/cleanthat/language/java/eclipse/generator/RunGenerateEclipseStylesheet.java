@@ -27,7 +27,7 @@ import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfigurati
 import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
 
 /**
- * Execute the procedure to generate a minifying Eclipse Formatter configuration
+ * Execute the procedure to generate a minimizing Eclipse Formatter configuration
  *
  * @author Benoit Lacelle
  */
@@ -43,7 +43,7 @@ public class RunGenerateEclipseStylesheet {
 		// Path writtenPath = stylesheetGenerator.writeInTmp();
 		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/RoaringBitmap");
 		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
-		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
+		Pattern fileMatcher = Pattern.compile(".*/src/.*/java/.*\\.java");
 
 		EclipseStylesheetGenerator stylesheetGenerator = new EclipseStylesheetGenerator();
 		Map<Path, String> pathToFile = stylesheetGenerator.loadFilesContent(rootForFiles, fileMatcher);

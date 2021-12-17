@@ -41,6 +41,8 @@ import eu.solven.cleanthat.formatter.LineEnding;
 public class EclipseJavaFormatter implements IStyleEnforcer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
+	public static final String ID = "eclipse_formatter";
+
 	private final Map<String, String> defaultSettings;
 
 	public EclipseJavaFormatter(EclipseJavaFormatterConfiguration configuration) {

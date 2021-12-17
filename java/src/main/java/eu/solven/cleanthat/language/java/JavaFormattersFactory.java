@@ -154,16 +154,22 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 		// Eclipse formatting is done last, to clean after rules
 		{
-			EclipseJavaFormatterProcessorProperties engineParameters = new EclipseJavaFormatterProcessorProperties();
-
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "eclipse_formatter")
-					.put(KEY_PARAMETERS, engineParameters)
-					.build());
+			Map<String, ?> processorProperties = makeEclipseFormatterDefaultProperties();
+			processors.add(processorProperties);
 		}
 
 		languageProperties.setProcessors(processors);
 
 		return languageProperties;
+	}
+
+	public static Map<String, ?> makeEclipseFormatterDefaultProperties() {
+		EclipseJavaFormatterProcessorProperties engineParameters = new EclipseJavaFormatterProcessorProperties();
+
+		Map<String, ?> processorProperties = ImmutableMap.<String, Object>builder()
+				.put(KEY_ENGINE, EclipseJavaFormatter.ID)
+				.put(KEY_PARAMETERS, engineParameters)
+				.build();
+		return processorProperties;
 	}
 }

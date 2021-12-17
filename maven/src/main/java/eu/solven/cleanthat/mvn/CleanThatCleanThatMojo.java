@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -14,14 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 
 /**
@@ -78,12 +73,9 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 
 		getLog().info("project.baseDir: " + baseDir);
 
-		// Process the root of current module
-		ICodeProviderWriter codeProvider = new FileSystemCodeProvider(baseDir.toPath());
+		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 
-		ICodeCleaner codeCleaner = new MavenCodeCleaner(
-				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList()),
-				appContext.getBean(ICodeProviderFormatter.class));
+		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
 
 		codeCleaner.formatCodeGivenConfig(codeProvider, isDryRun());
 	}

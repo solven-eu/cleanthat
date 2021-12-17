@@ -42,8 +42,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		return formatterProvider.formatCode(properties, pr, dryRun);
 	}
 
-	protected ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(
-			ICodeProvider codeProvider) {
+	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
 		String codeUrl = codeProvider.getHtmlUrl();
 
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);

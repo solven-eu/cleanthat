@@ -9,12 +9,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,6 +25,7 @@ import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -30,12 +34,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 
+import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.CleanthatUrlLoader;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.language.java.JavaFormattersFactory;
+import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
 import eu.solven.cleanthat.language.java.eclipse.generator.EclipseStylesheetGenerator;
 import eu.solven.cleanthat.language.java.eclipse.generator.IEclipseStylesheetGenerator;
+import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.
@@ -81,13 +99,93 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	}
 
 	@Override
-	public void doClean(ApplicationContext appContext) throws IOException {
+	public void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
 		IEclipseStylesheetGenerator generator = appContext.getBean(IEclipseStylesheetGenerator.class);
 
 		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
 
 		Map<String, String> settings = generator.generateSettings(pathToContent);
-		writeSettings(settings);
+		Path eclipseConfigPath = writeSettings(settings);
+
+		String rawConfigPath = getConfigPath();
+		if (Strings.isNullOrEmpty(rawConfigPath)) {
+			LOGGER.warn("There is no configPath: please adjust your cleanthat.yaml manually, in order to rely on '{}'",
+					eclipseConfigPath);
+			return;
+		}
+
+		{
+			ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
+			MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
+			ResultOrError<CleanthatRepositoryProperties, String> optResult =
+					codeCleaner.loadAndCheckConfiguration(codeProvider);
+
+			if (optResult.getOptError().isPresent()) {
+				String error = optResult.getOptError().get();
+				throw new MojoFailureException("ARG", error, error);
+			}
+
+			CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
+
+			Optional<LanguageProperties> optJavaProperties =
+					loadedConfig.getLanguages().stream().filter(lp -> "java".equals(lp.getLanguage())).findAny();
+
+			List<ObjectMapper> objectMappers =
+					appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
+			ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
+
+			LanguageProperties javaProperties = optJavaProperties.orElseGet(() -> {
+				// There is no java language properties
+				LOGGER.info("We introduce the java language properties");
+
+				// Enable mutations
+				List<LanguageProperties> mutableLanguages = new ArrayList<>(loadedConfig.getLanguages());
+				loadedConfig.setLanguages(mutableLanguages);
+
+				LanguageProperties languageProperties =
+						new JavaFormattersFactory(yamlObjectMapper).makeDefaultProperties();
+				mutableLanguages.add(languageProperties);
+
+				return languageProperties;
+			});
+
+			Optional<Map<String, ?>> optEclipseProperties = javaProperties.getProcessors()
+					.stream()
+					.filter(p -> EclipseJavaFormatter.ID.equals(p.get("engine")))
+					.findAny();
+
+			Map<String, ?> eclipseProperties;
+			if (optEclipseProperties.isPresent()) {
+				eclipseProperties = optEclipseProperties.get();
+			} else {
+				eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
+				javaProperties.getProcessors().add(eclipseProperties);
+			}
+
+			Optional<Map<String, Object>> optEclipseParameters =
+					PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
+
+			Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
+
+			eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + eclipseConfigPath);
+
+			String asYaml;
+			try {
+				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
+			}
+
+			try {
+				// StandardOpenOption.TRUNCATE_EXISTING
+				Files.writeString(Paths.get(rawConfigPath),
+						asYaml,
+						Charsets.UTF_8,
+						StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue writing YAML into: " + rawConfigPath, e);
+			}
+		}
 	}
 
 	protected Map<Path, String> loadAnyJavaFile(IEclipseStylesheetGenerator generator) {
@@ -140,7 +238,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		return pathToContent;
 	}
 
-	protected void writeSettings(Map<String, String> settings) throws IOException {
+	protected Path writeSettings(Map<String, String> settings) throws IOException {
 		Path whereToWrite = Paths.get(eclipseConfigPath);
 		File whereToWriteAsFile = whereToWrite.toFile().getAbsoluteFile();
 		if (whereToWriteAsFile.exists()) {
@@ -159,5 +257,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		} catch (TransformerException | ParserConfigurationException e) {
 			throw new IllegalArgumentException(e);
 		}
+
+		return whereToWrite;
 	}
 }

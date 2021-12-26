@@ -26,7 +26,7 @@ public class TestEclipseStylesheet {
 
 		final String path = "./src/test/java/";
 
-		Map<Path, String> contents = mojo.loadAnyJavaFile(generator, Set.of(Paths.get(path)));
+		Map<Path, String> contents = mojo.loadAnyJavaFile(Set.of(), generator, Set.of(Paths.get(path)));
 
 		Assertions.assertThat(contents)
 				.containsKey(Path.of("./src/test/java/eu/solven/cleanthat/mvn/TestEclipseStylesheet.java"));
@@ -37,7 +37,7 @@ public class TestEclipseStylesheet {
 	public void testLoadFiles_doesNotExist() {
 		final String path = "./src/test/java/does_not_exists";
 
-		Map<Path, String> contents = mojo.loadAnyJavaFile(generator, Set.of(Paths.get(path)));
+		Map<Path, String> contents = mojo.loadAnyJavaFile(Set.of(), generator, Set.of(Paths.get(path)));
 
 		Assertions.assertThat(contents).isEmpty();
 	}

@@ -9,15 +9,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +37,7 @@ import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,8 +47,10 @@ import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.git.GitIgnoreParser;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
@@ -77,13 +84,21 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
 	@Parameter(property = "eclipse_formatter.url",
-			defaultValue = "${maven.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml")
+			// defaultValue = "${maven.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml"
+			defaultValue = "${session.request.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml"
+
+	)
 	private String eclipseConfigPath;
 
 	// Generate the stylesheet can be very slow: make it faster by considering a subset of files
 	// e.g. -Djava.regex=MyClass\.java
 	@Parameter(property = "java.regex", defaultValue = DEFAULT_JAVA_REGEX)
 	private String javaRegex;
+
+	// PnYnMnDTnHnMnS
+	// https://en.wikipedia.org/wiki/ISO_8601#Durations
+	@Parameter(property = "duration.limit", defaultValue = "PT1M")
+	private String rawDurationLimit;
 
 	@VisibleForTesting
 	protected void setConfigPath(String eclipseConfigPath) {
@@ -97,7 +112,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	@Override
 	protected List<? extends Class<?>> springClasses() {
-		return Arrays.asList(EclipseStylesheetGenerator.class);
+		return Arrays.asList(EclipseStylesheetGenerator.class,
+				// Used to parse the existing config, to inject Eclipse stylesheet
+				CodeCleanerSpringConfig.class);
 	}
 
 	@Override
@@ -106,21 +123,42 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
 
-		Map<String, String> settings = generator.generateSettings(pathToContent);
+		Duration durationLimit = Duration.parse(rawDurationLimit);
+		OffsetDateTime timeLimit = OffsetDateTime.now().plus(durationLimit);
+		LOGGER.info(
+				"Job is limitted to duration={} (can be adjusted with '-Dduration.limit=PT1M') It will end at most at: {}",
+				rawDurationLimit,
+				timeLimit);
+
+		Map<String, String> settings = generator.generateSettings(timeLimit, pathToContent);
 		Path eclipseConfigPath = writeSettings(settings);
 
 		String rawConfigPath = getConfigPath();
 		if (Strings.isNullOrEmpty(rawConfigPath)) {
-			LOGGER.warn("There is no configPath: please adjust your cleanthat.yaml manually, in order to rely on '{}'",
+			LOGGER.warn(
+					"configPath is empty (-Dcleanthat.configPath=xxx): please adjust your cleanthat.yaml manually, in order to rely on '{}'",
 					eclipseConfigPath);
 			return;
 		}
 
+		Path configPath = Paths.get(rawConfigPath);
+		if (!configPath.toFile().isFile()) {
+			LOGGER.warn("configPath={} does not exists: please adjust your cleanthat.yaml manually", eclipseConfigPath);
+			return;
+		}
+
 		LOGGER.warn("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
-		injectStylesheetInConfig(appContext, eclipseConfigPath, rawConfigPath);
+
+		Path normalizedEclipsePath = normalize(eclipseConfigPath, configPath);
+		injectStylesheetInConfig(appContext, normalizedEclipsePath, configPath);
 	}
 
-	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, String rawConfigPath)
+	protected Path normalize(Path eclipseConfigPath, Path configPath) {
+		Path rootFolder = configPath.getParent();
+		return Paths.get("/", rootFolder.relativize(eclipseConfigPath).toString());
+	}
+
+	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)
 			throws MojoFailureException {
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
@@ -184,9 +222,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		// Write at given path
 		try {
-			Files.writeString(Paths.get(rawConfigPath), asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+			Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e) {
-			throw new UncheckedIOException("Issue writing YAML into: " + rawConfigPath, e);
+			throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
 		}
 	}
 
@@ -195,9 +233,11 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		List<MavenProject> collectedProjects = mavenProject.getCollectedProjects();
 
+		Path executionRoot = getBaseDir().toPath();
+		Set<String> gitIgnorePatterns = loadGitIgnorePatterns(executionRoot);
+
 		Set<Path> roots;
 		if (collectedProjects == null) {
-			Path executionRoot = getBaseDir().toPath();
 			LOGGER.info("Processing a folder with no 'pom.xml'. We will then process anything in '{}' matching '{}'",
 					executionRoot,
 					javaRegex);
@@ -217,11 +257,39 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			}).collect(Collectors.toSet());
 		}
 
-		return loadAnyJavaFile(generator, roots);
+		return loadAnyJavaFile(gitIgnorePatterns, generator, roots);
 	}
 
-	protected Map<Path, String> loadAnyJavaFile(IEclipseStylesheetGenerator generator, Set<Path> roots) {
+	protected Set<String> loadGitIgnorePatterns(Path executionRoot) {
+		// TODO This assumes the command is run from the repository root
+		Path gitIgnore = executionRoot.resolve(".gitignore");
+		File gitIgnoreFile = gitIgnore.toFile();
+
+		Set<String> gitIgnorePatterns;
+		if (gitIgnoreFile.isFile()) {
+			LOGGER.info("We detected a .gitignore ({})", gitIgnore);
+
+			String gitIgnoreContent;
+			try {
+				gitIgnoreContent =
+						new String(ByteStreams.toByteArray(new FileSystemResource(gitIgnoreFile).getInputStream()));
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue loading: " + gitIgnore, e);
+			}
+			gitIgnorePatterns = GitIgnoreParser.parsePatterns(gitIgnoreContent);
+		} else {
+			gitIgnorePatterns = Collections.emptySet();
+		}
+		return gitIgnorePatterns;
+	}
+
+	protected Map<Path, String> loadAnyJavaFile(Set<String> gitIgnorePatterns,
+			IEclipseStylesheetGenerator generator,
+			Set<Path> roots) {
 		Map<Path, String> pathToContent = new LinkedHashMap<>();
+
+		AtomicInteger nbFilteredByGitignore = new AtomicInteger();
+
 		roots.forEach(rootAsPath -> {
 			try {
 				if (!rootAsPath.toFile().exists()) {
@@ -231,7 +299,23 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 				Pattern compiledRegex = Pattern.compile(javaRegex);
 				Map<Path, String> fileToContent = generator.loadFilesContent(rootAsPath, compiledRegex);
+
+				if (!gitIgnorePatterns.isEmpty()) {
+					// Enable mutability
+					Map<Path, String> gitIgnoreFiltered = new HashMap<>(fileToContent);
+
+					gitIgnoreFiltered.keySet().removeIf(path -> !GitIgnoreParser.accept(gitIgnorePatterns, path));
+
+					nbFilteredByGitignore.addAndGet(fileToContent.size() - gitIgnoreFiltered.size());
+					fileToContent = gitIgnoreFiltered;
+				}
+
 				LOGGER.info("Loaded {} files from {}", fileToContent.size(), rootAsPath);
+
+				if (!gitIgnorePatterns.isEmpty()) {
+					LOGGER.info("#files ignored by .gitignore: {}", nbFilteredByGitignore);
+				}
+
 				pathToContent.putAll(fileToContent);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -241,15 +325,20 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	}
 
 	protected Path writeSettings(Map<String, String> settings) throws IOException {
+		if (eclipseConfigPath.startsWith("${")) {
+			throw new IllegalArgumentException("Issue with mvn placeholders: " + eclipseConfigPath);
+		}
 		Path whereToWrite = Paths.get(eclipseConfigPath);
+
 		File whereToWriteAsFile = whereToWrite.toFile().getAbsoluteFile();
 		if (whereToWriteAsFile.exists()) {
 			if (whereToWriteAsFile.isFile()) {
 				LOGGER.warn("We are going to write over '{}'", whereToWrite);
 			} else {
-				throw new IllegalStateException("There is something but not a file at: " + whereToWriteAsFile);
+				throw new IllegalStateException("There is something but not a file/folder at: " + whereToWriteAsFile);
 			}
 		} else {
+			LOGGER.info("About to write Eclipse configuration at: {}", whereToWriteAsFile);
 			whereToWriteAsFile.getParentFile().mkdirs();
 		}
 

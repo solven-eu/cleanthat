@@ -58,6 +58,7 @@ public class TestDefaultConfig {
 			// Ensure mutability
 			configFromEmpty.setLanguages(new ArrayList<>());
 
+			// TODO Refactor with eu.solven.cleanthat.mvn.CleanThatInitMojo.prepareDefaultConfiguration(ObjectMapper, Path)
 			{
 				LanguageProperties javaProperties = new LanguageProperties();
 

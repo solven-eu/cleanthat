@@ -17,6 +17,7 @@ public class JavaRevelcImportsCleanerProperties {
 	private static final boolean DEFAULT_REMOVED_UNUSED = true;
 	private static final String DEFAULT_ECLIPSE_GROUPS = "java.,javax.,org.,com.";
 	private static final String DEFAULT_ECLIPSE_STATIC_GROUPS = "java,*";
+	private static final boolean DEFAULT_STATIC_AFTER = false;
 
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#removeUnused
 	private boolean removeUnused = DEFAULT_REMOVED_UNUSED;
@@ -26,5 +27,8 @@ public class JavaRevelcImportsCleanerProperties {
 
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#staticGroups
 	private String staticGroups = DEFAULT_ECLIPSE_STATIC_GROUPS;
+
+	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#staticAfter
+	private boolean staticAfter = DEFAULT_STATIC_AFTER;
 
 }

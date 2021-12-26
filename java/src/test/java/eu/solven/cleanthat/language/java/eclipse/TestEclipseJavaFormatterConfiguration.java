@@ -21,6 +21,8 @@ public class TestEclipseJavaFormatterConfiguration {
 
 	@Test
 	public void testLoadConfig_empty() {
+		processorConfig.setUrl("");
+
 		EclipseJavaFormatterConfiguration config =
 				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
 
@@ -29,6 +31,18 @@ public class TestEclipseJavaFormatterConfiguration {
 				.containsEntry(JavaCore.COMPILER_SOURCE, "0")
 				.containsEntry(JavaCore.COMPILER_COMPLIANCE, "0")
 				.containsEntry(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "0");
+	}
+
+	@Test
+	public void testLoadConfig_default() {
+		EclipseJavaFormatterConfiguration config =
+				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
+
+		Assertions.assertThat(config.getSettings()).hasSize(332)
+		// .containsEntry(JavaCore.COMPILER_SOURCE, "0")
+		// .containsEntry(JavaCore.COMPILER_COMPLIANCE, "0")
+		// .containsEntry(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "0")
+		;
 	}
 
 	@Test

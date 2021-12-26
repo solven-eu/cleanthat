@@ -38,7 +38,8 @@ public class CleanthatUrlLoader {
 				throw new UncheckedIOException(e);
 			}
 			if (optContent.isEmpty()) {
-				throw new IllegalStateException("There is no content at: " + path);
+				throw new IllegalStateException(
+						"There is no content at: " + path + " (provider: " + codeProvider + ")");
 			}
 			resource = new ByteArrayResource(optContent.get().getBytes(StandardCharsets.UTF_8), path);
 		} else {

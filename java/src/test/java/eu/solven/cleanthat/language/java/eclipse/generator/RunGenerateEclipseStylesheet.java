@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -43,12 +44,13 @@ public class RunGenerateEclipseStylesheet {
 		// Path writtenPath = stylesheetGenerator.writeInTmp();
 		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/RoaringBitmap");
 		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
-		Pattern fileMatcher = Pattern.compile(".*/src/.*/java/.*\\.java");
+		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
 
 		EclipseStylesheetGenerator stylesheetGenerator = new EclipseStylesheetGenerator();
 		Map<Path, String> pathToFile = stylesheetGenerator.loadFilesContent(rootForFiles, fileMatcher);
 		{
-			Map<String, String> bestOptions = stylesheetGenerator.generateSettings(pathToFile);
+			Map<String, String> bestOptions =
+					stylesheetGenerator.generateSettings(OffsetDateTime.now().plusHours(1), pathToFile);
 
 			logDiffWithPepper(stylesheetGenerator, pathToFile, bestOptions);
 
@@ -74,7 +76,8 @@ public class RunGenerateEclipseStylesheet {
 		});
 		EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(pepperConvention);
 		EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
-		long pepperDiffScoreDiff = stylesheetGenerator.computeDiffScore(formatter, pathToFile.values());
+		long pepperDiffScoreDiff =
+				stylesheetGenerator.getCodeDiffHelper().computeDiffScore(formatter, pathToFile.values());
 		LOGGER.info("Pepper diff: {}", pepperDiffScoreDiff);
 	}
 

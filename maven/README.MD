@@ -30,6 +30,14 @@ CleanThat for Java holds a module to apply an Eclipse Stylesheet. However, gener
 
     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
 
+### Timeout
+
+As this process can be very slow, we default a timeout at 1 minute. It can be overriden through:
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet -Dduration.limit=PT1H
+
+Details about the syntax: https://en.wikipedia.org/wiki/ISO_8601#Durations
+
 # Developers
 
 Install the plugin in local mvn repository (if only the plugin has been updated):

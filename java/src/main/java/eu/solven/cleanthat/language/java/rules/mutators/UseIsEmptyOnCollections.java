@@ -21,7 +21,7 @@ import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
- * Prefer 'm.isEmpty()' over 'm.size() == 0'
+ * Prefer 'm.isEmpty()' over 'm.size() == 0'. Works with {@link Collection}, {@link Map} and {@link String}.
  *
  * @author Benoit Lacelle
  */
@@ -35,11 +35,14 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 
 	@Override
 	public String minimalJavaVersion() {
+		// java.util.Collection.isEmpty() exists since 1.2
+		// java.lang.String.isEmpty() exists since 1.6
 		return IJdkVersionConstants.JDK_6;
 	}
 
 	@Override
 	public String pmdUrl() {
+		// https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/bestpractices/UseCollectionIsEmptyRule.java
 		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty";
 	}
 
@@ -56,8 +59,10 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 			BinaryExpr binaryExpr = (BinaryExpr) node;
 			Optional<MethodCallExpr> checkmeForIsEmpty;
 			if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
+				// xxx.method() == 0
 				checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
 			} else if (binaryExpr.getLeft().equals(ZERO_EXPR) && binaryExpr.getRight() instanceof MethodCallExpr) {
+				// 0 == xxx.method()
 				checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getRight());
 			} else {
 				checkmeForIsEmpty = Optional.empty();
@@ -69,16 +74,19 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 			if (optLengthScope.isEmpty()) {
 				return false;
 			}
+
+			// Check the called method is .size() or .length()
 			if (!"size".equals(checkmeForIsEmpty.get().getNameAsString())
+					// For String.length()
 					&& !"length".equals(checkmeForIsEmpty.get().getNameAsString())) {
-				LOGGER.debug("Not calling .size()");
+				LOGGER.debug("Not calling .size() nor .length()");
 				return false;
 			}
 			Expression lengthScope = optLengthScope.get();
 			Optional<ResolvedType> type = optResolvedType(lengthScope);
 
 			if (type.isPresent()) {
-				boolean localTransformed = process(node, lengthScope, type.get());
+				boolean localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
 				if (localTransformed) {
 					return true;
 				}
@@ -89,7 +97,7 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
-	private boolean process(Node node, Expression lengthScope, ResolvedType type) {
+	private boolean checkTypeAndProcess(Node node, Expression lengthScope, ResolvedType type) {
 		boolean transformed;
 		if (type.isReferenceType()) {
 			LOGGER.info("scope={} type={}", lengthScope, type);
@@ -112,6 +120,7 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 				}
 			}
 			if (doIt) {
+				// replace 'x.size() == 0' with 'x.isEmpty()'
 				transformed = node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
 			} else {
 				transformed = false;

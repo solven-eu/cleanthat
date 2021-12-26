@@ -28,6 +28,7 @@ languages:
       remove_unused: true
       groups: "java.,javax.,org.,com."
       static_groups: "java,*"
+      static_after: false
   # Use Spring formatting convention
   - engine: "spring_formatter"
     parameters: {}

@@ -52,7 +52,8 @@ public class JavaRevelcImportsCleaner implements ILintFixer {
 	@Override
 	public String doFormat(String code, LineEnding eolToApply) throws IOException {
 		// see net.revelc.code.impsort.maven.plugin.AbstractImpSortMojo
-		Grouper grouper = new Grouper(properties.getGroups(), properties.getStaticGroups(), false, false, true);
+		Grouper grouper = new Grouper(properties
+				.getGroups(), properties.getStaticGroups(), properties.isStaticAfter(), false, true);
 		Charset charset = Charset.forName(sourceCodeProperties.getEncoding());
 		ImpSort impsort = new ImpSort(charset,
 				grouper,

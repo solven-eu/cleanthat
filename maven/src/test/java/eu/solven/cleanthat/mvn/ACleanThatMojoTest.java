@@ -2,6 +2,7 @@ package eu.solven.cleanthat.mvn;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -44,6 +45,14 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 
 		// https://stackoverflow.com/questions/9496534/test-default-values-and-expressions-of-mojos-using-maven-plugin-testing-harness
 		MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+
+		{
+			Properties userProperties = new Properties();
+			// Unclear why this is not setup by default test-harness
+			userProperties.setProperty("maven.multiModuleProjectDirectory", readWriteFolder.getAbsolutePath());
+			executionRequest.setUserProperties(userProperties);
+		}
+
 		ProjectBuildingRequest buildingRequest = executionRequest.getProjectBuildingRequest();
 		buildingRequest.setRepositorySession(new DefaultRepositorySystemSession());
 		ProjectBuilder projectBuilder = this.lookup(ProjectBuilder.class);
@@ -55,8 +64,14 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 	protected Mojo lookupConfiguredMojo(MavenProject project, String goal) throws Exception {
 		MavenSession session = newMavenSession(project);
 
-		// This enable the use of ${session.executionRootDirectory}
+		// This enables the use of ${session.executionRootDirectory}
 		session.getRequest().setBaseDirectory(project.getBasedir());
+		// This enables the use of ${maven.multiModuleProjectDirectory}
+		session.getRequest().setMultiModuleProjectDirectory(project.getBasedir());
+
+		// This enables adding -Dxxx.yyy=zzz
+		// It is especially useful to force ${maven.multiModuleProjectDirectory} in tests
+		session.getRequest().setUserProperties(project.getProjectBuildingRequest().getUserProperties());
 
 		return lookupConfiguredMojo(session, newMojoExecution(goal));
 	}

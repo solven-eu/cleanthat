@@ -15,12 +15,16 @@ Related projects:
 Cleanthat is currently compatible with the following languages:
 
  - java
+ - scala 
+ - json
 
 # Installation
 
 If your repository is hosted on Github.com:
 
     https://github.com/marketplace/cleanthat/
+    
+Else: You can spsonsor it (Gitlab, OnPremise, ...)
 
 # Last considerations
 

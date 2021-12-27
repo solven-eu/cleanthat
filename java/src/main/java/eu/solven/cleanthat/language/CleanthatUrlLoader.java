@@ -19,6 +19,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
  *
  */
 public class CleanthatUrlLoader {
+	public static final String PREFIX_CODE = "code:";
 
 	protected CleanthatUrlLoader() {
 		// hidden
@@ -26,10 +27,10 @@ public class CleanthatUrlLoader {
 
 	public static Resource loadUrl(ICodeProvider codeProvider, String javaConfigFile) {
 		Resource resource;
-		if (javaConfigFile.startsWith("code:")) {
+		if (javaConfigFile.startsWith(PREFIX_CODE)) {
 			// This is inspired by Spring 'classpath:'
 			// Here, it is used to load files from current repository
-			String path = javaConfigFile.substring("code:".length());
+			String path = javaConfigFile.substring(PREFIX_CODE.length());
 			Optional<String> optContent;
 			try {
 				optContent = codeProvider.loadContentForPath(path);
@@ -37,7 +38,8 @@ public class CleanthatUrlLoader {
 				throw new UncheckedIOException(e);
 			}
 			if (optContent.isEmpty()) {
-				throw new IllegalStateException("There is no content at: " + path);
+				throw new IllegalStateException(
+						"There is no content at: " + path + " (provider: " + codeProvider + ")");
 			}
 			resource = new ByteArrayResource(optContent.get().getBytes(StandardCharsets.UTF_8), path);
 		} else {

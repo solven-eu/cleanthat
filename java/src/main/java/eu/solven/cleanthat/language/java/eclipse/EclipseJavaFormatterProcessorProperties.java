@@ -15,7 +15,11 @@ import lombok.Data;
 @SuppressWarnings("PMD.ImmutableField")
 @Data
 public class EclipseJavaFormatterProcessorProperties {
+	public static final String URL_DEFAULT_GOOGLE = "classpath:/eclipse/eclipse-java-google-style.xml";
+	public static final String URL_DEFAULT_SPRING = "classpath:/eclipse/spring-eclipse-code-formatter.xml";
+	public static final String URL_DEFAULT_PEPPER = "classpath:/eclipse/pepper-eclipse-code-formatter.xml";
 
-	private String url;
+	// see eu.solven.cleanthat.language.CleanthatUrlLoader.loadUrl(ICodeProvider, String)
+	private String url = URL_DEFAULT_GOOGLE;
 
 }

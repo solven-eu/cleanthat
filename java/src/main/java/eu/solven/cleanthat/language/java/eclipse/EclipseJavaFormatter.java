@@ -15,6 +15,8 @@ package eu.solven.cleanthat.language.java.eclipse;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
@@ -26,6 +28,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 
@@ -41,7 +44,13 @@ import eu.solven.cleanthat.formatter.LineEnding;
 public class EclipseJavaFormatter implements IStyleEnforcer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
+	public static final String ID = "eclipse_formatter";
+
 	private final Map<String, String> defaultSettings;
+
+	// For statistics purposes
+	private static final AtomicInteger NB_FORMATTED = new AtomicInteger();
+	private static final AtomicLong TIME_FORMATTING = new AtomicLong();
 
 	public EclipseJavaFormatter(EclipseJavaFormatterConfiguration configuration) {
 		defaultSettings = configuration.getSettings();
@@ -52,6 +61,7 @@ public class EclipseJavaFormatter implements IStyleEnforcer {
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 
+		long start = System.currentTimeMillis();
 		TextEdit textEdit;
 		try {
 			textEdit = formatter.format(CodeFormatter.K_COMPILATION_UNIT
@@ -63,6 +73,19 @@ public class EclipseJavaFormatter implements IStyleEnforcer {
 		} catch (RuntimeException e) {
 			LOGGER.warn("Code cannot be formatted", e);
 			return null;
+		} catch (AssertionError e) {
+			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=543646
+			LOGGER.warn("Bug in Eclipse Formatter?", e);
+			return null;
+		} finally {
+			long time = System.currentTimeMillis() - start;
+			long totalDuration = TIME_FORMATTING.addAndGet(time);
+			int totalFormats = NB_FORMATTED.incrementAndGet();
+			if (Integer.bitCount(totalFormats) == 1) {
+				LOGGER.info("Total Eclipse Formats: {}. MeanTime: {}",
+						PepperLogHelper.humanBytes(totalFormats),
+						PepperLogHelper.humanDuration(totalDuration / totalFormats));
+			}
 		}
 		IDocument doc = new Document(code);
 		try {

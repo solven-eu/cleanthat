@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.language.java;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -10,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -18,6 +21,7 @@ import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterProcessorProperties;
@@ -61,9 +65,9 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		ILintFixer processor;
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, "engine");
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		// override with explicit configuration
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, "parameters");
+		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
 		if (parameters == null) {
 			// Some engine takes no parameter
 			parameters = Map.of();
@@ -81,6 +85,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			try {
 				configuration = configToEngine
 						.get(new EclipseFormatterCacheKey(codeProvider, languageProperties, processorConfig), () -> {
+							LOGGER.info("Loading for cache: {} {} {}",
+									codeProvider,
+									languageProperties,
+									processorConfig);
 							return EclipseJavaFormatterConfiguration
 									.load(codeProvider, languageProperties, processorConfig);
 						});
@@ -88,32 +96,80 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 				throw new RuntimeException(e);
 			}
 			processor = new EclipseJavaFormatter(configuration);
-		}
 			break;
+		}
 
 		case "revelc_imports": {
 			JavaRevelcImportsCleanerProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
 			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCode(), processorConfig);
-		}
 			break;
+		}
 
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
 					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
 			processor = new SpringJavaStyleEnforcer(languageProperties.getSourceCode(), processorConfig);
-		}
 			break;
+		}
 		case "rules": {
 			JavaRulesMutatorProperties processorConfig =
 					objectMapper.convertValue(parameters, JavaRulesMutatorProperties.class);
 			processor = new RulesJavaMutator(languageProperties, processorConfig);
-		}
 			break;
+		}
 
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
 		}
 		return processor;
+	}
+
+	public LanguageProperties makeDefaultProperties() {
+		LanguageProperties languageProperties = new LanguageProperties();
+
+		languageProperties.setLanguage(getLanguage());
+
+		List<Map<String, ?>> processors = new ArrayList<>();
+
+		// Apply rules
+		{
+			JavaRulesMutatorProperties engineParameters = new JavaRulesMutatorProperties();
+
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, "rules")
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
+
+		// Import cleaning
+		{
+			JavaRevelcImportsCleanerProperties engineParameters = new JavaRevelcImportsCleanerProperties();
+
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, "revelc_imports")
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
+
+		// Eclipse formatting is done last, to clean after rules
+		{
+			Map<String, ?> processorProperties = makeEclipseFormatterDefaultProperties();
+			processors.add(processorProperties);
+		}
+
+		languageProperties.setProcessors(processors);
+
+		return languageProperties;
+	}
+
+	public static Map<String, ?> makeEclipseFormatterDefaultProperties() {
+		EclipseJavaFormatterProcessorProperties engineParameters = new EclipseJavaFormatterProcessorProperties();
+
+		Map<String, ?> processorProperties = ImmutableMap.<String, Object>builder()
+				.put(KEY_ENGINE, EclipseJavaFormatter.ID)
+				.put(KEY_PARAMETERS, engineParameters)
+				.build();
+		return processorProperties;
 	}
 }

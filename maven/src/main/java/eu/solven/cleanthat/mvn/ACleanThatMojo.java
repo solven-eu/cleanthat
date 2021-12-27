@@ -9,6 +9,7 @@ import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 /**
@@ -29,7 +30,14 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	private MavenSession session;
 
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
-	@Parameter(property = "cleanthat.configPath", defaultValue = "${maven.multiModuleProjectDirectory}/cleanthat.yaml")
+	// It seems not possible to rely on 'maven.XXX' (hence not '${maven.multiModuleProjectDirectory}') in plugin
+	// parameters. See PluginParameterExpressionEvaluator
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.basedir}/cleanthat.yaml")
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
+	// The following is not compatible with goals executable without a pom.xml
+	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
+	// The following is not compatible with UnitTests
+	@Parameter(property = "cleanthat.configPath", defaultValue = "${session.executionRootDirectory}/cleanthat.yaml")
 	private String configPath;
 
 	@Parameter(property = "cleanthat.configUrl")
@@ -44,8 +52,8 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 */
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L214
 	// Is this the same as 'getProject().getBasedir()'?
-	@Parameter(defaultValue = "${project.basedir}", required = true, readonly = true)
-	private File basedir;
+	// @Parameter(defaultValue = "${project.basedir}", required = true, readonly = true)
+	// private File basedir;
 
 	/**
 	 * Runs the plugin only if the current project is the execution root.
@@ -56,6 +64,24 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L335
 	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
 	private boolean runOnlyAtRoot;
+
+	@VisibleForTesting
+	protected void setProject(MavenProject project) {
+		this.project = project;
+	}
+
+	public MavenProject getProject() {
+		return project;
+	}
+
+	@VisibleForTesting
+	protected void setSession(MavenSession session) {
+		this.session = session;
+	}
+
+	public MavenSession getSession() {
+		return session;
+	}
 
 	protected void checkParameters() {
 		String configPath = getConfigPath();
@@ -70,19 +96,39 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		}
 	}
 
-	public MavenProject getProject() {
-		return project;
-	}
-
-	public MavenSession getSession() {
-		return session;
+	public File getBaseDir() {
+		File baseDir = getProject().getBasedir();
+		if (baseDir == null) {
+			// We are processing a folder with no pom.xml
+			baseDir = new File(getSession().getExecutionRootDirectory());
+			LOGGER.info("Current folder has no pom.xml");
+			LOGGER.info("Consider as baseDir: {}", baseDir);
+		}
+		getLog().info("baseDir: " + baseDir);
+		return baseDir;
 	}
 
 	public String getConfigPath() {
+		if (configPath != null && configPath.contains("${")) {
+			// session.get
+			// project.getBasedir();
+			// session.getExecutionRootDirectory();
+			// session.getBas
+			throw new IllegalStateException("Issue with configPath: '" + configPath + "'");
+		}
+
 		return configPath;
 	}
 
+	@VisibleForTesting
+	public void setConfigUrl(String configUrl) {
+		this.configUrl = configUrl;
+	}
+
 	public String getConfigUrl() {
+		if (configUrl != null && configUrl.contains("${")) {
+			throw new IllegalStateException("Issue with configUrl: '" + configUrl + "'");
+		}
 		return configUrl;
 	}
 
@@ -102,17 +148,19 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// https://blog.sonatype.com/2009/05/how-to-make-a-plugin-run-once-during-a-build/
 	protected boolean isThisTheExecutionRoot() {
 		LOGGER.debug("Root Folder: {}", session.getExecutionRootDirectory());
-		LOGGER.debug("Current Folder: {}", basedir);
-		boolean result = session.getExecutionRootDirectory().equalsIgnoreCase(basedir.toString());
+
+		File baseDir = getProject().getBasedir();
+		LOGGER.debug("Current Folder: {}", baseDir);
+		boolean result = session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
 		if (result) {
 			LOGGER.debug("This is the execution root.");
 			if (!getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", basedir, getProject());
+				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
 			}
 		} else {
 			LOGGER.debug("This is NOT the execution root.");
 			if (getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", basedir, getProject());
+				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
 			}
 		}
 		return result;

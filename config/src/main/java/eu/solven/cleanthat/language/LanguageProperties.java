@@ -21,12 +21,12 @@ import lombok.Data;
 @Data
 public class LanguageProperties implements ILanguageProperties {
 
-	private SourceCodeProperties sourceCode;
-
 	private String language = "none";
 
 	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
 	private String languageVersion = "0";
+
+	private SourceCodeProperties sourceCode = new SourceCodeProperties();
 
 	// The (ordered) processors to apply
 	// @JsonDeserialize(using = ProcessorsDeseralizer.class)

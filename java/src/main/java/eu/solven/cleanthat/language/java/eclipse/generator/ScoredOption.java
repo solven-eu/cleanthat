@@ -24,4 +24,9 @@ public class ScoredOption<T> {
 		return score;
 	}
 
+	@Override
+	public String toString() {
+		// Do not print the options as it can be quite large
+		return "Option score: " + score;
+	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -35,6 +36,15 @@
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<!-- <exclusion> -->
+				<!-- We exclude this artifact as this is a maven plugin: it conflicts 
+					with META-INF -->
+				<!-- TODO We would exclude only in unit-tests -->
+				<!-- <groupId>net.revelc.code</groupId> -->
+				<!-- <artifactId>impsort-maven-plugin</artifactId> -->
+				<!-- </exclusion> -->
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -120,6 +130,13 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.cormoran-io.pepper</groupId>
+			<artifactId>pepper-unittest</artifactId>
+			<version>${pepper.version}</version>
+			<scope></scope>
 		</dependency>
 	</dependencies>
 

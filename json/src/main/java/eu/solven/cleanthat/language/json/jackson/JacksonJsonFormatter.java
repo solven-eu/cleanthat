@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 
@@ -22,7 +22,7 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/main/src/main/java/net/revelc/code/formatter/json/JsonFormatter.java
-public class JacksonJsonFormatter implements ILintFixer {
+public class JacksonJsonFormatter implements ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JacksonJsonFormatter.class);
 
 	final ISourceCodeProperties sourceCodeProperties;
@@ -42,6 +42,11 @@ public class JacksonJsonFormatter implements ILintFixer {
 		// formatter.setDefaultPrettyPrinter(printer);
 		formatter.enable(SerializationFeature.INDENT_OUTPUT);
 		formatter.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, useAlphabeticalOrder);
+	}
+
+	@Override
+	public String getId() {
+		return "jackson";
 	}
 
 	protected DefaultPrettyPrinter makePrinter(LineEnding ending) {

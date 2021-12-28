@@ -12,6 +12,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.GitHubClientUtil;
 import org.kohsuke.github.PagedSearchIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,9 +91,11 @@ public class RunGithubMonitoring {
 				}
 
 				logAboutUser(installationGithub, installation);
-				installation.setRoot(installationGithub);
 
-				PagedSearchIterable<GHRepository> repositories = installation.listRepositories();
+				// https://github.com/hub4j/github-api/issues/1082#issuecomment-991289909
+				// installation.setRoot(installationGithub);
+				// installation.listRepositories()
+				PagedSearchIterable<GHRepository> repositories = GitHubClientUtil.listRepositories(installationGithub);
 				LOGGER.info("#repositories: {}", repositories.getTotalCount());
 				repositories.forEach(repo -> {
 					if (Strings.isNullOrEmpty(repo.getLanguage())) {

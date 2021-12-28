@@ -10,7 +10,7 @@ import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
 /**

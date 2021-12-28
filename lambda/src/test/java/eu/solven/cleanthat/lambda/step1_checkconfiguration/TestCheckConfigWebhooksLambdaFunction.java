@@ -21,9 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @RunWith(SpringRunner.class)

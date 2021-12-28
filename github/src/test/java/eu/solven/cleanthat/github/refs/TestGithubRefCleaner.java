@@ -12,10 +12,10 @@ import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 

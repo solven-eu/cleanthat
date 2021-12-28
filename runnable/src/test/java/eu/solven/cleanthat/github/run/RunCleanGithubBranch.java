@@ -23,6 +23,7 @@ import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -121,10 +122,10 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			CodeFormatResult output = cleaner.formatRef(repo, Suppliers.memoize(() -> {
+			CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), Suppliers.memoize(() -> {
 				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
 				createdPr.set(pr);
-				return pr;
+				return GithubDecoratorHelper.decorate(pr);
 			}));
 
 			if (createdPr.get() == null) {

@@ -1,15 +1,11 @@
-package eu.solven.cleanthat.code_provider.github.refs;
+package eu.solven.cleanthat.codeprovider.git;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
-import eu.solven.cleanthat.code_provider.github.event.pojo.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 
 /**
@@ -17,7 +13,7 @@ import eu.solven.cleanthat.formatter.CodeFormatResult;
  *
  * @author Benoit Lacelle
  */
-public interface IGithubRefCleaner {
+public interface IGitRefCleaner {
 
 	/**
 	 * 
@@ -31,8 +27,10 @@ public interface IGithubRefCleaner {
 			GitRepoBranchSha1 theRef,
 			Set<String> relevantBaseBranches);
 
-	CodeFormatResult formatRef(GHRepository repo, Supplier<GHRef> refSupplier);
+	CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier);
 
-	CodeFormatResult formatRefDiff(GHRepository repo, GHRef baseSupplier, Supplier<GHRef> headSupplier);
+	CodeFormatResult formatRefDiff(IGitRepository repo,
+			IGitReference baseSupplier,
+			Supplier<IGitReference> headSupplier);
 
 }

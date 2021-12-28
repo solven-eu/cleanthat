@@ -12,7 +12,7 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
 /**

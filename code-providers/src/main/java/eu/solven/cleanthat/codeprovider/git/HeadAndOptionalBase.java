@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.code_provider.github.event.pojo;
+package eu.solven.cleanthat.codeprovider.git;
 
 import java.util.Optional;
 

@@ -2,6 +2,9 @@ package eu.solven.cleanthat.code_provider.github.event.pojo;
 
 import java.util.Optional;
 
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+
 /**
  * Holds details about a filter over an Event
  * 

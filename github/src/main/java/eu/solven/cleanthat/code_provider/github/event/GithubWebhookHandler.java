@@ -39,14 +39,16 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GitPrHeadRef;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
@@ -368,7 +370,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			String eventKey = githubEvent.getxGithubDelivery();
 			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get(), eventKey);
 		}
-		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
@@ -474,11 +476,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
-		Supplier<GHRef> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
+		Supplier<IGitReference> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
 		CodeFormatResult result;
 		if (relevancyResult.optBaseForHead().isPresent()) {
 			// If the base does not exist, then something is wrong: let's check right away it is available
@@ -488,9 +490,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-			result = cleaner.formatRefDiff(repo, base, headSupplier);
+			result = cleaner.formatRefDiff(GithubDecoratorHelper.decorate(repo),
+					GithubDecoratorHelper.decorate(base),
+					headSupplier);
 		} else {
-			result = cleaner.formatRef(repo, headSupplier);
+			result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier);
 		}
 		if (refLazyRefCreated.get() != null) {
 			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
@@ -527,11 +531,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 	}
 
-	public Supplier<GHRef> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
+	public Supplier<IGitReference> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
 			GHRepository repo,
 			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
-		Supplier<GHRef> headSupplier = () -> {
+		Supplier<IGitReference> headSupplier = () -> {
 			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
 			String refName = refToProcess.getRef();
 			String repoName = repo.getName();
@@ -548,7 +552,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			}
 			try {
-				return facade.getRef(refName);
+				return GithubDecoratorHelper.decorate(facade.getRef(refName));
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}

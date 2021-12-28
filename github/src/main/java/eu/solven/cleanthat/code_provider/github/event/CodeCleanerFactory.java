@@ -5,11 +5,11 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
- * Factory for {@link IGithubRefCleaner}
+ * Factory for {@link IGitRefCleaner}
  * 
  * @author Benoit Lacelle
  *
@@ -25,7 +25,7 @@ public class CodeCleanerFactory implements ICodeCleanerFactory {
 	}
 
 	@Override
-	public IGithubRefCleaner makeCleaner(Object somethingInteresting) {
+	public IGitRefCleaner makeCleaner(Object somethingInteresting) {
 		if (somethingInteresting instanceof GithubAndToken) {
 			return new GithubRefCleaner(objectMappers, formatterProvider, (GithubAndToken) somethingInteresting);
 		}

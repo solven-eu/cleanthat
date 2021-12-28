@@ -29,11 +29,14 @@ import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
-import eu.solven.cleanthat.code_provider.github.event.pojo.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
@@ -43,11 +46,11 @@ import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
- * Default for {@link IGithubRefCleaner}
+ * Default for {@link IGitRefCleaner}
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner {
+public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
@@ -174,21 +177,26 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	}
 
 	@Override
-	public CodeFormatResult formatRefDiff(GHRepository repo, GHRef base, Supplier<GHRef> headSupplier) {
+	public CodeFormatResult formatRefDiff(IGitRepository repo,
+			IGitReference base,
+			Supplier<IGitReference> headSupplier) {
 		// TODO Get the head lazily
-		GHRef head = headSupplier.get();
+		GHRef head = headSupplier.get().getDecorated();
+		GHRef ghBase = base.getDecorated();
 
-		LOGGER.info("Base: {} Head: {}", base.getRef(), head.getRef());
-		ICodeProviderWriter codeProvider = new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo, base, head);
+		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), head.getRef());
+		ICodeProviderWriter codeProvider =
+				new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ghBase, head);
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	@Override
-	public CodeFormatResult formatRef(GHRepository repo, Supplier<GHRef> refSupplier) {
+	public CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier) {
 		// TODO Get the head lazily
-		GHRef ref = refSupplier.get();
+		GHRef ref = refSupplier.get().getDecorated();
 
-		ICodeProviderWriter codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, ref);
+		ICodeProviderWriter codeProvider =
+				new GithubRefCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ref);
 		LOGGER.info("Ref: {}", codeProvider.getHtmlUrl());
 		return formatCodeGivenConfig(codeProvider, false);
 	}

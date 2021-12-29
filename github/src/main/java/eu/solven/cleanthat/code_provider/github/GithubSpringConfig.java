@@ -10,7 +10,9 @@ import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}
@@ -24,5 +26,11 @@ public class GithubSpringConfig {
 	@Bean
 	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env, List<ObjectMapper> objectMappers) {
 		return new GithubWebhookHandlerFactory(env, objectMappers);
+	}
+
+	@Bean
+	public GithubCodeCleanerFactory githubCodeCleanerFactory(List<ObjectMapper> objectMappers,
+			ICodeProviderFormatter formatterProvider) {
+		return new GithubCodeCleanerFactory(objectMappers, formatterProvider);
 	}
 }

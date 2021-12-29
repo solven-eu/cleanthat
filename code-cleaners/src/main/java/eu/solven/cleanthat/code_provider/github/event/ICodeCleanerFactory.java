@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.code_provider.github.event;
 
+import java.util.Optional;
+
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 
 /**
@@ -9,5 +11,5 @@ import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
  *
  */
 public interface ICodeCleanerFactory {
-	IGitRefCleaner makeCleaner(Object somethingInteresting);
+	Optional<IGitRefCleaner> makeCleaner(Object somethingInteresting);
 }

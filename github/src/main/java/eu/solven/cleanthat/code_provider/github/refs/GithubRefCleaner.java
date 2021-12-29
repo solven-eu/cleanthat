@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +19,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -31,6 +31,7 @@ import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
@@ -201,8 +202,22 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
-	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
+	@Override
+	public boolean tryOpenPRWithCleanThatStandardConfiguration(IGitBranch branch) {
+		GHBranch defaultBranch = branch.getDecorated();
 		GHRepository repo = defaultBranch.getOwner();
+
+		String branchName = defaultBranch.getName();
+		ICodeProvider codeProvider =
+				getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(), branchName, defaultBranch.getSHA1()));
+		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+		if (optPrConfig.isPresent()) {
+			LOGGER.info("There is a configuration (valid or not) in the default branch ({})", branchName);
+			return false;
+		} else {
+			LOGGER.info("There is no configuration in the default branch ({})", branchName);
+		}
+
 		String refName = REF_NAME_CONFIGURE;
 		String fullRefName = GithubFacade.toFullGitRef(refName);
 		boolean refAlreadyExists;
@@ -232,6 +247,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 						LOGGER.info("Related PR: {}", pr.getHtmlUrl());
 					}
 				});
+				return false;
 			} else {
 				GHCommit commit = commitConfig(defaultBranch, repo);
 				refToPR = Optional.of(repo.createRef(fullRefName, commit.getSHA1()));
@@ -245,11 +261,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
 				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
 						refToPR.get().getRef(),
-						defaultBranch.getName(),
+						branchName,
 						body,
 						true,
 						false);
 				LOGGER.info("Open PR: {}", pr.getHtmlUrl());
+				return true;
 			}
 		} catch (IOException e) {
 			// TODO If 401, it probably means the Installation is not allowed to modify given repo

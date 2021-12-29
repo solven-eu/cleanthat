@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
@@ -39,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GitPrHeadRef;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
@@ -153,7 +155,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// has a PR)
 		boolean pushBranch;
 		// boolean refHasOpenReviewRequest;
-		// baseRef is optional: in case of PR even, it is trivial, but in case of commitPush event, we have to scan for
+		// baseRef is optional: in case of PR event, it is trivial, but in case of commitPush event, we have to scan for
 		// a compatible
 		Optional<GitRepoBranchSha1> optBaseRef;
 		// If not headRef: this event is not relevant (e.g. it is a comment event)
@@ -237,6 +239,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 								Optional.empty());
 					}
 					String pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
+					// TODO 'cleanthat' username should not be hardcoded
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
 						return new GithubWebhookRelevancyResult(false,
@@ -370,7 +373,32 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			String eventKey = githubEvent.getxGithubDelivery();
 			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get(), eventKey);
 		}
-		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
+
+		// We rely on push over branches to trigger initialization
+		if (offlineResult.isPushBranch()) {
+			GHBranch defaultBranch;
+			try {
+				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
+			} catch (RuntimeException e) {
+				LOGGER.warn("We failed finding the default branch", e);
+				return WebhookRelevancyResult.dismissed("Issue guessing the default branch");
+			}
+
+			String pushedRef = offlineResult.optBaseRef().get().getRef();
+			if (pushedRef.equals(defaultBranch.getName())) {
+				// Open PR with default relevant configuration
+				boolean initialized = cleaner
+						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
+
+				if (initialized) {
+					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
+				}
+			} else {
+				LOGGER.info("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
+			}
+		}
+
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
@@ -412,7 +440,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanability(GHRepository eventRepo,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
-		// GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
 			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
 			GHPullRequest optPr;
@@ -476,7 +503,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean

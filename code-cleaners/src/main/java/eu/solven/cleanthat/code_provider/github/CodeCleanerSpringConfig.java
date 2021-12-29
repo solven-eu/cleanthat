@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.code_provider.github.event.CodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
@@ -61,8 +60,7 @@ public class CodeCleanerSpringConfig {
 	}
 
 	@Bean
-	public ICodeCleanerFactory codeCleanerFactory(List<ObjectMapper> objectMappers,
-			ICodeProviderFormatter formatterProvider) {
-		return new CodeCleanerFactory(objectMappers, formatterProvider);
+	public ICodeCleanerFactory compositeCodeCleanerFactory(List<ICodeCleanerFactory> specialized) {
+		return new CompositeCodeCleanerFactory(specialized);
 	}
 }

@@ -18,6 +18,7 @@ import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -52,7 +53,7 @@ public class ITGithubPullRequestCleaner {
 		cleaner = new GithubRefCleaner(objectMappers, codeProviderFormatter, githubForRepo);
 
 		GitHub installationGithub = githubForRepo.getGithub();
-		cleaner.openPRWithCleanThatStandardConfiguration(installationGithub,
-				GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName)));
+		cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper
+				.decorate(GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName))));
 	}
 }

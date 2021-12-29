@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.code_provider.github.event;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,27 +10,27 @@ import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
- * Factory for {@link IGitRefCleaner}
+ * {@link ICodeCleanerFactory} specialized for GitHub
  * 
  * @author Benoit Lacelle
  *
  */
-public class CodeCleanerFactory implements ICodeCleanerFactory {
-
+public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 	final List<ObjectMapper> objectMappers;
 	final ICodeProviderFormatter formatterProvider;
 
-	public CodeCleanerFactory(List<ObjectMapper> objectMappers, ICodeProviderFormatter formatterProvider) {
+	public GithubCodeCleanerFactory(List<ObjectMapper> objectMappers, ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
 		this.formatterProvider = formatterProvider;
 	}
 
 	@Override
-	public IGitRefCleaner makeCleaner(Object somethingInteresting) {
+	public Optional<IGitRefCleaner> makeCleaner(Object somethingInteresting) {
 		if (somethingInteresting instanceof GithubAndToken) {
-			return new GithubRefCleaner(objectMappers, formatterProvider, (GithubAndToken) somethingInteresting);
+			GithubRefCleaner refCleaner =
+					new GithubRefCleaner(objectMappers, formatterProvider, (GithubAndToken) somethingInteresting);
+			return Optional.of(refCleaner);
 		}
-		throw new IllegalArgumentException("Invalid argument:" + somethingInteresting);
+		return Optional.empty();
 	}
-
 }

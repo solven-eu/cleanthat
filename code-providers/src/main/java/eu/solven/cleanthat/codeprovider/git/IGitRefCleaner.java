@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -14,6 +15,8 @@ import eu.solven.cleanthat.formatter.CodeFormatResult;
  * @author Benoit Lacelle
  */
 public interface IGitRefCleaner {
+
+	boolean tryOpenPRWithCleanThatStandardConfiguration(IGitBranch branch);
 
 	/**
 	 * 

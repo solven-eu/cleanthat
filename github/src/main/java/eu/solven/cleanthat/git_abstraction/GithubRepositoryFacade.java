@@ -12,7 +12,7 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
 /**
@@ -90,10 +90,20 @@ public class GithubRepositoryFacade {
 		}
 
 		GHRef remoteRef = getRef(ref.getRef());
+
 		URL remoteRefUrl = remoteRef.getUrl();
-		LOGGER.info("About to delete {}", remoteRefUrl);
-		remoteRef.delete();
-		LOGGER.info("Deleted {}", remoteRefUrl);
+		String currentSha = remoteRef.getObject().getSha();
+		String initialSha = ref.getSha();
+		if (currentSha.equals(initialSha)) {
+			LOGGER.info("About to delete {}", remoteRefUrl);
+			remoteRef.delete();
+			LOGGER.info("Deleted {}", remoteRefUrl);
+		} else {
+			LOGGER.info("We skip removal of {} as its current sha ({}) differs from the sha at creation ({})",
+					remoteRefUrl,
+					currentSha,
+					initialSha);
+		}
 	}
 
 	public GHRef getRef(String refName) throws IOException {

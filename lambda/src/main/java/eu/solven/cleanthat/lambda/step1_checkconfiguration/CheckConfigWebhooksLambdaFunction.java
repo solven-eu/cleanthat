@@ -13,11 +13,11 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
@@ -37,7 +37,7 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
-		IGithubWebhookHandler makeWithFreshJwt = extracted(getAppContext());
+		IGitWebhookHandler makeWithFreshJwt = extracted(getAppContext());
 
 		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
 
@@ -64,13 +64,13 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		return Map.of("whatever", "done");
 	}
 
-	public static IGithubWebhookHandler extracted(ApplicationContext appContext) {
-		IGithubWebhookHandlerFactory githubFactory = appContext.getBean(IGithubWebhookHandlerFactory.class);
+	public static IGitWebhookHandler extracted(ApplicationContext appContext) {
+		IGitWebhookHandlerFactory githubFactory = appContext.getBean(IGitWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
-		IGithubWebhookHandler makeWithFreshJwt;
+		IGitWebhookHandler makeWithFreshJwt;
 		try {
-			makeWithFreshJwt = githubFactory.makeWithFreshJwt();
+			makeWithFreshJwt = githubFactory.makeWithFreshAuth();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

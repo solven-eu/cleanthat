@@ -25,7 +25,7 @@ import com.nimbusds.jwt.SignedJWT;
  *
  * @author Benoit Lacelle
  */
-public class GithubWebhookHandlerFactory implements IGithubWebhookHandlerFactory {
+public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 
 	// https://github.com/organizations/solven-eu/settings/apps/cleanthat
 	// https://github.com/apps/cleanthat
@@ -46,7 +46,7 @@ public class GithubWebhookHandlerFactory implements IGithubWebhookHandlerFactory
 	}
 
 	@Override
-	public IGithubWebhookHandler makeWithFreshJwt() throws IOException {
+	public IGithubWebhookHandler makeWithFreshAuth() throws IOException {
 		String jwt;
 		try {
 			jwt = makeJWT();

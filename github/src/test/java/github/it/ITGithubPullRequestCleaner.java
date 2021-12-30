@@ -18,12 +18,14 @@ import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
@@ -37,11 +39,13 @@ public class ITGithubPullRequestCleaner {
 	@Autowired
 	List<ObjectMapper> objectMappers;
 	@Autowired
+	List<ILanguageLintFixerFactory> factories;
+	@Autowired
 	ICodeProviderFormatter codeProviderFormatter;
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHApp app = handler.getGithubAsApp();
 
@@ -49,10 +53,10 @@ public class ITGithubPullRequestCleaner {
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId());
 
-		cleaner = new GithubRefCleaner(objectMappers, codeProviderFormatter, githubForRepo);
+		cleaner = new GithubRefCleaner(objectMappers, factories, codeProviderFormatter, githubForRepo);
 
 		GitHub installationGithub = githubForRepo.getGithub();
-		cleaner.openPRWithCleanThatStandardConfiguration(installationGithub,
-				GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName)));
+		cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper
+				.decorate(GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName))));
 	}
 }

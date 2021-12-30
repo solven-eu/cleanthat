@@ -23,6 +23,7 @@ import com.google.common.base.Suppliers;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -33,6 +34,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
+@Deprecated(since = "DELETEME")
 public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPullRequest.class);
@@ -57,7 +59,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
@@ -120,10 +122,10 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			CodeFormatResult output = cleaner.formatRef(repo, Suppliers.memoize(() -> {
+			CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), Suppliers.memoize(() -> {
 				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
 				createdPr.set(pr);
-				return pr;
+				return GithubDecoratorHelper.decorate(pr);
 			}));
 
 			if (createdPr.get() == null) {

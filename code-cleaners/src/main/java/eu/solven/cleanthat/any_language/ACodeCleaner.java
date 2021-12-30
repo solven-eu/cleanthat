@@ -1,12 +1,13 @@
 package eu.solven.cleanthat.any_language;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -14,10 +15,13 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
@@ -28,11 +32,15 @@ import eu.solven.cleanthat.utils.ResultOrError;
 public abstract class ACodeCleaner implements ICodeCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
 
-	final List<ObjectMapper> objectMappers;
+	final Collection<ObjectMapper> objectMappers;
+	final Collection<ILanguageLintFixerFactory> factories;
 	final ICodeProviderFormatter formatterProvider;
 
-	public ACodeCleaner(List<ObjectMapper> objectMappers, ICodeProviderFormatter formatterProvider) {
+	public ACodeCleaner(Collection<ObjectMapper> objectMappers,
+			Collection<ILanguageLintFixerFactory> factories,
+			ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
+		this.factories = factories;
 		this.formatterProvider = formatterProvider;
 	}
 
@@ -46,14 +54,11 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		String codeUrl = codeProvider.getHtmlUrl();
 
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
-		Optional<Map<String, ?>> optConfigurationToUse;
 		if (optPrConfig.isEmpty()) {
 			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeUrl);
 			return ResultOrError.error("No configuration");
-		} else {
-			optConfigurationToUse = optPrConfig;
 		}
-		Optional<String> version = PepperMapHelper.getOptionalString(optConfigurationToUse.get(), "syntax_version");
+		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
 		if (version.isEmpty()) {
 			LOGGER.warn("No version on configuration applying to PR {}", codeUrl);
 			return ResultOrError.error("No syntax_version in configuration");
@@ -63,7 +68,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 					+ "')", version.get(), codeUrl);
 			return ResultOrError.error("Invalid syntax_version in configuration");
 		}
-		Map<String, ?> prConfig = optConfigurationToUse.get();
+		Map<String, ?> prConfig = optPrConfig.get();
 		CleanthatRepositoryProperties properties;
 		try {
 			properties = prepareConfiguration(prConfig);
@@ -104,7 +109,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 	protected CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
 		// Whatever objectMapper is OK as we do not transcode into json/yaml
-		ObjectMapper objectMapper = objectMappers.get(0);
+		ObjectMapper objectMapper = objectMappers.iterator().next();
 
 		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
 	}
@@ -116,5 +121,17 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 			LOGGER.warn("Issue loading the configuration", e);
 			return Optional.empty();
 		}
+	}
+
+	protected String toYaml(CleanthatRepositoryProperties config) {
+		try {
+			return ConfigHelpers.getYaml(objectMappers).writeValueAsString(config);
+		} catch (JsonProcessingException e) {
+			throw new IllegalArgumentException("Inalid configuration: " + config, e);
+		}
+	}
+
+	protected CleanthatRepositoryProperties generateDefaultConfig(ICodeProvider codeProvider) {
+		return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
 	}
 }

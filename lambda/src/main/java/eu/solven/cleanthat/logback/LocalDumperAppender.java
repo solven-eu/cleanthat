@@ -20,6 +20,7 @@ import cormoran.pepper.memory.IPepperMemoryConstants;
  * @author Benoit Lacelle
  *
  */
+// TODO
 public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocalDumperAppender.class);
 

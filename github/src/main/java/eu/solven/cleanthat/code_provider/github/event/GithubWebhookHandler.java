@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
@@ -25,7 +26,6 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -39,18 +39,22 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitPrHeadRef;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -124,7 +128,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			"PMD.CognitiveComplexity",
 			"PMD.ExcessiveMethodLength" })
 	@Override
-	public GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
+	public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
@@ -151,7 +155,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// has a PR)
 		boolean pushBranch;
 		// boolean refHasOpenReviewRequest;
-		// baseRef is optional: in case of PR even, it is trivial, but in case of commitPush event, we have to scan for
+		// baseRef is optional: in case of PR event, it is trivial, but in case of commitPush event, we have to scan for
 		// a compatible
 		Optional<GitRepoBranchSha1> optBaseRef;
 		// If not headRef: this event is not relevant (e.g. it is a comment event)
@@ -169,7 +173,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
 					// Do not process CleanThat own PR open events
 					LOGGER.info("We discard as headRef is: {}", headRef);
-					return new GithubWebhookRelevancyResult(false,
+					return new GitWebhookRelevancyResult(false,
 							false, // false,
 							Optional.empty(),
 							Optional.empty(),
@@ -228,16 +232,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					String afterSha = optAfterSha.get();
 					if (afterSha.matches("0+")) {
 						LOGGER.info("We discard as deleted refs (after={})", afterSha);
-						return new GithubWebhookRelevancyResult(false,
+						return new GitWebhookRelevancyResult(false,
 								false,
 								Optional.empty(),
 								Optional.empty(),
 								Optional.empty());
 					}
 					String pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
+					// TODO 'cleanthat' username should not be hardcoded
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
-						return new GithubWebhookRelevancyResult(false,
+						return new GitWebhookRelevancyResult(false,
 								false,
 								Optional.empty(),
 								Optional.empty(),
@@ -273,7 +278,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.warn("Issue while printing the json of the webhook", e);
 			}
 		}
-		return new GithubWebhookRelevancyResult(prOpen, pushBranch, optHeadRef, optOpenPr, optBaseRef);
+		return new GitWebhookRelevancyResult(prOpen, pushBranch, optHeadRef, optOpenPr, optBaseRef);
 	}
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
@@ -283,7 +288,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
-		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
+		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -291,29 +296,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
-		GitHub githubAsInst = githubAuthAsInst.getGithub();
-		{
-			GHRateLimit rateLimit;
-			try {
-				rateLimit = githubAsInst.getRateLimit();
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue checking rateLimit", e);
-			}
-			int rateLimitRemaining = rateLimit.getRemaining();
-			if (rateLimitRemaining == 0) {
-				Object resetIn = PepperLogHelper.humanDuration(
-						rateLimit.getResetEpochSeconds() * TimeUnit.SECONDS.toMillis(1) - System.currentTimeMillis());
-				return WebhookRelevancyResult.dismissed("Installation has hit its own RateLimit. Reset in: " + resetIn);
-			}
+		ResultOrError<GHRepository, WebhookRelevancyResult> baseRepoOrError =
+				connectToRepository(input, githubAuthAsInst);
+
+		if (baseRepoOrError.getOptError().isPresent()) {
+			return baseRepoOrError.getOptError().get();
 		}
-		// We suppose this is always the same as the base repository id
-		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
-		GHRepository baseRepo;
-		try {
-			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+		GHRepository baseRepo = baseRepoOrError.getOptResult().get();
+
 		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
 		// String repoName = pushedRefOrRrHead.getRepoName();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
@@ -368,7 +359,33 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			String eventKey = githubEvent.getxGithubDelivery();
 			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get(), eventKey);
 		}
-		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
+
+		// We rely on push over branches to trigger initialization
+		if (offlineResult.isPushBranch()) {
+			GHBranch defaultBranch;
+			try {
+				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
+			} catch (RuntimeException e) {
+				LOGGER.warn("We failed finding the default branch", e);
+				return WebhookRelevancyResult.dismissed("Issue guessing the default branch");
+			}
+
+			String pushedRef = offlineResult.optBaseRef().get().getRef();
+			if (!pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
+				LOGGER.info("About to consider creating a default configuration for {} (as default branch)", pushedRef);
+				// Open PR with default relevant configuration
+				boolean initialized = cleaner
+						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
+
+				if (initialized) {
+					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
+				}
+			} else {
+				LOGGER.info("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
+			}
+		}
+
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
@@ -378,6 +395,36 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
 		}
 		return WebhookRelevancyResult.relevant(refToClean.get());
+	}
+
+	private ResultOrError<GHRepository, WebhookRelevancyResult> connectToRepository(Map<String, ?> input,
+			GithubAndToken githubAuthAsInst) {
+		GitHub githubAsInst = githubAuthAsInst.getGithub();
+		{
+			GHRateLimit rateLimit;
+			try {
+				rateLimit = githubAsInst.getRateLimit();
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue checking rateLimit", e);
+			}
+			int rateLimitRemaining = rateLimit.getRemaining();
+			if (rateLimitRemaining == 0) {
+				Object resetIn = PepperLogHelper.humanDuration(
+						rateLimit.getResetEpochSeconds() * TimeUnit.SECONDS.toMillis(1) - System.currentTimeMillis());
+				return ResultOrError.error(WebhookRelevancyResult
+						.dismissed("Installation has hit its own RateLimit. Reset in: " + resetIn));
+			}
+		}
+		// We suppose this is always the same as the base repository id
+		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
+		GHRepository baseRepo;
+		try {
+			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		LOGGER.info("We are connected to repo: {}", baseRepo.getUrl());
+		return ResultOrError.result(baseRepo);
 	}
 
 	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1, String eventKey) {
@@ -410,7 +457,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanability(GHRepository eventRepo,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
-		// GitRepoBranchSha1 theRef;
 		if (optOpenPr.isPresent()) {
 			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
 			GHPullRequest optPr;
@@ -428,9 +474,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
-			if (Long.compare(eventRepo.getId(), prHeadRepository.getId()) == 0) {
+			// We rely on Long.compare to workaround PMD complaining about == used over Strings
+			// which is seemingly an issue with @WithBridgeMethods
+			if (Long.compare(eventRepo.getId(), prHeadRepository.getId()) != 0) {
+				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/
+				// working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
-						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
+						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). eventRepoId="
+								+ eventRepo.getId()
+								+ " head="
 								+ headRepoFullname));
 			}
 		}
@@ -450,9 +502,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
+	public void doExecuteClean(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
-		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
+		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -464,57 +516,20 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = externalCodeEvent.getBody();
-		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
-		GitHub github = githubAuthAsInst.getGithub();
-		GHRepository repo;
-		try {
-			repo = github.getRepositoryById(baseRepoId);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		IGithubRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst);
+		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
+
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
-		Supplier<GHRef> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-		CodeFormatResult result;
-		if (relevancyResult.optBaseForHead().isPresent()) {
-			// If the base does not exist, then something is wrong: let's check right away it is available
-			GHRef base;
-			try {
-				base = facade.getRef(relevancyResult.optBaseForHead().get().getRef());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-			result = cleaner.formatRefDiff(repo, base, headSupplier);
-		} else {
-			result = cleaner.formatRef(repo, headSupplier);
-		}
-		if (refLazyRefCreated.get() != null) {
-			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
-			if (relevancyResult.optBaseForHead().isEmpty()) {
-				LOGGER.warn("We created a tmpRef but there is no base");
-			} else {
-				if (result.isEmpty()) {
-					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed",
-							lazyRefCreated);
-					try {
-						facade.removeRef(lazyRefCreated);
-					} catch (IOException e) {
-						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
-					}
-				} else {
-					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
-					doOpenPr(relevancyResult, facade, lazyRefCreated);
-				}
-			}
-		} else {
-			LOGGER.debug("The changes would have been committed directly in the head branch");
-		}
+		Supplier<IGitReference> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
+		CodeFormatResult result =
+				GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
+		GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
-		logAfterCleaning(installationId, github);
+		logAfterCleaning(installationId, repo.getRoot());
 	}
 
 	public void logAfterCleaning(long installationId, GitHub github) {
@@ -527,54 +542,55 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 	}
 
-	public Supplier<GHRef> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
+	public Supplier<IGitReference> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
 			GHRepository repo,
 			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
-		Supplier<GHRef> headSupplier = () -> {
-			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
-			String refName = refToProcess.getRef();
+		GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
+		String refName = refToProcess.getRef();
+
+		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
+		// Or to any protected branch?
+		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
+			GHBranch branch;
+			try {
+				branch = repo.getBranch(refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			if (branch.isProtected()) {
+				// For safety, we prefer not to take the risk of writing onto protected branches, which are any kind of
+				// privileged branch
+				// This may happen with a PR used to merge some master branch into a custom branch
+				// TODO Ensure we discard these scenarios earlier
+				throw new IllegalStateException(
+						"We should have rejected earlier a scenario leading to write over a protected branch: "
+								+ branch);
+			}
+		}
+
+		Supplier<IGitReference> headSupplier = () -> {
 			String repoName = repo.getName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
+				String sha = refToProcess.getSha();
 				try {
-					String sha = refToProcess.getSha();
 					repo.createRef(refName, sha);
 					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
-					refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 				} catch (IOException e) {
-					// TODO If already exists, should we stop the process, and continue?
+					// TODO If already exists, should we stop the process, or continue?
 					// Another process may be already working on this ref
 					throw new UncheckedIOException("Issue creating ref=" + refName, e);
 				}
+				refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 			}
+
 			try {
-				return facade.getRef(refName);
+				return GithubDecoratorHelper.decorate(facade.getRef(refName));
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}
 		};
 		return headSupplier;
-	}
-
-	public void doOpenPr(WebhookRelevancyResult relevancyResult,
-			GithubRepositoryFacade facade,
-			GitRepoBranchSha1 lazyRefCreated) {
-		// TODO We may want to open a PR in a different repository, in case the original repository does not
-		// accept new branches
-		Optional<?> optOpenPr;
-		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
-		try {
-			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", "Cleanthat <body>");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		if (optOpenPr.isPresent()) {
-			LOGGER.info("We succeeded opening a PR open to merge {} into {}: {}",
-					lazyRefCreated,
-					base,
-					optOpenPr.get());
-		} else {
-			LOGGER.info("There is already a PR open to merge {} into {}", lazyRefCreated, base);
-		}
 	}
 }

@@ -18,12 +18,11 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.git.GitIgnoreParser;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}
@@ -47,21 +46,17 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
-		File gitIgnore = root.resolve(fs.getPath(".gitignore")).toFile();
 		Predicate<Path> gitIgnorePredicate;
+
+		File gitIgnore = root.resolve(fs.getPath(".gitignore")).toFile();
 
 		// TODO Beware there could be .gitignore in subfolders
 		if (gitIgnore.isFile()) {
-			Set<String> lines = ImmutableSet.copyOf(Files.readAllLines(gitIgnore.toPath(), StandardCharsets.UTF_8));
-			gitIgnorePredicate = p -> {
-				for (int i = 0; i < p.getNameCount(); i++) {
-					// This will typically match the exclusion of 'target' (and 'target/')
-					if (lines.contains(p.getName(i).toString()) || lines.contains(p.getName(i).toString() + "/")) {
-						return false;
-					}
-				}
-				return true;
-			};
+			String gitIgnoreContent = Files.readString(gitIgnore.toPath(), StandardCharsets.UTF_8);
+
+			Set<String> patterns = GitIgnoreParser.parsePatterns(gitIgnoreContent);
+
+			gitIgnorePredicate = p -> GitIgnoreParser.accept(patterns, p);
 		} else {
 			gitIgnorePredicate = p -> true;
 		}

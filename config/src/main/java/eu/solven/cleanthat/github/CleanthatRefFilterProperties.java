@@ -2,13 +2,13 @@ package eu.solven.cleanthat.github;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.common.collect.ImmutableList;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -39,6 +39,9 @@ public final class CleanthatRefFilterProperties {
 	// By default, we clean a set of standard default branch names
 	// https://docs.github.com/en/github/administering-a-repository/managing-branches-in-your-repository/changing-the-default-branch
 	// 'main' is the new default branch as Github
+	// https://github.blog/changelog/2020-10-01-the-default-branch-for-newly-created-repositories-is-now-main/
+	public static final List<String> SIMPLE_DEFAULT_BRANCHES = ImmutableList.of("develop", "main", "master");
+
 	/**
 	 * 
 	 * @return the fully qualified branches (i.e. heads refs)
@@ -46,7 +49,7 @@ public final class CleanthatRefFilterProperties {
 	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
 	@Setter(AccessLevel.NONE)
 	private List<String> branches =
-			Stream.of("develop", "main", "master").map(s -> BRANCHES_PREFIX + s).collect(Collectors.toList());
+			SIMPLE_DEFAULT_BRANCHES.stream().map(s -> BRANCHES_PREFIX + s).collect(Collectors.toList());
 
 	public void setBranches(List<String> labels) {
 		labels = labels.stream().map(branch -> {

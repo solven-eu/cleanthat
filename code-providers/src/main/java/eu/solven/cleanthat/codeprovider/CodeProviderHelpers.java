@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,9 +36,9 @@ public class CodeProviderHelpers {
 
 	// public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
-	protected List<ObjectMapper> objectMappers;
+	protected Collection<ObjectMapper> objectMappers;
 
-	public CodeProviderHelpers(List<ObjectMapper> objectMappers) {
+	public CodeProviderHelpers(Collection<ObjectMapper> objectMappers) {
 		this.objectMappers = objectMappers;
 	}
 

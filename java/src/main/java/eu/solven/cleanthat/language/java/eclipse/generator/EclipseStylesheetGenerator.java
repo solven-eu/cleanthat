@@ -75,8 +75,8 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	 * @return the Set of options which minimizes the modifications over input contents.
 	 */
 	@Override
-	public Map<String, String> generateSettings(OffsetDateTime max, Map<Path, String> pathToFile) {
-		ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultSetting(max, pathToFile);
+	public Map<String, String> generateSettings(OffsetDateTime timeout, Map<Path, String> pathToFile) {
+		ScoredOption<Map<String, String>> bestDefaultConfig = findBestDefaultSetting(timeout, pathToFile);
 
 		if (pathToFile.isEmpty()) {
 			return bestDefaultConfig.getOption();
@@ -99,7 +99,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 			long singleFileScore = computeDiffScore(formatter, biggestFileAsMap.values());
 			LOGGER.info("On this biggest file, the score for the best default configuration is {}", singleFileScore);
 
-			bestDefaultConfig = searchForOptimalConfiguration(max,
+			bestDefaultConfig = searchForOptimalConfiguration(timeout,
 					biggestFileAsMap,
 					new ScoredOption<Map<String, String>>(bestDefaultConfig.getOption(), singleFileScore));
 		}
@@ -107,7 +107,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		// Now we have an optimal configuration for the biggest file, try processing all
 		// other files
 		LOGGER.info("Prepare the configuration over all files: {}", pathToFile.size());
-		return searchForOptimalConfiguration(max, pathToFile, bestDefaultConfig).getOption();
+		return searchForOptimalConfiguration(timeout, pathToFile, bestDefaultConfig).getOption();
 	}
 
 	private Map.Entry<Path, String> findBiggestFile(Map<Path, String> pathToFile) {
@@ -140,26 +140,34 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		}
 	}
 
-	public ScoredOption<Map<String, String>> searchForOptimalConfiguration(OffsetDateTime max,
+	/**
+	 * 
+	 * @param timeout
+	 *            at this point of time, we'll interrupt the process
+	 * @param pathToFile
+	 * @param bestDefaultConfig
+	 * @return
+	 */
+	public ScoredOption<Map<String, String>> searchForOptimalConfiguration(OffsetDateTime timeout,
 			Map<Path, String> pathToFile,
 			ScoredOption<Map<String, String>> bestDefaultConfig) {
 		ScoredOption<Map<String, String>> bestSettings = bestDefaultConfig;
 
 		// Start optimizing comment parameters
 		// It is useful as may lines/diff score may come from comments
-		bestSettings = optimizeSetOfSettings(max, pathToFile, bestSettings, getCommentSettings());
+		bestSettings = optimizeSetOfSettings(timeout, pathToFile, bestSettings, getCommentSettings());
 
 		// Start optimizing some crucial parameters
-		bestSettings = optimizeSetOfSettings(max, pathToFile, bestSettings, getMostImpactfulSettings());
+		bestSettings = optimizeSetOfSettings(timeout, pathToFile, bestSettings, getMostImpactfulSettings());
 
 		// Then we optimize parameters which differs from standard configurations: these are parameters which are often
 		// changed
 		Set<String> commonlyChangedSettings = getSettingsChangingThroughStandardConfig();
-		bestSettings = optimizeSetOfSettings(max, pathToFile, bestSettings, commonlyChangedSettings);
+		bestSettings = optimizeSetOfSettings(timeout, pathToFile, bestSettings, commonlyChangedSettings);
 
 		// Do not limit ourselves to settings in the current bestSetting, as it may not be exhaustive
 		Set<String> settingsToSwitch = getAllSetttings();
-		bestSettings = optimizeSetOfSettings(max, pathToFile, bestSettings, settingsToSwitch);
+		bestSettings = optimizeSetOfSettings(timeout, pathToFile, bestSettings, settingsToSwitch);
 
 		logPathsImpactedByConfiguration(pathToFile, bestSettings);
 
@@ -200,14 +208,14 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		return commonlyChangedSettings;
 	}
 
-	protected ScoredOption<Map<String, String>> optimizeSetOfSettings(OffsetDateTime max,
+	protected ScoredOption<Map<String, String>> optimizeSetOfSettings(OffsetDateTime timeout,
 			Map<Path, String> pathToFile,
 			ScoredOption<Map<String, String>> bestSettings,
 			Set<String> settingsToSwitch) {
 		analyticsOverOptions(settingsToSwitch);
 
 		// Process one by one only options still appearing as relevant
-		bestSettings = optimizeParametersOneByOne(max, pathToFile, bestSettings, settingsToSwitch);
+		bestSettings = optimizeParametersOneByOne(timeout, pathToFile, bestSettings, settingsToSwitch);
 		return bestSettings;
 	}
 
@@ -224,7 +232,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		LOGGER.debug("nbOptions to consider: {}", nbOptions);
 	}
 
-	private ScoredOption<Map<String, String>> optimizeParametersOneByOne(OffsetDateTime max,
+	private ScoredOption<Map<String, String>> optimizeParametersOneByOne(OffsetDateTime timeout,
 			Map<Path, String> pathToFile,
 			ScoredOption<Map<String, String>> bestSettings,
 			Set<String> settingsToSwitch) {
@@ -249,9 +257,9 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 					improvedSettings.add(settingToSwitch);
 				}
 
-				if (OffsetDateTime.now().isAfter(max)) {
+				if (OffsetDateTime.now().isAfter(timeout)) {
 					LOGGER.warn("We interrupt the optimization process as now() is after {}. Score={}",
-							max,
+							timeout,
 							bestSettings.getScore());
 					break;
 				}
@@ -267,7 +275,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		} while (!improvedSettings.isEmpty()
 				// If score is 0, we found a perfect configuration
 				&& bestSettings.getScore() > 0
-				&& OffsetDateTime.now().isBefore(max));
+				&& OffsetDateTime.now().isBefore(timeout));
 		return bestSettings;
 	}
 

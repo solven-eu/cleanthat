@@ -21,21 +21,18 @@ import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
 @MockBean({ ICodeFormatterApplier.class })
 public class ITGithubBranchCodeProvider {
-	GithubRefCleaner cleaner;
-
 	@Autowired
 	GithubWebhookHandlerFactory factory;
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHApp app = handler.getGithubAsApp();
 

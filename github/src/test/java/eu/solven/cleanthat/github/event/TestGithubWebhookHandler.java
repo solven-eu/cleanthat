@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.refs.IGithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 
 public class TestGithubWebhookHandler {
@@ -39,7 +39,7 @@ public class TestGithubWebhookHandler {
 
 	final GHPullRequest pr = Mockito.mock(GHPullRequest.class);
 
-	final IGithubRefCleaner prCleaner = Mockito.mock(IGithubRefCleaner.class);
+	final IGitRefCleaner prCleaner = Mockito.mock(IGitRefCleaner.class);
 
 	final GithubWebhookHandler handler =
 			new GithubWebhookHandler(ghApp, Arrays.asList(ConfigHelpers.makeJsonObjectMapper())) {

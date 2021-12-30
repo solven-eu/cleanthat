@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github.run;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
@@ -12,6 +13,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.GitHubClientUtil;
 import org.kohsuke.github.PagedSearchIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })
@@ -58,7 +61,17 @@ public class RunGithubMonitoring {
 
 			@Override
 			public String getLanguage() {
-				return "anything";
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public Set<String> getFileExtentions() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public LanguageProperties makeDefaultProperties() {
+				throw new UnsupportedOperationException();
 			}
 		};
 	}
@@ -67,7 +80,7 @@ public class RunGithubMonitoring {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHApp app = handler.getGithubAsApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());
@@ -90,9 +103,11 @@ public class RunGithubMonitoring {
 				}
 
 				logAboutUser(installationGithub, installation);
-				installation.setRoot(installationGithub);
 
-				PagedSearchIterable<GHRepository> repositories = installation.listRepositories();
+				// https://github.com/hub4j/github-api/issues/1082#issuecomment-991289909
+				// installation.setRoot(installationGithub);
+				// installation.listRepositories()
+				PagedSearchIterable<GHRepository> repositories = GitHubClientUtil.listRepositories(installationGithub);
 				LOGGER.info("#repositories: {}", repositories.getTotalCount());
 				repositories.forEach(repo -> {
 					if (Strings.isNullOrEmpty(repo.getLanguage())) {

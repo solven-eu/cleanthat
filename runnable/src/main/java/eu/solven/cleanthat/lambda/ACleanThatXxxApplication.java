@@ -15,7 +15,10 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
  *
  */
 @SpringBootApplication(scanBasePackages = "none")
-@Import({ GithubSpringConfig.class, AllLanguagesSpringConfig.class, CodeProviderHelpers.class })
+@Import({ GithubSpringConfig.class,
+		AllLanguagesSpringConfig.class,
+		TechnicalBoilerplateSpringConfig.class,
+		CodeProviderHelpers.class })
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class ACleanThatXxxApplication implements ApplicationContextAware {
 

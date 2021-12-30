@@ -3,6 +3,7 @@ package eu.solven.cleanthat.language.json;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,11 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 		return "json";
 	}
 
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of("json");
+	}
+
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
 	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
@@ -65,6 +71,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 		return processor;
 	}
 
+	@Override
 	public LanguageProperties makeDefaultProperties() {
 		LanguageProperties languageProperties = new LanguageProperties();
 

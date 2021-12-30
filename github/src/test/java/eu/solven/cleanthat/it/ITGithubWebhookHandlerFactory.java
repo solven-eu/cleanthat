@@ -26,7 +26,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 
@@ -63,7 +63,7 @@ public class ITGithubWebhookHandlerFactory {
 
 		GithubWebhookHandlerFactory factory =
 				new GithubWebhookHandlerFactory(env, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()));
-		IGithubWebhookHandler fresh = factory.makeWithFreshJwt();
+		IGithubWebhookHandler fresh = factory.makeWithFreshAuth();
 		GHApp app = fresh.getGithubAsApp();
 		app.listInstallations().forEach(install -> {
 			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());
@@ -83,7 +83,7 @@ public class ITGithubWebhookHandlerFactory {
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-open_event.json").getInputStream(),
 							Map.class);
-			GithubWebhookRelevancyResult result =
+			GitWebhookRelevancyResult result =
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
@@ -94,7 +94,7 @@ public class ITGithubWebhookHandlerFactory {
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-push_event-1.json").getInputStream(),
 							Map.class);
-			GithubWebhookRelevancyResult result =
+			GitWebhookRelevancyResult result =
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
@@ -105,7 +105,7 @@ public class ITGithubWebhookHandlerFactory {
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-push_event-1.json").getInputStream(),
 							Map.class);
-			GithubWebhookRelevancyResult result =
+			GitWebhookRelevancyResult result =
 					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 

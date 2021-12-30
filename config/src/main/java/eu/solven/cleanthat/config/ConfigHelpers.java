@@ -2,6 +2,7 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,14 +90,14 @@ public class ConfigHelpers {
 		return firstObjectMapper.convertValue(languageAsMap, LanguageProperties.class);
 	}
 
-	public static ObjectMapper getJson(List<ObjectMapper> objectMappers) {
+	public static ObjectMapper getJson(Collection<ObjectMapper> objectMappers) {
 		return objectMappers.stream()
 				.filter(om -> JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
 				.findAny()
 				.get();
 	}
 
-	public static ObjectMapper getYaml(List<ObjectMapper> objectMappers) {
+	public static ObjectMapper getYaml(Collection<ObjectMapper> objectMappers) {
 		return objectMappers.stream()
 				.filter(om -> !JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
 				.findAny()

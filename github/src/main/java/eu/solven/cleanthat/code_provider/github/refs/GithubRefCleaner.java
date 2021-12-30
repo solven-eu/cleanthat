@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +19,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -29,25 +29,31 @@ import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitRepoBranchSha1;
-import eu.solven.cleanthat.code_provider.github.event.pojo.HeadAndOptionalBase;
-import eu.solven.cleanthat.code_provider.github.event.pojo.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
- * Default for {@link IGithubRefCleaner}
+ * Default for {@link IGitRefCleaner}
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner {
+public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
@@ -62,9 +68,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	final GithubAndToken githubAndToken;
 
 	public GithubRefCleaner(List<ObjectMapper> objectMappers,
+			List<ILanguageLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken) {
-		super(objectMappers, formatterProvider);
+		super(objectMappers, factories, formatterProvider);
 		this.githubAndToken = githubAndToken;
 	}
 
@@ -174,27 +181,47 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	}
 
 	@Override
-	public CodeFormatResult formatRefDiff(GHRepository repo, GHRef base, Supplier<GHRef> headSupplier) {
-		// TODO Get the head lazily
-		GHRef head = headSupplier.get();
+	public CodeFormatResult formatRefDiff(IGitRepository repo,
+			IGitReference base,
+			Supplier<IGitReference> headSupplier) {
+		// TODO Get the head lazily, else it means we create branch which may remain empty
+		GHRef head = headSupplier.get().getDecorated();
+		GHRef ghBase = base.getDecorated();
 
-		LOGGER.info("Base: {} Head: {}", base.getRef(), head.getRef());
-		ICodeProviderWriter codeProvider = new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo, base, head);
+		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), head.getRef());
+		ICodeProviderWriter codeProvider =
+				new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ghBase, head);
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
 	@Override
-	public CodeFormatResult formatRef(GHRepository repo, Supplier<GHRef> refSupplier) {
+	public CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier) {
 		// TODO Get the head lazily
-		GHRef ref = refSupplier.get();
+		GHRef ref = refSupplier.get().getDecorated();
 
-		ICodeProviderWriter codeProvider = new GithubRefCodeProvider(githubAndToken.getToken(), repo, ref);
+		ICodeProviderWriter codeProvider =
+				new GithubRefCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ref);
 		LOGGER.info("Ref: {}", codeProvider.getHtmlUrl());
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
-	public void openPRWithCleanThatStandardConfiguration(GitHub userToServerGithub, GHBranch defaultBranch) {
+	@Override
+	public boolean tryOpenPRWithCleanThatStandardConfiguration(IGitBranch branch) {
+		GHBranch defaultBranch = branch.getDecorated();
 		GHRepository repo = defaultBranch.getOwner();
+
+		String branchName = defaultBranch.getName();
+		ICodeProvider codeProvider = getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(),
+				CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName,
+				defaultBranch.getSHA1()));
+		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+		if (optPrConfig.isPresent()) {
+			LOGGER.info("There is a configuration (valid or not) in the default branch ({})", branchName);
+			return false;
+		} else {
+			LOGGER.info("There is no configuration in the default branch ({})", branchName);
+		}
+
 		String refName = REF_NAME_CONFIGURE;
 		String fullRefName = GithubFacade.toFullGitRef(refName);
 		boolean refAlreadyExists;
@@ -224,6 +251,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 						LOGGER.info("Related PR: {}", pr.getHtmlUrl());
 					}
 				});
+				return false;
 			} else {
 				GHCommit commit = commitConfig(defaultBranch, repo);
 				refToPR = Optional.of(repo.createRef(fullRefName, commit.getSHA1()));
@@ -237,11 +265,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
 				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
 						refToPR.get().getRef(),
-						defaultBranch.getName(),
+						branchName,
 						body,
 						true,
 						false);
 				LOGGER.info("Open PR: {}", pr.getHtmlUrl());
+				return true;
 			}
 		} catch (IOException e) {
 			// TODO If 401, it probably means the Installation is not allowed to modify given repo
@@ -250,19 +279,16 @@ public class GithubRefCleaner extends ACodeCleaner implements IGithubRefCleaner 
 	}
 
 	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo) throws IOException {
-		// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
-		// Detect usage of Checkstyle:
-		// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
-		// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
-		// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
-		// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-		String exampleConfig = readResource("/standard-configurations/standard-java-11-spring");
+		GithubBranchCodeProvider codeProvider =
+				new GithubBranchCodeProvider(githubAndToken.getToken(), repo, defaultBranch);
+		CleanthatRepositoryProperties defaultConfig = generateDefaultConfig(codeProvider);
+
 		GHTree createTree = repo.createTree()
 				.baseTree(defaultBranch.getSHA1())
-				.add("cleanthat.json", exampleConfig, false)
+				.add(CodeProviderHelpers.FILENAME_CLEANTHAT_YAML, toYaml(defaultConfig), false)
 				.create();
 		GHCommit commit = GithubPRCodeProvider.prepareCommit(repo)
-				.message("Add default Cleanthat configuration")
+				.message(readResource("/templates/commit-message.txt"))
 				.parent(defaultBranch.getSHA1())
 				.tree(createTree.getSha())
 				.create();

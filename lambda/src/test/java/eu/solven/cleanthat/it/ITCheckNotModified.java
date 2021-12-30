@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Diff;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.collect.ImmutableMap;
 
+// TODO Move this to somewhere not specific to lambda?
 // https://github.com/javaparser/javaparser/issues/3317
 public class ITCheckNotModified {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ITCheckNotModified.class);

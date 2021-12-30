@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.language;
 
 import java.util.Map;
+import java.util.Set;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
@@ -16,7 +17,16 @@ public interface ILanguageLintFixerFactory {
 
 	String getLanguage();
 
+	/**
+	 * The typical file extensions concerned by this LintFixer
+	 * 
+	 * @return the {@link Set} of relevant file extensions.
+	 */
+	Set<String> getFileExtentions();
+
 	ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider);
+
+	LanguageProperties makeDefaultProperties();
 }

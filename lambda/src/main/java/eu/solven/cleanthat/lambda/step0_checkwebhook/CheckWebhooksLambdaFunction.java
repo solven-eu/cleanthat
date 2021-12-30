@@ -15,7 +15,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactor
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 
@@ -42,14 +42,14 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		// TODO Cache the Github instance for the JWT duration
 		IGithubWebhookHandler makeWithFreshJwt;
 		try {
-			makeWithFreshJwt = githubFactory.makeWithFreshJwt();
+			makeWithFreshJwt = githubFactory.makeWithFreshAuth();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 
 		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
 
-		GithubWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
+		GitWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
 		if (processAnswer.isReviewRequestOpen() || processAnswer.isPushBranch()) {
 			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();

@@ -25,6 +25,7 @@ import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
@@ -38,11 +39,13 @@ public class ITGithubPullRequestCleaner {
 	@Autowired
 	List<ObjectMapper> objectMappers;
 	@Autowired
+	List<ILanguageLintFixerFactory> factories;
+	@Autowired
 	ICodeProviderFormatter codeProviderFormatter;
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHApp app = handler.getGithubAsApp();
 
@@ -50,7 +53,7 @@ public class ITGithubPullRequestCleaner {
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId());
 
-		cleaner = new GithubRefCleaner(objectMappers, codeProviderFormatter, githubForRepo);
+		cleaner = new GithubRefCleaner(objectMappers, factories, codeProviderFormatter, githubForRepo);
 
 		GitHub installationGithub = githubForRepo.getGithub();
 		cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper

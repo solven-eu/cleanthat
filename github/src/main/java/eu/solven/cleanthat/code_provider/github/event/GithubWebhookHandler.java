@@ -42,19 +42,20 @@ import cormoran.pepper.jvm.GCInspector;
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GitPrHeadRef;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -128,7 +129,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			"PMD.CognitiveComplexity",
 			"PMD.ExcessiveMethodLength" })
 	@Override
-	public GithubWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
+	public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
@@ -173,7 +174,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
 					// Do not process CleanThat own PR open events
 					LOGGER.info("We discard as headRef is: {}", headRef);
-					return new GithubWebhookRelevancyResult(false,
+					return new GitWebhookRelevancyResult(false,
 							false, // false,
 							Optional.empty(),
 							Optional.empty(),
@@ -232,7 +233,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					String afterSha = optAfterSha.get();
 					if (afterSha.matches("0+")) {
 						LOGGER.info("We discard as deleted refs (after={})", afterSha);
-						return new GithubWebhookRelevancyResult(false,
+						return new GitWebhookRelevancyResult(false,
 								false,
 								Optional.empty(),
 								Optional.empty(),
@@ -242,7 +243,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					// TODO 'cleanthat' username should not be hardcoded
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
-						return new GithubWebhookRelevancyResult(false,
+						return new GitWebhookRelevancyResult(false,
 								false,
 								Optional.empty(),
 								Optional.empty(),
@@ -278,7 +279,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.warn("Issue while printing the json of the webhook", e);
 			}
 		}
-		return new GithubWebhookRelevancyResult(prOpen, pushBranch, optHeadRef, optOpenPr, optBaseRef);
+		return new GitWebhookRelevancyResult(prOpen, pushBranch, optHeadRef, optOpenPr, optBaseRef);
 	}
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
@@ -288,7 +289,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
-		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
+		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -296,29 +297,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Map<String, ?> input = githubEvent.getBody();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
-		GitHub githubAsInst = githubAuthAsInst.getGithub();
-		{
-			GHRateLimit rateLimit;
-			try {
-				rateLimit = githubAsInst.getRateLimit();
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue checking rateLimit", e);
-			}
-			int rateLimitRemaining = rateLimit.getRemaining();
-			if (rateLimitRemaining == 0) {
-				Object resetIn = PepperLogHelper.humanDuration(
-						rateLimit.getResetEpochSeconds() * TimeUnit.SECONDS.toMillis(1) - System.currentTimeMillis());
-				return WebhookRelevancyResult.dismissed("Installation has hit its own RateLimit. Reset in: " + resetIn);
-			}
+		ResultOrError<GHRepository, WebhookRelevancyResult> baseRepoOrError =
+				connectToRepository(input, githubAuthAsInst);
+
+		if (baseRepoOrError.getOptError().isPresent()) {
+			return baseRepoOrError.getOptError().get();
 		}
-		// We suppose this is always the same as the base repository id
-		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
-		GHRepository baseRepo;
-		try {
-			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+		GHRepository baseRepo = baseRepoOrError.getOptResult().get();
+
 		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
 		// String repoName = pushedRefOrRrHead.getRepoName();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
@@ -386,7 +373,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 
 			String pushedRef = offlineResult.optBaseRef().get().getRef();
-			if (pushedRef.equals(defaultBranch.getName())) {
+			if (!pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
+				LOGGER.info("About to consider creating a default configuration for {} (as default branch)", pushedRef);
 				// Open PR with default relevant configuration
 				boolean initialized = cleaner
 						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
@@ -408,6 +396,35 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
 		}
 		return WebhookRelevancyResult.relevant(refToClean.get());
+	}
+
+	private ResultOrError<GHRepository, WebhookRelevancyResult> connectToRepository(Map<String, ?> input,
+			GithubAndToken githubAuthAsInst) {
+		GitHub githubAsInst = githubAuthAsInst.getGithub();
+		{
+			GHRateLimit rateLimit;
+			try {
+				rateLimit = githubAsInst.getRateLimit();
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue checking rateLimit", e);
+			}
+			int rateLimitRemaining = rateLimit.getRemaining();
+			if (rateLimitRemaining == 0) {
+				Object resetIn = PepperLogHelper.humanDuration(
+						rateLimit.getResetEpochSeconds() * TimeUnit.SECONDS.toMillis(1) - System.currentTimeMillis());
+				return ResultOrError.error(WebhookRelevancyResult
+						.dismissed("Installation has hit its own RateLimit. Reset in: " + resetIn));
+			}
+		}
+		// We suppose this is always the same as the base repository id
+		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
+		GHRepository baseRepo;
+		try {
+			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		return ResultOrError.result(baseRepo);
 	}
 
 	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1, String eventKey) {
@@ -481,7 +498,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	@Override
 	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
-		GithubWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
+		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -493,16 +510,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = externalCodeEvent.getBody();
-		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
 		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
-		GitHub github = githubAuthAsInst.getGithub();
-		GHRepository repo;
-		try {
-			repo = github.getRepositoryById(baseRepoId);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
+
 		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
@@ -545,7 +556,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			LOGGER.debug("The changes would have been committed directly in the head branch");
 		}
 
-		logAfterCleaning(installationId, github);
+		logAfterCleaning(installationId, repo.getRoot());
 	}
 
 	public void logAfterCleaning(long installationId, GitHub github) {
@@ -595,7 +606,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Optional<?> optOpenPr;
 		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
 		try {
-			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", "Cleanthat <body>");
+			optOpenPr = facade.openPrIfNoneExists(base,
+					lazyRefCreated,
+					"Cleanthat",
+					"Cleanthat <body>\r\n@blacelle please look at me");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 
@@ -73,6 +73,6 @@ public class RunProcessWebhookEvent {
 		Map<String, ?> input = objectMapper
 				.readValue(new ClassPathResource("/github/webhook/oneshot.json").getInputStream(), Map.class);
 
-		GithubWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
+		GitWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
 	}
 }

@@ -2,7 +2,6 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHApp;
@@ -16,17 +15,22 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
 @MockBean({ ICodeFormatterApplier.class })
-public class ITGithubBranchCodeProvider {
+public class ITGithubRefCleaner {
+	@Autowired
+	GithubCodeCleanerFactory cleanerFactory;
+
 	@Autowired
 	GithubWebhookHandlerFactory factory;
 
@@ -36,21 +40,18 @@ public class ITGithubBranchCodeProvider {
 
 		GHApp app = handler.getGithubAsApp();
 
-		String repoName = "cleanthat";
+		String repoName = "cleanthat-integrationtests";
 
+		// Ensure the repo is available to the app
+		// https://github.com/organizations/solven-eu/settings/installations/9086720
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId());
 
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
-		GHBranch masterBranch = cleanthatRepo.getBranch("master");
+		GHBranch masterBranch = GithubHelper.getDefaultBranch(cleanthatRepo);
 
-		GithubSha1CodeProviderHelper codeProvider =
-				new GithubBranchCodeProvider(githubForRepo.getToken(), cleanthatRepo, masterBranch).getHelper();
-
-		// First call: we do clone
-		Assert.assertTrue(codeProvider.ensureLocalClone());
-
-		// Second call: already cloned
-		Assert.assertFalse(codeProvider.ensureLocalClone());
+		cleanerFactory.makeCleaner(githubForRepo)
+				.get()
+				.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(masterBranch));
 	}
 }

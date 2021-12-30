@@ -3,6 +3,7 @@ package eu.solven.cleanthat.language.scala;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,11 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 		return "scala";
 	}
 
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of("scala", "sc");
+	}
+
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
 	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
@@ -69,6 +75,7 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 		return processor;
 	}
 
+	@Override
 	public LanguageProperties makeDefaultProperties() {
 		LanguageProperties languageProperties = new LanguageProperties();
 

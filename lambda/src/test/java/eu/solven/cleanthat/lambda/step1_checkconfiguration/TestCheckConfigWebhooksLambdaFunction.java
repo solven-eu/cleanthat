@@ -19,15 +19,15 @@ import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @RunWith(SpringRunner.class)
-@MockBean({ IGithubWebhookHandlerFactory.class, ICodeCleanerFactory.class, ObjectMapper.class })
+@MockBean({ IGitWebhookHandlerFactory.class, ICodeCleanerFactory.class, ObjectMapper.class })
 public class TestCheckConfigWebhooksLambdaFunction {
 
 	final IGithubWebhookHandler webhookHandler = Mockito.mock(IGithubWebhookHandler.class);
@@ -38,7 +38,7 @@ public class TestCheckConfigWebhooksLambdaFunction {
 
 	@Before
 	public void prepareMocks() throws BeansException, IOException {
-		Mockito.when(appContext.getBean(IGithubWebhookHandlerFactory.class).makeWithFreshJwt())
+		Mockito.when(appContext.getBean(IGitWebhookHandlerFactory.class).makeWithFreshAuth())
 				.thenReturn(webhookHandler);
 
 		Mockito.when(dynamoDb.putItem(Mockito.any(PutItemRequest.class))).thenReturn(new PutItemResult());

@@ -29,6 +29,7 @@ import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
@@ -44,6 +45,7 @@ import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
@@ -66,9 +68,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	final GithubAndToken githubAndToken;
 
 	public GithubRefCleaner(List<ObjectMapper> objectMappers,
+			List<ILanguageLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken) {
-		super(objectMappers, formatterProvider);
+		super(objectMappers, factories, formatterProvider);
 		this.githubAndToken = githubAndToken;
 	}
 
@@ -208,8 +211,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		GHRepository repo = defaultBranch.getOwner();
 
 		String branchName = defaultBranch.getName();
-		ICodeProvider codeProvider =
-				getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(), branchName, defaultBranch.getSHA1()));
+		ICodeProvider codeProvider = getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(),
+				CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName,
+				defaultBranch.getSHA1()));
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isPresent()) {
 			LOGGER.info("There is a configuration (valid or not) in the default branch ({})", branchName);
@@ -275,19 +279,16 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	}
 
 	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo) throws IOException {
-		// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
-		// Detect usage of Checkstyle:
-		// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
-		// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
-		// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
-		// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-		String exampleConfig = readResource("/standard-configurations/standard-java-11-spring");
+		GithubBranchCodeProvider codeProvider =
+				new GithubBranchCodeProvider(githubAndToken.getToken(), repo, defaultBranch);
+		CleanthatRepositoryProperties defaultConfig = generateDefaultConfig(codeProvider);
+
 		GHTree createTree = repo.createTree()
 				.baseTree(defaultBranch.getSHA1())
-				.add("cleanthat.json", exampleConfig, false)
+				.add(CodeProviderHelpers.FILENAME_CLEANTHAT_YAML, toYaml(defaultConfig), false)
 				.create();
 		GHCommit commit = GithubPRCodeProvider.prepareCommit(repo)
-				.message("Add default Cleanthat configuration")
+				.message(readResource("/templates/commit-message.txt"))
 				.parent(defaultBranch.getSHA1())
 				.tree(createTree.getSha())
 				.create();

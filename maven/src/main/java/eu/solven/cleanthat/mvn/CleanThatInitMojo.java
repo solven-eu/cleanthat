@@ -3,19 +3,13 @@ package eu.solven.cleanthat.mvn;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -29,14 +23,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
-import eu.solven.cleanthat.language.java.JavaFormattersFactory;
-import eu.solven.cleanthat.language.json.JsonFormattersFactory;
-import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
+import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * This mojo will generate a relevant cleanthat configuration in current folder
@@ -61,6 +56,9 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 
 		classes.add(ConfigSpringConfig.class);
 		classes.add(CodeProviderHelpers.class);
+
+		// Needed to generate default configuration given all knowns languages
+		classes.add(AllLanguagesSpringConfig.class);
 
 		return classes;
 	}
@@ -96,74 +94,12 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 					"Something prevents the generation of a configuration");
 		}
 
-		CleanthatRepositoryProperties properties =
-				prepareDefaultConfiguration(appContext.getBean(ObjectMapper.class), configPathFile.getParent());
+		ICodeProvider codeProvider = new FileSystemCodeProvider(configPathFile.getParent());
+
+		GenerateInitialConfig generateInitialConfig =
+				new GenerateInitialConfig(appContext.getBeansOfType(ILanguageLintFixerFactory.class).values());
+		CleanthatRepositoryProperties properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
 		writeConfiguration(configPathFile, properties);
-	}
-
-	public CleanthatRepositoryProperties prepareDefaultConfiguration(ObjectMapper objectMapper, Path root) {
-		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
-
-		Set<String> extentionsFound = scanFileExtentions(root);
-
-		if (extentionsFound.contains("java")) {
-			LanguageProperties languageProperties = new JavaFormattersFactory(objectMapper).makeDefaultProperties();
-
-			properties.getLanguages().add(languageProperties);
-		}
-
-		if (extentionsFound.contains("json")) {
-			LanguageProperties languageProperties = new JsonFormattersFactory(objectMapper).makeDefaultProperties();
-
-			properties.getLanguages().add(languageProperties);
-		}
-
-		if (extentionsFound.contains("scala")) {
-			LanguageProperties languageProperties = new ScalaFormattersFactory(objectMapper).makeDefaultProperties();
-
-			properties.getLanguages().add(languageProperties);
-		}
-
-		return properties;
-	}
-
-	public Set<String> scanFileExtentions(Path root) {
-		Set<String> extentionsFound = new TreeSet<>();
-
-		try {
-			Files.walkFileTree(root, new FileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					String extention = FileNameUtils.getExtension(file.getFileName().toString());
-
-					extentionsFound.add(extention);
-
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-					return FileVisitResult.CONTINUE;
-				}
-			});
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue walking: " + root, e);
-		}
-
-		LOGGER.info("Extentions found: {}", extentionsFound);
-
-		return extentionsFound;
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {

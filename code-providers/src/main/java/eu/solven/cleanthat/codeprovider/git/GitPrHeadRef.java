@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.code_provider.github.event.pojo;
+package eu.solven.cleanthat.codeprovider.git;
 
 /**
  * Given PR may be cross repositories, we need to qualify the head by the actual repository (which may differ from the

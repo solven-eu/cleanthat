@@ -2,6 +2,7 @@ package eu.solven.cleanthat.github.run;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
@@ -35,6 +36,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.LanguageProperties;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })
@@ -59,7 +61,17 @@ public class RunGithubMonitoring {
 
 			@Override
 			public String getLanguage() {
-				return "anything";
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public Set<String> getFileExtentions() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public LanguageProperties makeDefaultProperties() {
+				throw new UnsupportedOperationException();
 			}
 		};
 	}
@@ -68,7 +80,7 @@ public class RunGithubMonitoring {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshJwt();
+		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
 		GHApp app = handler.getGithubAsApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());

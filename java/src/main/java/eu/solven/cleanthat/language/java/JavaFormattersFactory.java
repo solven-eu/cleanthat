@@ -3,6 +3,7 @@ package eu.solven.cleanthat.language.java;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -53,6 +54,11 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	@Override
 	public String getLanguage() {
 		return "java";
+	}
+
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of("java");
 	}
 
 	@VisibleForTesting
@@ -125,6 +131,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		return processor;
 	}
 
+	@Override
 	public LanguageProperties makeDefaultProperties() {
 		LanguageProperties languageProperties = new LanguageProperties();
 
@@ -172,4 +179,5 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 				.build();
 		return processorProperties;
 	}
+
 }

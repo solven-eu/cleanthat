@@ -1,8 +1,7 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 import org.springframework.context.ApplicationContext;
 
@@ -11,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * Helper methods in the context of a mvn plugin
@@ -24,10 +24,11 @@ public class CleanThatMavenHelper {
 	}
 
 	public static MavenCodeCleaner makeCodeCleaner(ApplicationContext appContext) {
-		List<ObjectMapper> objectMappers =
-				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
+		Collection<ObjectMapper> objectMappers = appContext.getBeansOfType(ObjectMapper.class).values();
+		Collection<ILanguageLintFixerFactory> factories =
+				appContext.getBeansOfType(ILanguageLintFixerFactory.class).values();
 		ICodeProviderFormatter codeProviderFormatter = appContext.getBean(ICodeProviderFormatter.class);
-		return new MavenCodeCleaner(objectMappers, codeProviderFormatter);
+		return new MavenCodeCleaner(objectMappers, factories, codeProviderFormatter);
 	}
 
 	// Process the root of current module

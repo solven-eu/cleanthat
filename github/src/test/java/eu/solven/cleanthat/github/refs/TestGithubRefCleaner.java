@@ -31,6 +31,7 @@ public class TestGithubRefCleaner {
 		Mockito.when(repository.getRef("heads/someRef")).thenReturn(ref);
 
 		GithubRefCleaner cleaner = new GithubRefCleaner(Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
+				Arrays.asList(),
 				Mockito.any(ICodeProviderFormatter.class),
 				new GithubAndToken(gitHub, "someToken", Map.of()));
 

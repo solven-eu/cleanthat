@@ -2,8 +2,9 @@ package eu.solven.cleanthat.lambda.step2_executeclean;
 
 import java.util.Map;
 
+import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
@@ -19,8 +20,8 @@ public class ExecuteCleaningWebhooksLambdaFunction extends AWebhooksLambdaFuncti
 
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
-		IGithubWebhookHandler makeWithFreshJwt = CheckConfigWebhooksLambdaFunction.extracted(getAppContext());
-		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
+		IGitWebhookHandler makeWithFreshJwt = CheckConfigWebhooksLambdaFunction.extracted(getAppContext());
+		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(CompositeCodeCleanerFactory.class);
 
 		makeWithFreshJwt.doExecuteWebhookEvent(cleanerFactory, input);
 

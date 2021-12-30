@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}
@@ -30,7 +31,8 @@ public class GithubSpringConfig {
 
 	@Bean
 	public GithubCodeCleanerFactory githubCodeCleanerFactory(List<ObjectMapper> objectMappers,
+			List<ILanguageLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider) {
-		return new GithubCodeCleanerFactory(objectMappers, formatterProvider);
+		return new GithubCodeCleanerFactory(objectMappers, factories, formatterProvider);
 	}
 }

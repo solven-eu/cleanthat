@@ -15,22 +15,16 @@ import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
-import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
-public class ITCleanDynamoDbEventLocally {
-	GithubRefCleaner cleaner;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
+@ContextConfiguration(classes = { CheckConfigWebhooksLambdaFunction.class })
+public class ITProcessLocallyDynamoDbEvent_CheckConfig {
 	@Autowired
 	AWebhooksLambdaFunction lambdaFunction;
 
@@ -38,11 +32,9 @@ public class ITCleanDynamoDbEventLocally {
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
 		AmazonDynamoDB dynamoDbClient = SaveToDynamoDb.makeDynamoDbClient();
 
-		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
-		// You can search logs for this key, in order to process given event locally
-		String key = "random-6787961d-e2b6-4ec2-8df5-7a3db5722b82";
-		GetItemResult item = dynamoDbClient.getItem(new GetItemRequest().withTableName("cleanthat_accepted_events")
-				.withKey(Map.of("X-GitHub-Delivery", new AttributeValue().withS(key))));
+		String key = "random-d1f94a67-ffe5-4334-9e78-b47e21486581";
+		GetItemResult item = dynamoDbClient.getItem(new GetItemRequest().withTableName("cleanthat_webhooks_github")
+				.withKey(Map.of(GithubWebhookEvent.X_GIT_HUB_DELIVERY, new AttributeValue().withS(key))));
 
 		Map<String, AttributeValue> dynamoDbItem = item.getItem();
 		if (dynamoDbItem == null) {

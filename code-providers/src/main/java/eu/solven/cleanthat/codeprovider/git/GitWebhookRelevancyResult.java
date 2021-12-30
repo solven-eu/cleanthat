@@ -1,9 +1,6 @@
-package eu.solven.cleanthat.code_provider.github.event.pojo;
+package eu.solven.cleanthat.codeprovider.git;
 
 import java.util.Optional;
-
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 
 /**
  * Holds details about a filter over an Event
@@ -11,7 +8,7 @@ import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
  * @author Benoit Lacelle
  *
  */
-public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
+public class GitWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
 	final boolean prOpen;
 	final boolean pushBranch;
 	// final boolean hasReviewRequest;
@@ -23,7 +20,7 @@ public class GithubWebhookRelevancyResult implements IExternalWebhookRelevancyRe
 	// merged soon). However, it would mean a single head is being merged into different base: edge-case.
 	final Optional<GitRepoBranchSha1> baseRef;
 
-	public GithubWebhookRelevancyResult(boolean prOpen,
+	public GitWebhookRelevancyResult(boolean prOpen,
 			boolean pushBranch,
 			// boolean hasReviewRequest,
 			Optional<GitRepoBranchSha1> optRef,

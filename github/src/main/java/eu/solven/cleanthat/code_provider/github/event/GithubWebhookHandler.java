@@ -475,7 +475,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
 			if (eventRepo.getId() != prHeadRepository.getId()) {
-				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
+				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/
+				// working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
 						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). eventRepoId="
 								+ eventRepo.getId()

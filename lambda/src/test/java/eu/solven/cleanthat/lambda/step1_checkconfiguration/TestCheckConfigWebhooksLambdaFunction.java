@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.amazonaws.http.SdkHttpMetadata;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
 import com.amazonaws.services.dynamodbv2.model.PutItemResult;
@@ -41,7 +42,10 @@ public class TestCheckConfigWebhooksLambdaFunction {
 		Mockito.when(appContext.getBean(IGitWebhookHandlerFactory.class).makeWithFreshAuth())
 				.thenReturn(webhookHandler);
 
-		Mockito.when(dynamoDb.putItem(Mockito.any(PutItemRequest.class))).thenReturn(new PutItemResult());
+		PutItemResult result = new PutItemResult();
+		Mockito.when(dynamoDb.putItem(Mockito.any(PutItemRequest.class))).thenReturn(result);
+		SdkHttpMetadata httpMetadata = Mockito.mock(SdkHttpMetadata.class);
+		result.setSdkHttpMetadata(httpMetadata);
 	}
 
 	@Test

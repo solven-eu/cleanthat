@@ -23,7 +23,7 @@ public class ExecuteCleaningWebhooksLambdaFunction extends AWebhooksLambdaFuncti
 		IGitWebhookHandler makeWithFreshJwt = CheckConfigWebhooksLambdaFunction.extracted(getAppContext());
 		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(CompositeCodeCleanerFactory.class);
 
-		makeWithFreshJwt.doExecuteWebhookEvent(cleanerFactory, input);
+		makeWithFreshJwt.doExecuteClean(cleanerFactory, input);
 
 		return Map.of("whatever", "done");
 	}

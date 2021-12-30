@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.github.run;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,19 +35,18 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
-public class RunCleanGithubBranch extends ACleanThatXxxApplication {
-
+/**
+ * This enables running CleanThat cleaning logic directly on given branch
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public class RunCleanGithubBranch extends ACleanThatXxxApplication implements ICleanThatITConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubBranch.class);
 
-	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
-
-	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
-
-	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
-
-	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
-
 	final String repoFullName = SOLVEN_EU_MITRUST_DATASHARING;
+	// If empty, we will process the default branch
+	final Optional<String> optBranch = Optional.empty();
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(RunCleanGithubBranch.class);
@@ -60,15 +60,13 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication {
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
 
+		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
-		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
 		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId());
 		GitHub github = githubAndToken.getGithub();
-		// GitHub userToServerGithub = handler.getGithubAsApp();
 
-		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHRepository repo;
 		try {
 			repo = github.getRepository(repoFullName);
@@ -77,63 +75,82 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication {
 			return;
 		}
 		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
-		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
-		GHBranch consideredBranch = defaultBranch;
+		GHBranch branch = optBranch.map(b -> {
+			try {
+				return repo.getBranch(b);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}).orElseGet(() -> GithubHelper.getDefaultBranch(repo));
 
-		ICodeProvider codeProvider = new GithubBranchCodeProvider(githubAndToken.getToken(), repo, defaultBranch);
+		ICodeProvider codeProvider = new GithubBranchCodeProvider(githubAndToken.getToken(), repo, branch);
 
 		CodeProviderHelpers codeProviderHelpers = appContext.getBean(CodeProviderHelpers.class);
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
 
 		if (mainBranchConfig.isEmpty()) {
 			String configureRef = GithubRefCleaner.REF_NAME_CONFIGURE;
-			LOGGER.info("CleanThat is not configured in the main branch ({}). Try switching to {}",
-					defaultBranch.getName(),
+			LOGGER.info("CleanThat is not configured in the requested branch ({}). Try switching to {}",
+					branch.getName(),
 					configureRef);
 
-			consideredBranch = repo.getBranch(configureRef);
+			branch = repo.getBranch(configureRef);
 
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, consideredBranch);
+					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, branch);
 			mainBranchConfig = codeProviderHelpers.unsafeConfig(configureBranchCodeProvider);
 		}
 
 		if (mainBranchConfig.isEmpty()) {
-			LOGGER.info("CleanThat is not configured in the main/configure branch ({})", defaultBranch.getName());
-
-			Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
-				ICodeProvider configureBranchCodeProvider =
-						new GithubBranchCodeProvider(githubAndToken.getToken(), repo, b);
-				return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
-			}).findAny();
-			boolean configExistsAnywhere = branchWithConfig.isPresent();
-			if (!configExistsAnywhere) {
-				// At some point, we could prefer remaining silent if we understand the repository tried to integrate
-				// us, but did not completed.
-				LOGGER.debug("TODO");
-				// cleaner.openPRWithCleanThatStandardConfiguration(userToServerGithub, defaultBranch);
-			} else {
-				LOGGER.info("There is at least one branch with CleanThat configured ({})",
-						branchWithConfig.get().getName());
-			}
+			behaveOnLackOfConfig(cleaner, githubAndToken, repo, branch, codeProviderHelpers);
 		} else {
-			LOGGER.info("CleanThat is configured in the main/configure branch ({})", defaultBranch.getName());
+			doClean(cleaner, repo, branch);
+		}
+	}
 
-			AtomicReference<GHRef> createdPr = new AtomicReference<>();
+	private void doClean(GithubRefCleaner cleaner, GHRepository repo, GHBranch branch) {
+		LOGGER.info("CleanThat is configured in the main/configure branch ({})", branch.getName());
 
-			GHBranch finalDefaultBranch = defaultBranch;
-			CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), Suppliers.memoize(() -> {
-				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
-				createdPr.set(pr);
-				return GithubDecoratorHelper.decorate(pr);
-			}));
+		// GithubEventHelper.executeCleaning(null, repo, cleaner, null, null)
 
-			if (createdPr.get() == null) {
-				LOGGER.info("Not a single file has been impacted");
-			} else {
-				LOGGER.info("Created PR: {}", createdPr.get().getUrl().toExternalForm());
-				LOGGER.info("Details: {}", output);
-			}
+		AtomicReference<GHRef> createdPr = new AtomicReference<>();
+
+		GHBranch finalBranch = branch;
+		CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), Suppliers.memoize(() -> {
+			GHRef pr = GithubHelper.openEmptyRef(repo, finalBranch);
+			createdPr.set(pr);
+			return GithubDecoratorHelper.decorate(pr);
+		}));
+
+		if (createdPr.get() == null) {
+			LOGGER.info("Not a single file has been impacted");
+		} else {
+			LOGGER.info("Created PR: {}", createdPr.get().getUrl().toExternalForm());
+			LOGGER.info("Details: {}", output);
+		}
+	}
+
+	private void behaveOnLackOfConfig(GithubRefCleaner cleaner,
+			GithubAndToken githubAndToken,
+			GHRepository repo,
+			GHBranch branch,
+			CodeProviderHelpers codeProviderHelpers) throws IOException {
+		LOGGER.info("CleanThat is not configured in the main/configure branch ({})", branch.getName());
+
+		Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
+			ICodeProvider configureBranchCodeProvider =
+					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, b);
+			return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
+		}).findAny();
+		boolean configExistsAnywhere = branchWithConfig.isPresent();
+		if (configExistsAnywhere) {
+			LOGGER.info("There is at least one branch with CleanThat configured ({})",
+					branchWithConfig.get().getName());
+		} else {
+			// At some point, we could prefer remaining silent if we understand the repository tried to integrate
+			// us, but did not completed.
+			LOGGER.info("About to try condiguring CleanThat in the repo");
+			cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(branch));
 		}
 	}
 }

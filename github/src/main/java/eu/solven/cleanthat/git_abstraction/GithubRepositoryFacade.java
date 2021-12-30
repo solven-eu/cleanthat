@@ -90,10 +90,20 @@ public class GithubRepositoryFacade {
 		}
 
 		GHRef remoteRef = getRef(ref.getRef());
+
 		URL remoteRefUrl = remoteRef.getUrl();
-		LOGGER.info("About to delete {}", remoteRefUrl);
-		remoteRef.delete();
-		LOGGER.info("Deleted {}", remoteRefUrl);
+		String currentSha = remoteRef.getObject().getSha();
+		String initialSha = ref.getSha();
+		if (currentSha.equals(initialSha)) {
+			LOGGER.info("About to delete {}", remoteRefUrl);
+			remoteRef.delete();
+			LOGGER.info("Deleted {}", remoteRefUrl);
+		} else {
+			LOGGER.info("We skip removal of {} as its current sha ({}) differs from the sha at creation ({})",
+					remoteRefUrl,
+					currentSha,
+					initialSha);
+		}
 	}
 
 	public GHRef getRef(String refName) throws IOException {

@@ -34,6 +34,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
+@Deprecated(since = "DELETEME")
 public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubPullRequest.class);

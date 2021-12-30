@@ -83,7 +83,7 @@ public class SaveToDynamoDb {
 		LOGGER.info("PUT metdata for table={} primaryKey={}: {}",
 				table,
 				primaryKey,
-				outcome.getPutItemResult().getSdkHttpMetadata());
+				outcome.getPutItemResult().getSdkHttpMetadata().getHttpStatusCode());
 
 	}
 }

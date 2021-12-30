@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.aws.dynamodb;
+package eu.solven.cleanthat.aws.dynamodb.it;
 
 import java.io.IOException;
 import java.util.Map;
@@ -10,16 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
-import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 
 /**
@@ -37,22 +30,11 @@ public class ITProcessLocallyDynamoDbEvent_ExecuteClean {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		AmazonDynamoDB dynamoDbClient = SaveToDynamoDb.makeDynamoDbClient();
-
 		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
 		// You can search logs for this key, in order to process given event locally
 		String key = "random-d1f94a67-ffe5-4334-9e78-b47e21486581";
-		GetItemResult item = dynamoDbClient.getItem(new GetItemRequest().withTableName("cleanthat_accepted_events")
-				.withKey(Map.of(GithubWebhookEvent.X_GIT_HUB_DELIVERY, new AttributeValue().withS(key))));
 
-		Map<String, AttributeValue> dynamoDbItem = item.getItem();
-		if (dynamoDbItem == null) {
-			throw new IllegalArgumentException("There is no item with key=" + key);
-		}
-
-		@SuppressWarnings("deprecation")
-		Map<String, ?> dynamoDbPureJson = InternalUtils.toSimpleMapValue(dynamoDbItem);
-
+		Map<String, ?> dynamoDbPureJson = EventFromDynamoDbITHelper.loadEvent("cleanthat_accepted_events", key);
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);
 
 		Assertions.assertThat(output).hasSize(1);

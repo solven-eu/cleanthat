@@ -184,7 +184,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	public CodeFormatResult formatRefDiff(IGitRepository repo,
 			IGitReference base,
 			Supplier<IGitReference> headSupplier) {
-		// TODO Get the head lazily
+		// TODO Get the head lazily, else it means we create branch which may remain empty
 		GHRef head = headSupplier.get().getDecorated();
 		GHRef ghBase = base.getDecorated();
 

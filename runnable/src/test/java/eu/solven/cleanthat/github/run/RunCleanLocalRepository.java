@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.jgit.api.Git;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ApplicationContext;
@@ -15,13 +17,24 @@ import org.springframework.context.event.EventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
+/**
+ * This enables easy cleaning of any given folder. Given folder is supposedly the root of a repository
+ * 
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class RunCleanLocalRepository extends ACleanThatXxxApplication {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanLocalRepository.class);
+
 	public static void main(String[] args) {
 		SpringApplication springApp = new SpringApplication(RunCleanLocalRepository.class);
 
@@ -32,20 +45,35 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
+		// One can adjust this to any local folder
 		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace2", "spring-boot");
 
-		Git jgit = Git.open(repoFolder.toFile());
+		LOGGER.info("About to process {}", repoFolder);
 
-		JGitCodeProvider codeProvider =
-				new JGitCodeProvider(repoFolder, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
+		ICodeProviderWriter codeProvider = makeCodeProvider(repoFolder);
 
 		ApplicationContext appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
 		File pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 
+		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 		CleanthatRepositoryProperties properties =
-				appContext.getBean(ObjectMapper.class).readValue(pathToConfig, CleanthatRepositoryProperties.class);
+				objectMapper.readValue(pathToConfig, CleanthatRepositoryProperties.class);
 		codeProviderFormatter.formatCode(properties, codeProvider, false);
+	}
+
+	private ICodeProviderWriter makeCodeProvider(Path root) throws IOException {
+		ICodeProviderWriter codeProvider;
+		if (root.resolve(".git").toFile().isDirectory()) {
+			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
+			Git jgit = Git.open(root.toFile());
+
+			codeProvider = new JGitCodeProvider(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
+		} else {
+			LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)");
+			codeProvider = new FileSystemCodeProvider(root);
+		}
+		return codeProvider;
 	}
 
 }

@@ -33,5 +33,5 @@ public interface IGitWebhookHandler {
 	WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
 			IWebhookEvent input);
 
-	void doExecuteWebhookEvent(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input);
+	void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input);
 }

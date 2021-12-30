@@ -106,10 +106,16 @@ The maven plugin enables generating an Eclipse Stylesheet minimizing changes ove
 
 see maven/README.MD
 
-# Deploy into Production (AWS):
+# Notes for maintainers
+
+## Deploy into Production (AWS):
 
     git push origin master:deploy-prd
 
-# Release a new version (and deploy jars to Sonatype m2central):
+## Release a new version (and deploy jars to Sonatype m2central):
 
     mvn release:clean release:prepare release:perform
+
+## Re-run locally events in AWS:
+
+See ITProcessLocallyDynamoDbEvent_CheckConfig

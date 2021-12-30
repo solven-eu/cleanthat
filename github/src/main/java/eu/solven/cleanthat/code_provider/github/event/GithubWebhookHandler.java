@@ -26,7 +26,6 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -424,6 +423,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		LOGGER.info("We are connected to repo: {}", baseRepo.getUrl());
 		return ResultOrError.result(baseRepo);
 	}
 
@@ -474,9 +474,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
-			if (Long.compare(eventRepo.getId(), prHeadRepository.getId()) == 0) {
+			if (eventRepo.getId() != prHeadRepository.getId()) {
+				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
-						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). head="
+						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). eventRepoId="
+								+ eventRepo.getId()
+								+ " head="
 								+ headRepoFullname));
 			}
 		}
@@ -496,7 +499,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public void doExecuteWebhookEvent(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
+	public void doExecuteClean(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
@@ -519,42 +522,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
 		Supplier<IGitReference> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-		CodeFormatResult result;
-		if (relevancyResult.optBaseForHead().isPresent()) {
-			// If the base does not exist, then something is wrong: let's check right away it is available
-			GHRef base;
-			try {
-				base = facade.getRef(relevancyResult.optBaseForHead().get().getRef());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-			result = cleaner.formatRefDiff(GithubDecoratorHelper.decorate(repo),
-					GithubDecoratorHelper.decorate(base),
-					headSupplier);
-		} else {
-			result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier);
-		}
-		if (refLazyRefCreated.get() != null) {
-			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
-			if (relevancyResult.optBaseForHead().isEmpty()) {
-				LOGGER.warn("We created a tmpRef but there is no base");
-			} else {
-				if (result.isEmpty()) {
-					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed",
-							lazyRefCreated);
-					try {
-						facade.removeRef(lazyRefCreated);
-					} catch (IOException e) {
-						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
-					}
-				} else {
-					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
-					doOpenPr(relevancyResult, facade, lazyRefCreated);
-				}
-			}
-		} else {
-			LOGGER.debug("The changes would have been committed directly in the head branch");
-		}
+		CodeFormatResult result =
+				GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
+		GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 		logAfterCleaning(installationId, repo.getRoot());
 	}
@@ -573,22 +543,45 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHRepository repo,
 			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
+		GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
+		String refName = refToProcess.getRef();
+
+		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
+		// Or to any protected branch?
+		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
+			GHBranch branch;
+			try {
+				branch = repo.getBranch(refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			if (branch.isProtected()) {
+				// For safety, we prefer not to take the risk of writing onto protected branches, which are any kind of
+				// privileged branch
+				// This may happen with a PR used to merge some master branch into a custom branch
+				// TODO Ensure we discard these scenarios earlier
+				throw new IllegalStateException(
+						"We should have rejected earlier a scenario leading to write over a protected branch: "
+								+ branch);
+			}
+		}
+
 		Supplier<IGitReference> headSupplier = () -> {
-			GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
-			String refName = refToProcess.getRef();
 			String repoName = repo.getName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
+				String sha = refToProcess.getSha();
 				try {
-					String sha = refToProcess.getSha();
 					repo.createRef(refName, sha);
 					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
-					refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 				} catch (IOException e) {
-					// TODO If already exists, should we stop the process, and continue?
+					// TODO If already exists, should we stop the process, or continue?
 					// Another process may be already working on this ref
 					throw new UncheckedIOException("Issue creating ref=" + refName, e);
 				}
+				refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 			}
+
 			try {
 				return GithubDecoratorHelper.decorate(facade.getRef(refName));
 			} catch (IOException e) {
@@ -596,30 +589,5 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 		};
 		return headSupplier;
-	}
-
-	public void doOpenPr(WebhookRelevancyResult relevancyResult,
-			GithubRepositoryFacade facade,
-			GitRepoBranchSha1 lazyRefCreated) {
-		// TODO We may want to open a PR in a different repository, in case the original repository does not
-		// accept new branches
-		Optional<?> optOpenPr;
-		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
-		try {
-			optOpenPr = facade.openPrIfNoneExists(base,
-					lazyRefCreated,
-					"Cleanthat",
-					"Cleanthat <body>\r\n@blacelle please look at me");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		if (optOpenPr.isPresent()) {
-			LOGGER.info("We succeeded opening a PR open to merge {} into {}: {}",
-					lazyRefCreated,
-					base,
-					optOpenPr.get());
-		} else {
-			LOGGER.info("There is already a PR open to merge {} into {}", lazyRefCreated, base);
-		}
 	}
 }

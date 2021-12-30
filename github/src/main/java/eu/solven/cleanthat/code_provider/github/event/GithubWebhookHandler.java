@@ -474,7 +474,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHCommitPointer prHead = optPr.getHead();
 			GHRepository prHeadRepository = prHead.getRepository();
 			String headRepoFullname = prHeadRepository.getFullName();
-			if (eventRepo.getId() != prHeadRepository.getId()) {
+			// We rely on Long.compare to workaround PMD complaining about == used over Strings
+			// which is seemingly an issue with @WithBridgeMethods
+			if (Long.compare(eventRepo.getId(), prHeadRepository.getId()) != 0) {
 				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/
 				// working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(

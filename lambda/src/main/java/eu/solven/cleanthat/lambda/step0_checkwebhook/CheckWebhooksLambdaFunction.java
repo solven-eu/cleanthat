@@ -11,8 +11,8 @@ import org.springframework.boot.SpringApplication;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
@@ -37,10 +37,10 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
-		GithubWebhookHandlerFactory githubFactory = getAppContext().getBean(GithubWebhookHandlerFactory.class);
+		IGitWebhookHandlerFactory githubFactory = getAppContext().getBean(IGitWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
-		IGithubWebhookHandler makeWithFreshJwt;
+		IGitWebhookHandler makeWithFreshJwt;
 		try {
 			makeWithFreshJwt = githubFactory.makeWithFreshAuth();
 		} catch (IOException e) {

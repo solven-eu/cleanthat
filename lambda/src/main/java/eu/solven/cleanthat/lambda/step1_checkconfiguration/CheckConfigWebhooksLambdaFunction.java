@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
@@ -39,7 +40,7 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
 		IGitWebhookHandler makeWithFreshJwt = extracted(getAppContext());
 
-		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(ICodeCleanerFactory.class);
+		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(CompositeCodeCleanerFactory.class);
 
 		WebhookRelevancyResult processAnswer =
 				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);

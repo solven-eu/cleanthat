@@ -26,6 +26,11 @@ import com.nimbusds.jwt.SignedJWT;
  * @author Benoit Lacelle
  */
 public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
+	// private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandlerFactory.class);
+
+	public static final String ENV_GITHUB_APP_PRIVATE_JWK = "github.app.private-jwk";
+
+	// public static final String GITHUB_APP_PRIVATE_JWK_FORUNITTESTS = "forUnitTests";
 
 	// https://github.com/organizations/solven-eu/settings/apps/cleanthat
 	// https://github.com/apps/cleanthat
@@ -63,7 +68,14 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
 	public String makeJWT() throws JOSEException {
-		String rawJwk = env.getRequiredProperty("github.app.private-jwk");
+		String rawJwk = env.getRequiredProperty(ENV_GITHUB_APP_PRIVATE_JWK);
+
+		// if (rawJwk.equals(GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS)
+		// && GCInspector.inUnitTest()) {
+		// LOGGER.info("We are in a unit-test");
+		// return GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS;
+		// }
+
 		RSAKey rsaJWK;
 		try {
 			rsaJWK = RSAKey.parse(rawJwk);

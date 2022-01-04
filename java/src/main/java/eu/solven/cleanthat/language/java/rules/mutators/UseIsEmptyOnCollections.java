@@ -59,7 +59,7 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 			return false;
 		}
 		BinaryExpr binaryExpr = (BinaryExpr) node;
-		if (!BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
+		if (!BinaryExpr.Operator.EQUALS.equals(binaryExpr.getOperator())) {
 			// We search for 'x == 0' or '0 == x'
 			return false;
 		}

@@ -9,7 +9,7 @@ import org.junit.Assume;
 import org.junit.Test;
 
 public class TestCleanThatGenerateEclipseStylesheetMojo {
-	CleanThatGenerateEclipseStylesheetMojo mojo = new CleanThatGenerateEclipseStylesheetMojo();
+	final CleanThatGenerateEclipseStylesheetMojo mojo = new CleanThatGenerateEclipseStylesheetMojo();
 
 	@Test
 	public void testNortmalizeEclipsePath() {
@@ -17,7 +17,9 @@ public class TestCleanThatGenerateEclipseStylesheetMojo {
 				Paths.get("/Users/blacelle/workspace2/RoaringBitmap/.cleanthat/eclipse_formatter-stylesheet.xml"),
 				Paths.get("/Users/blacelle/workspace2/RoaringBitmap/cleanthat.yaml"));
 
-		Assertions.assertThat(normalized.toString()).isEqualTo("/.cleanthat/eclipse_formatter-stylesheet.xml");
+		Assertions.assertThat(normalized.getFileName().toString()).isEqualTo("eclipse_formatter-stylesheet.xml");
+		Assertions.assertThat(CleanThatGenerateEclipseStylesheetMojo.toString(normalized))
+				.isEqualTo("/.cleanthat/eclipse_formatter-stylesheet.xml");
 	}
 
 	@Test
@@ -28,6 +30,8 @@ public class TestCleanThatGenerateEclipseStylesheetMojo {
 						"C:\\Users\\blacelle\\workspace2\\RoaringBitmap\\.cleanthat\\eclipse_formatter-stylesheet.xml"),
 				Paths.get("C:\\Users\\blacelle\\workspace2\\RoaringBitmap\\cleanthat.yaml"));
 
-		Assertions.assertThat(normalized.toString()).isEqualTo("/.cleanthat/eclipse_formatter-stylesheet.xml");
+		Assertions.assertThat(normalized.getFileName().toString()).isEqualTo("eclipse_formatter-stylesheet.xml");
+		Assertions.assertThat(CleanThatGenerateEclipseStylesheetMojo.toString(normalized))
+				.isEqualTo("/.cleanthat/eclipse_formatter-stylesheet.xml");
 	}
 }

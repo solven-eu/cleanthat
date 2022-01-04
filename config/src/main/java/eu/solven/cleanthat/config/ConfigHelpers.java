@@ -10,6 +10,8 @@ import java.util.Map;
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
@@ -39,7 +41,11 @@ public class ConfigHelpers {
 	}
 
 	public static ObjectMapper makeYamlObjectMapper() {
-		return new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER));
+		YAMLFactory yamlFactory = new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER)
+				// This is disabled by default
+				.enable(Feature.USE_PLATFORM_LINE_BREAKS);
+		ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
+		return objectMapper;
 	}
 
 	public CleanthatRepositoryProperties loadRepoConfig(Resource resource) {

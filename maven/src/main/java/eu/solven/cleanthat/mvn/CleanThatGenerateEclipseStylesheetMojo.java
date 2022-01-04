@@ -159,7 +159,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		if (rootFolder == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + configPath + " (no root)");
 		}
-		return Paths.get("/", rootFolder.relativize(eclipseConfigPath).toString());
+
+		return Paths.get("/").resolve(rootFolder.relativize(eclipseConfigPath));
 	}
 
 	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)

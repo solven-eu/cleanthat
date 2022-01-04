@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -25,6 +27,17 @@ public class TestConfigHelpers {
 	private static final String EOL = System.lineSeparator();
 
 	@Test
+	public void testYaml() throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+
+		String asString = yamlObjectMapper.writeValueAsString(Map.of("k1", Map.of("k2", "v")));
+
+		// This may demonstrate unexpected behavior with EOL on different systems
+		Assertions.assertThat(asString).contains("k", "  k2: \"v\"");
+		Assertions.assertThat(asString.split(EOL)).hasSize(2);
+	}
+
+	@Test
 	public void testFromJsonToYaml() throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper jsonObjectMapper = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(jsonObjectMapper));
@@ -42,6 +55,16 @@ public class TestConfigHelpers {
 				String expectedYaml = StreamUtils.copyToString(
 						new ClassPathResource("/config/" + name + ".to_yaml.yaml").getInputStream(),
 						StandardCharsets.UTF_8);
+
+				if (EOL.equals("\r\n")) {
+					// We are seemingly under Windows
+					if (!expectedYaml.contains(EOL)) {
+						Assert.fail("Files are not checked-out with system EOL");
+					} else if (!asYaml.contains(EOL)) {
+						Assert.fail("YAML are not generated with system EOL");
+					}
+				}
+
 				Assert.assertEquals("Issue with " + name, expectedYaml, asYaml);
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue with: " + name, e);

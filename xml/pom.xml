@@ -8,7 +8,7 @@
 		<artifactId>aggregator-cleanthat</artifactId>
 	</parent>
 
-	<artifactId>json</artifactId>
+	<artifactId>xml</artifactId>
 
 	<dependencies>
 		<dependency>

@@ -134,7 +134,7 @@
 			<groupId>com.github.cormoran-io.pepper</groupId>
 			<artifactId>pepper-unittest</artifactId>
 			<version>${pepper.version}</version>
-			<scope />
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

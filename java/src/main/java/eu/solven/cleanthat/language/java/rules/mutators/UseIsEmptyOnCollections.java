@@ -55,41 +55,48 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-		if (node instanceof BinaryExpr && BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
-			BinaryExpr binaryExpr = (BinaryExpr) node;
-			Optional<MethodCallExpr> checkmeForIsEmpty;
-			if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
-				// xxx.method() == 0
-				checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
-			} else if (binaryExpr.getLeft().equals(ZERO_EXPR) && binaryExpr.getRight() instanceof MethodCallExpr) {
-				// 0 == xxx.method()
-				checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getRight());
-			} else {
-				checkmeForIsEmpty = Optional.empty();
-			}
-			if (checkmeForIsEmpty.isEmpty()) {
-				return false;
-			}
-			Optional<Expression> optLengthScope = checkmeForIsEmpty.get().getScope();
-			if (optLengthScope.isEmpty()) {
-				return false;
-			}
+		if (!(node instanceof BinaryExpr)) {
+			return false;
+		}
+		BinaryExpr binaryExpr = (BinaryExpr) node;
+		if (!BinaryExpr.Operator.EQUALS.equals(((BinaryExpr) node).getOperator())) {
+			// We search for 'x == 0' or '0 == x'
+			return false;
+		}
 
-			// Check the called method is .size() or .length()
-			if (!"size".equals(checkmeForIsEmpty.get().getNameAsString())
-					// For String.length()
-					&& !"length".equals(checkmeForIsEmpty.get().getNameAsString())) {
-				LOGGER.debug("Not calling .size() nor .length()");
-				return false;
-			}
-			Expression lengthScope = optLengthScope.get();
-			Optional<ResolvedType> type = optResolvedType(lengthScope);
+		Optional<MethodCallExpr> checkmeForIsEmpty;
+		if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
+			// xxx.method() == 0
+			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
+		} else if (binaryExpr.getLeft().equals(ZERO_EXPR) && binaryExpr.getRight() instanceof MethodCallExpr) {
+			// 0 == xxx.method()
+			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getRight());
+		} else {
+			checkmeForIsEmpty = Optional.empty();
+		}
+		if (checkmeForIsEmpty.isEmpty()) {
+			return false;
+		}
+		Optional<Expression> optLengthScope = checkmeForIsEmpty.get().getScope();
+		if (optLengthScope.isEmpty()) {
+			return false;
+		}
 
-			if (type.isPresent()) {
-				boolean localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
-				if (localTransformed) {
-					return true;
-				}
+		// Check the called method is .size() or .length()
+		String methodCalledName = checkmeForIsEmpty.get().getNameAsString();
+		if (!"size".equals(methodCalledName)// For Collection.size()
+				&& !"length".equals(methodCalledName) // For String.length()
+		) {
+			LOGGER.debug("Not calling .size() nor .length()");
+			return false;
+		}
+		Expression lengthScope = optLengthScope.get();
+		Optional<ResolvedType> type = optResolvedType(lengthScope);
+
+		if (type.isPresent()) {
+			boolean localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
+			if (localTransformed) {
+				return true;
 			}
 		}
 

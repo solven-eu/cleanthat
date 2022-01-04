@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
@@ -70,7 +71,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
-		ILintFixer processor;
+		ILintFixerWithId processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		// override with explicit configuration
 		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
@@ -128,6 +129,11 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
 		}
+
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		}
+
 		return processor;
 	}
 

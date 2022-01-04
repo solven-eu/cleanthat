@@ -38,6 +38,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.formatter.ILintFixerHelpedByCodeStyleFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ILanguageProperties;
@@ -60,7 +61,7 @@ import eu.solven.cleanthat.language.java.rules.mutators.VariableEqualsConstant;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
+public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesJavaMutator.class);
 
@@ -117,6 +118,11 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 		this.transformers.forEach(ct -> {
 			LOGGER.debug("Using transformer: {}", ct.getId());
 		});
+	}
+
+	@Override
+	public String getId() {
+		return "rules";
 	}
 
 	public List<IClassTransformer> getTransformers() {

@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.xml.jackson;
+package eu.solven.cleanthat.language.xml.revelc;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -11,7 +11,7 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class JacksonXmlFormatterProperties {
+public class RevelcXmlFormatterProperties {
 
 	private static final int DEFAULT_INDENT_WHITESPACES = 4;
 

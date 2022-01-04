@@ -14,11 +14,14 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
-import eu.solven.cleanthat.language.xml.jackson.JacksonXmlFormatter;
-import eu.solven.cleanthat.language.xml.jackson.JacksonXmlFormatterProperties;
+import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatter;
+import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatterProperties;
+import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
+import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
 
 /**
  * Formatter for Json
@@ -55,17 +58,28 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 		LOGGER.info("Processing: {}", engine);
 
-		ILintFixer processor;
+		ILintFixerWithId processor;
 		switch (engine) {
-		case "jackson":
-			JacksonXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, JacksonXmlFormatterProperties.class);
-			processor = new JacksonXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+		case "revelc": {
+			RevelcXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
+			processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
+		}
+		case "javax": {
+			JavaxXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
+			processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
+			break;
+		}
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
+
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
 		}
 
 		return processor;
@@ -80,9 +94,8 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 		List<Map<String, ?>> processors = new ArrayList<>();
 
 		{
-			JacksonXmlFormatterProperties engineParameters = new JacksonXmlFormatterProperties();
-			JacksonXmlFormatter engine =
-					new JacksonXmlFormatter(languageProperties.getSourceCode(), engineParameters);
+			RevelcXmlFormatterProperties engineParameters = new RevelcXmlFormatterProperties();
+			RevelcXmlFormatter engine = new RevelcXmlFormatter(languageProperties.getSourceCode(), engineParameters);
 
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, engine.getId())

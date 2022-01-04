@@ -23,6 +23,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
@@ -34,7 +35,7 @@ import io.spring.javaformat.formatter.Formatter;
  * @author Benoit Lacelle
  */
 // https://github.com/spring-io/spring-javaformat
-public class SpringJavaStyleEnforcer implements IStyleEnforcer {
+public class SpringJavaStyleEnforcer implements IStyleEnforcer, ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringJavaStyleEnforcer.class);
 
 	final ISourceCodeProperties sourceCodeProperties;
@@ -44,6 +45,11 @@ public class SpringJavaStyleEnforcer implements IStyleEnforcer {
 			SpringJavaFormatterProperties processorConfig) {
 		this.sourceCodeProperties = sourceCodeProperties;
 		this.processorConfig = processorConfig;
+	}
+
+	@Override
+	public String getId() {
+		return "spring_formatter";
 	}
 
 	@Override

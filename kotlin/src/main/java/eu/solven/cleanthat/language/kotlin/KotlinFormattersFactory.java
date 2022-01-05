@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.scala;
+package eu.solven.cleanthat.language.kotlin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,31 +18,31 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
-import eu.solven.cleanthat.language.scala.scalafix.ScalafixFormatter;
-import eu.solven.cleanthat.language.scala.scalafix.ScalafixProperties;
-import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtProperties;
-import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtStyleEnforcer;
+import eu.solven.cleanthat.language.kotlin.ktfmt.KtfmtProperties;
+import eu.solven.cleanthat.language.kotlin.ktfmt.KtfmtStyleEnforcer;
+import eu.solven.cleanthat.language.kotlin.ktlint.KtlintFormatter;
+import eu.solven.cleanthat.language.kotlin.ktlint.KtlintProperties;
 
 /**
- * Formatter for Scala
+ * Formatter for Kotlin
  *
  * @author Benoit Lacelle
  */
-public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ScalaFormattersFactory.class);
+public class KotlinFormattersFactory extends ASourceCodeFormatterFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(KotlinFormattersFactory.class);
 
-	public ScalaFormattersFactory(ObjectMapper objectMapper) {
+	public KotlinFormattersFactory(ObjectMapper objectMapper) {
 		super(objectMapper);
 	}
 
 	@Override
 	public String getLanguage() {
-		return "scala";
+		return "kotlin";
 	}
 
 	@Override
 	public Set<String> getFileExtentions() {
-		return Set.of("scala", "sc");
+		return Set.of(".kt", ".kts", ".ktm");
 	}
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
@@ -58,20 +58,24 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 
 		ILintFixerWithId processor;
 		switch (engine) {
-		case "scalafmt": {
-			ScalafmtProperties properties = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
-			processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), properties);
+		case "ktfmt": {
+			KtfmtProperties config = getObjectMapper().convertValue(parameters, KtfmtProperties.class);
+			processor = new KtfmtStyleEnforcer(languageProperties.getSourceCode(), config);
 
 			break;
 		}
-		case "scalafix": {
-			ScalafixProperties properties = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
-			processor = new ScalafixFormatter(languageProperties.getSourceCode(), properties);
+		case "ktlint": {
+			KtlintProperties config = getObjectMapper().convertValue(parameters, KtlintProperties.class);
+			processor = new KtlintFormatter(languageProperties.getSourceCode(), config);
 
 			break;
 		}
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
+
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
 		}
 
 		return processor;
@@ -86,7 +90,7 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 		List<Map<String, ?>> processors = new ArrayList<>();
 
 		{
-			ScalafmtProperties engineParameters = new ScalafmtProperties();
+			KtfmtProperties engineParameters = new KtfmtProperties();
 
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, "scalafmt")
@@ -94,7 +98,7 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 					.build());
 		}
 		{
-			ScalafixProperties engineParameters = new ScalafixProperties();
+			KtlintProperties engineParameters = new KtlintProperties();
 
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, "scalafix")

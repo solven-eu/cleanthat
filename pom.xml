@@ -33,6 +33,7 @@
 		<!-- JVM languages -->
 		<module>java</module>
 		<module>scala</module>
+		<module>kotlin</module>
 
 		<!-- <module>python</module> -->
 

@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 
 import cormoran.pepper.collection.PepperMapHelper;
@@ -147,7 +148,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			return;
 		}
 
-		LOGGER.warn("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
+		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
 
 		Path normalizedEclipsePath = normalize(eclipseConfigPath, configPath);
 		injectStylesheetInConfig(appContext, normalizedEclipsePath, configPath);
@@ -155,7 +156,11 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	protected Path normalize(Path eclipseConfigPath, Path configPath) {
 		Path rootFolder = configPath.getParent();
-		return Paths.get("/", rootFolder.relativize(eclipseConfigPath).toString());
+		if (rootFolder == null) {
+			throw new IllegalArgumentException("Issue with configPath: " + configPath + " (no root)");
+		}
+
+		return Paths.get("/").resolve(rootFolder.relativize(eclipseConfigPath));
 	}
 
 	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)
@@ -210,7 +215,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 				PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
 
 		Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
-		eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + eclipseConfigPath);
+		eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + toString(eclipseConfigPath));
 
 		// Prepare the configuration as yaml
 		String asYaml;
@@ -226,6 +231,18 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
 		}
+	}
+
+	/**
+	 * Convert an OS dependent path to a '/root/folder/file' String.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String toString(Path path) {
+		return Streams.stream(path.iterator())
+				.map(p -> p.getFileName().toString())
+				.collect(Collectors.joining("/", "/", ""));
 	}
 
 	protected Map<Path, String> loadAnyJavaFile(IEclipseStylesheetGenerator generator) {

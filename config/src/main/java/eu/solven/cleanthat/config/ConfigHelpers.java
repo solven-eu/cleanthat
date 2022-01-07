@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import com.google.common.collect.Iterables;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -28,9 +29,9 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  */
 public class ConfigHelpers {
 
-	final List<ObjectMapper> objectMappers;
+	final Collection<ObjectMapper> objectMappers;
 
-	public ConfigHelpers(List<ObjectMapper> objectMappers) {
+	public ConfigHelpers(Collection<ObjectMapper> objectMappers) {
 		this.objectMappers = objectMappers;
 	}
 
@@ -39,7 +40,11 @@ public class ConfigHelpers {
 	}
 
 	public static ObjectMapper makeYamlObjectMapper() {
-		return new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER));
+		YAMLFactory yamlFactory = new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER)
+				// This is disabled by default
+				.enable(Feature.USE_PLATFORM_LINE_BREAKS);
+		ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
+		return objectMapper;
 	}
 
 	public CleanthatRepositoryProperties loadRepoConfig(Resource resource) {
@@ -60,29 +65,33 @@ public class ConfigHelpers {
 
 	protected ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
+		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
+
 		Map<String, Object> sourceConfig = new LinkedHashMap<>();
 		// Apply defaults from parent
-		sourceConfig.putAll(objectMappers.get(0).convertValue(properties.getSourceCode(), Map.class));
+		sourceConfig.putAll(firstObjectMapper.convertValue(properties.getSourceCode(), Map.class));
 		// Apply explicit configuration
 		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
 		if (explicitSourceCodeProperties != null) {
 			sourceConfig.putAll(explicitSourceCodeProperties);
 		}
-		return objectMappers.get(0).convertValue(sourceConfig, SourceCodeProperties.class);
+		return firstObjectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
 	}
 
 	public ILanguageProperties mergeLanguageProperties(CleanthatRepositoryProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
+		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
+
 		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageConfig);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageConfig);
 		languageConfig.put("source_code", sourceConfig);
-		ILanguageProperties languageP = objectMappers.get(0).convertValue(languageConfig, LanguageProperties.class);
+		ILanguageProperties languageP = firstObjectMapper.convertValue(languageConfig, LanguageProperties.class);
 		return languageP;
 	}
 
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
-		ObjectMapper firstObjectMapper = objectMappers.get(0);
+		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
 		Map<String, Object> languageAsMap = firstObjectMapper.convertValue(languageP, Map.class);
 		Map<String, Object> sourceCodeAsMap = firstObjectMapper.convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put("includes", includes);

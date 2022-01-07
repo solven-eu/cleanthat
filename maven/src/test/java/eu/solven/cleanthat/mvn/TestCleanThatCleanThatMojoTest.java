@@ -22,9 +22,6 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
 
-		// Resource defaultConfig = new ClassPathResource("/config/default-safe.yaml");
-		// Files.copy(defaultConfig.getInputStream(), cleanthatYaml.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
 		CleanThatCleanThatMojo myMojo = (CleanThatCleanThatMojo) lookupConfiguredMojo(project, "cleanthat");
 
 		try (ILogDisabler logCLoser = PepperTestHelper.disableLog(SpringApplication.class)) {
@@ -43,14 +40,11 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
 
-		// Resource defaultConfig = new ClassPathResource("/config/default-safe.yaml");
-		// Files.copy(defaultConfig.getInputStream(), cleanthatYaml.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
 		// 'init' will create a cleanthat.yaml
-		CleanThatInitMojo initMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, "init");
+		CleanThatInitMojo initMojo = lookupConfiguredInitMojo(project);
 		initMojo.execute();
 
-		CleanThatCleanThatMojo cleanthatMojo = (CleanThatCleanThatMojo) lookupConfiguredMojo(project, "cleanthat");
-		cleanthatMojo.execute();
+		CleanThatCleanThatMojo fixMojo = lookupConfiguredFixMojo(project);
+		fixMojo.execute();
 	}
 }

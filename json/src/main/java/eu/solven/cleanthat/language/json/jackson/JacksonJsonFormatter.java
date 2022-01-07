@@ -26,7 +26,6 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JacksonJsonFormatter.class);
 
 	final ISourceCodeProperties sourceCodeProperties;
-
 	final JacksonJsonFormatterProperties properties;
 
 	final ObjectMapper formatter;
@@ -50,11 +49,10 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 	}
 
 	protected DefaultPrettyPrinter makePrinter(LineEnding ending) {
-		int indent = properties.getIndent();
 		boolean spaceBeforeSeparator = properties.isSpaceBeforeSeparator();
 
 		// Setup a pretty printer with an indenter (indenter has 4 spaces in this case)
-		DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter(Strings.repeat(" ", indent), ending.getChars());
+		DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter(getIndentation(), ending.getChars());
 		DefaultPrettyPrinter printer = new DefaultPrettyPrinter() {
 			private static final long serialVersionUID = 1L;
 
@@ -80,9 +78,20 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 		return printer;
 	}
 
+	private String getIndentation() {
+		int deprecatedIndent = properties.getIndent();
+
+		if (deprecatedIndent >= 0) {
+			// Deprecated behavior: indentation is defined by a number of whitespaces
+			return Strings.repeat(" ", deprecatedIndent);
+		} else {
+			return properties.getIndentation();
+		}
+	}
+
 	@Override
 	public String doFormat(String code, LineEnding ending) throws IOException {
-		// Clone objectMapper as we will chanbge its prettyPrinter
+		// Clone objectMapper as we will change its prettyPrinter
 		ObjectMapper localFormatter = formatter.copy();
 
 		localFormatter.setDefaultPrettyPrinter(makePrinter(ending));
@@ -91,7 +100,7 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 		String formattedCode = formatter.writer().writeValueAsString(json);
 
 		// Append an EOL
-		if (properties.isEolAtEof()) {
+		if (properties.isEolAtEof() && !formattedCode.endsWith(ending.getChars())) {
 			formattedCode = formattedCode + ending.getChars();
 		}
 

@@ -41,7 +41,7 @@ import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = "init",
+@Mojo(name = CleanThatInitMojo.MOJO_INIT,
 		// This would be called once and for all
 		defaultPhase = LifecyclePhase.NONE,
 		threadSafe = true,
@@ -49,6 +49,8 @@ import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 		requiresProject = false)
 public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
+
+	public static final String MOJO_INIT = "init";
 
 	@Override
 	protected List<Class<?>> springClasses() {

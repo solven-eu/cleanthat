@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
@@ -55,7 +56,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 		LOGGER.info("Processing: {}", engine);
 
-		ILintFixer processor;
+		ILintFixerWithId processor;
 		switch (engine) {
 		case "jackson":
 			JacksonJsonFormatterProperties processorConfig =
@@ -66,6 +67,10 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
+
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
 		}
 
 		return processor;

@@ -27,6 +27,7 @@ public interface IRuleDescriber {
 	 * 
 	 * @see UseIsEmptyOnCollections
 	 */
+	// Relates to https://eslint.org/docs/user-guide/command-line-interface#--fix-type
 	default boolean isPerformanceImprovment() {
 		return false;
 	}

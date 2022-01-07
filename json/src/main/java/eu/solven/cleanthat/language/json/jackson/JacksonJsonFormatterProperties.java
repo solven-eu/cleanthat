@@ -3,6 +3,7 @@ package eu.solven.cleanthat.language.json.jackson;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import eu.solven.cleanthat.formatter.ICommonConventions;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
@@ -13,9 +14,9 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JacksonJsonFormatterProperties {
 
-	private static final int DEFAULT_INDENT_WHITESPACES = 4;
-
-	int indent = DEFAULT_INDENT_WHITESPACES;
+	@Deprecated(since = "Replaced by indentation")
+	int indent = -1;
+	String indentation = ICommonConventions.DEFAULT_INDENTATION;
 
 	String lineending = SourceCodeProperties.DEFAULT_LINE_ENDING;
 
@@ -23,12 +24,22 @@ public class JacksonJsonFormatterProperties {
 	boolean alphabeticalOrder = false;
 	boolean eolAtEof = false;
 
+	@Deprecated
 	public int getIndent() {
 		return indent;
 	}
 
+	@Deprecated
 	public void setIndent(int indent) {
 		this.indent = indent;
+	}
+
+	public String getIndentation() {
+		return indentation;
+	}
+
+	public void setIndentation(String indentation) {
+		this.indentation = indentation;
 	}
 
 	public String getLineending() {

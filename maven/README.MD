@@ -3,7 +3,22 @@
 Its release lifecycle is synchronized with cleanthat. Its latest version is available at:
 
     https://mvnrepository.com/artifact/io.github.solven-eu.cleanthat/cleanthat-maven-plugin
-    
+
+This plugin requires a JDK 11.X
+
+# Configure CleanThat mvn plugin
+
+Most CleanThat goals can be execute without a specific configuration in the pom.xml.
+Many CleanThat goals can be execute without any pom.xml (e.g. to call CleanThat logic out of a maven project)
+
+One can shorten its cleanthat commands by adding in ${user.home}/.m2/settings.xml:
+
+<pluginGroups>
+  <pluginGroup>io.github.solven-eu.cleanthat</pluginGroup>
+</pluginGroups>
+
+reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+
 # Goals
 
 ## cleanthat:init

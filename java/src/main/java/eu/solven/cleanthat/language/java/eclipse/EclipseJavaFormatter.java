@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cormoran.pepper.logging.PepperLogHelper;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 
@@ -41,7 +42,7 @@ import eu.solven.cleanthat.formatter.LineEnding;
 // Example configurations:
 // https://raw.githubusercontent.com/spring-io/spring-javaformat/master/.eclipse/eclipse-code-formatter.xml
 // https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
-public class EclipseJavaFormatter implements IStyleEnforcer {
+public class EclipseJavaFormatter implements IStyleEnforcer, ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
 	public static final String ID = "eclipse_formatter";
@@ -54,6 +55,11 @@ public class EclipseJavaFormatter implements IStyleEnforcer {
 
 	public EclipseJavaFormatter(EclipseJavaFormatterConfiguration configuration) {
 		defaultSettings = configuration.getSettings();
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = "cleanthat",
+@Mojo(name = CleanThatCleanThatMojo.MOJO_FIX,
 		defaultPhase = LifecyclePhase.PROCESS_SOURCES,
 		threadSafe = true,
 		// Used to enable symbolSolving based on project dependencies
@@ -35,6 +35,8 @@ import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 		requiresProject = false)
 public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
+
+	public static final String MOJO_FIX = "cleanthat";
 
 	@Override
 	protected List<Class<?>> springClasses() {
@@ -74,9 +76,7 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 		getLog().info("project.baseDir: " + baseDir);
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
-
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-
 		codeCleaner.formatCodeGivenConfig(codeProvider, isDryRun());
 	}
 }

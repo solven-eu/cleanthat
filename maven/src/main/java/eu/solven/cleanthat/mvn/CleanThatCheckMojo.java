@@ -1,25 +1,20 @@
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.springframework.context.ApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.any_language.ICodeCleaner;
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.formatter.CodeFormatterApplier;
-import eu.solven.cleanthat.formatter.CodeProviderFormatter;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.ILanguageFormatterFactory;
-import eu.solven.cleanthat.language.java.JavaFormattersFactory;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 
 /**
  * The mojo checking the code is clean
@@ -28,32 +23,38 @@ import eu.solven.cleanthat.language.java.JavaFormattersFactory;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = "check", defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
-public class CleanThatCheckMojo extends ACleanThatMojo {
+@Mojo(name = CleanThatCheckMojo.MOJO_CHECK, defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
+public class CleanThatCheckMojo extends ACleanThatSpringMojo {
+	public static final String MOJO_CHECK = "check";
+
+	@Override
+	protected List<Class<?>> springClasses() {
+		List<Class<?>> classes = new ArrayList<>();
+
+		classes.add(GithubSpringConfig.class);
+		classes.add(AllLanguagesSpringConfig.class);
+		classes.add(CodeProviderHelpers.class);
+
+		return classes;
+	}
 
 	// TODO Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
 	@Override
-	public void execute() throws MojoExecutionException {
+	protected void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
 		getLog().info("Hello, world.");
 		checkParameters();
 
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 
-		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
+		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
+		CodeFormatResult result = codeCleaner.formatCodeGivenConfig(codeProvider, true);
 
-		File pathToConfig = CodeProviderHelpers.pathToConfig(Paths.get("."));
-		CleanthatRepositoryProperties properties;
-		try {
-			properties = om.readValue(pathToConfig, CleanthatRepositoryProperties.class);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Issue with configuration at " + pathToConfig, e);
+		if (!result.isEmpty()) {
+			throw new MojoFailureException("ARG",
+					"CleanThat would have impacted the code",
+					"CleanThat would have impacted the code");
 		}
-
-		ILanguageFormatterFactory stringFormatterFactory =
-				new CodeCleanerSpringConfig().stringFormatterFactory(Arrays.asList(new JavaFormattersFactory(om)));
-		CodeProviderFormatter codeProviderFormatter =
-				new CodeProviderFormatter(Arrays.asList(om), stringFormatterFactory, new CodeFormatterApplier());
-		codeProviderFormatter.formatCode(properties, new FileSystemCodeProvider(Paths.get(".")), false);
 	}
 }

@@ -16,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 import com.google.common.base.Suppliers;
 import com.google.common.io.ByteStreams;
 
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
@@ -27,7 +28,7 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  *
  * @author Benoit Lacelle
  */
-public class ScalafmtStyleEnforcer implements IStyleEnforcer {
+public class ScalafmtStyleEnforcer implements IStyleEnforcer, ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScalafmtStyleEnforcer.class);
 
 	final ISourceCodeProperties sourceCodeProperties;
@@ -63,6 +64,11 @@ public class ScalafmtStyleEnforcer implements IStyleEnforcer {
 
 			return tmpPath;
 		});
+	}
+
+	@Override
+	public String getId() {
+		return "scalafmt";
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -38,6 +39,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.formatter.ILintFixerHelpedByCodeStyleFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ILanguageProperties;
@@ -60,7 +62,7 @@ import eu.solven.cleanthat.language.java.rules.mutators.VariableEqualsConstant;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
+public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesJavaMutator.class);
 
@@ -119,6 +121,11 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 		});
 	}
 
+	@Override
+	public String getId() {
+		return "rules";
+	}
+
 	public List<IClassTransformer> getTransformers() {
 		return transformers;
 	}
@@ -161,7 +168,9 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 			// Fill cache
 			if (optCompilationUnit.get() == null) {
 				try {
-					optCompilationUnit.set(parser.parse(refCleanCode.get()).getResult().get());
+					String sourceCode = refCleanCode.get();
+					ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
+					optCompilationUnit.set(parsed.getResult().get());
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
 				}
@@ -279,8 +288,8 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer {
 	}
 
 	public static JavaParser makeDefaultJavaParser() {
-		ParserConfiguration configuration = new ParserConfiguration()
-				.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
+		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver()));
+		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		JavaParser parser = new JavaParser(configuration);
 		return parser;
 	}

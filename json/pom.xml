@@ -10,10 +10,6 @@
 
 	<artifactId>json</artifactId>
 
-	<properties>
-		<scalafmt-core.version>3.0.0-RC6</scalafmt-core.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>

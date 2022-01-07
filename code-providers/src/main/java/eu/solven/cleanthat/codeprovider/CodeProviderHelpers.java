@@ -74,15 +74,12 @@ public class CodeProviderHelpers {
 	}
 
 	public static File pathToConfig(Path localFolder) {
-		// String overridePackage = "/eu.solven/mitrust-datasharing/";
-		// pathToConfig =
-		// new ClassPathResource("/overrides" + overridePackage + GithubPullRequestCleaner.FILENAME_CLEANTHAT_JSON)
-		// .getFile();
 		return CodeProviderHelpers.FILENAMES_CLEANTHAT.stream()
 				.map(s -> localFolder.resolve(s).toFile())
 				.filter(File::exists)
 				.findAny()
-				.get();
+				.orElseThrow(() -> new IllegalStateException(
+						"No configuration at pathes: " + CodeProviderHelpers.FILENAMES_CLEANTHAT));
 	}
 
 }

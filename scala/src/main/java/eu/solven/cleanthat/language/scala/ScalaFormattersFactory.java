@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
@@ -55,19 +56,20 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 				PepperMapHelper.<Map<String, ?>>getOptionalAs(rawProcessor, KEY_PARAMETERS).orElse(Map.of());
 		LOGGER.info("Processing: {}", engine);
 
-		ILintFixer processor;
+		ILintFixerWithId processor;
 		switch (engine) {
-		case "scalafmt":
-			ScalafmtProperties scalafmtConfig = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
-			processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), scalafmtConfig);
+		case "scalafmt": {
+			ScalafmtProperties properties = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
+			processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), properties);
 
 			break;
-		case "scalafix":
-			ScalafixProperties scalafixConfig = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
-			processor = new ScalafixFormatter(languageProperties.getSourceCode(), scalafixConfig);
+		}
+		case "scalafix": {
+			ScalafixProperties properties = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
+			processor = new ScalafixFormatter(languageProperties.getSourceCode(), properties);
 
 			break;
-
+		}
 		default:
 			throw new IllegalArgumentException("Unknown engine: " + engine);
 		}

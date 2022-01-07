@@ -76,9 +76,7 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 		getLog().info("project.baseDir: " + baseDir);
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
-
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-
 		codeCleaner.formatCodeGivenConfig(codeProvider, isDryRun());
 	}
 }

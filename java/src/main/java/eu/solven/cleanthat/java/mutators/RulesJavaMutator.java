@@ -31,6 +31,7 @@ import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -167,7 +168,9 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			// Fill cache
 			if (optCompilationUnit.get() == null) {
 				try {
-					optCompilationUnit.set(parser.parse(refCleanCode.get()).getResult().get());
+					String sourceCode = refCleanCode.get();
+					ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
+					optCompilationUnit.set(parsed.getResult().get());
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
 				}
@@ -285,8 +288,8 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 	}
 
 	public static JavaParser makeDefaultJavaParser() {
-		ParserConfiguration configuration = new ParserConfiguration()
-				.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
+		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver()));
+		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		JavaParser parser = new JavaParser(configuration);
 		return parser;
 	}

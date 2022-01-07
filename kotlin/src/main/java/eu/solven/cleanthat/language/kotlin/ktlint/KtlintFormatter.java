@@ -20,6 +20,9 @@ public class KtlintFormatter implements ILintFixerWithId {
 	final KtlintProperties properties;
 
 	public KtlintFormatter(ISourceCodeProperties sourceCodeProperties, KtlintProperties properties) {
+		this.sourceCodeProperties = sourceCodeProperties;
+		this.properties = properties;
+
 		// https://github.com/diffplug/spotless/tree/main/plugin-maven/src/main/java/com/diffplug/spotless/maven/kotlin
 		throw new UnsupportedOperationException("TODO");
 	}

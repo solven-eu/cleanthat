@@ -1,26 +1,19 @@
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.FileSystemResource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 
 /**
@@ -54,13 +47,14 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 		getLog().info("Path: " + getConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 
-		Collection<ObjectMapper> oms = appContext.getBeansOfType(ObjectMapper.class).values();
+		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
+		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
+		CodeFormatResult result = codeCleaner.formatCodeGivenConfig(codeProvider, true);
 
-		File pathToConfig = CodeProviderHelpers.pathToConfig(Paths.get("."));
-
-		CleanthatRepositoryProperties properties =
-				new ConfigHelpers(oms).loadRepoConfig(new FileSystemResource(pathToConfig));
-		ICodeProviderFormatter codeProviderFormatter = appContext.getBean(ICodeProviderFormatter.class);
-		codeProviderFormatter.formatCode(properties, new FileSystemCodeProvider(Paths.get(".")), false);
+		if (!result.isEmpty()) {
+			throw new MojoFailureException("ARG",
+					"CleanThat would have impacted the code",
+					"CleanThat would have impacted the code");
+		}
 	}
 }

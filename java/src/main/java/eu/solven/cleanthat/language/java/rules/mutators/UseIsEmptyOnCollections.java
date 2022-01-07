@@ -21,7 +21,7 @@ import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 
 /**
- * Prefer 'm.isEmpty()' over 'm.size() == 0'. Works with {@link Collection}, {@link Map} and {@link String}.
+ * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
  *
  * @author Benoit Lacelle
  */

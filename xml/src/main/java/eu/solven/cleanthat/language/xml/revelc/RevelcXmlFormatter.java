@@ -55,7 +55,8 @@ public class RevelcXmlFormatter implements ILintFixerWithId {
 		return "revelc";
 	}
 
-	protected FormattingPreferences parseRevelcPreferences(Map<String, Object> options) {
+	@SuppressWarnings("checkstyle:AvoidInlineConditionals")
+	protected final FormattingPreferences parseRevelcPreferences(Map<String, Object> options) {
 		FormattingPreferences prefs = new FormattingPreferences();
 
 		// https://github.com/revelc/formatter-maven-plugin/blob/main/src/main/java/net/revelc/code/formatter/xml/XMLFormatter.java

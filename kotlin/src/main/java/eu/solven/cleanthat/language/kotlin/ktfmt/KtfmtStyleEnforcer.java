@@ -21,6 +21,9 @@ public class KtfmtStyleEnforcer implements IStyleEnforcer, ILintFixerWithId {
 	final KtfmtProperties properties;
 
 	public KtfmtStyleEnforcer(ISourceCodeProperties sourceCodeProperties, KtfmtProperties properties) {
+		this.sourceCodeProperties = sourceCodeProperties;
+		this.properties = properties;
+
 		// https://github.com/diffplug/spotless/tree/main/plugin-maven/src/main/java/com/diffplug/spotless/maven/kotlin
 		throw new UnsupportedOperationException("TODO");
 	}

@@ -75,4 +75,28 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 
 		return lookupConfiguredMojo(session, newMojoExecution(goal));
 	}
+
+	protected CleanThatInitMojo lookupConfiguredInitMojo(MavenProject project) {
+		try {
+			return (CleanThatInitMojo) lookupConfiguredMojo(project, CleanThatInitMojo.MOJO_INIT);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected CleanThatCleanThatMojo lookupConfiguredFixMojo(MavenProject project) {
+		try {
+			return (CleanThatCleanThatMojo) lookupConfiguredMojo(project, CleanThatCleanThatMojo.MOJO_FIX);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected CleanThatCheckMojo lookupConfiguredCheckMojo(MavenProject project) {
+		try {
+			return (CleanThatCheckMojo) lookupConfiguredMojo(project, CleanThatCheckMojo.MOJO_CHECK);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

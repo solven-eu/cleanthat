@@ -10,7 +10,7 @@ import org.springframework.boot.SpringApplication;
 import cormoran.pepper.unittest.ILogDisabler;
 import cormoran.pepper.unittest.PepperTestHelper;
 
-public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
+public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 	@Test
 	public void testCleanthat_noConfig() throws Exception {
 		String relativePathToParent = "/unit/project-to-test";
@@ -22,7 +22,7 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
 
-		CleanThatCleanThatMojo myMojo = (CleanThatCleanThatMojo) lookupConfiguredMojo(project, "cleanthat");
+		CleanThatCleanThatMojo myMojo = lookupConfiguredFixMojo(project);
 
 		try (ILogDisabler logCLoser = PepperTestHelper.disableLog(SpringApplication.class)) {
 			Assertions.assertThatThrownBy(() -> myMojo.execute()).isInstanceOf(IllegalStateException.class);
@@ -30,7 +30,7 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 	}
 
 	@Test
-	public void testCleanthat_initThenLint() throws Exception {
+	public void testCleanthat_initThenCheck() throws Exception {
 		String relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
@@ -44,7 +44,29 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo initMojo = lookupConfiguredInitMojo(project);
 		initMojo.execute();
 
-		CleanThatCleanThatMojo fixMojo = lookupConfiguredFixMojo(project);
-		fixMojo.execute();
+		CleanThatCheckMojo checkMojo = lookupConfiguredCheckMojo(project);
+		checkMojo.execute();
+	}
+
+	@Test
+	public void testCleanthat_initThenLintThenCheck() throws Exception {
+		String relativePathToParent = "/unit/project-to-test";
+		File readWriteFolder = temporaryFolder(relativePathToParent);
+
+		// Ensure the test resources does not hold a cleanthat.yaml
+		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		Assertions.assertThat(cleanthatYaml).doesNotExist();
+
+		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
+
+		// 'init' will create a cleanthat.yaml
+		CleanThatInitMojo initMojo = lookupConfiguredInitMojo(project);
+		initMojo.execute();
+
+		CleanThatCleanThatMojo cleanthatMojo = lookupConfiguredFixMojo(project);
+		cleanthatMojo.execute();
+
+		CleanThatCheckMojo checkMojo = lookupConfiguredCheckMojo(project);
+		checkMojo.execute();
 	}
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.FileSystemResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -20,6 +21,7 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
@@ -46,7 +48,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		// One can adjust this to any local folder
-		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace2", "spring-boot");
+		Path repoFolder = Paths.get(System.getProperty("user.home"), "github", "bigdata-azure");
 
 		LOGGER.info("About to process {}", repoFolder);
 
@@ -56,9 +58,9 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
 		File pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 
-		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
-		CleanthatRepositoryProperties properties =
-				objectMapper.readValue(pathToConfig, CleanthatRepositoryProperties.class);
+		ConfigHelpers configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
+		CleanthatRepositoryProperties properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
+
 		codeProviderFormatter.formatCode(properties, codeProvider, false);
 	}
 

@@ -1,7 +1,7 @@
 CleanThat
 
-WARNING: `cleanthat` is new. Expect issues of all kinds which is not to say that you should not
-https://github.com/solven-eu/cleanthat/issues[report] them :)
+WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say that you should not 
+[report](https://github.com/solven-eu/cleanthat/issues) them :)
 
 # Motivation
 

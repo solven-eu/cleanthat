@@ -1,5 +1,8 @@
 CleanThat
 
+WARNING: `editorconfig-maven-plugin` is new. Expect issues of all kinds which is not to say that you should not
+https://github.com/ec4j/editorconfig-maven-plugin/issues[report] them :)
+
 # Motivation
 
 The point of this project is to enable automatic cleaning of your code-base. Some excellent maven plugin exists (e.g. )

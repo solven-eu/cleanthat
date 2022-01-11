@@ -1,7 +1,7 @@
 CleanThat
 
 WARNING: `editorconfig-maven-plugin` is new. Expect issues of all kinds which is not to say that you should not
-https://github.com/ec4j/editorconfig-maven-plugin/issues[report] them :)
+https://github.com/solven-eu/cleanthat/issues[report] them :)
 
 # Motivation
 

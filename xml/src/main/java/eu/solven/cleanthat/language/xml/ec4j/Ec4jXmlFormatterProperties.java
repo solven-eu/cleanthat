@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.xml.revelc;
+package eu.solven.cleanthat.language.xml.ec4j;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
- * Configuration for Revelc XML formatter
+ * Configuration for EC4J Xml formatter
  *
  * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class RevelcXmlFormatterProperties {
+public class Ec4jXmlFormatterProperties {
 
     private static final int DEFAULT_INDENT_WHITESPACES = 4;
 

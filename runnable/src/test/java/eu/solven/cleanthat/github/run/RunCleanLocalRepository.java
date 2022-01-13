@@ -66,15 +66,17 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 
 	private ICodeProviderWriter makeCodeProvider(Path root) throws IOException {
 		ICodeProviderWriter codeProvider;
-		if (root.resolve(".git").toFile().isDirectory()) {
-			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
-			Git jgit = Git.open(root.toFile());
-
-			codeProvider = new JGitCodeProvider(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
-		} else {
+		
+		// We do not rely on JGit as we do not want to add/commit/push when processnig local repository
+//		if (root.resolve(".git").toFile().isDirectory()) {
+//			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
+//			Git jgit = Git.open(root.toFile());
+//
+//			codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
+//		} else {
 			LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)");
 			codeProvider = new FileSystemCodeProvider(root);
-		}
+//		}
 		return codeProvider;
 	}
 

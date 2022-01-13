@@ -29,81 +29,79 @@ import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtStyleEnforcer;
  * @author Benoit Lacelle
  */
 public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ScalaFormattersFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScalaFormattersFactory.class);
 
-	public ScalaFormattersFactory(ObjectMapper objectMapper) {
-		super(objectMapper);
-	}
+    public ScalaFormattersFactory(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
 
-	@Override
-	public String getLanguage() {
-		return "scala";
-	}
+    @Override
+    public String getLanguage() {
+        return "scala";
+    }
 
-	@Override
-	public Set<String> getFileExtentions() {
-		return Set.of("scala", "sc");
-	}
+    @Override
+    public Set<String> getFileExtentions() {
+        return Set.of("scala", "sc");
+    }
 
-	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-	@Override
-	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-			ILanguageProperties languageProperties,
-			ICodeProvider codeProvider) {
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		// Some engine takes no parameter
-		Map<String, ?> parameters =
-				PepperMapHelper.<Map<String, ?>>getOptionalAs(rawProcessor, KEY_PARAMETERS).orElse(Map.of());
-		LOGGER.info("Processing: {}", engine);
+    @SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
+    @Override
+    public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+                                    ILanguageProperties languageProperties,
+                                    ICodeProvider codeProvider) {
+        String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+        Map<String, Object> parameters = getParameters(rawProcessor);
+        LOGGER.info("Processing: {}", engine);
 
-		ILintFixerWithId processor;
-		switch (engine) {
-		case "scalafmt": {
-			ScalafmtProperties properties = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
-			processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), properties);
+        ILintFixerWithId processor;
+        switch (engine) {
+        case "scalafmt": {
+            ScalafmtProperties properties = getObjectMapper().convertValue(parameters, ScalafmtProperties.class);
+            processor = new ScalafmtStyleEnforcer(languageProperties.getSourceCode(), properties);
 
-			break;
-		}
-		case "scalafix": {
-			ScalafixProperties properties = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
-			processor = new ScalafixFormatter(languageProperties.getSourceCode(), properties);
+            break;
+        }
+        case "scalafix": {
+            ScalafixProperties properties = getObjectMapper().convertValue(parameters, ScalafixProperties.class);
+            processor = new ScalafixFormatter(languageProperties.getSourceCode(), properties);
 
-			break;
-		}
-		default:
-			throw new IllegalArgumentException("Unknown engine: " + engine);
-		}
+            break;
+        }
+        default:
+            throw new IllegalArgumentException("Unknown engine: " + engine);
+        }
 
-		return processor;
-	}
+        return processor;
+    }
 
-	@Override
-	public LanguageProperties makeDefaultProperties() {
-		LanguageProperties languageProperties = new LanguageProperties();
+    @Override
+    public LanguageProperties makeDefaultProperties() {
+        LanguageProperties languageProperties = new LanguageProperties();
 
-		languageProperties.setLanguage(getLanguage());
+        languageProperties.setLanguage(getLanguage());
 
-		List<Map<String, ?>> processors = new ArrayList<>();
+        List<Map<String, ?>> processors = new ArrayList<>();
 
-		{
-			ScalafmtProperties engineParameters = new ScalafmtProperties();
+        {
+            ScalafmtProperties engineParameters = new ScalafmtProperties();
 
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "scalafmt")
-					.put(KEY_PARAMETERS, engineParameters)
-					.build());
-		}
-		{
-			ScalafixProperties engineParameters = new ScalafixProperties();
+            processors.add(ImmutableMap.<String, Object>builder()
+                .put(KEY_ENGINE, "scalafmt")
+                .put(KEY_PARAMETERS, engineParameters)
+                .build());
+        }
+        {
+            ScalafixProperties engineParameters = new ScalafixProperties();
 
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "scalafix")
-					.put(KEY_PARAMETERS, engineParameters)
-					.build());
-		}
+            processors.add(ImmutableMap.<String, Object>builder()
+                .put(KEY_ENGINE, "scalafix")
+                .put(KEY_PARAMETERS, engineParameters)
+                .build());
+        }
 
-		languageProperties.setProcessors(processors);
+        languageProperties.setProcessors(processors);
 
-		return languageProperties;
-	}
+        return languageProperties;
+    }
 }

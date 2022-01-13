@@ -21,15 +21,17 @@ import lombok.Data;
 @Data
 public class LanguageProperties implements ILanguageProperties {
 
-	private String language = "none";
+    private String language = "none";
 
-	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-	private String languageVersion = "0";
+    // https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
+    private String languageVersion = "0";
 
-	private SourceCodeProperties sourceCode = new SourceCodeProperties();
+    private SourceCodeProperties sourceCode = new SourceCodeProperties();
 
-	// The (ordered) processors to apply
-	// @JsonDeserialize(using = ProcessorsDeseralizer.class)
-	private List<Map<String, ?>> processors = Arrays.asList();
+    // The (ordered) processors to apply
+    // @JsonDeserialize(using = ProcessorsDeseralizer.class)
+    private List<Map<String, ?>> processors = Arrays.asList();
 
+    // By default, we do not skip
+    private boolean skip = false;
 }

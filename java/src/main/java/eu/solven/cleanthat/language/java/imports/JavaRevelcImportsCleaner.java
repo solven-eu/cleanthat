@@ -74,9 +74,9 @@ public class JavaRevelcImportsCleaner implements ILintFixerWithId {
 				LOGGER.debug("Loading imports-sorted file to {}", tmpFile);
 				String newCode = new String(Files.readAllBytes(tmpFile), charset);
 				if (newCode.equals(code)) {
-					LOGGER.info("Sorted imports (with no impact ???)");
+					LOGGER.debug("Sorted imports (with no impact ???)");
 				} else {
-					LOGGER.info("Sorted imports (with an impact)");
+					LOGGER.debug("Sorted imports (with an impact)");
 				}
 				code = newCode;
 			}

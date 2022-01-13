@@ -89,7 +89,7 @@ public class GithubSha1CodeProviderHelper {
 				localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, sha1CodeProvider);
 			} else {
 				Git jgit = cloneGitRepoLocally(workingDir);
-				localCodeProvider = new JGitCodeProvider(workingDir, jgit, sha1CodeProvider.getSha1());
+				localCodeProvider = JGitCodeProvider.wrap(workingDir, jgit, sha1CodeProvider.getSha1());
 			}
 			return localClone.compareAndSet(null, localCodeProvider);
 		}

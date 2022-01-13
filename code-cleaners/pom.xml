@@ -40,7 +40,6 @@
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>

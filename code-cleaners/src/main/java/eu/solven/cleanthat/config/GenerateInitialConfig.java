@@ -2,7 +2,9 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,55 +26,64 @@ import eu.solven.cleanthat.language.LanguageProperties;
  *
  */
 public class GenerateInitialConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GenerateInitialConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateInitialConfig.class);
 
-	final Collection<ILanguageLintFixerFactory> factories;
+    final Collection<ILanguageLintFixerFactory> factories;
 
-	public GenerateInitialConfig(Collection<ILanguageLintFixerFactory> factories) {
-		this.factories = factories;
-	}
+    public GenerateInitialConfig(Collection<ILanguageLintFixerFactory> factories) {
+        this.factories = factories;
+    }
 
-	// Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
-	// Detect usage of Checkstyle:
-	// https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
-	// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
-	// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
-	// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-	public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) {
-		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
+    // Guess Java version: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L13
+    // Detect usage of Checkstyle:
+    // https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L35
+    // Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
+    // https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
+    // com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
+    public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
+        CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
 
-		Set<String> extentionsFound = scanFileExtentions(codeProvider);
+        if (codeProvider.loadContentForPath("/.mvn/wrapper/maven-wrapper.properties").isPresent()) {
+            // mvn wrapper is generally copied without any changes from
+            // https://github.com/apache/maven-wrapper
+            List<String> currentExcludes = properties.getSourceCode().getExcludes();
+            List<String> newExcludes = new ArrayList<>(currentExcludes);
+            newExcludes.add("glob:/.mvn/wrapper/**");
+            properties.getSourceCode().setExcludes(newExcludes);
+        }
 
-		factories.forEach(factory -> {
-			if (!Sets.intersection(factory.getFileExtentions(), extentionsFound).isEmpty()) {
-				LOGGER.info("There is a file-extension match for {}", factory);
+        Set<String> extentionsFound = scanFileExtentions(codeProvider);
 
-				LanguageProperties languageProperties = factory.makeDefaultProperties();
-				properties.getLanguages().add(languageProperties);
-			}
-		});
+        factories.forEach(factory -> {
+            if (!Sets.intersection(factory.getFileExtentions(), extentionsFound).isEmpty()) {
+                LOGGER.info("There is a file-extension match for {}", factory);
 
-		return properties;
-	}
+                LanguageProperties languageProperties = factory.makeDefaultProperties();
+                properties.getLanguages().add(languageProperties);
+            }
+        });
 
-	public Set<String> scanFileExtentions(ICodeProvider codeProvider) {
-		Set<String> extentionsFound = new TreeSet<>();
+        return properties;
+    }
 
-		try {
-			codeProvider.listFiles(file -> {
-				String filePath = file.getPath();
+    public Set<String> scanFileExtentions(ICodeProvider codeProvider) {
+        Set<String> extentionsFound = new TreeSet<>();
 
-				String extention = FileNameUtils.getExtension(filePath);
+        try {
+            codeProvider.listFiles(file -> {
+                String filePath = file.getPath();
 
-				extentionsFound.add(extention);
-			});
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue listing all files for extentions", e);
-		}
+                String extention = FileNameUtils.getExtension(filePath);
 
-		LOGGER.info("Extentions found in {}: {}", codeProvider, extentionsFound);
+                extentionsFound.add(extention);
+            });
+        } catch (IOException e) {
+            throw new UncheckedIOException("Issue listing all files for extentions", e);
+        }
 
-		return extentionsFound;
-	}
+        LOGGER.info("Extentions found in {}: {}", codeProvider, extentionsFound);
+
+        return extentionsFound;
+    }
 
 }

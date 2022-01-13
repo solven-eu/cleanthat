@@ -18,6 +18,8 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatter;
+import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatter;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
@@ -29,82 +31,85 @@ import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
  * @author Benoit Lacelle
  */
 public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(XmlFormattersFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlFormattersFactory.class);
 
-	public XmlFormattersFactory(ObjectMapper objectMapper) {
-		super(objectMapper);
-	}
+    public XmlFormattersFactory(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
 
-	@Override
-	public String getLanguage() {
-		return "xml";
-	}
+    @Override
+    public String getLanguage() {
+        return "xml";
+    }
 
-	@Override
-	public Set<String> getFileExtentions() {
-		return Set.of("xml");
-	}
+    @Override
+    public Set<String> getFileExtentions() {
+        return Set.of("xml");
+    }
 
-	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-	@Override
-	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-			ILanguageProperties languageProperties,
-			ICodeProvider codeProvider) {
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
-		if (parameters == null) {
-			// Some engine takes no parameter
-			parameters = Map.of();
-		}
-		LOGGER.info("Processing: {}", engine);
+    @SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
+    @Override
+    public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+                                    ILanguageProperties languageProperties,
+                                    ICodeProvider codeProvider) {
+        String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+        Map<String, Object> parameters = getParameters(rawProcessor);
+        LOGGER.info("Processing: {}", engine);
 
-		ILintFixerWithId processor;
-		switch (engine) {
-		case "revelc": {
-			RevelcXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
-			processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+        ILintFixerWithId processor;
+        switch (engine) {
+        case "revelc": {
+            RevelcXmlFormatterProperties processorConfig =
+                getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
+            processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-			break;
-		}
-		case "javax": {
-			JavaxXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
-			processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+            break;
+        }
+        case "javax": {
+            JavaxXmlFormatterProperties processorConfig =
+                getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
+            processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-			break;
-		}
-		default:
-			throw new IllegalArgumentException("Unknown engine: " + engine);
-		}
+            break;
+        }
+        case "ec4j": {
+            Ec4jXmlFormatterProperties processorConfig =
+                getObjectMapper().convertValue(parameters, Ec4jXmlFormatterProperties.class);
+            processor = new Ec4jXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-		if (!processor.getId().equals(engine)) {
-			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
-		}
+            break;
+        }
+        default:
+            throw new IllegalArgumentException("Unknown engine: " + engine);
+        }
 
-		return processor;
-	}
+        if (!processor.getId().equals(engine)) {
+            throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+        }
 
-	@Override
-	public LanguageProperties makeDefaultProperties() {
-		LanguageProperties languageProperties = new LanguageProperties();
+        return processor;
+    }
 
-		languageProperties.setLanguage(getLanguage());
+    @Override
+    public LanguageProperties makeDefaultProperties() {
+        LanguageProperties languageProperties = new LanguageProperties();
 
-		List<Map<String, ?>> processors = new ArrayList<>();
+        languageProperties.setLanguage(getLanguage());
 
-		{
-			RevelcXmlFormatterProperties engineParameters = new RevelcXmlFormatterProperties();
-			RevelcXmlFormatter engine = new RevelcXmlFormatter(languageProperties.getSourceCode(), engineParameters);
+        List<Map<String, ?>> processors = new ArrayList<>();
 
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, engine.getId())
-					.put(KEY_PARAMETERS, engineParameters)
-					.build());
-		}
+        {
+            RevelcXmlFormatterProperties engineParameters = new RevelcXmlFormatterProperties();
+            RevelcXmlFormatter engine = new RevelcXmlFormatter(languageProperties.getSourceCode(), engineParameters);
 
-		languageProperties.setProcessors(processors);
+            processors.add(ImmutableMap.<String, Object>builder()
+                .put(KEY_ENGINE, engine.getId())
+                .put(KEY_PARAMETERS, engineParameters)
+                .build());
+        }
 
-		return languageProperties;
-	}
+        languageProperties.setProcessors(processors);
+
+        return languageProperties;
+    }
 }

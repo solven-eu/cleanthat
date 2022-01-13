@@ -117,7 +117,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 		}).collect(Collectors.toList());
 
 		this.transformers.forEach(ct -> {
-			LOGGER.debug("Using transformer: {}", ct.getId());
+			LOGGER.debug("Using transformer: {}", ct.getIds());
 		});
 	}
 

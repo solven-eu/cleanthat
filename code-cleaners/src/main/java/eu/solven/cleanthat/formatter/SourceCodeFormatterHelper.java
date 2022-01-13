@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import com.google.common.collect.Maps;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ISkippable;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
@@ -30,93 +32,122 @@ import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
  *
  */
 public class SourceCodeFormatterHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodeFormatterHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodeFormatterHelper.class);
 
-	private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-	public SourceCodeFormatterHelper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-	}
+    public SourceCodeFormatterHelper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
-	public LanguagePropertiesAndBuildProcessors compile(ILanguageProperties languageProperties,
-			ICodeProvider codeProvider,
-			ILanguageLintFixerFactory lintFixerFactory) {
-		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
-				languageProperties.getProcessors().stream().map(rawProcessor -> {
-					ILanguageProperties mergedLanguageProperties =
-							mergeLanguageProperties(languageProperties, rawProcessor);
-					ILintFixer formatter =
-							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);
-					return Maps.immutableEntry(mergedLanguageProperties, formatter);
-				}).collect(Collectors.toList());
+    public LanguagePropertiesAndBuildProcessors compile(ILanguageProperties languageProperties,
+                                                        ICodeProvider codeProvider,
+                                                        ILanguageLintFixerFactory lintFixerFactory) {
+        List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
+            languageProperties.getProcessors().stream().filter(rawProcessor -> {
+                Optional<Boolean> optSkip = PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
 
-		List<IStyleEnforcer> codeStyleFixer = processors.stream()
-				.map(e -> e.getValue())
-				.filter(lf -> lf instanceof IStyleEnforcer)
-				.map(lf -> (IStyleEnforcer) lf)
-				.collect(Collectors.toList());
+                if (optSkip.isEmpty()) {
+                    // By default, we do not skip
+                    return true;
+                } else {
+                    Boolean skip = optSkip.get();
 
-		if (codeStyleFixer.isEmpty()) {
-			LOGGER.warn("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
-		} else {
-			int nbCodeStyleFormatter = codeStyleFixer.size();
-			if (nbCodeStyleFormatter >= 2) {
-				LOGGER.warn("It is unsual to have multiple {} ({})",
-						IStyleEnforcer.class.getSimpleName(),
-						nbCodeStyleFormatter);
-			}
+                    // Execute processor if not skipped
+                    return !skip;
+                }
+            }).map(rawProcessor -> {
+                ILanguageProperties mergedLanguageProperties =
+                    mergeLanguageProperties(languageProperties, rawProcessor);
+                ILintFixer formatter =
+                    lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);
+                return Maps.immutableEntry(mergedLanguageProperties, formatter);
+            }).collect(Collectors.toList());
 
-			IStyleEnforcer firstCodeStyleFormatter = codeStyleFixer.get(0);
+        List<IStyleEnforcer> codeStyleFixer = processors.stream()
+            .map(e -> e.getValue())
+            .filter(lf -> lf instanceof IStyleEnforcer)
+            .map(lf -> (IStyleEnforcer) lf)
+            .collect(Collectors.toList());
 
-			processors.stream()
-					.map(e -> e.getValue())
-					.filter(Predicates.instanceOf(ILintFixerHelpedByCodeStyleFixer.class))
-					.map(lf -> (ILintFixerHelpedByCodeStyleFixer) lf)
-					.forEach(lf -> {
-						lf.registerCodeStyleFixer(firstCodeStyleFormatter);
-					});
-		}
+        if (codeStyleFixer.isEmpty()) {
+            LOGGER.warn("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+        } else {
+            int nbCodeStyleFormatter = codeStyleFixer.size();
+            if (nbCodeStyleFormatter >= 2) {
+                LOGGER.warn("It is unsual to have multiple {} ({})",
+                    IStyleEnforcer.class.getSimpleName(),
+                    nbCodeStyleFormatter);
+            }
 
-		return new LanguagePropertiesAndBuildProcessors(processors);
-	}
+            IStyleEnforcer firstCodeStyleFormatter = codeStyleFixer.get(0);
 
-	protected ILanguageProperties mergeLanguageProperties(ILanguageProperties languagePropertiesTemplate,
-			Map<String, ?> rawProcessor) {
-		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
-		// As we are processing a single processor, we can get ride of the processors field
-		languagePropertiesAsMap.remove("processors");
-		// An processor may need to be applied with an override languageVersion
-		Optional<String> optLanguageVersionOverload =
-				PepperMapHelper.getOptionalString(rawProcessor, "language_version");
-		if (optLanguageVersionOverload.isPresent()) {
-			languagePropertiesAsMap.put("language_version", optLanguageVersionOverload.get());
-		}
-		Optional<Map<String, ?>> optSourceOverloads = PepperMapHelper.getOptionalAs(rawProcessor, "source_code");
-		if (optSourceOverloads.isPresent()) {
-			// Mutable copy
-			Map<String, Object> sourcePropertiesAsMap =
-					new LinkedHashMap<>(PepperMapHelper.getRequiredMap(languagePropertiesAsMap, "source_code"));
-			// Mutate
-			sourcePropertiesAsMap.putAll(optSourceOverloads.get());
-			// Re-inject
-			languagePropertiesAsMap.put("source_code", sourcePropertiesAsMap);
-		}
-		ILanguageProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
-		return languageProperties;
-	}
+            processors.stream()
+                .map(e -> e.getValue())
+                .filter(Predicates.instanceOf(ILintFixerHelpedByCodeStyleFixer.class))
+                .map(lf -> (ILintFixerHelpedByCodeStyleFixer) lf)
+                .forEach(lf -> {
+                    lf.registerCodeStyleFixer(firstCodeStyleFormatter);
+                });
+        }
 
-	public <T> Map<String, Object> makeDeepCopy(T languagePropertiesTemplate) {
-		try {
-			// We make a deep-copy before mutation
-			byte[] serialized = objectMapper.writeValueAsBytes(languagePropertiesTemplate);
-			Map<String, ?> fromJackson = objectMapper.readValue(serialized, Map.class);
+        return new LanguagePropertiesAndBuildProcessors(processors);
+    }
 
-			return new LinkedHashMap<>(fromJackson);
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Issue with: " + languagePropertiesTemplate, e);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue with: " + languagePropertiesTemplate, e);
-		}
-	}
+    protected ILanguageProperties mergeLanguageProperties(ILanguageProperties languagePropertiesTemplate,
+                                                          Map<String, ?> rawProcessor) {
+        Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
+        // As we are processing a single processor, we can get ride of the processors field
+        languagePropertiesAsMap.remove("processors");
+        // An processor may need to be applied with an override languageVersion
+        Optional<String> optLanguageVersionOverload =
+            PepperMapHelper.getOptionalString(rawProcessor, "language_version");
+        if (optLanguageVersionOverload.isPresent()) {
+            languagePropertiesAsMap.put("language_version", optLanguageVersionOverload.get());
+        }
+        Optional<Map<String, ?>> optSourceOverloads = PepperMapHelper.getOptionalAs(rawProcessor, "source_code");
+        if (optSourceOverloads.isPresent()) {
+            // Mutable copy
+            Map<String, Object> sourcePropertiesAsMap =
+                mergeSourceCodeProperties(PepperMapHelper.getRequiredMap(languagePropertiesAsMap, "source_code"), optSourceOverloads.get());
+
+            // Re-inject
+            languagePropertiesAsMap.put("source_code", sourcePropertiesAsMap);
+        }
+        ILanguageProperties languageProperties =
+            objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
+        return languageProperties;
+    }
+
+    protected Map<String, Object> mergeSourceCodeProperties(Map<String, ?> outer, Map<String, ?> inner) {
+        Map<String, Object> merged = new LinkedHashMap<>();
+        // Inner has priority over outer
+        merged.putAll(inner);
+
+        Object innerLineEnding = inner.get("line_ending");
+        if (innerLineEnding == null || Set.of(LineEnding.UNKNOWN, LineEnding.UNKNOWN.toString()).contains(innerLineEnding)) {
+            // We give priority to outer lineEnding in case it is more explicit
+            Object outerLineEnding = outer.get("line_ending");
+            if (outerLineEnding != null) {
+                LOGGER.debug("Outer lineEnding is more explicit than the innerOne");
+                merged.put("line_ending", outerLineEnding);
+            }
+        }
+
+        return merged;
+    }
+
+    public <T> Map<String, Object> makeDeepCopy(T languagePropertiesTemplate) {
+        try {
+            // We make a deep-copy before mutation
+            byte[] serialized = objectMapper.writeValueAsBytes(languagePropertiesTemplate);
+            Map<String, ?> fromJackson = objectMapper.readValue(serialized, Map.class);
+
+            return new LinkedHashMap<>(fromJackson);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Issue with: " + languagePropertiesTemplate, e);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Issue with: " + languagePropertiesTemplate, e);
+        }
+    }
 }

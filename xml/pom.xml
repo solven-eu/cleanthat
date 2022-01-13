@@ -19,16 +19,23 @@
 		</dependency>
 
 		<dependency>
+			<groupId>net.revelc.code.formatter</groupId>
+			<artifactId>xml-formatter</artifactId>
+			<version>0.2.2</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.ec4j.linters/editorconfig-linters -->
+		<dependency>
+			<groupId>org.ec4j.linters</groupId>
+			<artifactId>editorconfig-linters</artifactId>
+			<version>0.2.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>net.revelc.code.formatter</groupId>
-			<artifactId>xml-formatter</artifactId>
-			<version>0.2.2</version>
 		</dependency>
 	</dependencies>
 </project>

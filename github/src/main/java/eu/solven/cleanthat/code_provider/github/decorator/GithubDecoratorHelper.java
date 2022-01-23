@@ -1,10 +1,12 @@
 package eu.solven.cleanthat.code_provider.github.decorator;
 
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
+import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 
@@ -58,6 +60,19 @@ public class GithubDecoratorHelper {
 		}
 	}
 
+	protected static class DecoratedGHCommit implements IGitCommit {
+		final GHCommit commit;
+
+		public DecoratedGHCommit(GHCommit commit) {
+			this.commit = commit;
+		}
+
+		@Override
+		public <T> T getDecorated() {
+			return (T) commit;
+		}
+	}
+
 	public static IGitRepository decorate(GHRepository repository) {
 		return new DecoratedGHRepository(repository);
 	}
@@ -68,5 +83,9 @@ public class GithubDecoratorHelper {
 
 	public static IGitBranch decorate(GHBranch branch) {
 		return new DecoratedGHBranch(branch);
+	}
+
+	public static IGitCommit decorate(GHCommit commit) {
+		return new DecoratedGHCommit(commit);
 	}
 }

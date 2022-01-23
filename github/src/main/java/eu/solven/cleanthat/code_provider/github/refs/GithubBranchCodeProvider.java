@@ -1,10 +1,16 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -36,7 +42,17 @@ public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
 
 	@Override
 	public String getRef() {
-		return branch.getName();
+		return CleanthatRefFilterProperties.BRANCHES_PREFIX + branch.getName();
+	}
+
+	@Override
+	protected GHRef getAsGHRef() {
+		String refName = getRef();
+		try {
+			return new GithubRepositoryFacade(getRepo()).getRef(refName);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue fetching ref=" + refName, e);
+		}
 	}
 
 }

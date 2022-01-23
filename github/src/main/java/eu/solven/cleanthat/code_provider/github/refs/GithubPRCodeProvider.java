@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.function.Consumer;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -68,12 +71,15 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		String refName = pr.getHead().getRef();
 		GHRepository repo = pr.getRepository();
-
-		String fullRefName = "heads/" + refName;
-		LOGGER.debug("Processing head={} for pr={}", fullRefName, pr);
-		commitIntoRef(pathToMutatedContent, prComments, repo, fullRefName);
+		String fullRefName = "refs/heads/" + pr.getHead().getRef();
+		GHRef ref;
+		try {
+			ref = new GithubRepositoryFacade(repo).getRef(fullRefName);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue fetching refName=" + fullRefName, e);
+		}
+		new GithubRefWriterLogic(repo, ref).persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
 	@Override

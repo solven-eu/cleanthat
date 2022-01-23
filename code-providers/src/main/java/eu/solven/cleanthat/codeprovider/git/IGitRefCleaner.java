@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
+import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -30,10 +31,30 @@ public interface IGitRefCleaner {
 			GitRepoBranchSha1 theRef,
 			Set<String> relevantBaseBranches);
 
+	/**
+	 * Format a whole ref, moving its head to a cleaned commit
+	 * 
+	 * @param repo
+	 * @param refSupplier
+	 * @return
+	 */
 	CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier);
 
+	@Deprecated
 	CodeFormatResult formatRefDiff(IGitRepository repo,
 			IGitReference baseSupplier,
+			Supplier<IGitReference> headSupplier);
+
+	/**
+	 * Format a ref, based on its diff with a base commit
+	 * 
+	 * @param repo
+	 * @param baseSupplier
+	 * @param headSupplier
+	 * @return
+	 */
+	CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
+			IGitCommit baseSupplier,
 			Supplier<IGitReference> headSupplier);
 
 }

@@ -106,6 +106,13 @@ public class GithubRepositoryFacade {
 		}
 	}
 
+	/**
+	 * 
+	 * @param refName
+	 *            a refName, starting with 'refs/'
+	 * @return
+	 * @throws IOException
+	 */
 	public GHRef getRef(String refName) throws IOException {
 		if (!refName.startsWith(CleanthatRefFilterProperties.REFS_PREFIX)) {
 			throw new IllegalArgumentException("Invalid ref: " + refName);

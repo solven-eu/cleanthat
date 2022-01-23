@@ -259,6 +259,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						// AKA z40 is a special reference, meaning no_ref
 						optBaseRef = Optional.empty();
 					} else {
+						// We do not consider as base the RR base, as this is a push event: we are not sure what is the
+						// relevant base.
 						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, beforeSha));
 					}
 				} else {
@@ -319,7 +321,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// WRONG: Here, we are looking for PR merging the pushed branch into some cleanable branch
 			// i.e. this is a push to a PR head, we are looking for the PR reference.
 			String ref = pushedRefOrRrHead.getRef();
-			LOGGER.info("Search for a PR merging the commited branch (head={})", ref);
+			LOGGER.info("Search for a PR with head the commited branch (head={})", ref);
 			try {
 				List<GHPullRequest> prMatchingHead = facade.findAnyPrHeadMatchingRef(ref).collect(Collectors.toList());
 				if (prMatchingHead.isEmpty()) {
@@ -330,12 +332,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					});
 					// There is no point in forcing to get a RR, as this is used later only to check the RR is still
 					// open, or to append a comment: given N compatible RR< none should be impacted on a push event
-					// GHPullRequest firstRr = prMatchingHead.get(0);
-					// LOGGER.info("We spot an open RR with head={}: {}", ref, firstRr.getHtmlUrl());
-					// optOpenPr = Optional.of(new GitPrHeadRef(repoName,
-					// firstRr.getNumber(),
-					// GithubFacade.toFullGitRef(firstRr.getBase()),
-					// GithubFacade.toFullGitRef(firstRr.getHead())));
 				}
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -372,7 +368,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 
 			String pushedRef = offlineResult.optBaseRef().get().getRef();
-			if (!pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
+			if (pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
 				LOGGER.info("About to consider creating a default configuration for {} (as default branch)", pushedRef);
 				// Open PR with default relevant configuration
 				boolean initialized = cleaner
@@ -382,7 +378,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
 				}
 			} else {
-				LOGGER.info("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
+				LOGGER.debug("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
 			}
 		}
 
@@ -549,26 +545,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
 		String refName = refToProcess.getRef();
 
-		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
-		// Or to any protected branch?
-		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
-			GHBranch branch;
-			try {
-				branch = repo.getBranch(refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length()));
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-
-			if (branch.isProtected()) {
-				// For safety, we prefer not to take the risk of writing onto protected branches, which are any kind of
-				// privileged branch
-				// This may happen with a PR used to merge some master branch into a custom branch
-				// TODO Ensure we discard these scenarios earlier
-				throw new IllegalStateException(
-						"We should have rejected earlier a scenario leading to write over a protected branch: "
-								+ branch);
-			}
-		}
+		checkBranchProtection(repo, refName);
 
 		Supplier<IGitReference> headSupplier = () -> {
 			String repoName = repo.getName();
@@ -592,5 +569,37 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 		};
 		return headSupplier;
+	}
+
+	private void checkBranchProtection(GHRepository repo, String refName) {
+		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
+		// Or to any protected branch?
+		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
+			String branchName = refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
+
+			if (branchName.startsWith(GithubRefCleaner.REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH)) {
+				LOGGER.info(
+						"We skip branch-protection validation for cleanthat branches (branch={}),"
+								+ " as we are allowed more stuff on them, and they may not exist yet anyway",
+						branchName);
+			} else {
+				GHBranch branch;
+				try {
+					branch = repo.getBranch(branchName);
+				} catch (IOException e) {
+					throw new UncheckedIOException("Issue picking branch=" + branchName, e);
+				}
+
+				if (branch.isProtected()) {
+					// For safety, we prefer not to take the risk of writing onto protected branches, which are any kind
+					// of privileged branch
+					// This may happen with a PR used to merge some master branch into a custom branch
+					// TODO Ensure we discard these scenarios earlier
+					throw new IllegalStateException(
+							"We should have rejected earlier a scenario leading to write over a protected branch: "
+									+ branch);
+				}
+			}
+		}
 	}
 }

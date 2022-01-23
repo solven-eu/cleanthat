@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
@@ -12,21 +13,22 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefDiffCodeProvider extends AGithubHeadRefDiffCodeProvider
+public class GithubCommitToRefDiffCodeProviderWriter extends AGithubHeadRefDiffCodeProvider
 		implements IListOnlyModifiedFiles, ICodeProviderWriter {
-	final GHRef base;
+	final GHCommit base;
 
-	public GithubRefDiffCodeProvider(String token, GHRepository baseRepository, GHRef base, GHRef head) {
+	public GithubCommitToRefDiffCodeProviderWriter(String token,
+			GHRepository baseRepository,
+			GHCommit base,
+			GHRef head) {
 		super(token, baseRepository, head);
+
 		this.base = base;
 	}
 
-	/**
-	 * base refName, starting with 'refs/'
-	 */
 	@Override
 	protected String getBaseId() {
-		return base.getRef();
+		return base.getSHA1();
 	}
 
 }

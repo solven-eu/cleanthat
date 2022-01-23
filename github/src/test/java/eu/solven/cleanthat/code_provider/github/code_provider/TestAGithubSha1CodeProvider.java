@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.function.InputStreamFunction;
 import org.mockito.Mockito;
@@ -49,6 +50,11 @@ public class TestAGithubSha1CodeProvider {
 			@Override
 			public String getRef() {
 				return someRef;
+			}
+
+			@Override
+			protected GHRef getAsGHRef() {
+				return Mockito.mock(GHRef.class);
 			}
 		};
 

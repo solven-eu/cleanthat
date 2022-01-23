@@ -33,6 +33,7 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
+import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
@@ -57,9 +58,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
+	public static final String REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH = REF_DOMAIN_CLEANTHAT + "/";
 
 	public static final String PREFIX_REF_CLEANTHAT =
-			CleanthatRefFilterProperties.BRANCHES_PREFIX + REF_DOMAIN_CLEANTHAT + "/";
+			CleanthatRefFilterProperties.BRANCHES_PREFIX + REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH;
 	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure";
 
 	public static final String PREFIX_REF_CLEANTHAT_TMPHEAD = PREFIX_REF_CLEANTHAT + "headfor-";
@@ -118,6 +120,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		String fullRef = theRef.getRef();
 		if (optBaseMatchingRule.isPresent()) {
 			// The base is cleanable: we are allowed to clean its head in-place
+			// TODO We should ensure the HEAD does not match any regex
 			String baseMatchingRule = optBaseMatchingRule.get();
 			if (result.isReviewRequestOpen()) {
 				LOGGER.info(
@@ -139,8 +142,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}).findAny();
 
 		if (optHeadMatchingRule.isPresent()) {
-			LOGGER.info(
-					"We have an event over a branch which is cleanable, but not head of an open PR to a cleanable base: we shall clean this through a new PR");
+			LOGGER.info("We have an event over a branch which is cleanable ({}),"
+					+ " but not head of an open PR to a cleanable base ({}): we shall clean this through a new PR",
+					fullRef,
+					cleanableBranchRegexes);
 
 			// We never clean inplace: we'll have to open a dedicated ReviewRequest if necessary
 			String newBranchRef = prepareRefNameForHead(fullRef);
@@ -149,6 +154,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
 			// In case of concurrent events, we may end opening multiple PR to clean the same branch
 			// TODO Should we handle this specifically when opening the actual branch?
+			LOGGER.info("If this ref ({}) is confirmed to need cleanup, the RR shall be open into {}",
+					fullRef,
+					newBranchRef);
 			GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoName(), newBranchRef, theRef.getSha());
 			return Optional.of(new HeadAndOptionalBase(head, Optional.of(theRef)));
 		} else {
@@ -164,7 +172,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	 * @return a new/unique reference, useful when opening a branch to clean a cleanable branch.
 	 */
 	public String prepareRefNameForHead(String baseToClean) {
-		return PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + "-" + UUID.randomUUID();
+		UUID random = UUID.randomUUID();
+		String ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + "-" + random;
+		LOGGER.info("We generated a temporary ref: {}", ref);
+		return ref;
 	}
 
 	public ICodeProvider getCodeProviderForRef(GitRepoBranchSha1 theRef) {
@@ -180,6 +191,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
+	@Deprecated(
+			since = "We clean on push events. This would be used on open PR events, but we may still fallback on sha1 diff cleaning")
 	@Override
 	public CodeFormatResult formatRefDiff(IGitRepository repo,
 			IGitReference base,
@@ -191,6 +204,23 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), head.getRef());
 		ICodeProviderWriter codeProvider =
 				new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ghBase, head);
+		return formatCodeGivenConfig(codeProvider, false);
+	}
+
+	@Override
+	public CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
+			IGitCommit base,
+			Supplier<IGitReference> headSupplier) {
+		// TODO Get the head lazily, else it means we create branch which may remain empty
+		// It typically leads to useless CI jobs
+		GHRef head = headSupplier.get().getDecorated();
+		GHCommit ghBase = base.getDecorated();
+
+		LOGGER.info("Base: {} Head: {}", ghBase.getSHA1(), head.getRef());
+		ICodeProviderWriter codeProvider = new GithubCommitToRefDiffCodeProviderWriter(githubAndToken.getToken(),
+				repo.getDecorated(),
+				ghBase,
+				head);
 		return formatCodeGivenConfig(codeProvider, false);
 	}
 
@@ -287,7 +317,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 				.baseTree(defaultBranch.getSHA1())
 				.add(CodeProviderHelpers.FILENAME_CLEANTHAT_YAML, toYaml(defaultConfig), false)
 				.create();
-		GHCommit commit = GithubPRCodeProvider.prepareCommit(repo)
+		GHCommit commit = GithubRefWriterLogic.prepareCommit(repo)
 				.message(readResource("/templates/commit-message.txt"))
 				.parent(defaultBranch.getSHA1())
 				.tree(createTree.getSha())
@@ -305,4 +335,5 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 		return body;
 	}
+
 }

@@ -35,6 +35,11 @@ public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 	}
 
 	@Override
+	protected GHRef getAsGHRef() {
+		return ref;
+	}
+
+	@Override
 	public String getHtmlUrl() {
 		return ref.getUrl().toExternalForm();
 	}
@@ -43,4 +48,5 @@ public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 	public String getTitle() {
 		return getRef();
 	}
+
 }

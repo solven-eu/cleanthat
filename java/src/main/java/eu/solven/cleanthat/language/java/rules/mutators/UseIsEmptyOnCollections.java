@@ -83,9 +83,9 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 		}
 
 		// Check the called method is .size() or .length()
-		String methodCalledName = checkmeForIsEmpty.get().getNameAsString();
-		if (!"size".equals(methodCalledName)// For Collection.size()
-				&& !"length".equals(methodCalledName) // For String.length()
+		String calledMethodName = checkmeForIsEmpty.get().getNameAsString();
+		if (!"size".equals(calledMethodName)// For Collection.size()
+				&& !"length".equals(calledMethodName) // For String.length()
 		) {
 			LOGGER.debug("Not calling .size() nor .length()");
 			return false;

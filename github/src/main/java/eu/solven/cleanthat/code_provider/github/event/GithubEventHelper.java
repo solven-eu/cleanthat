@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +39,28 @@ public class GithubEventHelper {
 			Supplier<IGitReference> headSupplier) {
 		CodeFormatResult result;
 		if (relevancyResult.optBaseForHead().isPresent()) {
-			// If the base does not exist, then something is wrong: let's check right away it is available
-			GHRef base;
+			GitRepoBranchSha1 baseAsObject = relevancyResult.optBaseForHead().get();
+
+			// We use as base a commit, and not a ref
+			// Else, a compare within a single ref would lead to no diff (as the ref would take by default the most
+			// recent commit, not the commit before the push)
+			String sha1 = baseAsObject.getSha();
+
+			GHCommit base;
 			try {
-				base = facade.getRef(relevancyResult.optBaseForHead().get().getRef());
+				base = repo.getCommit(sha1);
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				throw new UncheckedIOException("Issue fetching commit for sha1=" + sha1, e);
 			}
-			result = cleaner.formatRefDiff(GithubDecoratorHelper.decorate(repo),
+
+			// If the base does not exist, then something is wrong: let's check right away it is available
+			// GHRef base;
+			// try {
+			// base = facade.getRef(baseAsObject.getRef());
+			// } catch (IOException e) {
+			// throw new UncheckedIOException(e);
+			// }
+			result = cleaner.formatCommitToRefDiff(GithubDecoratorHelper.decorate(repo),
 					GithubDecoratorHelper.decorate(base),
 					headSupplier);
 		} else {

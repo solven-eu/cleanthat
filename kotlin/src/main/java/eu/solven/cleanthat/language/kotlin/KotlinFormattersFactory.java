@@ -29,83 +29,83 @@ import eu.solven.cleanthat.language.kotlin.ktlint.KtlintProperties;
  * @author Benoit Lacelle
  */
 public class KotlinFormattersFactory extends ASourceCodeFormatterFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KotlinFormattersFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KotlinFormattersFactory.class);
 
-    public KotlinFormattersFactory(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
+	public KotlinFormattersFactory(ObjectMapper objectMapper) {
+		super(objectMapper);
+	}
 
-    @Override
-    public String getLanguage() {
-        return "kotlin";
-    }
+	@Override
+	public String getLanguage() {
+		return "kotlin";
+	}
 
-    @Override
-    public Set<String> getFileExtentions() {
-        return Set.of(".kt", ".kts", ".ktm");
-    }
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of(".kt", ".kts", ".ktm");
+	}
 
-    @SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-    @Override
-    public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-                                    ILanguageProperties languageProperties,
-                                    ICodeProvider codeProvider) {
-        String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-        Map<String, Object> parameters = getParameters(rawProcessor);
-        LOGGER.info("Processing: {}", engine);
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
+	@Override
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+			ILanguageProperties languageProperties,
+			ICodeProvider codeProvider) {
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+		Map<String, Object> parameters = getParameters(rawProcessor);
+		LOGGER.info("Processing: {}", engine);
 
-        ILintFixerWithId processor;
-        switch (engine) {
-        case "ktfmt": {
-            KtfmtProperties config = getObjectMapper().convertValue(parameters, KtfmtProperties.class);
-            processor = new KtfmtStyleEnforcer(languageProperties.getSourceCode(), config);
+		ILintFixerWithId processor;
+		switch (engine) {
+		case "ktfmt": {
+			KtfmtProperties config = getObjectMapper().convertValue(parameters, KtfmtProperties.class);
+			processor = new KtfmtStyleEnforcer(languageProperties.getSourceCode(), config);
 
-            break;
-        }
-        case "ktlint": {
-            KtlintProperties config = getObjectMapper().convertValue(parameters, KtlintProperties.class);
-            processor = new KtlintFormatter(languageProperties.getSourceCode(), config);
+			break;
+		}
+		case "ktlint": {
+			KtlintProperties config = getObjectMapper().convertValue(parameters, KtlintProperties.class);
+			processor = new KtlintFormatter(languageProperties.getSourceCode(), config);
 
-            break;
-        }
-        default:
-            throw new IllegalArgumentException("Unknown engine: " + engine);
-        }
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
 
-        if (!processor.getId().equals(engine)) {
-            throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
-        }
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		}
 
-        return processor;
-    }
+		return processor;
+	}
 
-    @Override
-    public LanguageProperties makeDefaultProperties() {
-        LanguageProperties languageProperties = new LanguageProperties();
+	@Override
+	public LanguageProperties makeDefaultProperties() {
+		LanguageProperties languageProperties = new LanguageProperties();
 
-        languageProperties.setLanguage(getLanguage());
+		languageProperties.setLanguage(getLanguage());
 
-        List<Map<String, ?>> processors = new ArrayList<>();
+		List<Map<String, ?>> processors = new ArrayList<>();
 
-        {
-            KtfmtProperties engineParameters = new KtfmtProperties();
+		{
+			KtfmtProperties engineParameters = new KtfmtProperties();
 
-            processors.add(ImmutableMap.<String, Object>builder()
-                .put(KEY_ENGINE, "scalafmt")
-                .put(KEY_PARAMETERS, engineParameters)
-                .build());
-        }
-        {
-            KtlintProperties engineParameters = new KtlintProperties();
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, "scalafmt")
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
+		{
+			KtlintProperties engineParameters = new KtlintProperties();
 
-            processors.add(ImmutableMap.<String, Object>builder()
-                .put(KEY_ENGINE, "scalafix")
-                .put(KEY_PARAMETERS, engineParameters)
-                .build());
-        }
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, "scalafix")
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
 
-        languageProperties.setProcessors(processors);
+		languageProperties.setProcessors(processors);
 
-        return languageProperties;
-    }
+		return languageProperties;
+	}
 }

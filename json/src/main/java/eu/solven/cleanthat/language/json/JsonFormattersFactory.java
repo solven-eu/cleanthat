@@ -27,72 +27,72 @@ import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
  * @author Benoit Lacelle
  */
 public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonFormattersFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JsonFormattersFactory.class);
 
-    public JsonFormattersFactory(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
+	public JsonFormattersFactory(ObjectMapper objectMapper) {
+		super(objectMapper);
+	}
 
-    @Override
-    public String getLanguage() {
-        return "json";
-    }
+	@Override
+	public String getLanguage() {
+		return "json";
+	}
 
-    @Override
-    public Set<String> getFileExtentions() {
-        return Set.of("json");
-    }
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of("json");
+	}
 
-    @SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-    @Override
-    public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-                                    ILanguageProperties languageProperties,
-                                    ICodeProvider codeProvider) {
-        String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-        Map<String, Object> parameters = getParameters(rawProcessor);
-        LOGGER.info("Processing: {}", engine);
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
+	@Override
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+			ILanguageProperties languageProperties,
+			ICodeProvider codeProvider) {
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+		Map<String, Object> parameters = getParameters(rawProcessor);
+		LOGGER.info("Processing: {}", engine);
 
-        ILintFixerWithId processor;
-        switch (engine) {
-        case "jackson":
-            JacksonJsonFormatterProperties processorConfig =
-                getObjectMapper().convertValue(parameters, JacksonJsonFormatterProperties.class);
-            processor = new JacksonJsonFormatter(languageProperties.getSourceCode(), processorConfig);
+		ILintFixerWithId processor;
+		switch (engine) {
+		case "jackson":
+			JacksonJsonFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, JacksonJsonFormatterProperties.class);
+			processor = new JacksonJsonFormatter(languageProperties.getSourceCode(), processorConfig);
 
-            break;
+			break;
 
-        default:
-            throw new IllegalArgumentException("Unknown engine: " + engine);
-        }
+		default:
+			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
 
-        if (!processor.getId().equals(engine)) {
-            throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
-        }
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		}
 
-        return processor;
-    }
+		return processor;
+	}
 
-    @Override
-    public LanguageProperties makeDefaultProperties() {
-        LanguageProperties languageProperties = new LanguageProperties();
+	@Override
+	public LanguageProperties makeDefaultProperties() {
+		LanguageProperties languageProperties = new LanguageProperties();
 
-        languageProperties.setLanguage(getLanguage());
+		languageProperties.setLanguage(getLanguage());
 
-        List<Map<String, ?>> processors = new ArrayList<>();
+		List<Map<String, ?>> processors = new ArrayList<>();
 
-        {
-            JacksonJsonFormatterProperties engineParameters = new JacksonJsonFormatterProperties();
-            JacksonJsonFormatter engine =
-                new JacksonJsonFormatter(languageProperties.getSourceCode(), engineParameters);
+		{
+			JacksonJsonFormatterProperties engineParameters = new JacksonJsonFormatterProperties();
+			JacksonJsonFormatter engine =
+					new JacksonJsonFormatter(languageProperties.getSourceCode(), engineParameters);
 
-            processors.add(ImmutableMap.<String, Object>builder()
-                .put(KEY_ENGINE, engine.getId())
-                .put(KEY_PARAMETERS, engineParameters)
-                .build());
-        }
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, engine.getId())
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
 
-        languageProperties.setProcessors(processors);
+		languageProperties.setProcessors(processors);
 
-        return languageProperties;
-    }
+		return languageProperties;
+	}
 }

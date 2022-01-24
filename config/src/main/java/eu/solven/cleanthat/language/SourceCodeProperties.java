@@ -24,48 +24,48 @@ import lombok.Setter;
 @Data
 public class SourceCodeProperties implements ISourceCodeProperties {
 
-    public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
-    public static final LineEnding DEFAULT_LINE_ENDING = LineEnding.UNKNOWN;
+	public static final LineEnding DEFAULT_LINE_ENDING = LineEnding.UNKNOWN;
 
-    // If empty, no file is excluded
-    // If multiple, we exclude files matching at least one exclude (OR)
-    private List<String> excludes = Arrays.asList();
+	// If empty, no file is excluded
+	// If multiple, we exclude files matching at least one exclude (OR)
+	private List<String> excludes = Arrays.asList();
 
-    // If empty, no file is included
-    // If multiple, we include files matching at least one include (OR)
-    private List<String> includes = Arrays.asList();
+	// If empty, no file is included
+	// If multiple, we include files matching at least one include (OR)
+	private List<String> includes = Arrays.asList();
 
-    // The encoding of files
-    private String encoding = DEFAULT_ENCODING;
+	// The encoding of files
+	private String encoding = DEFAULT_ENCODING;
 
-    // https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    private LineEnding lineEnding = DEFAULT_LINE_ENDING;
+	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	private LineEnding lineEnding = DEFAULT_LINE_ENDING;
 
-    private LineEnding parseLineEnding(String lineEnding) {
-        return LineEnding.valueOf(lineEnding);
-    }
+	private LineEnding parseLineEnding(String lineEnding) {
+		return LineEnding.valueOf(lineEnding);
+	}
 
-    // Git has some preference to committing LF
-    // https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
-    @JsonIgnore
-    @Override
-    public LineEnding getLineEndingAsEnum() {
-        return lineEnding;
-    }
+	// Git has some preference to committing LF
+	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
+	@JsonIgnore
+	@Override
+	public LineEnding getLineEndingAsEnum() {
+		return lineEnding;
+	}
 
-    public String getLineEnding() {
-        return lineEnding.toString();
-    }
+	public String getLineEnding() {
+		return lineEnding.toString();
+	}
 
-    @JsonIgnore
-    public void setLineEndingAsEnum(LineEnding lineEnding) {
-        this.lineEnding = lineEnding;
-    }
+	@JsonIgnore
+	public void setLineEndingAsEnum(LineEnding lineEnding) {
+		this.lineEnding = lineEnding;
+	}
 
-    public void setLineEnding(String lineEnding) {
-        this.lineEnding = parseLineEnding(lineEnding);
-    }
+	public void setLineEnding(String lineEnding) {
+		this.lineEnding = parseLineEnding(lineEnding);
+	}
 }

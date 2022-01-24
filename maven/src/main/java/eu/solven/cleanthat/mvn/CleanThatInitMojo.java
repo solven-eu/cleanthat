@@ -42,121 +42,122 @@ import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 @Mojo(name = CleanThatInitMojo.MOJO_INIT,
-    // This would be called once and for all
-    defaultPhase = LifecyclePhase.NONE, threadSafe = true,
-    // One may rely on the mvn plugin to initialize a configuration, even if no pom.xml is available
-    requiresProject = false)
+		// This would be called once and for all
+		defaultPhase = LifecyclePhase.NONE,
+		threadSafe = true,
+		// One may rely on the mvn plugin to initialize a configuration, even if no pom.xml is available
+		requiresProject = false)
 public class CleanThatInitMojo extends ACleanThatSpringMojo {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
 
-    public static final String MOJO_INIT = "init";
+	public static final String MOJO_INIT = "init";
 
-    @Override
-    protected List<Class<?>> springClasses() {
-        List<Class<?>> classes = new ArrayList<>();
+	@Override
+	protected List<Class<?>> springClasses() {
+		List<Class<?>> classes = new ArrayList<>();
 
-        classes.add(ConfigSpringConfig.class);
-        classes.add(CodeProviderHelpers.class);
+		classes.add(ConfigSpringConfig.class);
+		classes.add(CodeProviderHelpers.class);
 
-        // Needed to generate default configuration given all knowns languages
-        classes.add(AllLanguagesSpringConfig.class);
+		// Needed to generate default configuration given all knowns languages
+		classes.add(AllLanguagesSpringConfig.class);
 
-        return classes;
-    }
+		return classes;
+	}
 
-    @Override
-    public void doClean(ApplicationContext appContext) throws MojoFailureException {
-        // https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
-        if (isRunOnlyAtRoot()) {
-            if (getProject().isExecutionRoot()) {
-                getLog().debug("We are, as expected, at executionRoot");
-            } else {
-                // This will check it is called only if the command is run from the project root.
-                // However, it will not prevent the plugin to be called on each module
-                getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
-                return;
-            }
-        } else {
-            getLog().debug("Not required to be executed at root");
-        }
+	@Override
+	public void doClean(ApplicationContext appContext) throws MojoFailureException {
+		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
+		if (isRunOnlyAtRoot()) {
+			if (getProject().isExecutionRoot()) {
+				getLog().debug("We are, as expected, at executionRoot");
+			} else {
+				// This will check it is called only if the command is run from the project root.
+				// However, it will not prevent the plugin to be called on each module
+				getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
+				return;
+			}
+		} else {
+			getLog().debug("Not required to be executed at root");
+		}
 
-        String configPath = getConfigPath();
-        if (Strings.isNullOrEmpty(configPath)) {
-            throw new IllegalArgumentException("We need a not-empty configPath to run the 'init' mojo");
-        }
+		String configPath = getConfigPath();
+		if (Strings.isNullOrEmpty(configPath)) {
+			throw new IllegalArgumentException("We need a not-empty configPath to run the 'init' mojo");
+		}
 
-        getLog().info("Path: " + configPath);
+		getLog().info("Path: " + configPath);
 
-        Path configPathFile = Paths.get(configPath);
+		Path configPathFile = Paths.get(configPath);
 
-        if (!checkIfValidToInit(configPathFile)) {
-            throw new MojoFailureException(configPathFile,
-                "Configuration cannot be generated",
-                "Something prevents the generation of a configuration");
-        }
+		if (!checkIfValidToInit(configPathFile)) {
+			throw new MojoFailureException(configPathFile,
+					"Configuration cannot be generated",
+					"Something prevents the generation of a configuration");
+		}
 
-        ICodeProvider codeProvider = new FileSystemCodeProvider(configPathFile.getParent());
+		ICodeProvider codeProvider = new FileSystemCodeProvider(configPathFile.getParent());
 
-        GenerateInitialConfig generateInitialConfig =
-            new GenerateInitialConfig(appContext.getBeansOfType(ILanguageLintFixerFactory.class).values());
-        CleanthatRepositoryProperties properties;
-        try {
-            properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
-        }
-        writeConfiguration(configPathFile, properties);
-    }
+		GenerateInitialConfig generateInitialConfig =
+				new GenerateInitialConfig(appContext.getBeansOfType(ILanguageLintFixerFactory.class).values());
+		CleanthatRepositoryProperties properties;
+		try {
+			properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
+		}
+		writeConfiguration(configPathFile, properties);
+	}
 
-    public boolean checkIfValidToInit(Path configPathFile) {
-        boolean isValid = true;
+	public boolean checkIfValidToInit(Path configPathFile) {
+		boolean isValid = true;
 
-        MavenProject project = getProject();
-        if (project == null || project.getBasedir() == null) {
-            // This happens on folder which has no pom.xml
-            // Useful to projects not integrating maven, but wishing to be initialized through the mvn plugin
-            LOGGER.info("You are initializing cleanthat without a pom.xml to contextualize it");
-        } else {
-            File baseFir = project.getBasedir();
+		MavenProject project = getProject();
+		if (project == null || project.getBasedir() == null) {
+			// This happens on folder which has no pom.xml
+			// Useful to projects not integrating maven, but wishing to be initialized through the mvn plugin
+			LOGGER.info("You are initializing cleanthat without a pom.xml to contextualize it");
+		} else {
+			File baseFir = project.getBasedir();
 
-            Path configPathFileParent = configPathFile.getParent();
-            if (!configPathFileParent.equals(baseFir.toPath())) {
-                LOGGER.info("We'll init only in a module containing the configuration at its root: {}",
-                    configPathFileParent);
-                isValid = false;
-            }
-        }
+			Path configPathFileParent = configPathFile.getParent();
+			if (!configPathFileParent.equals(baseFir.toPath())) {
+				LOGGER.info("We'll init only in a module containing the configuration at its root: {}",
+						configPathFileParent);
+				isValid = false;
+			}
+		}
 
-        if (configPathFile.toFile().isDirectory()) {
-            LOGGER.error("The path of the configuration is a folder: '{}'", configPathFile);
-            isValid = false;
-        } else if (configPathFile.toFile().exists()) {
-            if (configPathFile.toFile().isFile()) {
-                LOGGER.error("There is already a configuration: '{}'", configPathFile);
-            } else {
-                LOGGER.error("There is something but not a file at configuration: '{}'", configPathFile);
-            }
-            isValid = false;
-        } else {
-            LOGGER.info("We are about to init a configuration at: '{}'", configPathFile);
-        }
-        return isValid;
-    }
+		if (configPathFile.toFile().isDirectory()) {
+			LOGGER.error("The path of the configuration is a folder: '{}'", configPathFile);
+			isValid = false;
+		} else if (configPathFile.toFile().exists()) {
+			if (configPathFile.toFile().isFile()) {
+				LOGGER.error("There is already a configuration: '{}'", configPathFile);
+			} else {
+				LOGGER.error("There is something but not a file at configuration: '{}'", configPathFile);
+			}
+			isValid = false;
+		} else {
+			LOGGER.info("We are about to init a configuration at: '{}'", configPathFile);
+		}
+		return isValid;
+	}
 
-    public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) {
-        ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
-        String asYaml;
-        try {
-            asYaml = yamlObjectMapper.writeValueAsString(properties);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Issue converting " + properties + " to YAML", e);
-        }
+	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) {
+		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+		String asYaml;
+		try {
+			asYaml = yamlObjectMapper.writeValueAsString(properties);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Issue converting " + properties + " to YAML", e);
+		}
 
-        try {
-            // StandardOpenOption.TRUNCATE_EXISTING
-            Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Issue writing YAML into: " + configPathFile, e);
-        }
-    }
+		try {
+			// StandardOpenOption.TRUNCATE_EXISTING
+			Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue writing YAML into: " + configPathFile, e);
+		}
+	}
 }

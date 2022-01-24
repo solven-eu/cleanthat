@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.formatter.ICommonConventions;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
  * Configuration for Javax XML formatter
@@ -18,36 +17,36 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JavaxXmlFormatterProperties {
-    String indentation = ICommonConventions.DEFAULT_INDENTATION;
+	String indentation = ICommonConventions.DEFAULT_INDENTATION;
 
-    Map<String, String> outputOptions = ImmutableMap.<String, String>builder()
-        .put(OutputKeys.OMIT_XML_DECLARATION, "no")
-        .put(OutputKeys.INDENT, "yes")
-        .build();
+	Map<String, String> outputOptions = ImmutableMap.<String, String>builder()
+			.put(OutputKeys.OMIT_XML_DECLARATION, "no")
+			.put(OutputKeys.INDENT, "yes")
+			.build();
 
-    boolean eolAtEof = false;
+	boolean eolAtEof = false;
 
-    public String getIndentation() {
-        return indentation;
-    }
+	public String getIndentation() {
+		return indentation;
+	}
 
-    public void setIndentation(String indentation) {
-        this.indentation = indentation;
-    }
+	public void setIndentation(String indentation) {
+		this.indentation = indentation;
+	}
 
-    public Map<String, String> getOutputOptions() {
-        return outputOptions;
-    }
+	public Map<String, String> getOutputOptions() {
+		return outputOptions;
+	}
 
-    public void setOutputOptions(Map<String, String> outputOptions) {
-        this.outputOptions = outputOptions;
-    }
+	public void setOutputOptions(Map<String, String> outputOptions) {
+		this.outputOptions = outputOptions;
+	}
 
-    public boolean isEolAtEof() {
-        return eolAtEof;
-    }
+	public boolean isEolAtEof() {
+		return eolAtEof;
+	}
 
-    public void setEolAtEof(boolean eolAtEof) {
-        this.eolAtEof = eolAtEof;
-    }
+	public void setEolAtEof(boolean eolAtEof) {
+		this.eolAtEof = eolAtEof;
+	}
 }

@@ -7,7 +7,7 @@ package eu.solven.cleanthat.config;
  *
  */
 public interface ISkippable {
-    String KEY_SKIP = "skip";
+	String KEY_SKIP = "skip";
 
-    boolean isSkip();
+	boolean isSkip();
 }

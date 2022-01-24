@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.formatter.ICommonConventions;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
  * Configuration for Jackson Json formatter
@@ -17,7 +16,7 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JacksonJsonFormatterProperties {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JacksonJsonFormatterProperties.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JacksonJsonFormatterProperties.class);
 
 	@Deprecated(since = "Replaced by indentation")
 	int indent = -1;
@@ -48,7 +47,7 @@ public class JacksonJsonFormatterProperties {
 	@Deprecated(since = "Rely on ISourceCodeProperties")
 	public void setLineending(String lineending) {
 		if (!Strings.isNullOrEmpty(lineending)) {
-		    LOGGER.warn("This property is not used anymore");
+			LOGGER.warn("This property is not used anymore");
 		}
 	}
 

@@ -61,8 +61,6 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	public static JGitCodeProvider wrap(Path workingDir, Git jgit, String commit) {
-		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, commit);
-
 		Status status;
 		try {
 			status = jgit.status().call();
@@ -77,6 +75,8 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		if (!commit.equals(head)) {
 			throw new IllegalArgumentException("Invalid current sh1: " + head + " (expected: " + commit + ")");
 		}
+
+		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, commit);
 
 		return wrapped;
 	}

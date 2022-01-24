@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -19,7 +20,9 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.language.SourceCodeProperties;
 
 public class TestConfigHelpers {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestConfigHelpers.class);
@@ -70,5 +73,53 @@ public class TestConfigHelpers {
 				throw new UncheckedIOException("Issue with: " + name, e);
 			}
 		});
+	}
+
+	@Test
+	public void testMergeSourceCodeEol() {
+		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+
+		SourceCodeProperties defaultP = new SourceCodeProperties();
+		defaultP.setEncoding(StandardCharsets.ISO_8859_1.name());
+		SourceCodeProperties windowsP = new SourceCodeProperties();
+		windowsP.setLineEndingAsEnum(LineEnding.CRLF);
+		windowsP.setEncoding(StandardCharsets.US_ASCII.name());
+
+		Assert.assertEquals(LineEnding.UNKNOWN, defaultP.getLineEndingAsEnum());
+		Assert.assertEquals(LineEnding.CRLF, windowsP.getLineEndingAsEnum());
+
+		Assert.assertEquals("ISO-8859-1", defaultP.getEncoding());
+		Assert.assertEquals("US-ASCII", windowsP.getEncoding());
+
+		// windows as inner
+		{
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(windowsP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(LineEnding.CRLF, merged.getLineEndingAsEnum());
+			Assert.assertEquals("US-ASCII", merged.getEncoding());
+		}
+
+		// windows as outer
+		{
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(windowsP, Map.class),
+					om.convertValue(defaultP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(LineEnding.CRLF, merged.getLineEndingAsEnum());
+			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
+		}
+
+		// default and default
+		{
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(defaultP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(LineEnding.UNKNOWN, merged.getLineEndingAsEnum());
+			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
+		}
 	}
 }

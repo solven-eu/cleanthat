@@ -19,32 +19,32 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  */
 // https://github.com/ec4j/editorconfig-linters/blob/master/editorconfig-linters/src/main/java/org/ec4j/linters/XmlLinter.java
 public class Ec4jXmlFormatter implements ILintFixerWithId {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Ec4jXmlFormatter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Ec4jXmlFormatter.class);
 
-    final ISourceCodeProperties sourceCodeProperties;
+	final ISourceCodeProperties sourceCodeProperties;
 
-    final Ec4jXmlFormatterProperties properties;
+	final Ec4jXmlFormatterProperties properties;
 
-    final XmlLinter xmlLinter;
+	final XmlLinter xmlLinter;
 
-    public Ec4jXmlFormatter(ISourceCodeProperties sourceCodeProperties, Ec4jXmlFormatterProperties properties) {
-        this.sourceCodeProperties = sourceCodeProperties;
-        this.properties = properties;
+	public Ec4jXmlFormatter(ISourceCodeProperties sourceCodeProperties, Ec4jXmlFormatterProperties properties) {
+		this.sourceCodeProperties = sourceCodeProperties;
+		this.properties = properties;
 
-        this.xmlLinter = new XmlLinter();
-    }
+		this.xmlLinter = new XmlLinter();
+	}
 
-    @Override
-    public String getId() {
-        return "ec4j";
-    }
+	@Override
+	public String getId() {
+		return "ec4j";
+	}
 
-    @Override
-    public String doFormat(String code, LineEnding ending) throws IOException {
-        LOGGER.warn("TODO");
-        xmlLinter.process(new Resource(null, null, StandardCharsets.UTF_8, code), null, null);
+	@Override
+	public String doFormat(String code, LineEnding ending) throws IOException {
+		LOGGER.warn("TODO");
+		xmlLinter.process(new Resource(null, null, StandardCharsets.UTF_8, code), null, null);
 
-        return code;
-    }
+		return code;
+	}
 
 }

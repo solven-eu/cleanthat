@@ -20,61 +20,61 @@ import java.util.Optional;
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/LineEnding.java
 public enum LineEnding {
-    // https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
-    AUTO(System.lineSeparator()),
-    // Request to keep current EOL, on a per file basis
-    KEEP(null),
-    // MacOS
-    LF("\n"),
-    // Windows
-    CRLF("\r\n"),
-    // Unix
-    CR("\r"),
-    // When no explicit value is provided, or no easy way to guess the EOL
-    UNKNOWN(null);
+	// https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+	AUTO(System.lineSeparator()),
+	// Request to keep current EOL, on a per file basis
+	KEEP(null),
+	// MacOS
+	LF("\n"),
+	// Windows
+	CRLF("\r\n"),
+	// Unix
+	CR("\r"),
+	// When no explicit value is provided, or no easy way to guess the EOL
+	UNKNOWN(null);
 
-    private final String chars;
+	private final String chars;
 
-    LineEnding(String value) {
-        this.chars = value;
-    }
+	LineEnding(String value) {
+		this.chars = value;
+	}
 
-    /**
-     * 
-     * @return the actual characters for EOL, if determined. Else, null.
-     */
-    public String getChars() {
-        return this.chars;
-    }
+	/**
+	 * 
+	 * @return the actual characters for EOL, if determined. Else, null.
+	 */
+	public String getChars() {
+		return this.chars;
+	}
 
-    /**
-     * Returns the most occurring line-ending characters in the file text or null if no line-ending occurs the most.
-     */
-    @SuppressWarnings({ "PMD.AvoidReassigningLoopVariables", "PMD.CognitiveComplexity" })
-    public static Optional<LineEnding> determineLineEnding(String fileDataString) {
-        int lfCount = 0;
-        int crCount = 0;
-        int crlfCount = 0;
-        for (int i = 0; i < fileDataString.length(); i++) {
-            char c = fileDataString.charAt(i);
-            if (c == '\r') {
-                if ((i + 1) < fileDataString.length() && fileDataString.charAt(i + 1) == '\n') {
-                    crlfCount++;
-                    i++;
-                } else {
-                    crCount++;
-                }
-            } else if (c == '\n') {
-                lfCount++;
-            }
-        }
-        if (lfCount > crCount && lfCount > crlfCount) {
-            return Optional.of(LF);
-        } else if (crlfCount > lfCount && crlfCount > crCount) {
-            return Optional.of(CRLF);
-        } else if (crCount > lfCount && crCount > crlfCount) {
-            return Optional.of(CR);
-        }
-        return Optional.empty();
-    }
+	/**
+	 * Returns the most occurring line-ending characters in the file text or null if no line-ending occurs the most.
+	 */
+	@SuppressWarnings({ "PMD.AvoidReassigningLoopVariables", "PMD.CognitiveComplexity" })
+	public static Optional<LineEnding> determineLineEnding(String fileDataString) {
+		int lfCount = 0;
+		int crCount = 0;
+		int crlfCount = 0;
+		for (int i = 0; i < fileDataString.length(); i++) {
+			char c = fileDataString.charAt(i);
+			if (c == '\r') {
+				if ((i + 1) < fileDataString.length() && fileDataString.charAt(i + 1) == '\n') {
+					crlfCount++;
+					i++;
+				} else {
+					crCount++;
+				}
+			} else if (c == '\n') {
+				lfCount++;
+			}
+		}
+		if (lfCount > crCount && lfCount > crlfCount) {
+			return Optional.of(LF);
+		} else if (crlfCount > lfCount && crlfCount > crCount) {
+			return Optional.of(CRLF);
+		} else if (crCount > lfCount && crCount > crlfCount) {
+			return Optional.of(CR);
+		}
+		return Optional.empty();
+	}
 }

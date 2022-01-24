@@ -59,11 +59,7 @@ public class JavaRevelcImportsCleaner implements ILintFixerWithId {
 		Grouper grouper = new Grouper(properties
 				.getGroups(), properties.getStaticGroups(), properties.isStaticAfter(), false, true);
 		Charset charset = Charset.forName(sourceCodeProperties.getEncoding());
-		ImpSort impsort = new ImpSort(charset,
-				grouper,
-				properties.isRemoveUnused(),
-				true,
-				net.revelc.code.impsort.LineEnding.valueOf(eolToApply.name()));
+		ImpSort impsort = new ImpSort(charset, grouper, properties.isRemoveUnused(), true, toRevelcEol(eolToApply));
 		Path tmpFile = Files.createTempFile("cleanthat", ".tmp");
 		try {
 			Files.writeString(tmpFile, code, charset, StandardOpenOption.TRUNCATE_EXISTING);
@@ -84,5 +80,22 @@ public class JavaRevelcImportsCleaner implements ILintFixerWithId {
 			tmpFile.toFile().delete();
 		}
 		return code;
+	}
+
+	protected net.revelc.code.impsort.LineEnding toRevelcEol(LineEnding eolToApply) {
+		switch (eolToApply) {
+		case CRLF:
+			return net.revelc.code.impsort.LineEnding.CRLF;
+		case CR:
+			return net.revelc.code.impsort.LineEnding.CR;
+		case LF:
+			return net.revelc.code.impsort.LineEnding.LF;
+		case AUTO:
+			return net.revelc.code.impsort.LineEnding.AUTO;
+		case KEEP:
+			return net.revelc.code.impsort.LineEnding.KEEP;
+		default:
+			return net.revelc.code.impsort.LineEnding.UNKNOWN;
+		}
 	}
 }

@@ -31,85 +31,85 @@ import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
  * @author Benoit Lacelle
  */
 public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XmlFormattersFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XmlFormattersFactory.class);
 
-    public XmlFormattersFactory(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
+	public XmlFormattersFactory(ObjectMapper objectMapper) {
+		super(objectMapper);
+	}
 
-    @Override
-    public String getLanguage() {
-        return "xml";
-    }
+	@Override
+	public String getLanguage() {
+		return "xml";
+	}
 
-    @Override
-    public Set<String> getFileExtentions() {
-        return Set.of("xml");
-    }
+	@Override
+	public Set<String> getFileExtentions() {
+		return Set.of("xml");
+	}
 
-    @SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-    @Override
-    public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-                                    ILanguageProperties languageProperties,
-                                    ICodeProvider codeProvider) {
-        String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-        Map<String, Object> parameters = getParameters(rawProcessor);
-        LOGGER.info("Processing: {}", engine);
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
+	@Override
+	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+			ILanguageProperties languageProperties,
+			ICodeProvider codeProvider) {
+		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+		Map<String, Object> parameters = getParameters(rawProcessor);
+		LOGGER.info("Processing: {}", engine);
 
-        ILintFixerWithId processor;
-        switch (engine) {
-        case "revelc": {
-            RevelcXmlFormatterProperties processorConfig =
-                getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
-            processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+		ILintFixerWithId processor;
+		switch (engine) {
+		case "revelc": {
+			RevelcXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
+			processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-            break;
-        }
-        case "javax": {
-            JavaxXmlFormatterProperties processorConfig =
-                getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
-            processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+			break;
+		}
+		case "javax": {
+			JavaxXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
+			processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-            break;
-        }
-        case "ec4j": {
-            Ec4jXmlFormatterProperties processorConfig =
-                getObjectMapper().convertValue(parameters, Ec4jXmlFormatterProperties.class);
-            processor = new Ec4jXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+			break;
+		}
+		case "ec4j": {
+			Ec4jXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, Ec4jXmlFormatterProperties.class);
+			processor = new Ec4jXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
-            break;
-        }
-        default:
-            throw new IllegalArgumentException("Unknown engine: " + engine);
-        }
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unknown engine: " + engine);
+		}
 
-        if (!processor.getId().equals(engine)) {
-            throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
-        }
+		if (!processor.getId().equals(engine)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		}
 
-        return processor;
-    }
+		return processor;
+	}
 
-    @Override
-    public LanguageProperties makeDefaultProperties() {
-        LanguageProperties languageProperties = new LanguageProperties();
+	@Override
+	public LanguageProperties makeDefaultProperties() {
+		LanguageProperties languageProperties = new LanguageProperties();
 
-        languageProperties.setLanguage(getLanguage());
+		languageProperties.setLanguage(getLanguage());
 
-        List<Map<String, ?>> processors = new ArrayList<>();
+		List<Map<String, ?>> processors = new ArrayList<>();
 
-        {
-            RevelcXmlFormatterProperties engineParameters = new RevelcXmlFormatterProperties();
-            RevelcXmlFormatter engine = new RevelcXmlFormatter(languageProperties.getSourceCode(), engineParameters);
+		{
+			RevelcXmlFormatterProperties engineParameters = new RevelcXmlFormatterProperties();
+			RevelcXmlFormatter engine = new RevelcXmlFormatter(languageProperties.getSourceCode(), engineParameters);
 
-            processors.add(ImmutableMap.<String, Object>builder()
-                .put(KEY_ENGINE, engine.getId())
-                .put(KEY_PARAMETERS, engineParameters)
-                .build());
-        }
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, engine.getId())
+					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
 
-        languageProperties.setProcessors(processors);
+		languageProperties.setProcessors(processors);
 
-        return languageProperties;
-    }
+		return languageProperties;
+	}
 }

@@ -6,17 +6,24 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.google.common.collect.Iterables;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
@@ -28,11 +35,16 @@ import eu.solven.cleanthat.language.SourceCodeProperties;
  * @author Benoit Lacelle
  */
 public class ConfigHelpers {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigHelpers.class);
+
+	public static final String KEY_SOURCE_CODE = "source_code";
 
 	final Collection<ObjectMapper> objectMappers;
+	final ObjectMapper objectMapper;
 
 	public ConfigHelpers(Collection<ObjectMapper> objectMappers) {
 		this.objectMappers = objectMappers;
+		this.objectMapper = Iterables.get(objectMappers, 0);
 	}
 
 	public static ObjectMapper makeJsonObjectMapper() {
@@ -63,40 +75,104 @@ public class ConfigHelpers {
 		}
 	}
 
-	protected ISourceCodeProperties mergeSourceConfig(CleanthatRepositoryProperties properties,
-			Map<String, ?> dirtyLanguageConfig) {
-		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
-
-		Map<String, Object> sourceConfig = new LinkedHashMap<>();
-		// Apply defaults from parent
-		sourceConfig.putAll(firstObjectMapper.convertValue(properties.getSourceCode(), Map.class));
-		// Apply explicit configuration
-		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, "source_code");
-		if (explicitSourceCodeProperties != null) {
-			sourceConfig.putAll(explicitSourceCodeProperties);
-		}
-		return firstObjectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
-	}
-
-	public ILanguageProperties mergeLanguageProperties(CleanthatRepositoryProperties properties,
-			Map<String, ?> dirtyLanguageConfig) {
-		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
-
-		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageConfig);
+	public ILanguageProperties mergeLanguageProperties(IHasSourceCodeProperties properties,
+			ILanguageProperties dirtyLanguageConfig) {
+		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyLanguageConfig);
+		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
-		languageConfig.putAll(dirtyLanguageConfig);
-		languageConfig.put("source_code", sourceConfig);
-		ILanguageProperties languageP = firstObjectMapper.convertValue(languageConfig, LanguageProperties.class);
+		languageConfig.putAll(dirtyLanguageAsMap);
+		languageConfig.put(KEY_SOURCE_CODE, sourceConfig);
+		ILanguageProperties languageP = objectMapper.convertValue(languageConfig, LanguageProperties.class);
 		return languageP;
 	}
 
+	// Duplicates eu.solven.cleanthat.config.ConfigHelpers.mergeLanguageProperties(CleanthatRepositoryProperties,
+	// Map<String, ?>) ?
+	public ILanguageProperties mergeLanguageIntoProcessorProperties(ILanguageProperties languagePropertiesTemplate,
+			Map<String, ?> rawProcessor) {
+		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
+		// As we are processing a single processor, we can get ride of the processors field
+		languagePropertiesAsMap.remove("processors");
+		// An processor may need to be applied with an overriden languageVersion
+		// Optional<String> optLanguageVersionOverload =
+		// PepperMapHelper.getOptionalString(rawProcessor, "language_version");
+		// if (optLanguageVersionOverload.isPresent()) {
+		// languagePropertiesAsMap.put("language_version", optLanguageVersionOverload.get());
+		// }
+		Optional<Map<String, ?>> optSourceOverloads = PepperMapHelper.getOptionalAs(rawProcessor, KEY_SOURCE_CODE);
+		if (optSourceOverloads.isPresent()) {
+			// Mutable copy
+			Map<String, Object> sourcePropertiesAsMap =
+					mergeSourceCodeProperties(PepperMapHelper.getRequiredMap(languagePropertiesAsMap, KEY_SOURCE_CODE),
+							optSourceOverloads.get());
+
+			// Re-inject
+			languagePropertiesAsMap.put(KEY_SOURCE_CODE, sourcePropertiesAsMap);
+		}
+		ILanguageProperties languageProperties =
+				objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
+		return languageProperties;
+	}
+
+	protected ISourceCodeProperties mergeSourceConfig(IHasSourceCodeProperties properties,
+			Map<String, ?> dirtyLanguageConfig) {
+		Map<String, ?> rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
+		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, KEY_SOURCE_CODE);
+
+		Map<String, Object> sourceConfig =
+				mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);
+
+		return objectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
+	}
+
+	protected Map<String, Object> mergeSourceCodeProperties(Map<String, ?> outer, Map<String, ?> inner) {
+		Map<String, Object> merged = new LinkedHashMap<>();
+
+		if (outer != null) {
+			merged.putAll(outer);
+		}
+
+		if (inner != null) {
+			// Inner has priority over outer
+			merged.putAll(inner);
+		}
+
+		if (outer != null && inner != null) {
+			Object innerLineEnding = inner.get("line_ending");
+			if (innerLineEnding == null
+					|| Set.of(LineEnding.UNKNOWN, LineEnding.UNKNOWN.toString()).contains(innerLineEnding)) {
+				// We give priority to outer lineEnding in case it is more explicit
+				Object outerLineEnding = outer.get("line_ending");
+				if (outerLineEnding != null) {
+					LOGGER.debug("Outer lineEnding is more explicit than the innerOne");
+					merged.put("line_ending", outerLineEnding);
+				}
+			}
+		}
+
+		return merged;
+	}
+
+	public <T> Map<String, Object> makeDeepCopy(T object) {
+		try {
+			// We make a deep-copy before mutation
+			byte[] serialized = objectMapper.writeValueAsBytes(object);
+			Map<String, ?> fromJackson = objectMapper.readValue(serialized, Map.class);
+
+			return new LinkedHashMap<>(fromJackson);
+		} catch (JsonProcessingException e) {
+			throw new IllegalArgumentException("Issue with: " + object, e);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue with: " + object, e);
+		}
+	}
+
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
-		ObjectMapper firstObjectMapper = Iterables.get(objectMappers, 0);
-		Map<String, Object> languageAsMap = firstObjectMapper.convertValue(languageP, Map.class);
-		Map<String, Object> sourceCodeAsMap = firstObjectMapper.convertValue(languageP.getSourceCode(), Map.class);
+		Map<String, Object> languageAsMap = objectMapper.convertValue(languageP, Map.class);
+		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put("includes", includes);
-		languageAsMap.put("source_code", sourceCodeAsMap);
-		return firstObjectMapper.convertValue(languageAsMap, LanguageProperties.class);
+		languageAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
+		return objectMapper.convertValue(languageAsMap, LanguageProperties.class);
 	}
 
 	public static ObjectMapper getJson(Collection<ObjectMapper> objectMappers) {

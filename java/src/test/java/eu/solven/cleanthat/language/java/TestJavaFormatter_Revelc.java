@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,8 +53,8 @@ public class TestJavaFormatter_Revelc {
 
 		List<LanguageProperties> languages = properties.getLanguages();
 		Assert.assertEquals(1, languages.size());
-		ILanguageProperties languageP = new ConfigHelpers(Arrays.asList(objectMapper))
-				.mergeLanguageProperties(properties, objectMapper.convertValue(languages.get(0), Map.class));
+		ILanguageProperties languageP =
+				new ConfigHelpers(Arrays.asList(objectMapper)).mergeLanguageProperties(properties, languages.get(0));
 		return languageP;
 	}
 

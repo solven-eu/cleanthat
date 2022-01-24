@@ -19,19 +19,22 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
+// Order is defined by fields definition
+// @JsonPropertyOrder(alphabetic = true, value = { "language", "language_version", ISkippable.KEY_SKIP })
 public class LanguageProperties implements ILanguageProperties {
 
-    private String language = "none";
+	private String language = "none";
 
-    // https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-    private String languageVersion = "0";
+	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
+	private String languageVersion = "0";
 
-    private SourceCodeProperties sourceCode = new SourceCodeProperties();
+	// By default, we do not skip
+	private boolean skip = false;
 
-    // The (ordered) processors to apply
-    // @JsonDeserialize(using = ProcessorsDeseralizer.class)
-    private List<Map<String, ?>> processors = Arrays.asList();
+	private SourceCodeProperties sourceCode = new SourceCodeProperties();
 
-    // By default, we do not skip
-    private boolean skip = false;
+	// The (ordered) processors to apply
+	// @JsonDeserialize(using = ProcessorsDeseralizer.class)
+	private List<Map<String, ?>> processors = Arrays.asList();
+
 }

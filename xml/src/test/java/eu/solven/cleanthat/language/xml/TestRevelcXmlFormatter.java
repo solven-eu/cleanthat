@@ -16,15 +16,14 @@ import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
 
 public class TestRevelcXmlFormatter {
+
 	final ILintFixer formatter = new RevelcXmlFormatter(new SourceCodeProperties(), new RevelcXmlFormatterProperties());
 
 	@Test
 	public void testFormatNote_lf() throws IOException {
 		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
 				StandardCharsets.UTF_8);
-
 		String formatted = formatter.doFormat(expectedXml, LineEnding.LF);
-
 		// TODO Investigate why it is not expected EOL by system.eol which is applied
 		Assertions.assertThat(formatted.split(LineEnding.LF.getChars()))
 				.hasSize(8)
@@ -35,13 +34,10 @@ public class TestRevelcXmlFormatter {
 	@Test
 	public void testFormatNote_crlf() throws IOException {
 		// TODO This tests is OK only under Windows
-		Assume.assumeTrue(System.lineSeparator().equals("\r\n"));
-
+		Assume.assumeTrue("\r\n".equals(System.lineSeparator()));
 		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
 				StandardCharsets.UTF_8);
-
 		String formatted = formatter.doFormat(expectedXml, LineEnding.CRLF);
-
 		// TODO Investigate why it is not expected EOL by system.eol which is applied
 		Assertions.assertThat(formatted.split(LineEnding.CRLF.getChars()))
 				.hasSize(8)

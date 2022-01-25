@@ -266,7 +266,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			ILanguageProperties languageP,
 			String filePath) throws IOException {
 		String code = loadCodeOptMutated(codeProvider, pathToMutatedContent, filePath);
-		LOGGER.info("Processing {}", filePath);
+		LOGGER.debug("Processing {}", filePath);
 		String output = doFormat(languageP, codeProvider, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
 			pathToMutatedContent.put(filePath, output);

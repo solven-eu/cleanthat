@@ -658,9 +658,12 @@
 				</plugin>
 
 				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.2-SNAPSHOT:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
-					<version>${project.version}</version>
+					<!-- ${project.version} would lead to cyclic reference -->
+					<!-- <version>${project.version}</version> -->
+					<version>1.1</version>
 					<executions>
 						<execution>
 							<id>Clean the code</id>
@@ -679,7 +682,8 @@
 					</executions>
 
 					<configuration>
-						<configUrl>${project.basedir}/cleanthat.json</configUrl>
+						<!-- <configUrl>${project.basedir}/cleanthat.json</configUrl> -->
+						<!-- <configPath></configPath> -->
 					</configuration>
 				</plugin>
 			</plugins>
@@ -728,15 +732,13 @@
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 
-			<!-- <plugin> -->
-			<!-- <groupId>io.github.solven-eu.cleanthat</groupId> -->
-			<!-- <artifactId>cleanthat-maven-plugin</artifactId> -->
-			<!-- ${project.version} would lead to cyclic reference -->
-			<!-- <version>1.0-SNAPSHOT</version> -->
-			<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
-			<!-- Make sure CleanThat is executed only once from the root folder -->
-			<!-- <inherited>false</inherited> -->
-			<!-- </plugin> -->
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
+				<!-- Make sure CleanThat is executed only once from the root folder -->
+				<!-- <inherited>false</inherited> -->
+			</plugin>
 		</plugins>
 	</build>
 

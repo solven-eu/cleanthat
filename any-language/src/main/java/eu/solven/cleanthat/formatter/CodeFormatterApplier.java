@@ -25,21 +25,23 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeFormatterApplier.class);
 
 	@Override
-	public String applyProcessors(LanguagePropertiesAndBuildProcessors languageProperties, String filepath, String code)
-			throws IOException {
+	public String applyProcessors(LanguagePropertiesAndBuildProcessors languagePropertiesAndProcessors,
+			String filepath,
+			String code) throws IOException {
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
 
-		languageProperties.getProcessors().forEach(rawProcessor -> {
+		languagePropertiesAndProcessors.getProcessors().forEach(rawProcessor -> {
 			try {
 				String input = outputRef.get();
-				String output = applyProcessor(rawProcessor.getKey(), rawProcessor.getValue(), filepath, input);
+				ILanguageProperties languageProperties = rawProcessor.getKey();
+				String output = applyProcessor(languageProperties, rawProcessor.getValue(), filepath, input);
 				if (output == null) {
 					throw new IllegalStateException("Null code. TODO");
 				}
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step clean all previous not relevant changes)
-					LOGGER.info("{} mutated a file", rawProcessor);
+					LOGGER.info("Mutated a file given: {}", rawProcessor);
 				}
 				outputRef.set(output);
 			} catch (IOException | RuntimeException e) {

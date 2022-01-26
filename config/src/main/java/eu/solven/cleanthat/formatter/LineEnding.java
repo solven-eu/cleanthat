@@ -22,8 +22,16 @@ import java.util.Optional;
 public enum LineEnding {
 	// https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
 	AUTO(System.lineSeparator()),
-	//
-	KEEP(null), LF("\n"), CRLF("\r\n"), CR("\r"), UNKNOWN(null);
+	// Request to keep current EOL, on a per file basis
+	KEEP(null),
+	// MacOS
+	LF("\n"),
+	// Windows
+	CRLF("\r\n"),
+	// Unix
+	CR("\r"),
+	// When no explicit value is provided, or no easy way to guess the EOL
+	UNKNOWN(null);
 
 	private final String chars;
 
@@ -31,6 +39,10 @@ public enum LineEnding {
 		this.chars = value;
 	}
 
+	/**
+	 * 
+	 * @return the actual characters for EOL, if determined. Else, null.
+	 */
 	public String getChars() {
 		return this.chars;
 	}

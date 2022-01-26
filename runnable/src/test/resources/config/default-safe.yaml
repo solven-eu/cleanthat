@@ -11,7 +11,7 @@ source_code:
   excludes:
   - "regex:.*/generated/.*"
   encoding: "UTF-8"
-  line_ending: "LF"
+  line_ending: "UNKNOWN"
 languages:
 - language: "java"
   language_version: "11"
@@ -51,7 +51,6 @@ languages:
     parameters:
       indent: -1
       indentation: "    "
-      lineending: LF
       space_before_separator: true
       alphabetical_order: false
       eol_at_eof: false

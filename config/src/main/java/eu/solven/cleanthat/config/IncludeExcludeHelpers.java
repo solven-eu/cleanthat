@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.config;
 
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -26,7 +27,16 @@ public class IncludeExcludeHelpers {
 		return includeMatchers.stream().filter(pm -> pm.matches(Paths.get(fileName))).findFirst();
 	}
 
+	// https://stackoverflow.com/questions/44388227/sonar-raises-blocker-issue-on-java-filesystems-getdefault
+	@SuppressWarnings("PMD.CloseResource")
 	public static List<PathMatcher> prepareMatcher(List<String> regex) {
-		return regex.stream().map(r -> FileSystems.getDefault().getPathMatcher(r)).collect(Collectors.toList());
+		FileSystem fs = FileSystems.getDefault();
+		return regex.stream().map(r -> {
+			try {
+				return fs.getPathMatcher(r);
+			} catch (RuntimeException e) {
+				throw new IllegalArgumentException("Invalid regex: " + r, e);
+			}
+		}).collect(Collectors.toList());
 	}
 }

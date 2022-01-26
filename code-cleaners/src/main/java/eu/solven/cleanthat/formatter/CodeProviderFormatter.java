@@ -99,7 +99,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
 
-		repoProperties.getLanguages().forEach(dirtyLanguageConfig -> {
+		repoProperties.getLanguages().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
 			ILanguageProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
@@ -156,8 +156,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			LanguageProperties dirtyLanguageConfig) {
 		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
-		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties,
-				objectMappers.get(0).convertValue(dirtyLanguageConfig, Map.class));
+		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
 
 		String language = languageP.getLanguage();
 		LOGGER.info("About to prepare files for language: {}", language);
@@ -291,7 +290,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
 
 				return optContent
-						.orElseThrow(() -> new IllegalStateException("Issue fiding code for path=" + filePath));
+						.orElseThrow(() -> new IllegalStateException("Issue finding code for path=" + filePath));
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -303,9 +302,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			throws IOException {
 		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
+		SourceCodeFormatterHelper sourceCodeFormatterHelper =
+				new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers));
 		LanguagePropertiesAndBuildProcessors compiledProcessors =
-				new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers))
-						.compile(properties, codeProvider, formattersFactory);
+				sourceCodeFormatterHelper.compile(properties, codeProvider, formattersFactory);
 
 		return formatterApplier.applyProcessors(compiledProcessors, filepath, code);
 	}

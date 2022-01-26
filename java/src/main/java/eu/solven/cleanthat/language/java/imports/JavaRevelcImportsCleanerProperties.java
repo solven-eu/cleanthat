@@ -31,4 +31,21 @@ public class JavaRevelcImportsCleanerProperties {
 	// https://code.revelc.net/impsort-maven-plugin/sort-mojo.html#staticAfter
 	private boolean staticAfter = DEFAULT_STATIC_AFTER;
 
+	public JavaRevelcImportsCleanerProperties eclipse() {
+		// Constructor applies eclipse as default
+		return new JavaRevelcImportsCleanerProperties();
+	}
+
+	public JavaRevelcImportsCleanerProperties intellij() {
+		JavaRevelcImportsCleanerProperties p = new JavaRevelcImportsCleanerProperties();
+
+		// https://github.com/checkstyle/checkstyle/issues/5510
+		// https://github.com/revelc/impsort-maven-plugin/issues/28
+		p.setGroups("*,javax.,java.");
+		p.setStaticGroups("*");
+		p.setStaticAfter(true);
+		p.setRemoveUnused(true);
+
+		return p;
+	}
 }

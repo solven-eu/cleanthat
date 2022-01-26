@@ -62,6 +62,11 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 		getLog().debug("Hello, world.");
 		checkParameters();
 
+		if (isSkip()) {
+			LOGGER.info("Mojo is skipped. May be turned on with '-Dcleanthat.skip=true'");
+			return;
+		}
+
 		if (CURRENT_MOJO.compareAndSet(null, this)) {
 			LOGGER.debug("Start applicationContext");
 			try {

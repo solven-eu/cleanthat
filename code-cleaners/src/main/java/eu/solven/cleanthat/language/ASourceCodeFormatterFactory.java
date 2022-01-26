@@ -1,6 +1,10 @@
 package eu.solven.cleanthat.language;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cormoran.pepper.collection.PepperMapHelper;
 
 /**
  * Abstract class for language formatters
@@ -16,5 +20,11 @@ public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerF
 
 	public ObjectMapper getObjectMapper() {
 		return objectMapper;
+	}
+
+	protected Map<String, Object> getParameters(Map<String, ?> rawProcessor) {
+		return PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS)
+				// Some engines take no parameter
+				.orElse(Map.of());
 	}
 }

@@ -18,6 +18,8 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatter;
+import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatter;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
@@ -51,11 +53,7 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
-		if (parameters == null) {
-			// Some engine takes no parameter
-			parameters = Map.of();
-		}
+		Map<String, Object> parameters = getParameters(rawProcessor);
 		LOGGER.info("Processing: {}", engine);
 
 		ILintFixerWithId processor;
@@ -71,6 +69,13 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 			JavaxXmlFormatterProperties processorConfig =
 					getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
 			processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+
+			break;
+		}
+		case "ec4j": {
+			Ec4jXmlFormatterProperties processorConfig =
+					getObjectMapper().convertValue(parameters, Ec4jXmlFormatterProperties.class);
+			processor = new Ec4jXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
 		}

@@ -35,7 +35,8 @@ public interface IGitRefCleaner {
 	 * Format a whole ref, moving its head to a cleaned commit
 	 * 
 	 * @param repo
-	 * @param refSupplier
+	 * @param branchSupplier
+	 * @param headSupplier
 	 * @return
 	 */
 	CodeFormatResult formatRef(IGitRepository repo, IGitBranch branchSupplier, ILazyGitReference headSupplier);

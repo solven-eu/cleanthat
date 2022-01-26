@@ -34,14 +34,15 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			try {
 				String input = outputRef.get();
 				ILanguageProperties languageProperties = rawProcessor.getKey();
-				String output = applyProcessor(languageProperties, rawProcessor.getValue(), filepath, input);
+				ILintFixer lintFixer = rawProcessor.getValue();
+				String output = applyProcessor(languageProperties, lintFixer, filepath, input);
 				if (output == null) {
 					throw new IllegalStateException("Null code. TODO");
 				}
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step clean all previous not relevant changes)
-					LOGGER.info("Mutated a file given: {}", rawProcessor);
+					LOGGER.debug("Mutated a file given: {}", rawProcessor);
 				}
 				outputRef.set(output);
 			} catch (IOException | RuntimeException e) {

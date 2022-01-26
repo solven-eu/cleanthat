@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.any_language;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -132,6 +134,10 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	protected CleanthatRepositoryProperties generateDefaultConfig(ICodeProvider codeProvider) {
-		return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
+		try {
+			return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

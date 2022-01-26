@@ -1,26 +1,25 @@
 package eu.solven.cleanthat.formatter;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
 import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ISkippable;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
 
 /**
@@ -32,6 +31,8 @@ import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
 public class SourceCodeFormatterHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodeFormatterHelper.class);
 
+	private final AtomicBoolean reportedLackOfStyleEnforcer = new AtomicBoolean();
+
 	private final ObjectMapper objectMapper;
 
 	public SourceCodeFormatterHelper(ObjectMapper objectMapper) {
@@ -42,9 +43,23 @@ public class SourceCodeFormatterHelper {
 			ICodeProvider codeProvider,
 			ILanguageLintFixerFactory lintFixerFactory) {
 		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
-				languageProperties.getProcessors().stream().map(rawProcessor -> {
+				languageProperties.getProcessors().stream().filter(rawProcessor -> {
+					Optional<Boolean> optSkip =
+							PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
+
+					if (optSkip.isEmpty()) {
+						// By default, we do not skip
+						return true;
+					} else {
+						Boolean skip = optSkip.get();
+
+						// Execute processor if not skipped
+						return !skip;
+					}
+				}).map(rawProcessor -> {
 					ILanguageProperties mergedLanguageProperties =
-							mergeLanguageProperties(languageProperties, rawProcessor);
+							new ConfigHelpers(Collections.singleton(objectMapper))
+									.mergeLanguageIntoProcessorProperties(languageProperties, rawProcessor);
 					ILintFixer formatter =
 							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);
 					return Maps.immutableEntry(mergedLanguageProperties, formatter);
@@ -57,7 +72,12 @@ public class SourceCodeFormatterHelper {
 				.collect(Collectors.toList());
 
 		if (codeStyleFixer.isEmpty()) {
-			LOGGER.warn("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+			if (reportedLackOfStyleEnforcer.getAndSet(true)) {
+				// Already reported
+				LOGGER.debug("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+			} else {
+				LOGGER.warn("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+			}
 		} else {
 			int nbCodeStyleFormatter = codeStyleFixer.size();
 			if (nbCodeStyleFormatter >= 2) {
@@ -78,45 +98,5 @@ public class SourceCodeFormatterHelper {
 		}
 
 		return new LanguagePropertiesAndBuildProcessors(processors);
-	}
-
-	protected ILanguageProperties mergeLanguageProperties(ILanguageProperties languagePropertiesTemplate,
-			Map<String, ?> rawProcessor) {
-		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
-		// As we are processing a single processor, we can get ride of the processors field
-		languagePropertiesAsMap.remove("processors");
-		// An processor may need to be applied with an override languageVersion
-		Optional<String> optLanguageVersionOverload =
-				PepperMapHelper.getOptionalString(rawProcessor, "language_version");
-		if (optLanguageVersionOverload.isPresent()) {
-			languagePropertiesAsMap.put("language_version", optLanguageVersionOverload.get());
-		}
-		Optional<Map<String, ?>> optSourceOverloads = PepperMapHelper.getOptionalAs(rawProcessor, "source_code");
-		if (optSourceOverloads.isPresent()) {
-			// Mutable copy
-			Map<String, Object> sourcePropertiesAsMap =
-					new LinkedHashMap<>(PepperMapHelper.getRequiredMap(languagePropertiesAsMap, "source_code"));
-			// Mutate
-			sourcePropertiesAsMap.putAll(optSourceOverloads.get());
-			// Re-inject
-			languagePropertiesAsMap.put("source_code", sourcePropertiesAsMap);
-		}
-		ILanguageProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
-		return languageProperties;
-	}
-
-	public <T> Map<String, Object> makeDeepCopy(T languagePropertiesTemplate) {
-		try {
-			// We make a deep-copy before mutation
-			byte[] serialized = objectMapper.writeValueAsBytes(languagePropertiesTemplate);
-			Map<String, ?> fromJackson = objectMapper.readValue(serialized, Map.class);
-
-			return new LinkedHashMap<>(fromJackson);
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Issue with: " + languagePropertiesTemplate, e);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue with: " + languagePropertiesTemplate, e);
-		}
 	}
 }

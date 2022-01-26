@@ -11,5 +11,5 @@ source_code:
   excludes: []
   includes: []
   encoding: "UTF-8"
-  line_ending: "LF"
+  line_ending: "UNKNOWN"
 languages: []

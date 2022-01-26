@@ -2,7 +2,9 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,8 +40,17 @@ public class GenerateInitialConfig {
 	// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
 	// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
 	// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-	public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) {
+	public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
 		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
+
+		if (codeProvider.loadContentForPath("/.mvn/wrapper/maven-wrapper.properties").isPresent()) {
+			// mvn wrapper is generally copied without any changes from
+			// https://github.com/apache/maven-wrapper
+			List<String> currentExcludes = properties.getSourceCode().getExcludes();
+			List<String> newExcludes = new ArrayList<>(currentExcludes);
+			newExcludes.add("glob:/.mvn/wrapper/**");
+			properties.getSourceCode().setExcludes(newExcludes);
+		}
 
 		Set<String> extentionsFound = scanFileExtentions(codeProvider);
 

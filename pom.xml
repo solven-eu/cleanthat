@@ -34,6 +34,7 @@
 		<module>java</module>
 		<module>scala</module>
 		<module>kotlin</module>
+		<module>groovy</module>
 
 		<!-- <module>python</module> -->
 
@@ -684,6 +685,7 @@
 					<configuration>
 						<!-- <configUrl>${project.basedir}/cleanthat.json</configUrl> -->
 						<!-- <configPath></configPath> -->
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -732,13 +734,13 @@
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 
-			<plugin>
-				<groupId>io.github.solven-eu.cleanthat</groupId>
-				<artifactId>cleanthat-maven-plugin</artifactId>
+<!-- 			<plugin> -->
+<!-- 				<groupId>io.github.solven-eu.cleanthat</groupId> -->
+<!-- 				<artifactId>cleanthat-maven-plugin</artifactId> -->
 				<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
 				<!-- Make sure CleanThat is executed only once from the root folder -->
 				<!-- <inherited>false</inherited> -->
-			</plugin>
+<!-- 			</plugin> -->
 		</plugins>
 	</build>
 

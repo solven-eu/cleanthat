@@ -51,9 +51,7 @@ public class ScalaFormattersFactory extends ASourceCodeFormatterFactory {
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		// Some engine takes no parameter
-		Map<String, ?> parameters =
-				PepperMapHelper.<Map<String, ?>>getOptionalAs(rawProcessor, KEY_PARAMETERS).orElse(Map.of());
+		Map<String, Object> parameters = getParameters(rawProcessor);
 		LOGGER.info("Processing: {}", engine);
 
 		ILintFixerWithId processor;

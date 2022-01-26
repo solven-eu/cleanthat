@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 public interface ILazyGitReference extends IHasGitRef {
 	/**
 	 * 
-	 * @param <T>
 	 * @return the raw underlying item
 	 */
 	Supplier<IGitReference> getSupplier();

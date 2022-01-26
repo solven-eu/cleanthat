@@ -20,7 +20,6 @@ import org.springframework.util.FileSystemUtils;
 
 import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
-import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
@@ -86,7 +85,8 @@ public class GithubSha1CodeProviderHelper {
 			ICodeProvider localCodeProvider;
 			if (ZIP_ELSE_CLONE) {
 				ICodeProvider zippedLocalRef = downloadGitRefLocally(workingDir);
-				localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, sha1CodeProvider);
+				// localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, () -> sha1CodeProvider);
+				localCodeProvider = zippedLocalRef;
 			} else {
 				Git jgit = cloneGitRepoLocally(workingDir);
 				localCodeProvider = new JGitCodeProvider(workingDir, jgit, sha1CodeProvider.getSha1());

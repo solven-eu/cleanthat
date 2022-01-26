@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Typically used to be able to read from one {@link ICodeProvider} and write into a different
@@ -15,24 +19,21 @@ import java.util.function.Consumer;
  *
  */
 public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderDecoratingWriter.class);
 	protected final ICodeProvider codeProvider;
 
-	protected final ICodeProviderWriterLogic writerLogic;
+	protected final Supplier<ICodeProviderWriterLogic> writerLogicSupplier;
 
-	public CodeProviderDecoratingWriter(ICodeProvider codeProvider, ICodeProviderWriterLogic writerLogic) {
+	public CodeProviderDecoratingWriter(ICodeProvider codeProvider,
+			Supplier<ICodeProviderWriterLogic> writerLogicSupplier) {
 		this.codeProvider = codeProvider;
-		this.writerLogic = writerLogic;
+		this.writerLogicSupplier = writerLogicSupplier;
 	}
 
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		codeProvider.listFiles(consumer);
 	}
-
-	// @Override
-	// public boolean deprecatedFileIsRemoved(Object raw) {
-	// return codeProvider.deprecatedFileIsRemoved(raw);
-	// }
 
 	@Override
 	public String deprecatedLoadContent(Object file) throws IOException {
@@ -68,14 +69,12 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		// TODO Auto-generated method stub
-
+		writerLogicSupplier.get().persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
 	@Override
 	public void cleanTmpFiles() {
-		// TODO Auto-generated method stub
-
+		LOGGER.debug("Nothing to clean");
 	}
 
 }

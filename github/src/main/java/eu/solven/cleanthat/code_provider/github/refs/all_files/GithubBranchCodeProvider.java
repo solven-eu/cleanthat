@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.code_provider.github.refs;
+package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -7,7 +7,7 @@ import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
@@ -17,7 +17,7 @@ import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
  *
  * @author Benoit Lacelle
  */
-public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
+public class GithubBranchCodeProvider extends AGithubSha1CodeProviderWriter {
 	final GHBranch branch;
 
 	public GithubBranchCodeProvider(String token, GHRepository repo, GHBranch branch) {

@@ -45,6 +45,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
@@ -520,7 +521,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
-		Supplier<IGitReference> headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
+		ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
 		CodeFormatResult result =
 				GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
 		GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
@@ -538,7 +539,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 	}
 
-	public Supplier<IGitReference> prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
+	public ILazyGitReference prepareHeadSupplier(WebhookRelevancyResult relevancyResult,
 			GHRepository repo,
 			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
@@ -547,10 +548,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		checkBranchProtection(repo, refName);
 
+		String sha = refToProcess.getSha();
+
 		Supplier<IGitReference> headSupplier = () -> {
 			String repoName = repo.getName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
-				String sha = refToProcess.getSha();
+
 				try {
 					repo.createRef(refName, sha);
 					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
@@ -568,7 +571,20 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
 			}
 		};
-		return headSupplier;
+
+		return new ILazyGitReference() {
+
+			@Override
+			public String getFullRefOrSha1() {
+				return sha;
+			}
+
+			@Override
+			public Supplier<IGitReference> getSupplier() {
+				return headSupplier;
+			}
+
+		};
 	}
 
 	private void checkBranchProtection(GHRepository repo, String refName) {

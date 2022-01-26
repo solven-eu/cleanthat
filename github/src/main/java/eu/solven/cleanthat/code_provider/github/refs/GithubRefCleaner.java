@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
@@ -29,6 +28,9 @@ import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
+import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -36,6 +38,7 @@ import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
@@ -191,48 +194,54 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
+	private CodeFormatResult formatRefDiff(GHRepository theRepo,
+			ICodeProvider codeProvider,
+			ILazyGitReference headSupplier) {
+		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
+			// Get the head lazily, else it means we create branch which may remain empty
+			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
+			return new GithubRefCodeProvider(githubAndToken.getToken(), theRepo, headWhereToWrite);
+		});
+		return formatCodeGivenConfig(codeProviderWriter, false);
+	}
+
 	@Deprecated(
 			since = "We clean on push events. This would be used on open PR events, but we may still fallback on sha1 diff cleaning")
 	@Override
-	public CodeFormatResult formatRefDiff(IGitRepository repo,
-			IGitReference base,
-			Supplier<IGitReference> headSupplier) {
-		// TODO Get the head lazily, else it means we create branch which may remain empty
-		GHRef head = headSupplier.get().getDecorated();
+	public CodeFormatResult formatRefDiff(IGitRepository repo, IGitReference base, ILazyGitReference headSupplier) {
+		String refOrSha1 = headSupplier.getFullRefOrSha1();
 		GHRef ghBase = base.getDecorated();
 
-		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), head.getRef());
-		ICodeProviderWriter codeProvider =
-				new GithubRefDiffCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ghBase, head);
-		return formatCodeGivenConfig(codeProvider, false);
+		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), refOrSha1);
+		GHRepository theRepo = repo.getDecorated();
+		String token = githubAndToken.getToken();
+		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
+		ICodeProvider codeProvider = new GithubRefToCommitDiffCodeProvider(token, theRepo, ghBase, head);
+		return formatRefDiff(theRepo, codeProvider, headSupplier);
 	}
 
 	@Override
 	public CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
 			IGitCommit base,
-			Supplier<IGitReference> headSupplier) {
-		// TODO Get the head lazily, else it means we create branch which may remain empty
-		// It typically leads to useless CI jobs
-		GHRef head = headSupplier.get().getDecorated();
+			ILazyGitReference headSupplier) {
+		String refOrSha1 = headSupplier.getFullRefOrSha1();
 		GHCommit ghBase = base.getDecorated();
 
-		LOGGER.info("Base: {} Head: {}", ghBase.getSHA1(), head.getRef());
-		ICodeProviderWriter codeProvider = new GithubCommitToRefDiffCodeProviderWriter(githubAndToken.getToken(),
-				repo.getDecorated(),
-				ghBase,
-				head);
-		return formatCodeGivenConfig(codeProvider, false);
+		LOGGER.info("Base: {} Head: {}", ghBase.getSHA1(), refOrSha1);
+		GHRepository theRepo = repo.getDecorated();
+		String token = githubAndToken.getToken();
+		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
+		ICodeProvider codeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
+		return formatRefDiff(theRepo, codeProvider, headSupplier);
 	}
 
 	@Override
-	public CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier) {
-		// TODO Get the head lazily
-		GHRef ref = refSupplier.get().getDecorated();
+	public CodeFormatResult formatRef(IGitRepository repo, IGitBranch branchSupplier, ILazyGitReference headSupplier) {
+		GHBranch branch = branchSupplier.getDecorated();
 
 		ICodeProviderWriter codeProvider =
-				new GithubRefCodeProvider(githubAndToken.getToken(), repo.getDecorated(), ref);
-		LOGGER.info("Ref: {}", codeProvider.getHtmlUrl());
-		return formatCodeGivenConfig(codeProvider, false);
+				new GithubBranchCodeProvider(githubAndToken.getToken(), repo.getDecorated(), branch);
+		return formatRefDiff(repo.getDecorated(), codeProvider, headSupplier);
 	}
 
 	@Override

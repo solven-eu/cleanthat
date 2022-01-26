@@ -1,11 +1,11 @@
-package eu.solven.cleanthat.code_provider.github.refs;
+package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
 import java.util.Objects;
 
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
@@ -13,7 +13,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
+public class GithubRefCodeProvider extends AGithubSha1CodeProviderWriter {
 	final GHRef ref;
 
 	public GithubRefCodeProvider(String token, GHRepository repo, GHRef ref) {

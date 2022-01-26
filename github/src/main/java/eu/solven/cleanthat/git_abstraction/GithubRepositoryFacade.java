@@ -1,10 +1,12 @@
 package eu.solven.cleanthat.git_abstraction;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
@@ -126,6 +128,16 @@ public class GithubRepositoryFacade {
 
 	public GHRepository getRepository() {
 		return repository;
+	}
+
+	public GHCommit getCommit(String sha1) {
+		try {
+			return repository.getCommit(sha1);
+		} catch (IOException e) {
+			throw new UncheckedIOException(
+					"Issue fetching commit for sha1=" + sha1 + " (repo=" + repository.getHtmlUrl() + ")",
+					e);
+		}
 	}
 
 }

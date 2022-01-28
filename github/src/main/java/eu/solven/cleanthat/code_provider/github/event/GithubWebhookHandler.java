@@ -258,7 +258,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					if (beforeSha.matches("0+")) {
 						// 0000000000000000000000000000000000000000
 						// AKA z40 is a special reference, meaning no_ref
-						optBaseRef = Optional.empty();
+						// This is typically a branch creation
+						// TODO Should we consider as base a parent commit?
+						LOGGER.warn("Branch creation? We consider as base.sha1 the sha1 of after: {}", afterSha);
+						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, afterSha));
 					} else {
 						// We do not consider as base the RR base, as this is a push event: we are not sure what is the
 						// relevant base.
@@ -312,6 +315,72 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// String repoName = pushedRefOrRrHead.getRepoName();
 		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
+		Set<String> relevantBaseBranches =
+				computeRelevantBaseBranches(offlineResult, pushedRefOrRrHead, facade, optOpenPr);
+		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optHead =
+				checkRefCleanabilityAsHead(baseRepo, pushedRefOrRrHead, optOpenPr);
+		if (optHead.getOptError().isPresent()) {
+			return optHead.getOptError().get();
+		}
+		GitRepoBranchSha1 dirtyHeadRef = optHead.getOptResult().get();
+		Optional<String> optHeadSha1 = Optional.of(dirtyHeadRef.getSha());
+		if (optHeadSha1.isEmpty()) {
+			throw new IllegalStateException("Should not happen");
+		}
+
+		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
+
+		// We rely on push over branches to trigger initialization
+		if (offlineResult.isPushBranch()) {
+			GHBranch defaultBranch;
+			try {
+				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
+			} catch (RuntimeException e) {
+				LOGGER.warn("We failed finding the default branch", e);
+				return WebhookRelevancyResult.dismissed("Issue guessing the default branch");
+			}
+
+			String pushedRef = offlineResult.optBaseRef().get().getRef();
+			if (pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
+				LOGGER.debug("About to consider creating a default configuration for {} (as default branch)",
+						pushedRef);
+				// Open PR with default relevant configuration
+				boolean initialized = cleaner
+						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
+
+				if (initialized) {
+					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
+				}
+			} else {
+				LOGGER.debug("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
+			}
+		}
+
+		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
+		// meantime (e.g. merged+deleted before cleanthat doing its work)
+		Optional<HeadAndOptionalBase> refToClean =
+				cleaner.prepareRefToClean(offlineResult, dirtyHeadRef, relevantBaseBranches);
+		if (refToClean.isEmpty()) {
+			return WebhookRelevancyResult.dismissed(
+					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
+		}
+		return WebhookRelevancyResult.relevant(refToClean.get());
+	}
+
+	/**
+	 * 
+	 * @param offlineResult
+	 * @param pushedRefOrRrHead
+	 * @param facade
+	 * @param optOpenPr
+	 * @return in case of push events, we return all refs used as base of a RR, where the pushed branch in the head.
+	 * 
+	 *         in case of a RR event, we return only the RR base
+	 */
+	private Set<String> computeRelevantBaseBranches(GitWebhookRelevancyResult offlineResult,
+			GitRepoBranchSha1 pushedRefOrRrHead,
+			GithubRepositoryFacade facade,
+			Optional<GitPrHeadRef> optOpenPr) {
 		Set<String> relevantBaseBranches = new TreeSet<>();
 		if (offlineResult.isPushBranch()) {
 			// This is assumed to be empty as we should not list for RR, before current step
@@ -342,56 +411,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			assert offlineResult.optOpenPr().isPresent();
 			relevantBaseBranches.add(offlineResult.optOpenPr().get().getBaseRef());
 		}
-		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optTheRef =
-				checkRefCleanability(baseRepo, pushedRefOrRrHead, optOpenPr);
-		if (optTheRef.getOptError().isPresent()) {
-			return optTheRef.getOptError().get();
-		}
-		GitRepoBranchSha1 dirtyRef = optTheRef.getOptResult().get();
-		Optional<String> optSha1 = Optional.of(dirtyRef.getSha());
-		if (optSha1.isEmpty()) {
-			throw new IllegalStateException("Should not happen");
-		}
-		if (optSha1.isPresent()) {
-			String eventKey = githubEvent.getxGithubDelivery();
-			createCheckRun(githubAuthAsInst, baseRepo, optSha1.get(), eventKey);
-		}
-		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
-
-		// We rely on push over branches to trigger initialization
-		if (offlineResult.isPushBranch()) {
-			GHBranch defaultBranch;
-			try {
-				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
-			} catch (RuntimeException e) {
-				LOGGER.warn("We failed finding the default branch", e);
-				return WebhookRelevancyResult.dismissed("Issue guessing the default branch");
-			}
-
-			String pushedRef = offlineResult.optBaseRef().get().getRef();
-			if (pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
-				LOGGER.info("About to consider creating a default configuration for {} (as default branch)", pushedRef);
-				// Open PR with default relevant configuration
-				boolean initialized = cleaner
-						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
-
-				if (initialized) {
-					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
-				}
-			} else {
-				LOGGER.debug("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
-			}
-		}
-
-		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
-		// meantime (e.g. merged+deleted before cleanthat doing its work)
-		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(offlineResult, dirtyRef, relevantBaseBranches);
-		if (refToClean.isEmpty()) {
-			return WebhookRelevancyResult.dismissed(
-					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
-		}
-		return WebhookRelevancyResult.relevant(refToClean.get());
+		return relevantBaseBranches;
 	}
 
 	private ResultOrError<GHRepository, WebhookRelevancyResult> connectToRepository(Map<String, ?> input,
@@ -424,7 +444,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return ResultOrError.result(baseRepo);
 	}
 
-	public void createCheckRun(GithubAndToken githubAuthAsInst, GHRepository baseRepo, String sha1, String eventKey) {
+	public Optional<GHCheckRun> createCheckRun(GithubAndToken githubAuthAsInst,
+			GHRepository baseRepo,
+			String sha1,
+			String eventKey) {
 		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get(PERMISSION_CHECKS)) {
 			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 			// https://docs.github.com/en/rest/reference/checks#runs
@@ -433,25 +456,21 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			try {
 				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
 
-				// We complete right now, until we are able to complete this properly
-				checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED).create();
+				return Optional.of(checkRun);
 			} catch (IOException e) {
 				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.warn("Issue creating the CheckRun", e);
-				} else {
-					// As this occurs very often, skip the stacktrace in the logs
-					LOGGER.warn("Issue creating the CheckRun");
-				}
+				LOGGER.warn("Issue creating the CheckRun", e);
+				return Optional.empty();
 			}
 		} else {
 			// Invite users to go into:
 			// https://github.com/organizations/solven-eu/settings/installations/9086720
 			LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
+			return Optional.empty();
 		}
 	}
 
-	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanability(GHRepository eventRepo,
+	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanabilityAsHead(GHRepository eventRepo,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
 		if (optOpenPr.isPresent()) {
@@ -502,6 +521,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	public void doExecuteClean(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
+
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
@@ -517,16 +537,47 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId);
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
-		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
-		GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
-		AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
-		// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to clean
-		ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-		CodeFormatResult result =
-				GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
-		GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
+		Optional<GHCheckRun> optCheckRUn;
+		if (offlineResult.isPushBranch() && offlineResult.optPushedRefOrRrHead().isPresent()) {
+			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
+			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
+			optCheckRUn = createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
+		} else {
+			optCheckRUn = Optional.empty();
+		}
 
-		logAfterCleaning(installationId, repo.getRoot());
+		try {
+			IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
+			GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
+			AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
+			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
+			// clean
+			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
+			CodeFormatResult result =
+					GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
+			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
+
+			logAfterCleaning(installationId, githubAuthAsInst.getGithub());
+
+			// We complete right now, until we are able to complete this properly
+			optCheckRUn.ifPresent(checkRun -> {
+				try {
+					checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED).create();
+				} catch (IOException e) {
+					LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), e);
+				}
+			});
+		} catch (RuntimeException e) {
+			optCheckRUn.ifPresent(checkRun -> {
+				try {
+					checkRun.update().withConclusion(Conclusion.FAILURE).withStatus(Status.COMPLETED).create();
+				} catch (IOException ee) {
+					LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), ee);
+				}
+			});
+
+			throw new RuntimeException("Propagate", e);
+		}
 	}
 
 	public void logAfterCleaning(long installationId, GitHub github) {

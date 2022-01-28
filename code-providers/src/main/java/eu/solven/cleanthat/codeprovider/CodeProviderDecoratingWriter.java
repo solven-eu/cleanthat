@@ -30,6 +30,10 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 		this.writerLogicSupplier = writerLogicSupplier;
 	}
 
+	public ICodeProvider getDecorated() {
+		return codeProvider;
+	}
+
 	@Override
 	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
 		codeProvider.listFiles(consumer);

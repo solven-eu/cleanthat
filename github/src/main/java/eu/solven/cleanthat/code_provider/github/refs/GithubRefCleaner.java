@@ -86,10 +86,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public Optional<HeadAndOptionalBase> prepareRefToClean(IExternalWebhookRelevancyResult result,
-			GitRepoBranchSha1 theRef,
+			GitRepoBranchSha1 head,
 			// There can be multiple eventBaseBranches in case of push events
-			Set<String> eventBaseBranches) {
-		ICodeProvider codeProvider = getCodeProviderForRef(theRef);
+			Set<String> eventBaseRefs) {
+		ICodeProvider codeProvider = getCodeProviderForRef(head);
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
 
 		if (optConfig.getOptError().isPresent()) {
@@ -101,74 +101,143 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		List<String> cleanableBranchRegexes = properties.getMeta().getRefs().getBranches();
+		List<String> cleanableRefsRegexes = properties.getMeta().getRefs().getBranches();
 
-		Optional<String> optBaseMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {
-			Optional<String> matchingBase = eventBaseBranches.stream().filter(base -> {
-				return Pattern.matches(cleanableBranchRegex, base);
-			}).findAny();
+		String headRef = head.getRef();
+		if (canCleanInPlace(eventBaseRefs, cleanableRefsRegexes, headRef)) {
+			logWhyCanCleanInPlace(eventBaseRefs, cleanableRefsRegexes, result, headRef);
 
-			if (matchingBase.isEmpty()) {
-				LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", cleanableBranchRegex);
-				return false;
-			} else {
-				LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}",
-						cleanableBranchRegex,
-						matchingBase.get());
-			}
-
-			return true;
-		}).findAny();
-
-		String fullRef = theRef.getRef();
-		if (optBaseMatchingRule.isPresent()) {
-			// The base is cleanable: we are allowed to clean its head in-place
-			// TODO We should ensure the HEAD does not match any regex
-			String baseMatchingRule = optBaseMatchingRule.get();
-			if (result.isReviewRequestOpen()) {
-				LOGGER.info(
-						"We will clean {} in place as this event is due to a RR (re)open event with cleanable base (rule={})",
-						fullRef,
-						baseMatchingRule);
-			} else {
-				LOGGER.info(
-						"We will clean {} in place as this event is due to a push over a branch, itself head of a RR with a cleanable base (rule={})",
-						fullRef,
-						baseMatchingRule);
-			}
-			GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoName(), fullRef, theRef.getSha());
-			return Optional.of(new HeadAndOptionalBase(head, result.optBaseRef()));
+			return cleanHeadInPlace(result, head);
 		}
 
-		Optional<String> optHeadMatchingRule = cleanableBranchRegexes.stream().filter(cleanableBranchRegex -> {
-			return Pattern.matches(cleanableBranchRegex, fullRef);
-		}).findAny();
-
-		if (optHeadMatchingRule.isPresent()) {
-			LOGGER.info("We have an event over a branch which is cleanable ({}),"
-					+ " but not head of an open PR to a cleanable base ({}): we shall clean this through a new PR",
-					fullRef,
-					cleanableBranchRegexes);
-
-			// We never clean inplace: we'll have to open a dedicated ReviewRequest if necessary
-			String newBranchRef = prepareRefNameForHead(fullRef);
-			// We may open a branch later if it appears this branch is relevant
-			// String refToClean = codeProvider.openBranch(ref);
-			// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
-			// In case of concurrent events, we may end opening multiple PR to clean the same branch
-			// TODO Should we handle this specifically when opening the actual branch?
-			LOGGER.info("If this ref ({}) is confirmed to need cleanup, the RR shall be open into {}",
-					fullRef,
-					newBranchRef);
-			GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoName(), newBranchRef, theRef.getSha());
-			return Optional.of(new HeadAndOptionalBase(head, Optional.of(theRef)));
+		if (canCleanInRR(cleanableRefsRegexes, headRef)) {
+			return cleanInRR(result, head, cleanableRefsRegexes, headRef);
 		} else {
+			// Cleanable neither in-place nor in-rr
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
-					fullRef,
-					cleanableBranchRegexes,
-					eventBaseBranches);
+					headRef,
+					cleanableRefsRegexes,
+					eventBaseRefs);
 			return Optional.empty();
 		}
+	}
+
+	protected Optional<HeadAndOptionalBase> cleanInRR(IExternalWebhookRelevancyResult result,
+			GitRepoBranchSha1 head,
+			List<String> cleanableRefsRegexes,
+			String headRef) {
+		// We'll have to open a dedicated ReviewRequest if necessary
+		// As we prefer not to pollute a random existing PR
+		String newBranchRef = prepareRefNameForHead(headRef);
+		// We may open a branch later if it appears this branch is relevant
+		// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
+		// In case of concurrent events, we may end opening multiple PR to clean the same branch
+		LOGGER.info("ref={} is not cleanable in-place, but cleanable in-rr. Commits would be pushed into {}",
+				headRef,
+				cleanableRefsRegexes,
+				newBranchRef);
+
+		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoName(), newBranchRef, head.getSha());
+		// See GithubEventHelper.doOpenPr(WebhookRelevancyResult, GithubRepositoryFacade, GitRepoBranchSha1)
+		Optional<GitRepoBranchSha1> optBaseRef = result.optBaseRef();
+		if (optBaseRef.isEmpty()) {
+			// This may happen on the event of branch creation, when the branch is cleanable
+			throw new IllegalStateException("No baseRef? headRef=" + headRef);
+		}
+		GitRepoBranchSha1 base = optBaseRef.get();
+		// We keep the base sha1, as it will be used for diff computations (i.e. listing the concerned files)
+		// We use as refName the pushedRef/rrHead as it is to this ref that a RR has to be open
+		GitRepoBranchSha1 actualBase = new GitRepoBranchSha1(base.getRepoName(), head.getRef(), base.getSha());
+
+		return Optional.of(new HeadAndOptionalBase(actualHead, Optional.of(actualBase)));
+	}
+
+	private boolean canCleanInRR(List<String> cleanableRefsRegexes, String headRef) {
+		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(cleanableRefsRegexes, headRef);
+
+		return optHeadMatchingRule.isPresent();
+	}
+
+	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> refToCleanRegexes, String headRef) {
+		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(refToCleanRegexes, headRef);
+		if (optHeadMatchingRule.isPresent()) {
+			// We never clean in place the cleanable branches, as they are considered sensible
+			LOGGER.info("Not cleaning {} in-place as it is a sensible/cleanable ref (rule={})",
+					headRef,
+					optHeadMatchingRule.get());
+			return false;
+		}
+
+		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+
+		return optBaseMatchingRule.isPresent();
+	}
+
+	private void logWhyCanCleanInPlace(Set<String> eventBaseRefs,
+			List<String> refToCleanRegexes,
+			IExternalWebhookRelevancyResult result,
+			String headRef) {
+		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+
+		if (!optBaseMatchingRule.isPresent()) {
+			throw new IllegalStateException("Should be called only if .canCleanInPlace() returns true");
+		}
+
+		// TODO We should ensure the HEAD does not match any regex (i.e. not clean in-place a sensible branch, even
+		// if it is the head of a RR)
+		String baseMatchingRule = optBaseMatchingRule.get();
+
+		String prefix = "Cleaning {} in-place as ";
+		String suffix = " a sensible/cleanable base (rule={})";
+		if (result.isReviewRequestOpen()) {
+			LOGGER.info(prefix + "RR has" + suffix, headRef, baseMatchingRule);
+		} else {
+			LOGGER.info(prefix + "pushed used as head of a RR with" + suffix, headRef, baseMatchingRule);
+		}
+	}
+
+	private Optional<String> selectPatternOfSensibleHead(List<String> cleanableRefsRegexes, String fullRef) {
+		return cleanableRefsRegexes.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
+	}
+
+	/**
+	 * 
+	 * @param refs
+	 *            eligible full refs
+	 * @param regexes
+	 *            the regex of the branches allowed to be clean. Fact is these branches should never be cleaned by
+	 *            themselves, but only through RR
+	 * @return
+	 */
+	private Optional<String> selectValidBaseBranch(Set<String> refs, List<String> regexes) {
+		Optional<String> optBaseMatchingRule;
+		if (refs.isEmpty()) {
+			optBaseMatchingRule = Optional.empty();
+		} else {
+			optBaseMatchingRule = regexes.stream().filter(regex -> {
+				Optional<String> matchingBase = refs.stream().filter(base -> {
+					return Pattern.matches(regex, base);
+				}).findAny();
+
+				if (matchingBase.isEmpty()) {
+					LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", regex);
+					return false;
+				} else {
+					LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}", regex, matchingBase.get());
+				}
+
+				return true;
+			}).findAny();
+		}
+		return optBaseMatchingRule;
+	}
+
+	private Optional<HeadAndOptionalBase> cleanHeadInPlace(IExternalWebhookRelevancyResult result,
+			GitRepoBranchSha1 theRef) {
+		// The base is cleanable: we are allowed to clean its head in-place
+
+		GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoName(), theRef.getRef(), theRef.getSha());
+		return Optional.of(new HeadAndOptionalBase(head, result.optBaseRef()));
 	}
 
 	/**

@@ -58,7 +58,7 @@ public class GithubEventHelper {
 					GithubDecoratorHelper.decorate(base),
 					headSupplier);
 		} else {
-			throw new IllegalArgumentException("Unclear xpected behavior");
+			throw new IllegalArgumentException("Unclear expected behavior");
 			// result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier.getSupplier().get());
 		}
 		return result;

@@ -1,23 +1,22 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 
 /**
- * An {@link ICodeProvider} for Github pull-requests
+ * An {@link ICodeProvider} from a ref to a commit
  *
  * @author Benoit Lacelle
  */
-public class GithubCommitDiffCodeProvider extends AGithubDiffCodeProvider implements IListOnlyModifiedFiles {
-	// private static final Logger LOGGER = LoggerFactory.getLogger(GithubCommitDiffCodeProvider.class);
-
-	final GHCommit base;
+public class GithubRefToCommitDiffCodeProvider extends AGithubDiffCodeProvider implements IListOnlyModifiedFiles {
+	final GHRef base;
 	final GHCommit head;
 
-	public GithubCommitDiffCodeProvider(String token, GHRepository baseRepository, GHCommit base, GHCommit head) {
+	public GithubRefToCommitDiffCodeProvider(String token, GHRepository baseRepository, GHRef base, GHCommit head) {
 		super(token, baseRepository);
 
 		this.base = base;
@@ -26,7 +25,7 @@ public class GithubCommitDiffCodeProvider extends AGithubDiffCodeProvider implem
 
 	@Override
 	protected String getBaseId() {
-		return base.getSHA1();
+		return base.getRef();
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
 
 /**
  * Specific to Github sha1 {@link ICodeProvider}
@@ -11,7 +10,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
  * @author Benoit Lacelle
  *
  */
-public interface IGithubSha1CodeProvider extends ICodeProviderWriterLogic {
+public interface IGithubSha1CodeProvider {
 
 	String getSha1();
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -36,7 +35,7 @@ public class GithubEventHelper {
 			GHRepository repo,
 			IGitRefCleaner cleaner,
 			GithubRepositoryFacade facade,
-			Supplier<IGitReference> headSupplier) {
+			ILazyGitReference headSupplier) {
 		CodeFormatResult result;
 		if (relevancyResult.optBaseForHead().isPresent()) {
 			GitRepoBranchSha1 baseAsObject = relevancyResult.optBaseForHead().get();
@@ -46,12 +45,7 @@ public class GithubEventHelper {
 			// recent commit, not the commit before the push)
 			String sha1 = baseAsObject.getSha();
 
-			GHCommit base;
-			try {
-				base = repo.getCommit(sha1);
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue fetching commit for sha1=" + sha1, e);
-			}
+			GHCommit base = facade.getCommit(sha1);
 
 			// If the base does not exist, then something is wrong: let's check right away it is available
 			// GHRef base;
@@ -64,7 +58,8 @@ public class GithubEventHelper {
 					GithubDecoratorHelper.decorate(base),
 					headSupplier);
 		} else {
-			result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier);
+			throw new IllegalArgumentException("Unclear expected behavior");
+			// result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier.getSupplier().get());
 		}
 		return result;
 	}

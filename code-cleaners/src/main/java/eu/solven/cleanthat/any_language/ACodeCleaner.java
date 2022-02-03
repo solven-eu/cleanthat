@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.any_language;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -89,7 +92,8 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 		CleanthatRepositoryProperties properties = optResult.getOptResult().get();
 
-		if (codeProvider instanceof IListOnlyModifiedFiles) {
+		if (codeProvider instanceof IListOnlyModifiedFiles || codeProvider instanceof CodeProviderDecoratingWriter
+				&& ((CodeProviderDecoratingWriter) codeProvider).getDecorated() instanceof IListOnlyModifiedFiles) {
 			// We are on a PR event, or a commit_push over a branch which is head of an open PR
 			LOGGER.info("About to clean a limitted set of files");
 		} else {
@@ -132,6 +136,10 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	protected CleanthatRepositoryProperties generateDefaultConfig(ICodeProvider codeProvider) {
-		return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
+		try {
+			return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

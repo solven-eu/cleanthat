@@ -27,11 +27,13 @@ import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 @Deprecated(since = "DELETEME")
@@ -122,11 +124,14 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 			GHBranch finalDefaultBranch = defaultBranch;
-			CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), Suppliers.memoize(() -> {
-				GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
-				createdPr.set(pr);
-				return GithubDecoratorHelper.decorate(pr);
-			}));
+			String refName = CleanthatRefFilterProperties.BRANCHES_PREFIX + finalDefaultBranch.getName();
+			CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo),
+					GithubDecoratorHelper.decorate(defaultBranch),
+					new LazyGitReference(refName, Suppliers.memoize(() -> {
+						GHRef pr = GithubHelper.openEmptyRef(repo, finalDefaultBranch);
+						createdPr.set(pr);
+						return GithubDecoratorHelper.decorate(pr);
+					})));
 
 			if (createdPr.get() == null) {
 				LOGGER.info("Not a single file has been impacted");

@@ -9,10 +9,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.formatter.ICommonConventions;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
- * Configuration for Jackson Json formatter
+ * Configuration for Javax XML formatter
  *
  * @author Benoit Lacelle
  */
@@ -24,8 +23,6 @@ public class JavaxXmlFormatterProperties {
 			.put(OutputKeys.OMIT_XML_DECLARATION, "no")
 			.put(OutputKeys.INDENT, "yes")
 			.build();
-
-	String lineending = SourceCodeProperties.DEFAULT_LINE_ENDING;
 
 	boolean eolAtEof = false;
 
@@ -43,14 +40,6 @@ public class JavaxXmlFormatterProperties {
 
 	public void setOutputOptions(Map<String, String> outputOptions) {
 		this.outputOptions = outputOptions;
-	}
-
-	public String getLineending() {
-		return lineending;
-	}
-
-	public void setLineending(String lineending) {
-		this.lineending = lineending;
 	}
 
 	public boolean isEolAtEof() {

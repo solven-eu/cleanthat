@@ -2,14 +2,10 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
@@ -18,19 +14,16 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
-public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
-		implements ICodeProviderWriter, IGithubSha1CodeProvider {
+public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implements IGithubSha1CodeProvider {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProvider.class);
 
 	final String token;
@@ -55,8 +48,6 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
 	public String getToken() {
 		return token;
 	}
-
-	protected abstract GHRef getAsGHRef();
 
 	public GithubSha1CodeProviderHelper getHelper() {
 		return helper;
@@ -107,18 +98,6 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider
 				LOGGER.debug("Discard: {}", ghTreeEntry);
 			}
 		});
-	}
-
-	@Override
-	public void persistChanges(Map<String, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
-		new GithubRefWriterLogic(repo, getAsGHRef()).persistChanges(pathToMutatedContent, prComments, prLabels);
-	}
-
-	@Override
-	public void cleanTmpFiles() {
-		helper.cleanTmpFiles();
 	}
 
 	@Override

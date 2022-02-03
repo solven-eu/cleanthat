@@ -22,11 +22,17 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-
 		<dependency>
 			<!-- Used to clone a repo -->
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

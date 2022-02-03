@@ -51,11 +51,17 @@ public final class CleanthatRefFilterProperties {
 	private List<String> branches =
 			SIMPLE_DEFAULT_BRANCHES.stream().map(s -> BRANCHES_PREFIX + s).collect(Collectors.toList());
 
-	public void setBranches(List<String> labels) {
-		labels = labels.stream().map(branch -> {
+	/**
+	 * 
+	 * @param branches
+	 *            the regex of the branches allowed to be clean. Fact is these branches should never be cleaned by
+	 *            themselves, but only through RR
+	 */
+	public void setBranches(List<String> branches) {
+		branches = branches.stream().map(branch -> {
 			if (!branch.startsWith(REFS_PREFIX)) {
 				String qualifiedRef = BRANCHES_PREFIX + branch;
-				LOGGER.debug("We qualify {} into {}", branch, qualifiedRef);
+				LOGGER.debug("We qualify {} into {} (i.e. we supposed it is a branch name)", branch, qualifiedRef);
 				return qualifiedRef;
 			} else {
 				if (!branch.startsWith(BRANCHES_PREFIX)) {
@@ -65,6 +71,6 @@ public final class CleanthatRefFilterProperties {
 			}
 		}).distinct().collect(Collectors.toList());
 
-		this.branches = List.copyOf(labels);
+		this.branches = List.copyOf(branches);
 	}
 }

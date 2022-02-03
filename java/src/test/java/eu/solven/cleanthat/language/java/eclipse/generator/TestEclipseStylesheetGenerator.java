@@ -31,7 +31,8 @@ public class TestEclipseStylesheetGenerator {
 
 	@Test
 	public void testInterruptEarly() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/RoaringBitmap/RoaringBitmap.java");
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
@@ -45,7 +46,8 @@ public class TestEclipseStylesheetGenerator {
 	// We need to ensure we consider all parameters in the optimization process
 	@Test
 	public void testFromEmptyConfiguration() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/RoaringBitmap/RoaringBitmap.java");
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 

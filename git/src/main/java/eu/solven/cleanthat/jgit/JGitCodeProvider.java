@@ -54,11 +54,13 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	final Git jgit;
 	final String commit;
 
-	public JGitCodeProvider(Path workingDir, Git jgit, String commit) {
+	protected JGitCodeProvider(Path workingDir, Git jgit, String commit) {
 		this.workingDir = workingDir;
 		this.jgit = jgit;
 		this.commit = commit;
+	}
 
+	public static JGitCodeProvider wrap(Path workingDir, Git jgit, String commit) {
 		Status status;
 		try {
 			status = jgit.status().call();
@@ -73,6 +75,10 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		if (!commit.equals(head)) {
 			throw new IllegalArgumentException("Invalid current sh1: " + head + " (expected: " + commit + ")");
 		}
+
+		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, commit);
+
+		return wrapped;
 	}
 
 	@Override
@@ -123,9 +129,21 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		}
 	}
 
-	private void acceptLocalTreeWalk(Consumer<ICodeProviderFile> consumer, TreeWalk treeWalk) {
-		String path = treeWalk.getPathString();
+	protected void acceptLocalTreeWalk(Consumer<ICodeProviderFile> consumer, TreeWalk treeWalk) {
+		String path = "/" + treeWalk.getPathString();
 		consumer.accept(new DummyCodeProviderFile(path, path));
+	}
+
+	protected Path resolvePath(String path) {
+		if (path.startsWith("/")) {
+			// We receive absolute path, considering as root the git repository
+			// Hence we clean the leading '/' to build a path relative to the actual root
+			path = path.substring(1);
+		} else {
+			LOGGER.debug("TODO Should we reject this? lack of leading '/' in {}", path);
+		}
+
+		return workingDir.resolve(path);
 	}
 
 	private static RevCommit buildRevCommit(Repository repository, String commit) throws IOException {
@@ -165,7 +183,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 			List<String> prComments,
 			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((k, v) -> {
-			Path resolvedPath = workingDir.resolve(k);
+			Path resolvedPath = resolvePath(k);
 
 			try {
 				Files.writeString(resolvedPath, v, StandardOpenOption.TRUNCATE_EXISTING);
@@ -174,6 +192,10 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 			}
 		});
 
+		addCommitPush(prComments);
+	}
+
+	private void addCommitPush(List<String> prComments) {
 		// https://stackoverflow.com/questions/12734760/jgit-how-to-add-all-files-to-staging-area
 		try {
 			jgit.add().addFilepattern(".").call();
@@ -199,7 +221,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public String deprecatedLoadContent(Object file) throws IOException {
-		Path resolvedPath = workingDir.resolve((String) file);
+		Path resolvedPath = resolvePath((String) file);
 
 		return new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8);
 	}
@@ -211,7 +233,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolvedPath = workingDir.resolve(path);
+		Path resolvedPath = resolvePath(path);
 
 		if (resolvedPath.toFile().isFile()) {
 			return Optional.of(new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8));

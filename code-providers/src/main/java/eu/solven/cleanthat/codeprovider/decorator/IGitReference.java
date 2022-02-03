@@ -6,7 +6,7 @@ package eu.solven.cleanthat.codeprovider.decorator;
  * @author Benoit Lacelle
  *
  */
-public interface IGitReference {
+public interface IGitReference extends IHasGitRef {
 	/**
 	 * 
 	 * @param <T>

@@ -100,7 +100,12 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 
 		GenerateInitialConfig generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(ILanguageLintFixerFactory.class).values());
-		CleanthatRepositoryProperties properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
+		CleanthatRepositoryProperties properties;
+		try {
+			properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
+		}
 		writeConfiguration(configPathFile, properties);
 	}
 

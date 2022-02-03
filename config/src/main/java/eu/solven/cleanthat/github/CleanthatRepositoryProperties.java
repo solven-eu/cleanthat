@@ -21,7 +21,7 @@ import lombok.Data;
 // https://stackoverflow.com/questions/19272830/order-of-json-objects-using-jacksons-objectmapper
 @JsonPropertyOrder({ "syntax_version", "meta", "source_code", "languages" })
 @Data
-public final class CleanthatRepositoryProperties {
+public final class CleanthatRepositoryProperties implements IHasSourceCodeProperties {
 	public static final String LATEST_SYNTAX_VERSION = "2021-08-02";
 
 	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config

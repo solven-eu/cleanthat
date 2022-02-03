@@ -20,7 +20,7 @@ import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.refs.GithubBranchCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.language.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)

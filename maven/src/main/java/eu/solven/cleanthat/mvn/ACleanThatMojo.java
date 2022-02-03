@@ -47,6 +47,9 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	@Parameter(property = "cleanthat.dryRun", defaultValue = "false")
 	private boolean dryRun;
 
+	@Parameter(property = "cleanthat.skip", defaultValue = "false")
+	private boolean skip;
+
 	/**
 	 * Base directory of the project.
 	 */
@@ -138,6 +141,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	public boolean isRunOnlyAtRoot() {
 		return runOnlyAtRoot;
+	}
+
+	public boolean isSkip() {
+		return skip;
 	}
 
 	/**

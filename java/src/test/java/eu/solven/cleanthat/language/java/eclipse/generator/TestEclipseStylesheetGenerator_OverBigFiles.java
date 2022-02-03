@@ -36,7 +36,8 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 
 	@Test
 	public void testRoaringBitmap() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/RoaringBitmap/RoaringBitmap.java");
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
@@ -84,7 +85,8 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 
 	@Test
 	public void testTestRoaringBitmap() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/RoaringBitmap/TestRoaringBitmap.java");
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/TestRoaringBitmap.java");
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 

@@ -74,11 +74,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		ILintFixerWithId processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		// override with explicit configuration
-		Map<String, Object> parameters = PepperMapHelper.getAs(rawProcessor, KEY_PARAMETERS);
-		if (parameters == null) {
-			// Some engine takes no parameter
-			parameters = Map.of();
-		}
+		Map<String, Object> parameters = getParameters(rawProcessor);
 
 		LOGGER.debug("Processing: {}", engine);
 

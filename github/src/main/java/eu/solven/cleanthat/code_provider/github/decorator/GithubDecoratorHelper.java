@@ -42,6 +42,11 @@ public class GithubDecoratorHelper {
 		}
 
 		@Override
+		public String getFullRefOrSha1() {
+			return reference.getRef();
+		}
+
+		@Override
 		public <T> T getDecorated() {
 			return (T) reference;
 		}

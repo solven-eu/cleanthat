@@ -26,7 +26,7 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
-	public static final String DEFAULT_LINE_ENDING = "LF";
+	public static final LineEnding DEFAULT_LINE_ENDING = LineEnding.UNKNOWN;
 
 	// If empty, no file is excluded
 	// If multiple, we exclude files matching at least one exclude (OR)
@@ -42,7 +42,7 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	private String lineEnding = DEFAULT_LINE_ENDING;
+	private LineEnding lineEnding = DEFAULT_LINE_ENDING;
 
 	private LineEnding parseLineEnding(String lineEnding) {
 		return LineEnding.valueOf(lineEnding);
@@ -53,16 +53,19 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	@JsonIgnore
 	@Override
 	public LineEnding getLineEndingAsEnum() {
-		return parseLineEnding(lineEnding);
-	}
-
-	public String getLineEnding() {
 		return lineEnding;
 	}
 
-	public void setLineEnding(String lineEnding) {
-		parseLineEnding(lineEnding);
+	public String getLineEnding() {
+		return lineEnding.toString();
+	}
 
+	@JsonIgnore
+	public void setLineEndingAsEnum(LineEnding lineEnding) {
 		this.lineEnding = lineEnding;
+	}
+
+	public void setLineEnding(String lineEnding) {
+		this.lineEnding = parseLineEnding(lineEnding);
 	}
 }

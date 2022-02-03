@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.eclipse.jgit.api.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -24,7 +23,6 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 /**
@@ -66,15 +64,17 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 
 	private ICodeProviderWriter makeCodeProvider(Path root) throws IOException {
 		ICodeProviderWriter codeProvider;
-		if (root.resolve(".git").toFile().isDirectory()) {
-			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
-			Git jgit = Git.open(root.toFile());
 
-			codeProvider = new JGitCodeProvider(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
-		} else {
-			LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)");
-			codeProvider = new FileSystemCodeProvider(root);
-		}
+		// We do not rely on JGit as we do not want to add/commit/push when processnig local repository
+		// if (root.resolve(".git").toFile().isDirectory()) {
+		// LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
+		// Git jgit = Git.open(root.toFile());
+		//
+		// codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
+		// } else {
+		LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)");
+		codeProvider = new FileSystemCodeProvider(root);
+		// }
 		return codeProvider;
 	}
 

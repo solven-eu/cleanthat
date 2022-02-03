@@ -2,12 +2,12 @@ package eu.solven.cleanthat.codeprovider.git;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 
 /**
@@ -35,15 +35,14 @@ public interface IGitRefCleaner {
 	 * Format a whole ref, moving its head to a cleaned commit
 	 * 
 	 * @param repo
-	 * @param refSupplier
+	 * @param branchSupplier
+	 * @param headSupplier
 	 * @return
 	 */
-	CodeFormatResult formatRef(IGitRepository repo, Supplier<IGitReference> refSupplier);
+	CodeFormatResult formatRef(IGitRepository repo, IGitBranch branchSupplier, ILazyGitReference headSupplier);
 
 	@Deprecated
-	CodeFormatResult formatRefDiff(IGitRepository repo,
-			IGitReference baseSupplier,
-			Supplier<IGitReference> headSupplier);
+	CodeFormatResult formatRefDiff(IGitRepository repo, IGitReference baseSupplier, ILazyGitReference headSupplier);
 
 	/**
 	 * Format a ref, based on its diff with a base commit
@@ -55,6 +54,6 @@ public interface IGitRefCleaner {
 	 */
 	CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
 			IGitCommit baseSupplier,
-			Supplier<IGitReference> headSupplier);
+			ILazyGitReference headSupplier);
 
 }

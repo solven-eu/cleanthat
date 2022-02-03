@@ -312,11 +312,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GHRepository baseRepo = baseRepoOrError.getOptResult().get();
 
 		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
-		// String repoName = pushedRefOrRrHead.getRepoName();
-		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
-		Set<String> relevantBaseBranches =
-				computeRelevantBaseBranches(offlineResult, pushedRefOrRrHead, facade, optOpenPr);
+
 		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optHead =
 				checkRefCleanabilityAsHead(baseRepo, pushedRefOrRrHead, optOpenPr);
 		if (optHead.getOptError().isPresent()) {
@@ -355,6 +352,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.debug("This is not a push over the default branch ({}): {}", defaultBranch.getName(), pushedRef);
 			}
 		}
+
+		GithubRepositoryFacade facade = new GithubRepositoryFacade(baseRepo);
+		Set<String> relevantBaseBranches =
+				computeRelevantBaseBranches(offlineResult, pushedRefOrRrHead, facade, optOpenPr);
 
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)

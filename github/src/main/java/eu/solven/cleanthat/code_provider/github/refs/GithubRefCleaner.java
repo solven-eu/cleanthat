@@ -132,23 +132,25 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		// We may open a branch later if it appears this branch is relevant
 		// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
 		// In case of concurrent events, we may end opening multiple PR to clean the same branch
-		LOGGER.info("ref={} is not cleanable in-place, but cleanable in-rr. Commits would be pushed into {}",
+		LOGGER.info(
+				"ref={} is not cleanable in-place, but cleanable in-rr. Commits would be pushed into {} (cleanableRegex={})",
 				headRef,
-				cleanableRefsRegexes,
-				newBranchRef);
+				newBranchRef,
+				cleanableRefsRegexes);
 
-		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoName(), newBranchRef, head.getSha());
 		// See GithubEventHelper.doOpenPr(WebhookRelevancyResult, GithubRepositoryFacade, GitRepoBranchSha1)
 		Optional<GitRepoBranchSha1> optBaseRef = result.optBaseRef();
 		if (optBaseRef.isEmpty()) {
 			// This may happen on the event of branch creation, when the branch is cleanable
 			throw new IllegalStateException("No baseRef? headRef=" + headRef);
 		}
+
 		GitRepoBranchSha1 base = optBaseRef.get();
 		// We keep the base sha1, as it will be used for diff computations (i.e. listing the concerned files)
 		// We use as refName the pushedRef/rrHead as it is to this ref that a RR has to be open
 		GitRepoBranchSha1 actualBase = new GitRepoBranchSha1(base.getRepoName(), head.getRef(), base.getSha());
 
+		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoName(), newBranchRef, head.getSha());
 		return Optional.of(new HeadAndOptionalBase(actualHead, Optional.of(actualBase)));
 	}
 
@@ -173,6 +175,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return optBaseMatchingRule.isPresent();
 	}
 
+	// https://github.com/pmd/pmd/issues?q=is%3Aissue+is%3Aopen+InvalidLogMessageFormat
+	@SuppressWarnings("PMD.InvalidLogMessageFormat")
 	private void logWhyCanCleanInPlace(Set<String> eventBaseRefs,
 			List<String> refToCleanRegexes,
 			IExternalWebhookRelevancyResult result,

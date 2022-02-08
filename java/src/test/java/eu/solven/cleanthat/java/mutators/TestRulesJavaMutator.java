@@ -9,11 +9,10 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
@@ -27,8 +26,6 @@ import eu.solven.cleanthat.language.java.rules.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.language.java.rules.test.ATestCases;
 
 public class TestRulesJavaMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestRulesJavaMutator.class);
-
 	final LanguageProperties languageProperties = new LanguageProperties();
 	final JavaRulesMutatorProperties properties = new JavaRulesMutatorProperties();
 
@@ -124,10 +121,12 @@ public class TestRulesJavaMutator {
 		rulesJavaMutator.registerCodeStyleFixer(styleEnforcer);
 
 		CompilationUnit compilationUnit = javaParser.parse(dirtyCode).getResult().get();
+		LexicalPreservingPrinter.setup(compilationUnit);
 		String rawJavaparserCode = rulesJavaMutator.toString(compilationUnit);
 
 		// Check this is a piece of code which is dirtied by Javaparser
-		Assertions.assertThat(rawJavaparserCode).isNotEqualTo(dirtyCode);
+		// 2022-01: We rely on LexicalPreservingPrinter for prettyPrinting
+		Assertions.assertThat(rawJavaparserCode).isEqualTo(dirtyCode);
 
 		String cleanJavaparserCode = rulesJavaMutator.fixJavaparserUnexpectedChanges(dirtyCode, rawJavaparserCode);
 		Assertions.assertThat(cleanJavaparserCode).isEqualTo(dirtyCode);

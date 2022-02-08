@@ -34,6 +34,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -147,7 +148,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 
 		JavaParser parser = makeDefaultJavaParser();
 
-		transformers.forEach(ct -> {
+		transformers.stream().filter(ct -> {
 			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
 			int codeVersion = IJdkVersionConstants.ORDERED.indexOf(languageProperties.getLanguageVersion());
 
@@ -156,13 +157,15 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 						ct,
 						ct.minimalJavaVersion(),
 						languageProperties.getLanguageVersion());
-				return;
+				return false;
 			}
 
 			if (!ct.minimalJavaVersion().equals(languageProperties.getLanguageVersion())) {
 				LOGGER.debug("TODO Implement a rule to skip incompatible rules");
 			}
 
+			return true;
+		}).forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
 
 			// Fill cache
@@ -170,7 +173,12 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 				try {
 					String sourceCode = refCleanCode.get();
 					ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
-					optCompilationUnit.set(parsed.getResult().get());
+					CompilationUnit compilationUnit = parsed.getResult().get();
+
+					// https://github.com/javaparser/javaparser/issues/3490
+					// We register given node for later prettyPrinting
+					LexicalPreservingPrinter.setup(compilationUnit);
+					optCompilationUnit.set(compilationUnit);
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
 				}
@@ -181,7 +189,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
 				// We rely on javaParser source-code only if the rule has actually impacted the AST
-				LOGGER.info("It is a hit");
+				LOGGER.debug("A rule based on JavaParser actually modified the code");
 
 				// One relevant change: building source-code from the AST
 				refCleanCode.set(toString(compilationUnit));
@@ -284,7 +292,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 	}
 
 	protected String toString(CompilationUnit compilationUnit) {
-		return compilationUnit.toString();
+		return LexicalPreservingPrinter.print(compilationUnit);
 	}
 
 	public static JavaParser makeDefaultJavaParser() {

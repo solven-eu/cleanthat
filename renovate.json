@@ -8,5 +8,35 @@
   }, {
     "matchDepTypes" : [ "devDependencies" ],
     "automerge" : true
-  } ]
+  },
+    {
+      "matchPackagePatterns": ["eslint"],
+      "groupName": "eslint"
+    },
+    {
+      "matchPackagePatterns": ["spring"],
+      "groupName": "spring"
+    },
+    {
+      "matchPackagePatterns": ["com.microsoft"],
+      "groupName": "microsoft"
+    },
+    {
+      "matchPackagePatterns": ["com.google"],
+      "groupName": "google"
+    },
+    {
+      "matchPackagePatterns": ["com.github.spotbugs"],
+      "groupName": "spotbugs"
+    },
+    {
+      "matchPackagePatterns": ["org.apache.maven"],
+      "groupName": "mvn"
+    },
+    {
+      "matchPackagePatterns": ["org.eclipse.jdt"],
+      "groupName": "eclipse"
+    }
+    
+     ]
 }

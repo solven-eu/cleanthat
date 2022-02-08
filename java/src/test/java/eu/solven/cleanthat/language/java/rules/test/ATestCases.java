@@ -15,8 +15,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
+import eu.solven.cleanthat.language.java.rules.NoOpJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareTypes;
 import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
@@ -86,12 +88,24 @@ public class ATestCases {
 			// Check the transformer is impact-less on already clean code
 			// This is a less relevant test: to be done later
 			{
+				LexicalPreservingPrinter.setup(post);
+
 				// https://github.com/javaparser/javaparser/issues/3322
 				// We prefer not-processing clones as it may lead to dirty issues
 				MethodDeclaration clonedPost = post.clone();
-				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost,
-						transformer.walkNode(post));
+				boolean walked = transformer.walkNode(post);
+				if (transformer instanceof NoOpJavaParserRule) {
+					Assert.assertTrue("NoOpJavaParserRule always wals", walked);
+				} else {
+					Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost,
+							walked);
+				}
 				Assert.assertEquals(clonedPost, post);
+				Assert.assertEquals(clonedPost.toString(), post.toString());
+
+				// https://github.com/javaparser/javaparser/issues/1913
+				Assert.assertEquals(LexicalPreservingPrinter.print(clonedPost).toString(),
+						LexicalPreservingPrinter.print(post).toString());
 			}
 		});
 	}

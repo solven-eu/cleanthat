@@ -13,14 +13,4 @@ package eu.solven.cleanthat.java.mutators;
  */
 public class JavaparserDirtyMe {
 
-	// JavaParser will remove the EOL between these lines
-	public String someMethodWithEol() {
-		String string = "a";
-		string += "b";
-
-		string += "c";
-		string += "d";
-
-		return string;
-	}
 }

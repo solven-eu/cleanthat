@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -20,6 +19,7 @@ import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.groovy.jackson.EclipseGroovyFormatter;
 import eu.solven.cleanthat.language.groovy.jackson.EclipseGroovyFormatterProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Groovy

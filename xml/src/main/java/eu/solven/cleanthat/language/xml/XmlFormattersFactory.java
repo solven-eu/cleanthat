@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -24,6 +23,7 @@ import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatter;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Json

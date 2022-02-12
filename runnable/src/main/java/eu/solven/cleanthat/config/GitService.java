@@ -12,7 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps providing information about Git through a REST api. It implements {@link BeanFactoryPostProcessor} to ensure

@@ -47,7 +47,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -62,6 +61,7 @@ import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
 import eu.solven.cleanthat.language.java.eclipse.generator.EclipseStylesheetGenerator;
 import eu.solven.cleanthat.language.java.eclipse.generator.IEclipseStylesheetGenerator;
 import eu.solven.cleanthat.utils.ResultOrError;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.

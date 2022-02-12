@@ -28,10 +28,10 @@ import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Bridges to Eclipse formatting engine

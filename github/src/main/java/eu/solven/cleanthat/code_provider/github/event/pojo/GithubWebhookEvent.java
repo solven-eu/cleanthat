@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.google.common.base.Strings;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * a POJO holding details about Github webhooks

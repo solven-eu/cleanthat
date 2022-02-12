@@ -15,7 +15,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -31,6 +30,7 @@ import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleaner;
 import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Java

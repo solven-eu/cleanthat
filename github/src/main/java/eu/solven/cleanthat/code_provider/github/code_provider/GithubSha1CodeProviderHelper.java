@@ -18,11 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Helper for Github sha1

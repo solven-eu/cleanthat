@@ -12,10 +12,10 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Prevent relying .equals on {@link Enum} types

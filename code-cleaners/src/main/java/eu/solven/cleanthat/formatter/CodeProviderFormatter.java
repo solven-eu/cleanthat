@@ -24,7 +24,6 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-import cormoran.pepper.thread.PepperExecutorsHelper;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -39,6 +38,7 @@ import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
+import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Unclear what is the point of this class

@@ -323,9 +323,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		GHRepository repo = defaultBranch.getOwner();
 
 		String branchName = defaultBranch.getName();
-		ICodeProvider codeProvider = getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(),
-				CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName,
-				defaultBranch.getSHA1()));
+		String baseRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName;
+		ICodeProvider codeProvider =
+				getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(), baseRef, defaultBranch.getSHA1()));
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isPresent()) {
 			LOGGER.info("There is a configuration (valid or not) in the default branch ({})", branchName);
@@ -334,53 +334,47 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			LOGGER.info("There is no configuration in the default branch ({})", branchName);
 		}
 
-		String refName = REF_NAME_CONFIGURE;
-		String fullRefName = GithubFacade.toFullGitRef(refName);
-		boolean refAlreadyExists;
-		Optional<GHRef> refToPR;
+		String headRef = REF_NAME_CONFIGURE;
+		// String fullRefName = GithubFacade.toFullGitRef(refName);
+		Optional<GHRef> optRefToPR;
 		try {
 			try {
-				refToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(fullRefName));
-				LOGGER.info("There is already a ref: " + fullRefName);
-				refAlreadyExists = true;
+				optRefToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(headRef));
+				LOGGER.info("There is already a ref: " + headRef);
 			} catch (GHFileNotFoundException e) {
-				LOGGER.trace("There is not yet a ref: " + fullRefName, e);
-				LOGGER.info("There is not yet a ref: " + fullRefName);
-				refAlreadyExists = false;
-				refToPR = Optional.empty();
+				LOGGER.trace("There is not yet a ref: " + headRef, e);
+				LOGGER.info("There is not yet a ref: " + headRef);
+				optRefToPR = Optional.empty();
 			}
 		} catch (IOException e) {
 			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
 			throw new UncheckedIOException(e);
 		}
 		try {
-			if (refAlreadyExists) {
+			if (optRefToPR.isPresent()) {
+				GHRef refToPr = optRefToPR.get();
 				LOGGER.info(
 						"There is already a ref about to introduce a cleanthat default configuration. Do not open a new PR (url={})",
-						refToPR.get().getUrl().toExternalForm());
+						refToPr.getUrl().toExternalForm());
 				repo.listPullRequests(GHIssueState.ALL).forEach(pr -> {
-					if (refName.equals(pr.getHead().getRef())) {
+					if (headRef.equals(pr.getHead().getRef())) {
 						LOGGER.info("Related PR: {}", pr.getHtmlUrl());
 					}
 				});
 				return false;
 			} else {
 				GHCommit commit = commitConfig(defaultBranch, repo);
-				refToPR = Optional.of(repo.createRef(fullRefName, commit.getSHA1()));
+				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());
 				boolean force = false;
-				refToPR.get().updateTo(commit.getSHA1(), force);
+				refToPr.updateTo(commit.getSHA1(), force);
 				// Let's follow Renovate and its configuration PR
 				// https://github.com/solven-eu/agilea/pull/1
 				String body = readResource("/templates/onboarding-body.md");
 				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
 				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
-				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
-						refToPR.get().getRef(),
-						branchName,
-						body,
-						true,
-						false);
+				GHPullRequest pr =
+						repo.createPullRequest("Configure CleanThat", refToPr.getRef(), baseRef, body, true, false);
 				LOGGER.info("Open PR: {}", pr.getHtmlUrl());
 				return true;
 			}

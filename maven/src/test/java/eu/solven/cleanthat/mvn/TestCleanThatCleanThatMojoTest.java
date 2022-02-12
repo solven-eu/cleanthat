@@ -7,8 +7,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 
-import cormoran.pepper.unittest.ILogDisabler;
-import cormoran.pepper.unittest.PepperTestHelper;
+import eu.solven.pepper.unittest.ILogDisabler;
+import eu.solven.pepper.unittest.PepperTestHelper;
 
 public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 	@Test

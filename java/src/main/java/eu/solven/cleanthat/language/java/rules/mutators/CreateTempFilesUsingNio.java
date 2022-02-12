@@ -16,10 +16,10 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * cases inspired from #description

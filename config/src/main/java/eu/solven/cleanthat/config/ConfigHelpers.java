@@ -20,7 +20,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.google.common.collect.Iterables;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
@@ -28,6 +27,7 @@ import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps working with configuration files

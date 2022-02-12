@@ -131,7 +131,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.cormoran-io.pepper</groupId>
+			<groupId>io.github.solven-eu.pepper</groupId>
 			<artifactId>pepper-unittest</artifactId>
 			<version>${pepper.version}</version>
 			<scope>test</scope>

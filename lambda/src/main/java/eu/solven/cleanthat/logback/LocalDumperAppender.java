@@ -12,7 +12,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
-import cormoran.pepper.memory.IPepperMemoryConstants;
+import eu.solven.pepper.memory.IPepperMemoryConstants;
 
 /**
  * This LogBack {@link Appender} shall help enabling a log to be produced for each run.

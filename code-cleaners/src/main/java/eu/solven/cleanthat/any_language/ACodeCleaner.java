@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -26,6 +25,7 @@ import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Asbtract for {@link ICodeCleaner}

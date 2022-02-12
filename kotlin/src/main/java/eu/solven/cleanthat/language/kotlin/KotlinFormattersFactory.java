@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -22,6 +21,7 @@ import eu.solven.cleanthat.language.kotlin.ktfmt.KtfmtProperties;
 import eu.solven.cleanthat.language.kotlin.ktfmt.KtfmtStyleEnforcer;
 import eu.solven.cleanthat.language.kotlin.ktlint.KtlintFormatter;
 import eu.solven.cleanthat.language.kotlin.ktlint.KtlintProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Kotlin

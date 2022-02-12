@@ -15,10 +15,10 @@ import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IRuleDescriber;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Switch o.equals("someString") to "someString".equals(o)

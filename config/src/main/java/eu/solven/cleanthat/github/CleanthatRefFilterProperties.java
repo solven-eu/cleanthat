@@ -24,17 +24,8 @@ import lombok.Setter;
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Data
-public final class CleanthatRefFilterProperties {
+public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanthatRefFilterProperties.class);
-
-	// https://git-scm.com/book/en/v2/Git-Internals-Git-References
-	// In a local Git repository, refs are available at 'refs/heads/XXX'
-	public static final String REFS_PREFIX = "refs/";
-	public static final String BRANCHES_PREFIX = REFS_PREFIX + "heads/";
-
-	// https://stackoverflow.com/questions/1526471/git-difference-between-branchname-and-refs-heads-branchname
-	static final String REF_REMOTES = REFS_PREFIX + "remotes/";
-	static final String REF_TAGS = REFS_PREFIX + "tags/";
 
 	// By default, we clean a set of standard default branch names
 	// https://docs.github.com/en/github/administering-a-repository/managing-branches-in-your-repository/changing-the-default-branch

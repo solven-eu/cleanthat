@@ -56,7 +56,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/cormoran-io/pepper/releases -->
-		<pepper.version>2.1</pepper.version>
+		<pepper.version>3.0</pepper.version>
 
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
@@ -423,7 +423,7 @@
 					<version>${formatter-maven-plugin.version}</version>
 					<dependencies>
 						<dependency>
-							<groupId>com.github.cormoran-io.pepper</groupId>
+							<groupId>io.github.solven-eu.pepper</groupId>
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -499,7 +499,7 @@
 					<dependencies>
 						<dependency>
 							<!-- This dependency holds the default configuration -->
-							<groupId>com.github.cormoran-io.pepper</groupId>
+							<groupId>io.github.solven-eu.pepper</groupId>
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -530,7 +530,7 @@
 					<dependencies>
 						<dependency>
 							<!-- This dependency holds the default configuration -->
-							<groupId>com.github.cormoran-io.pepper</groupId>
+							<groupId>io.github.solven-eu.pepper</groupId>
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -578,7 +578,7 @@
 					<version>${maven-pmd-plugin.version}</version>
 					<dependencies>
 						<dependency>
-							<groupId>com.github.cormoran-io.pepper</groupId>
+							<groupId>io.github.solven-eu.pepper</groupId>
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>

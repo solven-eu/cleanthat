@@ -15,10 +15,10 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.

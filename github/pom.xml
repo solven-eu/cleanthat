@@ -17,7 +17,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.cormoran-io.pepper</groupId>
+			<groupId>io.github.solven-eu.pepper</groupId>
 			<artifactId>pepper</artifactId>
 			<version>${pepper.version}</version>
 		</dependency>

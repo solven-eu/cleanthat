@@ -14,13 +14,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ISkippable;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository

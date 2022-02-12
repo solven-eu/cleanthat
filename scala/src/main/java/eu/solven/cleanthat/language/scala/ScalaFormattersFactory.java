@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import cormoran.pepper.collection.PepperMapHelper;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -22,6 +21,7 @@ import eu.solven.cleanthat.language.scala.scalafix.ScalafixFormatter;
 import eu.solven.cleanthat.language.scala.scalafix.ScalafixProperties;
 import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtProperties;
 import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtStyleEnforcer;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Scala

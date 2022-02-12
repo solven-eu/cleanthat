@@ -35,10 +35,10 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Default implementation for {@link IEclipseStylesheetGenerator}

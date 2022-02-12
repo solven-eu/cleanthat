@@ -29,11 +29,11 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.CharMatcher;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.formatter.ICommonConventions;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Formatter for XML

@@ -11,10 +11,10 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import cormoran.pepper.logging.PepperLogHelper;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'

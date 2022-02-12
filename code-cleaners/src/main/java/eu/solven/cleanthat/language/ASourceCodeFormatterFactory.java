@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cormoran.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Abstract class for language formatters

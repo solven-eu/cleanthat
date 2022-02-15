@@ -41,7 +41,6 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 	// TODO Inspire from https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
 	@Override
 	protected void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
-		getLog().info("Hello, world.");
 		checkParameters();
 
 		getLog().info("Path: " + getConfigPath());

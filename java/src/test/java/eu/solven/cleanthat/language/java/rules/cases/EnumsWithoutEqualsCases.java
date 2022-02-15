@@ -2,7 +2,7 @@ package eu.solven.cleanthat.language.java.rules.cases;
 
 import java.math.RoundingMode;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

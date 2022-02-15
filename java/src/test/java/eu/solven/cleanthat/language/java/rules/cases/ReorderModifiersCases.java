@@ -2,8 +2,8 @@ package eu.solven.cleanthat.language.java.rules.cases;
 
 import java.util.Collection;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareTypes;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareTypes;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.ModifierOrder;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

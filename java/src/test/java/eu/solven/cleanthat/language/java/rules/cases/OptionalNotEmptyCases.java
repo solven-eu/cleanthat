@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

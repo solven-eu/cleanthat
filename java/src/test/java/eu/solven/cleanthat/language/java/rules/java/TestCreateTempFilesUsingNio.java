@@ -1,7 +1,6 @@
 package eu.solven.cleanthat.language.java.rules.java;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,24 +19,25 @@ import eu.solven.cleanthat.language.java.rules.cases.CreateTempFilesUsingNioCase
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.language.java.rules.test.ATestCases;
+import eu.solven.cleanthat.language.java.rules.test.LocalClassTestHelper;
 
 public class TestCreateTempFilesUsingNio extends ATestCases {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNio.class);
+
+	final CreateTempFilesUsingNio transformer = new CreateTempFilesUsingNio();
 
 	@Test
 	public void testCases() throws IOException {
-		testCasesIn(CreateTempFilesUsingNioCases.class, new CreateTempFilesUsingNio());
+		testCasesIn(CreateTempFilesUsingNioCases.class, transformer);
 	}
 
 	@Test
 	public void testImportNioFiles() throws IOException {
-		Path srcMainJava = getProjectTestSourceCode();
-		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
-		String path = CreateTempFilesUsingNioCases.class.getName().replaceAll("\\.", "/") + ".java";
-
-		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser();
-		CompilationUnit compilationUnit = javaParser.parse(srcMainJava.resolve(path)).getResult().get();
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser(transformer.isJreOnly());
+		CompilationUnit compilationUnit =
+				javaParser.parse(LocalClassTestHelper.localClassAsPath(CreateTempFilesUsingNioCases.class))
+						.getResult()
+						.get();
 
 		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();

@@ -1,7 +1,7 @@
 package eu.solven.cleanthat.language.java.rules.cases;
 
 import eu.solven.cleanthat.language.java.rules.NoOpJavaParserRule;
-import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
+import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.test.ACases;
 

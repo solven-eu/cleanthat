@@ -43,6 +43,13 @@ public interface IClassTransformer {
 	}
 
 	/**
+	 * @return true if this rule process only jre standard classes
+	 */
+	default boolean isJreOnly() {
+		return true;
+	}
+
+	/**
 	 * 
 	 * @return the minimal JDK for which this rule is applicable. For instance, any rule related with diamond operator
 	 *         requires JDK1.5

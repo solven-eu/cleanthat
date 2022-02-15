@@ -663,7 +663,7 @@
 					<artifactId>cleanthat-maven-plugin</artifactId>
 					<!-- ${project.version} would lead to cyclic reference -->
 					<!-- <version>${project.version}</version> -->
-					<version>1.1</version>
+					<version>1.2</version>
 					<executions>
 						<execution>
 							<id>Clean the code</id>
@@ -733,13 +733,13 @@
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 
-<!-- 			<plugin> -->
-<!-- 				<groupId>io.github.solven-eu.cleanthat</groupId> -->
-<!-- 				<artifactId>cleanthat-maven-plugin</artifactId> -->
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
 				<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
 				<!-- Make sure CleanThat is executed only once from the root folder -->
 				<!-- <inherited>false</inherited> -->
-<!-- 			</plugin> -->
+			</plugin>
 		</plugins>
 	</build>
 

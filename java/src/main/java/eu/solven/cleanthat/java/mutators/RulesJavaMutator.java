@@ -146,7 +146,9 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 		// Ensure we compute the compilation-unit only once per String
 		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
 
-		JavaParser parser = makeDefaultJavaParser();
+		// TODO Adjust this flag depending on filtered rules
+		boolean isJreOnly = false;
+		JavaParser parser = makeDefaultJavaParser(isJreOnly);
 
 		transformers.stream().filter(ct -> {
 			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
@@ -295,8 +297,10 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 		return LexicalPreservingPrinter.print(compilationUnit);
 	}
 
-	public static JavaParser makeDefaultJavaParser() {
-		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver()));
+	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
+		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+
+		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(new CombinedTypeSolver(reflectionTypeSolver));
 		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		JavaParser parser = new JavaParser(configuration);
 		return parser;

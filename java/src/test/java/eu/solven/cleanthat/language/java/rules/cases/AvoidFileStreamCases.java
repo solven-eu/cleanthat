@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.AvoidFileStream;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

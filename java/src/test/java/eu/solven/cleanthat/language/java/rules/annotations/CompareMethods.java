@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.rules.cases.annotations;
+package eu.solven.cleanthat.language.java.rules.annotations;
 
 /**
  * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method. They can take and

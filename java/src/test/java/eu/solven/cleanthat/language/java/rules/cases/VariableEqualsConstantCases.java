@@ -7,8 +7,8 @@ import org.junit.Ignore;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.VariableEqualsConstant;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

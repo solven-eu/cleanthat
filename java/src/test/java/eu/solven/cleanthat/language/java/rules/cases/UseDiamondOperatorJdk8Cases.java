@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

@@ -27,7 +27,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParse
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
+import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 
 /**
  * This is useful to investigate a misbehavior over current project file

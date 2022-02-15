@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
-import eu.solven.cleanthat.language.java.rules.cases.annotations.UnchangedMethod;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

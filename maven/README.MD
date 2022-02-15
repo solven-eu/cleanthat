@@ -19,6 +19,44 @@ One can shorten its cleanthat commands by adding in ${user.home}/.m2/settings.xm
 
 reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 
+## Configure within a pom.xml
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>${cleanthat.version}</version>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- CleanThat should be executed only in the top-directory -->
+				<inherited>false</inherited>
+			</plugin>
+		</plugins>
+	</build>
+
+
 # Goals
 
 ## cleanthat:init

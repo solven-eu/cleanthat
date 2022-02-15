@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import eu.solven.cleanthat.language.java.rules.cases.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

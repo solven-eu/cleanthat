@@ -1,8 +1,6 @@
 package eu.solven.cleanthat.java.mutators;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +21,7 @@ import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfigurati
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.language.java.rules.mutators.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.language.java.rules.test.ATestCases;
+import eu.solven.cleanthat.language.java.rules.test.LocalClassTestHelper;
 
 public class TestRulesJavaMutator {
 	final LanguageProperties languageProperties = new LanguageProperties();
@@ -98,14 +96,8 @@ public class TestRulesJavaMutator {
 
 	@Test
 	public void testCleanJavaparserUnexpectedChanges() throws IOException {
-		Path srcMainJava = ATestCases.getProjectTestSourceCode();
-		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
-		String path = JavaparserDirtyMe.class.getName().replaceAll("\\.", "/") + ".java";
-
-		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser();
-		Path pathToDirty = srcMainJava.resolve(path);
-
-		String dirtyCode = Files.readString(pathToDirty);
+		Class<JavaparserDirtyMe> classToLoad = JavaparserDirtyMe.class;
+		String dirtyCode = LocalClassTestHelper.loadClassAsString(classToLoad);
 
 		RulesJavaMutator rulesJavaMutator = new RulesJavaMutator(languageProperties, properties);
 
@@ -120,6 +112,7 @@ public class TestRulesJavaMutator {
 		IStyleEnforcer styleEnforcer = new EclipseJavaFormatter(new EclipseJavaFormatterConfiguration(options));
 		rulesJavaMutator.registerCodeStyleFixer(styleEnforcer);
 
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser(true);
 		CompilationUnit compilationUnit = javaParser.parse(dirtyCode).getResult().get();
 		LexicalPreservingPrinter.setup(compilationUnit);
 		String rawJavaparserCode = rulesJavaMutator.toString(compilationUnit);
@@ -131,4 +124,5 @@ public class TestRulesJavaMutator {
 		String cleanJavaparserCode = rulesJavaMutator.fixJavaparserUnexpectedChanges(dirtyCode, rawJavaparserCode);
 		Assertions.assertThat(cleanJavaparserCode).isEqualTo(dirtyCode);
 	}
+
 }

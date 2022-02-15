@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.rules.cases.annotations;
+package eu.solven.cleanthat.language.java.rules.annotations;
 
 /**
  * Enable checking the 'post' method is not impacted by the rule.

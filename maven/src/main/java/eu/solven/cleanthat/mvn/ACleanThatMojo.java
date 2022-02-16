@@ -104,7 +104,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		// In a multi-module, we want to process the folder containing the targetted pom.xml
 		// It may not be the root pom.xml, if one targetted specifically a child module
 		File baseDir = getProject().getBasedir();
-		
+
 		if (baseDir == null) {
 			// We are processing a folder with no pom.xml
 			baseDir = new File(getSession().getExecutionRootDirectory());

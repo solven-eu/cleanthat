@@ -23,6 +23,11 @@ import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+// Should the default phase be VALIDATE (i.e. the very first) or VERIFY (i.e. the very last)?
+// Checkstyle is VERIFY: https://maven.apache.org/plugins/maven-checkstyle-plugin/check-mojo.html
+// PMD is VERIFY: https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
+// SpotBugs is VERIFY: https://spotbugs.github.io/spotbugs-maven-plugin/check-mojo.html
+// Revelc is VALIDATE: https://code.revelc.net/formatter-maven-plugin/validate-mojo.html
 @Mojo(name = CleanThatCheckMojo.MOJO_CHECK, defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
 public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 	public static final String MOJO_CHECK = "check";

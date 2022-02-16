@@ -183,7 +183,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			String headRef) {
 		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
 
-		if (!optBaseMatchingRule.isPresent()) {
+		if (optBaseMatchingRule.isEmpty()) {
 			throw new IllegalStateException("Should be called only if .canCleanInPlace() returns true");
 		}
 

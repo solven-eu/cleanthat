@@ -9,8 +9,6 @@ source_code:
   excludes:
   - "regex:.*/generated/.*"
   - "regex:.*/do_not_format_me/.*"
-  includes:
-  - "regex:.*\\.java"
   encoding: "UTF-8"
   line_ending: "LF"
 languages:

@@ -118,7 +118,7 @@ public class JUnit4ToJUnit5 extends AJavaParserRule implements IClassTransformer
 
 	private Optional<String> computeNewName(String importName) {
 		Optional<String> optMigratedName;
-		if (importName.equals("org.junit")) {
+		if ("org.junit".equals(importName)) {
 			// 'org.junit.*' -> 'org.junit.jupiter.api.*'
 			optMigratedName = Optional.of("org.junit.jupiter.api");
 		} else {

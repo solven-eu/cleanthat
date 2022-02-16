@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -435,6 +436,8 @@
 							<!-- Test classes -->
 							<exclude>**/do_not_format_me/**</exclude>
 						</excludes>
+						<!-- Skip to rely on CleanThat -->
+						<skip>true</skip>
 					</configuration>
 					<executions>
 						<execution>
@@ -471,6 +474,8 @@
 							<!-- Test classes -->
 							<exclude>**/do_not_format_me/**</exclude>
 						</excludes>
+						<!-- Skip to rely on CleanThat -->
+						<skip>true</skip>
 					</configuration>
 					<executions>
 						<execution>
@@ -666,25 +671,45 @@
 					<version>1.2</version>
 					<executions>
 						<execution>
-							<id>Clean the code</id>
+							<id>cleanthat</id>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
 							<goals>
 								<goal>cleanthat</goal>
 							</goals>
-							<phase>process-sources</phase>
 						</execution>
 						<execution>
-							<id>Check the code is clean</id>
+							<id>checkthat</id>
+							<!-- runs at validate phase by default -->
+							<phase>${staticChecks}</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
-							<phase>verify</phase>
+						</execution>
+						<execution>
+							<id>apply_code_format</id>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
+							<goals>
+								<!-- https://code.revelc.net/formatter-maven-plugin/format-mojo.html -->
+								<goal>format</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>validate_code_format</id>
+							<!-- runs at validate phase by default -->
+							<phase>${staticChecks}</phase>
+							<goals>
+								<!-- https://code.revelc.net/formatter-maven-plugin/validate-mojo.html -->
+								<goal>validate</goal>
+							</goals>
 						</execution>
 					</executions>
 
 					<configuration>
 						<!-- <configUrl>${project.basedir}/cleanthat.json</configUrl> -->
 						<!-- <configPath></configPath> -->
-						<skip>true</skip>
+						<skip>false</skip>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -738,7 +763,7 @@
 				<artifactId>cleanthat-maven-plugin</artifactId>
 				<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
 				<!-- Make sure CleanThat is executed only once from the root folder -->
-				<!-- <inherited>false</inherited> -->
+				<inherited>false</inherited>
 			</plugin>
 		</plugins>
 	</build>

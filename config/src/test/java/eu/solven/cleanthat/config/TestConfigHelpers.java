@@ -69,6 +69,7 @@ public class TestConfigHelpers {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCodeEol() {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
@@ -114,6 +115,53 @@ public class TestConfigHelpers {
 
 			Assert.assertEquals(LineEnding.UNKNOWN, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testMergeSourceCode_parentHasExcluded() {
+		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+
+		SourceCodeProperties defaultP = new SourceCodeProperties();
+		defaultP.setExcludes(Arrays.asList(".*/generated/.*"));
+
+		{
+			// EmptyChildren
+			SourceCodeProperties childrenP = new SourceCodeProperties();
+
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(childrenP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(Arrays.asList(".*/generated/.*"), merged.getExcludes());
+		}
+
+		{
+			// NotEmptyChildren
+			SourceCodeProperties childrenP = new SourceCodeProperties();
+			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
+
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(childrenP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(Arrays.asList(".*/generated/.*", ".*/do_not_clean_me/.*"), merged.getExcludes());
+		}
+
+		{
+			// NotEmptyChildren and cancel parent exclusion
+			SourceCodeProperties childrenP = new SourceCodeProperties();
+			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
+			childrenP.setIncludes(Arrays.asList(".*/generated/.*"));
+
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(childrenP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(Arrays.asList(".*/do_not_clean_me/.*"), merged.getExcludes());
+			Assert.assertEquals(Arrays.asList(".*/generated/.*"), merged.getIncludes());
 		}
 	}
 }

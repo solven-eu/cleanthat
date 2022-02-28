@@ -177,8 +177,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			}
 		}
 
-		LOGGER.info("Applying includes rules: {}", includes);
-		LOGGER.info("Applying excludes rules: {}", sourceCodeProperties.getExcludes());
+		LOGGER.info("language={} Applying includes rules: {}", language, includes);
+		LOGGER.info("language={} Applying excludes rules: {}", language, sourceCodeProperties.getExcludes());
 		return languageP;
 	}
 
@@ -268,6 +268,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		LOGGER.debug("Processing {}", filePath);
 		String output = doFormat(languageP, codeProvider, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
+			if (filePath.contains("/generated/")) {
+				LOGGER.error("TODO");
+			}
+			LOGGER.info("We have succesfully cleaned path={}", filePath);
 			pathToMutatedContent.put(filePath, output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES

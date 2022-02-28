@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,6 +149,32 @@ public class ConfigHelpers {
 					LOGGER.debug("Outer lineEnding is more explicit than the innerOne");
 					merged.put("line_ending", outerLineEnding);
 				}
+			}
+
+			{
+				List<?> outerIncludes = (List<?>) outer.get("includes");
+				List<?> innerIncludes = (List<?>) inner.get("includes");
+
+				List<?> outerExcludes = (List<?>) outer.get("excludes");
+				List<?> innerExcludes = (List<?>) inner.get("excludes");
+
+				Stream<?> outerIncludesWithoutInnerExclude =
+						outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
+
+				List<Object> mergedIncludes = Stream.concat(outerIncludesWithoutInnerExclude, innerIncludes.stream())
+						.distinct()
+						.collect(Collectors.toList());
+
+				merged.put("includes", mergedIncludes);
+
+				// An inner includes cancels outer excludes
+				Stream<?> outerExcludesWithoutInnerInclude =
+						outerExcludes.stream().filter(exclude -> !innerIncludes.contains(exclude));
+				List<Object> mergedExcludes = Stream.concat(outerExcludesWithoutInnerInclude, innerExcludes.stream())
+						.distinct()
+						.collect(Collectors.toList());
+
+				merged.put("excludes", mergedExcludes);
 			}
 		}
 

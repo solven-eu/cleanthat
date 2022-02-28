@@ -89,7 +89,7 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 			}
 		} else {
 			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
-			LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+			LOGGER.info("Turning '{}' into '{}'", unaryExpr, replacement);
 			if (unaryExpr.replace(replacement)) {
 				localTransformed = true;
 			}

@@ -41,13 +41,19 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 				}
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
-					// final formatting step clean all previous not relevant changes)
+					// final formatting step may clean all previous not relevant changes)
 					LOGGER.debug("Mutated a file given: {}", rawProcessor);
+					outputRef.set(output);
 				}
-				outputRef.set(output);
 			} catch (IOException | RuntimeException e) {
 				// Log and move to next processor
-				LOGGER.warn("Issue with " + rawProcessor, e);
+				LOGGER.warn(
+						"Issue over file='" + filepath
+								+ "' with processor="
+								+ rawProcessor
+								+ ". Please report it to: "
+								+ "https://github.com/solven-eu/cleanthat/issues",
+						e);
 			}
 		});
 		return outputRef.get();
@@ -60,6 +66,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 		Objects.requireNonNull(code, "code should not be null");
 		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCode();
 
+		// TODO We should skip excluded files BEFORE loading their content
 		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
 		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filepath);
 		if (matchingInclude.isEmpty()) {

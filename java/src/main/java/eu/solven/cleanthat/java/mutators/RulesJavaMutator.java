@@ -187,7 +187,13 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			}
 
 			CompilationUnit compilationUnit = optCompilationUnit.get();
-			if (ct.walkNode(compilationUnit)) {
+			boolean walkNodeResult;
+			try {
+				walkNodeResult = ct.walkNode(compilationUnit);
+			} catch (RuntimeException e) {
+				throw new IllegalArgumentException("Issue with classTransformer: " + ct, e);
+			}
+			if (walkNodeResult) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
 				// We rely on javaParser source-code only if the rule has actually impacted the AST

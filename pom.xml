@@ -686,30 +686,12 @@
 								<goal>check</goal>
 							</goals>
 						</execution>
-						<execution>
-							<id>apply_code_format</id>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
-							<goals>
-								<!-- https://code.revelc.net/formatter-maven-plugin/format-mojo.html -->
-								<goal>format</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>validate_code_format</id>
-							<!-- runs at validate phase by default -->
-							<phase>${staticChecks}</phase>
-							<goals>
-								<!-- https://code.revelc.net/formatter-maven-plugin/validate-mojo.html -->
-								<goal>validate</goal>
-							</goals>
-						</execution>
 					</executions>
 
 					<configuration>
 						<!-- <configUrl>${project.basedir}/cleanthat.json</configUrl> -->
 						<!-- <configPath></configPath> -->
-						<skip>false</skip>
+						<skip>true</skip>
 					</configuration>
 				</plugin>
 			</plugins>

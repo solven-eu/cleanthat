@@ -39,6 +39,9 @@ import eu.solven.pepper.collection.PepperMapHelper;
 public class ConfigHelpers {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigHelpers.class);
 
+	private static final String KEY_EXCLUDES = "excludes";
+	private static final String KEY_INCLUDES = "includes";
+
 	public static final String KEY_SOURCE_CODE = "source_code";
 
 	final Collection<ObjectMapper> objectMappers;
@@ -152,11 +155,11 @@ public class ConfigHelpers {
 			}
 
 			{
-				List<?> outerIncludes = (List<?>) outer.get("includes");
-				List<?> innerIncludes = (List<?>) inner.get("includes");
+				List<?> outerIncludes = (List<?>) outer.get(KEY_INCLUDES);
+				List<?> innerIncludes = (List<?>) inner.get(KEY_INCLUDES);
 
-				List<?> outerExcludes = (List<?>) outer.get("excludes");
-				List<?> innerExcludes = (List<?>) inner.get("excludes");
+				List<?> outerExcludes = (List<?>) outer.get(KEY_EXCLUDES);
+				List<?> innerExcludes = (List<?>) inner.get(KEY_EXCLUDES);
 
 				Stream<?> outerIncludesWithoutInnerExclude =
 						outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
@@ -165,7 +168,7 @@ public class ConfigHelpers {
 						.distinct()
 						.collect(Collectors.toList());
 
-				merged.put("includes", mergedIncludes);
+				merged.put(KEY_INCLUDES, mergedIncludes);
 
 				// An inner includes cancels outer excludes
 				Stream<?> outerExcludesWithoutInnerInclude =
@@ -174,7 +177,7 @@ public class ConfigHelpers {
 						.distinct()
 						.collect(Collectors.toList());
 
-				merged.put("excludes", mergedExcludes);
+				merged.put(KEY_EXCLUDES, mergedExcludes);
 			}
 		}
 
@@ -198,7 +201,7 @@ public class ConfigHelpers {
 	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
 		Map<String, Object> languageAsMap = objectMapper.convertValue(languageP, Map.class);
 		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCode(), Map.class);
-		sourceCodeAsMap.put("includes", includes);
+		sourceCodeAsMap.put(KEY_INCLUDES, includes);
 		languageAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
 		return objectMapper.convertValue(languageAsMap, LanguageProperties.class);
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 
@@ -90,5 +92,18 @@ public class TestGithubWebhookHandler {
 		Map<String, ?> input =
 				objectMapper.readValue(new ClassPathResource("/github/webhook.push.json").getInputStream(), Map.class);
 		handler.filterWebhookEventRelevant(new GithubWebhookEvent(input));
+	}
+
+	@Test
+	public void testParseEvent_openPr() throws JsonParseException, JsonMappingException, IOException {
+		Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
+				.readValue(new ClassPathResource("/github/webhook/pr_open-open_event.json").getInputStream(),
+						Map.class);
+		GitWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(body));
+
+		Assertions.assertThat(result.isReviewRequestOpen()).isTrue();
+		Assertions.assertThat(result.isPushBranch()).isFalse();
+
+		Assertions.assertThat(result.optBaseRef().get().getRef()).isEqualTo("refs/heads/master");
 	}
 }

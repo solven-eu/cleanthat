@@ -51,6 +51,13 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 
 		GHTreeBuilder createTree = repo.createTree();
 		pathToMutatedContent.forEach((path, content) -> {
+			if (!path.startsWith("/")) {
+				throw new IllegalStateException("We expect to receive only rooted path: " + path);
+			}
+
+			// Remove the leading '/'
+			path = path.substring("/".length());
+
 			// TODO isExecutable isn't a parameter from the original file?
 			createTree.add(path, content, false);
 		});

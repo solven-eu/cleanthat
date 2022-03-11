@@ -53,6 +53,7 @@ import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
@@ -170,7 +171,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 			String githubAction = optAction.get();
 			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
-				String headRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
+				String simpleHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
+				String headRef = IGitRefsConstants.BRANCHES_PREFIX + simpleHeadRef;
+
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
 					// Do not process CleanThat own PR open events
 					LOGGER.info("We discard as headRef is: {}", headRef);
@@ -185,7 +188,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				// refHasOpenReviewRequest = true;
 				String baseRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
-				String baseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
+				String simpleBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
+				String baseRef = IGitRefsConstants.BRANCHES_PREFIX + simpleBaseRef;
+
 				long prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
 				String headRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");

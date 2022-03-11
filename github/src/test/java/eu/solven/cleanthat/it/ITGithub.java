@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
@@ -26,16 +28,21 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.github.IGitRefsConstants;
 
 //https://github-api.kohsuke.org/githubappjwtauth.html
-public class ITGithubWebhookHandlerFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITGithubWebhookHandlerFactory.class);
+public class ITGithub {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ITGithub.class);
 
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
 	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
+	private static final String SOLVEN_EU_CLEANTHAT_ITS = "solven-eu/cleanthat-integrationtests";
+
 	private static final String SOLVEN_EU_AGILEA = "solven-eu/agilea";
 	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
 
@@ -72,8 +79,8 @@ public class ITGithubWebhookHandlerFactory {
 		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9086720);
 
 		// Own repo
-		Assertions.assertThat(new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT)
-				.findFirstPrBaseMatchingRef("refs/heads/master")).isPresent();
+		GithubFacade ownRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT);
+		Assertions.assertThat(ownRepo.findFirstPrBaseMatchingRef("refs/heads/master")).isPresent();
 
 		// Private repo in same organisation
 		Assertions.assertThat(new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_MITRUST_DATASHARING)
@@ -81,17 +88,6 @@ public class ITGithubWebhookHandlerFactory {
 
 		{
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
-					.readValue(new ClassPathResource("/github/webhook/pr_open-open_event.json").getInputStream(),
-							Map.class);
-			GitWebhookRelevancyResult result =
-					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
-							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
-
-			Assertions.assertThat(result.isReviewRequestOpen()).isTrue();
-			Assertions.assertThat(result.isPushBranch()).isFalse();
-		}
-		{
-			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-push_event-1.json").getInputStream(),
 							Map.class);
 			GitWebhookRelevancyResult result =
@@ -111,6 +107,26 @@ public class ITGithubWebhookHandlerFactory {
 
 			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
 			Assertions.assertThat(result.isPushBranch()).isTrue();
+		}
+		{
+			GithubFacade itsRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT_ITS);
+			GithubRefWriterLogic writer = new GithubRefWriterLogic(itsRepo.getRepository(),
+					itsRepo.getRef(IGitRefsConstants.BRANCHES_PREFIX + "master"));
+
+			GithubBranchCodeProvider codeProvider = new GithubBranchCodeProvider(gitHubInstallation.getToken(),
+					itsRepo.getRepository(),
+					itsRepo.getRepository().getBranch("master"));
+
+			Map<String, String> changes = new LinkedHashMap<>();
+
+			// We write now in any now files
+			codeProvider.listFiles(file -> {
+				if (file.getPath().endsWith("now")) {
+					changes.put(file.getPath(), OffsetDateTime.now().toString());
+				}
+			});
+
+			writer.persistChanges(changes, Arrays.asList("someComment"), Arrays.asList("someLabel"));
 		}
 	}
 }

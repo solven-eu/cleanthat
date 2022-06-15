@@ -215,8 +215,7 @@
 
 						<!-- Skip style for faster process -->
 						<!-- We need javadoc to deploy to Sonatype -->
-						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle
-							-Dmaven.javadoc.skip=false</arguments>
+						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle -Dmaven.javadoc.skip=false</arguments>
 
 						<useReleaseProfile>false</useReleaseProfile>
 

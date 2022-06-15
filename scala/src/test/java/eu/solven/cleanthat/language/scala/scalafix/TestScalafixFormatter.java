@@ -27,7 +27,7 @@ public class TestScalafixFormatter {
 				StandardCharsets.UTF_8);
 
 		{
-			Assertions.assertThat(before.split("[\r\n]"))
+			Assertions.assertThat(before.split("[\r\n]+"))
 					.hasSize(5)
 					.containsExactly("// https://scalacenter.github.io/scalafix/docs/rules/ProcedureSyntax.html",
 							"object Hello {",
@@ -40,7 +40,7 @@ public class TestScalafixFormatter {
 
 		{
 			Assertions.assertThat(after).isNotEqualTo(before).hasLineCount(5);
-			Assertions.assertThat(after.split("[\r\n]"))
+			Assertions.assertThat(after.split("[\r\n]+"))
 					.hasSize(5)
 					.containsExactly("// https://scalacenter.github.io/scalafix/docs/rules/ProcedureSyntax.html",
 							"object Hello {",

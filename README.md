@@ -119,6 +119,19 @@ see maven/README.MD
 
     mvn release:clean release:prepare release:perform
 
+### New computer, new GPG Key
+
+https://stackoverflow.com/questions/29885887/gpg-no-default-secret-key-error-using-maven
+
+    gpg --list-keys
+
+https://keyring.debian.org/creating-key.html
+
+    gpg --gen-key --default-new-key-algo=rsa4096/cert,sign+rsa4096/encr
+    gpg --keyserver https://keyserver.ubuntu.com/ --send-key 90A8________________________________AAB7
+
+BEWARE pool.sks-keyservers.net is down: https://www.reddit.com/r/GnuPG/comments/o5tb6a/keyservers_are_gone/
+
 ## Re-run locally events in AWS:
 
 See ITProcessLocallyDynamoDbEvent_CheckConfig

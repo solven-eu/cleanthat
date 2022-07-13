@@ -132,6 +132,10 @@ https://keyring.debian.org/creating-key.html
 
 BEWARE pool.sks-keyservers.net is down: https://www.reddit.com/r/GnuPG/comments/o5tb6a/keyservers_are_gone/
 
+If it fails, upload manually:
+
+    gpg \-\-armor \-\-export 90A8________________________________AAB7
+
 ## Re-run locally events in AWS:
 
 See ITProcessLocallyDynamoDbEvent_CheckConfig

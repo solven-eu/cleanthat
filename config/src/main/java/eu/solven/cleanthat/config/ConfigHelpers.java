@@ -3,6 +3,7 @@ package eu.solven.cleanthat.config;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,11 +156,11 @@ public class ConfigHelpers {
 			}
 
 			{
-				List<?> outerIncludes = (List<?>) outer.get(KEY_INCLUDES);
-				List<?> innerIncludes = (List<?>) inner.get(KEY_INCLUDES);
+				List<?> outerIncludes = getAsNonNullList(outer, KEY_INCLUDES);
+				List<?> innerIncludes = getAsNonNullList(inner, KEY_INCLUDES);
 
-				List<?> outerExcludes = (List<?>) outer.get(KEY_EXCLUDES);
-				List<?> innerExcludes = (List<?>) inner.get(KEY_EXCLUDES);
+				List<?> outerExcludes = getAsNonNullList(outer, KEY_EXCLUDES);
+				List<?> innerExcludes = getAsNonNullList(inner, KEY_EXCLUDES);
 
 				Stream<?> outerIncludesWithoutInnerExclude =
 						outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
@@ -182,6 +183,14 @@ public class ConfigHelpers {
 		}
 
 		return merged;
+	}
+
+	private List<?> getAsNonNullList(Map<String, ?> outer, String k) {
+		List<?> outerIncludes = (List<?>) outer.get(k);
+		if (outerIncludes == null) {
+			outerIncludes = Collections.emptyList();
+		}
+		return outerIncludes;
 	}
 
 	public <T> Map<String, Object> makeDeepCopy(T object) {

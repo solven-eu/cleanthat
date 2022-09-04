@@ -37,3 +37,12 @@ languages:
      - "regex:.*\\.json"
   processors:
   - engine: "jackson"
+- language: "xml"
+  source_code:
+     includes:
+     - "regex:.*\\.xml"
+  processors:
+  - engine: "ecryd_sortpom"
+    source_code:
+       includes:
+       - "regex:pom.xml"

@@ -50,7 +50,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		Map<String, ?> parameters = getParameters(rawProcessor);
-		LOGGER.info("Processing: {}", engine);
+		LOGGER.debug("Processing: {}", engine);
 
 		ILintFixerWithId processor;
 		switch (engine) {

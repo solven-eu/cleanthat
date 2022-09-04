@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -15,7 +16,32 @@
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
+
+		<maven.version>3.8.3</maven.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-plugin-api</artifactId>
+				<version>${maven.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>${maven.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-model</artifactId>
+				<version>${maven.version}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -36,8 +62,7 @@
 			<version>${project.version}</version>
 			<exclusions>
 				<!-- <exclusion> -->
-				<!-- We exclude this artifact as this is a maven plugin: it conflicts 
-					with META-INF -->
+				<!-- We exclude this artifact as this is a maven plugin: it conflicts with META-INF -->
 				<!-- TODO We would exclude only in unit-tests -->
 				<!-- <groupId>net.revelc.code</groupId> -->
 				<!-- <artifactId>impsort-maven-plugin</artifactId> -->
@@ -48,15 +73,12 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>3.8.3</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<!-- Enables MavenProject and MavenSession -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
-			<version>3.8.3</version>
 		</dependency>
 
 		<!-- dependencies to annotations -->
@@ -108,7 +130,7 @@
 			<!-- component-lookup-exception-with-org-apache-maven-repository-repositorysystem-in -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-compat</artifactId>
-			<version>3.8.3</version>
+			<version>${maven.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

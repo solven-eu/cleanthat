@@ -57,12 +57,16 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	final ILanguageFormatterFactory formatterFactory;
 	final ICodeFormatterApplier formatterApplier;
 
+	final SourceCodeFormatterHelper sourceCodeFormatterHelper;
+
 	public CodeProviderFormatter(List<ObjectMapper> objectMappers,
 			ILanguageFormatterFactory formatterFactory,
 			ICodeFormatterApplier formatterApplier) {
 		this.objectMappers = objectMappers;
 		this.formatterFactory = formatterFactory;
 		this.formatterApplier = formatterApplier;
+
+		this.sourceCodeFormatterHelper = new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers));
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -306,8 +310,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			throws IOException {
 		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
-		SourceCodeFormatterHelper sourceCodeFormatterHelper =
-				new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers));
 		LanguagePropertiesAndBuildProcessors compiledProcessors =
 				sourceCodeFormatterHelper.compile(properties, codeProvider, formattersFactory);
 

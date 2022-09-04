@@ -17,13 +17,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.utils.FormatterHelpers;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import net.revelc.code.impsort.Grouper;
 import net.revelc.code.impsort.ImpSort;
@@ -60,26 +60,33 @@ public class JavaRevelcImportsCleaner implements ILintFixerWithId {
 				.getGroups(), properties.getStaticGroups(), properties.isStaticAfter(), false, true);
 		Charset charset = Charset.forName(sourceCodeProperties.getEncoding());
 		ImpSort impsort = new ImpSort(charset, grouper, properties.isRemoveUnused(), true, toRevelcEol(eolToApply));
-		Path tmpFile = Files.createTempFile("cleanthat", ".tmp");
-		try {
-			Files.writeString(tmpFile, code, charset, StandardOpenOption.TRUNCATE_EXISTING);
-			Result result = impsort.parseFile(tmpFile);
-			if (!result.isSorted()) {
-				LOGGER.debug("Saving imports-sorted file to {}", tmpFile);
-				result.saveSorted(tmpFile);
-				LOGGER.debug("Loading imports-sorted file to {}", tmpFile);
-				String newCode = new String(Files.readAllBytes(tmpFile), charset);
-				if (newCode.equals(code)) {
-					LOGGER.debug("Sorted imports (with no impact ???)");
-				} else {
-					LOGGER.debug("Sorted imports (with an impact)");
-				}
-				code = newCode;
+
+		return FormatterHelpers.formatAsFile(code, charset, path -> {
+			return formatImports(code, charset, impsort, path);
+		});
+	}
+
+	private String formatImports(String initialCode, Charset charset, ImpSort impsort, Path tmpFile)
+			throws IOException {
+		Result result = impsort.parseFile(tmpFile);
+
+		String cleanCode;
+		if (result.isSorted()) {
+			LOGGER.debug("The code is already imports-sorted");
+			cleanCode = initialCode;
+		} else {
+			LOGGER.debug("Saving imports-sorted file to {}", tmpFile);
+			result.saveSorted(tmpFile);
+			LOGGER.debug("Loading imports-sorted file to {}", tmpFile);
+			String newCode = Files.readString(tmpFile, charset);
+			if (newCode.equals(initialCode)) {
+				LOGGER.debug("Sorted imports (with no impact ???)");
+			} else {
+				LOGGER.debug("Sorted imports (with an impact)");
 			}
-		} finally {
-			tmpFile.toFile().delete();
+			cleanCode = newCode;
 		}
-		return code;
+		return cleanCode;
 	}
 
 	protected net.revelc.code.impsort.LineEnding toRevelcEol(LineEnding eolToApply) {

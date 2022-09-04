@@ -80,7 +80,7 @@ public class SaveToDynamoDb {
 		inputAsMap.put("headers", input.getHeaders());
 
 		PutItemOutcome outcome = myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
-		LOGGER.info("PUT metdata for table={} primaryKey={}: {}",
+		LOGGER.info("PUT metadata for table={} primaryKey={}: {}",
 				table,
 				primaryKey,
 				outcome.getPutItemResult().getSdkHttpMetadata().getHttpStatusCode());

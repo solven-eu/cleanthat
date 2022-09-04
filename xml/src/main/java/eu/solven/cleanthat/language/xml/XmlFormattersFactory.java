@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.language.xml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,13 +13,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.language.SourceCodeProperties;
 import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatter;
 import eu.solven.cleanthat.language.xml.ec4j.Ec4jXmlFormatterProperties;
+import eu.solven.cleanthat.language.xml.ekryd_sortpom.EcrydSortPomFormatter;
+import eu.solven.cleanthat.language.xml.ekryd_sortpom.EcrydSortPomFormatterProperties;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatter;
 import eu.solven.cleanthat.language.xml.javax.JavaxXmlFormatterProperties;
 import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatter;
@@ -26,7 +31,7 @@ import eu.solven.cleanthat.language.xml.revelc.RevelcXmlFormatterProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
- * Formatter for Json
+ * Formatter for XML and specialized-XMLs (e.g. pom.xml)
  *
  * @author Benoit Lacelle
  */
@@ -53,29 +58,36 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		Map<String, Object> parameters = getParameters(rawProcessor);
+		Map<String, ?> rawParameters = getParameters(rawProcessor);
 		LOGGER.info("Processing: {}", engine);
 
 		ILintFixerWithId processor;
 		switch (engine) {
 		case "revelc": {
 			RevelcXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, RevelcXmlFormatterProperties.class);
+					getObjectMapper().convertValue(rawParameters, RevelcXmlFormatterProperties.class);
 			processor = new RevelcXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
 		}
 		case "javax": {
 			JavaxXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, JavaxXmlFormatterProperties.class);
+					getObjectMapper().convertValue(rawParameters, JavaxXmlFormatterProperties.class);
 			processor = new JavaxXmlFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
 		}
 		case "ec4j": {
 			Ec4jXmlFormatterProperties processorConfig =
-					getObjectMapper().convertValue(parameters, Ec4jXmlFormatterProperties.class);
+					getObjectMapper().convertValue(rawParameters, Ec4jXmlFormatterProperties.class);
 			processor = new Ec4jXmlFormatter(languageProperties.getSourceCode(), processorConfig);
+
+			break;
+		}
+		case "ecryd_sortpom": {
+			EcrydSortPomFormatterProperties processorConfig =
+					getObjectMapper().convertValue(rawParameters, EcrydSortPomFormatterProperties.class);
+			processor = new EcrydSortPomFormatter(languageProperties.getSourceCode(), processorConfig);
 
 			break;
 		}
@@ -105,6 +117,21 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, engine.getId())
 					.put(KEY_PARAMETERS, engineParameters)
+					.build());
+		}
+
+		{
+			EcrydSortPomFormatterProperties engineParameters = new EcrydSortPomFormatterProperties();
+			EcrydSortPomFormatter engine =
+					new EcrydSortPomFormatter(languageProperties.getSourceCode(), engineParameters);
+
+			SourceCodeProperties ecrydSourceCode = new SourceCodeProperties();
+			ecrydSourceCode.setIncludes(Arrays.asList("pom.xml"));
+
+			processors.add(ImmutableMap.<String, Object>builder()
+					.put(KEY_ENGINE, engine.getId())
+					.put(KEY_PARAMETERS, engineParameters)
+					.put(ConfigHelpers.KEY_SOURCE_CODE, getObjectMapper().convertValue(ecrydSourceCode, Map.class))
 					.build());
 		}
 

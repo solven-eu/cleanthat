@@ -81,7 +81,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		if (codeWriter instanceof IListOnlyModifiedFiles) {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
-				codeWriter.listFiles(fileChanged -> {
+				codeWriter.listFilesForFilenames(fileChanged -> {
 					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getPath())) {
 						configIsChanged.set(true);
 						prComments.add("Configuration has changed");
@@ -199,7 +199,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		try {
-			pr.listFiles(file -> {
+			pr.listFilesForContent(file -> {
 				String filePath = file.getPath();
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);

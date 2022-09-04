@@ -35,18 +35,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
-		codeProvider.listFiles(consumer);
-	}
-
-	@Override
-	public String deprecatedLoadContent(Object file) throws IOException {
-		return codeProvider.deprecatedLoadContent(file);
-	}
-
-	@Override
-	public String deprecatedGetFilePath(Object file) {
-		return codeProvider.deprecatedGetFilePath(file);
+	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+		codeProvider.listFilesForContent(consumer);
 	}
 
 	@Override

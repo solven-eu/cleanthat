@@ -49,7 +49,7 @@ public class JsonFormattersFactory extends ASourceCodeFormatterFactory {
 			ILanguageProperties languageProperties,
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		Map<String, Object> parameters = getParameters(rawProcessor);
+		Map<String, ?> parameters = getParameters(rawProcessor);
 		LOGGER.info("Processing: {}", engine);
 
 		ILintFixerWithId processor;

@@ -61,6 +61,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 		GitHub github = new GitHubBuilder().withJwtToken(jwt)
 				// This leads to 401. Why?
 				// .withRateLimitChecker(new NoWaitRateLimitChecker())
+				.withConnector(GithubWebhookHandler.createGithubConnector())
 				.build();
 
 		return new GithubWebhookHandler(github.getApp(), objectMappers);

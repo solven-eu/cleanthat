@@ -82,7 +82,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		LOGGER.debug("About to list files");
 
 		walkFiles(consumer, "");
@@ -219,17 +219,17 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		}
 	}
 
-	@Override
-	public String deprecatedLoadContent(Object file) throws IOException {
-		Path resolvedPath = resolvePath((String) file);
-
-		return new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8);
-	}
-
-	@Override
-	public String deprecatedGetFilePath(Object file) {
-		return file.toString();
-	}
+	// @Override
+	// public String deprecatedLoadContent(Object file) throws IOException {
+	// Path resolvedPath = resolvePath((String) file);
+	//
+	// return new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8);
+	// }
+	//
+	// @Override
+	// public String deprecatedGetFilePath(Object file) {
+	// return file.toString();
+	// }
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {

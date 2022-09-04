@@ -70,8 +70,9 @@ public class EclipseJavaFormatter implements IStyleEnforcer, ILintFixerWithId {
 		long start = System.currentTimeMillis();
 		TextEdit textEdit;
 		try {
+			String eolChars = LineEnding.getOrGuess(ending, () -> code);
 			textEdit = formatter.format(CodeFormatter.K_COMPILATION_UNIT
-					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, ending.getChars());
+					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, eolChars);
 			if (textEdit == null) {
 				LOGGER.warn("Code cannot be formatted. Possible cause is unmatched source/target/compliance version.");
 				return null;

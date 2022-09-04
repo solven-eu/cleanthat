@@ -215,7 +215,9 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			return dirtyCode;
 		}
 
-		Optional<LineEnding> optLineEnding = LineEnding.determineLineEnding(dirtyCode);
+		String lineEndingChars =
+				LineEnding.getOrGuess(languageProperties.getSourceCode().getLineEndingAsEnum(), () -> cleanCode);
+		Optional<LineEnding> optLineEnding = LineEnding.determineLineEnding(lineEndingChars);
 
 		if (optLineEnding.isEmpty()) {
 			// Unable to guess the lineEnding: it may be a very small file
@@ -223,18 +225,20 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 		}
 
 		LineEnding lineEnding = optLineEnding.get();
+
+		String cleanerCode;
 		if (optCodeStyleFixer.isPresent()) {
 			// We are provided a way to format the code early
-			cleanCode = optCodeStyleFixer.get().doFormat(cleanCode, lineEnding);
+			cleanerCode = optCodeStyleFixer.get().doFormat(cleanCode, lineEnding);
+		} else {
+			cleanerCode = cleanCode;
 		}
 
-		String lineEndingChars = lineEnding.getChars();
-
 		List<String> dirtyRows = Arrays.asList(dirtyCode.split(lineEndingChars, -1));
-		List<String> cleanRows = Arrays.asList(cleanCode.split(lineEndingChars, -1));
+		List<String> cleanRows = Arrays.asList(cleanerCode.split(lineEndingChars, -1));
 		Patch<String> diff = DiffUtils.diff(dirtyRows, cleanRows, new MyersDiff<String>());
 
-		checkPatchIsValid(dirtyRows, cleanRows, diff);
+		assertPatchIsValid(dirtyRows, cleanRows, diff);
 
 		List<AbstractDelta<String>> fixedDelta = computeFixedDelta(diff);
 
@@ -283,7 +287,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 
 	// This should probably be removed. We keep it only until we valid the Diff library is working OK
 	// We check the patch is valid
-	protected void checkPatchIsValid(List<String> dirtyRows, List<String> cleanRows, Patch<String> diff) {
+	protected void assertPatchIsValid(List<String> dirtyRows, List<String> cleanRows, Patch<String> diff) {
 		List<String> patchApplied;
 		try {
 			patchApplied = diff.applyTo(dirtyRows);

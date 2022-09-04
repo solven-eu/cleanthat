@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.codeprovider;
 
-import java.io.IOException;
-
 /**
  * 
  * @author Benoit Lacelle
@@ -10,7 +8,7 @@ import java.io.IOException;
 public interface ICodeProviderFile {
 	// boolean fileIsRemoved(ICodeProvider codeProvider);
 
-	String loadContent(ICodeProvider codeProvider) throws IOException;
+	// String loadContent(ICodeProvider codeProvider) throws IOException;
 
 	// String getFilePath(ICodeProvider codeProvider);
 

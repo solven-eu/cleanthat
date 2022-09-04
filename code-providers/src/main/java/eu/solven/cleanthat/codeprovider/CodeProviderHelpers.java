@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 
@@ -45,30 +45,31 @@ public class CodeProviderHelpers {
 	// TODO Get the merged configuration head -> base
 	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
-		Optional<String> optContent;
-		AtomicReference<String> name = new AtomicReference<>();
-		optContent = PATH_CLEANTHAT.stream().map(p -> {
+		Optional<Map.Entry<String, String>> optPathAndContent;
+		optPathAndContent = PATH_CLEANTHAT.stream().map(p -> {
 			try {
-				return codeProvider.loadContentForPath(p);
+				return codeProvider.loadContentForPath(p).map(content -> Maps.immutableEntry(p, content));
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e);
-			} finally {
-				name.set(p);
 			}
 		}).flatMap(Optional::stream).findFirst();
 
+		if (optPathAndContent.isEmpty()) {
+			return Optional.empty();
+		}
+
 		ObjectMapper objectMapper;
-		if (name.get().endsWith("json")) {
+		if (optPathAndContent.get().getKey().endsWith("json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
 		} else {
 			objectMapper = ConfigHelpers.getYaml(objectMappers);
 		}
 
-		return optContent.map(content -> {
+		return optPathAndContent.map(content -> {
 			try {
-				return objectMapper.readValue(content, Map.class);
+				return objectMapper.readValue(content.getValue(), Map.class);
 			} catch (JsonProcessingException e) {
-				throw new IllegalArgumentException("Invalid json", e);
+				throw new IllegalArgumentException("Invalid config (json vs yaml?)", e);
 			}
 		});
 	}

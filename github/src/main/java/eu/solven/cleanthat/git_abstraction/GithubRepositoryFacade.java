@@ -46,11 +46,11 @@ public class GithubRepositoryFacade {
 
 	public Optional<?> openPrIfNoneExists(GitRepoBranchSha1 base, GitRepoBranchSha1 head, String title, String body)
 			throws IOException {
-		String repoName = getRepoName();
-		if (!base.getRepoName().equals(repoName)) {
+		String repoName = getRepoFullName();
+		if (!base.getRepoFullName().equals(repoName)) {
 			throw new IllegalArgumentException(
 					"The base (" + base + ") is not a ref of current repo (" + repoName + ")");
-		} else if (!head.getRepoName().equals(repoName)) {
+		} else if (!head.getRepoFullName().equals(repoName)) {
 			// TODO We would need the head username to build a headRef like 'username:branch'
 			// This way rely on the match Github allows a single fork per username/organisation
 			throw new UnsupportedOperationException(
@@ -82,13 +82,14 @@ public class GithubRepositoryFacade {
 		}
 	}
 
-	public String getRepoName() {
-		return repository.getName();
+	public String getRepoFullName() {
+		return repository.getFullName();
 	}
 
 	public void removeRef(GitRepoBranchSha1 ref) throws IOException {
-		if (!ref.getRepoName().equals(ref.getRepoName())) {
-			throw new IllegalArgumentException("Inconsistent repo: " + ref.getRepoName() + "and " + ref.getRepoName());
+		String repoName = getRepoFullName();
+		if (!repoName.equals(ref.getRepoFullName())) {
+			throw new IllegalArgumentException("Inconsistent repo: " + repoName + "and " + ref.getRepoFullName());
 		}
 
 		GHRef remoteRef = getRef(ref.getRef());

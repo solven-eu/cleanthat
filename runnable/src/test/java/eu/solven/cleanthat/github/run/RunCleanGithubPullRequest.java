@@ -79,7 +79,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			LOGGER.error("Either the repository is private, or it does not exist: '{}'", repoFullName);
 			return;
 		}
-		LOGGER.info("Repository name={} id={}", repo.getName(), repo.getId());
+		LOGGER.info("Repository name={} id={}", repo.getFullName(), repo.getId());
 		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
 		GHBranch consideredBranch = defaultBranch;
 

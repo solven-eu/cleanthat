@@ -61,7 +61,7 @@ public class TestCheckConfigWebhooksLambdaFunction {
 
 		IWebhookEvent input = Mockito.mock(IWebhookEvent.class);
 
-		GitRepoBranchSha1 head = new GitRepoBranchSha1("someRepoName", "someRef", "someSha1");
+		GitRepoBranchSha1 head = new GitRepoBranchSha1("someUser/someRepoName", "someRef", "someSha1");
 		Mockito.when(webhookHandler
 				.filterWebhookEventTargetRelevantBranch(appContext.getBean(ICodeCleanerFactory.class), input))
 				.thenReturn(WebhookRelevancyResult.relevant(new HeadAndOptionalBase(head, Optional.empty())));

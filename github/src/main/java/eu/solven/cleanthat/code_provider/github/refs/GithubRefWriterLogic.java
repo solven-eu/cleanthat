@@ -45,7 +45,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	}
 
 	protected void commitIntoRef(Map<String, String> pathToMutatedContent, List<String> prComments, GHRef ref) {
-		String repoName = repo.getName();
+		String repoName = repo.getFullName();
 		String refName = ref.getRef();
 		LOGGER.debug("Persisting into {}:{}", repoName, refName);
 

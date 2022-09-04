@@ -215,7 +215,9 @@
 							<functionName>cleanGivenConfiguration</functionName>
 							<handler>eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksHandler</handler>
 							<!-- MB -->
-							<memorySize>512</memorySize>
+							<!-- We encounter a lot of Metaspace OutOfMemoryError with 512M -->
+							<!-- https://stackoverflow.com/questions/35298616/aws-lambda-and-inaccurate-memory-allocation -->
+							<memorySize>1024</memorySize>
 							<!-- Startup can take up to 30 seconds -->
 							<!-- Repo cloning can take minutes -->
 							<timeout>300</timeout>

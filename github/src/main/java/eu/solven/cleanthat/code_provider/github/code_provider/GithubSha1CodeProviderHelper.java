@@ -54,10 +54,10 @@ public class GithubSha1CodeProviderHelper {
 		return localClone.get() != null;
 	}
 
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesLocally(Consumer<ICodeProviderFile> consumer) throws IOException {
 		ensureLocalClone();
 
-		localClone.get().listFiles(consumer);
+		localClone.get().listFilesForContent(consumer);
 	}
 
 	/**

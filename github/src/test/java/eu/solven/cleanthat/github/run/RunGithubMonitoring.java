@@ -61,7 +61,7 @@ public class RunGithubMonitoring {
 
 			@Override
 			public String getLanguage() {
-				throw new UnsupportedOperationException();
+				return "integration_test";
 			}
 
 			@Override

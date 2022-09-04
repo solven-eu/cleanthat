@@ -29,6 +29,10 @@ import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.HttpConnector;
+import org.kohsuke.github.connector.GitHubConnector;
+import org.kohsuke.github.extras.ImpatientHttpConnector;
+import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +125,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	protected GitHub makeInstallationGithub(String token) throws IOException {
-		return new GitHubBuilder().withAppInstallationToken(token).build();
+		GitHubConnector ghConnector = createGithubConnector();
+		return new GitHubBuilder().withAppInstallationToken(token).withConnector(ghConnector).build();
+	}
+
+	public static GitHubConnector createGithubConnector() {
+		// return DefaultGitHubConnector.create();
+		// Object httpClient;
+		// return new OkHttpGitHubConnector(new OkHttpClient.Builder().build());
+		return new GitHubConnectorHttpConnectorAdapter(new ImpatientHttpConnector(HttpConnector.DEFAULT));
 	}
 
 	@SuppressWarnings({ "PMD.ExcessiveMethodLength",
@@ -204,6 +216,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						prNumber,
 						GithubFacade.toFullGitRef(base.getRef()),
 						GithubFacade.toFullGitRef(head.getRef())));
+
+				LOGGER.info("Event for PR={} {} <- {}", githubAction, base.getRef(), head.getRef());
+
 			} else {
 				LOGGER.info("action={}", githubAction);
 				prOpen = false;
@@ -256,6 +271,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					}
 					pushBranch = true;
 					String ref = optFullRefName.get();
+					LOGGER.info("Event for pushing into {}", ref);
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
 					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
@@ -397,6 +413,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// WRONG: Here, we are looking for PR merging the pushed branch into some cleanable branch
 			// i.e. this is a push to a PR head, we are looking for the PR reference.
 			String ref = pushedRefOrRrHead.getRef();
+
 			LOGGER.info("Search for a PR with head the commited branch (head={})", ref);
 			try {
 				List<GHPullRequest> prMatchingHead = facade.findAnyPrHeadMatchingRef(ref).collect(Collectors.toList());
@@ -608,7 +625,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		String sha = refToProcess.getSha();
 
 		Supplier<IGitReference> headSupplier = () -> {
-			String repoName = repo.getName();
+			String repoName = facade.getRepoFullName();
 			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
 
 				try {

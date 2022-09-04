@@ -14,6 +14,7 @@
 package eu.solven.cleanthat.formatter;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * @author marvin.froeder
@@ -43,8 +44,8 @@ public enum LineEnding {
 	 * 
 	 * @return the actual characters for EOL, if determined. Else, null.
 	 */
-	public String getChars() {
-		return this.chars;
+	public Optional<String> optChars() {
+		return Optional.ofNullable(this.chars);
 	}
 
 	/**
@@ -76,5 +77,12 @@ public enum LineEnding {
 			return Optional.of(CR);
 		}
 		return Optional.empty();
+	}
+
+	public static String getOrGuess(LineEnding lineSeparator, Supplier<String> codeWithEol) {
+		return lineSeparator.optChars()
+				.or(() -> determineLineEnding(codeWithEol.get()).flatMap(LineEnding::optChars))
+				// We fallback on the system EOL, which may be pointless if the input has no EOL (preventing EOL-guess)
+				.orElse(System.lineSeparator());
 	}
 }

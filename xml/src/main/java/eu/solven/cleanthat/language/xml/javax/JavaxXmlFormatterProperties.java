@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.formatter.ICommonConventions;
+import eu.solven.cleanthat.language.xml.DefaultXmlFormatterProperties;
 
 /**
  * Configuration for Javax XML formatter
@@ -16,15 +17,13 @@ import eu.solven.cleanthat.formatter.ICommonConventions;
  * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class JavaxXmlFormatterProperties {
+public class JavaxXmlFormatterProperties extends DefaultXmlFormatterProperties {
 	String indentation = ICommonConventions.DEFAULT_INDENTATION;
 
 	Map<String, String> outputOptions = ImmutableMap.<String, String>builder()
 			.put(OutputKeys.OMIT_XML_DECLARATION, "no")
 			.put(OutputKeys.INDENT, "yes")
 			.build();
-
-	boolean eolAtEof = false;
 
 	public String getIndentation() {
 		return indentation;
@@ -42,11 +41,4 @@ public class JavaxXmlFormatterProperties {
 		this.outputOptions = outputOptions;
 	}
 
-	public boolean isEolAtEof() {
-		return eolAtEof;
-	}
-
-	public void setEolAtEof(boolean eolAtEof) {
-		this.eolAtEof = eolAtEof;
-	}
 }

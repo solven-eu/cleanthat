@@ -18,8 +18,11 @@ Related projects:
 Cleanthat is currently compatible with the following languages:
 
  - java
- - scala 
+ - ~scala~ (broken) 
  - json
+ - xml
+ - pom.xml
+ - groovy
 
 # Installation
 

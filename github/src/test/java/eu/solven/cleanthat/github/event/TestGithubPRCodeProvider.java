@@ -31,7 +31,7 @@ public class TestGithubPRCodeProvider {
 		Mockito.when(repository.getFileContent("someFileName", "headSha")).thenReturn(ghContent);
 		Mockito.when(ghContent.read())
 				.thenReturn(new ByteArrayInputStream("someContent".getBytes(StandardCharsets.UTF_8)));
-		String content = new GithubPRCodeProvider("someToken", pr).deprecatedLoadContent(file);
+		String content = new GithubPRCodeProvider("someToken", pr).loadContentForPath(file.getFilename()).get();
 		Assert.assertEquals("someContent", content);
 	}
 }

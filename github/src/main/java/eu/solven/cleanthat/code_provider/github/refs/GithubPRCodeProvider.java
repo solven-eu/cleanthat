@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	}
 
 	@Override
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		pr.listFiles().forEach(prFile -> {
 			if ("deleted".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a deleted file: {}", prFile.getFilename());
@@ -82,15 +81,15 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 		new GithubRefWriterLogic(repo, ref).persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
-	@Override
-	public String deprecatedLoadContent(Object file) throws IOException {
-		return loadContent(pr, ((GHPullRequestFileDetail) file).getFilename());
-	}
-
-	@Override
-	public String deprecatedGetFilePath(Object file) {
-		return ((GHPullRequestFileDetail) file).getFilename();
-	}
+	// @Override
+	// public String deprecatedLoadContent(Object file) throws IOException {
+	// return loadContent(pr, ((GHPullRequestFileDetail) file).getFilename());
+	// }
+	//
+	// @Override
+	// public String deprecatedGetFilePath(Object file) {
+	// return ((GHPullRequestFileDetail) file).getFilename();
+	// }
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {

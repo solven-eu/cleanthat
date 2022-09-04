@@ -29,13 +29,12 @@ public class RevelcXmlFormatter implements ILintFixerWithId {
 
 	final RevelcXmlFormatterProperties properties;
 
-	// TODO Is this thread-safe?
-	final XmlDocumentFormatter formatter;
-
 	public RevelcXmlFormatter(ISourceCodeProperties sourceCodeProperties, RevelcXmlFormatterProperties properties) {
 		this.sourceCodeProperties = sourceCodeProperties;
 		this.properties = properties;
+	}
 
+	private XmlDocumentFormatter makeFormatter(String code) {
 		ObjectMapper objectMapper = ConfigHelpers.makeJsonObjectMapper();
 		// parseRevelcPreferences expect lowerCamelCase, as in original Revelc implementation
 		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
@@ -43,11 +42,18 @@ public class RevelcXmlFormatter implements ILintFixerWithId {
 
 		FormattingPreferences prefs = parseRevelcPreferences(options);
 
-		this.formatter = new XmlDocumentFormatter(getEol(sourceCodeProperties, options), prefs);
+		return new XmlDocumentFormatter(getEol(options, sourceCodeProperties, code), prefs);
 	}
 
-	private String getEol(ISourceCodeProperties sourceCodeProperties, Map<String, Object> options) {
-		return (String) options.getOrDefault("lineending", sourceCodeProperties.getLineEndingAsEnum().getChars());
+	private String getEol(Map<String, Object> options, ISourceCodeProperties sourceCodeProperties, String dirtyCode) {
+		// https://github.com/revelc/formatter-maven-plugin/blob/main/src/main/java/net/revelc/code/formatter/xml/XMLFormatter.java#L55
+		Object revelcLineEnding = options.get("lineending");
+
+		if (revelcLineEnding != null) {
+			return revelcLineEnding.toString();
+		}
+
+		return LineEnding.getOrGuess(sourceCodeProperties.getLineEndingAsEnum(), () -> dirtyCode);
 	}
 
 	@Override
@@ -81,11 +87,11 @@ public class RevelcXmlFormatter implements ILintFixerWithId {
 
 	@Override
 	public String doFormat(String code, LineEnding ending) throws IOException {
-		String formattedCode = formatter.format(code);
+		String formattedCode = makeFormatter(code).format(code);
 
 		// Append an EOL
-		if (properties.isEolAtEof() && !formattedCode.endsWith(ending.getChars())) {
-			formattedCode = formattedCode + ending.getChars();
+		if (properties.isEolAtEof() && !formattedCode.endsWith(ending.optChars().orElseThrow())) {
+			formattedCode = formattedCode + ending.optChars();
 		}
 
 		if (code.equals(formattedCode)) {

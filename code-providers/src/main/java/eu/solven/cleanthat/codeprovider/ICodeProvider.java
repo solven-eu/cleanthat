@@ -11,16 +11,17 @@ import java.util.function.Consumer;
  */
 public interface ICodeProvider {
 
-	void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException;
+	void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException;
+
+	default void listFilesForFilenames(Consumer<ICodeProviderFile> consumer) throws IOException {
+		listFilesForContent(consumer);
+	}
 
 	// @Deprecated
-	// boolean deprecatedFileIsRemoved(Object raw);
+	// String deprecatedLoadContent(Object file) throws IOException;
 
-	@Deprecated
-	String deprecatedLoadContent(Object file) throws IOException;
-
-	@Deprecated
-	String deprecatedGetFilePath(Object file);
+	// @Deprecated
+	// String deprecatedGetFilePath(Object file);
 
 	String getHtmlUrl();
 
@@ -29,7 +30,5 @@ public interface ICodeProvider {
 	Optional<String> loadContentForPath(String path) throws IOException;
 
 	String getRepoUri();
-
-	// String openBranch(String baseRef);
 
 }

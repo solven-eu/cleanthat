@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.codeprovider;
 
-import java.io.IOException;
-
 /**
  * Simply wraps an {@link Object}
  * 
@@ -46,10 +44,10 @@ public class DummyCodeProviderFile implements ICodeProviderFile {
 	// return codeProvider.deprecatedFileIsRemoved(getRaw());
 	// }
 
-	@Override
-	public String loadContent(ICodeProvider codeProvider) throws IOException {
-		return codeProvider.deprecatedLoadContent(getRaw());
-	}
+	// @Override
+	// public String loadContent(ICodeProvider codeProvider) throws IOException {
+	// return codeProvider.deprecatedLoadContent(getRaw());
+	// }
 
 	// @Override
 	// public String getFilePath(ICodeProvider codeProvider) {

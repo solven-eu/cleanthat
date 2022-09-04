@@ -34,8 +34,8 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.language.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.java.eclipse.revelc.ConfigReadException;
-import eu.solven.cleanthat.language.java.eclipse.revelc.ConfigReader;
+import eu.solven.cleanthat.language.java.imports.revelc.ConfigReadException;
+import eu.solven.cleanthat.language.java.imports.revelc.ConfigReader;
 import lombok.Data;
 
 /**
@@ -99,7 +99,7 @@ public class EclipseJavaFormatterConfiguration {
 				throw new RuntimeException("Issue parsing config", e);
 			}
 		} catch (MalformedURLException e) {
-			throw new IllegalArgumentException("Invalid java.config_uri: + javaConfigFile", e);
+			throw new IllegalArgumentException("Invalid java.config_uri: " + resource, e);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

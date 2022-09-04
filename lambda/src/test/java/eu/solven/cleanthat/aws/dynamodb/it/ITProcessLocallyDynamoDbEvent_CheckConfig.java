@@ -23,7 +23,7 @@ public class ITProcessLocallyDynamoDbEvent_CheckConfig {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		String key = "random-dfe9e758-724e-4ca0-be2c-cab037873d8a";
+		String key = "random-b0f4488c-50d3-45f3-a356-52253bafbcf8";
 
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook()
 				.apply(EventFromDynamoDbITHelper.loadEvent("cleanthat_webhooks_github", key));

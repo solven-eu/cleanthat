@@ -25,7 +25,7 @@ public class TestGithubRefCleaner {
 		GitHub gitHub = Mockito.mock(GitHub.class);
 
 		GHRepository repository = Mockito.mock(GHRepository.class);
-		Mockito.when(gitHub.getRepository("someRepoName")).thenReturn(repository);
+		Mockito.when(gitHub.getRepository("someUser/someRepoName")).thenReturn(repository);
 
 		GHRef ref = Mockito.mock(GHRef.class);
 		Mockito.when(repository.getRef("heads/someRef")).thenReturn(ref);
@@ -35,8 +35,8 @@ public class TestGithubRefCleaner {
 				Mockito.any(ICodeProviderFormatter.class),
 				new GithubAndToken(gitHub, "someToken", Map.of()));
 
-		ICodeProvider codeProvider =
-				cleaner.getCodeProviderForRef(new GitRepoBranchSha1("someRepoName", "refs/heads/someRef", "someSha1"));
+		ICodeProvider codeProvider = cleaner.getCodeProviderForRef(
+				new GitRepoBranchSha1("someUser/someRepoName", "refs/heads/someRef", "someSha1"));
 
 		Assertions.assertThat(codeProvider).isInstanceOf(GithubRefCodeProvider.class);
 	}

@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 	protected abstract String getHeadId();
 
 	@Override
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		GHCompare diff = diffSupplier.get();
 
 		if (diff.getTotalCommits() >= LIMIT_COMMIT_IN_COMPARE) {
@@ -86,17 +85,6 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 	@Override
 	public String getTitle() {
 		return getHtmlUrl();
-	}
-
-	@Override
-	public String deprecatedLoadContent(Object rawFile) throws IOException {
-		GHPullRequestFileDetail file = (GHPullRequestFileDetail) rawFile;
-		return loadContent(baseRepository, file.getFilename(), null);
-	}
-
-	@Override
-	public String deprecatedGetFilePath(Object file) {
-		return ((GHPullRequestFileDetail) file).getFilename();
 	}
 
 	@Override

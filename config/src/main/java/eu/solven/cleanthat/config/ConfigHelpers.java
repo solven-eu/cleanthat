@@ -98,7 +98,7 @@ public class ConfigHelpers {
 		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
 		// As we are processing a single processor, we can get ride of the processors field
 		languagePropertiesAsMap.remove("processors");
-		// An processor may need to be applied with an overriden languageVersion
+		// A processor may need to be applied with an overriden languageVersion
 		// Optional<String> optLanguageVersionOverload =
 		// PepperMapHelper.getOptionalString(rawProcessor, "language_version");
 		// if (optLanguageVersionOverload.isPresent()) {

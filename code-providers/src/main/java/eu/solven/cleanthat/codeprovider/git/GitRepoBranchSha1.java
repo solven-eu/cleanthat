@@ -14,12 +14,19 @@ public class GitRepoBranchSha1 {
 	final String sha;
 
 	public GitRepoBranchSha1(String repoName, String ref, String sha) {
+		if (!repoName.contains("/")) {
+			throw new IllegalArgumentException("It seems we did not receive a fullName: " + repoName);
+		}
 		this.repoName = repoName;
 		this.ref = ref;
 		this.sha = sha;
 	}
 
-	public String getRepoName() {
+	/**
+	 * 
+	 * @return the repository fullname. e.g. 'solven-eu/cleanthat'
+	 */
+	public String getRepoFullName() {
 		return repoName;
 	}
 
@@ -30,4 +37,10 @@ public class GitRepoBranchSha1 {
 	public String getSha() {
 		return sha;
 	}
+
+	@Override
+	public String toString() {
+		return "GitRepoBranchSha1 [repoName=" + repoName + ", ref=" + ref + ", sha=" + sha + "]";
+	}
+
 }

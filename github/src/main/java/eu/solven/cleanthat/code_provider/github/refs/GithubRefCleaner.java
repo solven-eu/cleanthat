@@ -148,9 +148,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		GitRepoBranchSha1 base = optBaseRef.get();
 		// We keep the base sha1, as it will be used for diff computations (i.e. listing the concerned files)
 		// We use as refName the pushedRef/rrHead as it is to this ref that a RR has to be open
-		GitRepoBranchSha1 actualBase = new GitRepoBranchSha1(base.getRepoName(), head.getRef(), base.getSha());
+		GitRepoBranchSha1 actualBase = new GitRepoBranchSha1(base.getRepoFullName(), head.getRef(), base.getSha());
 
-		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoName(), newBranchRef, head.getSha());
+		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoFullName(), newBranchRef, head.getSha());
 		return Optional.of(new HeadAndOptionalBase(actualHead, Optional.of(actualBase)));
 	}
 
@@ -240,7 +240,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			GitRepoBranchSha1 theRef) {
 		// The base is cleanable: we are allowed to clean its head in-place
 
-		GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoName(), theRef.getRef(), theRef.getSha());
+		GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoFullName(), theRef.getRef(), theRef.getSha());
 		return Optional.of(new HeadAndOptionalBase(head, result.optBaseRef()));
 	}
 
@@ -258,7 +258,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		String ref = theRef.getRef();
 
 		try {
-			String repoName = theRef.getRepoName();
+			String repoName = theRef.getRepoFullName();
 			GithubFacade facade = new GithubFacade(githubAndToken.getGithub(), repoName);
 			GHRef refObject = facade.getRef(ref);
 			return new GithubRefCodeProvider(githubAndToken.getToken(), facade.getRepository(), refObject);
@@ -305,6 +305,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		String token = githubAndToken.getToken();
 		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
 		ICodeProvider codeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
+		// Typically used to load the configuration
+		// ICodeProvider headCodeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
 		return formatRefDiff(theRepo, codeProvider, headSupplier);
 	}
 

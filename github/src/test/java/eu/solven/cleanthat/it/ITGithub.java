@@ -120,7 +120,7 @@ public class ITGithub {
 			Map<String, String> changes = new LinkedHashMap<>();
 
 			// We write now in any now files
-			codeProvider.listFiles(file -> {
+			codeProvider.listFilesForFilenames(file -> {
 				if (file.getPath().endsWith("now")) {
 					changes.put(file.getPath(), OffsetDateTime.now().toString());
 				}

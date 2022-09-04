@@ -23,9 +23,10 @@ public class TestRevelcXmlFormatter {
 	public void testFormatNote_lf() throws IOException {
 		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
 				StandardCharsets.UTF_8);
-		String formatted = formatter.doFormat(expectedXml, LineEnding.LF);
+		LineEnding eol = LineEnding.LF;
+		String formatted = formatter.doFormat(expectedXml, eol);
 		// TODO Investigate why it is not expected EOL by system.eol which is applied
-		Assertions.assertThat(formatted.split(LineEnding.LF.getChars()))
+		Assertions.assertThat(formatted.split(eol.optChars().orElseThrow()))
 				.hasSize(8)
 				.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 				.contains("<!-- view-source:https://www.w3schools.com/xml/note.xml -->");
@@ -37,9 +38,10 @@ public class TestRevelcXmlFormatter {
 		Assume.assumeTrue("\r\n".equals(System.lineSeparator()));
 		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
 				StandardCharsets.UTF_8);
-		String formatted = formatter.doFormat(expectedXml, LineEnding.CRLF);
+		LineEnding eol = LineEnding.CRLF;
+		String formatted = formatter.doFormat(expectedXml, eol);
 		// TODO Investigate why it is not expected EOL by system.eol which is applied
-		Assertions.assertThat(formatted.split(LineEnding.CRLF.getChars()))
+		Assertions.assertThat(formatted.split(eol.optChars().orElseThrow()))
 				.hasSize(8)
 				.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 				.contains("<!-- view-source:https://www.w3schools.com/xml/note.xml -->");

@@ -1,18 +1,14 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -54,7 +50,25 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public void listFiles(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForFilenames(Consumer<ICodeProviderFile> consumer) throws IOException {
+		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
+		String sha = getSha1();
+
+		GHTree tree = repo.getTreeRecursive(sha, 1);
+
+		if (tree.isTruncated()) {
+			// https://github.community/t/github-get-tree-api-limits-and-recursivity/1300
+			LOGGER.info(
+					"Tree.isTruncated()=={} -> We will not rely on API to fetch each files, but rather create a local copy (wget zip, git clone, ...)",
+					true);
+			helper.listFilesLocally(consumer);
+		} else {
+			processTree(tree, consumer);
+		}
+	}
+
+	@Override
+	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		String sha = getSha1();
 
@@ -68,7 +82,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 			LOGGER.info(
 					"Tree.size()=={} -> We will not rely on API to fetch each files, but rather create a local copy (wget zip, git clone, ...)",
 					treeSize);
-			helper.listFiles(consumer);
+			helper.listFilesLocally(consumer);
 		} else {
 			processTree(tree, consumer);
 		}
@@ -98,22 +112,6 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 				LOGGER.debug("Discard: {}", ghTreeEntry);
 			}
 		});
-	}
-
-	@Override
-	public String deprecatedLoadContent(Object file) throws IOException {
-		String encoding = ((GHTreeEntry) file).asBlob().getEncoding();
-		if ("base64".equals(encoding)) {
-			// https://github.com/hub4j/github-api/issues/878
-			return new String(ByteStreams.toByteArray(((GHTreeEntry) file).asBlob().read()), StandardCharsets.UTF_8);
-		} else {
-			throw new RuntimeException("TODO Managed encoding: " + encoding);
-		}
-	}
-
-	@Override
-	public String deprecatedGetFilePath(Object file) {
-		return ((GHTreeEntry) file).getPath();
 	}
 
 	@Override

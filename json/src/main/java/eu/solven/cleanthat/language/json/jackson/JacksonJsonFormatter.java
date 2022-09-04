@@ -48,11 +48,11 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 		return "jackson";
 	}
 
-	protected DefaultPrettyPrinter makePrinter(LineEnding ending) {
+	protected DefaultPrettyPrinter makePrinter(String eol) {
 		boolean spaceBeforeSeparator = properties.isSpaceBeforeSeparator();
 
 		// Setup a pretty printer with an indenter (indenter has 4 spaces in this case)
-		DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter(getIndentation(), ending.getChars());
+		DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter(getIndentation(), eol);
 		DefaultPrettyPrinter printer = new DefaultPrettyPrinter() {
 			private static final long serialVersionUID = 1L;
 
@@ -91,17 +91,19 @@ public class JacksonJsonFormatter implements ILintFixerWithId {
 
 	@Override
 	public String doFormat(String code, LineEnding ending) throws IOException {
+		String eol = LineEnding.getOrGuess(ending, () -> code);
+
 		// Clone objectMapper as we will change its prettyPrinter
 		ObjectMapper localFormatter = formatter.copy();
 
-		localFormatter.setDefaultPrettyPrinter(makePrinter(ending));
+		localFormatter.setDefaultPrettyPrinter(makePrinter(eol));
 
 		Object json = formatter.readValue(code, Object.class);
 		String formattedCode = formatter.writer().writeValueAsString(json);
 
 		// Append an EOL
-		if (properties.isEolAtEof() && !formattedCode.endsWith(ending.getChars())) {
-			formattedCode = formattedCode + ending.getChars();
+		if (properties.isEolAtEof() && !formattedCode.endsWith(eol)) {
+			formattedCode = formattedCode + eol;
 		}
 
 		if (code.equals(formattedCode)) {

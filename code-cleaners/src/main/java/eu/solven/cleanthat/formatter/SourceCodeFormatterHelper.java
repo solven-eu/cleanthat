@@ -43,27 +43,7 @@ public class SourceCodeFormatterHelper {
 			ICodeProvider codeProvider,
 			ILanguageLintFixerFactory lintFixerFactory) {
 		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
-				languageProperties.getProcessors().stream().filter(rawProcessor -> {
-					Optional<Boolean> optSkip =
-							PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
-
-					if (optSkip.isEmpty()) {
-						// By default, we do not skip
-						return true;
-					} else {
-						Boolean skip = optSkip.get();
-
-						// Execute processor if not skipped
-						return !skip;
-					}
-				}).map(rawProcessor -> {
-					ILanguageProperties mergedLanguageProperties =
-							new ConfigHelpers(Collections.singleton(objectMapper))
-									.mergeLanguageIntoProcessorProperties(languageProperties, rawProcessor);
-					ILintFixer formatter =
-							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);
-					return Maps.immutableEntry(mergedLanguageProperties, formatter);
-				}).collect(Collectors.toList());
+				computeLintFixers(languageProperties, codeProvider, lintFixerFactory);
 
 		List<IStyleEnforcer> codeStyleFixer = processors.stream()
 				.map(e -> e.getValue())
@@ -71,12 +51,18 @@ public class SourceCodeFormatterHelper {
 				.map(lf -> (IStyleEnforcer) lf)
 				.collect(Collectors.toList());
 
+		String language = languageProperties.getLanguage();
 		if (codeStyleFixer.isEmpty()) {
 			if (reportedLackOfStyleEnforcer.getAndSet(true)) {
 				// Already reported
-				LOGGER.debug("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+				LOGGER.debug("It is certainly unsafe not to have a single {} for language={}",
+						IStyleEnforcer.class.getSimpleName(),
+						language);
 			} else {
-				LOGGER.warn("It is certainly unsafe not to have a single {}", IStyleEnforcer.class.getSimpleName());
+				// TODO this is true only due to specific formatters (e.g. RulesJavaMutator)
+				LOGGER.warn("It is certainly unsafe not to have a single {} for language={}",
+						IStyleEnforcer.class.getSimpleName(),
+						language);
 			}
 		} else {
 			int nbCodeStyleFormatter = codeStyleFixer.size();
@@ -98,5 +84,42 @@ public class SourceCodeFormatterHelper {
 		}
 
 		return new LanguagePropertiesAndBuildProcessors(processors);
+	}
+
+	/**
+	 * 
+	 * @param languageProperties
+	 * @param codeProvider
+	 *            necessary if some configuration is in the code itself
+	 * @param lintFixerFactory
+	 * @return
+	 */
+	public List<Map.Entry<ILanguageProperties, ILintFixer>> computeLintFixers(ILanguageProperties languageProperties,
+			ICodeProvider codeProvider,
+			ILanguageLintFixerFactory lintFixerFactory) {
+		ConfigHelpers configHelpers = new ConfigHelpers(Collections.singleton(objectMapper));
+
+		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
+				languageProperties.getProcessors().stream().filter(rawProcessor -> {
+					Optional<Boolean> optSkip =
+							PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
+
+					if (optSkip.isEmpty()) {
+						// By default, we do not skip
+						return true;
+					} else {
+						Boolean skip = optSkip.get();
+
+						// Execute processor if not skipped
+						return !skip;
+					}
+				}).map(rawProcessor -> {
+					ILanguageProperties mergedLanguageProperties =
+							configHelpers.mergeLanguageIntoProcessorProperties(languageProperties, rawProcessor);
+					ILintFixer formatter =
+							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);
+					return Maps.immutableEntry(mergedLanguageProperties, formatter);
+				}).collect(Collectors.toList());
+		return processors;
 	}
 }

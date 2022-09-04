@@ -105,5 +105,6 @@ public class TestGithubWebhookHandler {
 		Assertions.assertThat(result.isPushBranch()).isFalse();
 
 		Assertions.assertThat(result.optBaseRef().get().getRef()).isEqualTo("refs/heads/master");
+		Assertions.assertThat(result.optBaseRef().get().getRepoFullName()).isEqualTo("solven-eu/cleanthat");
 	}
 }

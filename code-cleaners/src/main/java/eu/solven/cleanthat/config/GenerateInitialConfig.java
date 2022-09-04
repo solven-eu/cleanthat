@@ -70,7 +70,9 @@ public class GenerateInitialConfig {
 		Set<String> extentionsFound = new TreeSet<>();
 
 		try {
-			codeProvider.listFiles(file -> {
+			// Listing files may be slow if there is many files (e.g. download of repo as zip)
+			LOGGER.info("About to list files to prepare a default configuration");
+			codeProvider.listFilesForFilenames(file -> {
 				String filePath = file.getPath();
 
 				String extention = FileNameUtils.getExtension(filePath);
@@ -79,6 +81,10 @@ public class GenerateInitialConfig {
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing all files for extentions", e);
+		} catch (OutOfMemoryError e) {
+			// https://github.com/hub4j/github-api/issues/1405
+			// The implementation downloading the repo as zip materialized the whole zip in memory
+			LOGGER.warn("Issue while processing the repository", e);
 		}
 
 		LOGGER.info("Extentions found in {}: {}", codeProvider, extentionsFound);

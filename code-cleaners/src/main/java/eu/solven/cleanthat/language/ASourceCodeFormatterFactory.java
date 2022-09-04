@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.language;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,9 +23,19 @@ public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerF
 		return objectMapper;
 	}
 
-	protected Map<String, Object> getParameters(Map<String, ?> rawProcessor) {
-		return PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS)
-				// Some engines take no parameter
-				.orElse(Map.of());
+	protected Map<String, ?> getParameters(Map<String, ?> rawProcessor) {
+		Optional<?> optRawParameters = PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS);
+
+		if (optRawParameters.isPresent()) {
+			if (optRawParameters.get() instanceof Map<?, ?>) {
+				return (Map<String, ?>) optRawParameters.get();
+			} else {
+				// We received a real instance of the parameters
+				return getObjectMapper().convertValue(optRawParameters.get(), Map.class);
+			}
+		} else {
+			// Various engines are parameter-less
+			return Map.of();
+		}
 	}
 }

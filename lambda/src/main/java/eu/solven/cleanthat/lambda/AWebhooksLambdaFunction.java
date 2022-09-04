@@ -185,7 +185,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
 
-			LOGGER.info("Processing {}={}",
+			LOGGER.info("{} processing {}={}",
+					this.getClass().getName(),
 					GithubWebhookEvent.X_GIT_HUB_DELIVERY,
 					PepperMapHelper.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY));
 		} else {

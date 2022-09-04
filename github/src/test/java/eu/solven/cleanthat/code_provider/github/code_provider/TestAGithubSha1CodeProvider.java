@@ -100,7 +100,7 @@ public class TestAGithubSha1CodeProvider {
 		ICodeProvider localCodeProvider = codeProvider.getHelper().downloadGitRefLocally(tmpDir);
 
 		Set<String> paths = new HashSet<>();
-		localCodeProvider.listFiles(file -> {
+		localCodeProvider.listFilesForContent(file -> {
 			paths.add(file.getPath());
 		});
 

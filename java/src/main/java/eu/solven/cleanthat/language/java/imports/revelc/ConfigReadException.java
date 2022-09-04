@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.language.java.eclipse.revelc;
+package eu.solven.cleanthat.language.java.imports.revelc;
 
 /**
  * An exception thrown when there is an error reading settings from the code formatter profile of an Eclipse formatter

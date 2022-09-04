@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.4-SNAPSHOT</version>
 		<relativePath>parent</relativePath>
 	</parent>
 
@@ -99,8 +98,8 @@
 		<!-- By default, there is no additional argument -->
 		<surefire.additionalArgument />
 
-		<!--This may be overriden to enable deploying older version of Eclipse, which may format different -->
-		<eclipse.jt.core.version>3.26.0</eclipse.jt.core.version>
+		<!-- Beware, changing this version often lead to a change of actual formatting -->
+		<eclipse.version>4.23</eclipse.version>
 	</properties>
 
 	<dependencyManagement>
@@ -129,31 +128,33 @@
 				<artifactId>checker-qual</artifactId>
 				<version>3.19.0</version>
 			</dependency>
+
+			<dependency>
+				<groupId>fr.jmini.ecentral</groupId>
+				<artifactId>eclipse-platform-dependencies</artifactId>
+				<version>${eclipse.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<profiles>
-		<!-- Given each EclipseJDTCore version may lead to a different formatting, we enable a project to choose its own version, and we need a lambda per version -->
+		<!-- Given each EclipseJDTCore version may lead to a different formatting, 
+			we enable a project to choose its own version, and we need a lambda per version -->
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
 		<profile>
-			<id>eclipseJdt3_25_0</id>
+			<id>eclipse_4.23</id>
 			<properties>
-				<eclipse.jt.core.version>3.25.0</eclipse.jt.core.version>
-				<lambda.functionNameSuffix>eclipseJdt3_25_0</lambda.functionNameSuffix>
+				<eclipse.version>4.23</eclipse.version>
+				<lambda.functionNameSuffix>eclipse_4_23</lambda.functionNameSuffix>
 			</properties>
 		</profile>
 		<profile>
-			<id>eclipseJdt3_24_0</id>
+			<id>eclipse_4.22</id>
 			<properties>
-				<eclipse.jt.core.version>3.24.0</eclipse.jt.core.version>
-				<lambda.functionNameSuffix>eclipseJdt3_24_0</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-		<profile>
-			<id>eclipseJdt3_23_0</id>
-			<properties>
-				<eclipse.jt.core.version>3.23.0</eclipse.jt.core.version>
-				<lambda.functionNameSuffix>eclipseJdt3_23_0</lambda.functionNameSuffix>
+				<eclipse.version>4.22</eclipse.version>
+				<lambda.functionNameSuffix>eclipse_4_22</lambda.functionNameSuffix>
 			</properties>
 		</profile>
 	</profiles>
@@ -196,7 +197,8 @@
 						<localCheckout>true</localCheckout>
 						<pushChanges>true</pushChanges>
 
-						<!-- This should ensure the next SNAPSHOT does compile, and it installed in local repo -->
+						<!-- This should ensure the next SNAPSHOT does compile, and it installed 
+							in local repo -->
 						<!-- TODO Is this useful only for Benoit Lacelle conveniency? -->
 						<!-- <completionGoals>install -DskipTests</completionGoals> -->
 
@@ -231,7 +233,8 @@
 							<!-- https://stackoverflow.com/questions/27799419/maven-jacoco-configuration-exclude-classes-packages-from-report-not-working -->
 							<exclude>**/generated/**/*</exclude>
 
-							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is needed) -->
+							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is 
+								needed) -->
 							<exclude>**/org/apache/pdfbox/pdmodel/font/PDSimpleFont.*</exclude>
 						</excludes>
 						<rules>
@@ -348,7 +351,8 @@
 							<java>SLASHSTAR_STYLE</java>
 							<xml>XML_PER_LINE</xml>
 						</mapping>
-						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
+						<!-- Single row header prevent many issues, especially regarding formatting 
+							and XMLs -->
 						<inlineHeader>
 							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
 						</inlineHeader>
@@ -378,7 +382,8 @@
 							<exclude>**/AuthorizationEndpoint.java</exclude>
 							<exclude>**/PDSimpleFont.java</exclude>
 
-							<!-- Useless to License generated files are regeneration will remove license -->
+							<!-- Useless to License generated files are regeneration will remove 
+								license -->
 							<excludes>**/generated/**</excludes>
 
 							<!-- Specific to module gui-web -->
@@ -562,8 +567,10 @@
 								<encoding>UTF-8</encoding>
 								<consoleOutput>true</consoleOutput>
 								<failsOnError>true</failsOnError>
-								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
-								<!-- only with goal checkstyle-aggregate or checkstyle generating a report -->
+								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - 
+									DISABLED -->
+								<!-- only with goal checkstyle-aggregate or checkstyle generating 
+									a report -->
 								<!--<linkXRef>false</linkXRef> -->
 							</configuration>
 							<goals>
@@ -587,7 +594,8 @@
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>
-						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle java11 -->
+						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle 
+							java11 -->
 						<dependency>
 							<groupId>net.sourceforge.pmd</groupId>
 							<artifactId>pmd-java</artifactId>
@@ -628,7 +636,8 @@
 							<!-- Default phase is verify, which is after tests. -->
 							<!-- We prefer to run static analysis before tests not to wait -->
 
-							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
+							<!-- PMD should run after impsort auto-cleaning: done by using same 
+								phase but ordering plugins properly -->
 							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 							<phase>${staticChecks}</phase>
 							<goals>
@@ -662,38 +671,7 @@
 					</configuration>
 				</plugin>
 
-				<plugin>
-					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.2-SNAPSHOT:cleanthat -->
-					<groupId>io.github.solven-eu.cleanthat</groupId>
-					<artifactId>cleanthat-maven-plugin</artifactId>
-					<!-- ${project.version} would lead to cyclic reference -->
-					<!-- <version>${project.version}</version> -->
-					<version>1.2</version>
-					<executions>
-						<execution>
-							<id>cleanthat</id>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
-							<goals>
-								<goal>cleanthat</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>checkthat</id>
-							<!-- runs at validate phase by default -->
-							<phase>${staticChecks}</phase>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
 
-					<configuration>
-						<!-- <configUrl>${project.basedir}/cleanthat.json</configUrl> -->
-						<!-- <configPath></configPath> -->
-						<skip>true</skip>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -714,7 +692,8 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically clean some style rules -->
+				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically 
+					clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 				<groupId>net.revelc.code</groupId>
 				<artifactId>impsort-maven-plugin</artifactId>
@@ -740,19 +719,24 @@
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 
-			<plugin>
-				<groupId>io.github.solven-eu.cleanthat</groupId>
-				<artifactId>cleanthat-maven-plugin</artifactId>
-				<!-- https://stackoverflow.com/questions/1670900/execute-maven-plugin-goal-on-parent-module-but-not-on-children/7476142 -->
-				<!-- Make sure CleanThat is executed only once from the root folder -->
-				<inherited>false</inherited>
-			</plugin>
 		</plugins>
 	</build>
 
 	<scm>
-		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
+		<!-- Only developerConnection was not set in parent po;m as its own parent 
+			was not a SNAPSHOT -->
 		<developerConnection>${scm.developerConnection}</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+
+
+	<!-- https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
+	<!-- https://jmini.github.io/ecentral/ -->
+	<repositories>
+		<repository>
+			<id>ecentral</id>
+			<url>https://raw.githubusercontent.com/jmini/ecentral/HEAD/repo</url>
+		</repository>
+	</repositories>
+
 </project>

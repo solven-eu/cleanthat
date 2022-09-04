@@ -55,6 +55,8 @@ public class ScalafixFormatter implements ILintFixerWithId {
 	public String doFormat(String code, LineEnding ending) throws IOException {
 		Path tmpPath;
 		try {
+			// Under Windows, we should write the temporary file in a folder in the same root as
+			// current process run folder. Else some path.relativize operation would fail.
 			tmpPath = Files.createTempFile("cleanthat", "anything.scala");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

@@ -45,8 +45,8 @@ languages:
   - engine: "ecryd_sortpom"
     source_code:
        includes:
-       - "regex:pom.xml"
+       - "regex:.*/pom.xml"
     parameters:
       indentation_as_string: '\t'
       # We like empty elements, while plugin default configuration would expand them
-      expandEmptyElements: false
+      expand_empty_elements: false

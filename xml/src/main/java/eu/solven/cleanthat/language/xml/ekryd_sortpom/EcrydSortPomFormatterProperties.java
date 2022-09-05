@@ -1,5 +1,8 @@
 package eu.solven.cleanthat.language.xml.ekryd_sortpom;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import eu.solven.cleanthat.language.xml.DefaultXmlFormatterProperties;
 
 /**
@@ -8,6 +11,7 @@ import eu.solven.cleanthat.language.xml.DefaultXmlFormatterProperties;
  * @author Benoit Lacelle
  */
 @SuppressWarnings({ "PMD.TooManyFields", "PMD.FieldDeclarationsShouldBeAtStartOfClass" })
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class EcrydSortPomFormatterProperties extends DefaultXmlFormatterProperties {
 
 	// See defaults in AbstractImpSortMojo
@@ -101,4 +105,11 @@ public class EcrydSortPomFormatterProperties extends DefaultXmlFormatterProperti
 	/** Ignore line separators when comparing current POM with sorted one */
 	boolean ignoreLineSeparators = true;
 
+	public boolean isExpandEmptyElements() {
+		return expandEmptyElements;
+	}
+
+	public void setExpandEmptyElements(boolean expandEmptyElements) {
+		this.expandEmptyElements = expandEmptyElements;
+	}
 }

@@ -23,13 +23,13 @@
 				<groupId>io.github.solven-eu.cleanthat</groupId>
 				<artifactId>cleanthat-maven-plugin</artifactId>
 				<version>${project.version}</version>
-				<configuration></configuration>
+				<configuration/>
 				<executions>
 					<execution>
 						<goals>
 							<goal>cleanthat</goal>
 						</goals>
-						<configuration></configuration>
+						<configuration/>
 					</execution>
 				</executions>
 			</plugin>

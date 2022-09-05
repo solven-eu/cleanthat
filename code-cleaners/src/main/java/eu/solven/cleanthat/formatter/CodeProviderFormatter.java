@@ -187,7 +187,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
-	protected AtomicLongMap<String> processFiles(ICodeProvider pr,
+	protected AtomicLongMap<String> processFiles(ICodeProvider codeProvider,
 			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
 			ILanguageProperties languageP) {
@@ -202,8 +202,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
+		LanguagePropertiesAndBuildProcessors compiledProcessors = buildProcessors(languageP, codeProvider);
+
 		try {
-			pr.listFilesForContent(file -> {
+			codeProvider.listFilesForContent(file -> {
 				String filePath = file.getPath();
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -212,7 +214,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					if (matchingExclude.isEmpty()) {
 						cs.submit(() -> {
 							try {
-								return doFormat(pr, pathToMutatedContent, languageP, filePath);
+								return doFormat(codeProvider, compiledProcessors, pathToMutatedContent, filePath);
 							} catch (IOException e) {
 								throw new UncheckedIOException("Issue with file: " + filePath, e);
 							} catch (RuntimeException e) {
@@ -265,14 +267,16 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private boolean doFormat(ICodeProvider codeProvider,
+			LanguagePropertiesAndBuildProcessors compiledProcessors,
 			Map<String, String> pathToMutatedContent,
-			ILanguageProperties languageP,
 			String filePath) throws IOException {
+		// Rely on the latest code (possibly formatted by a previous processor)
 		String code = loadCodeOptMutated(codeProvider, pathToMutatedContent, filePath);
-		LOGGER.debug("Processing {}", filePath);
-		String output = doFormat(languageP, codeProvider, filePath, code);
+
+		LOGGER.debug("Processing path={}", filePath);
+		String output = doFormat(compiledProcessors, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-			LOGGER.info("We have succesfully cleaned path={} ({})", filePath, languageP.getLanguage());
+			LOGGER.info("We have succesfully cleaned path={}", filePath);
 			pathToMutatedContent.put(filePath, output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES
@@ -303,13 +307,15 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		return code;
 	}
 
-	private String doFormat(ILanguageProperties properties, ICodeProvider codeProvider, String filepath, String code)
-			throws IOException {
+	private LanguagePropertiesAndBuildProcessors buildProcessors(ILanguageProperties properties,
+			ICodeProvider codeProvider) {
 		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
-		LanguagePropertiesAndBuildProcessors compiledProcessors =
-				sourceCodeFormatterHelper.compile(properties, codeProvider, formattersFactory);
+		return sourceCodeFormatterHelper.compile(properties, codeProvider, formattersFactory);
+	}
 
+	private String doFormat(LanguagePropertiesAndBuildProcessors compiledProcessors, String filepath, String code)
+			throws IOException {
 		return formatterApplier.applyProcessors(compiledProcessors, filepath, code);
 	}
 }

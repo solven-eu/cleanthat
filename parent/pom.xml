@@ -8,7 +8,7 @@
 		<artifactId>spring-boot-dependencies</artifactId>
 		<version>2.5.12</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath></relativePath>
+		<relativePath/>
 	</parent>
 
 	<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -88,7 +88,7 @@
 							<rules>
 								<!-- We have a local site used to upload report in circleci -->
 								<!-- <banDistributionManagement /> -->
-								<banDuplicatePomDependencyVersions></banDuplicatePomDependencyVersions>
+								<banDuplicatePomDependencyVersions/>
 								<!-- TODO Activate this rule requiring to force quite many dependencies -->
 								<!-- <dependencyConvergence /> -->
 								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->

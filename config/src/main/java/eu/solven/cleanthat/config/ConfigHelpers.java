@@ -162,14 +162,21 @@ public class ConfigHelpers {
 				List<?> outerExcludes = getAsNonNullList(outer, KEY_EXCLUDES);
 				List<?> innerExcludes = getAsNonNullList(inner, KEY_EXCLUDES);
 
-				Stream<?> outerIncludesWithoutInnerExclude =
-						outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
+				if (innerIncludes.isEmpty()) {
+					// An inner excludes cancels outer includes
+					Stream<?> outerIncludesWithoutInnerExclude =
+							outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
 
-				List<Object> mergedIncludes = Stream.concat(outerIncludesWithoutInnerExclude, innerIncludes.stream())
-						.distinct()
-						.collect(Collectors.toList());
+					List<Object> mergedIncludes =
+							Stream.concat(outerIncludesWithoutInnerExclude, innerIncludes.stream())
+									.distinct()
+									.collect(Collectors.toList());
 
-				merged.put(KEY_INCLUDES, mergedIncludes);
+					merged.put(KEY_INCLUDES, mergedIncludes);
+				} else {
+					// We discard outer includes to rely only on inner includes
+					merged.put(KEY_INCLUDES, innerIncludes);
+				}
 
 				// An inner includes cancels outer excludes
 				Stream<?> outerExcludesWithoutInnerInclude =

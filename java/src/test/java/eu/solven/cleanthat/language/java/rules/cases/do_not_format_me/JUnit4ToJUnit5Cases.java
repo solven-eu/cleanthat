@@ -1,10 +1,10 @@
-package eu.solven.cleanthat.language.java.rules.cases;
+package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me;
 
 import eu.solven.cleanthat.language.java.rules.annotations.CompareClasses;
-import eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5.BeforeAfterTestPost;
-import eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5.BeforeAfterTestPre;
-import eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5.BeforeAfterTest_wildcardImport_Post;
-import eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5.BeforeAfterTest_wildcardImport_Pre;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5.BeforeAfterTestPost;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5.BeforeAfterTestPre;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5.BeforeAfterTest_wildcardImport_Post;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5.BeforeAfterTest_wildcardImport_Pre;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.JUnit4ToJUnit5;
 import eu.solven.cleanthat.language.java.rules.test.ACases;

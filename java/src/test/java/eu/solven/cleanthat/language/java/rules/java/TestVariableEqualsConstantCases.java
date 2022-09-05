@@ -13,7 +13,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
-import eu.solven.cleanthat.language.java.rules.cases.VariableEqualsConstantCases;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.VariableEqualsConstantCases;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.VariableEqualsConstant;
 import eu.solven.cleanthat.language.java.rules.test.ATestCases;

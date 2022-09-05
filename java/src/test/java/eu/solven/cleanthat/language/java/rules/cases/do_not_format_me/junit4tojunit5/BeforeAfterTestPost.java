@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5;
+package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;

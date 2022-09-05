@@ -1,21 +1,16 @@
-package eu.solven.cleanthat.language.java.rules.cases.junit4tojunit5;
+package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.junit4tojunit5;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 // https://dimitrisli.wordpress.com/2011/03/06/junit-showcase-setting-up-and-optimising-unit-tests/
-public class BeforeAfterTestPre {
+public class BeforeAfterTest_wildcardImport_Post {
 
-	@BeforeClass
+	@BeforeAll
 	public static void initialiseClass() {
 		System.out.println("init class");
 	}
 
-	@Before
+	@BeforeEach
 	public void initialiseTest() {
 		System.out.println("init test");
 	}
@@ -23,21 +18,21 @@ public class BeforeAfterTestPre {
 	@Test
 	public void test1() {
 		System.out.println("inside test1");
-		Assert.assertTrue(true);
+		Assertions.assertTrue(true);
 	}
 
 	@Test
 	public void test2() {
 		System.out.println("inside test2");
-		Assert.assertTrue(true);
+		Assertions.assertTrue(true);
 	}
 
-	@After
+	@AfterEach
 	public void teardownTest() {
 		System.out.println("teardown test");
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void teardownClass() {
 		System.out.println("teardown class");
 	}

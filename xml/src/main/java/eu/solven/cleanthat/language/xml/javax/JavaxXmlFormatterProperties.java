@@ -25,14 +25,6 @@ public class JavaxXmlFormatterProperties extends DefaultXmlFormatterProperties {
 			.put(OutputKeys.INDENT, "yes")
 			.build();
 
-	public String getIndentation() {
-		return indentation;
-	}
-
-	public void setIndentation(String indentation) {
-		this.indentation = indentation;
-	}
-
 	public Map<String, String> getOutputOptions() {
 		return outputOptions;
 	}

@@ -108,16 +108,16 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		});
 	}
 
-//	@Override
-//	public String deprecatedLoadContent(Object file) throws IOException {
-//		return Files.readString((Path) file);
-//	}
-//
-//	@Override
-//	public String deprecatedGetFilePath(Object rawFile) {
-//		Path file = (Path) rawFile;
-//		return file.subpath(root.getNameCount(), file.getNameCount()).toString();
-//	}
+	// @Override
+	// public String deprecatedLoadContent(Object file) throws IOException {
+	// return Files.readString((Path) file);
+	// }
+	//
+	// @Override
+	// public String deprecatedGetFilePath(Object rawFile) {
+	// Path file = (Path) rawFile;
+	// return file.subpath(root.getNameCount(), file.getNameCount()).toString();
+	// }
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {

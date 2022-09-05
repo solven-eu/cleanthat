@@ -51,6 +51,13 @@
 		<!-- <module>gradle</module> -->
 	</modules>
 
+	<scm>
+		<!-- Only developerConnection was not set in parent po;m as its own parent 
+			was not a SNAPSHOT -->
+		<developerConnection>${scm.developerConnection}</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<properties>
 		<release.suffix>RELEASE</release.suffix>
 
@@ -96,7 +103,7 @@
 		<minimumTokens>60</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument />
+		<surefire.additionalArgument></surefire.additionalArgument>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<eclipse.version>4.23</eclipse.version>
@@ -139,25 +146,14 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<profiles>
-		<!-- Given each EclipseJDTCore version may lead to a different formatting, 
-			we enable a project to choose its own version, and we need a lambda per version -->
-		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
-		<profile>
-			<id>eclipse_4.23</id>
-			<properties>
-				<eclipse.version>4.23</eclipse.version>
-				<lambda.functionNameSuffix>eclipse_4_23</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-		<profile>
-			<id>eclipse_4.22</id>
-			<properties>
-				<eclipse.version>4.22</eclipse.version>
-				<lambda.functionNameSuffix>eclipse_4_22</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-	</profiles>
+	<!-- https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
+	<!-- https://jmini.github.io/ecentral/ -->
+	<repositories>
+		<repository>
+			<id>ecentral</id>
+			<url>https://raw.githubusercontent.com/jmini/ecentral/HEAD/repo</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<pluginManagement>
@@ -335,8 +331,7 @@
 
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine>
-							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
+						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -353,9 +348,7 @@
 						</mapping>
 						<!-- Single row header prevent many issues, especially regarding formatting 
 							and XMLs -->
-						<inlineHeader>
-							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
-						</inlineHeader>
+						<inlineHeader><![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]></inlineHeader>
 						<properties>
 							<owner>SOLVEN</owner>
 							<year>2021</year>
@@ -426,14 +419,6 @@
 					<groupId>net.revelc.code.formatter</groupId>
 					<artifactId>formatter-maven-plugin</artifactId>
 					<version>${formatter-maven-plugin.version}</version>
-					<dependencies>
-						<dependency>
-							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
-							<version>${pepper.version}</version>
-							<scope>runtime</scope>
-						</dependency>
-					</dependencies>
 					<configuration>
 						<configFile>eclipse/eclipse_java_code_formatter.xml</configFile>
 						<encoding>UTF-8</encoding>
@@ -444,24 +429,32 @@
 						<!-- Skip to rely on CleanThat -->
 						<skip>true</skip>
 					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>io.github.solven-eu.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
 					<executions>
 						<execution>
 							<id>apply_code_format</id>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
 							<goals>
 								<!-- https://code.revelc.net/formatter-maven-plugin/format-mojo.html -->
 								<goal>format</goal>
 							</goals>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
 						</execution>
 						<execution>
 							<id>validate_code_format</id>
-							<!-- runs at validate phase by default -->
-							<phase>${staticChecks}</phase>
 							<goals>
 								<!-- https://code.revelc.net/formatter-maven-plugin/validate-mojo.html -->
 								<goal>validate</goal>
 							</goals>
+							<!-- runs at validate phase by default -->
+							<phase>${staticChecks}</phase>
 						</execution>
 					</executions>
 				</plugin>
@@ -485,18 +478,19 @@
 					<executions>
 						<execution>
 							<id>sort-imports</id>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
 							<goals>
 								<goal>sort</goal>
 							</goals>
+							<!-- runs at process-sources phase by default -->
+							<phase>process-sources</phase>
 						</execution>
 						<execution>
 							<id>check-imports</id>
-							<phase>${staticChecks}</phase>
 							<goals>
-								<goal>check</goal><!-- runs at process-sources phase by default -->
+								<goal>check</goal>
+								<!-- runs at process-sources phase by default -->
 							</goals>
+							<phase>${staticChecks}</phase>
 						</execution>
 					</executions>
 				</plugin>
@@ -505,6 +499,11 @@
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
 					<version>${spotbugs.version}</version>
+					<configuration>
+						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
+						<!-- Activate with Pepper1.25 -->
+						<skip>true</skip>
+					</configuration>
 					<dependencies>
 						<dependency>
 							<!-- This dependency holds the default configuration -->
@@ -514,20 +513,15 @@
 							<scope>runtime</scope>
 						</dependency>
 					</dependencies>
-					<configuration>
-						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
-						<!-- Activate with Pepper1.25 -->
-						<skip>true</skip>
-					</configuration>
 					<executions>
 						<execution>
 							<id>check</id>
-							<!-- default phase is verify, which is after tests. -->
-							<!-- We prefer to run static analysis before tests not to wait -->
-							<phase>${staticChecks}</phase>
 							<goals>
 								<goal>check</goal>
 							</goals>
+							<!-- default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+							<phase>${staticChecks}</phase>
 						</execution>
 					</executions>
 				</plugin>
@@ -536,6 +530,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
+					<configuration>
+						<excludes>**/generated/**,**/jwk.test.properties</excludes>
+						<!-- We seem not able to exclude jwk.test.properties with <excludes> -->
+						<includeTestResources>false</includeTestResources>
+					</configuration>
 					<dependencies>
 						<dependency>
 							<!-- This dependency holds the default configuration -->
@@ -551,14 +550,12 @@
 							<version>${checkstyle.version}</version>
 						</dependency>
 					</dependencies>
-					<configuration>
-						<excludes>**/generated/**,**/jwk.test.properties</excludes>
-						<!-- We seem not able to exclude jwk.test.properties with <excludes> -->
-						<includeTestResources>false</includeTestResources>
-					</configuration>
 					<executions>
 						<execution>
 							<id>check</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
 							<!-- default phase is verify, which is after tests. -->
 							<!-- We prefer to run static analysis before tests not to wait -->
 							<phase>${staticChecks}</phase>
@@ -573,9 +570,6 @@
 									a report -->
 								<!--<linkXRef>false</linkXRef> -->
 							</configuration>
-							<goals>
-								<goal>check</goal>
-							</goals>
 						</execution>
 					</executions>
 				</plugin>
@@ -587,6 +581,22 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-pmd-plugin</artifactId>
 					<version>${maven-pmd-plugin.version}</version>
+					<configuration>
+						<!-- <includeTests>true</includeTests> -->
+						<indentSize>4</indentSize>
+						<printFailingErrors>true</printFailingErrors>
+
+						<!-- TODO Decrease to 4, then 3, until 1 -->
+						<failurePriority>5</failurePriority>
+						<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+						<linkXRef>false</linkXRef>
+						<rulesets>
+							<ruleset>style/pepper.pmd.rulesets.xml</ruleset>
+						</rulesets>
+						<excludes>
+							<exclude>**/generated/**</exclude>
+						</excludes>
+					</configuration>
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
@@ -615,24 +625,12 @@
 							<version>${pmd.version}</version>
 						</dependency>
 					</dependencies>
-					<configuration>
-						<!-- <includeTests>true</includeTests> -->
-						<indentSize>4</indentSize>
-						<printFailingErrors>true</printFailingErrors>
-
-						<!-- TODO Decrease to 4, then 3, until 1 -->
-						<failurePriority>5</failurePriority>
-						<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
-						<linkXRef>false</linkXRef>
-						<rulesets>
-							<ruleset>style/pepper.pmd.rulesets.xml</ruleset>
-						</rulesets>
-						<excludes>
-							<exclude>**/generated/**</exclude>
-						</excludes>
-					</configuration>
 					<executions>
 						<execution>
+							<goals>
+								<goal>check</goal>
+								<goal>cpd-check</goal>
+							</goals>
 							<!-- Default phase is verify, which is after tests. -->
 							<!-- We prefer to run static analysis before tests not to wait -->
 
@@ -640,10 +638,6 @@
 								phase but ordering plugins properly -->
 							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 							<phase>${staticChecks}</phase>
-							<goals>
-								<goal>check</goal>
-								<goal>cpd-check</goal>
-							</goals>
 						</execution>
 					</executions>
 				</plugin>
@@ -652,6 +646,14 @@
 					<!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
 					<groupId>io.github.git-commit-id</groupId>
 					<artifactId>git-commit-id-maven-plugin</artifactId>
+					<configuration>
+						<format>json</format>
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
+						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.json</generateGitPropertiesFilename>
+
+						<!-- https://github.com/ktoso/maven-git-commit-id-plugin/pull/65 -->
+						<injectAllReactorProjects>false</injectAllReactorProjects>
+					</configuration>
 					<executions>
 						<execution>
 							<id>get-the-git-infos</id>
@@ -661,16 +663,7 @@
 							<phase>process-resources</phase>
 						</execution>
 					</executions>
-					<configuration>
-						<format>json</format>
-						<generateGitPropertiesFile>true</generateGitPropertiesFile>
-						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.json</generateGitPropertiesFilename>
-
-						<!-- https://github.com/ktoso/maven-git-commit-id-plugin/pull/65 -->
-						<injectAllReactorProjects>false</injectAllReactorProjects>
-					</configuration>
 				</plugin>
-
 
 			</plugins>
 		</pluginManagement>
@@ -722,21 +715,24 @@
 		</plugins>
 	</build>
 
-	<scm>
-		<!-- Only developerConnection was not set in parent po;m as its own parent 
-			was not a SNAPSHOT -->
-		<developerConnection>${scm.developerConnection}</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-
-
-	<!-- https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
-	<!-- https://jmini.github.io/ecentral/ -->
-	<repositories>
-		<repository>
-			<id>ecentral</id>
-			<url>https://raw.githubusercontent.com/jmini/ecentral/HEAD/repo</url>
-		</repository>
-	</repositories>
+	<profiles>
+		<!-- Given each EclipseJDTCore version may lead to a different formatting, 
+			we enable a project to choose its own version, and we need a lambda per version -->
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
+		<profile>
+			<id>eclipse_4.23</id>
+			<properties>
+				<eclipse.version>4.23</eclipse.version>
+				<lambda.functionNameSuffix>eclipse_4_23</lambda.functionNameSuffix>
+			</properties>
+		</profile>
+		<profile>
+			<id>eclipse_4.22</id>
+			<properties>
+				<eclipse.version>4.22</eclipse.version>
+				<lambda.functionNameSuffix>eclipse_4_22</lambda.functionNameSuffix>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>

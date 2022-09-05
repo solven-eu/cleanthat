@@ -8,7 +8,7 @@
 		<artifactId>spring-boot-dependencies</artifactId>
 		<version>2.5.12</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath />
+		<relativePath></relativePath>
 	</parent>
 
 	<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -28,6 +28,14 @@
 			</roles>
 		</developer>
 	</developers>
+
+	<scm>
+		<!-- SCM is in properties as we can't configure it directly in profile -->
+		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
+		<connection>${scm.connection}</connection>
+		<tag>HEAD</tag>
+		<url>${scm.url}</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -80,7 +88,7 @@
 							<rules>
 								<!-- We have a local site used to upload report in circleci -->
 								<!-- <banDistributionManagement /> -->
-								<banDuplicatePomDependencyVersions />
+								<banDuplicatePomDependencyVersions></banDuplicatePomDependencyVersions>
 								<!-- TODO Activate this rule requiring to force quite many dependencies -->
 								<!-- <dependencyConvergence /> -->
 								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
@@ -185,7 +193,6 @@
 			</properties>
 		</profile>
 
-
 		<profile>
 			<!-- https://central.sonatype.org/publish/publish-maven/#deploying-to-ossrh-with-apache-maven-introduction -->
 			<id>Sonatype</id>
@@ -193,14 +200,14 @@
 			<!--Requires in settings.xml: <settings> <servers> <server> <id>ossrh</id> <username>your-jira-id</username> <password>your-jira-pwd</password> </server> 
 				</servers> </settings> -->
 			<distributionManagement>
-				<snapshotRepository>
-					<id>ossrh</id>
-					<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-				</snapshotRepository>
 				<repository>
 					<id>ossrh</id>
 					<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 				</repository>
+				<snapshotRepository>
+					<id>ossrh</id>
+					<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+				</snapshotRepository>
 			</distributionManagement>
 
 			<build>
@@ -214,10 +221,10 @@
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
-								<phase>verify</phase>
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<phase>verify</phase>
 							</execution>
 						</executions>
 					</plugin>
@@ -258,12 +265,4 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<scm>
-		<!-- SCM is in properties as we can't configure it directly in profile -->
-		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
-		<connection>${scm.connection}</connection>
-		<url>${scm.url}</url>
-		<tag>HEAD</tag>
-	</scm>
 </project>

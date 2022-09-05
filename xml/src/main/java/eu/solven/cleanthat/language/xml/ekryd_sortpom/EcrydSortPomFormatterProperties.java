@@ -44,11 +44,11 @@ public class EcrydSortPomFormatterProperties extends DefaultXmlFormatterProperti
 	 */
 	// int nrOfIndentSpace = properties.getIndent();
 	protected int getNrOfIndentSpace() {
-		return this.getIndent();
+		return this.getIndentationAsWhitespaces();
 	}
 
 	/** Should blank lines (if preserved) have indentation. */
-	boolean indentBLankLines = false;
+	boolean indentBlankLines = false;
 	/**
 	 * Should the schema location attribute of project (top level xml element) be placed on a new line. The attribute
 	 * will be indented (2 * nrOfIndentSpace + 1 space) characters.

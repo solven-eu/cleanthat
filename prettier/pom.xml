@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
-		<version>1.4-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
+		<version>1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>prettier</artifactId>
@@ -56,10 +56,10 @@
 				<executions>
 					<execution>
 						<id>download-node14-windows-32_bit</id>
-						<phase>generate-sources</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
+						<phase>generate-sources</phase>
 						<configuration>
 							<skip>true</skip>
 							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-win-x86.zip</url>
@@ -70,10 +70,10 @@
 					</execution>
 					<execution>
 						<id>download-node14-macos-64_bit</id>
-						<phase>generate-sources</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
+						<phase>generate-sources</phase>
 						<configuration>
 							<skip>true</skip>
 							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-darwin-x64.tar.gz</url>
@@ -84,10 +84,10 @@
 					</execution>
 					<execution>
 						<id>download-node14-linux-64_bit</id>
-						<phase>generate-sources</phase>
 						<goals>
 							<goal>wget</goal>
 						</goals>
+						<phase>generate-sources</phase>
 						<configuration>
 							<skip>true</skip>
 							<url>https://nodejs.org/dist/v14.17.5/node-v14.17.5-linux-x64.tar.xz</url>

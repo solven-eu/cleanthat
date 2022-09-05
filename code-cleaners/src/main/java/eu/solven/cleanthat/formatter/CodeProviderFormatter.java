@@ -272,10 +272,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		LOGGER.debug("Processing {}", filePath);
 		String output = doFormat(languageP, codeProvider, filePath, code);
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-			if (filePath.contains("/generated/")) {
-				LOGGER.error("TODO");
-			}
-			LOGGER.info("We have succesfully cleaned path={}", filePath);
+			LOGGER.info("We have succesfully cleaned path={} ({})", filePath, languageP.getLanguage());
 			pathToMutatedContent.put(filePath, output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES

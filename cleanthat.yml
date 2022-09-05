@@ -19,10 +19,6 @@ languages:
     - "regex:.*\\.java"
   processors:
   - engine: "rules"
-    source_code:
-      excludes:
-      # We exclude these tests cases as they hold code to be cleaned by unit-tests
-      - "regex:.*/src/test/java/.*/cases/.*"
   - engine: "eclipse_formatter"
     parameters:
       url: https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml

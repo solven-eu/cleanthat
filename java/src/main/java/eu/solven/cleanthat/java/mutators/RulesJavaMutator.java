@@ -141,14 +141,17 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 	@Override
 	public String doFormat(String dirtyCode, LineEnding eolToApply) throws IOException {
 		LOGGER.debug("{}", this.properties);
+		String cleanCode = applyTransformers(dirtyCode);
+		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);
+	}
+
+	private String applyTransformers(String dirtyCode) {
 		AtomicReference<String> refCleanCode = new AtomicReference<>(dirtyCode);
 
 		// Ensure we compute the compilation-unit only once per String
 		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
 
-		// TODO Adjust this flag depending on filtered rules
-		boolean isJreOnly = false;
-		JavaParser parser = makeDefaultJavaParser(isJreOnly);
+		JavaParser parser = makeJavaParser();
 
 		transformers.stream().filter(ct -> {
 			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
@@ -174,12 +177,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			if (optCompilationUnit.get() == null) {
 				try {
 					String sourceCode = refCleanCode.get();
-					ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
-					CompilationUnit compilationUnit = parsed.getResult().get();
-
-					// https://github.com/javaparser/javaparser/issues/3490
-					// We register given node for later prettyPrinting
-					LexicalPreservingPrinter.setup(compilationUnit);
+					CompilationUnit compilationUnit = parseRawCode(parser, sourceCode);
 					optCompilationUnit.set(compilationUnit);
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
@@ -206,7 +204,24 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 				optCompilationUnit.set(null);
 			}
 		});
-		return fixJavaparserUnexpectedChanges(dirtyCode, refCleanCode.get());
+		return refCleanCode.get();
+	}
+
+	public CompilationUnit parseRawCode(JavaParser parser, String sourceCode) {
+		ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
+		CompilationUnit compilationUnit = parsed.getResult().get();
+
+		// https://github.com/javaparser/javaparser/issues/3490
+		// We register given node for later prettyPrinting
+		LexicalPreservingPrinter.setup(compilationUnit);
+		return compilationUnit;
+	}
+
+	public JavaParser makeJavaParser() {
+		// TODO Adjust this flag depending on filtered rules
+		boolean isJreOnly = false;
+		JavaParser parser = makeDefaultJavaParser(isJreOnly);
+		return parser;
 	}
 
 	protected String fixJavaparserUnexpectedChanges(String dirtyCode, String cleanCode) throws IOException {

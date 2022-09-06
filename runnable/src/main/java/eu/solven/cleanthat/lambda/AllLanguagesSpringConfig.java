@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Import;
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 import eu.solven.cleanthat.language.json.JsonFormattersFactory;
 import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
+import eu.solven.cleanthat.language.xml.XmlFormattersFactory;
 
 /**
  * Spring configuration wrapping all available languages
@@ -14,7 +15,10 @@ import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
  *
  */
 @Configuration
-@Import({ JavaFormattersFactory.class, ScalaFormattersFactory.class, JsonFormattersFactory.class, })
+@Import({ JavaFormattersFactory.class,
+		ScalaFormattersFactory.class,
+		JsonFormattersFactory.class,
+		XmlFormattersFactory.class })
 public class AllLanguagesSpringConfig {
 
 }

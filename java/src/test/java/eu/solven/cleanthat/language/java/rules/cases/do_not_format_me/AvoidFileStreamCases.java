@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.rules.cases;
+package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

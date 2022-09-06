@@ -36,7 +36,8 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2021-08-02", config.getSyntaxVersion());
-		Assert.assertEquals(0, config.getLanguages().size());
+		Assert.assertEquals(1, config.getLanguages().size());
+		Assert.assertEquals("xml", config.getLanguages().get(0).getLanguage());
 	}
 
 	@Test
@@ -60,7 +61,7 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2021-08-02", config.getSyntaxVersion());
-		Assertions.assertThat(config.getLanguages()).hasSize(2);
+		Assertions.assertThat(config.getLanguages()).hasSize(3);
 
 		{
 			LanguageProperties languageProperties = config.getLanguages().get(0);
@@ -71,6 +72,11 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 			LanguageProperties languageProperties = config.getLanguages().get(1);
 
 			Assert.assertEquals("json", languageProperties.getLanguage());
+		}
+		{
+			LanguageProperties languageProperties = config.getLanguages().get(2);
+
+			Assert.assertEquals("xml", languageProperties.getLanguage());
 		}
 	}
 }

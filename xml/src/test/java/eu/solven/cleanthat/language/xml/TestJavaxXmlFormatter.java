@@ -19,8 +19,9 @@ public class TestJavaxXmlFormatter {
 
 	@Test
 	public void testFormatNote_lf() throws IOException {
-		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
-				StandardCharsets.UTF_8);
+		String expectedXml =
+				StreamUtils.copyToString(new ClassPathResource("/do_not_format_me/xml/note.xml").getInputStream(),
+						StandardCharsets.UTF_8);
 
 		String formatted = formatter.doFormat(expectedXml, LineEnding.LF);
 
@@ -35,8 +36,9 @@ public class TestJavaxXmlFormatter {
 
 	@Test
 	public void testFormatNote_crlf() throws IOException {
-		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
-				StandardCharsets.UTF_8);
+		String expectedXml =
+				StreamUtils.copyToString(new ClassPathResource("/do_not_format_me/xml/note.xml").getInputStream(),
+						StandardCharsets.UTF_8);
 
 		String formatted = formatter.doFormat(expectedXml, LineEnding.CRLF);
 

@@ -63,7 +63,7 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 		checkParameters();
 
 		if (isSkip()) {
-			LOGGER.info("Mojo is skipped. May be turned on with '-Dcleanthat.skip=true'");
+			LOGGER.info("Mojo is skipped. May be turned on with '-Dcleanthat.skip=false'");
 			return;
 		}
 

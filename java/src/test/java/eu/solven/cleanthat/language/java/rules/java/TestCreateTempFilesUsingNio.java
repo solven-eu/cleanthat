@@ -15,7 +15,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
-import eu.solven.cleanthat.language.java.rules.cases.CreateTempFilesUsingNioCases;
+import eu.solven.cleanthat.language.java.rules.cases.do_not_format_me.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.rules.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.language.java.rules.test.ATestCases;

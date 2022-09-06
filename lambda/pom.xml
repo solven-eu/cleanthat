@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
-		<version>1.4-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
+		<version>1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>lambda</artifactId>
@@ -94,6 +94,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<shadedClassifierName>aws</shadedClassifierName>
+				</configuration>
 				<dependencies>
 					<dependency>
 						<!-- https://stackoverflow.com/questions/51521953/how-to-use-propertiesmergingresourcetransformer-of-maven-shade-plugin-when-add -->
@@ -102,18 +107,13 @@
 						<version>2.5.6</version>
 					</dependency>
 				</dependencies>
-				<configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-					<shadedArtifactAttached>true</shadedArtifactAttached>
-					<shadedClassifierName>aws</shadedClassifierName>
-				</configuration>
 				<executions>
 					<execution>
 						<id>shadeFatJar</id>
-						<phase>package</phase>
 						<goals>
 							<goal>shade</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -125,7 +125,7 @@
 								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 									<resource>META-INF/spring.schemas</resource>
 								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>eu.solven.cleanthat.lambda.CleanThatWebhookLambdaFunction</mainClass>
 								</transformer>
@@ -144,13 +144,6 @@
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin/issues/104 -->
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin/issues/117 -->
 				<version>2.3.5</version>
-				<dependencies>
-					<dependency>
-						<groupId>javax.xml.bind</groupId>
-						<artifactId>jaxb-api</artifactId>
-						<version>${javax-jaxb.version}</version>
-					</dependency>
-				</dependencies>
 				<!-- IAM configuration is described here: https://github.com/SeanRoy/lambda-maven-plugin#credentials -->
 				<configuration>
 					<functionCode>${project.build.directory}/${project.build.finalName}-aws.jar</functionCode>
@@ -236,6 +229,13 @@
 						</lambdaFunction>
 					</lambdaFunctions>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+						<version>${javax-jaxb.version}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

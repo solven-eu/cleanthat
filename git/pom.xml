@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
-		<version>1.4-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
+		<version>1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>git</artifactId>
@@ -21,13 +21,13 @@
 			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<!-- Used to clone a repo -->
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>

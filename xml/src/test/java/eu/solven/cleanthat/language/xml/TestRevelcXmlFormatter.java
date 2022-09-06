@@ -21,8 +21,9 @@ public class TestRevelcXmlFormatter {
 
 	@Test
 	public void testFormatNote_lf() throws IOException {
-		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
-				StandardCharsets.UTF_8);
+		String expectedXml =
+				StreamUtils.copyToString(new ClassPathResource("/do_not_format_me/xml/note.xml").getInputStream(),
+						StandardCharsets.UTF_8);
 		LineEnding eol = LineEnding.LF;
 		String formatted = formatter.doFormat(expectedXml, eol);
 		// TODO Investigate why it is not expected EOL by system.eol which is applied
@@ -36,8 +37,9 @@ public class TestRevelcXmlFormatter {
 	public void testFormatNote_crlf() throws IOException {
 		// TODO This tests is OK only under Windows
 		Assume.assumeTrue("\r\n".equals(System.lineSeparator()));
-		String expectedXml = StreamUtils.copyToString(new ClassPathResource("/xml/note.xml").getInputStream(),
-				StandardCharsets.UTF_8);
+		String expectedXml =
+				StreamUtils.copyToString(new ClassPathResource("/do_not_format_me/xml/note.xml").getInputStream(),
+						StandardCharsets.UTF_8);
 		LineEnding eol = LineEnding.CRLF;
 		String formatted = formatter.doFormat(expectedXml, eol);
 		// TODO Investigate why it is not expected EOL by system.eol which is applied

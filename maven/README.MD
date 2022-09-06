@@ -103,6 +103,6 @@ With dependencies (if cleanthat core has been updated):
 
 Call the installed plugin with current SNAPSHOT:
     
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.1-SNAPSHOT:init
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.1-SNAPSHOT:eclipse_formatter-stylesheet
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.1-SNAPSHOT:cleanthat
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.4-SNAPSHOT:init
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.4-SNAPSHOT:eclipse_formatter-stylesheet
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:1.4-SNAPSHOT:cleanthat

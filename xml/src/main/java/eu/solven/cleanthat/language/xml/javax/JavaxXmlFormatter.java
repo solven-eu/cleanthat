@@ -111,11 +111,11 @@ public class JavaxXmlFormatter implements ILintFixerWithId {
 	}
 
 	protected int getIndentationCount() {
-		String indentation = properties.getIndentation();
+		String indentation = properties.getIndentationAsString();
 		if ("\t".equals(indentation)) {
 			// We replace '\t' by convention indentation as javax does not accept indenting by tabs
 			indentation = ICommonConventions.DEFAULT_INDENTATION;
-			LOGGER.warn("This can not indent with '\t'");
+			LOGGER.warn("This={} can not indent with '\t'", this);
 		}
 		// Consider indentation based on whitespaces
 		int whitespaces = CharMatcher.is(' ').countIn(indentation);

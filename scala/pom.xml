@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
-		<version>1.4-SNAPSHOT</version>
 		<artifactId>aggregator-cleanthat</artifactId>
+		<version>1.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>scala</artifactId>
@@ -64,13 +63,13 @@
 			<version>${scalafix.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/ch.epfl.scala/scalafix-cli -->
-		<dependency>
-			<!-- Excluded as it holds a logback.xml. Why is this dependency needed? -->
-			<!-- Else failure on 'java.lang.ClassNotFoundException: scalafix.internal.interfaces.ScalafixImpl' -->
-			<groupId>ch.epfl.scala</groupId>
-			<artifactId>scalafix-cli_${scalafix-scala.version}</artifactId>
-			<version>${scalafix.version}</version>
-		</dependency>
+		<!-- Excluded as it holds a logback.xml. -->
+		<!-- But it leads to failure on 'java.lang.ClassNotFoundException: scalafix.internal.interfaces.ScalafixImpl' -->
+		<!-- <dependency> -->
+		<!-- <groupId>ch.epfl.scala</groupId> -->
+		<!-- <artifactId>scalafix-cli_${scalafix-scala.version}</artifactId> -->
+		<!-- <version>${scalafix.version}</version> -->
+		<!-- </dependency> -->
 
 		<!-- https://mvnrepository.com/artifact/com.thesamet.scalapb/scalapb-runtime -->
 		<dependency>
@@ -79,7 +78,6 @@
 			<artifactId>scalapb-runtime_${scala.version}</artifactId>
 			<version>0.11.6</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>

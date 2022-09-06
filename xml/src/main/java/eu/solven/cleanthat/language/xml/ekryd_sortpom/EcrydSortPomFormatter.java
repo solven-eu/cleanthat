@@ -16,6 +16,7 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.utils.FormatterHelpers;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.logging.PepperLogHelper;
 import sortpom.SortPomImpl;
 import sortpom.logger.SortPomLogger;
 import sortpom.parameter.PluginParameters;
@@ -67,7 +68,7 @@ public class EcrydSortPomFormatter implements ILintFixerWithId {
 					}
 				}), properties.expandEmptyElements, properties.spaceBeforeCloseEmptyElement, properties.keepBlankLines)
 				.setIndent(properties.getNrOfIndentSpace(),
-						properties.indentBLankLines,
+						properties.indentBlankLines,
 						properties.indentSchemaLocation)
 				.setSortEntities(properties.sortDependencies,
 						properties.sortDependencyExclusions,
@@ -100,7 +101,8 @@ public class EcrydSortPomFormatter implements ILintFixerWithId {
 
 				@Override
 				public void info(String content) {
-					LOGGER.info("SortPom: {}", content);
+					// Debug as would typically log the tmp path
+					LOGGER.debug("SortPom: {} (content.length={})", content, PepperLogHelper.humanBytes(code.length()));
 				}
 
 				@Override

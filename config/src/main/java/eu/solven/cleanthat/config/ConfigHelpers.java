@@ -3,6 +3,7 @@ package eu.solven.cleanthat.config;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,20 +156,27 @@ public class ConfigHelpers {
 			}
 
 			{
-				List<?> outerIncludes = (List<?>) outer.get(KEY_INCLUDES);
-				List<?> innerIncludes = (List<?>) inner.get(KEY_INCLUDES);
+				List<?> outerIncludes = getAsNonNullList(outer, KEY_INCLUDES);
+				List<?> innerIncludes = getAsNonNullList(inner, KEY_INCLUDES);
 
-				List<?> outerExcludes = (List<?>) outer.get(KEY_EXCLUDES);
-				List<?> innerExcludes = (List<?>) inner.get(KEY_EXCLUDES);
+				List<?> outerExcludes = getAsNonNullList(outer, KEY_EXCLUDES);
+				List<?> innerExcludes = getAsNonNullList(inner, KEY_EXCLUDES);
 
-				Stream<?> outerIncludesWithoutInnerExclude =
-						outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
+				if (innerIncludes.isEmpty()) {
+					// An inner excludes cancels outer includes
+					Stream<?> outerIncludesWithoutInnerExclude =
+							outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
 
-				List<Object> mergedIncludes = Stream.concat(outerIncludesWithoutInnerExclude, innerIncludes.stream())
-						.distinct()
-						.collect(Collectors.toList());
+					List<Object> mergedIncludes =
+							Stream.concat(outerIncludesWithoutInnerExclude, innerIncludes.stream())
+									.distinct()
+									.collect(Collectors.toList());
 
-				merged.put(KEY_INCLUDES, mergedIncludes);
+					merged.put(KEY_INCLUDES, mergedIncludes);
+				} else {
+					// We discard outer includes to rely only on inner includes
+					merged.put(KEY_INCLUDES, innerIncludes);
+				}
 
 				// An inner includes cancels outer excludes
 				Stream<?> outerExcludesWithoutInnerInclude =
@@ -182,6 +190,14 @@ public class ConfigHelpers {
 		}
 
 		return merged;
+	}
+
+	private List<?> getAsNonNullList(Map<String, ?> outer, String k) {
+		List<?> outerIncludes = (List<?>) outer.get(k);
+		if (outerIncludes == null) {
+			outerIncludes = Collections.emptyList();
+		}
+		return outerIncludes;
 	}
 
 	public <T> Map<String, Object> makeDeepCopy(T object) {

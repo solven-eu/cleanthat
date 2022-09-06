@@ -23,7 +23,8 @@ public class TestEkrydSortPomFormatter {
 
 	@Test
 	public void testSort_defaultIndentation() throws IOException {
-		String dirty = StreamUtils.copyToString(new ClassPathResource("/pom/mis_ordered.xml").getInputStream(),
+		String dirty = StreamUtils.copyToString(
+				new ClassPathResource("/do_not_format_me/pom/mis_ordered.xml").getInputStream(),
 				StandardCharsets.UTF_8);
 
 		Assertions.assertThat(dirty.split(System.lineSeparator()))
@@ -53,9 +54,10 @@ public class TestEkrydSortPomFormatter {
 
 	@Test
 	public void testSort_tabIndentation() throws IOException {
-		properties.setIndent(ICommonConventions.DEFAULT_INDENT_FOR_TAB);
+		properties.setIndentationAsWhitespaces(ICommonConventions.DEFAULT_INDENT_FOR_TAB);
 
-		String dirty = StreamUtils.copyToString(new ClassPathResource("/pom/mis_ordered.xml").getInputStream(),
+		String dirty = StreamUtils.copyToString(
+				new ClassPathResource("/do_not_format_me/pom/mis_ordered.xml").getInputStream(),
 				StandardCharsets.UTF_8);
 
 		Assertions.assertThat(dirty.split(System.lineSeparator()))

@@ -59,7 +59,7 @@ public class XmlFormattersFactory extends ASourceCodeFormatterFactory {
 			ICodeProvider codeProvider) {
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		Map<String, ?> rawParameters = getParameters(rawProcessor);
-		LOGGER.info("Processing: {}", engine);
+		LOGGER.info("Relying on: {}", engine);
 
 		ILintFixerWithId processor;
 		switch (engine) {

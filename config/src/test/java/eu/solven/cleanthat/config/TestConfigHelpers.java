@@ -164,4 +164,37 @@ public class TestConfigHelpers {
 			Assert.assertEquals(Arrays.asList(".*/generated/.*"), merged.getIncludes());
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testMergeSourceCode_parentHasIncluded() {
+		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+
+		SourceCodeProperties defaultP = new SourceCodeProperties();
+		defaultP.setIncludes(Arrays.asList(".*\\.xml"));
+
+		{
+			// EmptyChildren
+			SourceCodeProperties childrenP = new SourceCodeProperties();
+
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(childrenP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(Arrays.asList(".*\\.xml"), merged.getIncludes());
+		}
+
+		{
+			// NotEmptyChildren
+			SourceCodeProperties childrenP = new SourceCodeProperties();
+			childrenP.setIncludes(Arrays.asList("pom.xml"));
+
+			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+					om.convertValue(childrenP, Map.class));
+			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+
+			Assert.assertEquals(Arrays.asList("pom.xml"), merged.getIncludes());
+		}
+	}
 }

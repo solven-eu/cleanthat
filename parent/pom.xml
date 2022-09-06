@@ -8,12 +8,12 @@
 		<artifactId>spring-boot-dependencies</artifactId>
 		<version>2.5.12</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath/>
+		<relativePath />
 	</parent>
 
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.4</version>
 	<packaging>pom</packaging>
 
 	<inceptionYear>2020</inceptionYear>
@@ -33,7 +33,7 @@
 		<!-- SCM is in properties as we can't configure it directly in profile -->
 		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
 		<connection>${scm.connection}</connection>
-		<tag>HEAD</tag>
+		<tag>v1.4.RELEASE</tag>
 		<url>${scm.url}</url>
 	</scm>
 
@@ -88,7 +88,7 @@
 							<rules>
 								<!-- We have a local site used to upload report in circleci -->
 								<!-- <banDistributionManagement /> -->
-								<banDuplicatePomDependencyVersions/>
+								<banDuplicatePomDependencyVersions />
 								<!-- TODO Activate this rule requiring to force quite many dependencies -->
 								<!-- <dependencyConvergence /> -->
 								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->

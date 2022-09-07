@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.5</version>
+		<version>1.6-SNAPSHOT</version>
 		<relativePath>parent</relativePath>
 	</parent>
 
@@ -54,7 +54,7 @@
 	<scm>
 		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
 		<developerConnection>${scm.developerConnection}</developerConnection>
-		<tag>v1.5.RELEASE</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<properties>

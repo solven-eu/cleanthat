@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.5-SNAPSHOT</version>
+		<version>1.5</version>
 		<relativePath>parent</relativePath>
 	</parent>
 
@@ -55,7 +54,7 @@
 	<scm>
 		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
 		<developerConnection>${scm.developerConnection}</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v1.5.RELEASE</tag>
 	</scm>
 
 	<properties>
@@ -103,7 +102,7 @@
 		<minimumTokens>60</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument/>
+		<surefire.additionalArgument />
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<eclipse.version>4.22</eclipse.version>

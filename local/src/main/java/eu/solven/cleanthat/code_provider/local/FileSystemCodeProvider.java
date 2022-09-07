@@ -60,6 +60,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		} else {
 			gitIgnorePredicate = p -> true;
 		}
+		// TODO Find a way to skip excluded folders all-together
 		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(f -> {
 			if (!f.startsWith(root)) {
 				throw new IllegalStateException("Issue given root=" + root + " and path=" + f);

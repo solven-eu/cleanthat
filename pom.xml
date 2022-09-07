@@ -106,12 +106,12 @@
 		<surefire.additionalArgument/>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
-		<eclipse.version>4.24</eclipse.version>
+		<eclipse.version>4.22</eclipse.version>
 
 		<!-- Deprecated -->
-		<eclipse.jt.core.version>3.26.0</eclipse.jt.core.version>
+		<!-- <eclipse.jt.core.version>3.26.0</eclipse.jt.core.version> -->
 		<!-- <eclipse.jt.core.version>3.30.0</eclipse.jt.core.version> -->
-		<eclipse.jdt.core.manipulation.version>1.16.100</eclipse.jdt.core.manipulation.version>
+		<!-- <eclipse.jdt.core.manipulation.version>1.16.100</eclipse.jdt.core.manipulation.version> -->
 	</properties>
 
 	<dependencyManagement>
@@ -142,27 +142,27 @@
 			</dependency>
 
 			<!-- Commented-out as we observe unexpected formattings -->
-			<!-- <dependency> -->
-			<!-- <groupId>fr.jmini.ecentral</groupId> -->
-			<!-- <artifactId>eclipse-platform-dependencies</artifactId> -->
-			<!-- <version>${eclipse.version}</version> -->
-			<!-- <type>pom</type> -->
-			<!-- <scope>import</scope> -->
-			<!-- </dependency> -->
+			<dependency>
+				<groupId>fr.jmini.ecentral</groupId>
+				<artifactId>eclipse-platform-dependencies</artifactId>
+				<version>${eclipse.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 
-			<dependency>
-				<groupId>org.eclipse.jdt</groupId>
-				<artifactId>org.eclipse.jdt.core</artifactId>
-				<version>${eclipse.jt.core.version}</version>
-			</dependency>
+			<!-- <dependency> -->
+			<!-- <groupId>org.eclipse.jdt</groupId> -->
+			<!-- <artifactId>org.eclipse.jdt.core</artifactId> -->
+			<!-- <version>${eclipse.jt.core.version}</version> -->
+			<!-- </dependency> -->
 			<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core.manipulation -->
-			<dependency>
-				<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
-				<!-- Used to rely on Eclipse CleanUp actions -->
-				<groupId>org.eclipse.jdt</groupId>
-				<artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-				<version>${eclipse.jdt.core.manipulation.version}</version>
-			</dependency>
+			<!-- <dependency> -->
+			<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
+			<!-- Used to rely on Eclipse CleanUp actions -->
+			<!-- <groupId>org.eclipse.jdt</groupId> -->
+			<!-- <artifactId>org.eclipse.jdt.core.manipulation</artifactId> -->
+			<!-- <version>${eclipse.jdt.core.manipulation.version}</version> -->
+			<!-- </dependency> -->
 		</dependencies>
 	</dependencyManagement>
 

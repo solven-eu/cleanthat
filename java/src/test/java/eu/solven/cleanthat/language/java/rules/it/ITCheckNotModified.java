@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.it;
+package eu.solven.cleanthat.language.java.rules.it;
 
 import java.io.File;
 import java.io.IOException;

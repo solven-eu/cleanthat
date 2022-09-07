@@ -85,6 +85,17 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 				LOGGER.debug("Issue with JavaParser: {} {}", ee.getClass().getName(), ee.getMessage());
 				return Optional.empty();
 			}
+		} catch (NoClassDefFoundError e) {
+			// https://github.com/javaparser/javaparser/issues/3504
+			LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+					"https://github.com/javaparser/javaparser/issues/3504",
+					scope);
+			LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+					"https://github.com/javaparser/javaparser/issues/3504",
+					scope,
+					e);
+
+			return Optional.empty();
 		}
 		try {
 			ResolvedType manualResolvedType = getThreadJavaParser().getType(scope);

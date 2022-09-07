@@ -16,7 +16,7 @@ languages:
   language_version: "11"
   source_code:
     includes:
-    - "regex:.*\\.java"
+    - "regex:.*TestInpiWebFormConf\\.java"
   processors:
   - engine: "rules"
   - engine: "eclipse_formatter"

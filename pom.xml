@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -52,8 +53,7 @@
 	</modules>
 
 	<scm>
-		<!-- Only developerConnection was not set in parent po;m as its own parent 
-			was not a SNAPSHOT -->
+		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
 		<developerConnection>${scm.developerConnection}</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
@@ -106,7 +106,12 @@
 		<surefire.additionalArgument/>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
-		<eclipse.version>4.23</eclipse.version>
+		<eclipse.version>4.24</eclipse.version>
+
+		<!-- Deprecated -->
+		<eclipse.jt.core.version>3.26.0</eclipse.jt.core.version>
+		<!-- <eclipse.jt.core.version>3.30.0</eclipse.jt.core.version> -->
+		<eclipse.jdt.core.manipulation.version>1.16.100</eclipse.jdt.core.manipulation.version>
 	</properties>
 
 	<dependencyManagement>
@@ -136,12 +141,27 @@
 				<version>3.19.0</version>
 			</dependency>
 
+			<!-- Commented-out as we observe unexpected formattings -->
+			<!-- <dependency> -->
+			<!-- <groupId>fr.jmini.ecentral</groupId> -->
+			<!-- <artifactId>eclipse-platform-dependencies</artifactId> -->
+			<!-- <version>${eclipse.version}</version> -->
+			<!-- <type>pom</type> -->
+			<!-- <scope>import</scope> -->
+			<!-- </dependency> -->
+
 			<dependency>
-				<groupId>fr.jmini.ecentral</groupId>
-				<artifactId>eclipse-platform-dependencies</artifactId>
-				<version>${eclipse.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
+				<groupId>org.eclipse.jdt</groupId>
+				<artifactId>org.eclipse.jdt.core</artifactId>
+				<version>${eclipse.jt.core.version}</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core.manipulation -->
+			<dependency>
+				<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
+				<!-- Used to rely on Eclipse CleanUp actions -->
+				<groupId>org.eclipse.jdt</groupId>
+				<artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+				<version>${eclipse.jdt.core.manipulation.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -193,8 +213,7 @@
 						<localCheckout>true</localCheckout>
 						<pushChanges>true</pushChanges>
 
-						<!-- This should ensure the next SNAPSHOT does compile, and it installed 
-							in local repo -->
+						<!-- This should ensure the next SNAPSHOT does compile, and it installed in local repo -->
 						<!-- TODO Is this useful only for Benoit Lacelle conveniency? -->
 						<!-- <completionGoals>install -DskipTests</completionGoals> -->
 
@@ -229,8 +248,7 @@
 							<!-- https://stackoverflow.com/questions/27799419/maven-jacoco-configuration-exclude-classes-packages-from-report-not-working -->
 							<exclude>**/generated/**/*</exclude>
 
-							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is 
-								needed) -->
+							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is needed) -->
 							<exclude>**/org/apache/pdfbox/pdmodel/font/PDSimpleFont.*</exclude>
 						</excludes>
 						<rules>
@@ -346,8 +364,7 @@
 							<java>SLASHSTAR_STYLE</java>
 							<xml>XML_PER_LINE</xml>
 						</mapping>
-						<!-- Single row header prevent many issues, especially regarding formatting 
-							and XMLs -->
+						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
 						<inlineHeader><![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]></inlineHeader>
 						<properties>
 							<owner>SOLVEN</owner>
@@ -375,8 +392,7 @@
 							<exclude>**/AuthorizationEndpoint.java</exclude>
 							<exclude>**/PDSimpleFont.java</exclude>
 
-							<!-- Useless to License generated files are regeneration will remove 
-								license -->
+							<!-- Useless to License generated files are regeneration will remove license -->
 							<excludes>**/generated/**</excludes>
 
 							<!-- Specific to module gui-web -->
@@ -564,10 +580,8 @@
 								<encoding>UTF-8</encoding>
 								<consoleOutput>true</consoleOutput>
 								<failsOnError>true</failsOnError>
-								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - 
-									DISABLED -->
-								<!-- only with goal checkstyle-aggregate or checkstyle generating 
-									a report -->
+								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+								<!-- only with goal checkstyle-aggregate or checkstyle generating a report -->
 								<!--<linkXRef>false</linkXRef> -->
 							</configuration>
 						</execution>
@@ -604,8 +618,7 @@
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>
-						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle 
-							java11 -->
+						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle java11 -->
 						<dependency>
 							<groupId>net.sourceforge.pmd</groupId>
 							<artifactId>pmd-java</artifactId>
@@ -634,8 +647,7 @@
 							<!-- Default phase is verify, which is after tests. -->
 							<!-- We prefer to run static analysis before tests not to wait -->
 
-							<!-- PMD should run after impsort auto-cleaning: done by using same 
-								phase but ordering plugins properly -->
+							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
 							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 							<phase>${staticChecks}</phase>
 						</execution>
@@ -685,8 +697,7 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically 
-					clean some style rules -->
+				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 				<groupId>net.revelc.code</groupId>
 				<artifactId>impsort-maven-plugin</artifactId>
@@ -716,9 +727,15 @@
 	</build>
 
 	<profiles>
-		<!-- Given each EclipseJDTCore version may lead to a different formatting, 
-			we enable a project to choose its own version, and we need a lambda per version -->
+		<!-- Given each EclipseJDTCore version may lead to a different formatting, we enable a project to choose its own version, and we need a lambda per version -->
 		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
+		<profile>
+			<id>eclipse_4.24</id>
+			<properties>
+				<eclipse.version>4.24</eclipse.version>
+				<lambda.functionNameSuffix>eclipse_4_24</lambda.functionNameSuffix>
+			</properties>
+		</profile>
 		<profile>
 			<id>eclipse_4.23</id>
 			<properties>

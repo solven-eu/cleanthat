@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.run;
+package eu.solven.cleanthat.it;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 		//
 		// codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
 		// } else {
-		LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)");
+		LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)", root);
 		codeProvider = new FileSystemCodeProvider(root);
 		// }
 		return codeProvider;

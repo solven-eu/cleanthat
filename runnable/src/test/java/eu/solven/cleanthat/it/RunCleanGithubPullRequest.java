@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github.run;
+package eu.solven.cleanthat.it;
 
 import java.io.IOException;
 import java.util.Map;

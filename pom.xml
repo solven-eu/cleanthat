@@ -76,7 +76,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
-		<checkstyle.version>9.3</checkstyle.version>
+		<checkstyle.version>10.3.3</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
 		<maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->

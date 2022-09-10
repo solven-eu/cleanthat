@@ -102,7 +102,7 @@
 		<minimumTokens>60</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument />
+		<surefire.additionalArgument/>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<eclipse.version>4.22</eclipse.version>

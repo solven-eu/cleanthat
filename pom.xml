@@ -137,7 +137,7 @@
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
 				<groupId>org.checkerframework</groupId>
 				<artifactId>checker-qual</artifactId>
-				<version>3.19.0</version>
+				<version>3.25.0</version>
 			</dependency>
 
 			<!-- Commented-out as we observe unexpected formattings -->

@@ -61,7 +61,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/cormoran-io/pepper/releases -->
-		<pepper.version>3.0</pepper.version>
+		<pepper.version>3.1</pepper.version>
 
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->

@@ -45,7 +45,7 @@
 			<!-- Else failure in SimpleFunctionRegistry$FunctionInvocationWrapper.isJson(SimpleFunctionRegistry.java:850) -->
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20210307</version>
+			<version>20220320</version>
 		</dependency>
 
 		<dependency>

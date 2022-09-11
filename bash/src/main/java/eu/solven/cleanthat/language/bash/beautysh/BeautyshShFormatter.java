@@ -18,6 +18,8 @@ import eu.solven.cleanthat.language.ISourceCodeProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/lovesegfault/beautysh
+// TODO Unclear how to efficiently/simply execute Python from Java
+// This should be pushed as its own lambda function?
 public class BeautyshShFormatter implements ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeautyshShFormatter.class);
 
@@ -48,6 +50,8 @@ public class BeautyshShFormatter implements ILintFixerWithId {
 			Properties preprops = System.getProperties();
 			PythonInterpreter.initialize(preprops, props, new String[0]);
 		}
+
+		// ScriptEngineManagerUtils.listEngines();
 
 		try (PythonInterpreter pyInterp = new PythonInterpreter()) {
 			StringWriter output = new StringWriter();

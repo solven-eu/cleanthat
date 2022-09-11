@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.compress.utils.FileNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
@@ -75,7 +75,8 @@ public class GenerateInitialConfig {
 			codeProvider.listFilesForFilenames(file -> {
 				String filePath = file.getPath();
 
-				String extention = FileNameUtils.getExtension(filePath);
+				// https://stackoverflow.com/questions/924394/how-to-get-the-filename-without-the-extension-in-java
+				String extention = Files.getFileExtension(filePath);
 
 				extentionsFound.add(extention);
 			});

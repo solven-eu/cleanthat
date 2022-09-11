@@ -105,3 +105,6 @@ lcov-report
 *.sln
 # VS Build folder?
 obj
+
+# In bash module
+.jython_cache

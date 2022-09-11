@@ -69,11 +69,15 @@ public class GithubRepositoryFacade {
 		}).findAny();
 
 		if (existingPr.isEmpty()) {
+			// TODO We should allow ourselves to write into a previous RR open by CleanThat (else we would open an
+			// infinite amount of cleaning PR, all with the same content)
+
 			String baseBranchName = baseFullRef.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
 
 			// We create only Draft PR for now
+			boolean isDraft = true;
 			// Maintainers are of-course allowed to modify CleanThat PR
-			GHPullRequest pr = repository.createPullRequest(title, baseBranchName, headRef, body, true, true);
+			GHPullRequest pr = repository.createPullRequest(title, headRef, baseBranchName, body, true, isDraft);
 
 			return Optional.of(pr.getNumber());
 		} else {

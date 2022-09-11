@@ -102,20 +102,19 @@ public class GithubEventHelper {
 		Optional<?> optOpenPr;
 		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
 		try {
-			optOpenPr = facade.openPrIfNoneExists(base,
-					lazyRefCreated,
-					"Cleanthat",
-					"Cleanthat <body>\r\n@blacelle please look at me");
+			// TODO Add details about the event triggering this
+			String body = "Cleanthat\r\n@blacelle please look at me";
+			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", body);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 		if (optOpenPr.isPresent()) {
-			LOGGER.info("We succeeded opening a PR open to merge {} into {}: {}",
+			LOGGER.info("We succeeded opening a RR open to merge {} into {}: {}",
 					lazyRefCreated,
 					base,
 					optOpenPr.get());
 		} else {
-			LOGGER.info("There is already a PR open to merge {} into {}", lazyRefCreated, base);
+			LOGGER.info("There is already a RR open to merge {} into {}", lazyRefCreated, base);
 		}
 	}
 }

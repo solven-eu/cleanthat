@@ -11,6 +11,12 @@
 
 	<artifactId>bash</artifactId>
 
+	<properties>
+		<!-- TODO -->
+		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
+		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>

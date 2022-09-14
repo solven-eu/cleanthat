@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -60,17 +63,38 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		} else {
 			gitIgnorePredicate = p -> true;
 		}
-		// TODO Find a way to skip excluded folders all-together
-		Files.walk(root).filter(p -> p.toFile().isFile()).filter(gitIgnorePredicate).forEach(f -> {
-			if (!f.startsWith(root)) {
-				throw new IllegalStateException("Issue given root=" + root + " and path=" + f);
+		// https://stackoverflow.com/questions/22867286/files-walk-calculate-total-size/22868706#22868706
+		Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
+
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				if (gitIgnorePredicate.test(dir)) {
+					return FileVisitResult.CONTINUE;
+				} else {
+					// We skip folders which are ignored, not to process each of their files
+					return FileVisitResult.SKIP_SUBTREE;
+				}
 			}
 
-			// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
-			Path relativized = root.relativize(f);
-			// We get '\' under Windows
-			String pathWithSlash = "/" + relativized.toString().replaceAll("\\\\", "/");
-			consumer.accept(new DummyCodeProviderFile(pathWithSlash, f));
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				if (!gitIgnorePredicate.test(file)) {
+					return FileVisitResult.CONTINUE;
+				}
+
+				if (!file.startsWith(root)) {
+					throw new IllegalStateException("Issue given root=" + root + " and path=" + file);
+				}
+
+				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
+				Path relativized = root.relativize(file);
+				// We get '\' under Windows
+				String pathWithSlash = "/" + relativized.toString().replaceAll("\\\\", "/");
+
+				consumer.accept(new DummyCodeProviderFile(pathWithSlash, file));
+
+				return FileVisitResult.CONTINUE;
+			}
 		});
 	}
 

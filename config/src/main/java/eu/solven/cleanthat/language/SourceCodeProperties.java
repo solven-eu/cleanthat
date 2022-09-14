@@ -30,10 +30,12 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 
 	// If empty, no file is excluded
 	// If multiple, we exclude files matching at least one exclude (OR)
+	// see java.nio.file.FileSystem.getPathMatcher(String)
 	private List<String> excludes = Arrays.asList();
 
 	// If empty, no file is included
 	// If multiple, we include files matching at least one include (OR)
+	// see java.nio.file.FileSystem.getPathMatcher(String)
 	private List<String> includes = Arrays.asList();
 
 	// The encoding of files

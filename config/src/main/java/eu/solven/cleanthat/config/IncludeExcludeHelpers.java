@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
  *
  */
 public class IncludeExcludeHelpers {
+	// It is good to know that '/' will be interpreted as folder separator even under Windows
+	// https://stackoverflow.com/questions/9148528/how-do-i-use-directory-globbing-in-jdk7
 	public static final List<String> DEFAULT_INCLUDES_JAVA = Arrays.asList("glob:**/*.java");
 
 	protected IncludeExcludeHelpers() {

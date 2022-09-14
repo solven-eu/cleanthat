@@ -13,7 +13,7 @@
 
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.6</version>
+	<version>1.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<inceptionYear>2020</inceptionYear>
@@ -33,7 +33,7 @@
 		<!-- SCM is in properties as we can't configure it directly in profile -->
 		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
 		<connection>${scm.connection}</connection>
-		<tag>v1.6.RELEASE</tag>
+		<tag>HEAD</tag>
 		<url>${scm.url}</url>
 	</scm>
 

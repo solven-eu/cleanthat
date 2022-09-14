@@ -62,12 +62,8 @@
 	<properties>
 		<release.suffix>RELEASE</release.suffix>
 
-		<!-- https://github.com/cormoran-io/pepper/releases -->
-		<pepper.version>4.0</pepper.version>
-
-		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
-		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
-		<springfox-swagger2.version>2.10.5</springfox-swagger2.version>
+		<!-- https://github.com/solven-eu/pepper/releases -->
+		<pepper.version>4.1</pepper.version>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -94,6 +90,7 @@
 
 		<sentry-spring.version>5.7.4</sentry-spring.version>
 
+		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2020.0.4</spring-cloud.version>
 
 		<!-- quality properties -->
@@ -104,7 +101,7 @@
 		<minimumTokens>60</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument/>
+		<surefire.additionalArgument />
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<eclipse.version>4.22</eclipse.version>

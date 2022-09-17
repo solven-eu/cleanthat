@@ -14,7 +14,7 @@
 		<scala.version>2.13</scala.version>
 
 		<scalafmt.version>3.5.9</scalafmt.version>
-		<scalafix.version>0.10.1</scalafix.version>
+		<scalafix.version>0.10.2</scalafix.version>
 		<scalafix-scala.version>${scala.version}.8</scalafix-scala.version>
 	</properties>
 

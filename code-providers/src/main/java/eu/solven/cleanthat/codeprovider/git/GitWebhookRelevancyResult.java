@@ -9,53 +9,41 @@ import java.util.Optional;
  *
  */
 public class GitWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
-	final boolean prOpen;
-	final boolean pushBranch;
-	// final boolean hasReviewRequest;
-	final Optional<GitRepoBranchSha1> ref;
-	final Optional<GitPrHeadRef> openPr;
+	final boolean rrOpen;
+	final boolean pushRef;
+	final Optional<GitRepoBranchSha1> optRef;
+	final Optional<GitPrHeadRef> optOpenRr;
 
 	// This is a compatible base: trivial in case of PR event, implicit in case of commit_push (i.e. we take the base of
 	// the first PR matching the head). We may prefer taking the latest matching PR (supposing older PR will not be
 	// merged soon). However, it would mean a single head is being merged into different base: edge-case.
-	final Optional<GitRepoBranchSha1> baseRef;
+	final Optional<GitRepoBranchSha1> optBaseRef;
 
-	public GitWebhookRelevancyResult(boolean prOpen,
-			boolean pushBranch,
-			// boolean hasReviewRequest,
+	public GitWebhookRelevancyResult(boolean rrOpen,
+			boolean pushRef,
 			Optional<GitRepoBranchSha1> optRef,
-			Optional<GitPrHeadRef> optOpenPr,
+			Optional<GitPrHeadRef> optOpenRr,
 			Optional<GitRepoBranchSha1> optBaseRef) {
-		this.prOpen = prOpen;
-		this.pushBranch = pushBranch;
-		// this.hasReviewRequest = hasReviewRequest;
-		this.ref = optRef;
-		this.openPr = optOpenPr;
-		this.baseRef = optBaseRef;
+		this.rrOpen = rrOpen;
+		this.pushRef = pushRef;
+
+		this.optRef = optRef;
+		this.optOpenRr = optOpenRr;
+		this.optBaseRef = optBaseRef;
+
+		if (rrOpen && pushRef) {
+			throw new IllegalArgumentException("Can not be both a rrOpen and a pushRef event");
+		}
 	}
 
 	@Override
 	public boolean isReviewRequestOpen() {
-		return prOpen;
+		return rrOpen;
 	}
 
 	@Override
-	public boolean isPushBranch() {
-		return pushBranch;
-	}
-
-	// @Override
-	// public boolean refHasOpenReviewRequest() {
-	// return hasReviewRequest;
-	// }
-
-	/**
-	 * In case of a PR event, this holds the HEAD of the PR, not the base.
-	 * 
-	 * @return
-	 */
-	public Optional<GitRepoBranchSha1> optPushedRefOrRrHead() {
-		return ref;
+	public boolean isPushRef() {
+		return pushRef;
 	}
 
 	/**
@@ -65,12 +53,22 @@ public class GitWebhookRelevancyResult implements IExternalWebhookRelevancyResul
 	 * 
 	 * @return
 	 */
+	@Override
 	public Optional<GitPrHeadRef> optOpenPr() {
-		return openPr;
+		return optOpenRr;
 	}
 
 	@Override
 	public Optional<GitRepoBranchSha1> optBaseRef() {
-		return baseRef;
+		return optBaseRef;
+	}
+
+	/**
+	 * In case of a RR event, this holds the HEAD of the PR, not the base.
+	 * 
+	 * @return
+	 */
+	public Optional<GitRepoBranchSha1> optPushedRefOrRrHead() {
+		return optRef;
 	}
 }

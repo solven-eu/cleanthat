@@ -100,7 +100,7 @@
 		<minimumTokens>60</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument />
+		<surefire.additionalArgument/>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<eclipse.version>4.22</eclipse.version>
@@ -674,6 +674,30 @@
 					</executions>
 				</plugin>
 
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>1.6</version>
+					<configuration>
+						<!-- We encounter some exceptions for now -->
+						<skip>false</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -720,6 +744,12 @@
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- CleanThat should be executed only in the top-directory -->
+				<inherited>false</inherited>
+			</plugin>
 		</plugins>
 	</build>
 

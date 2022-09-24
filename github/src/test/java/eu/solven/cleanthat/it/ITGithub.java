@@ -95,7 +95,7 @@ public class ITGithub {
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
 			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
-			Assertions.assertThat(result.isPushBranch()).isTrue();
+			Assertions.assertThat(result.isPushRef()).isTrue();
 		}
 		{
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
@@ -106,7 +106,7 @@ public class ITGithub {
 							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
 			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
-			Assertions.assertThat(result.isPushBranch()).isTrue();
+			Assertions.assertThat(result.isPushRef()).isTrue();
 		}
 		{
 			GithubFacade itsRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT_ITS);

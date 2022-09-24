@@ -107,6 +107,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		if (canCleanInPlace(eventBaseRefs, cleanableRefsRegexes, headRef)) {
 			logWhyCanCleanInPlace(eventBaseRefs, cleanableRefsRegexes, result, headRef);
 
+			// TODO We should take as base the base from 'canCleanInPlace'
+			// This is especially important in pushes after a rr-open, as the push before the rr-open would not be
+			// cleaned
+			// It would also help workaround previous clean having failed (e.g. by cleaning the RR on each event, not
+			// just the commits of the latest push)
 			return cleanHeadInPlace(result, head);
 		}
 
@@ -164,7 +169,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(refToCleanRegexes, headRef);
 		if (optHeadMatchingRule.isPresent()) {
 			// We never clean in place the cleanable branches, as they are considered sensible
-			LOGGER.info("Not cleaning {} in-place as it is a sensible/cleanable ref (rule={})",
+			LOGGER.info("Not cleaning in-place as head={} is a sensible/cleanable ref (rule={})",
 					headRef,
 					optHeadMatchingRule.get());
 			return false;

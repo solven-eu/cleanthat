@@ -102,9 +102,28 @@ public class TestGithubWebhookHandler {
 		GitWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
 		Assertions.assertThat(result.isReviewRequestOpen()).isTrue();
-		Assertions.assertThat(result.isPushBranch()).isFalse();
+		Assertions.assertThat(result.isPushRef()).isFalse();
 
 		Assertions.assertThat(result.optBaseRef().get().getRef()).isEqualTo("refs/heads/master");
 		Assertions.assertThat(result.optBaseRef().get().getRepoFullName()).isEqualTo("solven-eu/cleanthat");
+	}
+
+	@Test
+	public void testParseEvent_push000AsBase() throws JsonParseException, JsonMappingException, IOException {
+		Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
+				.readValue(new ClassPathResource("/github/push-000AsBase.json").getInputStream(), Map.class);
+		GitWebhookRelevancyResult result = handler.filterWebhookEventRelevant(new GithubWebhookEvent(body));
+
+		Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
+		Assertions.assertThat(result.isPushRef()).isTrue();
+
+		Assertions.assertThat(result.optBaseRef().get().getRef())
+				.isEqualTo("refs/heads/renovate/major-vue-cli-monorepo");
+		Assertions.assertThat(result.optBaseRef().get().getRepoFullName()).isEqualTo("solven-eu/mitrust-datasharing");
+
+		Assertions.assertThat(result.optPushedRefOrRrHead().get().getRef())
+				.isEqualTo("refs/heads/renovate/major-vue-cli-monorepo");
+		Assertions.assertThat(result.optPushedRefOrRrHead().get().getRepoFullName())
+				.isEqualTo("solven-eu/mitrust-datasharing");
 	}
 }

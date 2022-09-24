@@ -32,7 +32,6 @@ public class GithubEventHelper {
 	}
 
 	public static CodeFormatResult executeCleaning(WebhookRelevancyResult relevancyResult,
-			GHRepository repo,
 			IGitRefCleaner cleaner,
 			GithubRepositoryFacade facade,
 			ILazyGitReference headSupplier) {
@@ -54,9 +53,8 @@ public class GithubEventHelper {
 			// } catch (IOException e) {
 			// throw new UncheckedIOException(e);
 			// }
-			result = cleaner.formatCommitToRefDiff(GithubDecoratorHelper.decorate(repo),
-					GithubDecoratorHelper.decorate(base),
-					headSupplier);
+			result = cleaner
+					.formatCommitToRefDiff(facade.getRepository(), GithubDecoratorHelper.decorate(base), headSupplier);
 		} else {
 			throw new IllegalArgumentException("Unclear expected behavior");
 			// result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier.getSupplier().get());

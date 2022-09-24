@@ -51,7 +51,14 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 		GitWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
-		if (processAnswer.isReviewRequestOpen() || processAnswer.isPushBranch()) {
+		if (!processAnswer.isReviewRequestOpen() && !processAnswer.isPushRef()) {
+			LOGGER.info("Neither a PR-open event, nor a push-branch event");
+			return Map.of("status", "rejected as neither RR not push");
+			// TODO Unclear what we want to do with ref-creation: clean-all or clean-nothing
+			// } else if (processAnswer.optBaseRef().isEmpty()) {
+			// LOGGER.info("No base. Seemingly a ref-creation. Skip not to fully-process new-ref");
+			// return Map.of("status", "rejected as neither RR not push");
+		} else {
 			AmazonDynamoDB client = SaveToDynamoDb.makeDynamoDbClient();
 
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>();
@@ -62,10 +69,8 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_webhooks_github",
 					new CleanThatWebhookEvent(Map.of(), acceptedEvent),
 					client);
-		} else {
-			LOGGER.info("Neither a PR-open event, nor a push-branch event");
+			return Map.of("status", "Recorded in DB for further processing");
 		}
 
-		return Map.of("whatever", "done");
 	}
 }

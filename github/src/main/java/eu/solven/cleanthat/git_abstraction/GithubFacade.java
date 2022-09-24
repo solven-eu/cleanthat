@@ -70,7 +70,7 @@ public class GithubFacade {
 	}
 
 	public GHRepository getRepository() {
-		return repoFacade.getRepository();
+		return repoFacade.getRepository().getDecorated();
 	}
 
 }

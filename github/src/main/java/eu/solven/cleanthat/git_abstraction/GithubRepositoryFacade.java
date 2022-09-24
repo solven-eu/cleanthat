@@ -14,6 +14,8 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
@@ -131,8 +133,8 @@ public class GithubRepositoryFacade {
 		return repository.getRef(githubRefName);
 	}
 
-	public GHRepository getRepository() {
-		return repository;
+	public IGitRepository getRepository() {
+		return GithubDecoratorHelper.decorate(repository);
 	}
 
 	public GHCommit getCommit(String sha1) {

@@ -52,6 +52,7 @@ public interface IGitRefCleaner {
 	 * @param headSupplier
 	 * @return
 	 */
+	// @Deprecated(since = "unused?")
 	CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
 			IGitCommit baseSupplier,
 			ILazyGitReference headSupplier);

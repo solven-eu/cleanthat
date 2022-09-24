@@ -51,6 +51,7 @@ import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -172,7 +173,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// baseRef is optional: in case of PR event, it is trivial, but in case of commitPush event, we have to scan for
 		// a compatible
 		Optional<GitRepoBranchSha1> optBaseRef;
-		// If not headRef: this event is not relevant (e.g. it is a comment event)
+		// If no headRef: this event is not relevant (e.g. it is a comment event)
 		Optional<GitRepoBranchSha1> optHeadRef;
 		// TODO It is dumb to analyze the event, but we have to do that given we lost the header indicating the type of
 		// events through API Gateway and SQS
@@ -212,6 +213,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
 				GitRepoBranchSha1 head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
 				optHeadRef = Optional.of(head);
+
+				// This will lead to clean the whole RR, not just some late commit
+				// (which is important as a push before a rr-open would not be cleaned)
 				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName,
 						prNumber,
 						GithubFacade.toFullGitRef(base.getRef()),
@@ -220,7 +224,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.info("Event for PR={} {} <- {}", githubAction, base.getRef(), head.getRef());
 
 			} else {
-				LOGGER.info("action={}", githubAction);
+				LOGGER.warn("Add documentation about me: action={}", githubAction);
 				prOpen = false;
 				// refHasOpenReviewRequest = false;
 				optOpenPr = Optional.empty();
@@ -279,10 +283,36 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					if (beforeSha.matches("0+")) {
 						// 0000000000000000000000000000000000000000
 						// AKA z40 is a special reference, meaning no_ref
-						// This is typically a branch creation
-						// TODO Should we consider as base a parent commit?
-						LOGGER.warn("Branch creation? We consider as base.sha1 the sha1 of after: {}", afterSha);
-						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, afterSha));
+						// This is typically a ref creation (see push-000AsBase.json)
+						Optional<Object> optCreated = PepperMapHelper.getOptionalAs(input, "created");
+						if (optCreated.isPresent() && optCreated.get().equals(Boolean.TRUE)) {
+							LOGGER.info("Push event creating a ref. There is no clear base");
+						} else {
+							// Log to get information about such cases
+							LOGGER.warn("Not a ref creation?", input);
+						}
+
+						// WARNING This will lead to believe we commit from a sha1 to itself.
+						// optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, afterSha));
+
+						// There is no clear base-ref. This happens on ref-creation, due to a push, of potentially
+						// multiple commits
+						// One may argue the baseRef is the most recent commit already known by repo when pushing
+						// For CleantThat, we prefer discarding these events: a new ref is not cleaned!
+						// It would be cleaned by opening a PR
+						// It would be cleaned by additional commits/push IF there is a PR.
+						// it would be full-cleaned if the branch is to be cleaned (see meta.refs.branches)
+						// We would not clean only the files in the push event, as the parent may be a very old commit,
+						// which is not clean. This scenario confirms we should probably fully clean. But it is a
+						// problem as it means any PR from bots like Renovate would lead to full-cleanings (which are
+						// generally not relevant).
+						// This also suggests that push event to a RR should lead to cleaning all files touched by the
+						// RR (and not only the files of the push commits (i.e. we should capture the previous pushed to
+						// the same RR))
+						// It seems doomed to search for a base, as a RR may be open with any base, and it is the only
+						// way to clean the relevant subset of files.
+						// AS A CONCLUSION, it is clean-everything or clean nothing
+						optBaseRef = Optional.empty();
 					} else {
 						// We do not consider as base the RR base, as this is a push event: we are not sure what is the
 						// relevant base.
@@ -316,7 +346,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(githubEvent);
-		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		// https://developer.github.com/webhooks/event-payloads/
@@ -349,7 +379,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
 
 		// We rely on push over branches to trigger initialization
-		if (offlineResult.isPushBranch()) {
+		if (offlineResult.isPushRef()) {
 			GHBranch defaultBranch;
 			try {
 				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
@@ -399,12 +429,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	 * 
 	 *         in case of a RR event, we return only the RR base
 	 */
-	private Set<String> computeRelevantBaseBranches(GitWebhookRelevancyResult offlineResult,
+	private Set<String> computeRelevantBaseBranches(IExternalWebhookRelevancyResult offlineResult,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			GithubRepositoryFacade facade,
 			Optional<GitPrHeadRef> optOpenPr) {
 		Set<String> relevantBaseBranches = new TreeSet<>();
-		if (offlineResult.isPushBranch()) {
+		if (offlineResult.isPushRef()) {
 			// This is assumed to be empty as we should not list for RR, before current step
 			assert optOpenPr.isEmpty();
 			// TODO Is this a valid behavior at all?
@@ -432,6 +462,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			assert offlineResult.isReviewRequestOpen();
 			assert offlineResult.optOpenPr().isPresent();
+
+			// WARNING we have reason to believe we should clean all files in the RR (i.e. as base the RR base, not the
+			// before of the push)
+			// Especially in case of ref-creation, with which we may not clean anything (not knowing yet the proper
+			// base)
 			relevantBaseBranches.add(offlineResult.optOpenPr().get().getBaseRef());
 		}
 		return relevantBaseBranches;
@@ -545,7 +580,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = filterWebhookEventRelevant(externalCodeEvent);
 
-		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		WebhookRelevancyResult relevancyResult =
@@ -561,7 +596,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
 		Optional<GHCheckRun> optCheckRUn;
-		if (offlineResult.isPushBranch() && offlineResult.optPushedRefOrRrHead().isPresent()) {
+		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
 			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
 			optCheckRUn = createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
@@ -576,8 +611,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
 			// clean
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-			CodeFormatResult result =
-					GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
+			CodeFormatResult result = GithubEventHelper.executeCleaning(relevancyResult, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 			logAfterCleaning(installationId, githubAuthAsInst.getGithub());

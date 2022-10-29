@@ -31,11 +31,9 @@ public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
 		} catch (RuntimeException e) {
 			// Headers should hold the eventId,which enables fetching it from DB
 			LOGGER.warn("Issue processing an event. headers=" + input.getHeaders(), e);
+			Sentry.captureException(e);
 
-			RuntimeException wrapped = new RuntimeException(e);
-			Sentry.captureException(wrapped, "Lambda");
-
-			throw wrapped;
+			throw new RuntimeException(e);
 		}
 	}
 

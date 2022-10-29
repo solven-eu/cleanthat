@@ -13,7 +13,7 @@
 	<properties>
 		<!-- <wrapper.version>1.0.17.RELEASE</wrapper.version> -->
 		<maven.deploy.skip>true</maven.deploy.skip>
-		
+
 		<!-- The equivalent property for nexus-staging-maven-plugin -->
 		<!-- https://github.com/sonatype/nexus-maven-plugins/blob/main/staging/maven-plugin/README.md -->
 		<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
@@ -129,7 +129,7 @@
 								<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 									<resource>META-INF/spring.schemas</resource>
 								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>eu.solven.cleanthat.lambda.CleanThatWebhookLambdaFunction</mainClass>
 								</transformer>

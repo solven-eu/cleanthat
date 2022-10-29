@@ -87,7 +87,7 @@
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.7.0</impsort-maven-plugin.version>
 
-		<sentry-spring.version>5.7.4</sentry-spring.version>
+		<sentry-spring.version>6.6.0</sentry-spring.version>
 
 		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2020.0.6</spring-cloud.version>

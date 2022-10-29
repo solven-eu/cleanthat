@@ -154,7 +154,6 @@
 				<version>9.25.6</version>
 			</dependency>
 
-
 			<!-- <dependency> -->
 			<!-- <groupId>org.eclipse.jdt</groupId> -->
 			<!-- <artifactId>org.eclipse.jdt.core</artifactId> -->
@@ -354,9 +353,7 @@
 
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine>
-							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]>
-						</argLine>
+						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -372,9 +369,7 @@
 							<xml>XML_PER_LINE</xml>
 						</mapping>
 						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
-						<inlineHeader>
-							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
-						</inlineHeader>
+						<inlineHeader><![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]></inlineHeader>
 						<properties>
 							<owner>SOLVEN</owner>
 							<year>2021</year>

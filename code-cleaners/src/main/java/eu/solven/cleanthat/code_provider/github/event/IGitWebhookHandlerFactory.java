@@ -9,6 +9,7 @@ import java.io.IOException;
  *
  */
 public interface IGitWebhookHandlerFactory {
+	IGitWebhookHandler makeNoAuth() throws IOException;
 
 	IGitWebhookHandler makeWithFreshAuth() throws IOException;
 

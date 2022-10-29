@@ -271,7 +271,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			Map<String, String> pathToMutatedContent,
 			String filePath) throws IOException {
 		// Rely on the latest code (possibly formatted by a previous processor)
-		String code = loadCodeOptMutated(codeProvider, pathToMutatedContent, filePath);
+		Optional<String> optCode = loadCodeOptMutated(codeProvider, pathToMutatedContent, filePath);
+
+		if (optCode.isEmpty()) {
+			LOGGER.warn("Skip processing {} as its content is not available", filePath);
+			return false;
+		}
+		String code = optCode.get();
 
 		LOGGER.debug("Processing path={}", filePath);
 		String output = doFormat(compiledProcessors, filePath, code);
@@ -290,21 +296,28 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 	}
 
-	public String loadCodeOptMutated(ICodeProvider codeProvider,
+	/**
+	 * The file may be missing for various reasons (e.g. too big to be fetched)
+	 * 
+	 * @param codeProvider
+	 * @param pathToMutatedContent
+	 * @param filePath
+	 * @return an {@link Optional} of the content.
+	 */
+	public Optional<String> loadCodeOptMutated(ICodeProvider codeProvider,
 			Map<String, String> pathToMutatedContent,
 			String filePath) {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
-		String code = optAlreadyMutated.orElseGet(() -> {
-			try {
-				Optional<String> optContent = codeProvider.loadContentForPath(filePath);
 
-				return optContent
-						.orElseThrow(() -> new IllegalStateException("Issue finding code for path=" + filePath));
+		if (optAlreadyMutated.isPresent()) {
+			return optAlreadyMutated;
+		} else {
+			try {
+				return codeProvider.loadContentForPath(filePath);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-		});
-		return code;
+		}
 	}
 
 	private LanguagePropertiesAndBuildProcessors buildProcessors(ILanguageProperties properties,

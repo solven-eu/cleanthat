@@ -24,6 +24,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubNoApiWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -70,13 +71,14 @@ public class ITGithub {
 
 		GithubWebhookHandlerFactory factory =
 				new GithubWebhookHandlerFactory(env, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()));
-		IGithubWebhookHandler fresh = factory.makeWithFreshAuth();
+		GithubNoApiWebhookHandler noauth = factory.makeUnderlyingNoAuth();
+		IGithubWebhookHandler fresh = factory.makeGithubWebhookHandler();
 		GHApp app = fresh.getGithubAsApp();
 		app.listInstallations().forEach(install -> {
 			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());
 		});
 
-		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9086720);
+		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9086720).getOptResult().get();
 
 		// Own repo
 		GithubFacade ownRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT);
@@ -90,9 +92,7 @@ public class ITGithub {
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-push_event-1.json").getInputStream(),
 							Map.class);
-			GitWebhookRelevancyResult result =
-					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
-							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
+			GitWebhookRelevancyResult result = noauth.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
 			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
 			Assertions.assertThat(result.isPushBranch()).isTrue();
@@ -101,9 +101,7 @@ public class ITGithub {
 			Map<String, ?> body = ConfigHelpers.makeJsonObjectMapper()
 					.readValue(new ClassPathResource("/github/webhook/pr_open-push_event-1.json").getInputStream(),
 							Map.class);
-			GitWebhookRelevancyResult result =
-					new GithubWebhookHandler(app, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()))
-							.filterWebhookEventRelevant(new GithubWebhookEvent(body));
+			GitWebhookRelevancyResult result = noauth.filterWebhookEventRelevant(new GithubWebhookEvent(body));
 
 			Assertions.assertThat(result.isReviewRequestOpen()).isFalse();
 			Assertions.assertThat(result.isPushBranch()).isTrue();

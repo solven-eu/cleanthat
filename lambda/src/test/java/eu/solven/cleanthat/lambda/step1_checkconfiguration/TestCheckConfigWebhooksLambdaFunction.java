@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
@@ -32,7 +32,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 @MockBean({ IGitWebhookHandlerFactory.class, CompositeCodeCleanerFactory.class, ObjectMapper.class })
 public class TestCheckConfigWebhooksLambdaFunction {
 
-	final IGithubWebhookHandler webhookHandler = Mockito.mock(IGithubWebhookHandler.class);
+	final IGitWebhookHandler webhookHandler = Mockito.mock(IGitWebhookHandler.class);
 	final AmazonDynamoDB dynamoDb = Mockito.mock(AmazonDynamoDB.class);
 
 	@Autowired

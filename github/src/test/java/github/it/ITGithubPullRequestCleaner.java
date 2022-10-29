@@ -45,13 +45,13 @@ public class ITGithubPullRequestCleaner {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
+		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
 		GHApp app = handler.getGithubAsApp();
 
 		String repoName = "cleanthat";
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId());
+		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		cleaner = new GithubRefCleaner(objectMappers, factories, codeProviderFormatter, githubForRepo);
 

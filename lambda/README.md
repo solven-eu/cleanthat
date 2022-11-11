@@ -6,9 +6,13 @@ Or safer:
 	
     mvn clean install -pl :lambda -am
 
-To deploy:
+To deploy from localhost:
 
     mvn lambda:deploy-lambda -pl :lambda
+    
+Tp deploy from CircleCI
+
+    git push origin master:deploy-prd
     
 Issue with startup on Lambda? Start by testing in local:
 

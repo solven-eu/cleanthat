@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.github.seratch.jslack.Slack;
 
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
@@ -18,6 +20,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Used to filter relevant webhooks for useless webhooks.
@@ -49,6 +52,17 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
 
+		Optional<Map<String, ?>> optMarketplacePurchase =
+				PepperMapHelper.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
+		if (optMarketplacePurchase.isPresent()) {
+			Slack slack = getAppContext().getBean(Slack.class);
+
+			// https://docs.github.com/en/developers/github-marketplace/using-the-github-marketplace-api-in-your-app/webhook-events-for-the-github-marketplace-api
+			MarketPlaceEventManager
+					.handleMarketplaceEvent(getAppContext().getEnvironment(), slack, githubEvent.getBody());
+			return Map.of("event_type", "marketplace_purchase");
+		}
+
 		GitWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
 		if (processAnswer.isReviewRequestOpen() || processAnswer.isPushBranch()) {
@@ -62,10 +76,11 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_webhooks_github",
 					new CleanThatWebhookEvent(Map.of(), acceptedEvent),
 					client);
+			return Map.of("whatever", "accepted");
 		} else {
 			LOGGER.info("Neither a PR-open event, nor a push-branch event");
+			return Map.of("whatever", "discarded");
 		}
 
-		return Map.of("whatever", "done");
 	}
 }

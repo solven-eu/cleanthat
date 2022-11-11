@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.seratch.jslack.Slack;
 
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
@@ -41,6 +42,12 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 	private static final String KEY_BODY = "body";
 	private static final String KEY_HEADERS = "headers";
+
+	// Used to notify specific events
+	@Bean
+	public Slack slack() {
+		return new Slack();
+	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Bean

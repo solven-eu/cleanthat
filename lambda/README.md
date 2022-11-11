@@ -21,6 +21,10 @@ https://github-api.kohsuke.org/githubappjwtauth.html
     
     openssl pkcs8 -topk8 -inform PEM -outform DER -in ~/Dropbox/Solven/Dev/CleanThat/cleanthat.2020-05-19.private-key.pem -out ~/Dropbox/Solven/Dev/CleanThat/github-api-app.private-key.der -nocrypt
 
+Environment Variable:
+
+    GITHUB_APP_PRIVATE_JWK: to authenticate as a Github app
+    SLACK_WEBHOOK_MARKETPLACE: to send events on special webhooks (e.g. marketplace event)
 
 
 Lost note:

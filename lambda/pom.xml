@@ -70,6 +70,13 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-lambda</artifactId>
 		</dependency>
+		
+		<dependency>
+			<!--Notify Marketplace events -->
+			<groupId>com.github.seratch</groupId>
+			<artifactId>jslack-api-client</artifactId>
+			<version>3.4.2</version>
+		</dependency>
 
 		<dependency>
 			<!-- https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html#_comparing_functional_with_traditional_bean_definitions -->

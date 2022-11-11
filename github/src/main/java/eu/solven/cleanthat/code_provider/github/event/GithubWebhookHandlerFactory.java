@@ -57,12 +57,12 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 
 	@Override
 	public IGitWebhookHandler makeNoAuth() throws IOException {
-		GithubNoApiWebhookHandler udnerlying = makeUnderlyingNoAuth();
+		GithubNoApiWebhookHandler underlying = makeUnderlyingNoAuth();
 		return new IGitWebhookHandler() {
 
 			@Override
 			public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent input) {
-				return udnerlying.filterWebhookEventRelevant(input);
+				return underlying.filterWebhookEventRelevant(input);
 			}
 
 			@Override
@@ -79,8 +79,8 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 	}
 
 	public GithubNoApiWebhookHandler makeUnderlyingNoAuth() {
-		GithubNoApiWebhookHandler udnerlying = new GithubNoApiWebhookHandler(objectMappers);
-		return udnerlying;
+		GithubNoApiWebhookHandler underlying = new GithubNoApiWebhookHandler(objectMappers);
+		return underlying;
 	}
 
 	@Override

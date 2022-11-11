@@ -707,6 +707,30 @@
 					</executions>
 				</plugin>
 
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>1.6</version>
+					<configuration>
+						<!-- We encounter some exceptions for now -->
+						<skip>false</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>

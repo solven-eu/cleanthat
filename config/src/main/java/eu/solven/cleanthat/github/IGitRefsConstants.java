@@ -16,4 +16,6 @@ public interface IGitRefsConstants {
 	// https://stackoverflow.com/questions/1526471/git-difference-between-branchname-and-refs-heads-branchname
 	String REF_REMOTES = REFS_PREFIX + "remotes/";
 	String REF_TAGS = REFS_PREFIX + "tags/";
+
+	String SHA1_CLEANTHAT_UP_TO_REF_ROOT = "CLEANTHAT_UP_TO_REF_ROOT";
 }

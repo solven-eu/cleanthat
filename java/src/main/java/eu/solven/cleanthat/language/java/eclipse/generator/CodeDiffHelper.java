@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.myers.MyersDiff;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
@@ -71,7 +70,7 @@ public class CodeDiffHelper {
 	public long deltaDiff(String pathAsString, String formatted) {
 		List<String> originalRows = Arrays.asList(pathAsString.split("[\r\n]+"));
 		List<String> formattedRows = Arrays.asList(formatted.split("[\r\n]+"));
-		Patch<String> diff = DiffUtils.diff(originalRows, formattedRows, new MyersDiff<String>());
+		Patch<String> diff = DiffUtils.diff(originalRows, formattedRows);
 		List<String> patchApplied;
 		try {
 			patchApplied = diff.applyTo(originalRows);

@@ -51,6 +51,7 @@ import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
@@ -171,7 +172,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = githubNoApiWebhookHandler.filterWebhookEventRelevant(githubEvent);
-		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		// https://developer.github.com/webhooks/event-payloads/
@@ -209,7 +210,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();
 
 		// We rely on push over branches to trigger initialization
-		if (offlineResult.isPushBranch()) {
+		if (offlineResult.isPushRef()) {
 			GHBranch defaultBranch;
 			try {
 				defaultBranch = GithubHelper.getDefaultBranch(baseRepo);
@@ -259,12 +260,12 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	 * 
 	 *         in case of a RR event, we return only the RR base
 	 */
-	private Set<String> computeRelevantBaseBranches(GitWebhookRelevancyResult offlineResult,
+	private Set<String> computeRelevantBaseBranches(IExternalWebhookRelevancyResult offlineResult,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			GithubRepositoryFacade facade,
 			Optional<GitPrHeadRef> optOpenPr) {
 		Set<String> relevantBaseBranches = new TreeSet<>();
-		if (offlineResult.isPushBranch()) {
+		if (offlineResult.isPushRef()) {
 			// This is assumed to be empty as we should not list for RR, before current step
 			assert optOpenPr.isEmpty();
 			// TODO Is this a valid behavior at all?
@@ -292,6 +293,11 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			assert offlineResult.isReviewRequestOpen();
 			assert offlineResult.optOpenPr().isPresent();
+
+			// WARNING we have reason to believe we should clean all files in the RR (i.e. as base the RR base, not the
+			// before of the push)
+			// Especially in case of ref-creation, with which we may not clean anything (not knowing yet the proper
+			// base)
 			relevantBaseBranches.add(offlineResult.optOpenPr().get().getBaseRef());
 		}
 		return relevantBaseBranches;
@@ -406,7 +412,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GitWebhookRelevancyResult offlineResult =
 				githubNoApiWebhookHandler.filterWebhookEventRelevant(externalCodeEvent);
 
-		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushBranch()) {
+		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		WebhookRelevancyResult relevancyResult =
@@ -421,13 +427,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId).getOptResult().get();
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
-		Optional<GHCheckRun> optCheckRUn;
-		if (offlineResult.isPushBranch() && offlineResult.optPushedRefOrRrHead().isPresent()) {
+		Optional<GHCheckRun> optCheckRun;
+		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
 			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
-			optCheckRUn = createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
+			optCheckRun = createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
-			optCheckRUn = Optional.empty();
+			optCheckRun = Optional.empty();
 		}
 
 		try {
@@ -435,16 +441,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
-			// clean
+			// clean (e.g. when cleaning a master branch, into a new ref)
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-			CodeFormatResult result =
-					GithubEventHelper.executeCleaning(relevancyResult, repo, cleaner, facade, headSupplier);
+			CodeFormatResult result = GithubEventHelper.executeCleaning(relevancyResult, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 			logAfterCleaning(installationId, githubAuthAsInst.getGithub());
 
 			// We complete right now, until we are able to complete this properly
-			optCheckRUn.ifPresent(checkRun -> {
+			optCheckRun.ifPresent(checkRun -> {
 				try {
 					checkRun.update().withConclusion(Conclusion.SUCCESS).withStatus(Status.COMPLETED).create();
 				} catch (IOException e) {
@@ -452,7 +457,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			});
 		} catch (RuntimeException e) {
-			optCheckRUn.ifPresent(checkRun -> {
+			optCheckRun.ifPresent(checkRun -> {
 				try {
 					checkRun.update().withConclusion(Conclusion.FAILURE).withStatus(Status.COMPLETED).create();
 				} catch (IOException ee) {

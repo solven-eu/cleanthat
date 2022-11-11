@@ -14,7 +14,7 @@ public interface IExternalWebhookRelevancyResult {
 	 * 
 	 * @return true if current event refer to a Commit being pushed
 	 */
-	boolean isPushBranch();
+	boolean isPushRef();
 
 	/**
 	 * 
@@ -33,9 +33,13 @@ public interface IExternalWebhookRelevancyResult {
 	/**
 	 * For ReviewRequest events, this is the base. For push, this is the sha1 before the push.
 	 * 
+	 * Is empty in case of ref-creation.
+	 * 
 	 * @return the privileged base Ref for given event
 	 */
 	@Deprecated
 	Optional<GitRepoBranchSha1> optBaseRef();
+
+	Optional<GitPrHeadRef> optOpenPr();
 
 }

@@ -186,13 +186,28 @@ public class GithubNoApiWebhookHandler {
 					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
 					String beforeSha = optBeforeSha.get();
-					if (beforeSha.matches("0+")) {
+
+					boolean created = PepperMapHelper.getRequiredBoolean(input, "created");
+					boolean forced = PepperMapHelper.getRequiredBoolean(input, "forced");
+
+					if (created) {
+						LOGGER.info(
+								"This is a ref creation. We may go for a full clean if it was a sensible/cleanable ref");
+						optBaseRef = Optional.of(
+								new GitRepoBranchSha1(repoName, ref, IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT));
+					} else if (forced) {
+						LOGGER.info(
+								"This is a forced push. The before sha1 represents before the push, which is not relevant to determine the files to clean");
+						optBaseRef = Optional.of(
+								new GitRepoBranchSha1(repoName, ref, IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT));
+					} else if (beforeSha.matches("0+")) {
 						// 0000000000000000000000000000000000000000
 						// AKA z40 is a special reference, meaning no_ref
 						// This is typically a branch creation
-						// TODO Should we consider as base a parent commit?
+						// Should we consider as base a parent commit? We can not as a plain branch-creation is not
+						// giving any referential
 						LOGGER.warn("Branch creation? We consider as base.sha1 the sha1 of after: {}", afterSha);
-						optBaseRef = Optional.of(new GitRepoBranchSha1(repoName, ref, afterSha));
+						optBaseRef = Optional.empty();
 					} else {
 						// We do not consider as base the RR base, as this is a push event: we are not sure what is the
 						// relevant base.

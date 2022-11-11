@@ -52,7 +52,10 @@ public class SourceCodeFormatterHelper {
 				.collect(Collectors.toList());
 
 		String language = languageProperties.getLanguage();
-		if (codeStyleFixer.isEmpty()) {
+
+		// This is specific for java for the moment, and more precisely to RulesJavaMutator as AST manipulators has high
+		// probability to change massively the style
+		if (codeStyleFixer.isEmpty() && "java".equals(language)) {
 			if (reportedLackOfStyleEnforcer.getAndSet(true)) {
 				// Already reported
 				LOGGER.debug("It is certainly unsafe not to have a single {} for language={}",
@@ -64,12 +67,12 @@ public class SourceCodeFormatterHelper {
 						IStyleEnforcer.class.getSimpleName(),
 						language);
 			}
-		} else {
+		} else if (!codeStyleFixer.isEmpty()) {
 			int nbCodeStyleFormatter = codeStyleFixer.size();
 			if (nbCodeStyleFormatter >= 2) {
-				LOGGER.warn("It is unsual to have multiple {} ({})",
-						IStyleEnforcer.class.getSimpleName(),
-						nbCodeStyleFormatter);
+				LOGGER.warn("It is unsual to have multiple={} {}",
+						nbCodeStyleFormatter,
+						IStyleEnforcer.class.getSimpleName());
 			}
 
 			IStyleEnforcer firstCodeStyleFormatter = codeStyleFixer.get(0);

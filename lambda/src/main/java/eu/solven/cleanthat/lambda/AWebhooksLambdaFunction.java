@@ -81,16 +81,14 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 							asMap = parseDynamoDbEvent(dynamoDbObjectMapper, r);
 						}
 					} catch (RuntimeException e) {
-						try {
-							LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
-						} catch (JsonProcessingException ee) {
-							LOGGER.warn("Issue printing JSON", ee);
-						}
+						logEvent(objectMapper, input);
 						throw new RuntimeException("Issue parsing AWS message", e);
 					}
 
 					return asMap;
 				}).filter(m -> !m.isEmpty()).map(r -> {
+					logEvent(objectMapper, r);
+
 					IWebhookEvent event = wrapAsEvent(r);
 					try {
 						return processOneEvent(event);
@@ -103,12 +101,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			} else {
 				// This would happen on Lambda direct invocation
 				// But we always try to rely on events(SQS, DynamoDB, ...)
-				// It may also happens in localhot invocation (e.g. ITCleanEventLocallyInDynamoDb)
-				try {
-					LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
-				} catch (JsonProcessingException ee) {
-					LOGGER.warn("Issue printing JSON", ee);
-				}
+				// It may also happens in localhost invocation (e.g. ITCleanEventLocallyInDynamoDb)
+				logEvent(objectMapper, input);
 
 				IWebhookEvent event = wrapAsEvent(input);
 				functionOutput = processOneEvent(event);
@@ -117,6 +111,14 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			return functionOutput;
 		};
 
+	}
+
+	private void logEvent(ObjectMapper objectMapper, Map<String, ?> input) {
+		try {
+			LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
+		} catch (JsonProcessingException ee) {
+			LOGGER.warn("Issue printing JSON", ee);
+		}
 	}
 
 	public static ObjectMapper configureForDynamoDb(ObjectMapper objectMapper) {
@@ -192,10 +194,10 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			asMap = InternalUtils.toSimpleMapValue(dynamoDbAttributes);
 
-			LOGGER.info("{} processing {}={}",
-					this.getClass().getName(),
+			LOGGER.info("processing {}={} by {}",
 					GithubWebhookEvent.X_GIT_HUB_DELIVERY,
-					PepperMapHelper.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY));
+					PepperMapHelper.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY),
+					this.getClass().getName());
 		} else {
 			// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
 			// We are in a REMOVE event

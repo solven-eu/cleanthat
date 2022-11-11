@@ -59,7 +59,7 @@ public class GithubNoApiWebhookHandler {
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
 				organizationUrl.orElse("<missing>"));
-		
+
 		// We are interested in 2 kind of events:
 		// PR being (re)open: it is a good time to clean PR-head modified files (if not in a readonly branch)
 		// Commit to branches:

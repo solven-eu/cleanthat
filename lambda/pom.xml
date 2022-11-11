@@ -70,7 +70,7 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-lambda</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<!--Notify Marketplace events -->
 			<groupId>com.github.seratch</groupId>

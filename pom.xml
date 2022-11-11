@@ -62,7 +62,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/solven-eu/pepper/releases -->
-		<pepper.version>4.1</pepper.version>
+		<pepper.version>4.2</pepper.version>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>

@@ -31,6 +31,7 @@ import eu.solven.pepper.collection.PepperMapHelper;
  * @author Benoit Lacelle
  *
  */
+// https://docs.github.com/en/developers/github-marketplace/using-the-github-marketplace-api-in-your-app/webhook-events-for-the-github-marketplace-api
 public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CheckWebhooksLambdaFunction.class);
 
@@ -38,8 +39,21 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		SpringApplication.run(CheckWebhooksLambdaFunction.class, args);
 	}
 
+	@SuppressWarnings("PMD.CloseResource")
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
+		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
+
+		Optional<Map<String, ?>> optMarketplacePurchase =
+				PepperMapHelper.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
+		if (optMarketplacePurchase.isPresent()) {
+			Slack slack = getSlack();
+
+			MarketPlaceEventManager
+					.handleMarketplaceEvent(getAppContext().getEnvironment(), slack, githubEvent.getBody());
+			return Map.of("event_type", "marketplace_purchase");
+		}
+
 		IGitWebhookHandlerFactory githubFactory = getAppContext().getBean(IGitWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
@@ -48,19 +62,6 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			makeWithFreshJwt = githubFactory.makeWithFreshAuth();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		}
-
-		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
-
-		Optional<Map<String, ?>> optMarketplacePurchase =
-				PepperMapHelper.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
-		if (optMarketplacePurchase.isPresent()) {
-			Slack slack = getAppContext().getBean(Slack.class);
-
-			// https://docs.github.com/en/developers/github-marketplace/using-the-github-marketplace-api-in-your-app/webhook-events-for-the-github-marketplace-api
-			MarketPlaceEventManager
-					.handleMarketplaceEvent(getAppContext().getEnvironment(), slack, githubEvent.getBody());
-			return Map.of("event_type", "marketplace_purchase");
 		}
 
 		GitWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
@@ -82,5 +83,10 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			return Map.of("whatever", "discarded");
 		}
 
+	}
+
+	@SuppressWarnings("PMD.CloseResource")
+	private Slack getSlack() {
+		return getAppContext().getBean(Slack.class);
 	}
 }

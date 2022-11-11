@@ -123,7 +123,7 @@ public class ConfigHelpers {
 	protected ISourceCodeProperties mergeSourceConfig(IHasSourceCodeProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, ?> rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
-		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getAs(dirtyLanguageConfig, KEY_SOURCE_CODE);
+		Map<String, ?> explicitSourceCodeProperties = PepperMapHelper.getRequiredMap(dirtyLanguageConfig, KEY_SOURCE_CODE);
 
 		Map<String, Object> sourceConfig =
 				mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);

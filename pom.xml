@@ -657,6 +657,32 @@
 						</execution>
 					</executions>
 				</plugin>
+
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>1.7</version>
+					<configuration>
+						<!-- We encounter some exceptions for now -->
+						<!--skip>true</skip-->
+					</configuration>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<!-- Generate a git.properties file only in this 'helpers' jar -->
 					<!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
@@ -725,6 +751,13 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- CleanThat should be executed only in the top-directory -->
+				<inherited>false</inherited>
 			</plugin>
 		</plugins>
 	</build>

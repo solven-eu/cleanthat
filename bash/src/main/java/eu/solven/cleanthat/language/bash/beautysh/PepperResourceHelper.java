@@ -36,7 +36,7 @@ public class PepperResourceHelper {
 		try {
 			Optional<Resource> optResource = Optional.of(new ClassPathResource(resourcePath, initialClassLoader));
 
-			if (!optResource.isPresent() || !optResource.get().exists()) {
+			if (optResource.isEmpty() || !optResource.get().exists()) {
 				// https://dzone.com/articles/spring-boot-classloader-and-class-override
 				// For an unknown reason, in SpringBoot jar, searching for json does not work with (default)
 				// AppClassLoader, but it succeeds with its parent
@@ -53,19 +53,19 @@ public class PepperResourceHelper {
 				}
 			}
 
-			if (!optResource.isPresent() || !optResource.get().exists()) {
+			if (optResource.isEmpty() || !optResource.get().exists()) {
 				optResource = tryPath(initialClassLoader, "classpath:" + resourcePath);
 			}
 
-			if (!optResource.isPresent() || !optResource.get().exists()) {
+			if (optResource.isEmpty() || !optResource.get().exists()) {
 				optResource = tryPath(initialClassLoader, "classpath*:" + resourcePath);
 			}
 
-			if (!optResource.isPresent() || !optResource.get().exists()) {
+			if (optResource.isEmpty() || !optResource.get().exists()) {
 				optResource = tryPath(initialClassLoader, "classpath*:" + resourcePath + "*");
 			}
 
-			if (!optResource.isPresent() || !optResource.get().exists()) {
+			if (optResource.isEmpty() || !optResource.get().exists()) {
 				throw new IllegalArgumentException("Can not find: " + resourcePath);
 			}
 

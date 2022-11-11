@@ -441,7 +441,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
-			// clean
+			// clean (e.g. when cleaning a master branch, into a new ref)
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
 			CodeFormatResult result = GithubEventHelper.executeCleaning(relevancyResult, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);

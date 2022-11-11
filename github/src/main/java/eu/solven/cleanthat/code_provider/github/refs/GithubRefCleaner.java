@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCompare;
+import org.kohsuke.github.GHCompare.Commit;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
@@ -27,6 +29,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
@@ -49,6 +52,7 @@ import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
 
@@ -115,8 +119,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			return cleanHeadInPlace(result, head);
 		}
 
-		if (canCleanInRR(cleanableRefsRegexes, headRef)) {
-			return cleanInRR(result, head, cleanableRefsRegexes, headRef);
+		if (canCleanInNewRR(cleanableRefsRegexes, headRef)) {
+			return cleanInNewRR(result, head, cleanableRefsRegexes, headRef);
 		} else {
 			// Cleanable neither in-place nor in-rr
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
@@ -127,7 +131,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
-	protected Optional<HeadAndOptionalBase> cleanInRR(IExternalWebhookRelevancyResult result,
+	protected Optional<HeadAndOptionalBase> cleanInNewRR(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 head,
 			List<String> cleanableRefsRegexes,
 			String headRef) {
@@ -159,7 +163,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return Optional.of(new HeadAndOptionalBase(actualHead, Optional.of(actualBase)));
 	}
 
-	private boolean canCleanInRR(List<String> cleanableRefsRegexes, String headRef) {
+	private boolean canCleanInNewRR(List<String> cleanableRefsRegexes, String headRef) {
 		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(cleanableRefsRegexes, headRef);
 
 		return optHeadMatchingRule.isPresent();
@@ -242,11 +246,31 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	}
 
 	private Optional<HeadAndOptionalBase> cleanHeadInPlace(IExternalWebhookRelevancyResult result,
-			GitRepoBranchSha1 theRef) {
+			GitRepoBranchSha1 head) {
 		// The base is cleanable: we are allowed to clean its head in-place
+		Optional<GitRepoBranchSha1> optBase = result.optBaseRef();
+		if (optBase.isPresent() && IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT.equals(optBase.get().getSha())) {
+			// Typically a refs has been created, or forced-push
+			// Its base would be the ancestor commit which is in the default branch
+			GitRepoBranchSha1 ambiguousBase = optBase.get();
+			try {
+				GHRepository repo = githubAndToken.getGithub().getRepository(ambiguousBase.getRepoFullName());
+				GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
 
-		GitRepoBranchSha1 head = new GitRepoBranchSha1(theRef.getRepoFullName(), theRef.getRef(), theRef.getSha());
-		return Optional.of(new HeadAndOptionalBase(head, result.optBaseRef()));
+				// https://docs.github.com/en/rest/commits/commits#compare-two-commits
+				GHCompare compare = repo.getCompare(defaultBranch.getSHA1(), head.getSha());
+				Commit mergeBase = compare.getMergeBaseCommit();
+
+				GitRepoBranchSha1 newBase =
+						new GitRepoBranchSha1(ambiguousBase.getRef(), ambiguousBase.getRef(), mergeBase.getSHA1());
+				LOGGER.info("We will use as base: {}", newBase);
+				optBase = Optional.of(newBase);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		return Optional.of(new HeadAndOptionalBase(head, optBase));
 	}
 
 	/**

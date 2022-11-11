@@ -16,10 +16,12 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
+import eu.solven.cleanthat.code_provider.github.code_provider.FileIsTooBigException;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -94,6 +96,13 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);
+			return Optional.empty();
+		} catch (FileIsTooBigException e) {
+			LOGGER.trace("File is too big to be processed: {} ({})",
+					path,
+					PepperLogHelper.humanBytes(e.getLength()),
+					e);
+			LOGGER.warn("File is too big to be processed: {} ({})", path, PepperLogHelper.humanBytes(e.getLength()));
 			return Optional.empty();
 		}
 	}

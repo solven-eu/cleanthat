@@ -36,7 +36,7 @@ public class ITGithubRefCleaner {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
+		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
 		GHApp app = handler.getGithubAsApp();
 
@@ -45,7 +45,7 @@ public class ITGithubRefCleaner {
 		// Ensure the repo is available to the app
 		// https://github.com/organizations/solven-eu/settings/installations/9086720
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId());
+		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = GithubHelper.getDefaultBranch(cleanthatRepo);

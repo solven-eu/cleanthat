@@ -21,6 +21,12 @@ public abstract class AGithubCodeProvider implements ICodeProvider {
 
 	public static String loadContent(GHRepository repository, String filename, String sha1) throws IOException {
 		GHContent content = repository.getFileContent(filename, sha1);
+
+		if ("none".equals(content.getEncoding())) {
+			// https://github.com/hub4j/github-api/issues/1558
+			throw new FileIsTooBigException(content.getGitUrl(), content.getSize());
+		}
+
 		String asString;
 		try (InputStreamReader reader = new InputStreamReader(content.read(), Charsets.UTF_8)) {
 			asString = CharStreams.toString(reader);

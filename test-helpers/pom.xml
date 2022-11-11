@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.8-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>test-helpers</artifactId>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>nl.jqno.equalsverifier</groupId>
 			<artifactId>equalsverifier</artifactId>
-			<version>3.10.1</version>
+			<version>3.11</version>
 		</dependency>
 
 		<dependency>

@@ -61,13 +61,13 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
+		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
 		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
-		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId());
+		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 		GitHub github = githubAndToken.getGithub();
 		// GitHub userToServerGithub = handler.getGithubAsApp();
 

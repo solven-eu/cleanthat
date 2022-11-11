@@ -81,6 +81,16 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			return code;
 		}
 		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
-		return formatter.doFormat(code, lineEnding);
+
+		if (lineEnding == LineEnding.UNKNOWN) {
+			LineEnding.determineLineEnding(code).orElse(LineEnding.UNKNOWN);
+		}
+		if (lineEnding == LineEnding.UNKNOWN) {
+			LOGGER.warn("Undefined EOL: We skip formatting");
+			return code;
+		} else {
+			return formatter.doFormat(code, lineEnding);
+		}
+
 	}
 }

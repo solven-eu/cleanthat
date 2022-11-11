@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7-SNAPSHOT</version>
+		<version>1.8-SNAPSHOT</version>
 		<relativePath>parent</relativePath>
 	</parent>
 
@@ -62,35 +62,35 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://github.com/solven-eu/pepper/releases -->
-		<pepper.version>4.1</pepper.version>
+		<pepper.version>4.2</pepper.version>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-		<spotbugs.version>4.7.2.0</spotbugs.version>
+		<spotbugs.version>4.7.2.1</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
-		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
-		<checkstyle.version>10.3.3</checkstyle.version>
+		<checkstyle.version>10.4</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
-		<maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
+		<maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
-		<pmd.version>6.49.0</pmd.version>
+		<pmd.version>6.51.0</pmd.version>
 		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
 		<git-commit-id-plugin.version>5.0.0</git-commit-id-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
-		<formatter-maven-plugin.version>2.20.0</formatter-maven-plugin.version>
+		<formatter-maven-plugin.version>2.21.0</formatter-maven-plugin.version>
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.7.0</impsort-maven-plugin.version>
 
-		<sentry-spring.version>5.7.4</sentry-spring.version>
+		<sentry-spring.version>6.7.0</sentry-spring.version>
 
 		<!-- Used for agnostic AWS-Lambda -->
-		<spring-cloud.version>2020.0.4</spring-cloud.version>
+		<spring-cloud.version>2021.0.5</spring-cloud.version>
 
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
@@ -125,7 +125,7 @@
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>1.12.305</version>
+				<version>1.12.336</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -135,7 +135,7 @@
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
 				<groupId>org.checkerframework</groupId>
 				<artifactId>checker-qual</artifactId>
-				<version>3.25.0</version>
+				<version>3.27.0</version>
 			</dependency>
 
 			<!-- Commented-out as we observe unexpected formattings -->
@@ -145,6 +145,13 @@
 				<version>${eclipse.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>9.25.6</version>
 			</dependency>
 
 			<!-- <dependency> -->
@@ -646,6 +653,32 @@
 
 							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
 							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>1.7</version>
+					<configuration>
+						<!-- We encounter some exceptions for now -->
+						<!--skip>true</skip-->
+					</configuration>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
 							<phase>${staticChecks}</phase>
 						</execution>
 					</executions>

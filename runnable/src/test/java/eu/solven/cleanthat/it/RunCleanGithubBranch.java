@@ -26,8 +26,8 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
@@ -61,13 +61,13 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
+		GithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
 		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
-		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId());
+		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 		GitHub github = githubAndToken.getGithub();
 
 		GHRepository repo;

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Import;
 
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 import eu.solven.cleanthat.language.json.JsonFormattersFactory;
-import eu.solven.cleanthat.language.scala.ScalaFormattersFactory;
 import eu.solven.cleanthat.language.xml.XmlFormattersFactory;
 
 /**
@@ -15,10 +14,14 @@ import eu.solven.cleanthat.language.xml.XmlFormattersFactory;
  *
  */
 @Configuration
-@Import({ JavaFormattersFactory.class,
-		ScalaFormattersFactory.class,
-		JsonFormattersFactory.class,
-		XmlFormattersFactory.class })
+@Import({ JavaFormattersFactory.class, JsonFormattersFactory.class, XmlFormattersFactory.class })
 public class AllLanguagesSpringConfig {
 
+	// TODO Rely on AutoConfiguration
+	// Scala is typically excluded from packaes (e.g. Lambda due to size limitations
+	// @ConditionalOnClass(ScalaFormattersFactory.class)
+	// @Bean
+	// public ScalaFormattersFactory ScalaFormattersFactory(ObjectMapper objectMapper) {
+	// return new ScalaFormattersFactory(objectMapper);
+	// }
 }

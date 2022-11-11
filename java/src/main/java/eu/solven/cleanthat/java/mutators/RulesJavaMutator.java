@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.myers.MyersDiff;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
@@ -251,7 +250,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 
 		List<String> dirtyRows = Arrays.asList(dirtyCode.split(lineEndingChars, -1));
 		List<String> cleanRows = Arrays.asList(cleanerCode.split(lineEndingChars, -1));
-		Patch<String> diff = DiffUtils.diff(dirtyRows, cleanRows, new MyersDiff<String>());
+		Patch<String> diff = DiffUtils.diff(dirtyRows, cleanRows);
 
 		assertPatchIsValid(dirtyRows, cleanRows, diff);
 

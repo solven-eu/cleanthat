@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

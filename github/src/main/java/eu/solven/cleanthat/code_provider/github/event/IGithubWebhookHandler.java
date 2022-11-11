@@ -3,12 +3,15 @@ package eu.solven.cleanthat.code_provider.github.event;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
 
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.utils.ResultOrError;
+
 /**
  * Knows how to process a Github webhook
  *
  * @author Benoit Lacelle
  */
-public interface IGithubWebhookHandler extends IGitWebhookHandler {
+public interface IGithubWebhookHandler {
 	/**
 	 * Typically useful to list installations
 	 * 
@@ -21,6 +24,6 @@ public interface IGithubWebhookHandler extends IGitWebhookHandler {
 	 * @param installationId
 	 * @return a {@link GitHub} instance authenticated as given installation, having access to permitted repositories
 	 */
-	GithubAndToken makeInstallationGithub(long installationId);
+	ResultOrError<GithubAndToken, WebhookRelevancyResult> makeInstallationGithub(long installationId);
 
 }

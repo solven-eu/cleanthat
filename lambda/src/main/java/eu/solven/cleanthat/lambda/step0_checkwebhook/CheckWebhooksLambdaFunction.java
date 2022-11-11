@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.github.seratch.jslack.Slack;
 
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
@@ -18,6 +20,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Used to filter relevant webhooks for useless webhooks.
@@ -28,6 +31,7 @@ import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
  * @author Benoit Lacelle
  *
  */
+// https://docs.github.com/en/developers/github-marketplace/using-the-github-marketplace-api-in-your-app/webhook-events-for-the-github-marketplace-api
 public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CheckWebhooksLambdaFunction.class);
 
@@ -35,8 +39,21 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		SpringApplication.run(CheckWebhooksLambdaFunction.class, args);
 	}
 
+	@SuppressWarnings("PMD.CloseResource")
 	@Override
 	protected Map<String, ?> unsafeProcessOneEvent(IWebhookEvent input) {
+		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
+
+		Optional<Map<String, ?>> optMarketplacePurchase =
+				PepperMapHelper.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
+		if (optMarketplacePurchase.isPresent()) {
+			Slack slack = getSlack();
+
+			MarketPlaceEventManager
+					.handleMarketplaceEvent(getAppContext().getEnvironment(), slack, githubEvent.getBody());
+			return Map.of("event_type", "marketplace_purchase");
+		}
+
 		IGitWebhookHandlerFactory githubFactory = getAppContext().getBean(IGitWebhookHandlerFactory.class);
 
 		// TODO Cache the Github instance for the JWT duration
@@ -46,8 +63,6 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
-		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
 
 		GitWebhookRelevancyResult processAnswer = makeWithFreshJwt.filterWebhookEventRelevant(githubEvent);
 
@@ -72,5 +87,10 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			return Map.of("status", "Recorded in DB for further processing");
 		}
 
+	}
+
+	@SuppressWarnings("PMD.CloseResource")
+	private Slack getSlack() {
+		return getAppContext().getBean(Slack.class);
 	}
 }

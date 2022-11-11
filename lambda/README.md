@@ -6,9 +6,13 @@ Or safer:
 	
     mvn clean install -pl :lambda -am
 
-To deploy:
+To deploy from localhost:
 
     mvn lambda:deploy-lambda -pl :lambda
+    
+Tp deploy from CircleCI
+
+    git push origin master:deploy-prd
     
 Issue with startup on Lambda? Start by testing in local:
 
@@ -21,6 +25,10 @@ https://github-api.kohsuke.org/githubappjwtauth.html
     
     openssl pkcs8 -topk8 -inform PEM -outform DER -in ~/Dropbox/Solven/Dev/CleanThat/cleanthat.2020-05-19.private-key.pem -out ~/Dropbox/Solven/Dev/CleanThat/github-api-app.private-key.der -nocrypt
 
+Environment Variable:
+
+    GITHUB_APP_PRIVATE_JWK: to authenticate as a Github app
+    SLACK_WEBHOOK_MARKETPLACE: to send events on special webhooks (e.g. marketplace event)
 
 
 Lost note:

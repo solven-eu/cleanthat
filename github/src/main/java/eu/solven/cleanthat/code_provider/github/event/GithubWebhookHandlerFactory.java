@@ -20,6 +20,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+
 /**
  * Factory for {@link GitHub}, on a per-installation basis
  *
@@ -51,7 +56,59 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 	}
 
 	@Override
-	public IGithubWebhookHandler makeWithFreshAuth() throws IOException {
+	public IGitWebhookHandler makeNoAuth() throws IOException {
+		GithubNoApiWebhookHandler underlying = makeUnderlyingNoAuth();
+		return new IGitWebhookHandler() {
+
+			@Override
+			public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent input) {
+				return underlying.filterWebhookEventRelevant(input);
+			}
+
+			@Override
+			public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
+					IWebhookEvent input) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input) {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+
+	public GithubNoApiWebhookHandler makeUnderlyingNoAuth() {
+		GithubNoApiWebhookHandler underlying = new GithubNoApiWebhookHandler(objectMappers);
+		return underlying;
+	}
+
+	@Override
+	public IGitWebhookHandler makeWithFreshAuth() throws IOException {
+		GithubWebhookHandler githubWebhookHandler = makeGithubWebhookHandler();
+
+		IGitWebhookHandler noAuth = makeNoAuth();
+
+		return new IGitWebhookHandler() {
+			@Override
+			public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent input) {
+				return noAuth.filterWebhookEventRelevant(input);
+			}
+
+			@Override
+			public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
+					IWebhookEvent input) {
+				return githubWebhookHandler.filterWebhookEventTargetRelevantBranch(codeCleanerFactory, input);
+			}
+
+			@Override
+			public void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input) {
+				githubWebhookHandler.doExecuteClean(codeCleanerFactory, input);
+			}
+		};
+	}
+
+	public GithubWebhookHandler makeGithubWebhookHandler() throws IOException {
 		String jwt;
 		try {
 			jwt = makeJWT();
@@ -64,7 +121,8 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 				.withConnector(GithubWebhookHandler.createGithubConnector())
 				.build();
 
-		return new GithubWebhookHandler(github.getApp(), objectMappers);
+		GithubWebhookHandler githubWebhookHandler = new GithubWebhookHandler(github.getApp(), objectMappers);
+		return githubWebhookHandler;
 	}
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature

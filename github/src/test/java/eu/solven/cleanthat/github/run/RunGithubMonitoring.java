@@ -80,7 +80,7 @@ public class RunGithubMonitoring {
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		ApplicationContext appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
-		IGithubWebhookHandler handler = factory.makeWithFreshAuth();
+		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
 		GHApp app = handler.getGithubAsApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());

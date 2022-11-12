@@ -711,7 +711,7 @@
 					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
-					<version>1.6</version>
+					<version>1.7</version>
 					<configuration>
 						<!-- We encounter some exceptions for now -->
 						<skip>false</skip>

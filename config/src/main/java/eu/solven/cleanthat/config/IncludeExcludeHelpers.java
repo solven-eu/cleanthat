@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.config;
 
+import java.io.File;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
@@ -35,7 +36,17 @@ public class IncludeExcludeHelpers {
 		FileSystem fs = FileSystems.getDefault();
 		return regex.stream().map(r -> {
 			try {
-				return fs.getPathMatcher(r);
+				String newPattern;
+				// https://stackoverflow.com/questions/64102053/java-pathmatcher-not-working-properly-on-windows
+				if (File.separator.equals("\\")) {
+					// We are under Windows
+					newPattern = r.replace("/", "\\\\");
+				} else {
+					// We are under Linux
+					newPattern = r;
+				}
+
+				return fs.getPathMatcher(newPattern);
 			} catch (RuntimeException e) {
 				throw new IllegalArgumentException("Invalid regex: " + r, e);
 			}

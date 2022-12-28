@@ -35,6 +35,7 @@
 		</dependency>
 
 		<dependency>
+			<!-- For Eclipse, given downloaded jar: 'java -jar lombok.jar' --> 
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

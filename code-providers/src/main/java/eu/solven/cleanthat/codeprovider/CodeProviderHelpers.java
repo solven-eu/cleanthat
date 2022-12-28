@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -23,6 +26,7 @@ import eu.solven.cleanthat.config.ConfigHelpers;
  *
  */
 public class CodeProviderHelpers {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
 
 	public static final String FILENAME_CLEANTHAT_YAML = "cleanthat.yaml";
 	public static final String FILENAME_CLEANTHAT_YML = "cleanthat.yml";
@@ -59,7 +63,9 @@ public class CodeProviderHelpers {
 		}
 
 		ObjectMapper objectMapper;
-		if (optPathAndContent.get().getKey().endsWith("json")) {
+		Map.Entry<String, String> pathAndContent = optPathAndContent.get();
+		LOGGER.info("Loaded config from {}", pathAndContent.getKey());
+		if (pathAndContent.getKey().endsWith(".json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
 		} else {
 			objectMapper = ConfigHelpers.getYaml(objectMappers);

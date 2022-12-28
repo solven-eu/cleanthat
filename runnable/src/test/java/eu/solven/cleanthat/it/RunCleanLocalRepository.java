@@ -46,7 +46,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		// One can adjust this to any local folder
-		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace3", "mitrust-datasharing");
+		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace-2022", "cleanthat");
 
 		LOGGER.info("About to process {}", repoFolder);
 

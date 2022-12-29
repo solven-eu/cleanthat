@@ -80,6 +80,7 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		} catch (RuntimeException e) {
 			// TODO Is this related to code-modifications?
 			try {
+				LOGGER.warn("Does this still happen? Yes!");
 				return Optional.of(getThreadJavaParser().getType(scope));
 			} catch (RuntimeException ee) {
 				LOGGER.debug("Issue with JavaParser: {} {}", ee.getClass().getName(), ee.getMessage());
@@ -107,7 +108,8 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 			// return Optional.of(calculateResolvedType);
 			return Optional.of(manualResolvedType);
 		} catch (RuntimeException e) {
-			// This will happens often as, as of 2021-01, we solve types only given current class context,
+			LOGGER.warn("Does this still happen? Yes!");
+			// This will happen often as, as of 2021-01, we solve types only given current class context,
 			// neither other classes of the project, nor its maven/gradle dependencies
 			// UnsolvedSymbolException
 			// https://github.com/javaparser/javaparser/issues/1491

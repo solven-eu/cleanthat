@@ -97,7 +97,7 @@
 		<jacoco.instruction.ratio>0.10</jacoco.instruction.ratio>
 		<!-- CPD: We configure as property to enable overriding by sub-modules -->
 		<!-- Code duplication: Lower is better. Default is 100 -->
-		<minimumTokens>60</minimumTokens>
+		<minimumTokens>80</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
 		<surefire.additionalArgument/>

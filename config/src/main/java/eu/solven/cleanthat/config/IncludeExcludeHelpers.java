@@ -43,7 +43,7 @@ public class IncludeExcludeHelpers {
 			try {
 				String newPattern;
 				// https://stackoverflow.com/questions/64102053/java-pathmatcher-not-working-properly-on-windows
-				if (File.separator.equals("\\")) {
+				if ("\\".equals(File.separator)) {
 					// We are under Windows
 					newPattern = r.replace("/", "\\\\");
 					LOGGER.info("File.separator='{}' so we switched regex to: {}", File.separator, newPattern);

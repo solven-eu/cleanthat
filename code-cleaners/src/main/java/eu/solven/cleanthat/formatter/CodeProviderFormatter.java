@@ -207,10 +207,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		try {
 			codeProvider.listFilesForContent(file -> {
 				String filePath = file.getPath();
-				
-				if (filePath.contains("do_not_format_me")) {
-					LOGGER.error("TODO");
-				}
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);

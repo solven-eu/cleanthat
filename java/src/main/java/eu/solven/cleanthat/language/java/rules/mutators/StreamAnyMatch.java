@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
@@ -23,21 +23,24 @@ import eu.solven.pepper.logging.PepperLogHelper;
  */
 public class StreamAnyMatch extends AJavaParserRule implements IClassTransformer {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
+
+	private static final String METHOD_FILTER = "filter";
+	private static final String METHOD_FIND_ANY = "findAny";
 	private static final String METHOD_IS_PRESENT = "isPresent";
 	private static final String METHOD_IS_EMPTY = "isEmpty";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
+	private static final String METHOD_ANY_MATCH = "anyMatch";
 
-	// Optional exists since 8
-	// Optional.isPresent exists since 11
+	// Stream exists since 8
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_11;
+		return IJdkVersionConstants.JDK_8;
 	}
 
 	@Override
 	public String getId() {
-		return "OptionalNotEmpty";
+		return "StreamAnyMatch";
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
@@ -49,52 +52,56 @@ public class StreamAnyMatch extends AJavaParserRule implements IClassTransformer
 		}
 		MethodCallExpr methodCall = (MethodCallExpr) node;
 		String methodCallIdentifier = methodCall.getName().getIdentifier();
-		if (!METHOD_IS_EMPTY.equals(methodCallIdentifier) && !METHOD_IS_PRESENT.equals(methodCallIdentifier)) {
+		if (!METHOD_IS_PRESENT.equals(methodCallIdentifier) && !METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
 			return false;
 		}
-		Optional<Node> optParent = methodCall.getParentNode();
-		// We looks for a negated expression '!optional.isEmpty()'
-		if (methodCall.getScope().isEmpty() || optParent.isEmpty() || !(optParent.get() instanceof UnaryExpr)) {
-			return false;
-		}
-		UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
-		if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
-			return false;
-		}
+
 		Optional<Expression> optScope = methodCall.getScope();
-		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
-		if (optType.isEmpty()) {
-			return false;
-		}
-		ResolvedType type = optType.get();
-		boolean isCorrectClass = false;
-		if (type.isConstraint()) {
-			// Happens on Lambda
-			type = type.asConstraintType().getBound();
-		}
-		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(Optional.class.getName())) {
-			// We are calling 'isEmpty' not on an Optional object
-			isCorrectClass = true;
-		}
-		if (!isCorrectClass) {
+		if (optScope.isEmpty()) {
 			return false;
 		}
 		Expression scope = optScope.get();
-		boolean localTransformed = false;
-		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
-			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_PRESENT);
-			LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-			if (unaryExpr.replace(replacement)) {
-				localTransformed = true;
-			}
-		} else {
-			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
-			LOGGER.info("Turning '{}' into '{}'", unaryExpr, replacement);
-			if (unaryExpr.replace(replacement)) {
-				localTransformed = true;
-			}
+		if (!(scope instanceof MethodCallExpr)) {
+			return false;
 		}
-		// TODO Add a rule to replace such trivial 'if else return'
+		MethodCallExpr scopeAsMethodCallExpr = (MethodCallExpr) scope;
+		if (!METHOD_FIND_ANY.equals(scopeAsMethodCallExpr.getName().getIdentifier())) {
+			return false;
+		}
+
+		Optional<Expression> optParentScope = scopeAsMethodCallExpr.getScope();
+		if (optParentScope.isEmpty()) {
+			return false;
+		}
+		Expression parentScope = optParentScope.get();
+		if (!parentScope.isMethodCallExpr()) {
+			return false;
+		}
+		MethodCallExpr parentScopeAsMethodCallExpr = (MethodCallExpr) parentScope;
+		if (!METHOD_FILTER.equals(parentScopeAsMethodCallExpr.getName().getIdentifier())) {
+			return false;
+		}
+
+		Optional<Expression> optGrandParentScope = parentScopeAsMethodCallExpr.getScope();
+		if (optGrandParentScope.isEmpty()) {
+			return false;
+		}
+		Expression grandParentScope = optGrandParentScope.get();
+
+		Expression filterPredicate = parentScopeAsMethodCallExpr.getArgument(0);
+
+		boolean localTransformed = false;
+		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
+		Expression replacement = new MethodCallExpr(grandParentScope, METHOD_ANY_MATCH, replaceArguments);
+
+		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
+			replacement = new UnaryExpr(replacement, UnaryExpr.Operator.LOGICAL_COMPLEMENT);
+		}
+		LOGGER.info("Turning {} into {}", methodCall, replacement);
+		if (methodCall.replace(replacement)) {
+			localTransformed = true;
+		}
+
 		if (localTransformed) {
 			return true;
 		} else {

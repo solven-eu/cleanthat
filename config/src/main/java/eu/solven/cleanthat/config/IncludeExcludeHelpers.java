@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Helpers related to include and exclude rules
  * 
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
  *
  */
 public class IncludeExcludeHelpers {
+	private static final Logger LOGGER = LoggerFactory.getLogger(IncludeExcludeHelpers.class);
+
 	// It is good to know that '/' will be interpreted as folder separator even under Windows
 	// https://stackoverflow.com/questions/9148528/how-do-i-use-directory-globbing-in-jdk7
 	public static final List<String> DEFAULT_INCLUDES_JAVA = Arrays.asList("glob:**/*.java");
@@ -41,6 +46,7 @@ public class IncludeExcludeHelpers {
 				if (File.separator.equals("\\")) {
 					// We are under Windows
 					newPattern = r.replace("/", "\\\\");
+					LOGGER.info("File.separator='{}' so we switched regex to: {}", File.separator, newPattern);
 				} else {
 					// We are under Linux
 					newPattern = r;

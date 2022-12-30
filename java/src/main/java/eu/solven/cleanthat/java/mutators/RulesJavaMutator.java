@@ -223,7 +223,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 	}
 
 	protected String fixJavaparserUnexpectedChanges(String dirtyCode, String cleanCode) throws IOException {
-		if (dirtyCode.equals(cleanCode)) {
+		if (cleanCode.equals(dirtyCode)) {
 			// Return the original reference whenever possible
 			return dirtyCode;
 		}
@@ -307,11 +307,11 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 		} catch (PatchFailedException e) {
 			throw new RuntimeException(e);
 		}
-		if (!cleanRows.equals(patchApplied)) {
+		if (!patchApplied.equals(cleanRows)) {
 			throw new IllegalArgumentException("Issue aplying the patch");
 		}
 		List<String> patchRestored = diff.restore(cleanRows);
-		if (!dirtyRows.equals(patchRestored)) {
+		if (!patchRestored.equals(dirtyRows)) {
 			throw new IllegalArgumentException("Issue restoring the patch");
 		}
 	}

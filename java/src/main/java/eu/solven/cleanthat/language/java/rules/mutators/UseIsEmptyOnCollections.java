@@ -65,10 +65,10 @@ public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTr
 		}
 
 		Optional<MethodCallExpr> checkmeForIsEmpty;
-		if (binaryExpr.getRight().equals(ZERO_EXPR) && binaryExpr.getLeft() instanceof MethodCallExpr) {
+		if (ZERO_EXPR.equals(binaryExpr.getRight()) && binaryExpr.getLeft() instanceof MethodCallExpr) {
 			// xxx.method() == 0
 			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
-		} else if (binaryExpr.getLeft().equals(ZERO_EXPR) && binaryExpr.getRight() instanceof MethodCallExpr) {
+		} else if (ZERO_EXPR.equals(binaryExpr.getLeft()) && binaryExpr.getRight() instanceof MethodCallExpr) {
 			// 0 == xxx.method()
 			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getRight());
 		} else {

@@ -1,17 +1,24 @@
 package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.InputStreamResource;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.language.java.rules.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.rules.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
@@ -326,6 +333,15 @@ public class VariableEqualsConstantCases extends ACases {
 	public static class CompareMethodCallWithVariable {
 		public Object post(String input, Object object) {
 			return object.toString().equals(input);
+		}
+	}
+
+	private static final String EOL = System.lineSeparator();
+
+	@UnchangedMethod
+	public static class HardcodedStringVsStatic {
+		public Object post() {
+			return "\r\n".equals(EOL);
 		}
 	}
 }

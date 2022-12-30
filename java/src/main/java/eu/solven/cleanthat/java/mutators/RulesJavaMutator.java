@@ -100,10 +100,7 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			// Ensure the code has lower version than the rule minimalVersion
 			return languageVersion.compareTo(transformerVersion) >= 0;
 		}).filter(ct -> {
-			boolean isExclusion = excludedRules.stream()
-					.filter(excludedRule -> ct.getIds().contains(excludedRule))
-					.findAny()
-					.isPresent();
+			boolean isExclusion = excludedRules.stream().anyMatch(excludedRule -> ct.getIds().contains(excludedRule));
 
 			if (isExclusion) {
 				LOGGER.info("We exclude '{}'", ct.getIds());

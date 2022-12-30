@@ -65,8 +65,8 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		if (node.toString().contains("constantSomeClass")) {
-			LOGGER.error("{}", PepperLogHelper.getObjectAndClass(node));
+		if (node.toString().contains("EOL")) {
+			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		}
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
@@ -122,9 +122,12 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			return false;
 		}
 
-		if (!mayBeNull(argument) && mayBeNull(scope)
+		if (!mayBeNull(scope)) {
+			// The scope can not be null: preserve the current style
+			return false;
+		} else if (!mayBeNull(argument)
 				// Static fields are considered notNull when compared with a notStatic thing
-				|| isStaticField(singleArgument) && !isStaticField(scope)) {
+				|| isStaticField(argument) && !isStaticField(scope)) {
 			MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
 			return tryReplace(node, replacement);
 		} else {

@@ -54,7 +54,7 @@ public class TestConfigHelpers {
 				String expectedYaml = StreamUtils.copyToString(
 						new ClassPathResource("/config/" + name + ".to_yaml.yaml").getInputStream(),
 						StandardCharsets.UTF_8);
-				if (EOL.equals("\r\n")) {
+				if ("\r\n".equals(EOL)) {
 					// We are seemingly under Windows
 					if (!expectedYaml.contains(EOL)) {
 						Assert.fail("Files are not checked-out with system EOL");

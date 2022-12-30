@@ -84,10 +84,13 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		try {
 			calculateResolvedType = scope.calculateResolvedType();
 		} catch (RuntimeException e) {
-			// TODO Is this related to code-modifications?
 			try {
-				LOGGER.warn("1- Does this still happen? Yes!", e);
-				return Optional.of(getThreadJavaParser().getType(scope));
+				Optional<ResolvedType> fallbackType = Optional.of(getThreadJavaParser().getType(scope));
+				if (fallbackType.isPresent()) {
+					// TODO Is this related to code-modifications?
+					LOGGER.debug("1- Does this still happen? As of 2022-12: Yes!", e);
+				}
+				return fallbackType;
 			} catch (RuntimeException ee) {
 				LOGGER.debug("Issue with JavaParser: {} {}", ee.getClass().getName(), ee.getMessage());
 				return Optional.empty();

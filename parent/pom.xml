@@ -134,6 +134,7 @@
 				<license.skip>true</license.skip>
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
+				<cleanthat.skip>true</cleanthat.skip>
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
 			</properties>
@@ -148,7 +149,7 @@
 				</property>
 			</activation>
 			<properties>
-				<!-- Skip static-analysis -->
+				<!-- Skip tests -->
 				<jacoco.skip>true</jacoco.skip>
 			</properties>
 		</profile>
@@ -159,6 +160,28 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
+				<skipITs>true</skipITs>
+			</properties>
+		</profile>
+		<profile>
+			<!-- skip everything, test, quality, format,... -->
+			<id>fast</id>
+			<properties>
+				<!--<skipTests>true</skipTests> -->
+				<!--<jacoco.skip>true</jacoco.skip> -->
+				<checkstyle.skip>true</checkstyle.skip>
+				<pmd.skip>true</pmd.skip>
+				<cpd.skip>true</cpd.skip>
+				<spotbugs.skip>true</spotbugs.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+				<license.skip>true</license.skip>
+				<formatter.skip>true</formatter.skip>
+				<impsort.skip>true</impsort.skip>
+				<cleanthat.skip>true</cleanthat.skip>
+				<!-- Dependency will be checked with style -->
+				<enforcer.skip>true</enforcer.skip>
+				<!-- Skip tests -->
+				<jacoco.skip>true</jacoco.skip>
 				<skipITs>true</skipITs>
 			</properties>
 		</profile>

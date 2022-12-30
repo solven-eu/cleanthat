@@ -41,4 +41,35 @@ public class TestVariableEqualsConstantCases extends ATestCases {
 
 		Assertions.assertThat(transformed).isTrue();
 	}
+
+	@Test
+	public void testIssueWithFile2() throws IOException {
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/Generic/ConstantWithDigitInName.java");
+		String asString =
+				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+
+		IClassTransformer transformer = new VariableEqualsConstant();
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser(transformer.isJreOnly());
+		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+
+		boolean transformed = transformer.walkNode(compilationUnit);
+
+		Assertions.assertThat(transformed).isFalse();
+	}
+
+	@Test
+	public void testIssueWithFile3() throws IOException {
+		Resource testRoaringBitmapSource = new ClassPathResource("/source/do_not_format_me/MiTrust/LocaleHelper.java");
+		String asString =
+				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+
+		IClassTransformer transformer = new VariableEqualsConstant();
+		JavaParser javaParser = RulesJavaMutator.makeDefaultJavaParser(transformer.isJreOnly());
+		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+
+		boolean transformed = transformer.walkNode(compilationUnit);
+
+		Assertions.assertThat(transformed).isFalse();
+	}
 }

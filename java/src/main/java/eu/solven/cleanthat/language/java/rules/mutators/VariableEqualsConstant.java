@@ -14,6 +14,8 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.SuperExpr;
+import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
@@ -63,6 +65,9 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
+		if (node.toString().contains("constantSomeClass")) {
+			LOGGER.error("{}", PepperLogHelper.getObjectAndClass(node));
+		}
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
@@ -99,10 +104,12 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		} else {
 			return false;
 		}
+
 		// recover argument of equals
 		Expression argument = singleArgument;
-		// hardocoded string seems to be instance of StringLiteralExpr
+		// hardcoded string seems to be instance of StringLiteralExpr
 		LOGGER.debug("Find a hardcoded string : {}", argument);
+
 		// argument is hard coded we need scope to inverse the two
 		Optional<Expression> optScope = methodCall.getScope();
 		if (optScope.isEmpty()) {
@@ -110,24 +117,43 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			return false;
 		}
 		Expression scope = optScope.get();
-		if (scope instanceof StringLiteralExpr || scope instanceof ObjectCreationExpr) {
-			// There is no point in switching a constant with another constant
-			return false;
-		}
+
 		if (stringScopeOnly && !isStringScope(scope)) {
 			return false;
 		}
 
-		if (isStaticField(scope) && !isStaticField(singleArgument)) {
-			// Scope is a static field: keep it as scope
-			return false;
-		} else if (isField(scope) && !isField(singleArgument)) {
-			// Scope is a static field: keep it as scope
+		if (!mayBeNull(argument) && mayBeNull(scope)
+				// Static fields are considered notNull when compared with a notStatic thing
+				|| isStaticField(singleArgument) && !isStaticField(scope)) {
+			MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
+			return tryReplace(node, replacement);
+		} else {
+			// There is no point in switching a constant with another constant
+			// Or switching a nullable with another nullable
 			return false;
 		}
 
-		MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
-		return tryReplace(node, replacement);
+		// if (isStaticField(scope) && !isStaticField(singleArgument)) {
+		// // Scope is a static field: keep it as scope
+		// return false;
+		// } else if (isField(scope) && !isField(singleArgument)) {
+		// // Scope is a field: keep it as scope
+		// return false;
+		// } else if (!isField(scope) && scope.isNameExpr() && !isField(singleArgument) && singleArgument.isNameExpr())
+		// {
+		// // Comparing 2 anonymous variables
+		// return false;
+		// }
+
+	}
+
+	private boolean mayBeNull(Expression expr) {
+		if (expr instanceof StringLiteralExpr || expr instanceof ObjectCreationExpr
+				|| expr instanceof SuperExpr
+				|| expr instanceof ThisExpr) {
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isStaticField(Expression singleArgument) {
@@ -177,7 +203,7 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 	}
 
 	private static boolean looksLikeAConstant(SimpleName name) {
-		return name.asString().matches("[A-Z_]+");
+		return name.asString().matches("[A-Z0-9_]+");
 	}
 
 	private boolean isStringScope(Expression scope) {

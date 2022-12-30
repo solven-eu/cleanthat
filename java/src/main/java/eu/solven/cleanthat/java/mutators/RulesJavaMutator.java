@@ -51,6 +51,7 @@ import eu.solven.cleanthat.language.java.rules.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.language.java.rules.mutators.ModifierOrder;
 import eu.solven.cleanthat.language.java.rules.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.language.java.rules.mutators.PrimitiveBoxedForString;
+import eu.solven.cleanthat.language.java.rules.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.language.java.rules.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.language.java.rules.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.language.java.rules.mutators.UseIsEmptyOnCollections;
@@ -77,7 +78,8 @@ public class RulesJavaMutator implements ILintFixerHelpedByCodeStyleFixer, ILint
 			new UseDiamondOperator(),
 			new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
-			new VariableEqualsConstant());
+			new VariableEqualsConstant(),
+			new StreamAnyMatch());
 
 	private final List<IClassTransformer> transformers;
 

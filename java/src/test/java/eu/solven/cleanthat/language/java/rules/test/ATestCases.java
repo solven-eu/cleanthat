@@ -55,13 +55,24 @@ public class ATestCases {
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 			MethodDeclaration post = getMethodWithName(oneCase, "post");
+
+			// https://github.com/javaparser/javaparser/issues/3322
+			// We prefer not-processing clones as it may lead to dirty issues
+			MethodDeclaration clonedPre = pre.clone();
+
 			// Check 'pre' is transformed into 'post'
 			// This is generally the most relevant test: to be done first
 			{
 				boolean transformed = transformer.walkNode(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
-				Assert.assertEquals(post, pre);
+				Assert.assertEquals("Should have mutated " + clonedPre
+						+ " into "
+						+ post
+						+ " but it turned into: "
+						+ pre
+						+ ". The whole testcase is: "
+						+ oneCase, post, pre);
 				// We check this after checking comparison with 'post' for greater test result readability
 				Assert.assertTrue("We miss a transformation flag for: " + pre, transformed);
 			}
@@ -95,7 +106,7 @@ public class ATestCases {
 				MethodDeclaration clonedPost = post.clone();
 				boolean walked = transformer.walkNode(post);
 				if (transformer instanceof NoOpJavaParserRule) {
-					Assert.assertTrue("NoOpJavaParserRule always wals", walked);
+					Assert.assertTrue("NoOpJavaParserRule is always walked", walked);
 				} else {
 					Assert.assertFalse(
 							"Should not have mutated " + post

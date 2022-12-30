@@ -1,9 +1,13 @@
 package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.Ignore;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.InputStreamResource;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -230,14 +234,13 @@ public class VariableEqualsConstantCases extends ACases {
 	}
 
 	@UnchangedMethod
-	public static class CheckStartsWith {
+	public static class CheckStartsWith_ConstantAfter {
 		public Object post(String o) {
 			return o.startsWith(JsonFactory.FORMAT_NAME_JSON);
 		}
 	}
 
-	// TODO This is a bug as we switch due to the field name mislead supposing it is a constant
-	@CompareMethods
+	@UnchangedMethod
 	public static class ConstantIsIllNamedObjectField {
 		private static class LikeString {
 			public final String FORMAT_NAME_JSON = "someString";
@@ -245,12 +248,8 @@ public class VariableEqualsConstantCases extends ACases {
 
 		final LikeString o = new LikeString();
 
-		public Object pre(String x) {
-			return x.equals(o.FORMAT_NAME_JSON);
-		}
-
 		public Object post(String x) {
-			return o.FORMAT_NAME_JSON.equals(x);
+			return x.equals(o.FORMAT_NAME_JSON);
 		}
 	}
 
@@ -267,4 +266,66 @@ public class VariableEqualsConstantCases extends ACases {
 		}
 	}
 
+	public class MultipartInputStreamFileResource extends InputStreamResource {
+
+		private final String filename;
+
+		public MultipartInputStreamFileResource(InputStream inputStream, String filename) {
+			super(inputStream);
+			this.filename = filename;
+		}
+
+		@Override
+		public String getFilename() {
+			return this.filename;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result + Objects.hash(filename);
+			return result;
+		}
+
+	}
+
+	@UnchangedMethod
+	public static class CallsSuperEquals {
+
+		public Object post(CallsSuperEquals o) {
+			if (this == o) {
+				return true;
+			}
+			if (!super.equals(o)) {
+				return false;
+			}
+			if (getClass() != o.getClass()) {
+				return false;
+			}
+			return true;
+		}
+	}
+
+	@UnchangedMethod
+	public static class TwoUnknownVariable {
+
+		public Object post(String o1, String o2) {
+			return o1.equals(o2);
+		}
+	}
+
+	@UnchangedMethod
+	public static class CompareVariableWithMethodCall {
+		public Object post(String input, Object object) {
+			return input.equals(object.toString());
+		}
+	}
+
+	@UnchangedMethod
+	public static class CompareMethodCallWithVariable {
+		public Object post(String input, Object object) {
+			return object.toString().equals(input);
+		}
+	}
 }

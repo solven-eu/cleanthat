@@ -97,7 +97,12 @@ public class ATestCases {
 				if (transformer instanceof NoOpJavaParserRule) {
 					Assert.assertTrue("NoOpJavaParserRule always wals", walked);
 				} else {
-					Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost,
+					Assert.assertFalse(
+							"Should not have mutated " + post
+									+ " but it turned into: "
+									+ clonedPost
+									+ ". The whole testcase is: "
+									+ oneCase,
 							walked);
 				}
 				Assert.assertEquals(clonedPost, post);

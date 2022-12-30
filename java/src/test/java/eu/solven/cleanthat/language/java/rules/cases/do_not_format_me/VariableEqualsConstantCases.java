@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.language.java.rules.cases.do_not_format_me;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -65,9 +66,41 @@ public class VariableEqualsConstantCases extends ACases {
 		}
 	}
 
-	// TODO To make this work, we would need the ability to know the argument is non-null. While it looks trivial for a
-	// human, it needs additional work through JavaParser
 	@UnchangedMethod
+	public static class CaseConstantCustom_constructor_bothsides {
+		private static final class SomeClass {
+
+		}
+
+		private static final class OtherClass {
+
+		}
+
+		@SuppressWarnings("unlikely-arg-type")
+		public Object post(Object input) {
+			return new OtherClass().equals(new SomeClass());
+		}
+	}
+
+	// This is a bug as we are putting null a scope of a method call
+	@CompareMethods
+	public static class CaseConstantCustom_ref_null {
+		private static final SomeClass constantSomeClass = null;
+
+		private static final class SomeClass {
+
+		}
+
+		public Object pre(Object input) {
+			return input.equals(constantSomeClass);
+		}
+
+		public Object post(Object input) {
+			return constantSomeClass.equals(input);
+		}
+	}
+
+	@CompareMethods
 	public static class CaseConstantCustom_ref {
 		private static final SomeClass constantSomeClass = new SomeClass();
 
@@ -75,8 +108,12 @@ public class VariableEqualsConstantCases extends ACases {
 
 		}
 
-		public Object post(Object input) {
+		public Object pre(Object input) {
 			return input.equals(constantSomeClass);
+		}
+
+		public Object post(Object input) {
+			return constantSomeClass.equals(input);
 		}
 	}
 
@@ -214,6 +251,19 @@ public class VariableEqualsConstantCases extends ACases {
 
 		public Object post(String x) {
 			return o.FORMAT_NAME_JSON.equals(x);
+		}
+	}
+
+	@CompareMethods
+	public static class ConstantAsStatic {
+		private static final LocalDate TODAY = LocalDate.now();
+
+		public Object pre(Object x) {
+			return x.equals(TODAY);
+		}
+
+		public Object post(Object x) {
+			return TODAY.equals(x);
 		}
 	}
 

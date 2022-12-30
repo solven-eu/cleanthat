@@ -18,6 +18,8 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableMap;
@@ -131,13 +133,21 @@ public class JUnit4ToJUnit5 extends AJavaParserRule implements IClassTransformer
 	}
 
 	protected boolean processAnnotation(AnnotationExpr annotation) {
-		boolean localTransformed = false;
-
-		// https://github.com/javaparser/javaparser/issues/1621
-		String qualifiedName = annotation.resolve().getQualifiedName();
+		ResolvedAnnotationDeclaration resolvedAnnotation;
+		try {
+			// https://github.com/javaparser/javaparser/issues/1621
+			resolvedAnnotation = annotation.resolve();
+		} catch (UnsolvedSymbolException e) {
+			// This typically happens when processing a node after having migrated to junit5: junit5 annotations are
+			// unknown, hence this fails
+			LOGGER.debug("We were not able to resolve annotation: {}", annotation);
+			return false;
+		}
+		String qualifiedName = resolvedAnnotation.getQualifiedName();
 
 		Optional<String> optMigratedName = computeNewName(qualifiedName);
 
+		boolean localTransformed = false;
 		if (optMigratedName.isPresent()) {
 			localTransformed = true;
 

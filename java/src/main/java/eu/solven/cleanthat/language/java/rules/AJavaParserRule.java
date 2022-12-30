@@ -46,6 +46,12 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		AtomicBoolean transformed = new AtomicBoolean();
 		tree.walk(node -> {
 			if (processNotRecursively(node)) {
+				// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
+				if (!this.getIds().contains("NoOp") && processNotRecursively(node)) {
+					// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
+					// to again 'a.equals(b)')
+					LOGGER.warn("Applying {} over {} is not idem-potent. It is a bug!", this, tree);
+				}
 				transformed.set(true);
 			}
 		});

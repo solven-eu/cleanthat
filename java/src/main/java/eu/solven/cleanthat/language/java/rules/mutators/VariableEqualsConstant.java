@@ -10,9 +10,14 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
+import com.github.javaparser.resolution.Resolvable;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
@@ -82,19 +87,12 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 			} else {
 				return false;
 			}
-		} else if (singleArgument instanceof FieldAccessExpr && METHOD_EQUALS.equals(methodCallName)
-				&& isConstant(((FieldAccessExpr) singleArgument).getName())) {
-			// TODO Think deeper about relying on the field name to suppose it is constant. We should at least check
-			// the object is a class and not an object
-			Expression scope = ((FieldAccessExpr) singleArgument).getScope();
-
-			// TODO Do not switch if both the scope and the argument are constants
-			// https://github.com/javaparser/javaparser/issues/3330
-			// optResolvedType(scope);
-			// scope.calculateResolvedType()
-			LOGGER.debug("TODO Check scope is a class ({})", scope);
-			LOGGER.debug("We prefer having the constant at the left");
-			stringScopeOnly = true;
+		} else if (METHOD_EQUALS.equals(methodCallName)
+				&& (singleArgument instanceof FieldAccessExpr || singleArgument instanceof NameExpr)
+		// && isConstant(((NodeWithSimpleName<?>) singleArgument).getName())
+		) {
+			// We may switch if the scope is a variable
+			stringScopeOnly = false;
 		} else if (singleArgument instanceof StringLiteralExpr && isCompareStringMethod(methodCallName)) {
 			LOGGER.debug("TODO replace x.compareTo('bar')<0 by 'bar'.compareTo(x)>0");
 			return false;
@@ -119,11 +117,66 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		if (stringScopeOnly && !isStringScope(scope)) {
 			return false;
 		}
+
+		if (isStaticField(scope) && !isStaticField(singleArgument)) {
+			// Scope is a static field: keep it as scope
+			return false;
+		} else if (isField(scope) && !isField(singleArgument)) {
+			// Scope is a static field: keep it as scope
+			return false;
+		}
+
 		MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
 		return tryReplace(node, replacement);
 	}
 
-	private static boolean isConstant(SimpleName name) {
+	private boolean isStaticField(Expression singleArgument) {
+		boolean argumentIsField;
+		if (singleArgument instanceof NameExpr || singleArgument instanceof FieldAccessExpr) {
+			ResolvedValueDeclaration resolved;
+			try {
+				resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
+			} catch (UnsolvedSymbolException e) {
+				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)");
+
+				return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
+			}
+
+			if (resolved.isField() && resolved.asField().isStatic()) {
+				argumentIsField = true;
+			} else {
+				argumentIsField = false;
+			}
+		} else {
+			argumentIsField = false;
+		}
+		return argumentIsField;
+	}
+
+	private boolean isField(Expression singleArgument) {
+		boolean argumentIsField;
+		if (singleArgument instanceof NameExpr || singleArgument instanceof FieldAccessExpr) {
+			ResolvedValueDeclaration resolved;
+			try {
+				resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
+			} catch (UnsolvedSymbolException e) {
+				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)");
+
+				return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
+			}
+
+			if (resolved.isField()) {
+				argumentIsField = true;
+			} else {
+				argumentIsField = false;
+			}
+		} else {
+			argumentIsField = false;
+		}
+		return argumentIsField;
+	}
+
+	private static boolean looksLikeAConstant(SimpleName name) {
 		return name.asString().matches("[A-Z_]+");
 	}
 

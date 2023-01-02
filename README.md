@@ -5,13 +5,14 @@ WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say tha
 
 # Motivation
 
-The point of this project is to enable automatic cleaning of your code-base. Some excellent maven plugin exists (e.g. )
+The point of this project is to enable automatic cleaning of your code-base. As of 2022-12, it focuses on Java projects
 
 Related projects:
 
  - https://github.com/revelc/formatter-maven-plugin
  - https://github.com/revelc/impsort-maven-plugin
  - https://jsparrow.github.io/
+ - https://github.com/JnRouvignac/AutoRefactor
 
 # Compatibility
 
@@ -26,63 +27,46 @@ Cleanthat is currently compatible with the following languages:
 
 # Installation
 
+## Maven (Free)
+
+See README: https://github.com/solven-eu/cleanthat/tree/master/maven
+
+
+## Github (Paid)
+
 If your repository is hosted on Github.com:
 
     https://github.com/marketplace/cleanthat/
-    
-Else: You can spsonsor it (Gitlab, OnPremise, ...)
+
+It is configured through a cleanthat.yaml file at the root of the repository (e.g. https://github.com/solven-eu/cleanthat/blob/master/cleanthat.yml).
+
+It differs with mvn integration by fetching only relevant (e.g. modified) files.
+
+# Key design decisions
+
+As of 2022-12, this projects focuses on typical Java projects. Hence, it enables:
+
+- Advanced Refactoring of .java files
+- Advanced Formatting of .java files (to be dropped)
+- Advanced Formatting of pom.xml files
+- Basic Formatting of .json, .xml, etc files
+
+## About Advanced Formatting of .java files
+
+Refactoring .java files would break the code conventions. Hence, any refactoring operation should be followed by a formatting operation.
+With mvn integration, once should follow the cleanthat step with some mvn formatter step.
+With github integration, once may rely on CleanThat own .java formatting abilities.
+
+There is multiple good options for formatting Java files:
+
+- https://github.com/revelc/formatter-maven-plugin
+- https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md (e.g. https://github.com/JnRouvignac/AutoRefactor/blob/master/pom.xml#L240)
 
 # Last considerations
 
 This software is provided WITHOUT ANY WARRANTY, and is available under the Apache License, Version 2. Any code loss caused by using this plugin is not the responsibility of the author(s). Be sure to use some source repository management system such as GIT before using this plugin.
 
 Contributions are welcome.
-
-# Configuration
-
-CleanThat is configured through a cleanthat.json file at the root of the repository.
-
-Here is an example configuration:
-
-```yaml
-syntax_version: "2021-08-02"
-meta:
-  labels:
-  - "cleanthat"
-  refs:
-    branches:
-    - "refs/heads/develop"
-    - "refs/heads/main"
-    - "refs/heads/master"
-source_code:
-  excludes:
-  - "regex:.*/generated/.*"
-  encoding: "UTF-8"
-  line_ending: "LF"
-languages:
-- language: "java"
-  language_version: "11"
-  source_code:
-    includes:
-    - "regex:.*\\.java"
-  processors:
-  - engine: "rules"
-    parameters:
-      production_ready_only: true
-  - engine: "revelc_imports"
-    parameters:
-      # Organize imports like in Eclipse
-      remove_unused: true
-      groups: "java.,javax.,org.,com."
-      static_groups: "java,*"
-  # Use Spring formatting convention
-  - engine: "spring_formatter"
-    parameters: {}
-```
-
-This can be generated into an existing repository with:
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
 
 # Using Eclipse Formatter
 

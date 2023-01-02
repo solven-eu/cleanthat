@@ -33,16 +33,3 @@ languages:
      - "regex:.*\\.json"
   processors:
   - engine: "jackson"
-- language: "xml"
-  source_code:
-     includes:
-     - "regex:.*\\.xml"
-  processors:
-  - engine: "ecryd_sortpom"
-    source_code:
-       includes:
-       - "regex:.*/pom.xml"
-    parameters:
-      indentation_as_string: '\t'
-      # We like empty elements, while plugin default configuration would expand them
-      expand_empty_elements: false

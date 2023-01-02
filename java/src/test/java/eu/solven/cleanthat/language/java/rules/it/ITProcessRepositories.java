@@ -1,3 +1,4 @@
+/* (C)2023 */
 package eu.solven.cleanthat.language.java.rules.it;
 
 import java.util.stream.Stream;

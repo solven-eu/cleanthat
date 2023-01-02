@@ -1,6 +1,6 @@
 CleanThat
 
-WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say that you should not 
+WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say that you should not
 [report](https://github.com/solven-eu/cleanthat/issues) them :)
 
 # Motivation
@@ -9,21 +9,21 @@ The point of this project is to enable automatic cleaning of your code-base. As 
 
 Related projects:
 
- - https://github.com/revelc/formatter-maven-plugin
- - https://github.com/revelc/impsort-maven-plugin
- - https://jsparrow.github.io/
- - https://github.com/JnRouvignac/AutoRefactor
+- https://github.com/revelc/formatter-maven-plugin
+- https://github.com/revelc/impsort-maven-plugin
+- https://jsparrow.github.io/
+- https://github.com/JnRouvignac/AutoRefactor
 
 # Compatibility
 
 Cleanthat is currently compatible with the following languages:
 
- - java
- - ~scala~ (broken) 
- - json
- - xml
- - pom.xml
- - groovy
+- java
+- ~scala~ (broken)
+- json
+- xml
+- pom.xml
+- groovy
 
 # Installation
 
@@ -31,12 +31,11 @@ Cleanthat is currently compatible with the following languages:
 
 See README: https://github.com/solven-eu/cleanthat/tree/master/maven
 
-
 ## Github (Paid)
 
 If your repository is hosted on Github.com:
 
-    https://github.com/marketplace/cleanthat/
+        https://github.com/marketplace/cleanthat/
 
 It is configured through a cleanthat.yaml file at the root of the repository (e.g. https://github.com/solven-eu/cleanthat/blob/master/cleanthat.yml).
 
@@ -74,11 +73,11 @@ An alternative to spring_formatter is eclipse_formatter. It takes as parameter a
 
 A public http(s) URL:
 
-    https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
-    
+        https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+
 A file in local repository (root being assumed based on Git root/Maven top module)
-    
-    code:/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+
+        code:/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
 
 Eclipse Stylesheets can exported to XML through:
 
@@ -92,7 +91,7 @@ CleanThat will accept only configuration with a single profile in them. If multi
 
 The maven plugin enables generating an Eclipse Stylesheet minimizing changes over a clean repository:
 
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
+        mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
 
 see maven/README.MD
 
@@ -100,28 +99,28 @@ see maven/README.MD
 
 ## Deploy into Production (AWS):
 
-    git push origin master:deploy-prd
+        git push origin master:deploy-prd
 
 ## Release a new version (and deploy jars to Sonatype m2central):
 
-    mvn release:clean release:prepare release:perform
+        mvn release:clean release:prepare release:perform
 
 ### New computer, new GPG Key
 
 https://stackoverflow.com/questions/29885887/gpg-no-default-secret-key-error-using-maven
 
-    gpg --list-keys
+        gpg --list-keys
 
 https://keyring.debian.org/creating-key.html
 
-    gpg --gen-key --default-new-key-algo=rsa4096/cert,sign+rsa4096/encr
-    gpg --keyserver https://keyserver.ubuntu.com/ --send-key 90A8________________________________AAB7
+        gpg --gen-key --default-new-key-algo=rsa4096/cert,sign+rsa4096/encr
+        gpg --keyserver https://keyserver.ubuntu.com/ --send-key 90A8________________________________AAB7
 
 BEWARE pool.sks-keyservers.net is down: https://www.reddit.com/r/GnuPG/comments/o5tb6a/keyservers_are_gone/
 
 If it fails, upload manually:
 
-    gpg \-\-armor \-\-export 90A8________________________________AAB7
+        gpg \-\-armor \-\-export 90A8________________________________AAB7
 
 ## Re-run locally events in AWS:
 

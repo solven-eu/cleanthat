@@ -87,6 +87,8 @@
 		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
 		<impsort-maven-plugin.version>1.7.0</impsort-maven-plugin.version>
 
+		<spotless.version>2.29.0</spotless.version>
+
 		<sentry-spring.version>6.7.0</sentry-spring.version>
 
 		<!-- Used for agnostic AWS-Lambda -->
@@ -731,76 +733,81 @@
 						</execution>
 					</executions>
 				</plugin>
-				
+
 				<plugin>
-				<!-- mvn com.diffplug.spotless:spotless-maven-plugin:apply -->
-				<!-- mvn com.diffplug.spotless:spotless-maven-plugin:check -->
-				  <groupId>com.diffplug.spotless</groupId>
-				  <artifactId>spotless-maven-plugin</artifactId>
-				  <version>${spotless.version}</version>
-				  <configuration>
-				    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
-				    <ratchetFrom>origin/main</ratchetFrom>
-				    <formats>
-				      <!-- you can define as many formats as you want, each is independent -->
-				      <format>
-				        <!-- define the files to apply to -->
-				        <includes>
-				          <include>*.md</include>
-				          <include>.gitignore</include>
-				        </includes>
-				        <!-- define the steps to apply to those files -->
-				        <trimTrailingWhitespace/>
-				        <endWithNewline/>
-				        <indent>
-				          <tabs>true</tabs>
-				          <spacesPerTab>4</spacesPerTab>
-				        </indent>
-				      </format>
-				    </formats>
-				    
-				      <pom>
-    <!-- These are the defaults, you can override if you want -->
-    <includes>
-      <include>pom.xml</include>
-      <include>**/pom.xml</include>
-    </includes>
+					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:apply -->
+					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:check -->
+					<groupId>com.diffplug.spotless</groupId>
+					<artifactId>spotless-maven-plugin</artifactId>
+					<version>${spotless.version}</version>
+					<configuration>
+						<!-- optional: limit format enforcement to just the files changed by this feature branch -->
+						<ratchetFrom>origin/master</ratchetFrom>
+						<formats>
+							<!-- you can define as many formats as you want, each is independent -->
+							<format>
+								<!-- define the files to apply to -->
+								<includes>
+									<include>*.md</include>
+									<include>.gitignore</include>
+								</includes>
+								<!-- define the steps to apply to those files -->
+								<trimTrailingWhitespace/>
+								<endWithNewline/>
+								<indent>
+									<tabs>true</tabs>
+									<spacesPerTab>4</spacesPerTab>
+								</indent>
+							</format>
+						</formats>
 
-	<!-- https://github.com/diffplug/spotless/tree/main/plugin-maven#sortpom -->
-    <sortPom>
-			<!-- We like empty elements, while plugin default configuration would expand them -->
-		<expandEmptyElements>false</expandEmptyElements>
-	</sortPom>
+						<pom>
+							<includes>
+								<include>pom.xml</include>
+							</includes>
 
-  </pom>
-				    
-				      <markdown>
-    <includes> <!-- You have to set the target manually -->
-      <include>**/*.md</include>
-    </includes>
+							<!-- https://github.com/diffplug/spotless/tree/main/plugin-maven#sortpom -->
+							<sortPom>
+								<!-- We like empty elements, while plugin default configuration would expand them -->
+								<expandEmptyElements>false</expandEmptyElements>
 
-    <flexmark/> <!-- has its own section below -->
-  </markdown>
-				    
-				    <!-- define a language-specific format -->
-				    <java>
-						<removeUnusedImports />
-						
-						<eclipse>
+								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
+								<!-- -1 means tabulation -->
+								<nrOfIndentSpace>-1</nrOfIndentSpace>
+							</sortPom>
+
+						</pom>
+
+						<markdown>
+							<includes>
+								<!-- You have to set the target manually -->
+								<include>**/*.md</include>
+							</includes>
+
+							<flexmark/>
+							<!-- has its own section below -->
+						</markdown>
+
+						<!-- define a language-specific format -->
+						<java>
+							<removeUnusedImports/>
+
+							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
-<!--							<version>4.18.0</version>-->
-							<file>eclipse/eclipse_java_code_formatter.xml</file>
-						</eclipse>
-				
-				      <!-- make sure every file has the following copyright header.
+								<!--							<version>4.18.0</version>-->
+								<file>eclipse/eclipse_java_code_formatter.xml</file>
+							</eclipse>
+
+							<!-- make sure every file has the following copyright header.
 				        optionally, Spotless can set copyright years by digging
 				        through git history (see "license" section below) -->
-				      <licenseHeader>
-				        <content>/* (C)$YEAR */</content>  <!-- or <file>${project.basedir}/license-header</file> -->
-				      </licenseHeader>
-				    </java>
-				  </configuration>
-				  
+							<licenseHeader>
+								<content>/* (C)$YEAR */</content>
+								<!-- or <file>${project.basedir}/license-header</file> -->
+							</licenseHeader>
+						</java>
+					</configuration>
+
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>

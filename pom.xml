@@ -25,22 +25,13 @@
 
 		<module>config</module>
 
-		<module>prettier</module>
-
 		<module>code-cleaners</module>
 
 		<!-- JVM languages -->
 		<module>java</module>
-		<module>scala</module>
-		<module>kotlin</module>
-		<module>groovy</module>
-
-		<module>bash</module>
-		<!-- <module>python</module> -->
 
 		<!-- configurations -->
 		<module>json</module>
-		<module>xml</module>
 
 		<module>runnable</module>
 		<module>lambda</module>
@@ -394,11 +385,7 @@
 							<!-- Eclipse Launch (Debug/Run) files -->
 							<exclude>**/*.launch</exclude>
 
-							<!-- Hacked class -->
-							<exclude>**/AuthorizationEndpoint.java</exclude>
-							<exclude>**/PDSimpleFont.java</exclude>
-
-							<!-- Useless to License generated files are regeneration will remove license -->
+							<!-- Useless to License generated files as regeneration will remove license -->
 							<excludes>**/generated/**</excludes>
 
 							<!-- Specific to module gui-web -->
@@ -772,10 +759,9 @@
 								<expandEmptyElements>false</expandEmptyElements>
 
 								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
-								<!-- -1 means tabulation -->
+								<!-- -1 means '\t' -->
 								<nrOfIndentSpace>-1</nrOfIndentSpace>
 							</sortPom>
-
 						</pom>
 
 						<markdown>
@@ -798,9 +784,6 @@
 								<file>eclipse/eclipse_java_code_formatter.xml</file>
 							</eclipse>
 
-							<!-- make sure every file has the following copyright header.
-				        optionally, Spotless can set copyright years by digging
-				        through git history (see "license" section below) -->
 							<licenseHeader>
 								<content>/* (C)$YEAR */</content>
 								<!-- or <file>${project.basedir}/license-header</file> -->

@@ -61,17 +61,10 @@
 			<version>3.0.1u2</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<!-- Beware this is a Maven plugin: it may conflicts wth other plugins 
-				due to META-INF files -->
-			<groupId>net.revelc.code</groupId>
-			<artifactId>impsort-maven-plugin</artifactId>
-			<version>1.7.0</version>
-		</dependency>
-
+		
 		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
 		<dependency>
+			<!-- Used to generate Eclipse stylesheet -->
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.core</artifactId>
 		</dependency>

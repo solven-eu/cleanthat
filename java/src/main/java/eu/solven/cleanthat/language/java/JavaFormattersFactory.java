@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,6 @@ import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterProcessorProperties;
-import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleaner;
-import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
 import eu.solven.pepper.collection.PepperMapHelper;
@@ -81,34 +78,6 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		ObjectMapper objectMapper = getObjectMapper();
 
 		switch (engine) {
-		case "eclipse_formatter": {
-			EclipseJavaFormatterProcessorProperties processorConfig =
-					objectMapper.convertValue(parameters, EclipseJavaFormatterProcessorProperties.class);
-			EclipseJavaFormatterConfiguration configuration;
-			try {
-				configuration = configToEngine
-						.get(new EclipseFormatterCacheKey(codeProvider, languageProperties, processorConfig), () -> {
-							LOGGER.info("Loading for cache: {} {} {}",
-									codeProvider,
-									languageProperties,
-									processorConfig);
-							return EclipseJavaFormatterConfiguration
-									.load(codeProvider, languageProperties, processorConfig);
-						});
-			} catch (ExecutionException e) {
-				throw new RuntimeException(e);
-			}
-			processor = new EclipseJavaFormatter(configuration);
-			break;
-		}
-
-		case "revelc_imports": {
-			JavaRevelcImportsCleanerProperties processorConfig =
-					objectMapper.convertValue(parameters, JavaRevelcImportsCleanerProperties.class);
-			processor = new JavaRevelcImportsCleaner(languageProperties.getSourceCode(), processorConfig);
-			break;
-		}
-
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
 					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
@@ -147,16 +116,6 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, "rules")
-					.put(KEY_PARAMETERS, engineParameters)
-					.build());
-		}
-
-		// Import cleaning
-		{
-			JavaRevelcImportsCleanerProperties engineParameters = new JavaRevelcImportsCleanerProperties();
-
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "revelc_imports")
 					.put(KEY_PARAMETERS, engineParameters)
 					.build());
 		}

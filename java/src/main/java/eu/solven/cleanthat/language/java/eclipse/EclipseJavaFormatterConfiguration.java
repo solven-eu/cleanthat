@@ -34,8 +34,8 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.language.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.java.imports.revelc.ConfigReadException;
-import eu.solven.cleanthat.language.java.imports.revelc.ConfigReader;
+import eu.solven.cleanthat.language.java.eclipse.config.ConfigReadException;
+import eu.solven.cleanthat.language.java.eclipse.config.ConfigReader;
 import lombok.Data;
 
 /**

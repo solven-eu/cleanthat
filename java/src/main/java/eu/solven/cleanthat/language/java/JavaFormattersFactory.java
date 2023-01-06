@@ -17,14 +17,14 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
-import eu.solven.cleanthat.java.mutators.RulesJavaMutator;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterProcessorProperties;
+import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
 import eu.solven.pepper.collection.PepperMapHelper;
@@ -85,9 +85,9 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			break;
 		}
 		case "rules": {
-			JavaRulesMutatorProperties processorConfig =
-					objectMapper.convertValue(parameters, JavaRulesMutatorProperties.class);
-			processor = new RulesJavaMutator(languageProperties, processorConfig);
+			JavaRefactorerProperties processorConfig =
+					objectMapper.convertValue(parameters, JavaRefactorerProperties.class);
+			processor = new JavaRefactorer(languageProperties, processorConfig);
 			break;
 		}
 
@@ -112,7 +112,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 		// Apply rules
 		{
-			JavaRulesMutatorProperties engineParameters = new JavaRulesMutatorProperties();
+			JavaRefactorerProperties engineParameters = new JavaRefactorerProperties();
 
 			processors.add(ImmutableMap.<String, Object>builder()
 					.put(KEY_ENGINE, "rules")

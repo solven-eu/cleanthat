@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
-import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 
 /**
  * Helps preparing rules

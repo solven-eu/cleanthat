@@ -14,9 +14,9 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
+import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.language.java.refactorer.meta.IRuleExternalUrls;
 import eu.solven.cleanthat.language.java.rules.function.OnMethodName;
-import eu.solven.cleanthat.language.java.rules.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.meta.IRuleExternalUrls;
 
 /**
  * Enables common behavior to JavaParser-based rules

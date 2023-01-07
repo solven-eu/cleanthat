@@ -33,3 +33,18 @@ languages:
      - "regex:.*\\.json"
   processors:
   - engine: "jackson"
+# https://github.com/diffplug/spotless/pull/568
+- language: "plugin"
+  source_code:
+     includes:
+     - "regex:.*\\.json"
+     - "regex:.*\\.java"
+  processors:
+  - engine: "maven"
+    parameters:
+      # https://github.com/diffplug/spotless/tree/main/plugin-maven#can-i-apply-spotless-to-specific-files
+      command: "mvn com.diffplug.spotless:spotless-maven-plugin:apply"
+  - engine: "gradle"
+    parameters:
+      command: "./gradlew --quiet -PspotlessIdeHook=C:/Absolute/Path/To/File -PspotlessIdeHookUseStdin -PspotlessIdeHookUseStdOut"
+  

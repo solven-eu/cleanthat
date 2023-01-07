@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.kohsuke.github.GHCommit;
@@ -68,8 +69,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		try {
 			GHTree createdTree = createTree.baseTree(sha).create();
 			String commitMessage = prComments.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
-			GHCommit commit =
-					prepareCommit(repo).message(commitMessage).parent(sha).tree(createdTree.getSha()).create();
+			GHCommitBuilder preparedCommit =
+					prepareCommit(repo).message(commitMessage).parent(sha).tree(createdTree.getSha());
+
+			computeSignature().ifPresent(s -> preparedCommit.withSignature(s));
+
+			GHCommit commit = preparedCommit
+
+					.create();
 
 			String newHead = commit.getSHA1();
 			LOGGER.info("Update {}:{} to {} ({})", repoName, refName, newHead, commit.getHtmlUrl());
@@ -80,7 +87,17 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		}
 	}
 
+	// https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+	// https://github.com/GitbookIO/github-api-signature/blob/master/src/createSignature.ts#L34
+	protected Optional<String> computeSignature() {
+		return Optional.empty();
+	}
+
 	public static GHCommitBuilder prepareCommit(GHRepository repo) {
-		return repo.createCommit().author("CleanThat", "CleanThat", new Date());
+		return repo.createCommit()
+		// https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification#signature-verification-for-bots
+		// No author so that the commit is automatocally marked as Verified by Github
+		// .author("CleanThat", "CleanThat", new Date())
+		;
 	}
 }

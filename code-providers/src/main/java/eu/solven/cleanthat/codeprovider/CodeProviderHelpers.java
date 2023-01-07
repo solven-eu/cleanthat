@@ -28,12 +28,11 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 public class CodeProviderHelpers {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
 
-	public static final String FILENAME_CLEANTHAT_YAML = "cleanthat.yaml";
-	public static final String FILENAME_CLEANTHAT_YML = "cleanthat.yml";
-	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
+	public static final String FILENAME_CLEANTHAT_YAML = "spotless.yaml";
+	public static final String FILENAME_CLEANTHAT_YML = "spotless.yml";
 
 	public static final List<String> FILENAMES_CLEANTHAT =
-			Arrays.asList(FILENAME_CLEANTHAT_YAML, FILENAME_CLEANTHAT_YML, FILENAME_CLEANTHAT_JSON);
+			Arrays.asList(FILENAME_CLEANTHAT_YAML, FILENAME_CLEANTHAT_YML);
 
 	public static final List<String> PATH_CLEANTHAT =
 			FILENAMES_CLEANTHAT.stream().map(s -> "/" + s).collect(Collectors.toList());
@@ -65,11 +64,7 @@ public class CodeProviderHelpers {
 		ObjectMapper objectMapper;
 		Map.Entry<String, String> pathAndContent = optPathAndContent.get();
 		LOGGER.info("Loaded config from {}", pathAndContent.getKey());
-		if (pathAndContent.getKey().endsWith(".json")) {
-			objectMapper = ConfigHelpers.getJson(objectMappers);
-		} else {
-			objectMapper = ConfigHelpers.getYaml(objectMappers);
-		}
+		objectMapper = ConfigHelpers.getYaml(objectMappers);
 
 		return optPathAndContent.map(content -> {
 			try {
@@ -78,15 +73,6 @@ public class CodeProviderHelpers {
 				throw new IllegalArgumentException("Invalid config (json vs yaml?)", e);
 			}
 		});
-	}
-
-	public static File pathToConfig(Path localFolder) {
-		return CodeProviderHelpers.FILENAMES_CLEANTHAT.stream()
-				.map(s -> localFolder.resolve(s).toFile())
-				.filter(File::exists)
-				.findAny()
-				.orElseThrow(() -> new IllegalStateException(
-						"No configuration at pathes: " + CodeProviderHelpers.FILENAMES_CLEANTHAT));
 	}
 
 }

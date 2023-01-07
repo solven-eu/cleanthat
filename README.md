@@ -5,12 +5,10 @@ WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say tha
 
 # Motivation
 
-The point of this project is to enable automatic cleaning of your code-base. As of 2022-12, it focuses on Java projects
+The point of this project is to enable automatic refactoring of your code-base. As of 2022-12, it focuses on Java projects
 
 Related projects:
 
-- https://github.com/revelc/formatter-maven-plugin
-- https://github.com/revelc/impsort-maven-plugin
 - https://jsparrow.github.io/
 - https://github.com/JnRouvignac/AutoRefactor
 
@@ -19,17 +17,16 @@ Related projects:
 Cleanthat is currently compatible with the following languages:
 
 - java
-- ~scala~ (broken)
-- json
-- xml
-- pom.xml
-- groovy
 
 # Installation
 
 ## Maven (Free)
 
 See README: https://github.com/solven-eu/cleanthat/tree/master/maven
+
+## Gradle (Free)
+
+Pending for Spotless integration: https://github.com/diffplug/spotless/tree/main/plugin-gradle
 
 ## Github (Paid)
 
@@ -39,16 +36,22 @@ If your repository is hosted on Github.com:
 
 It is configured through a cleanthat.yaml file at the root of the repository (e.g. https://github.com/solven-eu/cleanthat/blob/master/cleanthat.yml).
 
-It differs with mvn integration by fetching only relevant (e.g. modified) files.
+It differs with mvn integration by fetching only relevant (e.g. modified) files, based on Github Events.
+
+- https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent
+- https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pushevent
 
 # Key design decisions
 
 As of 2022-12, this projects focuses on typical Java projects. Hence, it enables:
 
 - Advanced Refactoring of .java files
-- Advanced Formatting of .java files (to be dropped)
-- Advanced Formatting of pom.xml files
-- Basic Formatting of .json, .xml, etc files
+- Advanced Formatting of .java files (to be dropped, to rely on Spotless)
+- Advanced Formatting of pom.xml files (to be dropped, to rely on Spotless)
+- Basic Formatting of .json, .xml, etc files (to be dropped, to rely on Spotless)
+
+## Github App does not rely on Maven and Gradle
+While we work on integrating CleanThat into Spotless, the Github CleanThat App does not rely on existing Maven (https://github.com/diffplug/spotless/tree/main/plugin-maven) and Gradle (https://github.com/diffplug/spotless/tree/main/plugin-gradle) plugins. The main reason for that is security. Indeed, while it would enable very setup over a project already integrating Spotless, it would open dangerous security breach as one could easily inject custom code as dependency of the maven/gradle plugin, which would enable one to extract CleanThat secrets (Github token, GPG key, etc).
 
 ## About Advanced Formatting of .java files
 

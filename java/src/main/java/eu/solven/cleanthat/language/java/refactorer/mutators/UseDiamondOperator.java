@@ -55,6 +55,7 @@ public class UseDiamondOperator extends AJavaParserRule implements IClassTransfo
 		return "https://jsparrow.github.io/rules/diamond-operator.html";
 	}
 
+	// NodeWithTypeArguments
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (!(node instanceof NodeWithTypeArguments)) {

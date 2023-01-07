@@ -74,7 +74,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	public CodeFormatResult formatCode(CleanthatRepositoryProperties repoProperties,
 			ICodeProviderWriter codeWriter,
 			boolean dryRun) {
-		// A config change may be cleanthat.json, or a processor configuration file
+		// A config change may be spotless.yaml, or a processor configuration file
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
 		// version upgrade led to a change of some engine, which should trigger a full re-compute)
@@ -88,7 +88,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				codeWriter.listFilesForFilenames(fileChanged -> {
 					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getPath())) {
 						configIsChanged.set(true);
-						prComments.add("Configuration has changed");
+						prComments.add("Spotless configuration has changed");
 					}
 				});
 			} catch (IOException e) {

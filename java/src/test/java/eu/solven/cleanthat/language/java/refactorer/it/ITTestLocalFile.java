@@ -46,8 +46,7 @@ public class ITTestLocalFile {
 
 		String pathAsString = Files.readString(file.toPath());
 
-		JavaRefactorer rulesJavaMutator =
-				new JavaRefactorer(new LanguageProperties(), new JavaRefactorerProperties());
+		JavaRefactorer rulesJavaMutator = new JavaRefactorer(new LanguageProperties(), new JavaRefactorerProperties());
 
 		CompilationUnit compilationUnit =
 				rulesJavaMutator.parseRawCode(rulesJavaMutator.makeJavaParser(), pathAsString);

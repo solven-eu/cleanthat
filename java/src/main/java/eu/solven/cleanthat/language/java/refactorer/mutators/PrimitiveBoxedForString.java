@@ -15,9 +15,9 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.meta.IRuleExternalUrls;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**

@@ -14,9 +14,9 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.meta.IRuleExternalUrls;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 
 /**
  * Order modifiers according the the Java specification.

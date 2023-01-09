@@ -23,8 +23,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**

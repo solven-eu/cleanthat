@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.language.java.refactorer;
+package eu.solven.cleanthat.language.java.spotless;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;

@@ -16,8 +16,8 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IRuleDescriber;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**

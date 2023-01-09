@@ -6,8 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.ATodoJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.ATodoJavaParserRule;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}

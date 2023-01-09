@@ -1,8 +1,6 @@
 package eu.solven.cleanthat.codeprovider;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

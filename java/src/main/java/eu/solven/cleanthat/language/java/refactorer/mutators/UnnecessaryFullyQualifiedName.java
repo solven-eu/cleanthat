@@ -9,16 +9,13 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -99,7 +96,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserRule implements IC
 			List<ImportDeclaration> imports = getImports(node);
 
 			Optional<ImportDeclaration> optMatchingImport = searchMatchingImport(imports, nodeWithType.getType());
-			if (!optMatchingImport.isPresent()) {
+			if (optMatchingImport.isEmpty()) {
 				doSimplifyType = false;
 			} else {
 				doSimplifyType = true;

@@ -12,9 +12,9 @@ import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.meta.IRuleExternalUrls;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 
 /**
  * Use the diamond operation {@code <>} whenever possible.

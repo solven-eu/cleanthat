@@ -4,7 +4,6 @@ import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.meta.IRuleExternalUrls;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 
 /**
  * This {@link AJavaParserRule} does not modify the AST, but always report it as changed. It can be useful to checkthe

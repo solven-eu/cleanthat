@@ -12,8 +12,8 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.AJavaParserRule;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**

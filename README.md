@@ -9,8 +9,9 @@ The point of this project is to enable automatic refactoring of your code-base. 
 
 Related projects:
 
-- https://jsparrow.github.io/
-- https://github.com/JnRouvignac/AutoRefactor
+- https://jsparrow.github.io/ (paid)
+- https://github.com/JnRouvignac/AutoRefactor (free)
+- https://github.com/openrewrite/rewrite-migrate-java (free)
 
 # Compatibility
 

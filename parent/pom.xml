@@ -22,7 +22,7 @@
 		<developer>
 			<id>blacelle</id>
 			<name>Benoit Lacelle</name>
-			<email>benoit.lacelle at gmail.com</email>
+			<email>benoit.lacelle at solven.eu</email>
 			<roles>
 				<role>Project lead</role>
 			</roles>
@@ -121,11 +121,10 @@
 
 	<profiles>
 		<profile>
-			<!-- skip everything, test, quality, format,... -->
+			<!-- skip formatting and refactoring: test, quality, format,... -->
 			<id>skipStyle</id>
 			<properties>
-				<!--<skipTests>true</skipTests> -->
-				<!--<jacoco.skip>true</jacoco.skip> -->
+				<!-- Code style -->
 				<checkstyle.skip>true</checkstyle.skip>
 				<pmd.skip>true</pmd.skip>
 				<cpd.skip>true</cpd.skip>
@@ -134,8 +133,17 @@
 				<license.skip>true</license.skip>
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
+				<cleanthat.skip>true</cleanthat.skip>
+				<skip.npm.style>true</skip.npm.style>
+				<spotless.apply.skip>true</spotless.apply.skip>
+				<spotless.check.skip>true</spotless.check.skip>
+
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
+
+				<skipTests>true</skipTests>
+				<skipITs>true</skipITs>
+				<jacoco.skip>true</jacoco.skip>
 			</properties>
 		</profile>
 		<profile>
@@ -162,18 +170,23 @@
 				<skipITs>true</skipITs>
 			</properties>
 		</profile>
-
-		<!-- Useful to skip JS compilation -->
+		
 		<profile>
-			<id>skipJs</id>
-			<activation>
-				<property>
-					<name>infra</name>
-					<value>heroku</value>
-				</property>
-			</activation>
+			<!-- skip everything, test, quality, format,... -->
+			<id>fast</id>
 			<properties>
-				<skip.npm>true</skip.npm>
+				<!--<skipTests>true</skipTests> -->
+				<!--<jacoco.skip>true</jacoco.skip> -->
+				<checkstyle.skip>true</checkstyle.skip>
+				<pmd.skip>true</pmd.skip>
+				<cpd.skip>true</cpd.skip>
+				<spotbugs.skip>true</spotbugs.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+				<license.skip>true</license.skip>
+				<formatter.skip>true</formatter.skip>
+				<impsort.skip>true</impsort.skip>
+				<!-- Dependency will be checked with style -->
+				<enforcer.skip>true</enforcer.skip>
 			</properties>
 		</profile>
 

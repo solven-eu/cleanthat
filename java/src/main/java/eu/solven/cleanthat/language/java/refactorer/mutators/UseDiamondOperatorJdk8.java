@@ -3,8 +3,8 @@ package eu.solven.cleanthat.language.java.refactorer.mutators;
 import java.util.Optional;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
+import eu.solven.cleanthat.language.java.refactorer.ATodoJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.rules.ATodoJavaParserRule;
 
 /**
  * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8

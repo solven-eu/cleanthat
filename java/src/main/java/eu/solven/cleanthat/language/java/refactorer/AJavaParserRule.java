@@ -133,4 +133,30 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 			}
 		}
 	}
+
+	protected boolean scopeHasRequiredType(Optional<Expression> optScope, Class<?> requiredType) {
+		return scopeHasRequiredType(optScope, requiredType.getName());
+	}
+
+	protected boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
+		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
+		if (optType.isEmpty()) {
+			return false;
+		}
+		ResolvedType type = optType.get();
+		boolean isCorrectClass = false;
+		if (type.isConstraint()) {
+			// Happens on Lambda
+			type = type.asConstraintType().getBound();
+		}
+		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(requiredType)) {
+			// We are calling 'isEmpty' not on an Optional object
+			isCorrectClass = true;
+		}
+		if (!isCorrectClass) {
+			return false;
+		}
+
+		return true;
+	}
 }

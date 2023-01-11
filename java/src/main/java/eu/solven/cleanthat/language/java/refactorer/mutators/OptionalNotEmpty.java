@@ -62,23 +62,11 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 			return false;
 		}
 		Optional<Expression> optScope = methodCall.getScope();
-		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
-		if (optType.isEmpty()) {
+
+		if (!scopeHasRequiredType(optScope, Optional.class)) {
 			return false;
 		}
-		ResolvedType type = optType.get();
-		boolean isCorrectClass = false;
-		if (type.isConstraint()) {
-			// Happens on Lambda
-			type = type.asConstraintType().getBound();
-		}
-		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(Optional.class.getName())) {
-			// We are calling 'isEmpty' not on an Optional object
-			isCorrectClass = true;
-		}
-		if (!isCorrectClass) {
-			return false;
-		}
+
 		Expression scope = optScope.get();
 		boolean localTransformed = false;
 		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {

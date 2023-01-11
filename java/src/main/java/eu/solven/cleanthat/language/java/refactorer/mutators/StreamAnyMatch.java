@@ -17,7 +17,7 @@ import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
- * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'
+ * Prefer 's.anyMatch(predicate)' over 's.filter(p).findAny().isPresent()'
  *
  * @author Benoit Lacelle
  */
@@ -43,6 +43,7 @@ public class StreamAnyMatch extends AJavaParserRule implements IClassTransformer
 		return "StreamAnyMatch";
 	}
 
+	// TODO Lack of checking for Stream type
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

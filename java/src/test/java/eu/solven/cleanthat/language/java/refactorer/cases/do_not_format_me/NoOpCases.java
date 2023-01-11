@@ -20,6 +20,13 @@ public class NoOpCases extends ACases {
 		}
 	}
 
+	/**
+	 * 
+	 * JavaParser tends to remove smepty empty lines from Javadoc
+	 * 
+	 * @author Benoit Lacelle
+	 *
+	 */
 	@UnchangedMethod
 	public static class EmptyRowBetweenComments_withAditions {
 		public String post() {

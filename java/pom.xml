@@ -10,11 +10,6 @@
 
 	<artifactId>java</artifactId>
 
-	<properties>
-		<spotless.dependency.version>2.31.0</spotless.dependency.version>
-	</properties>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -115,18 +110,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.10.0</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-lib -->
-		<dependency>
-			<groupId>com.diffplug.spotless</groupId>
-			<artifactId>spotless-lib</artifactId>
-			<version>${spotless.dependency.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.diffplug.spotless</groupId>
-			<artifactId>spotless-lib-extra</artifactId>
-			<version>${spotless.dependency.version}</version>
 		</dependency>
 
 		<dependency>

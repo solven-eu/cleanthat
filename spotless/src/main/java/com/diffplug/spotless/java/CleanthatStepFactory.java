@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.language.java.spotless;
+package com.diffplug.spotless.java;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -28,14 +28,14 @@ import com.diffplug.spotless.Jvm;
 import com.diffplug.spotless.Provisioner;
 
 /**
- * Enables CleanThat as a SpotLess step
+ * Enables CleanThat as a SpotLess step. This may be moved to Spotless own repo (https://github.com/diffplug/spotless/tree/main/lib)
  * 
  * @author Benoit Lacelle
  */
 // https://github.com/diffplug/spotless/blob/main/CONTRIBUTING.md#how-to-add-a-new-formatterstep
-public class CleanthatSpotlessStep {
+public class CleanthatStepFactory {
 	// prevent direct instantiation
-	private CleanthatSpotlessStep() {
+	private CleanthatStepFactory() {
 	}
 
 	private static final String NAME = "cleanthat";

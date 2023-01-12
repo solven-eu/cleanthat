@@ -41,6 +41,10 @@
 		<!-- Build automation tools -->
 		<module>maven</module>
 		<!-- <module>gradle</module> -->
+		
+		<!-- Enable running spotless in GithubApp -->
+		<!-- (Not enabling cleanthat through spotless) -->
+		<module>spotless</module>
 	</modules>
 
 	<scm>

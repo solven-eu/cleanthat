@@ -25,16 +25,11 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class VariableEqualsConstant extends AJavaParserRule implements IRuleDescriber {
+public class LiteralsFirstInComparisons extends AJavaParserRule implements IRuleDescriber {
 
 	private static final String METHOD_EQUALS = "equals";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(VariableEqualsConstant.class);
-
-	@Override
-	public String getId() {
-		return pmdId();
-	}
+	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -46,8 +41,9 @@ public class VariableEqualsConstant extends AJavaParserRule implements IRuleDesc
 		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons";
 	}
 
-	public String pmdId() {
-		return "LiteralsFirstInComparisons";
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("LiteralsFirstInComparisons");
 	}
 
 	@Override

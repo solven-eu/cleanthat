@@ -12,7 +12,7 @@ import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import lombok.Data;
 
 /**
- * The configuration of what is not related to a language.
+ * Some metadata properties.
  *
  * @author Benoit Lacelle
  */

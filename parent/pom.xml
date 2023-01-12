@@ -121,7 +121,7 @@
 
 	<profiles>
 		<profile>
-			<!-- skip formatting and refactoring: test, quality, format,... -->
+			<!-- Skip formatting and refactoring: quality, format,... -->
 			<id>skipStyle</id>
 			<properties>
 				<!-- Code style -->
@@ -135,15 +135,12 @@
 				<impsort.skip>true</impsort.skip>
 				<cleanthat.skip>true</cleanthat.skip>
 				<skip.npm.style>true</skip.npm.style>
+				<cleanthat.skip>true</cleanthat.skip>
 				<spotless.apply.skip>true</spotless.apply.skip>
 				<spotless.check.skip>true</spotless.check.skip>
 
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
-
-				<skipTests>true</skipTests>
-				<skipITs>true</skipITs>
-				<jacoco.skip>true</jacoco.skip>
 			</properties>
 		</profile>
 		<profile>
@@ -172,11 +169,10 @@
 		</profile>
 		
 		<profile>
-			<!-- skip everything, test, quality, format,... -->
+			<!-- Skip everything: test, quality, format,... -->
 			<id>fast</id>
 			<properties>
-				<!--<skipTests>true</skipTests> -->
-				<!--<jacoco.skip>true</jacoco.skip> -->
+				<!-- Code style -->
 				<checkstyle.skip>true</checkstyle.skip>
 				<pmd.skip>true</pmd.skip>
 				<cpd.skip>true</cpd.skip>
@@ -185,8 +181,18 @@
 				<license.skip>true</license.skip>
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
+				<cleanthat.skip>true</cleanthat.skip>
+				<skip.npm.style>true</skip.npm.style>
+				<cleanthat.skip>true</cleanthat.skip>
+				<spotless.apply.skip>true</spotless.apply.skip>
+				<spotless.check.skip>true</spotless.check.skip>
+
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
+
+				<skipTests>true</skipTests>
+				<skipITs>true</skipITs>
+				<jacoco.skip>true</jacoco.skip>
 			</properties>
 		</profile>
 

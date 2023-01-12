@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.spotless;
+package eu.solven.cleanthat.spotless.language;
 
 import java.io.File;
 import java.util.Arrays;
@@ -10,11 +10,19 @@ import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
 import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.spotless.AFormatterStepFactory;
+import eu.solven.cleanthat.spotless.SpotlessStepProperties;
+
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
-	private static final Set<String> DEFAULT_INCLUDES =
-			ImmutableSet.of("src/main/java/**/*.java", "src/test/java/**/*.java");
+	// CleanThat will call spotless from the root directory: process any Java file from there
+	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/*.java");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
+
+	public JavaFormatterStepFactory(ICodeProvider codeProvider, String[] includes, String[] excludes) {
+		super(codeProvider, includes, excludes);
+	}
 
 	@Override
 	public Set<String> defaultIncludes() {

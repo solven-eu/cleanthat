@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * The configuration of what is not related to a language.
+ * The configuration of what is not related to a language/an engine.
  *
  * @author Benoit Lacelle
  */

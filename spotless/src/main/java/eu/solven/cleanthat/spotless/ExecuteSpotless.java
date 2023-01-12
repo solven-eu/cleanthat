@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.spotless;
+package eu.solven.cleanthat.spotless;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +16,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +35,20 @@ import com.diffplug.spotless.LineEnding;
 import com.diffplug.spotless.PaddedCell;
 import com.diffplug.spotless.Provisioner;
 
+import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
+import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
+
 // see com.diffplug.spotless.maven.SpotlessApplyMojo
 public class ExecuteSpotless {
+	private static final class CleanthatJvmProvisioner implements Provisioner {
+		@Override
+		public Set<File> provisionWithTransitives(boolean withTransitives, Collection<String> mavenCoordinates) {
+			LOGGER.error("TODO");
+			return Set.of();
+		}
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteSpotless.class);
 
 	final Formatter formatter;
@@ -67,19 +87,23 @@ public class ExecuteSpotless {
 
 		AFormatterStepFactory stepFactory = makeFormatterStepFactory(language);
 
-		Provisioner provisionner = new Provisioner() {
+		// Provisioner provisionner = new CleanthatJvmProvisioner();
+		Provisioner provisionner = makeProvisionner();
 
-			@Override
-			public Set<File> provisionWithTransitives(boolean withTransitives, Collection<String> mavenCoordinates) {
-				LOGGER.error("TODO");
-				return Set.of();
-			}
-		};
-		// FormatterStep.createLazy(s.getName(), () -> globalState, unusedState -> formatter)
 		return spotlessProperties.getSteps()
 				.stream()
 				.map(s -> stepFactory.makeStep(s, provisionner))
 				.collect(Collectors.toList());
+	}
+
+	private static Provisioner makeProvisionner() {
+		RepositorySystem repositorySystem = new DefaultRepositorySystem();
+		RepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
+		List<RemoteRepository> repositories = new ArrayList<>();
+		Log log = new SystemStreamLog();
+		Provisioner provisionner = MavenProvisioner
+				.create(new ArtifactResolver(repositorySystem, repositorySystemSession, repositories, log));
+		return provisionner;
 	}
 
 	private static AFormatterStepFactory makeFormatterStepFactory(String language) {

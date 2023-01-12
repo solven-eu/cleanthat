@@ -16,14 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.java.mutators.JavaRulesMutatorProperties;
 import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.SourceCodeProperties;
-import eu.solven.cleanthat.language.java.imports.JavaRevelcImportsCleanerProperties;
+import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
-import eu.solven.cleanthat.language.json.jackson.JacksonJsonFormatterProperties;
-import eu.solven.cleanthat.language.scala.scalafix.ScalafixProperties;
-import eu.solven.cleanthat.language.scala.scalafmt.ScalafmtProperties;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -75,14 +71,14 @@ public class TestDefaultConfig {
 				javaProperties.getProcessors()
 						.add(ImmutableMap.<String, Object>builder()
 								.put("engine", "rules")
-								.put("parameters", JavaRulesMutatorProperties.defaults())
+								.put("parameters", JavaRefactorerProperties.defaults())
 								.build());
 
-				javaProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "revelc_imports")
-								.put("parameters", new JavaRevelcImportsCleanerProperties())
-								.build());
+				// javaProperties.getProcessors()
+				// .add(ImmutableMap.<String, Object>builder()
+				// .put("engine", "revelc_imports")
+				// .put("parameters", new JavaRevelcImportsCleanerProperties())
+				// .build());
 
 				javaProperties.getProcessors()
 						.add(ImmutableMap.<String, Object>builder()
@@ -90,53 +86,6 @@ public class TestDefaultConfig {
 								.put("parameters", new SpringJavaFormatterProperties())
 								.build());
 				configFromEmpty.getLanguages().add(javaProperties);
-			}
-
-			{
-				LanguageProperties lProperties = new LanguageProperties();
-
-				lProperties.setLanguage("scala");
-				lProperties.setLanguageVersion("2.12");
-				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
-				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.scala"));
-				lProperties.setSourceCode(javaSourceCodeProperties);
-
-				Assertions.assertThat(lProperties.getProcessors()).isEmpty();
-				lProperties.setProcessors(new ArrayList<>());
-
-				lProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "scalafix")
-								.put("parameters", new ScalafixProperties())
-								.build());
-
-				lProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "scalafmt")
-								.put("parameters", new ScalafmtProperties())
-								.build());
-
-				configFromEmpty.getLanguages().add(lProperties);
-			}
-
-			{
-				LanguageProperties lProperties = new LanguageProperties();
-
-				lProperties.setLanguage("json");
-				// javaProperties.setLanguageVersion("11");
-				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
-				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.json"));
-				lProperties.setSourceCode(javaSourceCodeProperties);
-
-				Assertions.assertThat(lProperties.getProcessors()).isEmpty();
-				lProperties.setProcessors(new ArrayList<>());
-
-				lProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "jackson")
-								.put("parameters", new JacksonJsonFormatterProperties())
-								.build());
-				configFromEmpty.getLanguages().add(lProperties);
 			}
 
 		}

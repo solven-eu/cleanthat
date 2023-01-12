@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.mvn.spotless;
+package eu.solven.cleanthat.spotless.mvn;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -25,11 +25,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.maven.plugin.logging.Log;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
@@ -45,8 +48,10 @@ public class ArtifactResolver {
 	private final List<RemoteRepository> repositories;
 	private final Log log;
 
-	public ArtifactResolver(RepositorySystem repositorySystem, RepositorySystemSession session,
-			List<RemoteRepository> repositories, Log log) {
+	public ArtifactResolver(RepositorySystem repositorySystem,
+			RepositorySystemSession session,
+			List<RemoteRepository> repositories,
+			Log log) {
 		this.repositorySystem = Objects.requireNonNull(repositorySystem);
 		this.session = Objects.requireNonNull(session);
 		this.repositories = Objects.requireNonNull(repositories);
@@ -54,8 +59,8 @@ public class ArtifactResolver {
 	}
 
 	/**
-	 * Given a set of maven coordinates, returns a set of jars which include all
-	 * of the specified coordinates and optionally their transitive dependencies.
+	 * Given a set of maven coordinates, returns a set of jars which include all of the specified coordinates and
+	 * optionally their transitive dependencies.
 	 */
 	public Set<File> resolve(boolean withTransitives, Collection<String> mavenCoordinates) {
 		Collection<Exclusion> excludeTransitive = new ArrayList<Exclusion>(1);
@@ -82,7 +87,8 @@ public class ArtifactResolver {
 		try {
 			return repositorySystem.resolveDependencies(session, dependencyRequest);
 		} catch (DependencyResolutionException e) {
-			throw new ArtifactResolutionException("Unable to resolve dependencies", e);
+			// throw new ArtifactResolutionException("Unable to resolve dependencies", e);
+			throw new IllegalStateException("Unable to resolve dependencies", e);
 		}
 	}
 

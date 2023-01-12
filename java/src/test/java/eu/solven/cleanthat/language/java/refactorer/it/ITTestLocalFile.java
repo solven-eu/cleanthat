@@ -16,7 +16,7 @@ import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.refactorer.mutators.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
 
 /**
  * This is useful to investigate a misbehavior over current project file
@@ -52,7 +52,7 @@ public class ITTestLocalFile {
 				rulesJavaMutator.parseRawCode(rulesJavaMutator.makeJavaParser(), pathAsString);
 
 		// TODO Refactor to rely on RulesJavaMutator
-		IClassTransformer rule = new VariableEqualsConstant();
+		IClassTransformer rule = new LiteralsFirstInComparisons();
 		boolean changed = rule.walkNode(compilationUnit);
 
 		if (!changed) {

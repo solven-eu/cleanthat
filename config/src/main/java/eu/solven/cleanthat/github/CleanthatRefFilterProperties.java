@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableList;
@@ -23,6 +24,7 @@ import lombok.Setter;
  * @author Benoit Lacelle
  */
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonIgnoreProperties({ "branches" })
 @Data
 public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanthatRefFilterProperties.class);
@@ -39,29 +41,35 @@ public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	 */
 	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
 	@Setter(AccessLevel.NONE)
-	private List<String> branches =
+	private List<String> protectedPatterns =
 			SIMPLE_DEFAULT_BRANCHES.stream().map(s -> BRANCHES_PREFIX + s).collect(Collectors.toList());
 
 	/**
 	 * 
-	 * @param branches
-	 *            the regex of the branches allowed to be clean. Fact is these branches should never be cleaned by
-	 *            themselves, but only through RR
+	 * @param protectedPatterns
+	 *            the branches-patterns considered as protected. Fact is these branches should never be cleaned by
+	 *            themselves, but only through RR. They would also be used as referential branches (i.e. given a branch,
+	 *            we consider existing RR given these protected branches).
+	 * 
+	 *            A pattern is prefixed by 'refs/heads' is not prefixed by 'refs/'. The rationale is to consider with an
+	 *            inmplicit ref is considered a branch ref.
+	 * 
+	 *            The pattern is later tested with java Pattern.matches
 	 */
-	public void setBranches(List<String> branches) {
-		branches = branches.stream().map(branch -> {
+	public void setProtectedPatterns(List<String> protectedPatterns) {
+		protectedPatterns = protectedPatterns.stream().map(branch -> {
 			if (!branch.startsWith(REFS_PREFIX)) {
 				String qualifiedRef = BRANCHES_PREFIX + branch;
 				LOGGER.debug("We qualify {} into {} (i.e. we supposed it is a branch name)", branch, qualifiedRef);
 				return qualifiedRef;
 			} else {
 				if (!branch.startsWith(BRANCHES_PREFIX)) {
-					LOGGER.warn("Unusual ref: {}", branch);
+					LOGGER.warn("Unusual protected ref: {}", branch);
 				}
 				return branch;
 			}
 		}).distinct().collect(Collectors.toList());
 
-		this.branches = List.copyOf(branches);
+		this.protectedPatterns = List.copyOf(protectedPatterns);
 	}
 }

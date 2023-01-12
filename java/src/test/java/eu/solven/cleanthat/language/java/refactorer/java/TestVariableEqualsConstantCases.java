@@ -15,7 +15,7 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.VariableEqualsConstantCases;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.refactorer.mutators.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.language.java.refactorer.test.ATestCases;
 
 public class TestVariableEqualsConstantCases extends ATestCases {
@@ -33,7 +33,7 @@ public class TestVariableEqualsConstantCases extends ATestCases {
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		IClassTransformer transformer = new VariableEqualsConstant();
+		IClassTransformer transformer = new LiteralsFirstInComparisons();
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 

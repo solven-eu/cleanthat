@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.spotless;
+package eu.solven.cleanthat.spotless;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

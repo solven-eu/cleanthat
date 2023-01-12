@@ -1,0 +1,24 @@
+syntax_version: "2023-01-09"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    protected_patterns:
+      - master
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  - "regex:.*/do_not_format_me/.*"
+  encoding: "UTF-8"
+  line_ending: "AUTO"
+engines:
+# https://github.com/diffplug/spotless/pull/568
+- engine: "spotless"
+  source_code:
+    includes:
+    # For now, Spotless applies only to Java files
+    - "regex:.*\\.java"
+ parameters:
+   configuration: "code:/.cleanthat/spotless.yaml"
+  processors:
+  - engine: "spotless"

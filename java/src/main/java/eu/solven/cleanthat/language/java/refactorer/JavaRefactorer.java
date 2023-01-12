@@ -55,7 +55,7 @@ import eu.solven.cleanthat.language.java.refactorer.mutators.PrimitiveBoxedForSt
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.language.java.refactorer.mutators.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
 
 /**
  * This class is dedicated to refactoring. Most rules will refactor code to a better (e.g. shorter, faster, safer, etc)
@@ -79,7 +79,7 @@ public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFi
 			new UseDiamondOperator(),
 			new UseDiamondOperatorJdk8(),
 			new UseIsEmptyOnCollections(),
-			new VariableEqualsConstant());
+			new LiteralsFirstInComparisons());
 
 	public static final List<String> getAllIncluded() {
 		return ALL_TRANSFORMERS.stream().map(ct -> Iterables.getOnlyElement(ct.getIds())).collect(Collectors.toList());

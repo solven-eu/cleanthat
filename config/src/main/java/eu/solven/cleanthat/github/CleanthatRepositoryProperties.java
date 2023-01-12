@@ -22,7 +22,8 @@ import lombok.Data;
 @JsonPropertyOrder({ "syntax_version", "meta", "source_code", "languages" })
 @Data
 public final class CleanthatRepositoryProperties implements IHasSourceCodeProperties {
-	public static final String LATEST_SYNTAX_VERSION = "2021-08-02";
+	public static final String PREVIOUS_SYNTAX_VERSION = "2021-08-02";
+	public static final String LATEST_SYNTAX_VERSION = "2023-01-09";
 
 	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config
 	// version

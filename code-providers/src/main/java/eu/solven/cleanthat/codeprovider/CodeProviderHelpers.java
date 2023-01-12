@@ -1,6 +1,8 @@
 package eu.solven.cleanthat.codeprovider;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,11 +28,18 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 public class CodeProviderHelpers {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
 
-	public static final String FILENAME_CLEANTHAT_YAML = "spotless.yaml";
-	public static final String FILENAME_CLEANTHAT_YML = "spotless.yml";
+	public static final String FILENAME_CLEANTHAT_FOLDER = ".cleanthat";
+
+	public static final String FILENAME_CLEANTHAT_YAML = "cleanthat.yaml";
+	public static final String FILENAME_CLEANTHAT_YML = "cleanthat.yml";
+	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
 
 	public static final List<String> FILENAMES_CLEANTHAT =
-			Arrays.asList(FILENAME_CLEANTHAT_YAML, FILENAME_CLEANTHAT_YML);
+			Arrays.asList(FILENAME_CLEANTHAT_FOLDER + FILENAME_CLEANTHAT_YAML,
+					FILENAME_CLEANTHAT_FOLDER + FILENAME_CLEANTHAT_YML,
+					FILENAME_CLEANTHAT_YAML,
+					FILENAME_CLEANTHAT_YML,
+					FILENAME_CLEANTHAT_JSON);
 
 	public static final List<String> PATH_CLEANTHAT =
 			FILENAMES_CLEANTHAT.stream().map(s -> "/" + s).collect(Collectors.toList());
@@ -62,7 +71,13 @@ public class CodeProviderHelpers {
 		ObjectMapper objectMapper;
 		Map.Entry<String, String> pathAndContent = optPathAndContent.get();
 		LOGGER.info("Loaded config from {}", pathAndContent.getKey());
-		objectMapper = ConfigHelpers.getYaml(objectMappers);
+		if (pathAndContent.getKey().endsWith(".json")) {
+			objectMapper = ConfigHelpers.getJson(objectMappers);
+		} else if (pathAndContent.getKey().endsWith(".yml") || pathAndContent.getKey().endsWith(".yaml")) {
+			objectMapper = ConfigHelpers.getJson(objectMappers);
+		} else {
+			throw new IllegalArgumentException("Not managed extention: " + pathAndContent.getKey());
+		}
 
 		return optPathAndContent.map(content -> {
 			try {
@@ -71,6 +86,15 @@ public class CodeProviderHelpers {
 				throw new IllegalArgumentException("Invalid config (json vs yaml?)", e);
 			}
 		});
+	}
+
+	public static File pathToConfig(Path localFolder) {
+		return CodeProviderHelpers.FILENAMES_CLEANTHAT.stream()
+				.map(s -> localFolder.resolve(s).toFile())
+				.filter(File::exists)
+				.findAny()
+				.orElseThrow(() -> new IllegalStateException(
+						"No configuration at pathes: " + CodeProviderHelpers.FILENAMES_CLEANTHAT));
 	}
 
 }

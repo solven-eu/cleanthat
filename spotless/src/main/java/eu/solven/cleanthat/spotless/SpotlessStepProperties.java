@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.spotless;
+package eu.solven.cleanthat.spotless;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 /**
- * Helps configuring a {@link FormatterStep}
+ * Helps configuring a {@link FormatterStep}. Any dynamic property is accepted, and available at runtime through
+ * .getCustomProperty
  * 
  * @author Benoit Lacelle
  *

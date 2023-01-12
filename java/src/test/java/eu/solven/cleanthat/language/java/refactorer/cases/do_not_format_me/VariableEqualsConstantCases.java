@@ -10,14 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.refactorer.mutators.VariableEqualsConstant;
+import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.language.java.refactorer.test.ACases;
 
 public class VariableEqualsConstantCases extends ACases {
 
 	@Override
 	public IClassTransformer getTransformer() {
-		return new VariableEqualsConstant();
+		return new LiteralsFirstInComparisons();
 	}
 
 	@CompareMethods

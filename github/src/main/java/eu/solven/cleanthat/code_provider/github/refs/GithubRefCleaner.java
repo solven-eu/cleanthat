@@ -105,11 +105,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		List<String> cleanableRefsRegexes = properties.getMeta().getRefs().getBranches();
+		List<String> protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
 
 		String headRef = head.getRef();
-		if (canCleanInPlace(eventBaseRefs, cleanableRefsRegexes, headRef)) {
-			logWhyCanCleanInPlace(eventBaseRefs, cleanableRefsRegexes, result, headRef);
+		if (canCleanInPlace(eventBaseRefs, protectedPatterns, headRef)) {
+			logWhyCanCleanInPlace(eventBaseRefs, protectedPatterns, result, headRef);
 
 			// TODO We should take as base the base from 'canCleanInPlace'
 			// This is especially important in pushes after a rr-open, as the push before the rr-open would not be
@@ -119,13 +119,13 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			return cleanHeadInPlace(result, head);
 		}
 
-		if (canCleanInNewRR(cleanableRefsRegexes, headRef)) {
-			return cleanInNewRR(result, head, cleanableRefsRegexes, headRef);
+		if (canCleanInNewRR(protectedPatterns, headRef)) {
+			return cleanInNewRR(result, head, protectedPatterns, headRef);
 		} else {
 			// Cleanable neither in-place nor in-rr
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
 					headRef,
-					cleanableRefsRegexes,
+					protectedPatterns,
 					eventBaseRefs);
 			return Optional.empty();
 		}
@@ -169,8 +169,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return optHeadMatchingRule.isPresent();
 	}
 
-	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> refToCleanRegexes, String headRef) {
-		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(refToCleanRegexes, headRef);
+	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> protectedPatterns, String headRef) {
+		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(protectedPatterns, headRef);
 		if (optHeadMatchingRule.isPresent()) {
 			// We never clean in place the cleanable branches, as they are considered sensible
 			LOGGER.info("Not cleaning in-place as head={} is a sensible/cleanable ref (rule={})",
@@ -179,7 +179,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			return false;
 		}
 
-		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, protectedPatterns);
 
 		return optBaseMatchingRule.isPresent();
 	}
@@ -209,8 +209,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
-	private Optional<String> selectPatternOfSensibleHead(List<String> cleanableRefsRegexes, String fullRef) {
-		return cleanableRefsRegexes.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
+	private Optional<String> selectPatternOfSensibleHead(List<String> protectedPatterns, String fullRef) {
+		return protectedPatterns.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
 	}
 
 	/**

@@ -54,21 +54,6 @@
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>scala</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<!-- <dependency> -->
 		<!-- https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-java-aop-spring.html -->

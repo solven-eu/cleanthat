@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 
-import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;

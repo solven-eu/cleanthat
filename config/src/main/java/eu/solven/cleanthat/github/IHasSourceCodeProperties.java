@@ -1,7 +1,7 @@
 package eu.solven.cleanthat.github;
 
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 
 /**
  * Anything wityh a {@link SourceCodeProperties}

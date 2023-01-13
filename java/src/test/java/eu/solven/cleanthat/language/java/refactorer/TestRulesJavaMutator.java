@@ -13,8 +13,8 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.collect.ImmutableMap;
 
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
-import eu.solven.cleanthat.language.LanguageProperties;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;

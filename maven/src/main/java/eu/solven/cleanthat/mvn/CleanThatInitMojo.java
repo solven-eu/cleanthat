@@ -28,8 +28,8 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 

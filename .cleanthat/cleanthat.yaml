@@ -18,7 +18,7 @@ engines:
     includes:
     # For now, Spotless applies only to Java files
     - "regex:.*\\.java"
- parameters:
-   configuration: "code:/.cleanthat/spotless.yaml"
   processors:
   - engine: "spotless"
+    parameters:
+      configuration: "code:/.cleanthat/spotless.yaml"

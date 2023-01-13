@@ -21,8 +21,8 @@ import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 /**

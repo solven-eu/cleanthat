@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java;
+package eu.solven.cleanthat.language.spotless;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,38 +30,25 @@ import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
 import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
- * Formatter for Java
+ * Formatter for Spotless Engine
  *
  * @author Benoit Lacelle
  */
-public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormattersFactory.class);
+public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessFormattersFactory.class);
 
-	private static final int DEFAULT_CACHE_SIZE = 16;
-
-	// Prevents parsing/loading remote configuration on each parse
-	// We expect a low number of different configurations
-	// Beware this can lead to race-conditions/thread-safety issues into EclipseJavaFormatter
-	final Cache<EclipseFormatterCacheKey, EclipseJavaFormatterConfiguration> configToEngine =
-			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build();
-
-	public JavaFormattersFactory(ObjectMapper objectMapper) {
+	public SpotlessFormattersFactory(ObjectMapper objectMapper) {
 		super(objectMapper);
 	}
 
 	@Override
 	public String getLanguage() {
-		return "java";
+		return "spotless";
 	}
 
 	@Override
 	public Set<String> getFileExtentions() {
-		return Set.of("java");
-	}
-
-	@VisibleForTesting
-	protected long getCacheSize() {
-		return configToEngine.size();
+		return Set.of("java", "scala", "json");
 	}
 
 	@Override
@@ -78,16 +65,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		ObjectMapper objectMapper = getObjectMapper();
 
 		switch (engine) {
-		case "spring_formatter": {
-			SpringJavaFormatterProperties processorConfig =
-					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
-			processor = new SpringJavaStyleEnforcer(languageProperties.getSourceCode(), processorConfig);
-			break;
-		}
-		case "rules": {
-			JavaRefactorerProperties processorConfig =
-					objectMapper.convertValue(parameters, JavaRefactorerProperties.class);
-			processor = new JavaRefactorer(languageProperties, processorConfig);
+		case "spotless": {
+			SpotlessCleanthatProperties processorConfig =
+					objectMapper.convertValue(parameters, SpotlessCleanthatProperties.class);
+			processor = new SpotlessLintFixer(languageProperties.getSourceCode(), processorConfig);
 			break;
 		}
 
@@ -112,33 +93,17 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 		// Apply rules
 		{
-			JavaRefactorerProperties engineParameters = new JavaRefactorerProperties();
+			SpotlessCleanthatProperties engineParameters = new SpotlessCleanthatProperties();
 
 			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "rules")
+					.put(KEY_ENGINE, "spotless")
 					.put(KEY_PARAMETERS, engineParameters)
 					.build());
-		}
-
-		// Eclipse formatting is done last, to clean after rules
-		{
-			Map<String, ?> processorProperties = makeEclipseFormatterDefaultProperties();
-			processors.add(processorProperties);
 		}
 
 		languageProperties.setProcessors(processors);
 
 		return languageProperties;
-	}
-
-	public static Map<String, ?> makeEclipseFormatterDefaultProperties() {
-		EclipseJavaFormatterProcessorProperties engineParameters = new EclipseJavaFormatterProcessorProperties();
-
-		Map<String, ?> processorProperties = ImmutableMap.<String, Object>builder()
-				.put(KEY_ENGINE, EclipseJavaFormatter.ID)
-				.put(KEY_PARAMETERS, engineParameters)
-				.build();
-		return processorProperties;
 	}
 
 }

@@ -33,8 +33,8 @@ import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeP
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.run.ICleanThatITConstants;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 

@@ -57,65 +57,6 @@ public class ExecuteSpotless {
 		this.formatter = formatter;
 	}
 
-	// com.diffplug.gradle.spotless.SpotlessTask#buildFormatter
-	public static Formatter makeFormatter(SpotlessProperties spotlessProperties, Provisioner provisioner) {
-		Path tmpRoot;
-		try {
-			tmpRoot = Files.createTempDirectory("cleanthat-spotless-");
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue creating tmp rootDirectory", e);
-		}
-
-		// BEWARE may rely on formatterLineEndings.createPolicy(config.getFileLocator().getBaseDir(), filesToFormat)
-		LineEnding.Policy lineEndingsPolicy = LineEnding.valueOf(spotlessProperties.getLineEnding()).createPolicy();
-
-		// FormatExceptionPolicy.failOnlyOnError()
-		FormatExceptionPolicy exceptionPolicy = new FormatExceptionPolicyStrict();
-
-		List<FormatterStep> steps = buildSteps(spotlessProperties, provisioner);
-		return Formatter.builder()
-				.lineEndingsPolicy(lineEndingsPolicy)
-				.encoding(Charset.forName(spotlessProperties.getEncoding()))
-				.rootDir(tmpRoot)
-				.steps(steps)
-				.exceptionPolicy(exceptionPolicy)
-				.build();
-	}
-
-	private static List<FormatterStep> buildSteps(SpotlessProperties spotlessProperties, Provisioner provisioner) {
-		String language = spotlessProperties.getLanguage();
-
-		AFormatterStepFactory stepFactory = makeFormatterStepFactory(language);
-
-		// Provisioner provisionner = new CleanthatJvmProvisioner();
-		Provisioner provisionner = makeProvisionner();
-
-		return spotlessProperties.getSteps()
-				.stream()
-				.map(s -> stepFactory.makeStep(s, provisionner))
-				.collect(Collectors.toList());
-	}
-
-	private static Provisioner makeProvisionner() {
-		RepositorySystem repositorySystem = new DefaultRepositorySystem();
-		RepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
-		List<RemoteRepository> repositories = new ArrayList<>();
-		Log log = new SystemStreamLog();
-		Provisioner provisionner = MavenProvisioner
-				.create(new ArtifactResolver(repositorySystem, repositorySystemSession, repositories, log));
-		return provisionner;
-	}
-
-	private static AFormatterStepFactory makeFormatterStepFactory(String language) {
-		switch (language) {
-		case "java":
-			return new JavaFormatterStepFactory();
-
-		default:
-			throw new IllegalArgumentException("Not managed language: " + language);
-		}
-	}
-
 	/**
 	 * 
 	 * @param relativePath

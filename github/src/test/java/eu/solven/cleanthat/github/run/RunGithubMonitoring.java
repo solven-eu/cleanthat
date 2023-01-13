@@ -33,10 +33,10 @@ import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })

@@ -7,9 +7,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 import eu.solven.cleanthat.language.java.refactorer.JavaparserDirtyMe;
 import eu.solven.cleanthat.language.java.refactorer.test.LocalClassTestHelper;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;

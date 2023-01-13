@@ -8,16 +8,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.ArraysStreamCases;
+import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.ArraysDotStreamCases;
 import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class TestArraysStream extends AParameterizesRefactorerCases {
+public class TestArraysDotStream extends AParameterizesRefactorerCases {
 
 	private static ARefactorerCases getStaticRefactorerCases() {
-		return new ArraysStreamCases();
+		return new ArraysDotStreamCases();
 	}
 
-	public TestArraysStream(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestArraysDotStream(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);
 	}
 

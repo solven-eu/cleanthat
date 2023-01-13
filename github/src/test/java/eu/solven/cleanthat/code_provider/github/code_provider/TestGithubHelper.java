@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import com.google.common.collect.Sets;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 public class TestGithubHelper {
 	final GHRepository repo = Mockito.mock(GHRepository.class);

@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 public class TestGenerateInitialConfig {

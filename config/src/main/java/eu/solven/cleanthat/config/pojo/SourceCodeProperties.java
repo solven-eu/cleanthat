@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language;
+package eu.solven.cleanthat.config.pojo;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;

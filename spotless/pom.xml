@@ -49,6 +49,11 @@
 			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>code-cleaners</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-lib -->
 		<dependency>

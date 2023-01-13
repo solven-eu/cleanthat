@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github;
+package eu.solven.cleanthat.config.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import eu.solven.cleanthat.language.CleanthatMetaProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
-import eu.solven.cleanthat.language.SourceCodeProperties;
+import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import lombok.Data;
 
 /**

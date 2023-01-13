@@ -15,9 +15,9 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.LanguageProperties;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}

@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 
 public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 

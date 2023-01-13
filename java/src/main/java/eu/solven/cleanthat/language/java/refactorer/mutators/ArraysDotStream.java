@@ -9,7 +9,6 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
@@ -81,7 +80,8 @@ public class ArraysDotStream extends AJavaParserRule implements IClassTransforme
 			return false;
 		}
 
-		if (scopeAsMethodCallExpr.getArguments().size() >= 2) {
+		if (scopeAsMethodCallExpr.getArguments().size() != 1) {
+			// TODO Handle this case with Stream.of(...)
 			return false;
 		}
 		Expression filterPredicate = scopeAsMethodCallExpr.getArgument(0);

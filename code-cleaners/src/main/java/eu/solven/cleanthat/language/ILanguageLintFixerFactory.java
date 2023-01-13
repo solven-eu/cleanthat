@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.formatter.ILintFixer;
 
 /**

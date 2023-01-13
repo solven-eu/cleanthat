@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 /**
  * Helps working with Github

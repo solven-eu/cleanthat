@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
-import eu.solven.cleanthat.language.SourceCodeProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
 import nl.jqno.equalsverifier.EqualsVerifier;

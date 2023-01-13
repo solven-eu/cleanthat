@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 /**
  * Enable a Facade over RewiewRequestProvider

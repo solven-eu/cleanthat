@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.language.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 
 public class TestEclipseJavaFormatterConfiguration {

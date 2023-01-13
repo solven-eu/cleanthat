@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 
 public class RunConvertToYml {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunConvertToYml.class);

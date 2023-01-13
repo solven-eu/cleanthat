@@ -6,11 +6,12 @@ import java.util.stream.Stream;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.ArraysDotStream;
 import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class ArraysStreamCases extends ARefactorerCases {
+public class ArraysDotStreamCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new ArraysDotStream();
@@ -49,8 +50,8 @@ public class ArraysStreamCases extends ARefactorerCases {
 		}
 	}
 
-	@Ignore("TODO")
-	@CompareMethods
+	// @CompareMethods
+	@UnchangedMethod
 	public static class EmptyArray {
 		public Object pre() {
 			return Arrays.asList().stream();
@@ -61,8 +62,8 @@ public class ArraysStreamCases extends ARefactorerCases {
 		}
 	}
 
-	@Ignore("TODO")
-	@CompareMethods
+	// @CompareMethods
+	@UnchangedMethod
 	public static class ConstantArray {
 		public Object pre() {
 			return Arrays.asList("a", 1).stream();
@@ -73,8 +74,8 @@ public class ArraysStreamCases extends ARefactorerCases {
 		}
 	}
 
-	@Ignore("TODO")
-	@CompareMethods
+	// @CompareMethods
+	@UnchangedMethod
 	public static class IndividualArguments {
 		public Object pre(String a, Number b) {
 			return Arrays.asList(a, b).stream();

@@ -9,8 +9,8 @@ import org.kohsuke.github.GHRepository;
 
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

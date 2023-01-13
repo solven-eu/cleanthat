@@ -3,6 +3,7 @@ package eu.solven.cleanthat.language;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
 
 public class TestSourceCodeProperties {

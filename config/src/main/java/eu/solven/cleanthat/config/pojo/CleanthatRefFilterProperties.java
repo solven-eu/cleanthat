@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.github;
+package eu.solven.cleanthat.config.pojo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.github.IGitRefsConstants;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;

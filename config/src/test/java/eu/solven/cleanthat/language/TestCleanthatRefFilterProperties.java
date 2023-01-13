@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 public class TestCleanthatRefFilterProperties {
 	final ObjectMapper objectMapper = new ObjectMapper();

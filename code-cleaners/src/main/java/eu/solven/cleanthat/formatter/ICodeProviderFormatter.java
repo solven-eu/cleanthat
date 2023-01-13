@@ -1,7 +1,7 @@
 package eu.solven.cleanthat.formatter;
 
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 
 /**
  * 

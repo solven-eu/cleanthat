@@ -18,10 +18,10 @@ import java.nio.file.Paths;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.AvoidFileStream;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
-public class AvoidFileStreamCases extends ACases {
+public class AvoidFileStreamCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new AvoidFileStream();

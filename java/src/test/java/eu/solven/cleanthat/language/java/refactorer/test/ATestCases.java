@@ -29,7 +29,8 @@ public class ATestCases {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
-	protected void testCasesIn(ACases cases) throws IOException {
+	@Deprecated
+	protected void testCasesIn(ARefactorerCases cases) throws IOException {
 		testCasesIn(cases.getClass(), cases.getTransformer());
 	}
 
@@ -101,7 +102,7 @@ public class ATestCases {
 
 	protected void doCheckUnchanged(IClassTransformer transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
-		MethodDeclaration post = getMethodWithName(oneCase, "post");
+		MethodDeclaration post = getMethodWithName(oneCase, "pre");
 		// Check the transformer is impact-less on already clean code
 		// This is a less relevant test: to be done later
 		{

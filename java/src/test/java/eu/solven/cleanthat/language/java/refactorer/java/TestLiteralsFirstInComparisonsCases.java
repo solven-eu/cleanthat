@@ -13,16 +13,16 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.VariableEqualsConstantCases;
+import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.LiteralsFirstInComparisonsCases;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.language.java.refactorer.test.ATestCases;
 
-public class TestVariableEqualsConstantCases extends ATestCases {
+public class TestLiteralsFirstInComparisonsCases extends ATestCases {
 
 	@Test
 	public void testCases() throws IOException {
-		testCasesIn(new VariableEqualsConstantCases());
+		testCasesIn(new LiteralsFirstInComparisonsCases());
 	}
 
 	// Cannot keep element because we reached the end of nodetext

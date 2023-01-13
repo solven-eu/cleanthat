@@ -10,9 +10,9 @@ import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class UnnecessaryFullyQualifiedNameCases extends ACases {
+public class UnnecessaryFullyQualifiedNameCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new UnnecessaryFullyQualifiedName();
@@ -98,7 +98,7 @@ public class UnnecessaryFullyQualifiedNameCases extends ACases {
 
 	@UnchangedMethod
 	public static class NotImportedType {
-		public Object post(java.util.Map<?, ?> m) {
+		public Object pre(java.util.Map<?, ?> m) {
 			return m;
 		}
 	}

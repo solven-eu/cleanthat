@@ -3,26 +3,21 @@ package eu.solven.cleanthat.language.java.refactorer.java;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.UnnecessaryFullyQualifiedNameCases;
+import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.ArraysStreamCases;
 import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-@RunWith(Parameterized.class)
-public class TestUnnecessaryFullyQualifiedNameCases extends AParameterizesRefactorerCases {
+public class TestArraysStream extends AParameterizesRefactorerCases {
 
 	private static ARefactorerCases getStaticRefactorerCases() {
-		return new UnnecessaryFullyQualifiedNameCases();
+		return new ArraysStreamCases();
 	}
 
-	public TestUnnecessaryFullyQualifiedNameCases(JavaParser javaParser,
-			String testName,
-			ClassOrInterfaceDeclaration testCase) {
+	public TestArraysStream(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);
 	}
 

@@ -5,10 +5,10 @@ import java.math.RoundingMode;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.EnumsWithoutEquals;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
-public class EnumsWithoutEqualsCases extends ACases {
+public class EnumsWithoutEqualsCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new EnumsWithoutEquals();

@@ -3,9 +3,9 @@ package eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseIndexOfChar;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class UseIndexOfCharCases extends ACases {
+public class UseIndexOfCharCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new UseIndexOfChar();

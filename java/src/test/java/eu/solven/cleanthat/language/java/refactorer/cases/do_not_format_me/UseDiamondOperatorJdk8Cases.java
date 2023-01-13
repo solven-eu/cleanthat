@@ -7,10 +7,10 @@ import java.util.List;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseDiamondOperatorJdk8;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
 //TODO Have a maven module per version of Java, to ensure the post is valid
-public class UseDiamondOperatorJdk8Cases extends ACases {
+public class UseDiamondOperatorJdk8Cases extends ARefactorerCases {
 
 	@Override
 	public IClassTransformer getTransformer() {

@@ -7,9 +7,9 @@ import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.junit
 import eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me.junit4tojunit5.BeforeAfterTest_wildcardImport_Pre;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.JUnit4ToJUnit5;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class JUnit4ToJUnit5Cases extends ACases {
+public class JUnit4ToJUnit5Cases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new JUnit4ToJUnit5();

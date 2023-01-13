@@ -432,50 +432,6 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<!-- https://code.revelc.net/formatter-maven-plugin/ -->
-					<groupId>net.revelc.code.formatter</groupId>
-					<artifactId>formatter-maven-plugin</artifactId>
-					<version>${formatter-maven-plugin.version}</version>
-					<configuration>
-						<configFile>eclipse/eclipse_java_code_formatter.xml</configFile>
-						<encoding>UTF-8</encoding>
-						<excludes>
-							<!-- Test classes -->
-							<exclude>**/do_not_format_me/**</exclude>
-						</excludes>
-						<!-- Skip to rely on CleanThat -->
-						<skip>true</skip>
-					</configuration>
-					<dependencies>
-						<dependency>
-							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
-							<version>${pepper.version}</version>
-							<scope>runtime</scope>
-						</dependency>
-					</dependencies>
-					<executions>
-						<execution>
-							<id>apply_code_format</id>
-							<goals>
-								<!-- https://code.revelc.net/formatter-maven-plugin/format-mojo.html -->
-								<goal>format</goal>
-							</goals>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
-						</execution>
-						<execution>
-							<id>validate_code_format</id>
-							<goals>
-								<!-- https://code.revelc.net/formatter-maven-plugin/validate-mojo.html -->
-								<goal>validate</goal>
-							</goals>
-							<!-- runs at validate phase by default -->
-							<phase>${staticChecks}</phase>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
 					<!-- http://code.revelc.net/impsort-maven-plugin/ -->
 					<groupId>net.revelc.code</groupId>
 					<artifactId>impsort-maven-plugin</artifactId>
@@ -661,8 +617,8 @@
 					<artifactId>cleanthat-maven-plugin</artifactId>
 					<version>1.7</version>
 					<configuration>
-						<!-- We encounter some exceptions for now -->
-						<!--skip>true</skip-->
+						<!-- Skipped while working on 2.0-SNAPSHOT -->
+						<skip>true</skip>
 					</configuration>
 					<executions>
 						<execution>

@@ -5,9 +5,9 @@ import java.util.List;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.StreamAnyMatch;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class StreamAnyMatchCases extends ACases {
+public class StreamAnyMatchCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new StreamAnyMatch();

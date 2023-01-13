@@ -10,9 +10,9 @@ import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.OptionalNotEmpty;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class OptionalNotEmptyCases extends ACases {
+public class OptionalNotEmptyCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new OptionalNotEmpty();
@@ -42,21 +42,21 @@ public class OptionalNotEmptyCases extends ACases {
 
 	@UnchangedMethod
 	public static class CaseOnMap {
-		public Object post(Map<?, ?> input) {
+		public Object pre(Map<?, ?> input) {
 			return !input.isEmpty();
 		}
 	}
 
 	@UnchangedMethod
 	public static class CaseOnHashMap {
-		public Object post(HashMap<?, ?> input) {
+		public Object pre(HashMap<?, ?> input) {
 			return !input.isEmpty();
 		}
 	}
 
 	@UnchangedMethod
 	public static class CaseOnLambda {
-		public Object post(List<Map<?, ?>> input) {
+		public Object pre(List<Map<?, ?>> input) {
 			return input.stream().filter(m -> !m.isEmpty()).collect(Collectors.toList());
 		}
 	}

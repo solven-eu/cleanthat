@@ -7,9 +7,9 @@ import java.util.Map;
 import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class UseIsEmptyOnCollectionsCases extends ACases {
+public class UseIsEmptyOnCollectionsCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new UseIsEmptyOnCollections();

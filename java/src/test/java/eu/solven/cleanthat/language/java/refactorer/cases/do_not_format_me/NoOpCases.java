@@ -3,9 +3,9 @@ package eu.solven.cleanthat.language.java.refactorer.cases.do_not_format_me;
 import eu.solven.cleanthat.language.java.refactorer.NoOpJavaParserRule;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class NoOpCases extends ACases {
+public class NoOpCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new NoOpJavaParserRule();
@@ -13,7 +13,7 @@ public class NoOpCases extends ACases {
 
 	@UnchangedMethod
 	public static class EmptyRowBetweenComments {
-		public void post() {
+		public void pre() {
 			// Comment before empty row
 
 			// Comment after empty row
@@ -29,7 +29,7 @@ public class NoOpCases extends ACases {
 	 */
 	@UnchangedMethod
 	public static class EmptyRowBetweenComments_withAditions {
-		public String post() {
+		public String pre() {
 			String string = "a";
 			string += "b";
 

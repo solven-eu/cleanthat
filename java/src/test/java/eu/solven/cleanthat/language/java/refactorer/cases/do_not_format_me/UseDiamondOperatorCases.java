@@ -8,9 +8,9 @@ import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.UseDiamondOperator;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class UseDiamondOperatorCases extends ACases {
+public class UseDiamondOperatorCases extends ARefactorerCases {
 	@Override
 	public IClassTransformer getTransformer() {
 		return new UseDiamondOperator();

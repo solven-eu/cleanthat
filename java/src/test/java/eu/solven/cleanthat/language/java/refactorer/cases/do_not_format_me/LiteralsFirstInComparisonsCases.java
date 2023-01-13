@@ -11,9 +11,9 @@ import eu.solven.cleanthat.language.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.language.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.language.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.language.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.language.java.refactorer.test.ACases;
+import eu.solven.cleanthat.language.java.refactorer.test.ARefactorerCases;
 
-public class VariableEqualsConstantCases extends ACases {
+public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 
 	@Override
 	public IClassTransformer getTransformer() {
@@ -33,7 +33,7 @@ public class VariableEqualsConstantCases extends ACases {
 
 	@UnchangedMethod
 	public static class CaseConstantStringWithAnotherConstant {
-		public Object post() {
+		public Object pre() {
 			return "hardcoded".equals("input");
 		}
 	}
@@ -75,7 +75,7 @@ public class VariableEqualsConstantCases extends ACases {
 
 		}
 
-		public Object post(Object input) {
+		public Object pre(Object input) {
 			return input.equals(constantSomeClass);
 		}
 	}
@@ -154,7 +154,7 @@ public class VariableEqualsConstantCases extends ACases {
 			}
 		}
 
-		public Object post(LikeString input) {
+		public Object pre(LikeString input) {
 			return input.contentEquals("hardcoded");
 		}
 	}
@@ -194,7 +194,7 @@ public class VariableEqualsConstantCases extends ACases {
 
 	@UnchangedMethod
 	public static class CheckStartsWith {
-		public Object post(String o) {
+		public Object pre(String o) {
 			return o.startsWith(JsonFactory.FORMAT_NAME_JSON);
 		}
 	}

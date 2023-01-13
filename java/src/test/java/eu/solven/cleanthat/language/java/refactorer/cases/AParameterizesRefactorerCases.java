@@ -1,4 +1,4 @@
-package eu.solven.cleanthat.language.java.refactorer.java;
+package eu.solven.cleanthat.language.java.refactorer.cases;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -115,7 +115,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 	private void logEvent(ObjectMapper objectMapper, Map<String, ?> input) {
 		try {
-			LOGGER.warn("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
+			LOGGER.info("TODO Add unit-test for: {}", objectMapper.writeValueAsString(input));
 		} catch (JsonProcessingException ee) {
 			LOGGER.warn("Issue printing JSON", ee);
 		}

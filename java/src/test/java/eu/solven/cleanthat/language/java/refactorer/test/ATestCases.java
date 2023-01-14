@@ -113,9 +113,10 @@ public class ATestCases {
 			MethodDeclaration clonedPost = post.clone();
 			boolean walked = transformer.walkNode(post);
 			if (transformer instanceof NoOpJavaParserRule) {
-				Assert.assertTrue("NoOpJavaParserRule always wals", walked);
-			} else {
-				Assert.assertFalse("Should not have mutated " + post + " but it turned into: " + clonedPost, walked);
+				Assert.assertTrue("NoOpJavaParserRule always walk", walked);
+			} else if (walked) {
+				post.setName("post");
+				Assert.assertFalse("Should not have mutated " + clonedPost + " but it turned into: " + post, walked);
 			}
 			Assert.assertEquals(clonedPost, post);
 			Assert.assertEquals(clonedPost.toString(), post.toString());

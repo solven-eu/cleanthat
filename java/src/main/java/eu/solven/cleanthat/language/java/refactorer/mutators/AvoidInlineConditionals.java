@@ -7,8 +7,19 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.AssignExpr.Operator;
+import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;
@@ -48,56 +59,88 @@ public class AvoidInlineConditionals extends AJavaParserRule implements IClassTr
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-		if (!(node instanceof MethodCallExpr)) {
+		if (!(node instanceof ConditionalExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
-		String methodCallIdentifier = methodCall.getNameAsString();
-		if (!METHOD_STREAM.equals(methodCallIdentifier)) {
+		ConditionalExpr ternary = (ConditionalExpr) node;
+
+		if (!ternary.getParentNode().isPresent()) {
 			return false;
+		}
+		Node parent = ternary.getParentNode().get();
+
+		Expression condition = ternary.getCondition();
+		Expression thenExpr = ternary.getThenExpr();
+		Expression elseExpr = ternary.getElseExpr();
+
+		// Try discard a redundant blockStatement as 'if (...)' always implies it
+		while (condition instanceof EnclosedExpr) {
+			condition = ((EnclosedExpr) condition).getInner();
 		}
 
-		Optional<Expression> optScope = methodCall.getScope();
-		if (optScope.isEmpty()) {
-			return false;
-		}
-		Expression scope = optScope.get();
-		if (!(scope instanceof MethodCallExpr)) {
-			return false;
-		}
-		MethodCallExpr scopeAsMethodCallExpr = (MethodCallExpr) scope;
-		if (!METHOD_ASLIST.equals(scopeAsMethodCallExpr.getName().getIdentifier())) {
-			return false;
-		}
+		if (parent instanceof VariableDeclarator) {
+			if (!parent.getParentNode().isPresent()) {
+				return false;
+			}
+			Node grandParent = parent.getParentNode().get();
+			if (!(grandParent instanceof VariableDeclarationExpr)) {
+				return false;
+			}
+			VariableDeclarationExpr variableDeclExpr = (VariableDeclarationExpr) grandParent;
+			if (variableDeclExpr.getVariables().size() != 1) {
+				return false;
+			}
+			VariableDeclarator variableDeclarator = variableDeclExpr.getVariables().get(0);
 
-		Optional<Expression> optParentScope = scopeAsMethodCallExpr.getScope();
-		if (optParentScope.isEmpty()) {
-			return false;
-		}
-		Expression parentScope = optParentScope.get();
-		if (!parentScope.isNameExpr()) {
-			return false;
-		}
+			SimpleName variableName = variableDeclarator.getName();
+			Node newNode =
+					new IfStmt(condition, wrapThenElse(thenExpr, variableName), wrapThenElse(elseExpr, variableName));
 
-		if (scopeAsMethodCallExpr.getArguments().size() != 1) {
-			// TODO Handle this case with Stream.of(...)
-			return false;
-		}
-		Expression filterPredicate = scopeAsMethodCallExpr.getArgument(0);
+			if (grandParent.getParentNode().isEmpty()) {
+				return false;
+			}
+			Node grandGrandParent = grandParent.getParentNode().get();
+			if (!(grandGrandParent instanceof ExpressionStmt)) {
+				return false;
+			}
 
-		boolean localTransformed = false;
-		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
-		Expression replacement = new MethodCallExpr(parentScope, METHOD_STREAM, replaceArguments);
+			if (grandGrandParent.getParentNode().isEmpty()) {
+				return false;
+			}
+			Node grandGrandGrandParent = grandGrandParent.getParentNode().get();
+			if (!(grandGrandGrandParent instanceof BlockStmt)) {
+				return false;
+			}
+			BlockStmt grandGrandGrandParentBlockStmt = (BlockStmt) grandGrandGrandParent;
 
-		LOGGER.info("Turning {} into {}", methodCall, replacement);
-		if (methodCall.replace(replacement)) {
-			localTransformed = true;
-		}
+			// We declare the variable before the 'if (...)' statement
+			{
+				VariableDeclarator newVariableDeclarator =
+						new VariableDeclarator(variableDeclarator.getType(), variableName);
+				int indexOfVariableInParent = grandGrandGrandParentBlockStmt.getStatements().indexOf(grandGrandParent);
+				if (indexOfVariableInParent < 0) {
+					LOGGER.error("AssertionFailed around: {}", grandGrandGrandParentBlockStmt);
+					return false;
+				}
+				grandGrandGrandParentBlockStmt.addStatement(indexOfVariableInParent,
+						new VariableDeclarationExpr(newVariableDeclarator));
+			}
 
-		if (localTransformed) {
-			return true;
+			return grandGrandParent.replace(newNode);
+		} else if (parent instanceof ReturnStmt) {
+			// https://github.com/javaparser/javaparser/issues/3850
+			Node newNode = new IfStmt(condition,
+					new BlockStmt(new NodeList<>(new ReturnStmt(thenExpr))),
+					new BlockStmt(new NodeList<>(new ReturnStmt(elseExpr))));
+			return parent.replace(newNode);
+			// return false;
 		} else {
 			return false;
 		}
+	}
+
+	private BlockStmt wrapThenElse(Expression thenExpr, SimpleName variableName) {
+		return new BlockStmt(new NodeList<>(
+				new ExpressionStmt(new AssignExpr(new NameExpr(variableName), thenExpr, Operator.ASSIGN))));
 	}
 }

@@ -8,13 +8,13 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -45,8 +45,8 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	final Cache<EclipseFormatterCacheKey, EclipseJavaFormatterConfiguration> configToEngine =
 			CacheBuilder.newBuilder().maximumSize(DEFAULT_CACHE_SIZE).build();
 
-	public JavaFormattersFactory(ObjectMapper objectMapper) {
-		super(objectMapper);
+	public JavaFormattersFactory(ConfigHelpers configHelpers) {
+		super(configHelpers);
 	}
 
 	@Override
@@ -75,18 +75,15 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 		LOGGER.debug("Processing: {}", engine);
 
-		ObjectMapper objectMapper = getObjectMapper();
-
 		switch (engine) {
 		case "spring_formatter": {
 			SpringJavaFormatterProperties processorConfig =
-					objectMapper.convertValue(parameters, SpringJavaFormatterProperties.class);
+					convertValue(parameters, SpringJavaFormatterProperties.class);
 			processor = new SpringJavaStyleEnforcer(languageProperties.getSourceCode(), processorConfig);
 			break;
 		}
 		case "rules": {
-			JavaRefactorerProperties processorConfig =
-					objectMapper.convertValue(parameters, JavaRefactorerProperties.class);
+			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
 			processor = new JavaRefactorer(languageProperties, processorConfig);
 			break;
 		}

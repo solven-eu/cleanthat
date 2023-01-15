@@ -31,16 +31,13 @@ import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 
 public class FormatterFactory {
 	final ICodeProvider codeProvider;
-	final List<String> includes;
-	final List<String> excludes;
 
-	public FormatterFactory(ICodeProvider codeProvider, List<String> includes, List<String> excludes) {
+	public FormatterFactory(ICodeProvider codeProvider) {
 		this.codeProvider = codeProvider;
-		this.includes = includes;
-		this.excludes = excludes;
 	}
 
-	private static Provisioner makeProvisionner() {
+	// Provisioner provisionner = new CleanthatJvmProvisioner();
+	public static Provisioner makeProvisionner() {
 		RepositorySystem repositorySystem = new DefaultRepositorySystem();
 		RepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
 		List<RemoteRepository> repositories = new ArrayList<>();
@@ -50,12 +47,11 @@ public class FormatterFactory {
 		return provisionner;
 	}
 
-	private AFormatterStepFactory makeFormatterStepFactory(String language) {
+	private AFormatterStepFactory makeFormatterStepFactory(SpotlessProperties spotlessProperties) {
+		String language = spotlessProperties.getLanguage();
 		switch (language) {
 		case "java":
-			return new JavaFormatterStepFactory(codeProvider,
-					includes.toArray(String[]::new),
-					excludes.toArray(String[]::new));
+			return new JavaFormatterStepFactory(codeProvider, spotlessProperties);
 
 		default:
 			throw new IllegalArgumentException("Not managed language: " + language);
@@ -88,16 +84,11 @@ public class FormatterFactory {
 	}
 
 	private List<FormatterStep> buildSteps(SpotlessProperties spotlessProperties, Provisioner provisioner) {
-		String language = spotlessProperties.getLanguage();
-
-		AFormatterStepFactory stepFactory = makeFormatterStepFactory(language);
-
-		// Provisioner provisionner = new CleanthatJvmProvisioner();
-		Provisioner provisionner = makeProvisionner();
+		AFormatterStepFactory stepFactory = makeFormatterStepFactory(spotlessProperties);
 
 		return spotlessProperties.getSteps()
 				.stream()
-				.map(s -> stepFactory.makeStep(s, provisionner))
+				.map(s -> stepFactory.makeStep(s, provisioner))
 				.collect(Collectors.toList());
 	}
 }

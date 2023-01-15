@@ -127,5 +127,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<!-- Until adding CleanThat as as official Spotless Java step -->
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>java</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

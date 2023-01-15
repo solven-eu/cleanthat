@@ -31,5 +31,8 @@ public class SpotlessProperties {
 	// java, json
 	private final String language;
 
+	private List<String> includes = new ArrayList<>();
+	private List<String> excludes = new ArrayList<>();
+
 	private List<SpotlessStepProperties> steps = new ArrayList<>();
 }

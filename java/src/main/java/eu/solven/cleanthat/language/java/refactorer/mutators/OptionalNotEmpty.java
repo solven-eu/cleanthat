@@ -9,7 +9,6 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.language.java.IJdkVersionConstants;
 import eu.solven.cleanthat.language.java.refactorer.AJavaParserRule;

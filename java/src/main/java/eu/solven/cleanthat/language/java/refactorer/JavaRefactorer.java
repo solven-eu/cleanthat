@@ -81,13 +81,13 @@ public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFi
 			new UseIsEmptyOnCollections(),
 			new LiteralsFirstInComparisons());
 
-	public static final List<String> getAllIncluded() {
-		return ALL_TRANSFORMERS.stream().map(ct -> Iterables.getOnlyElement(ct.getIds())).collect(Collectors.toList());
-	}
-
 	private final List<IClassTransformer> transformers;
 
 	private Optional<IStyleEnforcer> optCodeStyleFixer = Optional.empty();
+
+	public static final List<String> getAllIncluded() {
+		return ALL_TRANSFORMERS.stream().map(ct -> Iterables.getOnlyElement(ct.getIds())).collect(Collectors.toList());
+	}
 
 	public JavaRefactorer(ILanguageProperties languageProperties, JavaRefactorerProperties properties) {
 		this.languageProperties = languageProperties;

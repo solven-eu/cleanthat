@@ -28,7 +28,8 @@ import com.diffplug.spotless.Jvm;
 import com.diffplug.spotless.Provisioner;
 
 /**
- * Enables CleanThat as a SpotLess step. This may be moved to Spotless own repo (https://github.com/diffplug/spotless/tree/main/lib)
+ * Enables CleanThat as a SpotLess step. This may be moved to Spotless own repo
+ * (https://github.com/diffplug/spotless/tree/main/lib)
  * 
  * @author Benoit Lacelle
  */
@@ -41,10 +42,7 @@ public class CleanthatStepFactory {
 	private static final String NAME = "cleanthat";
 	private static final String MAVEN_COORDINATE = "io.github.solven-eu.cleanthat:java:";
 
-	static final String FORMATTER_CLASS = "eu.solven.cleanthat.java.mutators.RulesJavaMutator";
-	static final String FORMATTER_METHOD = "doFormat";
-
-	private static final Jvm.Support<String> JVM_SUPPORT = Jvm.<String>support(NAME).add(8, "1.9");
+	private static final Jvm.Support<String> JVM_SUPPORT = Jvm.<String>support(NAME).add(8, "2.0");
 
 	/** Creates a step which formats everything - code, import order, and unused imports. */
 	public static FormatterStep create(Provisioner provisioner) {
@@ -93,8 +91,8 @@ public class CleanthatStepFactory {
 		final String stepName;
 		final String version;
 
-		final List<String> excluded;
 		final List<String> included;
+		final List<String> excluded;
 
 		JavaRulesState(String stepName, String version, Provisioner provisioner) throws Exception {
 			this(stepName, MAVEN_COORDINATE, version, defaultExcluded(), defaultIncluded(), provisioner);
@@ -103,8 +101,8 @@ public class CleanthatStepFactory {
 		JavaRulesState(String stepName,
 				String groupArtifact,
 				String version,
-				List<String> excluded,
 				List<String> included,
+				List<String> excluded,
 				Provisioner provisioner) throws Exception {
 			JVM_SUPPORT.assertFormatterSupported(version);
 			// ModuleHelper.doOpenInternalPackagesIfRequired();
@@ -112,50 +110,22 @@ public class CleanthatStepFactory {
 			this.stepName = stepName;
 			this.version = version;
 
-			this.excluded = excluded;
 			this.included = included;
+			this.excluded = excluded;
 		}
 
-		@SuppressWarnings({ "unchecked" })
 		FormatterFunc createFormat() throws Exception {
 			ClassLoader classLoader = jarState.getClassLoader();
 
-			Class<?> lineEndingClass = classLoader.loadClass("eu.solven.cleanthat.formatter.LineEnding");
-			// Spotless will invoke String to be formatted, always filled with '\n'
-			// https://stackoverflow.com/questions/3735927/java-instantiating-an-enum-using-reflection
-			Object linuxLineEnding = Enum.valueOf(lineEndingClass.asSubclass(Enum.class), "LF");
+			Class<?> formatterClazz =
+					classLoader.loadClass("com.diffplug.spotless.glue.java.JavaCleanthatRefactoringFunc");
+			Constructor<?> formatterConstructor = formatterClazz.getConstructor(List.class, List.class);
 
-			Class<?> iLanguagePropertiesClass =
-					classLoader.loadClass("eu.solven.cleanthat.language.ILanguageProperties");
-
-			Class<?> languagePropertiesClass = classLoader.loadClass("eu.solven.cleanthat.language.LanguageProperties");
-			Object languageProperties = languagePropertiesClass.getConstructor().newInstance();
-
-			{
-				languageProperties.getClass().getMethod("setLanguage", String.class).invoke(languageProperties, "java");
-				// IJdkVersionConstants
-				languageProperties.getClass()
-						.getMethod("setLanguageVersion", String.class)
-						.invoke(languageProperties, "1.8");
-			}
-
-			Class<?> rulesPropertiesClass =
-					classLoader.loadClass("eu.solven.cleanthat.java.mutators.JavaRefactorerProperties");
-			Object rulesProperties = rulesPropertiesClass.getConstructor().newInstance();
-			{
-				// eu.solven.cleanthat.language.java.JavaFormattersFactory.getLanguage()
-				rulesProperties.getClass().getMethod("setLanguage", String.class).invoke(languageProperties, "java");
-			}
-
-			Class<?> formatterClazz = classLoader.loadClass(FORMATTER_CLASS);
-			Constructor<?> formatterConstructor =
-					formatterClazz.getConstructor(iLanguagePropertiesClass, rulesPropertiesClass);
-
-			Object formatter = formatterConstructor.newInstance(languageProperties, rulesProperties);
-			Method formatterMethod = formatterClazz.getMethod(FORMATTER_METHOD, String.class, lineEndingClass);
+			Object formatter = formatterConstructor.newInstance(included, excluded);
+			Method formatterMethod = formatterClazz.getMethod("apply", String.class);
 
 			return JVM_SUPPORT.suggestLaterVersionOnError(version, (input -> {
-				return (String) formatterMethod.invoke(formatter, input, linuxLineEnding);
+				return (String) formatterMethod.invoke(formatter, input);
 			}));
 		}
 

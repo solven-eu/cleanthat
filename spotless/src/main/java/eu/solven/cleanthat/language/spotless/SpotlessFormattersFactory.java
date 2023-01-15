@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.language.spotless;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,26 +9,23 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.diffplug.spotless.Formatter;
+import com.diffplug.spotless.Provisioner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
-import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterConfiguration;
-import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatterProcessorProperties;
-import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
-import eu.solven.cleanthat.language.java.spring.SpringJavaStyleEnforcer;
+import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.SpotlessProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
@@ -37,8 +36,8 @@ import eu.solven.pepper.collection.PepperMapHelper;
 public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessFormattersFactory.class);
 
-	public SpotlessFormattersFactory(ObjectMapper objectMapper) {
-		super(objectMapper);
+	public SpotlessFormattersFactory(ConfigHelpers configHelpers) {
+		super(configHelpers);
 	}
 
 	@Override
@@ -62,13 +61,29 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 		LOGGER.debug("Processing: {}", engine);
 
-		ObjectMapper objectMapper = getObjectMapper();
-
 		switch (engine) {
 		case "spotless": {
-			SpotlessCleanthatProperties processorConfig =
-					objectMapper.convertValue(parameters, SpotlessCleanthatProperties.class);
-			processor = new SpotlessLintFixer(languageProperties.getSourceCode(), processorConfig);
+			SpotlessCleanthatProperties processorConfig = convertValue(parameters, SpotlessCleanthatProperties.class);
+
+			String spotlessConfig = processorConfig.getConfiguration();
+			if (Strings.isNullOrEmpty(spotlessConfig)) {
+				throw new IllegalArgumentException("'configuration' is mandatory");
+			}
+
+			Resource spotlessPropertiesResource = CleanthatUrlLoader.loadUrl(codeProvider, spotlessConfig);
+
+			SpotlessProperties spotlessProperties;
+			try {
+				spotlessProperties = getConfigHelpers().getObjectMapper()
+						.readValue(spotlessPropertiesResource.getInputStream(), SpotlessProperties.class);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue with " + spotlessPropertiesResource, e);
+			}
+
+			Formatter formatter =
+					new FormatterFactory(codeProvider).makeFormatter(spotlessProperties, makeProvisionner());
+
+			processor = new SpotlessLintFixer(formatter);
 			break;
 		}
 
@@ -81,6 +96,10 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 
 		return processor;
+	}
+
+	protected Provisioner makeProvisionner() {
+		return FormatterFactory.makeProvisionner();
 	}
 
 	@Override

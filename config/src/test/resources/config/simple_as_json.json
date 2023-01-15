@@ -3,7 +3,7 @@
   "meta" : {
     "labels" : [ "cleanthat" ],
     "refs" : {
-      "branches" : [ "master" ]
+      "protected_patterns" : [ "master" ]
     }
   },
   "source_code" : {

@@ -33,6 +33,7 @@ import eu.solven.cleanthat.language.ILanguageProperties;
 public class TestJavaFormatter_Revelc {
 
 	final ObjectMapper objectMapper = new ObjectMapper();
+	final ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(objectMapper));
 
 	// https://www.baeldung.com/spring-load-resource-as-string
 	public static String asString(Resource resource) {
@@ -43,13 +44,13 @@ public class TestJavaFormatter_Revelc {
 		}
 	}
 
-	final JavaFormattersFactory formatter = new JavaFormattersFactory(objectMapper);
+	final JavaFormattersFactory formatter = new JavaFormattersFactory(configHelpers);
 	final ICodeFormatterApplier applier = new CodeFormatterApplier();
 	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper(objectMapper);
 
 	private ILanguageProperties getLanguageProperties() throws IOException, JsonParseException, JsonMappingException {
-		CleanthatRepositoryProperties properties = new ConfigHelpers(Arrays.asList(objectMapper))
-				.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
+		CleanthatRepositoryProperties properties =
+				configHelpers.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
 
 		List<LanguageProperties> languages = properties.getLanguages();
 		Assert.assertEquals(1, languages.size());

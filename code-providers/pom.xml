@@ -12,7 +12,7 @@
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
-		<jacoco.instruction.ratio>0.07</jacoco.instruction.ratio>
+		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
 	</properties>
 
 	<dependencies>

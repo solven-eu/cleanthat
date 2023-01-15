@@ -21,4 +21,4 @@ engines:
   processors:
   - engine: "spotless"
     parameters:
-      configuration: "code:/.cleanthat/spotless.yaml"
+      configuration: "repository:/.cleanthat/spotless.yaml"

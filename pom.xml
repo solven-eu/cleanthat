@@ -30,9 +30,6 @@
 		<!-- JVM languages -->
 		<module>java</module>
 
-		<!-- configurations -->
-		<module>json</module>
-
 		<module>runnable</module>
 		<module>lambda</module>
 
@@ -41,7 +38,7 @@
 		<!-- Build automation tools -->
 		<module>maven</module>
 		<!-- <module>gradle</module> -->
-		
+
 		<!-- Enable running spotless in GithubApp -->
 		<!-- (Not enabling cleanthat through spotless) -->
 		<module>spotless</module>
@@ -77,12 +74,8 @@
 		<git-commit-id-plugin.version>5.0.0</git-commit-id-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
-		<!-- https://mvnrepository.com/artifact/net.revelc.code.formatter/formatter-maven-plugin -->
-		<formatter-maven-plugin.version>2.21.0</formatter-maven-plugin.version>
-		<!-- https://github.com/revelc/impsort-maven-plugin/releases -->
-		<impsort-maven-plugin.version>1.7.0</impsort-maven-plugin.version>
 
-		<spotless.version>2.29.0</spotless.version>
+		<spotless.version>2.30.0</spotless.version>
 
 		<sentry-spring.version>6.7.0</sentry-spring.version>
 
@@ -100,7 +93,8 @@
 		<surefire.additionalArgument />
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
-		<eclipse.version>4.22</eclipse.version>
+		<!-- https://github.com/jmini/ecentral/tree/master/repo/fr/jmini/ecentral/eclipse-platform-dependencies -->
+		<eclipse.version>4.25</eclipse.version>
 
 		<!-- Deprecated -->
 		<!-- <eclipse.jt.core.version>3.26.0</eclipse.jt.core.version> -->
@@ -432,42 +426,6 @@
 					</executions>
 				</plugin>
 				<plugin>
-					<!-- http://code.revelc.net/impsort-maven-plugin/ -->
-					<groupId>net.revelc.code</groupId>
-					<artifactId>impsort-maven-plugin</artifactId>
-					<version>${impsort-maven-plugin.version}</version>
-					<configuration>
-						<!-- Eclipse default -->
-						<groups>java.,javax.,org.,com.</groups>
-						<staticGroups>java,*</staticGroups>
-						<removeUnused>true</removeUnused>
-						<excludes>
-							<!-- Test classes -->
-							<exclude>**/do_not_format_me/**</exclude>
-						</excludes>
-						<!-- Skip to rely on CleanThat -->
-						<skip>true</skip>
-					</configuration>
-					<executions>
-						<execution>
-							<id>sort-imports</id>
-							<goals>
-								<goal>sort</goal>
-							</goals>
-							<!-- runs at process-sources phase by default -->
-							<phase>process-sources</phase>
-						</execution>
-						<execution>
-							<id>check-imports</id>
-							<goals>
-								<goal>check</goal>
-								<!-- runs at process-sources phase by default -->
-							</goals>
-							<phase>${staticChecks}</phase>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
 					<!--https://spotbugs.github.io/spotbugs-maven-plugin/index.html -->
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
@@ -674,7 +632,6 @@
 							<format>
 								<!-- define the files to apply to -->
 								<includes>
-									<include>*.md</include>
 									<include>.gitignore</include>
 								</includes>
 								<!-- define the steps to apply to those files -->
@@ -704,23 +661,27 @@
 						</pom>
 
 						<markdown>
+							<endWithNewline />
+							<indent>
+								<tabs>true</tabs>
+								<spacesPerTab>4</spacesPerTab>
+							</indent>
 							<includes>
-								<!-- You have to set the target manually -->
 								<include>**/*.md</include>
 							</includes>
 
 							<flexmark />
-							<!-- has its own section below -->
 						</markdown>
 
 						<!-- define a language-specific format -->
 						<java>
-							<removeUnusedImports />
-
 							<excludes>
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
+
+							<removeUnusedImports />
+							<importOrder />
 
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
@@ -733,7 +694,32 @@
 								<!-- or <file>${project.basedir}/license-header</file> -->
 							</licenseHeader>
 						</java>
+
+						<json>
+							<trimTrailingWhitespace />
+							<endWithNewline />
+							<indent>
+								<tabs>true</tabs>
+								<spacesPerTab>4</spacesPerTab>
+							</indent>
+							
+							<includes>
+								<include>**/*.json</include>
+							</includes>
+
+							<gson></gson>
+						</json>
 					</configuration>
+
+					<executions>
+						<execution>
+							<id>applySpotless</id>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>apply</goal>
+							</goals>
+						</execution>
+					</executions>
 
 					<dependencies>
 						<dependency>
@@ -764,14 +750,16 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<!-- Ensure impsort is executed before checkstyle/PMD, as it will automatically clean some style rules -->
+				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
-				<groupId>net.revelc.code</groupId>
-				<artifactId>impsort-maven-plugin</artifactId>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- CleanThat should be executed only in the top-directory -->
+				<inherited>false</inherited>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -788,13 +776,6 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>io.github.solven-eu.cleanthat</groupId>
-				<artifactId>cleanthat-maven-plugin</artifactId>
-				<!-- CleanThat should be executed only in the top-directory -->
-				<inherited>false</inherited>
 			</plugin>
 		</plugins>
 	</build>

@@ -43,6 +43,12 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserRule implements IC
 		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname";
 	}
 
+	/**
+	 * Collects the {@link ImportDeclaration} associated to a {@link Node} into a {@link List}
+	 * 
+	 * @author Benoit Lacelle
+	 *
+	 */
 	public static class ImportVisitorAdapter extends VoidVisitorAdapter<Object> {
 
 		final List<ImportDeclaration> imports = new ArrayList<>();

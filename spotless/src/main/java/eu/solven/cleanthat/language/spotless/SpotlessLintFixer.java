@@ -6,23 +6,18 @@ import com.diffplug.spotless.Formatter;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.cleanthat.spotless.ExecuteSpotless;
-import eu.solven.cleanthat.spotless.FormatterFactory;
 
 public class SpotlessLintFixer implements ILintFixerWithId {
-	final ISourceCodeProperties sourceCode;
-	final SpotlessCleanthatProperties processorConfig;
+	final Formatter formatter;
 
-	public SpotlessLintFixer(ISourceCodeProperties sourceCode, SpotlessCleanthatProperties processorConfig) {
-		this.sourceCode = sourceCode;
-		this.processorConfig = processorConfig;
+	public SpotlessLintFixer(Formatter formatter) {
+		this.formatter = formatter;
 	}
 
 	@Override
 	public String doFormat(String code, LineEnding ending) throws IOException {
-		Formatter formatter = new FormatterFactory(codeProvider, includes, excludes).makeFormatter(spotlessProperties, provisionner);
-		return new ExecuteSpotless(formatter);
+		return new ExecuteSpotless(formatter).doStuff(code, code);
 	}
 
 	@Override

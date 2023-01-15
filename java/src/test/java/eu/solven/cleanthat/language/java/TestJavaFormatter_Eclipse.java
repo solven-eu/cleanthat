@@ -43,7 +43,7 @@ public class TestJavaFormatter_Eclipse {
 		}
 	}
 
-	final JavaFormattersFactory formatter = new JavaFormattersFactory(objectMapper);
+	final JavaFormattersFactory formatter = new JavaFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)));
 	final ICodeFormatterApplier applier = new CodeFormatterApplier();
 	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper(objectMapper);
 

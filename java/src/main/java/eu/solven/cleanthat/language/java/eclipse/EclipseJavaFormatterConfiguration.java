@@ -32,7 +32,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.language.CleanthatUrlLoader;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageProperties;
 import eu.solven.cleanthat.language.java.eclipse.config.ConfigReadException;
 import eu.solven.cleanthat.language.java.eclipse.config.ConfigReader;

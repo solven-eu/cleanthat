@@ -2,10 +2,12 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +55,18 @@ public class ConfigHelpers {
 		this.objectMapper = Iterables.get(objectMappers, 0);
 	}
 
+	public static ConfigHelpers forTests() {
+		return new ConfigHelpers(Arrays.asList(ConfigHelpers.makeYamlObjectMapper()));
+	}
+
+	/**
+	 * 
+	 * @return some default {@link ObjectMapper}. May be specialized for JSON, or YAML.
+	 */
+	public ObjectMapper getObjectMapper() {
+		return objectMapper;
+	}
+
 	public static ObjectMapper makeJsonObjectMapper() {
 		return new ObjectMapper();
 	}
@@ -66,14 +80,21 @@ public class ConfigHelpers {
 	}
 
 	public CleanthatRepositoryProperties loadRepoConfig(Resource resource) {
+		return loadResource(resource, CleanthatRepositoryProperties.class);
+	}
+
+	public CleanthatRepositoryProperties loadResource(Resource resource, Class<CleanthatRepositoryProperties> clazz) {
 		ObjectMapper objectMapper;
-		if (resource.getFilename().endsWith("json")) {
+		String filenameLowerCase = resource.getFilename().toLowerCase(Locale.US);
+		if (filenameLowerCase.endsWith(".json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
-		} else {
+		} else if (filenameLowerCase.endsWith(".yml") || filenameLowerCase.endsWith(".yaml")) {
 			objectMapper = ConfigHelpers.getYaml(objectMappers);
+		} else {
+			throw new IllegalArgumentException("Not managed filename: " + filenameLowerCase);
 		}
 		try {
-			return objectMapper.readValue(resource.getInputStream(), CleanthatRepositoryProperties.class);
+			return objectMapper.readValue(resource.getInputStream(), clazz);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue loading: " + resource, e);
 		} catch (Exception e) {

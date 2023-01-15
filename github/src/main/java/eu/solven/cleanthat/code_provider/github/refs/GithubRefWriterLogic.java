@@ -3,7 +3,6 @@ package eu.solven.cleanthat.code_provider.github.refs;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

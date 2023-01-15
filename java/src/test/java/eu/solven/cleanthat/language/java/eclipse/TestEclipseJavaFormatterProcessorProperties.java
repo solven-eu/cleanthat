@@ -13,7 +13,7 @@ import org.springframework.core.io.Resource;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.language.CleanthatUrlLoader;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 
 public class TestEclipseJavaFormatterProcessorProperties {
 	@Test

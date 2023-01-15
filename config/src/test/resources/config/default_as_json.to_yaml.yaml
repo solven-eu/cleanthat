@@ -3,7 +3,7 @@ meta:
   labels:
   - "cleanthat"
   refs:
-    branches:
+    protected_patterns:
     - "refs/heads/develop"
     - "refs/heads/main"
     - "refs/heads/master"

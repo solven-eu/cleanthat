@@ -49,11 +49,11 @@ import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.LanguageProperties;
 import eu.solven.cleanthat.git.GitIgnoreParser;
-import eu.solven.cleanthat.language.CleanthatUrlLoader;
 import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.java.JavaFormattersFactory;
 import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
@@ -192,7 +192,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			List<LanguageProperties> mutableLanguages = new ArrayList<>(loadedConfig.getLanguages());
 			loadedConfig.setLanguages(mutableLanguages);
 
-			LanguageProperties languageProperties = new JavaFormattersFactory(yamlObjectMapper).makeDefaultProperties();
+			LanguageProperties languageProperties =
+					new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
 			mutableLanguages.add(languageProperties);
 
 			return languageProperties;

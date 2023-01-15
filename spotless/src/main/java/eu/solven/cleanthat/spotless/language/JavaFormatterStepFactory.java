@@ -1,8 +1,14 @@
 package eu.solven.cleanthat.spotless.language;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
+
+import org.springframework.core.io.Resource;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
@@ -11,7 +17,9 @@ import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
+import eu.solven.cleanthat.spotless.SpotlessProperties;
 import eu.solven.cleanthat.spotless.SpotlessStepProperties;
 
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
@@ -20,8 +28,21 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/*.java");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
+	final ICodeProvider codeProvider;
+
+	@Deprecated
 	public JavaFormatterStepFactory(ICodeProvider codeProvider, String[] includes, String[] excludes) {
 		super(codeProvider, includes, excludes);
+
+		this.codeProvider = codeProvider;
+	}
+
+	public JavaFormatterStepFactory(ICodeProvider codeProvider, SpotlessProperties spotlessProperties) {
+		super(codeProvider,
+				spotlessProperties.getIncludes().toArray(String[]::new),
+				spotlessProperties.getExcludes().toArray(String[]::new));
+
+		this.codeProvider = codeProvider;
 	}
 
 	@Override
@@ -46,8 +67,13 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 					eclipseVersion == null ? EclipseJdtFormatterStep.defaultVersion() : eclipseVersion.toString());
 
 			Object stylesheetFile = s.getCustomProperty("file");
-			if (null != stylesheetFile) {
-				File settingsFile = locateFile(stylesheetFile);
+			if (stylesheetFile instanceof String) {
+				File settingsFile;
+				try {
+					settingsFile = locateFile(stylesheetFile.toString());
+				} catch (IOException e) {
+					throw new UncheckedIOException("Issue processing eclipse.file: " + stylesheetFile, e);
+				}
 				eclipseConfig.setPreferences(Arrays.asList(settingsFile));
 			}
 			return eclipseConfig.build();
@@ -58,10 +84,17 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		}
 	}
 
-	private File locateFile(Object stylesheetFile) {
-		// File, or in dependency?
-		// Cleanthat: File in code, or in URL
-		throw new IllegalArgumentException("TODO");
+	private File locateFile(String stylesheetFile) throws IOException {
+		Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, stylesheetFile);
+
+		if (resource.isFile()) {
+			return resource.getFile();
+		}
+
+		File tmpFile = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml").toFile();
+		tmpFile.deleteOnExit();
+
+		return tmpFile;
 	}
 
 }

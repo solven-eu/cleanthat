@@ -35,9 +35,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
 public class AvoidInlineConditionals extends AJavaParserRule implements IClassTransformer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
-	private static final String METHOD_ASLIST = "asList";
-	private static final String METHOD_STREAM = "stream";
-
 	// Stream exists since 8
 	@Override
 	public String minimalJavaVersion() {
@@ -70,8 +67,6 @@ public class AvoidInlineConditionals extends AJavaParserRule implements IClassTr
 		Node parent = ternary.getParentNode().get();
 
 		Expression condition = ternary.getCondition();
-		Expression thenExpr = ternary.getThenExpr();
-		Expression elseExpr = ternary.getElseExpr();
 
 		// Try discard a redundant blockStatement as 'if (...)' always implies it
 		while (condition instanceof EnclosedExpr) {
@@ -86,15 +81,6 @@ public class AvoidInlineConditionals extends AJavaParserRule implements IClassTr
 			if (!(grandParent instanceof VariableDeclarationExpr)) {
 				return false;
 			}
-			VariableDeclarationExpr variableDeclExpr = (VariableDeclarationExpr) grandParent;
-			if (variableDeclExpr.getVariables().size() != 1) {
-				return false;
-			}
-			VariableDeclarator variableDeclarator = variableDeclExpr.getVariables().get(0);
-
-			SimpleName variableName = variableDeclarator.getName();
-			Node newNode =
-					new IfStmt(condition, wrapThenElse(thenExpr, variableName), wrapThenElse(elseExpr, variableName));
 
 			if (grandParent.getParentNode().isEmpty()) {
 				return false;
@@ -111,23 +97,40 @@ public class AvoidInlineConditionals extends AJavaParserRule implements IClassTr
 			if (!(grandGrandGrandParent instanceof BlockStmt)) {
 				return false;
 			}
+
+			VariableDeclarationExpr variableDeclExpr = (VariableDeclarationExpr) grandParent;
+			if (variableDeclExpr.getVariables().size() != 1) {
+				return false;
+			}
+			VariableDeclarator variableDeclarator = variableDeclExpr.getVariables().get(0);
+
+			SimpleName variableName = variableDeclarator.getName();
 			BlockStmt grandGrandGrandParentBlockStmt = (BlockStmt) grandGrandGrandParent;
 
 			// We declare the variable before the 'if (...)' statement
 			{
-				VariableDeclarator newVariableDeclarator =
-						new VariableDeclarator(variableDeclarator.getType(), variableName);
 				int indexOfVariableInParent = grandGrandGrandParentBlockStmt.getStatements().indexOf(grandGrandParent);
 				if (indexOfVariableInParent < 0) {
-					LOGGER.error("AssertionFailed around: {}", grandGrandGrandParentBlockStmt);
+					LOGGER.error("Issue searching for {} inside {}", grandGrandParent, grandGrandGrandParentBlockStmt);
 					return false;
 				}
+
+				VariableDeclarator newVariableDeclarator =
+						new VariableDeclarator(variableDeclarator.getType(), variableName);
 				grandGrandGrandParentBlockStmt.addStatement(indexOfVariableInParent,
 						new VariableDeclarationExpr(newVariableDeclarator));
 			}
 
+			Expression thenExpr = ternary.getThenExpr();
+			Expression elseExpr = ternary.getElseExpr();
+			Node newNode =
+					new IfStmt(condition, wrapThenElse(thenExpr, variableName), wrapThenElse(elseExpr, variableName));
+
 			return grandGrandParent.replace(newNode);
 		} else if (parent instanceof ReturnStmt) {
+			Expression thenExpr = ternary.getThenExpr();
+			Expression elseExpr = ternary.getElseExpr();
+
 			// https://github.com/javaparser/javaparser/issues/3850
 			Node newNode = new IfStmt(condition,
 					new BlockStmt(new NodeList<>(new ReturnStmt(thenExpr))),

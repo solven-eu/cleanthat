@@ -16,10 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.language.java.spring.SpringJavaFormatterProperties;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
+import eu.solven.cleanthat.engine.java.spring.SpringJavaFormatterProperties;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
@@ -50,17 +50,17 @@ public class TestDefaultConfig {
 
 		{
 
-			Assertions.assertThat(configFromEmpty.getLanguages()).isEmpty();
+			Assertions.assertThat(configFromEmpty.getEngines()).isEmpty();
 			// Ensure mutability
-			configFromEmpty.setLanguages(new ArrayList<>());
+			configFromEmpty.setEngines(new ArrayList<>());
 
 			// TODO Refactor with eu.solven.cleanthat.mvn.CleanThatInitMojo.prepareDefaultConfiguration(ObjectMapper,
 			// Path)
 			{
-				LanguageProperties javaProperties = new LanguageProperties();
+				EngineProperties javaProperties = new EngineProperties();
 
-				javaProperties.setLanguage("java");
-				javaProperties.setLanguageVersion("11");
+				javaProperties.setEngine("java");
+				javaProperties.setEngineVersion("11");
 				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
 				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.java"));
 				javaProperties.setSourceCode(javaSourceCodeProperties);
@@ -85,7 +85,7 @@ public class TestDefaultConfig {
 								.put("engine", "spring_formatter")
 								.put("parameters", new SpringJavaFormatterProperties())
 								.build());
-				configFromEmpty.getLanguages().add(javaProperties);
+				configFromEmpty.getEngines().add(javaProperties);
 			}
 
 		}

@@ -1,4 +1,26 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.config;
+
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -7,17 +29,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}
@@ -58,8 +71,8 @@ public class GenerateInitialConfig {
 			if (!Sets.intersection(factory.getFileExtentions(), extentionsFound).isEmpty()) {
 				LOGGER.info("There is a file-extension match for {}", factory);
 
-				LanguageProperties languageProperties = factory.makeDefaultProperties();
-				properties.getLanguages().add(languageProperties);
+				EngineProperties languageProperties = factory.makeDefaultProperties();
+				properties.getEngines().add(languageProperties);
 			}
 		});
 

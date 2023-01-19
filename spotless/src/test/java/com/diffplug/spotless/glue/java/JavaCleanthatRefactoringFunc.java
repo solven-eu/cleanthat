@@ -21,10 +21,10 @@ import java.util.List;
 
 import com.diffplug.spotless.FormatterFunc;
 
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.language.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.language.java.refactorer.JavaRefactorerProperties;
 
 public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 	private List<String> included;
@@ -46,7 +46,7 @@ public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 		refactorerProperties.setIncluded(included);
 		refactorerProperties.setExcluded(excluded);
 
-		JavaRefactorer refactorer = new JavaRefactorer(new LanguageProperties(), refactorerProperties);
+		JavaRefactorer refactorer = new JavaRefactorer(new EngineProperties(), refactorerProperties);
 
 		// Spotless calls steps always with LF eol.
 		return refactorer.doFormat(input, LineEnding.LF);

@@ -21,7 +21,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
-import eu.solven.cleanthat.language.ICodeFormatterApplier;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })

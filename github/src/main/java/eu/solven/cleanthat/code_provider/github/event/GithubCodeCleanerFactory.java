@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * {@link ICodeCleanerFactory} specialized for GitHub

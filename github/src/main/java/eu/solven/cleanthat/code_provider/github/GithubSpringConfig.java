@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}

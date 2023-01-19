@@ -1,5 +1,34 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.config;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import com.google.common.collect.Iterables;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.github.IHasSourceCodeProperties;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
@@ -13,26 +42,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
-import com.google.common.collect.Iterables;
-
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
-import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.github.IHasSourceCodeProperties;
-import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps working with configuration files
@@ -102,20 +114,20 @@ public class ConfigHelpers {
 		}
 	}
 
-	public ILanguageProperties mergeLanguageProperties(IHasSourceCodeProperties properties,
-			ILanguageProperties dirtyLanguageConfig) {
+	public IEngineProperties mergeLanguageProperties(IHasSourceCodeProperties properties,
+			IEngineProperties dirtyLanguageConfig) {
 		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyLanguageConfig);
 		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageAsMap);
 		languageConfig.put(KEY_SOURCE_CODE, sourceConfig);
-		ILanguageProperties languageP = objectMapper.convertValue(languageConfig, LanguageProperties.class);
+		IEngineProperties languageP = objectMapper.convertValue(languageConfig, EngineProperties.class);
 		return languageP;
 	}
 
 	// Duplicates eu.solven.cleanthat.config.ConfigHelpers.mergeLanguageProperties(CleanthatRepositoryProperties,
 	// Map<String, ?>) ?
-	public ILanguageProperties mergeLanguageIntoProcessorProperties(ILanguageProperties languagePropertiesTemplate,
+	public IEngineProperties mergeLanguageIntoProcessorProperties(IEngineProperties languagePropertiesTemplate,
 			Map<String, ?> rawProcessor) {
 		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
 		// As we are processing a single processor, we can get ride of the processors field
@@ -136,8 +148,8 @@ public class ConfigHelpers {
 			// Re-inject
 			languagePropertiesAsMap.put(KEY_SOURCE_CODE, sourcePropertiesAsMap);
 		}
-		ILanguageProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, LanguageProperties.class);
+		IEngineProperties languageProperties =
+				objectMapper.convertValue(languagePropertiesAsMap, EngineProperties.class);
 		return languageProperties;
 	}
 
@@ -236,12 +248,12 @@ public class ConfigHelpers {
 		}
 	}
 
-	public ILanguageProperties forceIncludes(ILanguageProperties languageP, List<String> includes) {
+	public IEngineProperties forceIncludes(IEngineProperties languageP, List<String> includes) {
 		Map<String, Object> languageAsMap = objectMapper.convertValue(languageP, Map.class);
 		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put(KEY_INCLUDES, includes);
 		languageAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
-		return objectMapper.convertValue(languageAsMap, LanguageProperties.class);
+		return objectMapper.convertValue(languageAsMap, EngineProperties.class);
 	}
 
 	public static ObjectMapper getJson(Collection<ObjectMapper> objectMappers) {
@@ -253,7 +265,7 @@ public class ConfigHelpers {
 
 	public static ObjectMapper getYaml(Collection<ObjectMapper> objectMappers) {
 		return objectMappers.stream()
-				.filter(om -> !JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
+				.filter(om -> YAMLFactory.FORMAT_NAME_YAML.equals(om.getFactory().getFormatName()))
 				.findAny()
 				.get();
 	}

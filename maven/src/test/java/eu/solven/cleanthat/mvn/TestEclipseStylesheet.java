@@ -11,7 +11,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.solven.cleanthat.language.java.eclipse.generator.EclipseStylesheetGenerator;
+import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
 
 public class TestEclipseStylesheet {
 	final EclipseStylesheetGenerator generator = new EclipseStylesheetGenerator();

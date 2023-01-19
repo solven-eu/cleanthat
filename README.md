@@ -52,6 +52,7 @@ As of 2022-12, this projects focuses on typical Java projects. Hence, it enables
 - Basic Formatting of .json, .xml, etc files (to be dropped, to rely on Spotless)
 
 ## Github App does not rely on Maven and Gradle
+
 While we work on integrating CleanThat into Spotless, the Github CleanThat App does not rely on existing Maven (https://github.com/diffplug/spotless/tree/main/plugin-maven) and Gradle (https://github.com/diffplug/spotless/tree/main/plugin-gradle) plugins. The main reason for that is security. Indeed, while it would enable very setup over a project already integrating Spotless, it would open dangerous security breach as one could easily inject custom code as dependency of the maven/gradle plugin, which would enable one to extract CleanThat secrets (Github token, GPG key, etc).
 
 ## About Advanced Formatting of .java files

@@ -1,5 +1,44 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import eu.solven.cleanthat.utils.ResultOrError;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -11,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -36,32 +74,6 @@ import org.kohsuke.github.extras.ImpatientHttpConnector;
 import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
-import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
-import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.git_abstraction.GithubFacade;
-import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.cleanthat.utils.ResultOrError;
-import eu.solven.pepper.collection.PepperMapHelper;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Default implementation for IGithubWebhookHandler

@@ -30,8 +30,8 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * This mojo will generate a relevant cleanthat configuration in current folder

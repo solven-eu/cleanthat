@@ -52,14 +52,14 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
+import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
+import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
+import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
+import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
 import eu.solven.cleanthat.git.GitIgnoreParser;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.java.JavaFormattersFactory;
-import eu.solven.cleanthat.language.java.eclipse.EclipseJavaFormatter;
-import eu.solven.cleanthat.language.java.eclipse.checkstyle.XmlProfileWriter;
-import eu.solven.cleanthat.language.java.eclipse.generator.EclipseStylesheetGenerator;
-import eu.solven.cleanthat.language.java.eclipse.generator.IEclipseStylesheetGenerator;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
 
@@ -177,22 +177,22 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
 
-		Optional<LanguageProperties> optJavaProperties =
-				loadedConfig.getLanguages().stream().filter(lp -> "java".equals(lp.getLanguage())).findAny();
+		Optional<EngineProperties> optJavaProperties =
+				loadedConfig.getEngines().stream().filter(lp -> "java".equals(lp.getEngine())).findAny();
 
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
 		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
 
-		LanguageProperties javaProperties = optJavaProperties.orElseGet(() -> {
+		EngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
 			// There is no java language properties
 			LOGGER.info("We introduce the java language properties");
 
 			// Enable mutations
-			List<LanguageProperties> mutableLanguages = new ArrayList<>(loadedConfig.getLanguages());
-			loadedConfig.setLanguages(mutableLanguages);
+			List<EngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
+			loadedConfig.setEngines(mutableLanguages);
 
-			LanguageProperties languageProperties =
+			EngineProperties languageProperties =
 					new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
 			mutableLanguages.add(languageProperties);
 

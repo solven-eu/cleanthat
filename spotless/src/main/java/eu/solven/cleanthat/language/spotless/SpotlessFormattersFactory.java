@@ -19,11 +19,11 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.language.ASourceCodeFormatterFactory;
-import eu.solven.cleanthat.language.ILanguageProperties;
+import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.SpotlessProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
@@ -41,7 +41,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public String getLanguage() {
+	public String getEngine() {
 		return "spotless";
 	}
 
@@ -52,7 +52,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-			ILanguageProperties languageProperties,
+			IEngineProperties languageProperties,
 			ICodeProvider codeProvider) {
 		ILintFixerWithId processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
@@ -103,10 +103,10 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public LanguageProperties makeDefaultProperties() {
-		LanguageProperties languageProperties = new LanguageProperties();
+	public EngineProperties makeDefaultProperties() {
+		EngineProperties languageProperties = new EngineProperties();
 
-		languageProperties.setLanguage(getLanguage());
+		languageProperties.setEngine(getEngine());
 
 		List<Map<String, ?>> processors = new ArrayList<>();
 

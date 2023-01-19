@@ -1,0 +1,58 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package eu.solven.cleanthat.engine;
+
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.pepper.collection.PepperMapHelper;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * Abstract class for language formatters
+ *
+ * @author Benoit Lacelle
+ */
+public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerFactory {
+	final ConfigHelpers configHelpers;
+
+	public ASourceCodeFormatterFactory(ConfigHelpers configHelpers) {
+		this.configHelpers = configHelpers;
+	}
+
+	public <T> T convertValue(Object input, Class<T> clazz) {
+		return configHelpers.getObjectMapper().convertValue(input, clazz);
+	}
+
+	public ConfigHelpers getConfigHelpers() {
+		return configHelpers;
+	}
+
+	protected Map<String, ?> getParameters(Map<String, ?> rawProcessor) {
+		Optional<?> optRawParameters = PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS);
+
+		if (optRawParameters.isPresent()) {
+			if (optRawParameters.get() instanceof Map<?, ?>) {
+				return (Map<String, ?>) optRawParameters.get();
+			} else {
+				// We received a real instance of the parameters
+				return convertValue(optRawParameters.get(), Map.class);
+			}
+		} else {
+			// Various engines are parameter-less
+			return Map.of();
+		}
+	}
+}

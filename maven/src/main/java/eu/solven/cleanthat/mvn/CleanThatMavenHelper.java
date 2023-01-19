@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 
 /**
  * Helper methods in the context of a mvn plugin

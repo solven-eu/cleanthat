@@ -1,5 +1,40 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.formatter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.util.concurrent.AtomicLongMap;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.thread.PepperExecutorsHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.PathMatcher;
@@ -15,30 +50,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
-import com.google.common.util.concurrent.AtomicLongMap;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
-import eu.solven.cleanthat.language.ICodeFormatterApplier;
-import eu.solven.cleanthat.language.ILanguageFormatterFactory;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
-import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Unclear what is the point of this class
@@ -103,8 +115,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
 
-		repoProperties.getLanguages().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
-			ILanguageProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
+		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
+			IEngineProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
 			// Beware about concurrency as multiple processors/languages may impact the same file
@@ -117,7 +129,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					.map(e -> e.getKey() + ": " + e.getValue())
 					.collect(Collectors.joining(EOL));
 
-			prComments.add("language=" + languageP.getLanguage() + EOL + details);
+			prComments.add("language=" + languageP.getEngine() + EOL + details);
 			languageCounters.asMap().forEach((l, c) -> {
 				languagesCounters.addAndGet(l, c);
 			});
@@ -156,19 +168,19 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		return new CodeFormatResult(isEmpty, new LinkedHashMap<>(languagesCounters.asMap()));
 	}
 
-	private ILanguageProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
-			LanguageProperties dirtyLanguageConfig) {
+	private IEngineProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
+			EngineProperties dirtyLanguageConfig) {
 		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
-		ILanguageProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
+		IEngineProperties languageP = configHelpers.mergeLanguageProperties(repoProperties, dirtyLanguageConfig);
 
-		String language = languageP.getLanguage();
+		String language = languageP.getEngine();
 		LOGGER.info("About to prepare files for language: {}", language);
 
 		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCode();
 		List<String> includes = languageP.getSourceCode().getIncludes();
 		if (includes.isEmpty()) {
-			if ("java".equals(languageP.getLanguage())) {
+			if ("java".equals(languageP.getEngine())) {
 				List<String> defaultIncludes = IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA;
 				LOGGER.info("Default includes to: {}", defaultIncludes);
 				// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
@@ -190,7 +202,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	protected AtomicLongMap<String> processFiles(ICodeProvider codeProvider,
 			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
-			ILanguageProperties languageP) {
+			IEngineProperties languageP) {
 		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCode();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
@@ -202,7 +214,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
-		LanguagePropertiesAndBuildProcessors compiledProcessors = buildProcessors(languageP, codeProvider);
+		EnginePropertiesAndBuildProcessors compiledProcessors = buildProcessors(languageP, codeProvider);
 
 		try {
 			codeProvider.listFilesForContent(file -> {
@@ -250,7 +262,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				boolean result = polled.get();
 
 				if (result) {
-					languageToNbMutatedFiles.incrementAndGet(languageP.getLanguage());
+					languageToNbMutatedFiles.incrementAndGet(languageP.getEngine());
 					languageCounters.incrementAndGet("nb_files_formatted");
 				} else {
 					languageCounters.incrementAndGet("nb_files_already_formatted");
@@ -267,7 +279,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private boolean doFormat(ICodeProvider codeProvider,
-			LanguagePropertiesAndBuildProcessors compiledProcessors,
+			EnginePropertiesAndBuildProcessors compiledProcessors,
 			Map<String, String> pathToMutatedContent,
 			String filePath) throws IOException {
 		// Rely on the latest code (possibly formatted by a previous processor)
@@ -320,14 +332,14 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 	}
 
-	private LanguagePropertiesAndBuildProcessors buildProcessors(ILanguageProperties properties,
+	private EnginePropertiesAndBuildProcessors buildProcessors(IEngineProperties properties,
 			ICodeProvider codeProvider) {
 		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
 		return sourceCodeFormatterHelper.compile(properties, codeProvider, formattersFactory);
 	}
 
-	private String doFormat(LanguagePropertiesAndBuildProcessors compiledProcessors, String filepath, String code)
+	private String doFormat(EnginePropertiesAndBuildProcessors compiledProcessors, String filepath, String code)
 			throws IOException {
 		return formatterApplier.applyProcessors(compiledProcessors, filepath, code);
 	}

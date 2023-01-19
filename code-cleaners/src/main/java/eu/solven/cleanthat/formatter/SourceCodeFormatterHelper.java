@@ -1,26 +1,38 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.formatter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Maps;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ISkippable;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.ISkippable;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.LanguagePropertiesAndBuildProcessors;
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository
@@ -39,10 +51,10 @@ public class SourceCodeFormatterHelper {
 		this.objectMapper = objectMapper;
 	}
 
-	public LanguagePropertiesAndBuildProcessors compile(ILanguageProperties languageProperties,
+	public EnginePropertiesAndBuildProcessors compile(IEngineProperties languageProperties,
 			ICodeProvider codeProvider,
 			ILanguageLintFixerFactory lintFixerFactory) {
-		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
+		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
 				computeLintFixers(languageProperties, codeProvider, lintFixerFactory);
 
 		List<IStyleEnforcer> codeStyleFixer = processors.stream()
@@ -51,7 +63,7 @@ public class SourceCodeFormatterHelper {
 				.map(lf -> (IStyleEnforcer) lf)
 				.collect(Collectors.toList());
 
-		String language = languageProperties.getLanguage();
+		String language = languageProperties.getEngine();
 
 		// This is specific for java for the moment, and more precisely to RulesJavaMutator as AST manipulators has high
 		// probability to change massively the style
@@ -86,7 +98,7 @@ public class SourceCodeFormatterHelper {
 					});
 		}
 
-		return new LanguagePropertiesAndBuildProcessors(processors);
+		return new EnginePropertiesAndBuildProcessors(processors);
 	}
 
 	/**
@@ -97,12 +109,12 @@ public class SourceCodeFormatterHelper {
 	 * @param lintFixerFactory
 	 * @return
 	 */
-	public List<Map.Entry<ILanguageProperties, ILintFixer>> computeLintFixers(ILanguageProperties languageProperties,
+	public List<Map.Entry<IEngineProperties, ILintFixer>> computeLintFixers(IEngineProperties languageProperties,
 			ICodeProvider codeProvider,
 			ILanguageLintFixerFactory lintFixerFactory) {
 		ConfigHelpers configHelpers = new ConfigHelpers(Collections.singleton(objectMapper));
 
-		List<Map.Entry<ILanguageProperties, ILintFixer>> processors =
+		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
 				languageProperties.getProcessors().stream().filter(rawProcessor -> {
 					Optional<Boolean> optSkip =
 							PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
@@ -117,7 +129,7 @@ public class SourceCodeFormatterHelper {
 						return !skip;
 					}
 				}).map(rawProcessor -> {
-					ILanguageProperties mergedLanguageProperties =
+					IEngineProperties mergedLanguageProperties =
 							configHelpers.mergeLanguageIntoProcessorProperties(languageProperties, rawProcessor);
 					ILintFixer formatter =
 							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, codeProvider);

@@ -11,7 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.LanguageProperties;
+import eu.solven.cleanthat.config.pojo.EngineProperties;
 
 public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 
@@ -36,8 +36,8 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2021-08-02", config.getSyntaxVersion());
-		Assert.assertEquals(1, config.getLanguages().size());
-		Assert.assertEquals("xml", config.getLanguages().get(0).getLanguage());
+		Assert.assertEquals(1, config.getEngines().size());
+		Assert.assertEquals("xml", config.getEngines().get(0).getEngine());
 	}
 
 	@Test
@@ -61,22 +61,22 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2021-08-02", config.getSyntaxVersion());
-		Assertions.assertThat(config.getLanguages()).hasSize(3);
+		Assertions.assertThat(config.getEngines()).hasSize(3);
 
 		{
-			LanguageProperties languageProperties = config.getLanguages().get(0);
+			EngineProperties languageProperties = config.getEngines().get(0);
 
-			Assert.assertEquals("java", languageProperties.getLanguage());
+			Assert.assertEquals("java", languageProperties.getEngine());
 		}
 		{
-			LanguageProperties languageProperties = config.getLanguages().get(1);
+			EngineProperties languageProperties = config.getEngines().get(1);
 
-			Assert.assertEquals("json", languageProperties.getLanguage());
+			Assert.assertEquals("json", languageProperties.getEngine());
 		}
 		{
-			LanguageProperties languageProperties = config.getLanguages().get(2);
+			EngineProperties languageProperties = config.getEngines().get(2);
 
-			Assert.assertEquals("xml", languageProperties.getLanguage());
+			Assert.assertEquals("xml", languageProperties.getEngine());
 		}
 	}
 }

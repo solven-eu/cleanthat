@@ -3,7 +3,7 @@ package eu.solven.cleanthat.lambda;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import eu.solven.cleanthat.language.java.JavaFormattersFactory;
+import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
 
 /**
  * Spring configuration wrapping all available languages

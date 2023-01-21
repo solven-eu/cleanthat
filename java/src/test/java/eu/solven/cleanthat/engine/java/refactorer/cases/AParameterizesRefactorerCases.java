@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -28,7 +27,6 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

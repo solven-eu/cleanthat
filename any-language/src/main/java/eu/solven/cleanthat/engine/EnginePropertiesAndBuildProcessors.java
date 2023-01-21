@@ -15,11 +15,10 @@
  */
 package eu.solven.cleanthat.engine;
 
-import java.util.List;
-import java.util.Map;
-
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Computed processors, to be applicable to any file of a given repository

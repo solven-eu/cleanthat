@@ -23,7 +23,6 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;

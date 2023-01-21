@@ -3,8 +3,6 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import org.junit.Ignore;
-
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;

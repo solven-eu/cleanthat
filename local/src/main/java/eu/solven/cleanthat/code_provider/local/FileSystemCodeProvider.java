@@ -1,5 +1,25 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.local;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.git.GitIgnoreParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -17,15 +37,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.git.GitIgnoreParser;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}
@@ -99,13 +112,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public String getHtmlUrl() {
+	public String toString() {
 		return root.toAbsolutePath().toString();
-	}
-
-	@Override
-	public String getTitle() {
-		return root.getFileName().toString();
 	}
 
 	protected Path resolvePath(String path) {

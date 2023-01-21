@@ -1,9 +1,9 @@
-syntax_version: "2021-08-02"
+syntax_version: "2023-01-09"
 meta:
   labels:
   - "cleanthat"
   refs:
-    branches:
+    protected_patterns:
     - "refs/heads/develop"
     - "refs/heads/main"
     - "refs/heads/master"
@@ -12,45 +12,18 @@ source_code:
   - "regex:.*/generated/.*"
   encoding: "UTF-8"
   line_ending: "UNKNOWN"
-languages:
-- language: "java"
-  language_version: "11"
+engines:
+- engine: "spotless"
+  engine_version: "0"
+  skip: false
   source_code:
     includes:
     - "regex:.*\\.java"
-  processors:
-  - engine: "rules"
-    parameters:
-      production_ready_only: true
-  - engine: "revelc_imports"
-    parameters:
-      # Organize imports like in Eclipse
-      remove_unused: true
-      groups: "java.,javax.,org.,com."
-      static_groups: "java,*"
-      static_after: false
-  # Use Spring formatting convention
-  - engine: "spring_formatter"
-    parameters: {}
-- language: "scala"
-  language_version: "2.12"
-  source_code:
-    includes:
-    - "regex:.*\\.scala"
-  processors:
-  - engine: "scalafix"
-    parameters: {}
-  - engine: "scalafmt"
-    parameters: {}
-- language: "json"
-  source_code:
-    includes:
     - "regex:.*\\.json"
-  processors:
-  - engine: "jackson"
+    - "glob:**/pom.xml"
+    encoding: "UTF-8"
+    line_ending: "UNKNOWN"
+  steps:
+  - id: "spotless"
     parameters:
-      indent: -1
-      indentation: "    "
-      space_before_separator: true
-      alphabetical_order: false
-      eol_at_eof: false
+      configuration: ".cleanthat/cleanthat.yaml"

@@ -1,5 +1,21 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,23 +24,24 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.engine.java.spring.SpringJavaFormatterProperties;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessProperties;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class TestDefaultConfig {
-	// private static final Logger LOGGER = LoggerFactory.getLogger(TestDefaultConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestDefaultConfig.class);
 
 	@Test
 	public void testHashcodeEquals() {
@@ -33,67 +50,52 @@ public class TestDefaultConfig {
 
 	@Test
 	public void testFromJsonToYaml() throws JsonParseException, JsonMappingException, IOException {
-		// ObjectMapper jsonObjectMapper = ConfigHelpers.makeJsonObjectMapper();
 		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 
-		// 'default_as_json' case is not satisfying as we have null in its yaml version
-		// try {
-
-		CleanthatRepositoryProperties configFromEmpty =
+		CleanthatRepositoryProperties safeRebuiltFromEmpty =
 				yamlObjectMapper.convertValue(Map.of(), CleanthatRepositoryProperties.class);
 
 		// By in safe-default, we exclude anything in an 'exclude' directory
 		{
-			Assertions.assertThat(configFromEmpty.getSourceCode().getExcludes()).isEmpty();
-			configFromEmpty.getSourceCode().setExcludes(Arrays.asList("regex:.*/generated/.*"));
+			Assertions.assertThat(safeRebuiltFromEmpty.getSourceCode().getExcludes()).isEmpty();
+			safeRebuiltFromEmpty.getSourceCode().setExcludes(Arrays.asList("regex:.*/generated/.*"));
 		}
 
 		{
-
-			Assertions.assertThat(configFromEmpty.getEngines()).isEmpty();
+			Assertions.assertThat(safeRebuiltFromEmpty.getEngines()).isEmpty();
 			// Ensure mutability
-			configFromEmpty.setEngines(new ArrayList<>());
+			safeRebuiltFromEmpty.setEngines(new ArrayList<>());
 
-			// TODO Refactor with eu.solven.cleanthat.mvn.CleanThatInitMojo.prepareDefaultConfiguration(ObjectMapper,
-			// Path)
+			// TODO Refactor with
+			// eu.solven.cleanthat.config.GenerateInitialConfig.prepareDefaultConfiguration(ICodeProvider)
 			{
-				EngineProperties javaProperties = new EngineProperties();
+				CleanthatEngineProperties engineProperties = new CleanthatEngineProperties();
 
-				javaProperties.setEngine("java");
-				javaProperties.setEngineVersion("11");
+				engineProperties.setEngine("spotless");
 				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
-				javaSourceCodeProperties.setIncludes(Arrays.asList("regex:.*\\.java"));
-				javaProperties.setSourceCode(javaSourceCodeProperties);
+				javaSourceCodeProperties
+						.setIncludes(Arrays.asList("regex:.*\\.java", "regex:.*\\.json", "glob:**/pom.xml"));
+				engineProperties.setSourceCode(javaSourceCodeProperties);
 
-				Assertions.assertThat(javaProperties.getProcessors()).isEmpty();
-				javaProperties.setProcessors(new ArrayList<>());
+				Assertions.assertThat(engineProperties.getSteps()).isEmpty();
+				engineProperties.setSteps(new ArrayList<>());
 
-				javaProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "rules")
-								.put("parameters", JavaRefactorerProperties.defaults())
+				engineProperties.getSteps()
+						.add(CleanthatStepProperties.builder()
+								.id("spotless")
+								.parameters(new CleanthatSpotlessProperties())
 								.build());
 
-				// javaProperties.getProcessors()
-				// .add(ImmutableMap.<String, Object>builder()
-				// .put("engine", "revelc_imports")
-				// .put("parameters", new JavaRevelcImportsCleanerProperties())
-				// .build());
-
-				javaProperties.getProcessors()
-						.add(ImmutableMap.<String, Object>builder()
-								.put("engine", "spring_formatter")
-								.put("parameters", new SpringJavaFormatterProperties())
-								.build());
-				configFromEmpty.getEngines().add(javaProperties);
+				safeRebuiltFromEmpty.getEngines().add(engineProperties);
 			}
-
 		}
 
 		// This is useful to convert the Java class of processors into Map (like it will happen when loading from the
 		// yaml)
-		CleanthatRepositoryProperties configFromEmptyAsMap = yamlObjectMapper
-				.readValue(yamlObjectMapper.writeValueAsString(configFromEmpty), CleanthatRepositoryProperties.class);
+		String defaultConfigAsYaml = yamlObjectMapper.writeValueAsString(safeRebuiltFromEmpty);
+		LOGGER.info("Default config as YAML: {}{}", System.lineSeparator(), defaultConfigAsYaml);
+		CleanthatRepositoryProperties configFromEmptyAsMap =
+				yamlObjectMapper.readValue(defaultConfigAsYaml, CleanthatRepositoryProperties.class);
 
 		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(yamlObjectMapper));
 		CleanthatRepositoryProperties configDefaultSafe =

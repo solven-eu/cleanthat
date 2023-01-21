@@ -20,12 +20,10 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
-
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

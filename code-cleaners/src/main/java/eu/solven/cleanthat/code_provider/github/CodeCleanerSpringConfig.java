@@ -26,7 +26,6 @@ import eu.solven.cleanthat.engine.StringFormatterFactory;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

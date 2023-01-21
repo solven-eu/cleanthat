@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.IEngineProperties;
 
 /**

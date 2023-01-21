@@ -1,9 +1,11 @@
 /*
+ * Copyright 2023 Solven
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.spring;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 
 /**
  * Spring Java formatter configuration
@@ -24,6 +27,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 // see io.spring.javaformat.formatter.eclipse.DefaultCodeFormatter.initOptions
 @Deprecated
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SpringJavaFormatterProperties {
+public class SpringJavaFormatterProperties implements ICleanthatStepParametersProperties {
 
 }

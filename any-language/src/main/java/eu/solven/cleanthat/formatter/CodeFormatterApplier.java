@@ -20,7 +20,6 @@ import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
-
 import java.io.IOException;
 import java.nio.file.PathMatcher;
 import java.util.List;

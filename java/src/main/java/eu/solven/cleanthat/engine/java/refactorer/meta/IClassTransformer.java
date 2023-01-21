@@ -16,9 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import com.github.javaparser.ast.Node;
-
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;

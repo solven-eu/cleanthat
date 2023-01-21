@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import java.util.List;
 import lombok.Data;
 
@@ -34,7 +35,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
-public class JavaRefactorerProperties {
+public class JavaRefactorerProperties implements ICleanthatStepParametersProperties {
 	public static final String WILDCARD = "*";
 
 	/**

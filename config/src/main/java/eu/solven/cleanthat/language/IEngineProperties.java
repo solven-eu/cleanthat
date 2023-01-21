@@ -16,9 +16,9 @@
 package eu.solven.cleanthat.language;
 
 import eu.solven.cleanthat.config.ISkippable;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The common configuration on a per-engine basis
@@ -31,5 +31,5 @@ public interface IEngineProperties extends ISkippable, IHasSourceCodeProperties 
 
 	String getEngineVersion();
 
-	List<Map<String, ?>> getProcessors();
+	List<CleanthatStepProperties> getSteps();
 }

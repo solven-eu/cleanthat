@@ -39,13 +39,8 @@ public class GithubBranchCodeProvider extends AGithubSha1CodeProviderWriter {
 	}
 
 	@Override
-	public String getHtmlUrl() {
-		return "TODO Branch URL";
-	}
-
-	@Override
-	public String getTitle() {
-		return branch.getName();
+	public String toString() {
+		return branch.getOwner().getFullName() + "/" + branch.getName();
 	}
 
 	@Override

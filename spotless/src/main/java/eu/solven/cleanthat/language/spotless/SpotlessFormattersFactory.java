@@ -1,32 +1,45 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.language.spotless;
 
+import com.diffplug.spotless.Formatter;
+import com.diffplug.spotless.Provisioner;
+import com.google.common.base.Strings;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
+import eu.solven.cleanthat.formatter.CleanthatSession;
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-
-import com.diffplug.spotless.Formatter;
-import com.diffplug.spotless.Provisioner;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
-import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.spotless.FormatterFactory;
-import eu.solven.cleanthat.spotless.SpotlessProperties;
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Formatter for Spotless Engine
@@ -51,9 +64,9 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+	public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
 			IEngineProperties languageProperties,
-			ICodeProvider codeProvider) {
+			CleanthatSession cleanthatSession) {
 		ILintFixerWithId processor;
 		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
 		// override with explicit configuration
@@ -63,27 +76,31 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 		switch (engine) {
 		case "spotless": {
-			SpotlessCleanthatProperties processorConfig = convertValue(parameters, SpotlessCleanthatProperties.class);
+			CleanthatSpotlessProperties processorConfig = convertValue(parameters, CleanthatSpotlessProperties.class);
 
 			String spotlessConfig = processorConfig.getConfiguration();
 			if (Strings.isNullOrEmpty(spotlessConfig)) {
 				throw new IllegalArgumentException("'configuration' is mandatory");
 			}
 
-			Resource spotlessPropertiesResource = CleanthatUrlLoader.loadUrl(codeProvider, spotlessConfig);
+			Resource spotlessPropertiesResource =
+					CleanthatUrlLoader.loadUrl(cleanthatSession.getCodeProvider(), spotlessConfig);
 
-			SpotlessProperties spotlessProperties;
+			SpotlessEngineProperties spotlessEngine;
 			try {
-				spotlessProperties = getConfigHelpers().getObjectMapper()
-						.readValue(spotlessPropertiesResource.getInputStream(), SpotlessProperties.class);
+				spotlessEngine = getConfigHelpers().getObjectMapper()
+						.readValue(spotlessPropertiesResource.getInputStream(), SpotlessEngineProperties.class);
 			} catch (IOException e) {
-				throw new UncheckedIOException("Issue with " + spotlessPropertiesResource, e);
+				throw new UncheckedIOException("Issue loading " + spotlessConfig, e);
 			}
 
-			Formatter formatter =
-					new FormatterFactory(codeProvider).makeFormatter(spotlessProperties, makeProvisionner());
+			List<Formatter> formatters = spotlessEngine.getFormatters()
+					.stream()
+					.map(formatter -> new FormatterFactory(cleanthatSession)
+							.makeFormatter(spotlessEngine, formatter, makeProvisionner()))
+					.collect(Collectors.toList());
 
-			processor = new SpotlessLintFixer(formatter);
+			processor = new SpotlessLintFixer(formatters);
 			break;
 		}
 
@@ -103,24 +120,23 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public EngineProperties makeDefaultProperties() {
-		EngineProperties languageProperties = new EngineProperties();
+	public CleanthatEngineProperties makeDefaultProperties() {
+		CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
 
 		languageProperties.setEngine(getEngine());
 
-		List<Map<String, ?>> processors = new ArrayList<>();
+		List<CleanthatStepProperties> steps = new ArrayList<>();
 
 		// Apply rules
 		{
-			SpotlessCleanthatProperties engineParameters = new SpotlessCleanthatProperties();
 
-			processors.add(ImmutableMap.<String, Object>builder()
-					.put(KEY_ENGINE, "spotless")
-					.put(KEY_PARAMETERS, engineParameters)
+			steps.add(CleanthatStepProperties.builder()
+					.id("spotless")
+					.parameters(new CleanthatSpotlessProperties())
 					.build());
 		}
 
-		languageProperties.setProcessors(processors);
+		languageProperties.setSteps(steps);
 
 		return languageProperties;
 	}

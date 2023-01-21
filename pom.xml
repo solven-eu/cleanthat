@@ -29,6 +29,7 @@
 
 		<!-- JVM languages -->
 		<module>java</module>
+		<module>java-eclipse</module>
 
 		<module>runnable</module>
 		<module>lambda</module>

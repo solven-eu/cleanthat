@@ -1,33 +1,43 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.spotless;
 
+import com.diffplug.spotless.Formatter;
+import com.diffplug.spotless.PaddedCell;
+import com.diffplug.spotless.Provisioner;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.diffplug.spotless.Formatter;
-import com.diffplug.spotless.PaddedCell;
-import com.diffplug.spotless.Provisioner;
-
+/**
+ * Trigger effectiviely Spotless engine
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 // see com.diffplug.spotless.maven.SpotlessApplyMojo
 public class ExecuteSpotless {
-	private static final class CleanthatJvmProvisioner implements Provisioner {
-		@Override
-		public Set<File> provisionWithTransitives(boolean withTransitives, Collection<String> mavenCoordinates) {
-			LOGGER.error("TODO");
-			return Set.of();
-		}
-	}
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteSpotless.class);
 
 	final Formatter formatter;
@@ -49,8 +59,9 @@ public class ExecuteSpotless {
 	public String doStuff(String relativePath, String rawBytes) {
 		assert relativePath.startsWith(Pattern.quote("/"));
 
-		Path root = formatter.getRootDir();
-		File filePath = root.resolve("." + relativePath).toFile();
+		// Path root = formatter.getRootDir();
+		File filePath = new File("");
+		// root.resolve("." + relativePath).toFile();
 
 		try {
 			PaddedCell.DirtyState dirty =

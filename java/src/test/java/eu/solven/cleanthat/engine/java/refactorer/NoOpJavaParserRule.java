@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import com.github.javaparser.ast.Node;
-
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 

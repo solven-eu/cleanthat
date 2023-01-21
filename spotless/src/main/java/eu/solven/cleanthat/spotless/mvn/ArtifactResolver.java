@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 DiffPlug
+ * Copyright 2016-2023 Solven
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import org.apache.maven.plugin.logging.Log;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -39,6 +38,16 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
 
+/**
+ * Duplicates com.diffplug.spotless.maven.ArtifactResolver, as it is difficult to import from a maven-plugin jar.
+ * 
+ * This enables to download and load in classpath jars, following the mvn scheme (especially regarding transitive
+ * dependencies).
+ * 
+ * @author Diffplug
+ * @see com.diffplug.spotless.maven.ArtifactResolver
+ *
+ */
 public class ArtifactResolver {
 
 	private final static Exclusion EXCLUDE_ALL_TRANSITIVES = new Exclusion("*", "*", "*", "*");

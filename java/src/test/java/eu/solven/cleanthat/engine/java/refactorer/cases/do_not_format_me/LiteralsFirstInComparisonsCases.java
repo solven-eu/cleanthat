@@ -80,7 +80,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 
 		@SuppressWarnings("unlikely-arg-type")
-		public Object post(Object input) {
+		public Object pre(Object input) {
 			return new OtherClass().equals(new SomeClass());
 		}
 	}
@@ -247,7 +247,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 
 		final LikeString o = new LikeString();
 
-		public Object post(String x) {
+		public Object pre(String x) {
 			return x.equals(o.FORMAT_NAME_JSON);
 		}
 	}
@@ -292,7 +292,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 	@UnchangedMethod
 	public static class CallsSuperEquals {
 
-		public Object post(CallsSuperEquals o) {
+		public Object pre(CallsSuperEquals o) {
 			if (this == o) {
 				return true;
 			}
@@ -309,21 +309,21 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 	@UnchangedMethod
 	public static class TwoUnknownVariable {
 
-		public Object post(String o1, String o2) {
+		public Object pre(String o1, String o2) {
 			return o1.equals(o2);
 		}
 	}
 
 	@UnchangedMethod
 	public static class CompareVariableWithMethodCall {
-		public Object post(String input, Object object) {
+		public Object pre(String input, Object object) {
 			return input.equals(object.toString());
 		}
 	}
 
 	@UnchangedMethod
 	public static class CompareMethodCallWithVariable {
-		public Object post(String input, Object object) {
+		public Object pre(String input, Object object) {
 			return object.toString().equals(input);
 		}
 	}
@@ -332,7 +332,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 
 	@UnchangedMethod
 	public static class HardcodedStringVsStatic {
-		public Object post() {
+		public Object pre() {
 			return "\r\n".equals(EOL);
 		}
 	}

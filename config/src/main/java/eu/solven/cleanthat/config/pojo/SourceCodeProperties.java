@@ -15,14 +15,17 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -45,11 +48,13 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	// If empty, no file is excluded
 	// If multiple, we exclude files matching at least one exclude (OR)
 	// see java.nio.file.FileSystem.getPathMatcher(String)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<String> excludes = Arrays.asList();
 
 	// If empty, no file is included
 	// If multiple, we include files matching at least one include (OR)
 	// see java.nio.file.FileSystem.getPathMatcher(String)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private List<String> includes = Arrays.asList();
 
 	// The encoding of files

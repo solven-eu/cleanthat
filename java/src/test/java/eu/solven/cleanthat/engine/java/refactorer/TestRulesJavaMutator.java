@@ -15,31 +15,26 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-import com.google.common.collect.ImmutableMap;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-import eu.solven.cleanthat.formatter.IStyleEnforcer;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
 
 public class TestRulesJavaMutator {
-	final EngineProperties languageProperties = new EngineProperties();
+	final CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
 	final JavaRefactorerProperties properties = new JavaRefactorerProperties();
 
 	@Test
@@ -115,17 +110,6 @@ public class TestRulesJavaMutator {
 		String dirtyCode = LocalClassTestHelper.loadClassAsString(classToLoad);
 
 		JavaRefactorer rulesJavaMutator = new JavaRefactorer(languageProperties, properties);
-
-		// We need this piece of configuration, else cleaning the post-Javaparser code leads to very different result to
-		// the diry/original code, hence leading the Diff procedure to give too-different results
-		Map<String, String> options = ImmutableMap.<String, String>builder()
-				.put("org.eclipse.jdt.core.formatter.lineSplit", "120")
-				.put("org.eclipse.jdt.core.formatter.comment.line_length", "120")
-				.build();
-
-		// We need any styleEnforce to workaround Javaparser weaknesses
-		IStyleEnforcer styleEnforcer = new EclipseJavaFormatter(new EclipseJavaFormatterConfiguration(options));
-		rulesJavaMutator.registerCodeStyleFixer(styleEnforcer);
 
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(true);
 		CompilationUnit compilationUnit = javaParser.parse(dirtyCode).getResult().get();

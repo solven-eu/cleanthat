@@ -1,0 +1,56 @@
+syntax_version: "2021-08-02"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    branches:
+    - "refs/heads/develop"
+    - "refs/heads/main"
+    - "refs/heads/master"
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  encoding: "UTF-8"
+  line_ending: "UNKNOWN"
+languages:
+- language: "java"
+  language_version: "11"
+  source_code:
+    includes:
+    - "regex:.*\\.java"
+  processors:
+  - engine: "rules"
+    parameters:
+      production_ready_only: true
+  - engine: "revelc_imports"
+    parameters:
+      # Organize imports like in Eclipse
+      remove_unused: true
+      groups: "java.,javax.,org.,com."
+      static_groups: "java,*"
+      static_after: false
+  # Use Spring formatting convention
+  - engine: "spring_formatter"
+    parameters: {}
+- language: "scala"
+  language_version: "2.12"
+  source_code:
+    includes:
+    - "regex:.*\\.scala"
+  processors:
+  - engine: "scalafix"
+    parameters: {}
+  - engine: "scalafmt"
+    parameters: {}
+- language: "json"
+  source_code:
+    includes:
+    - "regex:.*\\.json"
+  processors:
+  - engine: "jackson"
+    parameters:
+      indent: -1
+      indentation: "    "
+      space_before_separator: true
+      alphabetical_order: false
+      eol_at_eof: false

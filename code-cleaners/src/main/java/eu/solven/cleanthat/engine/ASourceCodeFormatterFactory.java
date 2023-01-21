@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerF
 		return configHelpers;
 	}
 
-	protected Map<String, ?> getParameters(Map<String, ?> rawProcessor) {
+	protected Map<String, ?> getParameters(CleanthatStepProperties rawProcessor) {
 		Optional<?> optRawParameters = PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS);
 
 		if (optRawParameters.isPresent()) {

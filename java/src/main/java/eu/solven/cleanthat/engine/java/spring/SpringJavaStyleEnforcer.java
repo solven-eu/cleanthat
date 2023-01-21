@@ -1,9 +1,11 @@
 /*
+ * Copyright 2023 Solven
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import io.spring.javaformat.formatter.Formatter;
@@ -35,7 +36,7 @@ import io.spring.javaformat.formatter.Formatter;
  * @author Benoit Lacelle
  */
 // https://github.com/spring-io/spring-javaformat
-public class SpringJavaStyleEnforcer implements IStyleEnforcer, ILintFixerWithId {
+public class SpringJavaStyleEnforcer implements ILintFixerWithId {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringJavaStyleEnforcer.class);
 
 	final ISourceCodeProperties sourceCodeProperties;

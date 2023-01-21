@@ -20,14 +20,13 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
-
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
@@ -66,9 +65,9 @@ public class RunGithubMonitoring {
 		return new ILanguageLintFixerFactory() {
 
 			@Override
-			public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+			public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
 					IEngineProperties languageProperties,
-					ICodeProvider codeProvider) {
+					CleanthatSession cleanthatSession) {
 				throw new UnsupportedOperationException("Should not format anything");
 			}
 
@@ -83,7 +82,7 @@ public class RunGithubMonitoring {
 			}
 
 			@Override
-			public EngineProperties makeDefaultProperties() {
+			public CleanthatEngineProperties makeDefaultProperties() {
 				throw new UnsupportedOperationException();
 			}
 		};

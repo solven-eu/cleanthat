@@ -16,12 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.it;
 
 import com.github.javaparser.ast.CompilationUnit;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +58,8 @@ public class ITTestLocalFile {
 
 		String pathAsString = Files.readString(file.toPath());
 
-		JavaRefactorer rulesJavaMutator = new JavaRefactorer(new EngineProperties(), new JavaRefactorerProperties());
+		JavaRefactorer rulesJavaMutator =
+				new JavaRefactorer(new CleanthatEngineProperties(), new JavaRefactorerProperties());
 
 		CompilationUnit compilationUnit =
 				rulesJavaMutator.parseRawCode(rulesJavaMutator.makeJavaParser(), pathAsString);

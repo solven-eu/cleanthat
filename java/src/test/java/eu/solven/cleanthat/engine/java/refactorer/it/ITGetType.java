@@ -31,9 +31,7 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

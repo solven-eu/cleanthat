@@ -18,10 +18,9 @@ package eu.solven.cleanthat.config;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class GenerateInitialConfig {
 			if (!Sets.intersection(factory.getFileExtentions(), extentionsFound).isEmpty()) {
 				LOGGER.info("There is a file-extension match for {}", factory);
 
-				EngineProperties languageProperties = factory.makeDefaultProperties();
+				CleanthatEngineProperties languageProperties = factory.makeDefaultProperties();
 				properties.getEngines().add(languageProperties);
 			}
 		});

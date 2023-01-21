@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
 
 public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 
@@ -64,17 +64,17 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		Assertions.assertThat(config.getEngines()).hasSize(3);
 
 		{
-			EngineProperties languageProperties = config.getEngines().get(0);
+			CleanthatEngineProperties languageProperties = config.getEngines().get(0);
 
 			Assert.assertEquals("java", languageProperties.getEngine());
 		}
 		{
-			EngineProperties languageProperties = config.getEngines().get(1);
+			CleanthatEngineProperties languageProperties = config.getEngines().get(1);
 
 			Assert.assertEquals("json", languageProperties.getEngine());
 		}
 		{
-			EngineProperties languageProperties = config.getEngines().get(2);
+			CleanthatEngineProperties languageProperties = config.getEngines().get(2);
 
 			Assert.assertEquals("xml", languageProperties.getEngine());
 		}

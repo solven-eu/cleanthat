@@ -1,27 +1,44 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.spotless.language;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Set;
-
-import org.springframework.core.io.Resource;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
 import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
-import eu.solven.cleanthat.spotless.SpotlessProperties;
-import eu.solven.cleanthat.spotless.SpotlessStepProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Set;
+import org.springframework.core.io.Resource;
 
+/**
+ * Configure Spotless engine for '.java' files
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 	// CleanThat will call spotless from the root directory: process any Java file from there
@@ -37,10 +54,10 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		this.codeProvider = codeProvider;
 	}
 
-	public JavaFormatterStepFactory(ICodeProvider codeProvider, SpotlessProperties spotlessProperties) {
+	public JavaFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties formatterProperties) {
 		super(codeProvider,
-				spotlessProperties.getIncludes().toArray(String[]::new),
-				spotlessProperties.getExcludes().toArray(String[]::new));
+				formatterProperties.getIncludes().toArray(String[]::new),
+				formatterProperties.getExcludes().toArray(String[]::new));
 
 		this.codeProvider = codeProvider;
 	}
@@ -57,8 +74,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 	@Override
 	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
-		String stepName = s.getName();
-		switch (stepName) {
+		String stepId = s.getId();
+		switch (stepId) {
 		case "eclipse": {
 			EclipseBasedStepBuilder eclipseConfig = EclipseJdtFormatterStep.createBuilder(provisioner);
 
@@ -79,7 +96,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			return eclipseConfig.build();
 		}
 		default: {
-			throw new IllegalArgumentException("Unknown Java step: " + stepName);
+			throw new IllegalArgumentException("Unknown Java step: " + stepId);
 		}
 		}
 	}

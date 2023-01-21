@@ -15,16 +15,33 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
-import java.io.IOException;
-import org.junit.Test;
-
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.OptionalNotEmptyCases;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import java.io.IOException;
+import java.util.Collection;
+import org.junit.runners.Parameterized.Parameters;
 
-public class TestReplaceOptionalNotEmpty extends ATestCases {
+public class TestReplaceOptionalNotEmpty extends AParameterizesRefactorerCases {
 
-	@Test
-	public void testCases() throws IOException {
-		testCasesIn(new OptionalNotEmptyCases());
+	private static ARefactorerCases getStaticRefactorerCases() {
+		return new OptionalNotEmptyCases();
+	}
+
+	public TestReplaceOptionalNotEmpty(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testName, testCase);
+	}
+
+	// https://github.com/junit-team/junit4/wiki/parameterized-tests
+	@Parameters(name = "{1}")
+	public static Collection<Object[]> data() throws IOException {
+		ARefactorerCases testCases = getStaticRefactorerCases();
+		return listCases(testCases);
+	}
+
+	@Override
+	protected ARefactorerCases getCases() {
+		return getStaticRefactorerCases();
 	}
 }

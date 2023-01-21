@@ -19,7 +19,6 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;

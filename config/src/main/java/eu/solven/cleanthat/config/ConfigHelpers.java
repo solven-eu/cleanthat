@@ -21,8 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.google.common.collect.Iterables;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
@@ -114,21 +115,21 @@ public class ConfigHelpers {
 		}
 	}
 
-	public IEngineProperties mergeLanguageProperties(IHasSourceCodeProperties properties,
+	public IEngineProperties mergeEngineProperties(IHasSourceCodeProperties properties,
 			IEngineProperties dirtyLanguageConfig) {
 		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyLanguageConfig);
 		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageAsMap);
 		languageConfig.put(KEY_SOURCE_CODE, sourceConfig);
-		IEngineProperties languageP = objectMapper.convertValue(languageConfig, EngineProperties.class);
+		IEngineProperties languageP = objectMapper.convertValue(languageConfig, CleanthatEngineProperties.class);
 		return languageP;
 	}
 
 	// Duplicates eu.solven.cleanthat.config.ConfigHelpers.mergeLanguageProperties(CleanthatRepositoryProperties,
 	// Map<String, ?>) ?
 	public IEngineProperties mergeLanguageIntoProcessorProperties(IEngineProperties languagePropertiesTemplate,
-			Map<String, ?> rawProcessor) {
+			CleanthatStepProperties rawProcessor) {
 		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
 		// As we are processing a single processor, we can get ride of the processors field
 		languagePropertiesAsMap.remove("processors");
@@ -149,7 +150,7 @@ public class ConfigHelpers {
 			languagePropertiesAsMap.put(KEY_SOURCE_CODE, sourcePropertiesAsMap);
 		}
 		IEngineProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, EngineProperties.class);
+				objectMapper.convertValue(languagePropertiesAsMap, CleanthatEngineProperties.class);
 		return languageProperties;
 	}
 
@@ -253,7 +254,7 @@ public class ConfigHelpers {
 		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCode(), Map.class);
 		sourceCodeAsMap.put(KEY_INCLUDES, includes);
 		languageAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
-		return objectMapper.convertValue(languageAsMap, EngineProperties.class);
+		return objectMapper.convertValue(languageAsMap, CleanthatEngineProperties.class);
 	}
 
 	public static ObjectMapper getJson(Collection<ObjectMapper> objectMappers) {

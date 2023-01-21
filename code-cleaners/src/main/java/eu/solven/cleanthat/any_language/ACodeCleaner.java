@@ -66,21 +66,19 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
-		String codeUrl = codeProvider.getHtmlUrl();
-
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeUrl);
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeProvider);
 			return ResultOrError.error("No configuration");
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
 		if (version.isEmpty()) {
-			LOGGER.warn("No version on configuration applying to PR {}", codeUrl);
+			LOGGER.warn("No version on configuration applying to PR {}", codeProvider);
 			return ResultOrError.error("No syntax_version in configuration");
 		} else if (!CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION.equals(version.get())) {
 			LOGGER.warn("Version '{}' on configuration is not supported {}" + "(only syntax_version='"
 					+ CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION
-					+ "')", version.get(), codeUrl);
+					+ "')", version.get(), codeProvider);
 			return ResultOrError.error("Invalid syntax_version in configuration");
 		}
 		Map<String, ?> prConfig = optPrConfig.get();

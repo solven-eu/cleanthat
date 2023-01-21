@@ -15,17 +15,33 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.EnumsWithoutEqualsCases;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
-
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import java.io.IOException;
-import org.junit.Test;
+import java.util.Collection;
+import org.junit.runners.Parameterized.Parameters;
 
-public class TestEnumsWithoutEquals extends ATestCases {
+public class TestEnumsWithoutEquals extends AParameterizesRefactorerCases {
 
-	@Test
-	public void testCases() throws IOException {
-		testCasesIn(EnumsWithoutEqualsCases.class, new EnumsWithoutEquals());
+	private static ARefactorerCases getStaticRefactorerCases() {
+		return new EnumsWithoutEqualsCases();
+	}
+
+	public TestEnumsWithoutEquals(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testName, testCase);
+	}
+
+	// https://github.com/junit-team/junit4/wiki/parameterized-tests
+	@Parameters(name = "{1}")
+	public static Collection<Object[]> data() throws IOException {
+		ARefactorerCases testCases = getStaticRefactorerCases();
+		return listCases(testCases);
+	}
+
+	@Override
+	protected ARefactorerCases getCases() {
+		return getStaticRefactorerCases();
 	}
 }

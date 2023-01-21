@@ -20,34 +20,48 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestCreateTempFilesUsingNio extends ATestCases {
+public class TestCreateTempFilesUsingNio extends AParameterizesRefactorerCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNio.class);
 
-	final CreateTempFilesUsingNio transformer = new CreateTempFilesUsingNio();
+	private static ARefactorerCases getStaticRefactorerCases() {
+		return new CreateTempFilesUsingNioCases();
+	}
 
-	@Test
-	public void testCases() throws IOException {
-		testCasesIn(CreateTempFilesUsingNioCases.class, transformer);
+	public TestCreateTempFilesUsingNio(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testName, testCase);
+	}
+
+	// https://github.com/junit-team/junit4/wiki/parameterized-tests
+	@Parameters(name = "{1}")
+	public static Collection<Object[]> data() throws IOException {
+		ARefactorerCases testCases = getStaticRefactorerCases();
+		return listCases(testCases);
+	}
+
+	@Override
+	protected ARefactorerCases getCases() {
+		return getStaticRefactorerCases();
 	}
 
 	@Test
 	public void testImportNioFiles() throws IOException {
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
+		JavaParser javaParser =
+				JavaRefactorer.makeDefaultJavaParser(getStaticRefactorerCases().getTransformer().isJreOnly());
 		CompilationUnit compilationUnit =
 				javaParser.parse(LocalClassTestHelper.localClassAsPath(CreateTempFilesUsingNioCases.class))
 						.getResult()

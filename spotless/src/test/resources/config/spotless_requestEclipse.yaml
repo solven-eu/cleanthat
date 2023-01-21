@@ -1,0 +1,20 @@
+syntax_version: "2023-01-14"
+encoding: "UTF-8"
+line_ending: "GIT_ATTRIBUTES"
+formatters:
+- format: "java"
+  excludes:
+  - "**/do_not_format_me/**"
+  steps:
+  - engine: "removeUnusedImports"
+  - engine: "eclipse"
+    file: "repository:/config/eclipse_java_code_formatter.xml"
+  - engine: "licenseHeader"
+    content: "/* (C)$YEAR */"
+- format: "pom"
+  includes:
+  - "regex:**/pom.xml"
+  steps:
+  - engine: "sortPom"
+    expandEmptyElements: false
+    nrOfIndentSpace: -1

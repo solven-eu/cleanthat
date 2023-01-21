@@ -15,6 +15,19 @@
  */
 package eu.solven.cleanthat.language.java.spotless;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.do_not_format_me.CleanClass;
+import eu.solven.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.formatter.CodeFormatterApplier;
+import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -23,28 +36,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.FileCopyUtils;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
-import eu.solven.cleanthat.do_not_format_me.CleanClass;
-import eu.solven.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.formatter.CodeFormatterApplier;
-import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 public class TestJavaFormatter_Revelc {
 
@@ -68,10 +65,10 @@ public class TestJavaFormatter_Revelc {
 		CleanthatRepositoryProperties properties =
 				configHelpers.loadRepoConfig(new ClassPathResource("/config/" + "revelcimport_cleanthat.json"));
 
-		List<EngineProperties> languages = properties.getEngines();
+		List<CleanthatEngineProperties> languages = properties.getEngines();
 		Assert.assertEquals(1, languages.size());
 		IEngineProperties languageP =
-				new ConfigHelpers(Arrays.asList(objectMapper)).mergeLanguageProperties(properties, languages.get(0));
+				new ConfigHelpers(Arrays.asList(objectMapper)).mergeEngineProperties(properties, languages.get(0));
 		return languageP;
 	}
 

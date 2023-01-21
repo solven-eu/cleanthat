@@ -16,74 +16,35 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.google.common.io.ByteStreams;
-
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LiteralsFirstInComparisonsCases;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
-
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import java.util.Collection;
+import org.junit.runners.Parameterized.Parameters;
 
-public class TestLiteralsFirstInComparisonsCases extends ATestCases {
+public class TestLiteralsFirstInComparisonsCases extends AParameterizesRefactorerCases {
 
-	@Test
-	public void testCases() throws IOException {
-		testCasesIn(new LiteralsFirstInComparisonsCases());
+	private static ARefactorerCases getStaticRefactorerCases() {
+		return new LiteralsFirstInComparisonsCases();
 	}
 
-	// Cannot keep element because we reached the end of nodetext
-	@Test
-	public void testIssueWithFile() throws IOException {
-		Resource testRoaringBitmapSource =
-				new ClassPathResource("/source/do_not_format_me/MiTrust/TestNodeResourceImpl.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
-
-		IClassTransformer transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
-
-		boolean transformed = transformer.walkNode(compilationUnit);
-
-		Assertions.assertThat(transformed).isTrue();
+	public TestLiteralsFirstInComparisonsCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testName, testCase);
 	}
 
-	@Test
-	public void testIssueWithFile2() throws IOException {
-		Resource testRoaringBitmapSource =
-				new ClassPathResource("/source/do_not_format_me/Generic/ConstantWithDigitInName.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
-
-		IClassTransformer transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
-
-		boolean transformed = transformer.walkNode(compilationUnit);
-
-		Assertions.assertThat(transformed).isFalse();
+	// https://github.com/junit-team/junit4/wiki/parameterized-tests
+	@Parameters(name = "{1}")
+	public static Collection<Object[]> data() throws IOException {
+		ARefactorerCases testCases = getStaticRefactorerCases();
+		return listCases(testCases);
 	}
 
-	@Test
-	public void testIssueWithFile3() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/do_not_format_me/MiTrust/LocaleHelper.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
-
-		IClassTransformer transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
-
-		boolean transformed = transformer.walkNode(compilationUnit);
-
-		Assertions.assertThat(transformed).isFalse();
+	@Override
+	protected ARefactorerCases getCases() {
+		return getStaticRefactorerCases();
 	}
+
 }

@@ -15,11 +15,9 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.VersionWrapper;
 
 public class TestVersionWrapper {
 	@Test

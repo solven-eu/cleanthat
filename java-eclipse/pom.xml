@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.github.solven-eu.cleanthat</groupId>
+		<artifactId>aggregator-cleanthat</artifactId>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>java</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>config</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>code-cleaners</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://github.com/INRIA/spoon -->
+			<groupId>fr.inria.gforge.spoon</groupId>
+			<artifactId>spoon-core</artifactId>
+			<version>10.2.0</version>
+		</dependency>
+		<dependency>
+			<!-- https://github.com/javaparser/javaparser -->
+			<!-- JavaParser seems a better option to later handle more languages -->
+			<groupId>com.github.javaparser</groupId>
+			<artifactId>javaparser-symbol-solver-core</artifactId>
+			<version>3.24.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-spring</artifactId>
+			<version>${sentry-spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>3.0.1u2</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
+		<dependency>
+			<!-- Used to generate Eclipse stylesheet -->
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core.manipulation -->
+		<dependency>
+			<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
+			<!-- Used to rely on Eclipse CleanUp actions -->
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+		</dependency>
+
+		<dependency>
+			<!-- Used to parse Eclipse XML config files -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-digester3</artifactId>
+			<version>3.2</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://github.com/google/google-java-format -->
+			<groupId>com.google.googlejavaformat</groupId>
+			<artifactId>google-java-format</artifactId>
+			<version>1.15.0</version>
+		</dependency>
+
+		<dependency>
+			<!-- https://github.com/spring-io/spring-javaformat -->
+			<groupId>io.spring.javaformat</groupId>
+			<artifactId>spring-javaformat-formatter</artifactId>
+			<version>0.0.35</version>
+		</dependency>
+
+		<dependency>
+			<!-- Used to clean unexpected changes by Javaparser -->
+			<groupId>io.github.java-diff-utils</groupId>
+			<artifactId>java-diff-utils</artifactId>
+			<version>4.12</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+		<dependency>
+			<!-- Used to find longest common for diff -->
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

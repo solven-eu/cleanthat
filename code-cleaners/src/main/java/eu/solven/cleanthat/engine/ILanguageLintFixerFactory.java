@@ -15,12 +15,11 @@
  */
 package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
-
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,9 +40,9 @@ public interface ILanguageLintFixerFactory {
 	 */
 	Set<String> getFileExtentions();
 
-	ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
+	ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
 			IEngineProperties languageProperties,
-			ICodeProvider codeProvider);
+			CleanthatSession cleanthatSession);
 
-	EngineProperties makeDefaultProperties();
+	CleanthatEngineProperties makeDefaultProperties();
 }

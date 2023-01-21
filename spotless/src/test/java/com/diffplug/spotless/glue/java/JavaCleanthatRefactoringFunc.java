@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 DiffPlug
+ * Copyright 2021-2023 Solven
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package com.diffplug.spotless.glue.java;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.diffplug.spotless.FormatterFunc;
-
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 	private List<String> included;
@@ -46,7 +44,7 @@ public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 		refactorerProperties.setIncluded(included);
 		refactorerProperties.setExcluded(excluded);
 
-		JavaRefactorer refactorer = new JavaRefactorer(new EngineProperties(), refactorerProperties);
+		JavaRefactorer refactorer = new JavaRefactorer(new CleanthatEngineProperties(), refactorerProperties);
 
 		// Spotless calls steps always with LF eol.
 		return refactorer.doFormat(input, LineEnding.LF);

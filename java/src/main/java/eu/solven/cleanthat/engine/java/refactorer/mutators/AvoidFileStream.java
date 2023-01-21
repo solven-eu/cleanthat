@@ -15,14 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}

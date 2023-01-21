@@ -15,6 +15,17 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
@@ -43,21 +54,9 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
-import eu.solven.cleanthat.formatter.ILintFixerHelpedByCodeStyleFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.IStyleEnforcer;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is dedicated to refactoring. Most rules will refactor code to a better (e.g. shorter, faster, safer, etc)
@@ -66,7 +65,7 @@ import org.slf4j.LoggerFactory;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFixerWithId {
+public class JavaRefactorer implements ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
@@ -85,8 +84,6 @@ public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFi
 			new StreamAnyMatch());
 
 	private final List<IClassTransformer> transformers;
-
-	private Optional<IStyleEnforcer> optCodeStyleFixer = Optional.empty();
 
 	public static final List<String> getAllIncluded() {
 		return ALL_TRANSFORMERS.stream().map(ct -> Iterables.getOnlyElement(ct.getIds())).collect(Collectors.toList());
@@ -144,13 +141,6 @@ public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFi
 
 	public List<IClassTransformer> getTransformers() {
 		return transformers;
-	}
-
-	@Override
-	public void registerCodeStyleFixer(IStyleEnforcer codeStyleFixer) {
-		// TODO This could be in INFO, but it is called once per file (unexpectedly)
-		LOGGER.debug("We register {} into {}", codeStyleFixer, this);
-		this.optCodeStyleFixer = Optional.of(codeStyleFixer);
 	}
 
 	@Override
@@ -254,18 +244,8 @@ public class JavaRefactorer implements ILintFixerHelpedByCodeStyleFixer, ILintFi
 			return cleanCode;
 		}
 
-		LineEnding lineEnding = optLineEnding.get();
-
-		String cleanerCode;
-		if (optCodeStyleFixer.isPresent()) {
-			// We are provided a way to format the code early
-			cleanerCode = optCodeStyleFixer.get().doFormat(cleanCode, lineEnding);
-		} else {
-			cleanerCode = cleanCode;
-		}
-
 		List<String> dirtyRows = Arrays.asList(dirtyCode.split(lineEndingChars, -1));
-		List<String> cleanRows = Arrays.asList(cleanerCode.split(lineEndingChars, -1));
+		List<String> cleanRows = Arrays.asList(cleanCode.split(lineEndingChars, -1));
 		Patch<String> diff = DiffUtils.diff(dirtyRows, cleanRows);
 
 		assertPatchIsValid(dirtyRows, cleanRows, diff);

@@ -51,8 +51,9 @@ import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.EngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
 import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
@@ -177,39 +178,37 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
 
-		Optional<EngineProperties> optJavaProperties =
+		Optional<CleanthatEngineProperties> optJavaProperties =
 				loadedConfig.getEngines().stream().filter(lp -> "java".equals(lp.getEngine())).findAny();
 
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
 		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
 
-		EngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
+		CleanthatEngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
 			// There is no java language properties
 			LOGGER.info("We introduce the java language properties");
 
 			// Enable mutations
-			List<EngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
+			List<CleanthatEngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
 			loadedConfig.setEngines(mutableLanguages);
 
-			EngineProperties languageProperties =
+			CleanthatEngineProperties languageProperties =
 					new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
 			mutableLanguages.add(languageProperties);
 
 			return languageProperties;
 		});
 
-		Optional<Map<String, ?>> optEclipseProperties = javaProperties.getProcessors()
-				.stream()
-				.filter(p -> EclipseJavaFormatter.ID.equals(p.get("engine")))
-				.findAny();
+		Optional<CleanthatStepProperties> optEclipseProperties =
+				javaProperties.getSteps().stream().filter(p -> EclipseJavaFormatter.ID.equals(p.getId())).findAny();
 
-		Map<String, ?> eclipseProperties;
+		CleanthatStepProperties eclipseProperties;
 		if (optEclipseProperties.isPresent()) {
 			eclipseProperties = optEclipseProperties.get();
 		} else {
 			eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
-			javaProperties.getProcessors().add(eclipseProperties);
+			javaProperties.getSteps().add(eclipseProperties);
 		}
 
 		Optional<Map<String, Object>> optEclipseParameters =

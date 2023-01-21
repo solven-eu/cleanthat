@@ -21,7 +21,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.NoOpJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
@@ -29,7 +28,6 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;

@@ -40,6 +40,22 @@
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 
+		<!-- https://github.com/marschall/memoryfilesystem -->
+		<dependency>
+			<!-- This enables manipulating Path not dependent on a local FileSystem -->
+			<groupId>com.github.marschall</groupId>
+			<artifactId>memoryfilesystem</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
+		<dependency>
+			<!-- For Eclipse, given downloaded jar: 'java -jar lombok.jar' -->
+			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>

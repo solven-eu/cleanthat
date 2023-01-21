@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 DiffPlug
+ * Copyright 2016-2023 Solven
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import com.diffplug.spotless.Provisioner;
 /** Maven integration for Provisioner. */
 // see com.diffplug.gradle.spotless.GradleProvisioner
 public class MavenProvisioner {
-	private MavenProvisioner() {}
+	private MavenProvisioner() {
+	}
 
 	public static Provisioner create(ArtifactResolver artifactResolver) {
 		return artifactResolver::resolve;

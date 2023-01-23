@@ -15,17 +15,16 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -40,10 +39,7 @@ import lombok.Setter;
 @SuppressWarnings("PMD.ImmutableField")
 @Data
 public class SourceCodeProperties implements ISourceCodeProperties {
-
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
-
-	public static final LineEnding DEFAULT_LINE_ENDING = LineEnding.UNKNOWN;
 
 	// If empty, no file is excluded
 	// If multiple, we exclude files matching at least one exclude (OR)
@@ -58,15 +54,24 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	private List<String> includes = Arrays.asList();
 
 	// The encoding of files
-	private String encoding = DEFAULT_ENCODING;
+	private String encoding = null;
 
 	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	private LineEnding lineEnding = DEFAULT_LINE_ENDING;
+	private Optional<LineEnding> lineEnding = Optional.empty();
 
 	private LineEnding parseLineEnding(String lineEnding) {
 		return LineEnding.valueOf(lineEnding);
+	}
+
+	public static SourceCodeProperties defaultRoot() {
+		SourceCodeProperties root = new SourceCodeProperties();
+
+		root.setEncoding(DEFAULT_ENCODING);
+		root.setLineEndingAsEnum(LineEnding.GIT);
+
+		return root;
 	}
 
 	// Git has some preference to committing LF
@@ -74,19 +79,23 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	@JsonIgnore
 	@Override
 	public LineEnding getLineEndingAsEnum() {
-		return lineEnding;
+		return lineEnding.orElse(null);
 	}
 
 	public String getLineEnding() {
-		return lineEnding.toString();
+		return lineEnding.map(Object::toString).orElse(null);
 	}
 
 	@JsonIgnore
 	public void setLineEndingAsEnum(LineEnding lineEnding) {
-		this.lineEnding = lineEnding;
+		this.lineEnding = Optional.ofNullable(lineEnding);
 	}
 
 	public void setLineEnding(String lineEnding) {
-		this.lineEnding = parseLineEnding(lineEnding);
+		if (lineEnding == null) {
+			this.lineEnding = Optional.empty();
+		} else {
+			this.lineEnding = Optional.of(parseLineEnding(lineEnding));
+		}
 	}
 }

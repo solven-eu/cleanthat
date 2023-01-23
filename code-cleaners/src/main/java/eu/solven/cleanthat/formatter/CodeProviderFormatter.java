@@ -15,27 +15,6 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
-import com.google.common.base.Strings;
-import com.google.common.util.concurrent.AtomicLongMap;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.pepper.thread.PepperExecutorsHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystem;
@@ -52,7 +31,30 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
+
+import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.base.Strings;
+import com.google.common.util.concurrent.AtomicLongMap;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
+import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Unclear what is the point of this class
@@ -66,21 +68,21 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private static final int CORES_FORMATTER = 16;
 	private static final int MAX_LOG_MANY_FILES = 128;
 
-	final List<ObjectMapper> objectMappers;
-
 	final ILanguageFormatterFactory formatterFactory;
 	final ICodeFormatterApplier formatterApplier;
 
 	final SourceCodeFormatterHelper sourceCodeFormatterHelper;
 
-	public CodeProviderFormatter(List<ObjectMapper> objectMappers,
+	final ConfigHelpers configHelpers;
+
+	public CodeProviderFormatter(ConfigHelpers configHelpers,
 			ILanguageFormatterFactory formatterFactory,
 			ICodeFormatterApplier formatterApplier) {
-		this.objectMappers = objectMappers;
+		this.configHelpers = configHelpers;
 		this.formatterFactory = formatterFactory;
 		this.formatterApplier = formatterApplier;
 
-		this.sourceCodeFormatterHelper = new SourceCodeFormatterHelper(ConfigHelpers.getJson(objectMappers));
+		this.sourceCodeFormatterHelper = new SourceCodeFormatterHelper();
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -100,7 +102,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				codeWriter.listFilesForFilenames(fileChanged -> {
-					if (CodeProviderHelpers.FILENAMES_CLEANTHAT.contains(fileChanged.getPath())) {
+					if (CodeProviderHelpers.PATHES_CLEANTHAT.contains(fileChanged.getPath())) {
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
 					}
@@ -178,7 +180,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	private IEngineProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
 			CleanthatEngineProperties dirtyLanguageConfig) {
-		ConfigHelpers configHelpers = new ConfigHelpers(objectMappers);
 
 		IEngineProperties languageP = configHelpers.mergeEngineProperties(repoProperties, dirtyLanguageConfig);
 

@@ -17,8 +17,6 @@ package eu.solven.cleanthat.spotless.pojo;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 import com.google.common.base.Strings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Check a {@link SpotlessStepProperties} is properly configured
@@ -27,14 +25,13 @@ import org.slf4j.LoggerFactory;
  */
 public final class SpotlessStepPropertiesSanitizer
 		extends StdConverter<SpotlessStepProperties, SpotlessStepProperties> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessStepPropertiesSanitizer.class);
 
 	@Override
-	public SpotlessStepProperties convert(SpotlessStepProperties pojo) {
-		if (Strings.isNullOrEmpty(pojo.getId())) {
+	public SpotlessStepProperties convert(SpotlessStepProperties step) {
+		if (Strings.isNullOrEmpty(step.getId())) {
 			throw new IllegalArgumentException("the 'id' is mandatory");
 		}
 
-		return pojo;
+		return step;
 	}
 }

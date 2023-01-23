@@ -29,15 +29,13 @@ public class TestSpotlessStepProperties {
 		SpotlessStepProperties p = new SpotlessStepProperties();
 		p.setId("someStepName");
 
-		p.add("someCustomeKey", "someCustomValue");
+		p.putProperty("someCustomeKey", "someCustomValue");
 
 		String asString = om.writeValueAsString(p);
-		Assertions.assertThat(asString)
-				.containsSubsequence("name", "someStepName", "someCustomeKey", "someCustomValue");
+		Assertions.assertThat(asString).containsSubsequence("id", "someStepName", "someCustomeKey", "someCustomValue");
 
 		SpotlessStepProperties backAsObject = om.readValue(asString, SpotlessStepProperties.class);
 
 		Assertions.assertThat(backAsObject).isEqualTo(p);
-
 	}
 }

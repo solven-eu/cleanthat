@@ -15,26 +15,24 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class TestRulesJavaMutator {
-	final CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
+	final CleanthatEngineProperties languageProperties =
+			CleanthatEngineProperties.builder().engine("java").engineVersion(IJdkVersionConstants.JDK_8).build();
 	final JavaRefactorerProperties properties = new JavaRefactorerProperties();
 
 	@Test

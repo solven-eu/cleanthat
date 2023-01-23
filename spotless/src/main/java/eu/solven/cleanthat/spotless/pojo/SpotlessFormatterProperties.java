@@ -17,9 +17,11 @@ package eu.solven.cleanthat.spotless.pojo;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Used to configure a specific Spotless format
@@ -32,18 +34,21 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
+@Builder
+@Jacksonized
 public class SpotlessFormatterProperties {
 	// If left to default, we will rely on the engine encoding
-	private String encoding = SpotlessEngineProperties.DEFAULT_DEFAULT;
+	private String encoding;
 
 	// java, json, etc (or a generic 'format')
 	private String format;
 	// Any String. Useful when multiple formatters rely on the same format
 	private String alias;
 
-	private List<String> includes = new ArrayList<>();
-	private List<String> excludes = new ArrayList<>();
+	private List<String> includes;
+	private List<String> excludes;
 
 	// The steps of given language
-	private List<SpotlessStepProperties> steps = new ArrayList<>();
+	@Singular
+	private List<SpotlessStepProperties> steps;
 }

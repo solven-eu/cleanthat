@@ -53,7 +53,7 @@ public class GenerateInitialConfig {
 	// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
 	// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
 	public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
-		CleanthatRepositoryProperties properties = new CleanthatRepositoryProperties();
+		CleanthatRepositoryProperties properties = CleanthatRepositoryProperties.defaultRepository();
 
 		if (codeProvider.loadContentForPath("/.mvn/wrapper/maven-wrapper.properties").isPresent()) {
 			// mvn wrapper is generally copied without any changes from

@@ -89,13 +89,13 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
+		SourceCodeProperties defaultP = SourceCodeProperties.defaultRoot();
 		defaultP.setEncoding(StandardCharsets.ISO_8859_1.name());
 		SourceCodeProperties windowsP = new SourceCodeProperties();
 		windowsP.setLineEndingAsEnum(LineEnding.CRLF);
 		windowsP.setEncoding(StandardCharsets.US_ASCII.name());
 
-		Assert.assertEquals(LineEnding.UNKNOWN, defaultP.getLineEndingAsEnum());
+		Assert.assertEquals(LineEnding.GIT, defaultP.getLineEndingAsEnum());
 		Assert.assertEquals(LineEnding.CRLF, windowsP.getLineEndingAsEnum());
 
 		Assert.assertEquals("ISO-8859-1", defaultP.getEncoding());
@@ -117,7 +117,7 @@ public class TestConfigHelpers {
 					om.convertValue(defaultP, Map.class));
 			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
-			Assert.assertEquals(LineEnding.CRLF, merged.getLineEndingAsEnum());
+			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
 		}
 
@@ -127,7 +127,7 @@ public class TestConfigHelpers {
 					om.convertValue(defaultP, Map.class));
 			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
-			Assert.assertEquals(LineEnding.UNKNOWN, merged.getLineEndingAsEnum());
+			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
 		}
 	}

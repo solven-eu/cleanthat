@@ -68,7 +68,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeProvider);
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATHES_CLEANTHAT, codeProvider);
 			return ResultOrError.error("No configuration");
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");

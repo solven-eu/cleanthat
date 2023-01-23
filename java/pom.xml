@@ -62,34 +62,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
-		<dependency>
-			<!-- Used to generate Eclipse stylesheet -->
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>org.eclipse.jdt.core</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core.manipulation -->
-		<dependency>
-			<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
-			<!-- Used to rely on Eclipse CleanUp actions -->
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- Used to parse Eclipse XML config files -->
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-digester3</artifactId>
-			<version>3.2</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/google/google-java-format -->
-			<groupId>com.google.googlejavaformat</groupId>
-			<artifactId>google-java-format</artifactId>
-			<version>1.15.0</version>
-		</dependency>
-
 		<dependency>
 			<!-- https://github.com/spring-io/spring-javaformat -->
 			<groupId>io.spring.javaformat</groupId>

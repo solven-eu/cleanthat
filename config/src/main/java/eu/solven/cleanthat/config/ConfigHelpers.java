@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,6 @@ import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -89,6 +88,11 @@ public class ConfigHelpers {
 				// This is disabled by default
 				.enable(Feature.USE_PLATFORM_LINE_BREAKS);
 		ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
+
+		// Used not to print null options in configurations
+		// https://www.baeldung.com/jackson-ignore-null-fields
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
+
 		return objectMapper;
 	}
 
@@ -126,34 +130,6 @@ public class ConfigHelpers {
 		return languageP;
 	}
 
-	// Duplicates eu.solven.cleanthat.config.ConfigHelpers.mergeLanguageProperties(CleanthatRepositoryProperties,
-	// Map<String, ?>) ?
-	public IEngineProperties mergeLanguageIntoProcessorProperties(IEngineProperties languagePropertiesTemplate,
-			CleanthatStepProperties rawProcessor) {
-		Map<String, Object> languagePropertiesAsMap = makeDeepCopy(languagePropertiesTemplate);
-		// As we are processing a single processor, we can get ride of the processors field
-		languagePropertiesAsMap.remove("processors");
-		// A processor may need to be applied with an overriden languageVersion
-		// Optional<String> optLanguageVersionOverload =
-		// PepperMapHelper.getOptionalString(rawProcessor, "language_version");
-		// if (optLanguageVersionOverload.isPresent()) {
-		// languagePropertiesAsMap.put("language_version", optLanguageVersionOverload.get());
-		// }
-		Optional<Map<String, ?>> optSourceOverloads = PepperMapHelper.getOptionalAs(rawProcessor, KEY_SOURCE_CODE);
-		if (optSourceOverloads.isPresent()) {
-			// Mutable copy
-			Map<String, Object> sourcePropertiesAsMap =
-					mergeSourceCodeProperties(PepperMapHelper.getRequiredMap(languagePropertiesAsMap, KEY_SOURCE_CODE),
-							optSourceOverloads.get());
-
-			// Re-inject
-			languagePropertiesAsMap.put(KEY_SOURCE_CODE, sourcePropertiesAsMap);
-		}
-		IEngineProperties languageProperties =
-				objectMapper.convertValue(languagePropertiesAsMap, CleanthatEngineProperties.class);
-		return languageProperties;
-	}
-
 	protected ISourceCodeProperties mergeSourceConfig(IHasSourceCodeProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, ?> rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
@@ -180,8 +156,7 @@ public class ConfigHelpers {
 
 		if (outer != null && inner != null) {
 			Object innerLineEnding = inner.get("line_ending");
-			if (innerLineEnding == null
-					|| Set.of(LineEnding.UNKNOWN, LineEnding.UNKNOWN.toString()).contains(innerLineEnding)) {
+			if (innerLineEnding == null) {
 				// We give priority to outer lineEnding in case it is more explicit
 				Object outerLineEnding = outer.get("line_ending");
 				if (outerLineEnding != null) {

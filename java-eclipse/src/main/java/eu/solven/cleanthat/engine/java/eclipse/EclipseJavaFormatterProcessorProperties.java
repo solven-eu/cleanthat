@@ -40,4 +40,12 @@ public class EclipseJavaFormatterProcessorProperties implements ICleanthatStepPa
 	// see eu.solven.cleanthat.language.CleanthatUrlLoader.loadUrl(ICodeProvider, String)
 	private String url = URL_DEFAULT_GOOGLE;
 
+	@Override
+	public Object getCustomProperty(String key) {
+		if ("url".equalsIgnoreCase(key)) {
+			return url;
+		}
+		return null;
+	}
+
 }

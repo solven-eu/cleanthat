@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.language.spotless;
 
 import com.diffplug.spotless.Formatter;
+import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.spotless.ExecuteSpotless;
@@ -23,6 +24,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * {@link ILintFixer} for Spotless engine
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class SpotlessLintFixer implements ILintFixerWithId {
 	final List<Formatter> formatters;
 
@@ -41,7 +48,7 @@ public class SpotlessLintFixer implements ILintFixerWithId {
 
 	@Override
 	public String getId() {
-		return "spotless";
+		return CleanthatSpotlessStepParametersProperties.ENGINE_ID;
 	}
 
 }

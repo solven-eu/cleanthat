@@ -17,14 +17,18 @@ package eu.solven.cleanthat.spotless.language;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
+import com.diffplug.spotless.markdown.FlexmarkStep;
 import com.diffplug.spotless.pom.SortPomCfg;
 import com.diffplug.spotless.pom.SortPomStep;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,22 +42,16 @@ import org.slf4j.LoggerFactory;
 public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PomXmlFormatterStepFactory.class);
 
-	// CleanThat will call spotless from the root directory: process any 'pom.xml' file from there
-	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/pom.xml");
-
-	public PomXmlFormatterStepFactory(ICodeProvider codeProvider, String[] includes, String[] excludes) {
-		super(codeProvider, includes, excludes);
-	}
-
 	public PomXmlFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties spotlessProperties) {
-		super(codeProvider,
-				spotlessProperties.getIncludes().toArray(String[]::new),
-				spotlessProperties.getExcludes().toArray(String[]::new));
+		super(codeProvider, spotlessProperties);
 	}
 
+	/**
+	 * CleanThat will call spotless from the root directory: process any 'pom.xml' file from there
+	 */
 	@Override
 	public Set<String> defaultIncludes() {
-		return DEFAULT_INCLUDES;
+		return ImmutableSet.of("**/pom.xml");
 	}
 
 	@Override
@@ -61,6 +59,7 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 		return null;
 	}
 
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
 	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
@@ -91,6 +90,22 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 			throw new IllegalArgumentException("Unknown Java step: " + stepName);
 		}
 		}
+	}
+
+	// This is useful to demonstrate all available configuration
+	public static List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepProperties sortPom = new SpotlessStepProperties();
+		sortPom.setId("sortPom");
+		SortPomCfg defaultSortPomConfig = new SortPomCfg();
+		for (Field f : SortPomCfg.class.getFields()) {
+			try {
+				sortPom.putProperty(f.getName(), f.get(defaultSortPomConfig));
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				LOGGER.warn("Issue fethcing default value for field={}", f, e);
+			}
+		}
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(sortPom).build();
 	}
 
 }

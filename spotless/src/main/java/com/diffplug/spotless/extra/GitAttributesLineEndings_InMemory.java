@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
  */
 // This differs from original GitAttributesLineEndings as it rely on a .gitattributes as a String, and no not try
 // consider any system git configuration
+@SuppressWarnings("checkstyle:TypeName")
 public final class GitAttributesLineEndings_InMemory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GitAttributesLineEndings_InMemory.class);
 
@@ -101,6 +102,7 @@ public final class GitAttributesLineEndings_InMemory {
 			this.toFormat = Objects.requireNonNull(toFormat, "toFormat");
 		}
 
+		@SuppressWarnings("PMD.NullAssignment")
 		@Override
 		protected CachedEndings_InMemory calculateState() throws Exception {
 			Runtime_InMemory runtime = new RuntimeInit_InMemory(codeProvider, git, projectDir).atRuntime();
@@ -119,21 +121,23 @@ public final class GitAttributesLineEndings_InMemory {
 	}
 
 	// @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+	@SuppressWarnings("checkstyle:AvoidInlineConditionals")
 	static class CachedEndings_InMemory implements Serializable {
 		private static final long serialVersionUID = -2534772773057900619L;
 
 		/** this is transient, to simulate PathSensitive.RELATIVE */
-		transient final String rootDir;
+		final transient String rootDir;
 		/** the line ending used for most files */
 		final String defaultEnding;
 		/** any exceptions to that default, in terms of relative path from rootDir */
+		@SuppressWarnings("PMD.LinguisticNaming")
 		final ConcurrentRadixTree<String> hasNonDefaultEnding =
 				new ConcurrentRadixTree<>(new DefaultCharSequenceNodeFactory());
 
 		CachedEndings_InMemory(Path projectDir, Runtime_InMemory runtime, Iterable<Path> toFormat) {
 			String rootPath = FileSignature.pathNativeToUnix(projectDir.toAbsolutePath().toString());
 			// is this a bug in original implementation? (.equals instead of .endsWith)
-			rootDir = rootPath.equals("/") ? rootPath : rootPath + "/";
+			rootDir = "/".equals(rootPath) ? rootPath : rootPath + "/";
 			defaultEnding = runtime.defaultEnding;
 			for (Path file : toFormat) {
 				String ending = runtime.getEndingFor(file);
@@ -194,7 +198,10 @@ public final class GitAttributesLineEndings_InMemory {
 	}
 
 	/** https://github.com/git/git/blob/1fe8f2cf461179c41f64efbd1dc0a9fb3b7a0fb1/Documentation/gitattributes.txt */
-	static class Runtime_InMemory {
+	static final class Runtime_InMemory {
+
+		private static final String KEY_EOL = "eol";
+
 		final @Nullable Path workTree;
 
 		/** Cache of local .gitattributes files. */
@@ -211,8 +218,6 @@ public final class GitAttributesLineEndings_InMemory {
 
 			cache = new AttributesCache(codeProvider);
 		}
-
-		private static final String KEY_EOL = "eol";
 
 		public String getEndingFor(Path file) {
 			// handle the local .gitattributes (if any)
@@ -231,7 +236,7 @@ public final class GitAttributesLineEndings_InMemory {
 			case "crlf":
 				return LineEnding.WINDOWS.str();
 			default:
-				System.err.println(".gitattributes file has unspecified eol value: " + eol
+				LOGGER.error(".gitattributes file has unspecified eol value: " + eol
 						+ " for "
 						+ file
 						+ ", defaulting to platform native");
@@ -289,7 +294,7 @@ public final class GitAttributesLineEndings_InMemory {
 
 		final Map<Path, List<AttributesRule>> rulesAtPath = new HashMap<>();
 
-		public AttributesCache(ICodeProvider codeProvider) {
+		AttributesCache(ICodeProvider codeProvider) {
 			this.codeProvider = codeProvider;
 		}
 

@@ -15,9 +15,9 @@
  */
 package eu.solven.cleanthat.code_provider.github;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
@@ -65,10 +65,10 @@ public class CodeCleanerSpringConfig {
 	}
 
 	@Bean
-	public ICodeProviderFormatter codeProviderFormatter(List<ObjectMapper> objectMappers,
+	public ICodeProviderFormatter codeProviderFormatter(ConfigHelpers configHelpers,
 			ILanguageFormatterFactory formatterFactory,
 			ICodeFormatterApplier formatterApplier) {
-		return new CodeProviderFormatter(objectMappers, formatterFactory, formatterApplier);
+		return new CodeProviderFormatter(configHelpers, formatterFactory, formatterApplier);
 	}
 
 	@Bean

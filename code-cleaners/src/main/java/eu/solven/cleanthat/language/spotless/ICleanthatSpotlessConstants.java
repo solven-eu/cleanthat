@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.spring;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
+package eu.solven.cleanthat.language.spotless;
 
 /**
- * Spring Java formatter configuration
- *
+ * Constants related to configuring Spotless with CleanThat
+ * 
  * @author Benoit Lacelle
+ *
  */
-// TODO An option would be to switch from tabs to whiteapaces
-// see io.spring.javaformat.formatter.eclipse.DefaultCodeFormatter.initOptions
-@Deprecated
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SpringJavaFormatterProperties implements ICleanthatStepParametersProperties {
-
+public interface ICleanthatSpotlessConstants {
+	String ENGINE_ID = "spotless";
+	String STEP_ID = ENGINE_ID;
 }

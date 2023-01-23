@@ -7,10 +7,7 @@ formatters:
   - "**/do_not_format_me/**"
   steps:
   - id: "removeUnusedImports"
-  - id: "eclipse"
-    file: "repository:/config/eclipse_java_code_formatter.xml"
-  - id: "licenseHeader"
-    content: "/* (C)$YEAR */"
+  - id: "importOrder"
 - format: "pom"
   includes:
   - "regex:**/pom.xml"

@@ -17,9 +17,7 @@ package eu.solven.cleanthat.engine;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.pepper.collection.PepperMapHelper;
-import java.util.Map;
-import java.util.Optional;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 
 /**
  * Abstract class for language formatters
@@ -41,19 +39,7 @@ public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerF
 		return configHelpers;
 	}
 
-	protected Map<String, ?> getParameters(CleanthatStepProperties rawProcessor) {
-		Optional<?> optRawParameters = PepperMapHelper.<Map<String, Object>>getOptionalAs(rawProcessor, KEY_PARAMETERS);
-
-		if (optRawParameters.isPresent()) {
-			if (optRawParameters.get() instanceof Map<?, ?>) {
-				return (Map<String, ?>) optRawParameters.get();
-			} else {
-				// We received a real instance of the parameters
-				return convertValue(optRawParameters.get(), Map.class);
-			}
-		} else {
-			// Various engines are parameter-less
-			return Map.of();
-		}
+	protected ICleanthatStepParametersProperties getParameters(CleanthatStepProperties rawProcessor) {
+		return rawProcessor.getParameters();
 	}
 }

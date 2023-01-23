@@ -20,6 +20,7 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.JarState;
 import com.diffplug.spotless.Jvm;
 import com.diffplug.spotless.Provisioner;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -33,15 +34,16 @@ import java.util.Objects;
  * @author Benoit Lacelle
  */
 // https://github.com/diffplug/spotless/blob/main/CONTRIBUTING.md#how-to-add-a-new-formatterstep
-public class CleanthatStepFactory {
-	// prevent direct instantiation
-	private CleanthatStepFactory() {
-	}
+public final class CleanthatStepFactory {
 
 	private static final String NAME = "cleanthat";
 	private static final String MAVEN_COORDINATE = "io.github.solven-eu.cleanthat:java:";
 
 	private static final Jvm.Support<String> JVM_SUPPORT = Jvm.<String>support(NAME).add(8, "2.0");
+
+	// prevent direct instantiation
+	private CleanthatStepFactory() {
+	}
 
 	/** Creates a step which formats everything - code, import order, and unused imports. */
 	public static FormatterStep create(Provisioner provisioner) {
@@ -93,7 +95,7 @@ public class CleanthatStepFactory {
 		final List<String> included;
 		final List<String> excluded;
 
-		JavaRulesState(String stepName, String version, Provisioner provisioner) throws Exception {
+		JavaRulesState(String stepName, String version, Provisioner provisioner) throws IOException {
 			this(stepName, MAVEN_COORDINATE, version, defaultExcluded(), defaultIncluded(), provisioner);
 		}
 
@@ -102,7 +104,7 @@ public class CleanthatStepFactory {
 				String version,
 				List<String> included,
 				List<String> excluded,
-				Provisioner provisioner) throws Exception {
+				Provisioner provisioner) throws IOException {
 			JVM_SUPPORT.assertFormatterSupported(version);
 			// ModuleHelper.doOpenInternalPackagesIfRequired();
 			this.jarState = JarState.from(groupArtifact + ":" + version, provisioner);
@@ -113,19 +115,25 @@ public class CleanthatStepFactory {
 			this.excluded = excluded;
 		}
 
-		FormatterFunc createFormat() throws Exception {
+		@SuppressWarnings("PMD.UseProperClassLoader")
+		FormatterFunc createFormat() {
 			ClassLoader classLoader = jarState.getClassLoader();
 
-			Class<?> formatterClazz =
-					classLoader.loadClass("com.diffplug.spotless.glue.java.JavaCleanthatRefactoringFunc");
-			Constructor<?> formatterConstructor = formatterClazz.getConstructor(List.class, List.class);
+			Object formatter;
+			Method formatterMethod;
+			try {
+				Class<?> formatterClazz =
+						classLoader.loadClass("com.diffplug.spotless.glue.java.JavaCleanthatRefactoringFunc");
+				Constructor<?> formatterConstructor = formatterClazz.getConstructor(List.class, List.class);
 
-			Object formatter = formatterConstructor.newInstance(included, excluded);
-			Method formatterMethod = formatterClazz.getMethod("apply", String.class);
-
-			return JVM_SUPPORT.suggestLaterVersionOnError(version, (input -> {
+				formatter = formatterConstructor.newInstance(included, excluded);
+				formatterMethod = formatterClazz.getMethod("apply", String.class);
+			} catch (ReflectiveOperationException e) {
+				throw new IllegalStateException("Issue executing the formatter", e);
+			}
+			return JVM_SUPPORT.suggestLaterVersionOnError(version, input -> {
 				return (String) formatterMethod.invoke(formatter, input);
-			}));
+			});
 		}
 
 	}

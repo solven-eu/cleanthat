@@ -17,7 +17,7 @@ package eu.solven.cleanthat.engine;
 
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
-import org.junit.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class TestSourceCodeProperties {
@@ -25,8 +25,15 @@ public class TestSourceCodeProperties {
 	public void testDefaultConstructor() {
 		SourceCodeProperties properties = new SourceCodeProperties();
 
+		// We rely on null so that any other parameter takes precedence
+		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
+	}
+
+	@Test
+	public void testDefaultMethod() {
+		SourceCodeProperties properties = SourceCodeProperties.defaultRoot();
+
 		// By default, neither LR or CRLF as we should not privilege a platform
-		// We rely on UNKNOWN so that any other parameter takes precedence
-		Assert.assertEquals(LineEnding.UNKNOWN, properties.getLineEndingAsEnum());
+		Assertions.assertThat(properties.getLineEndingAsEnum()).isEqualTo(LineEnding.GIT);
 	}
 }

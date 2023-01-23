@@ -15,11 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse;
 
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
@@ -29,10 +31,6 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Bridges to Eclipse formatting engine

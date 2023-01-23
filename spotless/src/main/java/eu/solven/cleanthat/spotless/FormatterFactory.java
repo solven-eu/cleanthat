@@ -48,6 +48,12 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.repository.RemoteRepository;
 
+/**
+ * Knows how to instantiate {@link AFormatterStepFactory}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class FormatterFactory {
 	final FileSystem fileSystem;
 	final ICodeProvider codeProvider;
@@ -109,10 +115,15 @@ public class FormatterFactory {
 		// FormatExceptionPolicy.failOnlyOnError()
 		FormatExceptionPolicy exceptionPolicy = new FormatExceptionPolicyStrict();
 
+		String encoding = formatterProperties.getEncoding();
+		if (encoding == null) {
+			encoding = engineProperties.getEncoding();
+		}
+
 		List<FormatterStep> steps = buildSteps(formatterProperties, provisioner);
 		return Formatter.builder()
 				.lineEndingsPolicy(lineEndingsPolicy)
-				.encoding(Charset.forName(formatterProperties.getEncoding()))
+				.encoding(Charset.forName(encoding))
 				.rootDir(tmpRoot)
 				.steps(steps)
 				.exceptionPolicy(exceptionPolicy)

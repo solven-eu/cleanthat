@@ -19,14 +19,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * The configuration of Spotless step.
  * 
  * BEWARE This is in 'code-cleaners' module as it is part of the default cleanthat configuration (e.g. when bootstraping
- * a new repositoty)
+ * a new repository)
  * 
  * @author Benoit Lacelle
  *
@@ -35,9 +38,24 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
-public class CleanthatSpotlessProperties implements ICleanthatStepParametersProperties {
+@Builder
+@Jacksonized
+public class CleanthatSpotlessStepParametersProperties
+		implements ICleanthatStepParametersProperties, ICleanthatSpotlessConstants {
 	// The default configuration location is the first option amongst the possible locations
-	private static final String DEFAULT_CONFIGURATION = CodeProviderHelpers.FILENAMES_CLEANTHAT.get(0);
+	private static final String DEFAULT_CONFIGURATION =
+			CodeProviderHelpers.PATH_SEPARATOR + CodeProviderHelpers.FILENAME_CLEANTHAT_FOLDER
+					+ CodeProviderHelpers.PATH_SEPARATOR
+					+ "spotless.yaml";
 
-	private String configuration = DEFAULT_CONFIGURATION;;
+	@Builder.Default
+	private String configuration = CleanthatUrlLoader.PREFIX_CODE + DEFAULT_CONFIGURATION;
+
+	@Override
+	public Object getCustomProperty(String key) {
+		if ("configuration".equalsIgnoreCase(key)) {
+			return configuration;
+		}
+		return null;
+	}
 }

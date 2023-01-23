@@ -42,6 +42,9 @@ public class CleanthatStepProperties {
 	// the step name/id
 	private final String id;
 
+	@Builder.Default
+	private boolean skip = false;
+
 	// the step parameters
 	@JsonDeserialize(as = CleanthatStepParametersProperties.class)
 	private final ICleanthatStepParametersProperties parameters;

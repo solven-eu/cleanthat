@@ -17,13 +17,11 @@ package eu.solven.cleanthat.spotless;
 
 import com.diffplug.spotless.Formatter;
 import com.diffplug.spotless.PaddedCell;
-import com.diffplug.spotless.Provisioner;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -85,9 +83,14 @@ public class ExecuteSpotless {
 		}
 	}
 
-	private Set<String> getIncludes(AFormatterStepFactory formatterFactory) {
-		Set<String> configuredIncludes = formatterFactory.includes();
-		Set<String> includes = configuredIncludes.isEmpty() ? formatterFactory.defaultIncludes() : configuredIncludes;
+	protected Set<String> getIncludes(AFormatterStepFactory formatterFactory) {
+		Set<String> configuredIncludes = formatterFactory.getIncludes();
+		Set<String> includes;
+		if (configuredIncludes.isEmpty()) {
+			includes = formatterFactory.defaultIncludes();
+		} else {
+			includes = configuredIncludes;
+		}
 		if (includes.isEmpty()) {
 			throw new IllegalArgumentException(
 					"You must specify some files to include, such as 'includes:\r\n- 'src/**/*.blah''");
@@ -95,8 +98,8 @@ public class ExecuteSpotless {
 		return includes;
 	}
 
-	private Set<String> getExcludes(AFormatterStepFactory formatterFactory) {
-		Set<String> configuredExcludes = formatterFactory.excludes();
+	protected Set<String> getExcludes(AFormatterStepFactory formatterFactory) {
+		Set<String> configuredExcludes = formatterFactory.getExcludes();
 
 		Set<String> excludes = new HashSet<>();
 		// excludes.addAll(FileUtils.getDefaultExcludesAsList());

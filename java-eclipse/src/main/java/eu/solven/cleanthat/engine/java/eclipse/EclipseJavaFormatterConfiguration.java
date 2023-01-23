@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import lombok.Data;
 import org.eclipse.jdt.core.JavaCore;
@@ -65,7 +66,7 @@ public class EclipseJavaFormatterConfiguration {
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
-			String jdkVersion = languageProperties.getEngineVersion();
+			String jdkVersion = Optional.ofNullable(languageProperties.getEngineVersion()).orElse("1.8");
 			// if (optJdkVersion.isEmpty()) {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
 			// }

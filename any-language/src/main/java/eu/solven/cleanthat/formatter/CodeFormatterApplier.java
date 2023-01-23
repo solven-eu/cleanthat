@@ -38,24 +38,23 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeFormatterApplier.class);
 
 	@Override
-	public String applyProcessors(EnginePropertiesAndBuildProcessors languagePropertiesAndProcessors,
-			String filepath,
-			String code) throws IOException {
+	public String applyProcessors(EnginePropertiesAndBuildProcessors engineAndSteps, String filepath, String code)
+			throws IOException {
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
 
-		languagePropertiesAndProcessors.getProcessors().forEach(rawProcessor -> {
+		engineAndSteps.getProcessors().forEach(step -> {
 			try {
 				String input = outputRef.get();
-				IEngineProperties languageProperties = rawProcessor.getKey();
-				ILintFixer lintFixer = rawProcessor.getValue();
-				String output = applyProcessor(languageProperties, lintFixer, filepath, input);
+				IEngineProperties engineProperties = step.getKey();
+				ILintFixer lintFixer = step.getValue();
+				String output = applyProcessor(engineProperties, lintFixer, filepath, input);
 				if (output == null) {
 					throw new IllegalStateException("Null code. TODO");
 				}
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step may clean all previous not relevant changes)
-					LOGGER.debug("Mutated a file given: {}", rawProcessor);
+					LOGGER.debug("Mutated a file given: {}", step);
 					outputRef.set(output);
 				}
 			} catch (IOException | RuntimeException e) {
@@ -63,7 +62,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 				LOGGER.warn(
 						"Issue over file='" + filepath
 								+ "' with processor="
-								+ rawProcessor
+								+ step
 								+ ". Please report it to: "
 								+ "https://github.com/solven-eu/cleanthat/issues",
 						e);
@@ -95,15 +94,14 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 		}
 		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
 
-		if (lineEnding == LineEnding.UNKNOWN) {
-			LineEnding.determineLineEnding(code).orElse(LineEnding.UNKNOWN);
-		}
-		if (lineEnding == LineEnding.UNKNOWN) {
-			LOGGER.warn("Undefined EOL: We skip formatting");
-			return code;
-		} else {
-			return formatter.doFormat(code, lineEnding);
+		if (lineEnding == LineEnding.GIT) {
+			// see GitAttributesLineEndings_InMemory
+			LOGGER.warn("We switch lineEnding from {} to {}", lineEnding, LineEnding.NATIVE);
+			lineEnding = LineEnding.NATIVE;
+		} else if (lineEnding == LineEnding.KEEP) {
+			lineEnding = LineEnding.determineLineEnding(code).orElse(LineEnding.NATIVE);
 		}
 
+		return formatter.doFormat(code, lineEnding);
 	}
 }

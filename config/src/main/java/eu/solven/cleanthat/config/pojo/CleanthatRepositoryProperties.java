@@ -15,16 +15,16 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
+import java.util.List;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * The configuration of a formatting job
@@ -36,6 +36,8 @@ import lombok.Data;
 @JsonPropertyOrder({ "syntax_version", "meta", "source_code", "engines" })
 @JsonIgnoreProperties({ "languages" })
 @Data
+@Builder
+@Jacksonized
 public final class CleanthatRepositoryProperties implements IHasSourceCodeProperties {
 	public static final String PREVIOUS_SYNTAX_VERSION = "2021-08-02";
 	public static final String LATEST_SYNTAX_VERSION = "2023-01-09";
@@ -43,14 +45,25 @@ public final class CleanthatRepositoryProperties implements IHasSourceCodeProper
 	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config
 	// version
 	// AWS IAM policy relies on a field named 'Version' with a localDate as value: it is a source of inspiration
+	@Builder.Default
 	private String syntaxVersion = LATEST_SYNTAX_VERSION;
 
+	@Builder.Default
 	private CleanthatMetaProperties meta = new CleanthatMetaProperties();
 
 	// Properties to apply to each children
-	private SourceCodeProperties sourceCode = new SourceCodeProperties();
+	private SourceCodeProperties sourceCode;
 
 	// @JsonProperty(index = -999)
-	private List<CleanthatEngineProperties> engines = new ArrayList<>();
+	@Singular
+	private List<CleanthatEngineProperties> engines;
+
+	public static CleanthatRepositoryProperties defaultRepository() {
+		CleanthatRepositoryProperties root = CleanthatRepositoryProperties.builder().build();
+
+		root.setSourceCode(SourceCodeProperties.defaultRoot());
+
+		return root;
+	}
 
 }

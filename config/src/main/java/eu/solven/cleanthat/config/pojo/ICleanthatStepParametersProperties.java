@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Marking interface indicating the implementation can be used to configure a {@link CleanthatStepProperties}
  * 
@@ -23,4 +25,6 @@ package eu.solven.cleanthat.config.pojo;
  */
 public interface ICleanthatStepParametersProperties {
 
+	@JsonIgnore
+	Object getCustomProperty(String key);
 }

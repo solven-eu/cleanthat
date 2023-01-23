@@ -8,7 +8,7 @@
 		<version>2.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>java</artifactId>
+	<artifactId>java-eclipse</artifactId>
 
 	<dependencies>
 		<dependency>
@@ -20,31 +20,6 @@
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>code-cleaners</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/INRIA/spoon -->
-			<groupId>fr.inria.gforge.spoon</groupId>
-			<artifactId>spoon-core</artifactId>
-			<version>10.2.0</version>
-		</dependency>
-		<dependency>
-			<!-- https://github.com/javaparser/javaparser -->
-			<!-- JavaParser seems a better option to later handle more languages -->
-			<groupId>com.github.javaparser</groupId>
-			<artifactId>javaparser-symbol-solver-core</artifactId>
-			<version>3.24.9</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-spring</artifactId>
-			<version>${sentry-spring.version}</version>
 		</dependency>
 
 		<dependency>

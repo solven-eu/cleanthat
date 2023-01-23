@@ -20,7 +20,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -35,12 +35,14 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
-@JsonIgnoreProperties({ "custom_properties" })
-public class CleanthatStepParametersProperties implements ICleanthatStepParametersProperties {
+// @Builder
+// @Jacksonized
+public final class CleanthatStepParametersProperties implements ICleanthatStepParametersProperties {
 
 	// https://stackoverflow.com/questions/32235993/mix-of-standard-and-dynamic-properties-in-jackson-mapping
 	// https://stackoverflow.com/questions/61165401/make-jsonanysetter-work-with-value-lombok
 	// @Singular("add")
+	@JsonIgnore
 	private Map<String, Object> any = new LinkedHashMap<>();
 
 	@JsonAnySetter
@@ -53,6 +55,7 @@ public class CleanthatStepParametersProperties implements ICleanthatStepParamete
 		return any;
 	}
 
+	@Override
 	public Object getCustomProperty(String key) {
 		return any.get(key);
 	}

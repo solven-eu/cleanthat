@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine;
+package eu.solven.cleanthat.engine.java.eclipse.spring;
 
-import java.io.IOException;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 
 /**
- * Knows how to format a String
+ * Spring Java formatter configuration
  *
  * @author Benoit Lacelle
  */
-public interface ICodeFormatterApplier {
-	String applyProcessors(EnginePropertiesAndBuildProcessors languageProperties, String filepath, String code)
-			throws IOException;
+// TODO An option would be to switch from tabs to whiteapaces
+// see io.spring.javaformat.formatter.eclipse.DefaultCodeFormatter.initOptions
+@Deprecated
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class SpringJavaFormatterProperties implements ICleanthatStepParametersProperties {
+
+	@Override
+	public Object getCustomProperty(String key) {
+		return null;
+	}
+
 }

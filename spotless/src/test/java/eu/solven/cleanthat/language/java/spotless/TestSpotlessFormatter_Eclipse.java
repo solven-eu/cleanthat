@@ -15,10 +15,32 @@
  */
 package eu.solven.cleanthat.language.java.spotless;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.util.FileCopyUtils;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -33,23 +55,6 @@ import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import eu.solven.pepper.resource.PepperResourceHelper;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UncheckedIOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.util.FileCopyUtils;
 
 public class TestSpotlessFormatter_Eclipse {
 
@@ -67,13 +72,12 @@ public class TestSpotlessFormatter_Eclipse {
 	final SpotlessFormattersFactory formatter =
 			new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)));
 	final ICodeFormatterApplier applier = new CodeFormatterApplier();
-	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper(objectMapper);
+	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper();
 
 	final CleanthatRepositoryProperties repositoryProperties = new ConfigHelpers(Arrays.asList(objectMapper))
 			.loadRepoConfig(new ClassPathResource("/config/" + "cleanthat_requestSpotless_requestEclipse.yaml"));
 
 	private IEngineProperties getEngineProperties() throws IOException, JsonParseException, JsonMappingException {
-
 		List<CleanthatEngineProperties> languages = repositoryProperties.getEngines();
 		Assert.assertEquals(1, languages.size());
 		IEngineProperties engineP = new ConfigHelpers(Arrays.asList(objectMapper))
@@ -118,7 +122,7 @@ public class TestSpotlessFormatter_Eclipse {
 		String classAsString = asString(new UrlResource(location));
 
 		String cleaned = applier
-				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", classAsString);
+				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "smoeModule/stc/main/java/some_package/someFilePath.java", classAsString);
 		Assert.assertEquals(cleaned, classAsString);
 
 		// Assert.assertEquals(1, formatter.getCacheSize());
@@ -126,14 +130,36 @@ public class TestSpotlessFormatter_Eclipse {
 
 	@Test
 	public void testFormat_WrongIndentation() throws IOException {
+		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+				"",
+				"import java.time.LocalDate;",
+				"import java.time.LocalDateTime;",
+				"",
+				"public class CleanClass {",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"	final LocalDate someLocalDate;",
+				"",
+				"	final LocalDateTime someLocalDateTime;",
+				"",
+				"	public CleanClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {",
+				"		super();",
+				"		this.someLocalDate = someLocalDate;",
+				"		this.someLocalDateTime = someLocalDateTime;",
+				"	}",
+				"}",
+				"",
+				"").collect(Collectors.joining(System.lineSeparator()));
+
 		IEngineProperties languageP = getEngineProperties();
 
-		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
-		String classAsString = asString(new UrlResource(location));
-
 		String cleaned = applier
-				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", classAsString);
-		Assert.assertEquals(cleaned, classAsString);
+				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", sourceCode);
+		Assert.assertEquals(cleaned, sourceCode);
 
 		// Assert.assertEquals(1, formatter.getCacheSize());
 	}

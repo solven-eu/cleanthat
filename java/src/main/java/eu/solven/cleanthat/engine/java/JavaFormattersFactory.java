@@ -15,9 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -26,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
@@ -57,18 +55,18 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		return Set.of("java");
 	}
 
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
 	public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
 			IEngineProperties languageProperties,
 			CleanthatSession cleanthatSession) {
 		ILintFixerWithId processor;
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
-		// override with explicit configuration
-		Map<String, ?> parameters = getParameters(rawProcessor);
+		String stepId = rawProcessor.getId();
+		ICleanthatStepParametersProperties parameters = getParameters(rawProcessor);
 
-		LOGGER.debug("Processing: {}", engine);
+		LOGGER.debug("Processing: {}", stepId);
 
-		switch (engine) {
+		switch (stepId) {
 		case "refactorer": {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
 			processor = new JavaRefactorer(languageProperties, processorConfig);
@@ -76,11 +74,11 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 
 		default:
-			throw new IllegalArgumentException("Unknown engine: " + engine);
+			throw new IllegalArgumentException("Unknown step: " + stepId);
 		}
 
-		if (!processor.getId().equals(engine)) {
-			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		if (!processor.getId().equals(stepId)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + stepId);
 		}
 
 		return processor;
@@ -88,23 +86,13 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public CleanthatEngineProperties makeDefaultProperties() {
-		CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
-
-		languageProperties.setEngine(getEngine());
-
-		List<CleanthatStepProperties> processors = new ArrayList<>();
-
-		// Apply rules
-		{
-			processors.add(CleanthatStepProperties.builder()
-					.id("refactorer")
-					.parameters(JavaRefactorerProperties.defaults())
-					.build());
-		}
-
-		languageProperties.setSteps(processors);
-
-		return languageProperties;
+		return CleanthatEngineProperties.builder()
+				.engine(getEngine())
+				.step(CleanthatStepProperties.builder()
+						.id("refactorer")
+						.parameters(JavaRefactorerProperties.defaults())
+						.build())
+				.build();
 	}
 
 }

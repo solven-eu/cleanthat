@@ -1,7 +1,10 @@
 package eu.solven.cleanthat.do_not_format_me;
-
+// @formatter:off
 import java.time.LocalDate;
 // START Keep EOLs here
+
+
+
 // STOP Keep EOLs here
 import java.time.LocalDateTime;
 

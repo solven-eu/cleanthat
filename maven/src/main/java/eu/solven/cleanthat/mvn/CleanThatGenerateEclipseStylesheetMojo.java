@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,12 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 
@@ -54,15 +54,16 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
 import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
 import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
 import eu.solven.cleanthat.git.GitIgnoreParser;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.
@@ -87,9 +88,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
 	@Parameter(property = "eclipse_formatter.url",
 			// defaultValue = "${maven.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml"
-			defaultValue = "${session.request.multiModuleProjectDirectory}/.cleanthat/eclipse_formatter-stylesheet.xml"
-
-	)
+			defaultValue = "${session.request.multiModuleProjectDirectory}"
+					+ JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE)
 	private String eclipseConfigPath;
 
 	// Generate the stylesheet can be very slow: make it faster by considering a subset of files
@@ -165,7 +165,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	}
 
 	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)
-			throws MojoFailureException {
+			throws MojoFailureException, IOException {
+		LOGGER.info("You need to wire manually the Eclipse stylesheet path (e.g. into '/.cleanthat/spotless.yaml'");
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
 		ResultOrError<CleanthatRepositoryProperties, String> optResult =
@@ -178,58 +179,164 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
 
-		Optional<CleanthatEngineProperties> optJavaProperties =
-				loadedConfig.getEngines().stream().filter(lp -> "java".equals(lp.getEngine())).findAny();
+		Optional<CleanthatEngineProperties> optSpotlessProperties = loadedConfig.getEngines()
+				.stream()
+				.filter(lp -> CleanthatSpotlessStepParametersProperties.ENGINE_ID.equals(lp.getEngine()))
+				.findAny();
+
+		boolean needToSaveCleanthat;
+
+		CleanthatEngineProperties spotlessEngine;
+		if (optSpotlessProperties.isEmpty()) {
+			CleanthatSpotlessStepParametersProperties spotlessSingleStep =
+					CleanthatSpotlessStepParametersProperties.builder().build();
+			spotlessEngine = CleanthatEngineProperties.builder()
+					.engine(CleanthatSpotlessStepParametersProperties.ENGINE_ID)
+					.step(CleanthatStepProperties.builder()
+							.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
+							.parameters(spotlessSingleStep)
+							.build())
+					.build();
+
+			loadedConfig.setEngines(ImmutableList.<CleanthatEngineProperties>builder()
+					.addAll(loadedConfig.getEngines())
+					.add(spotlessEngine)
+					.build());
+
+			LOGGER.info("Append Spotless engine into Cleanthat configuration");
+			needToSaveCleanthat = true;
+		} else {
+			spotlessEngine = optSpotlessProperties.get();
+			needToSaveCleanthat = false;
+		}
+
+		String pathToSpotlessConfig =
+				(String) spotlessEngine.getSteps().get(0).getParameters().getCustomProperty("url");
+
+		ConfigHelpers configHelpers = appContext.getBean(ConfigHelpers.class);
+
+		Resource spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
+
+		SpotlessEngineProperties spotlessEngineProperties;
+		try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
+			spotlessEngineProperties =
+					configHelpers.getObjectMapper().convertValue(inputStream, SpotlessEngineProperties.class);
+		}
+
+		Optional<SpotlessFormatterProperties> optJavaFormatter =
+				spotlessEngineProperties.getFormatters().stream().filter(f -> "java".equals(f.getFormat())).findFirst();
+
+		SpotlessFormatterProperties javaFormatter;
+
+		boolean needToSaveSpotless;
+		if (optJavaFormatter.isEmpty()) {
+			javaFormatter = SpotlessFormatterProperties.builder().format("java").build();
+
+			LOGGER.info("Append java formatter into Spotless engine");
+			needToSaveSpotless = true;
+		} else {
+			javaFormatter = optJavaFormatter.get();
+			needToSaveSpotless = false;
+		}
+
+		SpotlessStepProperties eclipseStep;
+		Optional<SpotlessStepProperties> optEclipseStep =
+				javaFormatter.getSteps().stream().filter(f -> "eclipse".equalsIgnoreCase(f.getId())).findFirst();
+		if (optEclipseStep.isEmpty()) {
+			eclipseStep = new SpotlessStepProperties();
+			eclipseStep.setId("eclipse");
+			eclipseStep.putProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE,
+					CleanthatUrlLoader.PREFIX_CODE + JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE);
+
+			javaFormatter.setSteps(ImmutableList.<SpotlessStepProperties>builder()
+					.addAll(javaFormatter.getSteps())
+					.add(eclipseStep)
+					.build());
+
+			LOGGER.info("Append eclipse step into Java formatter");
+			needToSaveSpotless = true;
+		} else {
+			eclipseStep = optEclipseStep.get();
+			needToSaveSpotless = false;
+		}
+
+		String eclipseStylesheetFile =
+				eclipseStep.getCustomProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, String.class);
+		if (eclipseStylesheetFile != null && !eclipseStylesheetFile.equals(eclipseStylesheetFile)) {
+			// TODO We would prefer writing the new stylesheet in the previously configured path
+			eclipseStep.putProperty(pathToSpotlessConfig, pathToSpotlessConfig);
+			needToSaveSpotless = true;
+		}
 
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
 		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
+		//
+		// CleanthatEngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
+		// // There is no java language properties
+		// LOGGER.info("We introduce the java language properties");
+		//
+		// // Enable mutations
+		// List<CleanthatEngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
+		// loadedConfig.setEngines(mutableLanguages);
+		//
+		// CleanthatEngineProperties languageProperties =
+		// new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
+		// mutableLanguages.add(languageProperties);
+		//
+		// return languageProperties;
+		// });
+		//
+		//// Optional<CleanthatStepProperties> optEclipseProperties =
+		//// javaProperties.getSteps().stream().filter(p -> EclipseJavaFormatter.ID.equals(p.getId())).findAny();
+		////
+		//// CleanthatStepProperties eclipseProperties;
+		//// if (optEclipseProperties.isPresent()) {
+		//// eclipseProperties = optEclipseProperties.get();
+		//// } else {
+		//// eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
+		//// javaProperties.getSteps().add(eclipseProperties);
+		//// }
+		//
+		//// Optional<Map<String, Object>> optEclipseParameters =
+		//// PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
+		//
+		// Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
+		// eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + toString(eclipseConfigPath));
+		//
 
-		CleanthatEngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
-			// There is no java language properties
-			LOGGER.info("We introduce the java language properties");
+		if (needToSaveCleanthat) {
+			// Prepare the configuration as yaml
+			String asYaml;
+			try {
+				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
+			}
 
-			// Enable mutations
-			List<CleanthatEngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
-			loadedConfig.setEngines(mutableLanguages);
-
-			CleanthatEngineProperties languageProperties =
-					new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
-			mutableLanguages.add(languageProperties);
-
-			return languageProperties;
-		});
-
-		Optional<CleanthatStepProperties> optEclipseProperties =
-				javaProperties.getSteps().stream().filter(p -> EclipseJavaFormatter.ID.equals(p.getId())).findAny();
-
-		CleanthatStepProperties eclipseProperties;
-		if (optEclipseProperties.isPresent()) {
-			eclipseProperties = optEclipseProperties.get();
-		} else {
-			eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
-			javaProperties.getSteps().add(eclipseProperties);
+			// Write at given path
+			try {
+				Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
+			}
 		}
 
-		Optional<Map<String, Object>> optEclipseParameters =
-				PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
+		if (needToSaveSpotless) {
+			// Prepare the configuration as yaml
+			String asYaml;
+			try {
+				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
+			}
 
-		Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
-		eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + toString(eclipseConfigPath));
-
-		// Prepare the configuration as yaml
-		String asYaml;
-		try {
-			asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
-		}
-
-		// Write at given path
-		try {
-			Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
+			// Write at given path
+			try {
+				Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
+			}
 		}
 	}
 

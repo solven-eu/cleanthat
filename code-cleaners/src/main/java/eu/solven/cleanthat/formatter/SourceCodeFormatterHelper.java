@@ -15,21 +15,17 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.ISkippable;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository
@@ -38,11 +34,6 @@ import eu.solven.pepper.collection.PepperMapHelper;
  *
  */
 public class SourceCodeFormatterHelper {
-	private final ObjectMapper objectMapper;
-
-	public SourceCodeFormatterHelper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-	}
 
 	public EnginePropertiesAndBuildProcessors compile(IEngineProperties languageProperties,
 			CleanthatSession cleanthatSession,
@@ -55,38 +46,23 @@ public class SourceCodeFormatterHelper {
 
 	/**
 	 * 
-	 * @param languageProperties
+	 * @param engineProperties
 	 * @param cleanthatSession
 	 *            necessary if some configuration is in the code itself
 	 * @param lintFixerFactory
 	 * @return
 	 */
-	public List<Map.Entry<IEngineProperties, ILintFixer>> computeLintFixers(IEngineProperties languageProperties,
+	public List<Map.Entry<IEngineProperties, ILintFixer>> computeLintFixers(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			ILanguageLintFixerFactory lintFixerFactory) {
-		ConfigHelpers configHelpers = new ConfigHelpers(Collections.singleton(objectMapper));
-
-		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
-				languageProperties.getSteps().stream().filter(rawProcessor -> {
-					Optional<Boolean> optSkip =
-							PepperMapHelper.<Boolean>getOptionalAs(rawProcessor, ISkippable.KEY_SKIP);
-
-					if (optSkip.isEmpty()) {
-						// By default, we do not skip
-						return true;
-					} else {
-						Boolean skip = optSkip.get();
-
-						// Execute processor if not skipped
-						return !skip;
-					}
-				}).map(rawProcessor -> {
-					IEngineProperties mergedLanguageProperties =
-							configHelpers.mergeLanguageIntoProcessorProperties(languageProperties, rawProcessor);
-					ILintFixer formatter =
-							lintFixerFactory.makeLintFixer(rawProcessor, languageProperties, cleanthatSession);
-					return Maps.immutableEntry(mergedLanguageProperties, formatter);
-				}).collect(Collectors.toList());
+		List<Map.Entry<IEngineProperties, ILintFixer>> processors = engineProperties.getSteps()
+				.stream()
+				.filter(Predicate.not(CleanthatStepProperties::isSkip))
+				.map(step -> {
+					ILintFixer formatter = lintFixerFactory.makeLintFixer(step, engineProperties, cleanthatSession);
+					return Maps.immutableEntry(engineProperties, formatter);
+				})
+				.collect(Collectors.toList());
 		return processors;
 	}
 }

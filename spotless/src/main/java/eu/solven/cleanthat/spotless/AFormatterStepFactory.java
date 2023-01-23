@@ -21,7 +21,9 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.google.common.collect.Sets;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -33,32 +35,36 @@ import java.util.Set;
 // see com.diffplug.spotless.maven.FormatterFactory
 public abstract class AFormatterStepFactory {
 
-	private String[] includes;
-
-	private String[] excludes;
-
-	// private final List<FormatterStepFactory> stepFactories = new ArrayList<>();
-
-	// private ToggleOffOn toggle;
+	private final SpotlessFormatterProperties spotlessProperties;
 
 	final ICodeProvider codeProvider;
 
-	public AFormatterStepFactory(ICodeProvider codeProvider, String[] includes, String[] excludes) {
+	@SuppressWarnings({ "PMD.UseVarargs", "PMD.ArrayIsStoredDirectly" })
+	public AFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties spotlessProperties) {
 		this.codeProvider = codeProvider;
-		this.includes = includes;
-		this.excludes = excludes;
+		this.spotlessProperties = spotlessProperties;
 	}
 
 	public abstract Set<String> defaultIncludes();
 
 	public abstract String licenseHeaderDelimiter();
 
-	public final Set<String> includes() {
-		return includes == null ? emptySet() : Sets.newHashSet(includes);
+	public final Set<String> getIncludes() {
+		Collection<String> includes = spotlessProperties.getIncludes();
+		if (includes == null) {
+			return emptySet();
+		} else {
+			return Sets.newHashSet(includes);
+		}
 	}
 
-	public final Set<String> excludes() {
-		return excludes == null ? emptySet() : Sets.newHashSet(excludes);
+	public final Set<String> getExcludes() {
+		Collection<String> excludes = spotlessProperties.getExcludes();
+		if (excludes == null) {
+			return emptySet();
+		} else {
+			return Sets.newHashSet(excludes);
+		}
 	}
 
 	public abstract FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner);

@@ -28,7 +28,7 @@ import org.springframework.core.io.ClassPathResource;
 
 public class TestEclipseJavaFormatterConfiguration {
 	final ICodeProvider codeProvider = Mockito.mock(ICodeProvider.class);
-	final CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
+	final CleanthatEngineProperties engineProperties = CleanthatEngineProperties.builder().build();
 	final EclipseJavaFormatterProcessorProperties processorConfig = new EclipseJavaFormatterProcessorProperties();
 
 	@Test
@@ -36,19 +36,19 @@ public class TestEclipseJavaFormatterConfiguration {
 		processorConfig.setUrl("");
 
 		EclipseJavaFormatterConfiguration config =
-				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
+				EclipseJavaFormatterConfiguration.load(codeProvider, engineProperties, processorConfig);
 
 		Assertions.assertThat(config.getSettings())
 				.hasSize(3)
-				.containsEntry(JavaCore.COMPILER_SOURCE, "0")
-				.containsEntry(JavaCore.COMPILER_COMPLIANCE, "0")
-				.containsEntry(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "0");
+				.containsEntry(JavaCore.COMPILER_SOURCE, "1.8")
+				.containsEntry(JavaCore.COMPILER_COMPLIANCE, "1.8")
+				.containsEntry(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "1.8");
 	}
 
 	@Test
 	public void testLoadConfig_default() {
 		EclipseJavaFormatterConfiguration config =
-				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
+				EclipseJavaFormatterConfiguration.load(codeProvider, engineProperties, processorConfig);
 
 		Assertions.assertThat(config.getSettings()).hasSize(332)
 		// .containsEntry(JavaCore.COMPILER_SOURCE, "0")
@@ -69,7 +69,7 @@ public class TestEclipseJavaFormatterConfiguration {
 		Mockito.when(codeProvider.loadContentForPath(path)).thenReturn(Optional.of(content));
 
 		EclipseJavaFormatterConfiguration config =
-				EclipseJavaFormatterConfiguration.load(codeProvider, languageProperties, processorConfig);
+				EclipseJavaFormatterConfiguration.load(codeProvider, engineProperties, processorConfig);
 
 		Assertions.assertThat(config.getSettings())
 				.hasSize(308)

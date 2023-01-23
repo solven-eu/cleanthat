@@ -44,7 +44,8 @@ public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 		refactorerProperties.setIncluded(included);
 		refactorerProperties.setExcluded(excluded);
 
-		JavaRefactorer refactorer = new JavaRefactorer(new CleanthatEngineProperties(), refactorerProperties);
+		JavaRefactorer refactorer =
+				new JavaRefactorer(CleanthatEngineProperties.builder().build(), refactorerProperties);
 
 		// Spotless calls steps always with LF eol.
 		return refactorer.doFormat(input, LineEnding.LF);

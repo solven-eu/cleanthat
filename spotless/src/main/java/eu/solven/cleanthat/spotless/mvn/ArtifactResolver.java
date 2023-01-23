@@ -48,9 +48,10 @@ import org.eclipse.aether.resolution.DependencyResult;
  * @see com.diffplug.spotless.maven.ArtifactResolver
  *
  */
+@SuppressWarnings("PMD.ProperLogger")
 public class ArtifactResolver {
 
-	private final static Exclusion EXCLUDE_ALL_TRANSITIVES = new Exclusion("*", "*", "*", "*");
+	private static final Exclusion EXCLUDE_ALL_TRANSITIVES = new Exclusion("*", "*", "*", "*");
 
 	private final RepositorySystem repositorySystem;
 	private final RepositorySystemSession session;

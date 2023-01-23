@@ -1,9 +1,11 @@
 /*
+ * Copyright 2023 Solven
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,17 +24,20 @@ import java.util.function.Supplier;
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/LineEnding.java
 public enum LineEnding {
 	// https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
-	AUTO(System.lineSeparator()),
-	// Request to keep current EOL, on a per file basis
-	KEEP(null),
+	// https://git-scm.com/docs/git-config#Documentation/git-config.txt-coreeol
+	NATIVE(System.lineSeparator()),
 	// MacOS
 	LF("\n"),
 	// Windows
 	CRLF("\r\n"),
 	// Unix
 	CR("\r"),
-	// When no explicit value is provided, or no easy way to guess the EOL
-	UNKNOWN(null);
+	// Request to keep current EOL, on a per file basis
+	KEEP(null),
+	// Rely on '.gitattributes' and similar mechanisms
+	// It may maps different files to different EOL
+	// If not '.gitattributes' is available, it would fallback to 'SYSTEM'
+	GIT(null);
 
 	private final String chars;
 
@@ -83,6 +88,6 @@ public enum LineEnding {
 		return lineSeparator.optChars()
 				.or(() -> determineLineEnding(codeWithEol.get()).flatMap(LineEnding::optChars))
 				// We fallback on the system EOL, which may be pointless if the input has no EOL (preventing EOL-guess)
-				.orElse(System.lineSeparator());
+				.orElse(LineEnding.NATIVE.optChars().get());
 	}
 }

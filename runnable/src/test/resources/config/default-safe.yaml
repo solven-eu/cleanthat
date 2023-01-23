@@ -11,19 +11,16 @@ source_code:
   excludes:
   - "regex:.*/generated/.*"
   encoding: "UTF-8"
-  line_ending: "UNKNOWN"
+  line_ending: "GIT"
 engines:
 - engine: "spotless"
-  engine_version: "0"
   skip: false
   source_code:
     includes:
     - "regex:.*\\.java"
     - "regex:.*\\.json"
     - "glob:**/pom.xml"
-    encoding: "UTF-8"
-    line_ending: "UNKNOWN"
   steps:
   - id: "spotless"
     parameters:
-      configuration: ".cleanthat/cleanthat.yaml"
+      configuration: "repository:/.cleanthat/spotless.yaml"

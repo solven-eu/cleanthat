@@ -17,7 +17,9 @@ package eu.solven.cleanthat.spotless.pojo;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 import org.eclipse.jgit.lib.ConfigConstants;
 
 /**
@@ -32,10 +34,15 @@ import org.eclipse.jgit.lib.ConfigConstants;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
+@Builder
+@Jacksonized
 public class SpotlessGitProperties {
 
-	private String coreAutocrlf = null;
+	// https://git-scm.com/docs/git-config#Documentation/git-config.txt-coreeol
+	@Builder.Default
+	private String coreEol = "native";
 
-	private String coreEol = null;
+	// https://git-scm.com/docs/git-config#Documentation/git-config.txt-coreautocrlf
+	private String coreAutocrlf;
 
 }

@@ -15,30 +15,25 @@
  */
 package eu.solven.cleanthat.config;
 
-import java.io.File;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.language.spotless.CleanthatSpotlessProperties;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 public class TestDefaultConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestDefaultConfig.class);
@@ -49,11 +44,10 @@ public class TestDefaultConfig {
 	}
 
 	@Test
-	public void testFromJsonToYaml() throws JsonParseException, JsonMappingException, IOException {
+	public void testDefaultCleanthat() throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 
-		CleanthatRepositoryProperties safeRebuiltFromEmpty =
-				yamlObjectMapper.convertValue(Map.of(), CleanthatRepositoryProperties.class);
+		CleanthatRepositoryProperties safeRebuiltFromEmpty = CleanthatRepositoryProperties.defaultRepository();
 
 		// By in safe-default, we exclude anything in an 'exclude' directory
 		{
@@ -69,22 +63,21 @@ public class TestDefaultConfig {
 			// TODO Refactor with
 			// eu.solven.cleanthat.config.GenerateInitialConfig.prepareDefaultConfiguration(ICodeProvider)
 			{
-				CleanthatEngineProperties engineProperties = new CleanthatEngineProperties();
 
-				engineProperties.setEngine("spotless");
 				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
 				javaSourceCodeProperties
 						.setIncludes(Arrays.asList("regex:.*\\.java", "regex:.*\\.json", "glob:**/pom.xml"));
-				engineProperties.setSourceCode(javaSourceCodeProperties);
 
-				Assertions.assertThat(engineProperties.getSteps()).isEmpty();
-				engineProperties.setSteps(new ArrayList<>());
+				CleanthatEngineProperties engineProperties = CleanthatEngineProperties.builder()
+						.engine(CleanthatSpotlessStepParametersProperties.ENGINE_ID)
+						.sourceCode(javaSourceCodeProperties)
+						.step(CleanthatStepProperties.builder()
+								.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
+								.parameters(CleanthatSpotlessStepParametersProperties.builder().build())
+								.build())
+						.build();
 
-				engineProperties.getSteps()
-						.add(CleanthatStepProperties.builder()
-								.id("spotless")
-								.parameters(new CleanthatSpotlessProperties())
-								.build());
+				Assertions.assertThat(engineProperties.getSteps()).hasSize(1);
 
 				safeRebuiltFromEmpty.getEngines().add(engineProperties);
 			}
@@ -101,7 +94,8 @@ public class TestDefaultConfig {
 		CleanthatRepositoryProperties configDefaultSafe =
 				configHelpers.loadRepoConfig(new ClassPathResource("/config/default-safe.yaml"));
 
-		Assert.assertEquals(configDefaultSafe.toString(), configFromEmptyAsMap.toString());
+		Assert.assertEquals(yamlObjectMapper.writeValueAsString(configDefaultSafe),
+				yamlObjectMapper.writeValueAsString(configFromEmptyAsMap));
 		Assert.assertEquals(configDefaultSafe, configFromEmptyAsMap);
 	}
 }

@@ -15,13 +15,25 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+
 import com.diffplug.spotless.Formatter;
 import com.diffplug.spotless.Provisioner;
 import com.google.common.base.Strings;
+
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
@@ -29,17 +41,6 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
-import eu.solven.pepper.collection.PepperMapHelper;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 /**
  * Formatter for Spotless Engine
@@ -55,7 +56,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public String getEngine() {
-		return "spotless";
+		return CleanthatSpotlessStepParametersProperties.ENGINE_ID;
 	}
 
 	@Override
@@ -63,20 +64,22 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		return Set.of("java", "scala", "json");
 	}
 
+	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
+	public ILintFixer makeLintFixer(CleanthatStepProperties stepProperties,
 			IEngineProperties languageProperties,
 			CleanthatSession cleanthatSession) {
 		ILintFixerWithId processor;
-		String engine = PepperMapHelper.getRequiredString(rawProcessor, KEY_ENGINE);
+		String stepId = stepProperties.getId();
 		// override with explicit configuration
-		Map<String, ?> parameters = getParameters(rawProcessor);
+		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
 
-		LOGGER.debug("Processing: {}", engine);
+		LOGGER.debug("Processing: {}", stepId);
 
-		switch (engine) {
-		case "spotless": {
-			CleanthatSpotlessProperties processorConfig = convertValue(parameters, CleanthatSpotlessProperties.class);
+		switch (stepId) {
+		case CleanthatSpotlessStepParametersProperties.ENGINE_ID: {
+			CleanthatSpotlessStepParametersProperties processorConfig =
+					convertValue(parameters, CleanthatSpotlessStepParametersProperties.class);
 
 			String spotlessConfig = processorConfig.getConfiguration();
 			if (Strings.isNullOrEmpty(spotlessConfig)) {
@@ -94,10 +97,11 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 				throw new UncheckedIOException("Issue loading " + spotlessConfig, e);
 			}
 
+			FormatterFactory formatterFactory = new FormatterFactory(cleanthatSession);
+
 			List<Formatter> formatters = spotlessEngine.getFormatters()
 					.stream()
-					.map(formatter -> new FormatterFactory(cleanthatSession)
-							.makeFormatter(spotlessEngine, formatter, makeProvisionner()))
+					.map(formatter -> formatterFactory.makeFormatter(spotlessEngine, formatter, makeProvisionner()))
 					.collect(Collectors.toList());
 
 			processor = new SpotlessLintFixer(formatters);
@@ -105,11 +109,11 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 
 		default:
-			throw new IllegalArgumentException("Unknown engine: " + engine);
+			throw new IllegalArgumentException("Unknown step: " + stepId);
 		}
 
-		if (!processor.getId().equals(engine)) {
-			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + engine);
+		if (!processor.getId().equals(stepId)) {
+			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + stepId);
 		}
 
 		return processor;
@@ -121,24 +125,13 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public CleanthatEngineProperties makeDefaultProperties() {
-		CleanthatEngineProperties languageProperties = new CleanthatEngineProperties();
-
-		languageProperties.setEngine(getEngine());
-
-		List<CleanthatStepProperties> steps = new ArrayList<>();
-
-		// Apply rules
-		{
-
-			steps.add(CleanthatStepProperties.builder()
-					.id("spotless")
-					.parameters(new CleanthatSpotlessProperties())
-					.build());
-		}
-
-		languageProperties.setSteps(steps);
-
-		return languageProperties;
+		return CleanthatEngineProperties.builder()
+				.engine(getEngine())
+				.step(CleanthatStepProperties.builder()
+						.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
+						.parameters(CleanthatSpotlessStepParametersProperties.builder().build())
+						.build())
+				.build();
 	}
 
 }

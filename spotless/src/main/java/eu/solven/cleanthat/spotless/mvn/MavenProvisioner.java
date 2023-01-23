@@ -17,9 +17,13 @@ package eu.solven.cleanthat.spotless.mvn;
 
 import com.diffplug.spotless.Provisioner;
 
-/** Maven integration for Provisioner. */
+/**
+ * Maven integration for Provisioner.
+ * 
+ * @author Benoit Lacelle
+ */
 // see com.diffplug.gradle.spotless.GradleProvisioner
-public class MavenProvisioner {
+public final class MavenProvisioner {
 	private MavenProvisioner() {
 	}
 

@@ -20,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import eu.solven.cleanthat.language.IEngineProperties;
-import java.util.Arrays;
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * The configuration of what is not related to a language.
@@ -33,24 +35,25 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
+@Builder
+@Jacksonized
 @JsonIgnoreProperties({ "language", "language_version" })
 // Order is defined by fields definition
 // @JsonPropertyOrder(alphabetic = true, value = { "language", "language_version", ISkippable.KEY_SKIP })
 public class CleanthatEngineProperties implements IEngineProperties {
-	public static final String NO_ENGINE = "none";
-
-	private String engine = NO_ENGINE;
+	private String engine;
 
 	// https://stackoverflow.com/questions/2591083/getting-java-version-at-runtime
-	private String engineVersion = "0";
+	private String engineVersion;
 
 	// By default, we do not skip
+	@Builder.Default
 	private boolean skip = false;
 
-	private SourceCodeProperties sourceCode = new SourceCodeProperties();
+	private SourceCodeProperties sourceCode;
 
 	// The (ordered) steps to apply
-	// @JsonDeserialize(using = ProcessorsDeseralizer.class)
-	private List<CleanthatStepProperties> steps = Arrays.asList();
+	@Singular
+	private List<CleanthatStepProperties> steps;
 
 }

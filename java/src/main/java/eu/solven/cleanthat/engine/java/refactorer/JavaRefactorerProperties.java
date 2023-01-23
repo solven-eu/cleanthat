@@ -37,21 +37,33 @@ import lombok.Data;
 @Data
 public class JavaRefactorerProperties implements ICleanthatStepParametersProperties {
 	public static final String WILDCARD = "*";
-
-	/**
-	 * A {@link List} of excluded rules (by ID)
-	 */
-	private List<String> excluded = List.of();
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */
 	private List<String> included = List.of(WILDCARD);
 
 	/**
+	 * A {@link List} of excluded rules (by ID)
+	 */
+	private List<String> excluded = List.of();
+
+	/**
 	 * One may activate not-production-ready rules. It may be useful to test a new rule over some external repository
 	 */
 	@Deprecated
 	private boolean productionReadyOnly = true;
+
+	@Override
+	public Object getCustomProperty(String key) {
+		if ("included".equalsIgnoreCase(key)) {
+			return included;
+		} else if ("excluded".equalsIgnoreCase(key)) {
+			return excluded;
+		} else if ("production_ready_only".equalsIgnoreCase(key)) {
+			return productionReadyOnly;
+		}
+		return null;
+	}
 
 	public static JavaRefactorerProperties defaults() {
 		return new JavaRefactorerProperties();

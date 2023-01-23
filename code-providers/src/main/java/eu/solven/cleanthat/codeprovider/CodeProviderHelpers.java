@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,23 +37,24 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CodeProviderHelpers {
+	// We consider only paths with Unix-like path separator
+	public static final String PATH_SEPARATOR = "/";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
 
 	public static final String FILENAME_CLEANTHAT_FOLDER = ".cleanthat";
 
 	public static final String FILENAME_CLEANTHAT_YAML = "cleanthat.yaml";
 	public static final String FILENAME_CLEANTHAT_YML = "cleanthat.yml";
+	@Deprecated
 	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
 
-	public static final List<String> FILENAMES_CLEANTHAT =
-			Arrays.asList(FILENAME_CLEANTHAT_FOLDER + "/" + FILENAME_CLEANTHAT_YAML,
-					FILENAME_CLEANTHAT_FOLDER + "/" + FILENAME_CLEANTHAT_YML,
-					FILENAME_CLEANTHAT_YAML,
-					FILENAME_CLEANTHAT_YML,
-					FILENAME_CLEANTHAT_JSON);
-
-	public static final List<String> PATH_CLEANTHAT =
-			FILENAMES_CLEANTHAT.stream().map(s -> "/" + s).collect(Collectors.toList());
+	public static final List<String> PATHES_CLEANTHAT =
+			Arrays.asList(PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
+					PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,
+					PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
+					PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,
+					PATH_SEPARATOR + FILENAME_CLEANTHAT_JSON);
 
 	// public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
@@ -68,7 +68,7 @@ public class CodeProviderHelpers {
 	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
 		Optional<Map.Entry<String, String>> optPathAndContent;
-		optPathAndContent = PATH_CLEANTHAT.stream().map(p -> {
+		optPathAndContent = PATHES_CLEANTHAT.stream().map(p -> {
 			try {
 				return codeProvider.loadContentForPath(p).map(content -> Maps.immutableEntry(p, content));
 			} catch (IOException e) {
@@ -101,12 +101,18 @@ public class CodeProviderHelpers {
 	}
 
 	public static File pathToConfig(Path localFolder) {
-		return CodeProviderHelpers.FILENAMES_CLEANTHAT.stream()
-				.map(s -> localFolder.resolve(s).toFile())
+		return CodeProviderHelpers.PATHES_CLEANTHAT.stream().map(s -> {
+			String prefix = PATH_SEPARATOR;
+			if (!s.startsWith(prefix)) {
+				throw new IllegalArgumentException("We expect cleanpath config pathes to start with '" + prefix + "'");
+			}
+			File file = localFolder.resolve(s.substring(prefix.length())).toFile();
+			return file;
+		})
 				.filter(File::exists)
 				.findAny()
 				.orElseThrow(() -> new IllegalStateException(
-						"No configuration at pathes: " + CodeProviderHelpers.FILENAMES_CLEANTHAT));
+						"No configuration at pathes: " + CodeProviderHelpers.PATHES_CLEANTHAT));
 	}
 
 }

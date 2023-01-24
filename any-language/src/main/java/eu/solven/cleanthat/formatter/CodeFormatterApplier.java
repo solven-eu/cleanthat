@@ -25,6 +25,7 @@ import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +38,14 @@ import org.slf4j.LoggerFactory;
 public class CodeFormatterApplier implements ICodeFormatterApplier {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeFormatterApplier.class);
 
+	public static final AtomicInteger NB_EXCEPTIONS = new AtomicInteger();
+
 	@Override
 	public String applyProcessors(EnginePropertiesAndBuildProcessors engineAndSteps, String filepath, String code)
 			throws IOException {
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
 
-		engineAndSteps.getProcessors().forEach(step -> {
+		engineAndSteps.getLinters().forEach(step -> {
 			try {
 				String input = outputRef.get();
 				IEngineProperties engineProperties = step.getKey();
@@ -58,6 +61,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 					outputRef.set(output);
 				}
 			} catch (IOException | RuntimeException e) {
+				NB_EXCEPTIONS.incrementAndGet();
 				// Log and move to next processor
 				LOGGER.warn(
 						"Issue over file='" + filepath

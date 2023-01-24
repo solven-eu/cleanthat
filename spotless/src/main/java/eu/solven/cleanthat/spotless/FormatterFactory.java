@@ -31,22 +31,19 @@ import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.resolver.examples.util.Booter;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
-import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -55,6 +52,8 @@ import org.eclipse.aether.repository.RemoteRepository;
  *
  */
 public class FormatterFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterFactory.class);
+
 	final FileSystem fileSystem;
 	final ICodeProvider codeProvider;
 
@@ -64,13 +63,35 @@ public class FormatterFactory {
 	}
 
 	// Provisioner provisionner = new CleanthatJvmProvisioner();
-	public static Provisioner makeProvisionner() {
-		RepositorySystem repositorySystem = new DefaultRepositorySystem();
-		RepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
-		List<RemoteRepository> repositories = new ArrayList<>();
+	public static Provisioner makeProvisionner() throws IOException {
+		// DefaultRepositorySystem repositorySystem = new DefaultRepositorySystem();
+		// DependencyCollector dependencyCollector = new DefaultDependencyCollector();
+		// repositorySystem.setDependencyCollector(dependencyCollector);
+		//
+		// DefaultRepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
+		// Path tmpRepo = Files.createTempDirectory("cleanthat-spotless-maven-");
+		// LOGGER.info("We will use as m2 local repository: {}", tmpRepo);
+		// LocalRepository localRepository = new LocalRepository(tmpRepo.toFile());
+		//
+		// DefaultLocalRepositoryProvider localRepositoryProvider = new DefaultLocalRepositoryProvider();
+		// LocalRepositoryManagerFactory localRepositoryManagerFactory = new SimpleLocalRepositoryManagerFactory();
+		// localRepositoryProvider.addLocalRepositoryManagerFactory(localRepositoryManagerFactory);
+		// repositorySystem.setLocalRepositoryProvider(localRepositoryProvider);
+		//
+		// LocalRepositoryManager localRepositoryManager =
+		// repositorySystem.newLocalRepositoryManager(repositorySystemSession, localRepository);
+		// repositorySystemSession.setLocalRepositoryManager(localRepositoryManager);
+		//
+		// List<RemoteRepository> repositories = new ArrayList<>();
 		Log log = new SystemStreamLog();
-		Provisioner provisionner = MavenProvisioner
-				.create(new ArtifactResolver(repositorySystem, repositorySystemSession, repositories, log));
+
+		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
+		DefaultRepositorySystemSession repositorySystemSession = Booter.newRepositorySystemSession(repositorySystem);
+
+		Provisioner provisionner = MavenProvisioner.create(new ArtifactResolver(repositorySystem,
+				repositorySystemSession,
+				Booter.newRepositories(repositorySystem, repositorySystemSession),
+				log));
 		return provisionner;
 	}
 
@@ -91,12 +112,8 @@ public class FormatterFactory {
 	public Formatter makeFormatter(SpotlessEngineProperties engineProperties,
 			SpotlessFormatterProperties formatterProperties,
 			Provisioner provisioner) {
-		Path tmpRoot;
-		try {
-			tmpRoot = Files.createTempDirectory("cleanthat-spotless-");
-		} catch (IOException e) {
-			throw new UncheckedIOException("Issue creating tmp rootDirectory", e);
-		}
+		// In our virtual fileSystem, we process from the root (as root of the repository)
+		Path tmpRoot = fileSystem.getPath("/");
 
 		// File baseDir;
 		// Supplier<Iterable<File>> filesProvider;

@@ -27,14 +27,14 @@ import java.util.Map;
  *
  */
 public class EnginePropertiesAndBuildProcessors {
-	final List<Map.Entry<IEngineProperties, ILintFixer>> engineProcessors;
+	final List<Map.Entry<IEngineProperties, ILintFixer>> linters;
 
-	public EnginePropertiesAndBuildProcessors(List<Map.Entry<IEngineProperties, ILintFixer>> engineProcessors) {
-		this.engineProcessors = engineProcessors;
+	public EnginePropertiesAndBuildProcessors(List<Map.Entry<IEngineProperties, ILintFixer>> linters) {
+		this.linters = linters;
 	}
 
-	public List<Map.Entry<IEngineProperties, ILintFixer>> getProcessors() {
-		return engineProcessors;
+	public List<Map.Entry<IEngineProperties, ILintFixer>> getLinters() {
+		return linters;
 	}
 
 }

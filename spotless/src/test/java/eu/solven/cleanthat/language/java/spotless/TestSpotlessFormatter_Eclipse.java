@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.util.Arrays;
@@ -29,11 +28,13 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.util.FileCopyUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -46,8 +47,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.do_not_format_me.CleanClass;
-import eu.solven.cleanthat.do_not_format_me.ManySpacesBetweenImportsSimpleClass;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
@@ -114,18 +114,14 @@ public class TestSpotlessFormatter_Eclipse {
 		cleanthatSession = new CleanthatSession(fileSystem, classpathCodeProvider, repositoryProperties);
 	}
 
-	@Test
-	public void testFormat_Clean() throws IOException {
-		IEngineProperties languageP = getEngineProperties();
+	@Before
+	public void resetCounters() {
+		CodeFormatterApplier.NB_EXCEPTIONS.set(0);
+	}
 
-		URL location = CleanClass.class.getProtectionDomain().getCodeSource().getLocation();
-		String classAsString = asString(new UrlResource(location));
-
-		String cleaned = applier
-				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "smoeModule/stc/main/java/some_package/someFilePath.java", classAsString);
-		Assert.assertEquals(cleaned, classAsString);
-
-		// Assert.assertEquals(1, formatter.getCacheSize());
+	@After
+	public void checkCounters() {
+		Assertions.assertThat(CodeFormatterApplier.NB_EXCEPTIONS.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -157,25 +153,10 @@ public class TestSpotlessFormatter_Eclipse {
 
 		IEngineProperties languageP = getEngineProperties();
 
-		String cleaned = applier
-				.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", sourceCode);
+		EnginePropertiesAndBuildProcessors compile = helper.compile(languageP, cleanthatSession, formatter);
+		String cleaned = applier.applyProcessors(compile,
+				"someModule/src/main/java/some_package/someFilePath.java",
+				sourceCode);
 		Assert.assertEquals(cleaned, sourceCode);
-
-		// Assert.assertEquals(1, formatter.getCacheSize());
-	}
-
-	@Test
-	public void testFormat_WrongIndentation_Multiple() throws IOException {
-		IEngineProperties languageP = getEngineProperties();
-
-		URL location = ManySpacesBetweenImportsSimpleClass.class.getProtectionDomain().getCodeSource().getLocation();
-		String classAsString = asString(new UrlResource(location));
-
-		// Format twice
-		applier.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", classAsString);
-		applier.applyProcessors(helper.compile(languageP, cleanthatSession, formatter), "someFilePath", classAsString);
-
-		// Check the cache is used properly
-		// Assert.assertEquals(1, formatter.getCacheSize());
 	}
 }

@@ -15,20 +15,9 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-
 import com.diffplug.spotless.Formatter;
 import com.diffplug.spotless.Provisioner;
 import com.google.common.base.Strings;
-
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -41,6 +30,14 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 /**
  * Formatter for Spotless Engine
@@ -120,7 +117,11 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	protected Provisioner makeProvisionner() {
-		return FormatterFactory.makeProvisionner();
+		try {
+			return FormatterFactory.makeProvisionner();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class SpotlessLintFixer implements ILintFixerWithId {
 	public String doFormat(String code, LineEnding ending) throws IOException {
 		AtomicReference<String> output = new AtomicReference<>(code);
 
-		formatters.stream().forEach(f -> output.set(new ExecuteSpotless(f).doStuff("", output.get())));
+		formatters.stream().forEach(f -> output.set(new ExecuteSpotless(f).doStuff(output.get())));
 
 		return output.get();
 	}
@@ -49,6 +49,11 @@ public class SpotlessLintFixer implements ILintFixerWithId {
 	@Override
 	public String getId() {
 		return CleanthatSpotlessStepParametersProperties.ENGINE_ID;
+	}
+
+	@Override
+	public String toString() {
+		return "Formatters: " + formatters.toString();
 	}
 
 }

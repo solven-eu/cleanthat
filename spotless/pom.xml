@@ -16,7 +16,8 @@
 
 		<spotless.dependency.version>2.31.0</spotless.dependency.version>
 
-		<maven.version>3.8.6</maven.version>
+		<maven.version>3.8.7</maven.version>
+		<maven-resolver.version>1.6.3</maven-resolver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -107,6 +108,23 @@
 			<artifactId>maven-plugin-annotations</artifactId>
 			<version>3.7.0</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Basic dependencies as present in maven-resolver samples -->
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-connector-basic</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-file</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-http</artifactId>
+			<version>${maven-resolver.version}</version>
 		</dependency>
 
 		<!-- Maven is used to fetch 3rd-parties jars -->

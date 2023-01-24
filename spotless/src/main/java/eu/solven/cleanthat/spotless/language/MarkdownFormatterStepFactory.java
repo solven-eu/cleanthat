@@ -15,27 +15,21 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
-import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.diffplug.spotless.markdown.FlexmarkStep;
 import com.diffplug.spotless.markdown.FreshMarkStep;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Configure Spotless engine for 'pm.xml' files
@@ -44,8 +38,6 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MarkdownFormatterStepFactory.class);
-
 	public MarkdownFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties spotlessProperties) {
 		super(codeProvider, spotlessProperties);
 	}

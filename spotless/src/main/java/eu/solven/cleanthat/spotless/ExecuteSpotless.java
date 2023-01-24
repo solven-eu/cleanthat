@@ -24,7 +24,6 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,18 +53,16 @@ public class ExecuteSpotless {
 	 */
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
-	public String doStuff(String relativePath, String rawBytes) {
-		assert relativePath.startsWith(Pattern.quote("/"));
-
+	public String doStuff(String rawBytes) {
 		// Path root = formatter.getRootDir();
-		File filePath = new File("");
+		File absoluteFilePath = new File("/somePath");
 		// root.resolve("." + relativePath).toFile();
 
 		try {
-			PaddedCell.DirtyState dirty =
-					PaddedCell.calculateDirtyState(formatter, filePath, rawBytes.getBytes(StandardCharsets.UTF_8));
+			PaddedCell.DirtyState dirty = PaddedCell
+					.calculateDirtyState(formatter, absoluteFilePath, rawBytes.getBytes(StandardCharsets.UTF_8));
 			if (dirty.isClean()) {
-				LOGGER.debug("This is already clean: {}", filePath);
+				LOGGER.debug("This is already clean: {}", absoluteFilePath);
 				return rawBytes;
 			} else if (dirty.didNotConverge()) {
 				LOGGER.info("Spotless did not converge. {}",
@@ -79,7 +76,7 @@ public class ExecuteSpotless {
 				return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 			}
 		} catch (IOException e) {
-			throw new UncheckedIOException("Unable to format file " + filePath, e);
+			throw new UncheckedIOException("Unable to format file " + absoluteFilePath, e);
 		}
 	}
 

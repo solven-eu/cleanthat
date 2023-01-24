@@ -15,17 +15,15 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.Maps;
-
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository
@@ -35,11 +33,11 @@ import eu.solven.cleanthat.language.IEngineProperties;
  */
 public class SourceCodeFormatterHelper {
 
-	public EnginePropertiesAndBuildProcessors compile(IEngineProperties languageProperties,
+	public EnginePropertiesAndBuildProcessors compile(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			ILanguageLintFixerFactory lintFixerFactory) {
 		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
-				computeLintFixers(languageProperties, cleanthatSession, lintFixerFactory);
+				computeLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
 
 		return new EnginePropertiesAndBuildProcessors(processors);
 	}

@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +61,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/src/**/*.java");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
-	public static final String KEY_ECLIPSE_FILE = "file";
+	private static final String KEY_FILE = "file";
+	public static final String KEY_ECLIPSE_FILE = KEY_FILE;
 
 	public static final String DEFAULT_ECLIPSE_FILE =
 			CodeProviderHelpers.PATH_SEPARATOR + CodeProviderHelpers.FILENAME_CLEANTHAT_FOLDER
@@ -96,7 +99,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			// https://stackoverflow.com/questions/34450900/how-to-sort-import-statements-in-eclipse-in-case-insensitive-order
 			boolean wildcardsLast = s.getCustomProperty("wildcardsLast", Boolean.class);
 
-			String ordersFile = s.getCustomProperty("file", String.class);
+			String ordersFile = s.getCustomProperty(KEY_FILE, String.class);
 			if (ordersFile != null) {
 				return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
 			}
@@ -117,7 +120,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			if (eclipseVersion == null) {
 				eclipseVersion = EclipseJdtFormatterStep.defaultVersion();
 			}
-			eclipseConfig.setVersion(eclipseVersion.toString());
+			eclipseConfig.setVersion(eclipseVersion);
 
 			String stylesheetFile = s.getCustomProperty(KEY_ECLIPSE_FILE, String.class);
 			if (stylesheetFile != null) {
@@ -140,7 +143,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			if (delimiter == null) {
 				throw new IllegalArgumentException("You need to specify 'delimiter'.");
 			}
-			String file = s.getCustomProperty("file", String.class);
+			String file = s.getCustomProperty(KEY_FILE, String.class);
 			String content;
 			if (file != null) {
 				if (s.getCustomProperty("content", String.class) != null) {
@@ -175,7 +178,10 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			return resource.getFile();
 		}
 
-		File tmpFile = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml").toFile();
+		Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml");
+
+		Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
+		File tmpFile = tmpFileAsPath.toFile();
 		tmpFile.deleteOnExit();
 
 		return tmpFile;
@@ -188,12 +194,12 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 		SpotlessStepProperties importOrder = new SpotlessStepProperties();
 		importOrder.setId("importOrder");
-		importOrder.putProperty("file", "repository:/.cleanthat/java-importOrder.properties");
+		importOrder.putProperty(KEY_FILE, "repository:/.cleanthat/java-importOrder.properties");
 
 		SpotlessStepProperties eclipse = new SpotlessStepProperties();
 		eclipse.setId("eclipse");
 		eclipse.putProperty("version", EclipseJdtFormatterStep.defaultVersion());
-		eclipse.putProperty("file", "repository:/.cleanthat/java-eclipse_stylesheet.xml");
+		eclipse.putProperty(KEY_FILE, "repository:/.cleanthat/java-eclipse_stylesheet.xml");
 
 		return ImmutableList.<SpotlessStepProperties>builder()
 				.add(removeUnusedImports)

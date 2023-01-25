@@ -44,6 +44,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
 import java.util.Arrays;
@@ -141,7 +142,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(String dirtyCode, LineEnding eolToApply) throws IOException {
+	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
+		String dirtyCode = pathAndContent.getContent();
 		LOGGER.debug("{}", this.properties);
 		String cleanCode = applyTransformers(dirtyCode);
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);

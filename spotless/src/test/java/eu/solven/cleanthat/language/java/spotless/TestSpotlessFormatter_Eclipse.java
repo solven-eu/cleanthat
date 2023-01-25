@@ -51,6 +51,7 @@ import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
@@ -155,8 +156,10 @@ public class TestSpotlessFormatter_Eclipse {
 
 		EnginePropertiesAndBuildProcessors compile = helper.compile(languageP, cleanthatSession, formatter);
 		String cleaned = applier.applyProcessors(compile,
-				"someModule/src/main/java/some_package/someFilePath.java",
-				sourceCode);
+				new PathAndContent(
+						cleanthatSession.getFileSystem()
+								.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
+						sourceCode));
 		Assert.assertEquals(cleaned, sourceCode);
 	}
 }

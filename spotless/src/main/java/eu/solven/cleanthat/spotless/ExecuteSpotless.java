@@ -15,8 +15,6 @@
  */
 package eu.solven.cleanthat.spotless;
 
-import com.diffplug.spotless.Formatter;
-import com.diffplug.spotless.PaddedCell;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +22,19 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.codehaus.plexus.util.MatchPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.diffplug.spotless.PaddedCell;
+
+import eu.solven.cleanthat.formatter.PathAndContent;
+
 /**
- * Trigger effectiviely Spotless engine
+ * Trigger Spotless engine
  * 
  * @author Benoit Lacelle
  *
@@ -37,9 +43,9 @@ import org.slf4j.LoggerFactory;
 public class ExecuteSpotless {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteSpotless.class);
 
-	final Formatter formatter;
+	final EnrichedFormatter formatter;
 
-	public ExecuteSpotless(Formatter formatter) {
+	public ExecuteSpotless(EnrichedFormatter formatter) {
 		this.formatter = formatter;
 	}
 
@@ -53,14 +59,30 @@ public class ExecuteSpotless {
 	 */
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
-	public String doStuff(String rawBytes) {
+	public String doStuff(PathAndContent pathAndContent) {
 		// Path root = formatter.getRootDir();
-		File absoluteFilePath = new File("/somePath");
+		// https://github.com/diffplug/spotless/pull/1525
+		String rawPath = pathAndContent.getPath().toString();
+		File absoluteFilePath = new File(rawPath);
+
+		MatchPatterns includePatterns =
+				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
+		MatchPatterns excludePatterns =
+				MatchPatterns.from(withNormalizedFileSeparators(getExcludes(formatter.formatterStepFactory)));
+
+		String rawBytes = pathAndContent.getContent();
+		if (!includePatterns.matches(rawPath, true)) {
+			return rawBytes;
+		} else if (excludePatterns.matches(rawPath, true)) {
+			return rawBytes;
+		}
+
 		// root.resolve("." + relativePath).toFile();
 
 		try {
-			PaddedCell.DirtyState dirty = PaddedCell
-					.calculateDirtyState(formatter, absoluteFilePath, rawBytes.getBytes(StandardCharsets.UTF_8));
+			PaddedCell.DirtyState dirty = PaddedCell.calculateDirtyState(formatter.formatter,
+					absoluteFilePath,
+					rawBytes.getBytes(StandardCharsets.UTF_8));
 			if (dirty.isClean()) {
 				LOGGER.debug("This is already clean: {}", absoluteFilePath);
 				return rawBytes;
@@ -80,6 +102,7 @@ public class ExecuteSpotless {
 		}
 	}
 
+	// com.diffplug.spotless.maven.AbstractSpotlessMojo#getIncludes
 	protected Set<String> getIncludes(AFormatterStepFactory formatterFactory) {
 		Set<String> configuredIncludes = formatterFactory.getIncludes();
 		Set<String> includes;
@@ -95,6 +118,7 @@ public class ExecuteSpotless {
 		return includes;
 	}
 
+	// com.diffplug.spotless.maven.AbstractSpotlessMojo#getExcludes
 	protected Set<String> getExcludes(AFormatterStepFactory formatterFactory) {
 		Set<String> configuredExcludes = formatterFactory.getExcludes();
 
@@ -103,5 +127,13 @@ public class ExecuteSpotless {
 		// excludes.add(withTrailingSeparator(buildDir.toString()));
 		excludes.addAll(configuredExcludes);
 		return excludes;
+	}
+
+	// com.diffplug.spotless.maven.AbstractSpotlessMojo#withNormalizedFileSeparators
+	private Iterable<String> withNormalizedFileSeparators(Iterable<String> patterns) {
+		return StreamSupport.stream(patterns.spliterator(), true)
+				.map(pattern -> pattern.replace('/', File.separatorChar))
+				.map(pattern -> pattern.replace('\\', File.separatorChar))
+				.collect(Collectors.toSet());
 	}
 }

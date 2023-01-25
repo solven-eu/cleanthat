@@ -15,20 +15,23 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
 
 /**
  * Abstract class for language formatters
@@ -41,8 +44,10 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	public static final AtomicInteger NB_EXCEPTIONS = new AtomicInteger();
 
 	@Override
-	public String applyProcessors(EnginePropertiesAndBuildProcessors engineAndSteps, String filepath, String code)
+	public String applyProcessors(EnginePropertiesAndBuildProcessors engineAndSteps, PathAndContent pathAndContent)
 			throws IOException {
+		String code = pathAndContent.getContent();
+		Path filepath = pathAndContent.getPath();
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
 
 		engineAndSteps.getLinters().forEach(step -> {
@@ -50,7 +55,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 				String input = outputRef.get();
 				IEngineProperties engineProperties = step.getKey();
 				ILintFixer lintFixer = step.getValue();
-				String output = applyProcessor(engineProperties, lintFixer, filepath, input);
+				String output = applyProcessor(engineProperties, lintFixer, pathAndContent);
 				if (output == null) {
 					throw new IllegalStateException("Null code. TODO");
 				}
@@ -77,23 +82,25 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 
 	protected String applyProcessor(IEngineProperties languageProperties,
 			ILintFixer formatter,
-			String filepath,
-			String code) throws IOException {
-		Objects.requireNonNull(code, "code should not be null");
+			PathAndContent pathAndContent) throws IOException {
+		Objects.requireNonNull(pathAndContent, "pathAndContent should not be null");
 		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCode();
+
+		String filePath = pathAndContent.getPath().toString();
 
 		// TODO We should skip excluded files BEFORE loading their content
 		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
-		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filepath);
+		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+		String code = pathAndContent.getContent();
 		if (matchingInclude.isEmpty()) {
-			LOGGER.debug("File {} was initially included but not included for processor: {}", filepath, formatter);
+			LOGGER.debug("File {} was initially included but not included for processor: {}", filePath, formatter);
 			return code;
 		}
 
 		List<PathMatcher> excludeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getExcludes());
-		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filepath);
+		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
 		if (matchingExclude.isPresent()) {
-			LOGGER.debug("File {} was initially not-excluded but excluded for processor: {}", filepath, formatter);
+			LOGGER.debug("File {} was initially not-excluded but excluded for processor: {}", filePath, formatter);
 			return code;
 		}
 		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
@@ -106,6 +113,6 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			lineEnding = LineEnding.determineLineEnding(code).orElse(LineEnding.NATIVE);
 		}
 
-		return formatter.doFormat(code, lineEnding);
+		return formatter.doFormat(pathAndContent, lineEnding);
 	}
 }

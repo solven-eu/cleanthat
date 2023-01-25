@@ -17,12 +17,14 @@ package eu.solven.cleanthat.engine;
 
 import java.io.IOException;
 
+import eu.solven.cleanthat.formatter.PathAndContent;
+
 /**
  * Knows how to format a String
  *
  * @author Benoit Lacelle
  */
 public interface ICodeFormatterApplier {
-	String applyProcessors(EnginePropertiesAndBuildProcessors languageProperties, String filepath, String code)
+	String applyProcessors(EnginePropertiesAndBuildProcessors languageProperties, PathAndContent pathAndContent)
 			throws IOException;
 }

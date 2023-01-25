@@ -15,25 +15,29 @@
  */
 package com.diffplug.spotless.glue.java;
 
-import com.diffplug.spotless.FormatterFunc;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.formatter.LineEnding;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class JavaCleanthatRefactoringFunc implements FormatterFunc {
+import com.diffplug.spotless.FormatterFunc;
+
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
+
+public class JavaCleanthatRefactorerFunc implements FormatterFunc {
 	private List<String> included;
 	private List<String> excluded;
 
-	public JavaCleanthatRefactoringFunc(List<String> included, List<String> excluded) {
+	public JavaCleanthatRefactorerFunc(List<String> included, List<String> excluded) {
 		this.included = included == null ? Collections.emptyList() : included;
 		this.excluded = excluded == null ? Collections.emptyList() : excluded;
 	}
 
-	public JavaCleanthatRefactoringFunc() {
+	public JavaCleanthatRefactorerFunc() {
 		this(Arrays.asList(JavaRefactorerProperties.WILDCARD), Arrays.asList());
 	}
 
@@ -48,7 +52,7 @@ public class JavaCleanthatRefactoringFunc implements FormatterFunc {
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), refactorerProperties);
 
 		// Spotless calls steps always with LF eol.
-		return refactorer.doFormat(input, LineEnding.LF);
+		return refactorer.doFormat(new PathAndContent(Paths.get("fake"), input), LineEnding.LF);
 	}
 
 }

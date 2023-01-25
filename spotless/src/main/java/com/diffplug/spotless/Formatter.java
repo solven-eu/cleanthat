@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
+// Duplicated until https://github.com/diffplug/spotless/pull/1525
 /** Formatter which performs the full formatting. */
 public final class Formatter implements Serializable, AutoCloseable {
 	private static final long serialVersionUID = 1L;

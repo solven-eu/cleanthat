@@ -9,5 +9,5 @@ import java.io.IOException;
  */
 public interface ILintFixer {
 
-	String doFormat(String code, LineEnding ending) throws IOException;
+	String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException;
 }

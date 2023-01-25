@@ -15,21 +15,26 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.LineEnding;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * Helps computing a difference score between code source
@@ -56,14 +61,14 @@ public class CodeDiffHelper {
 
 	/**
 	 * 
-	 * @param styleEnforcer
+	 * @param lintFixer
 	 * @param pathAsString
 	 * @return a score indicating how much this formatter impacts given content. If 0, the formatter has no impacts. A
 	 *         higher score means a bigger difference
 	 * @throws IOException
 	 */
-	protected long computeDiffScore(ILintFixer styleEnforcer, String pathAsString) throws IOException {
-		String formatted = styleEnforcer.doFormat(pathAsString, LineEnding.KEEP);
+	protected long computeDiffScore(ILintFixer lintFixer, String content) throws IOException {
+		String formatted = lintFixer.doFormat(new PathAndContent(Paths.get("fake"), content), LineEnding.KEEP);
 
 		if (formatted == null) {
 			// It means something failed while formatting
@@ -72,7 +77,7 @@ public class CodeDiffHelper {
 
 		long deltaDiff;
 		try {
-			deltaDiff = cache.get(Arrays.asList(pathAsString, formatted), () -> deltaDiff(pathAsString, formatted));
+			deltaDiff = cache.get(Arrays.asList(content, formatted), () -> deltaDiff(content, formatted));
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
 		}

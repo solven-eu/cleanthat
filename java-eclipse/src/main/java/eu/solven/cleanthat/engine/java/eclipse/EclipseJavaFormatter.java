@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.eclipse;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.util.Map;
@@ -62,7 +63,9 @@ public class EclipseJavaFormatter implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
+	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
+		String code = pathAndContent.getContent();
+
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 

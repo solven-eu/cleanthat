@@ -15,14 +15,16 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
-import com.diffplug.spotless.Formatter;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.spotless.ExecuteSpotless;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
+import eu.solven.cleanthat.spotless.EnrichedFormatter;
+import eu.solven.cleanthat.spotless.ExecuteSpotless;
 
 /**
  * {@link ILintFixer} for Spotless engine
@@ -31,19 +33,20 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  */
 public class SpotlessLintFixer implements ILintFixerWithId {
-	final List<Formatter> formatters;
+	final List<EnrichedFormatter> formatters;
 
-	public SpotlessLintFixer(List<Formatter> formatters) {
+	public SpotlessLintFixer(List<EnrichedFormatter> formatters) {
 		this.formatters = formatters;
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
-		AtomicReference<String> output = new AtomicReference<>(code);
+	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
+		AtomicReference<PathAndContent> output = new AtomicReference<>(pathAndContent);
 
-		formatters.stream().forEach(f -> output.set(new ExecuteSpotless(f).doStuff(output.get())));
+		formatters.stream()
+				.forEach(f -> output.set(pathAndContent.withContent(new ExecuteSpotless(f).doStuff(output.get()))));
 
-		return output.get();
+		return output.get().getContent();
 	}
 
 	@Override

@@ -109,7 +109,7 @@ public class FormatterFactory {
 	}
 
 	// com.diffplug.gradle.spotless.SpotlessTask#buildFormatter
-	public Formatter makeFormatter(SpotlessEngineProperties engineProperties,
+	public EnrichedFormatter makeFormatter(SpotlessEngineProperties engineProperties,
 			SpotlessFormatterProperties formatterProperties,
 			Provisioner provisioner) {
 		// In our virtual fileSystem, we process from the root (as root of the repository)
@@ -136,20 +136,21 @@ public class FormatterFactory {
 		if (encoding == null) {
 			encoding = engineProperties.getEncoding();
 		}
+		AFormatterStepFactory stepFactory = makeFormatterStepFactory(formatterProperties);
 
-		List<FormatterStep> steps = buildSteps(formatterProperties, provisioner);
-		return Formatter.builder()
-				.lineEndingsPolicy(lineEndingsPolicy)
-				.encoding(Charset.forName(encoding))
-				.rootDir(tmpRoot)
-				.steps(steps)
-				.exceptionPolicy(exceptionPolicy)
-				.build();
+		List<FormatterStep> steps = buildSteps(stepFactory,formatterProperties, provisioner);
+		return new EnrichedFormatter(stepFactory,
+				Formatter.builder()
+						.lineEndingsPolicy(lineEndingsPolicy)
+						.encoding(Charset.forName(encoding))
+						.rootDir(tmpRoot)
+						.steps(steps)
+						.exceptionPolicy(exceptionPolicy)
+						.build());
 	}
 
-	private List<FormatterStep> buildSteps(SpotlessFormatterProperties spotlessProperties, Provisioner provisioner) {
-		AFormatterStepFactory stepFactory = makeFormatterStepFactory(spotlessProperties);
-
+	private List<FormatterStep> buildSteps(
+			AFormatterStepFactory stepFactory, SpotlessFormatterProperties spotlessProperties, Provisioner provisioner) {
 		return spotlessProperties.getSteps()
 				.stream()
 				.map(s -> stepFactory.makeStep(s, provisioner))

@@ -15,21 +15,25 @@
  */
 package eu.solven.cleanthat.config;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import com.google.common.io.Files;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}
@@ -40,9 +44,9 @@ import org.slf4j.LoggerFactory;
 public class GenerateInitialConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GenerateInitialConfig.class);
 
-	final Collection<ILanguageLintFixerFactory> factories;
+	final Collection<IEngineLintFixerFactory> factories;
 
-	public GenerateInitialConfig(Collection<ILanguageLintFixerFactory> factories) {
+	public GenerateInitialConfig(Collection<IEngineLintFixerFactory> factories) {
 		this.factories = factories;
 	}
 
@@ -52,30 +56,26 @@ public class GenerateInitialConfig {
 	// Code formatting: https://github.com/solven-eu/spring-boot/blob/master/buildSrc/build.gradle#L17
 	// https://github.com/spring-io/spring-javaformat/blob/master/src/checkstyle/checkstyle.xml
 	// com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck
-	public CleanthatRepositoryProperties prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
-		CleanthatRepositoryProperties properties = CleanthatRepositoryProperties.defaultRepository();
+	public EngineInitializerResult prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
+		Map<String, String> pathToContent = new LinkedHashMap<>();
 
-		if (codeProvider.loadContentForPath("/.mvn/wrapper/maven-wrapper.properties").isPresent()) {
-			// mvn wrapper is generally copied without any changes from
-			// https://github.com/apache/maven-wrapper
-			List<String> currentExcludes = properties.getSourceCode().getExcludes();
-			List<String> newExcludes = new ArrayList<>(currentExcludes);
-			newExcludes.add("glob:/.mvn/wrapper/**");
-			properties.getSourceCode().setExcludes(newExcludes);
-		}
+		CleanthatRepositoryProperties properties = CleanthatRepositoryProperties.defaultRepository();
 
 		Set<String> extentionsFound = scanFileExtentions(codeProvider);
 
 		factories.forEach(factory -> {
-			if (!Sets.intersection(factory.getFileExtentions(), extentionsFound).isEmpty()) {
-				LOGGER.info("There is a file-extension match for {}", factory);
+			SetView<String> intersection = Sets.intersection(factory.getFileExtentions(), extentionsFound);
+			if (!intersection.isEmpty()) {
+				LOGGER.info("There is a file-extension match ({}) for {}", intersection, factory.getEngine());
 
-				CleanthatEngineProperties languageProperties = factory.makeDefaultProperties();
-				properties.getEngines().add(languageProperties);
+				CleanthatEngineProperties engineProperties = factory.makeDefaultProperties();
+				properties.getEngines().add(engineProperties);
+
+				pathToContent.putAll(factory.makeCustomDefaultFiles(engineProperties));
 			}
 		});
 
-		return properties;
+		return EngineInitializerResult.builder().repoProperties(properties).pathToContents(pathToContent).build();
 	}
 
 	public Set<String> scanFileExtentions(ICodeProvider codeProvider) {

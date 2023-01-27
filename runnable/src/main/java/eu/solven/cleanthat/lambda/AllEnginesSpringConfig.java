@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.lambda;
 
-import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -26,14 +26,11 @@ import org.springframework.context.annotation.Import;
  *
  */
 @Configuration
-@Import({ JavaFormattersFactory.class })
-public class AllLanguagesSpringConfig {
+@Import({
 
-	// TODO Rely on AutoConfiguration
-	// Scala is typically excluded from packaes (e.g. Lambda due to size limitations
-	// @ConditionalOnClass(ScalaFormattersFactory.class)
-	// @Bean
-	// public ScalaFormattersFactory ScalaFormattersFactory(ObjectMapper objectMapper) {
-	// return new ScalaFormattersFactory(objectMapper);
-	// }
+		// JavaFormattersFactory.class,
+		SpotlessFormattersFactory.class,
+
+})
+public class AllEnginesSpringConfig {
 }

@@ -30,8 +30,10 @@ import org.eclipse.aether.transfer.TransferResource;
 
 /**
  * A simplistic transfer listener that logs uploads/downloads to the console.
+ * 
+ * @author https://github.com/apache/maven-resolver/
  */
-@SuppressWarnings({ "PMD", "checkstyle" })
+@SuppressWarnings({ "PMD", "checkstyle:JavadocType", "checkstyle:AvoidInlineConditionals", "checkstyle:MagicNumber" })
 public class ConsoleTransferListener extends AbstractTransferListener {
 
 	private final PrintStream out;

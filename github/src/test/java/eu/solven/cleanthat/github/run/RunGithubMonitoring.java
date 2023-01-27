@@ -22,11 +22,12 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactor
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
@@ -61,8 +62,8 @@ public class RunGithubMonitoring {
 	}
 
 	@Bean
-	public ILanguageLintFixerFactory stringFormatter() {
-		return new ILanguageLintFixerFactory() {
+	public IEngineLintFixerFactory stringFormatter() {
+		return new IEngineLintFixerFactory() {
 
 			@Override
 			public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
@@ -83,6 +84,11 @@ public class RunGithubMonitoring {
 
 			@Override
 			public CleanthatEngineProperties makeDefaultProperties() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
 				throw new UnsupportedOperationException();
 			}
 		};

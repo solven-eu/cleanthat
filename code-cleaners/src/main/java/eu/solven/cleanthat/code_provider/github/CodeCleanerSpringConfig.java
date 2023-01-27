@@ -21,7 +21,7 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.engine.StringFormatterFactory;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
@@ -52,8 +52,8 @@ public class CodeCleanerSpringConfig {
 	}
 
 	@Bean
-	public ILanguageFormatterFactory stringFormatterFactory(List<ILanguageLintFixerFactory> stringFormatters) {
-		Map<String, ILanguageLintFixerFactory> asMap = new LinkedHashMap<>();
+	public ILanguageFormatterFactory stringFormatterFactory(List<IEngineLintFixerFactory> stringFormatters) {
+		Map<String, IEngineLintFixerFactory> asMap = new LinkedHashMap<>();
 
 		stringFormatters.forEach(sf -> {
 			String language = sf.getEngine();

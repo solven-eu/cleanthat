@@ -1,5 +1,34 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.mvn;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.EngineInitializerResult;
+import eu.solven.cleanthat.config.GenerateInitialConfig;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -9,7 +38,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -17,21 +45,6 @@ import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.GenerateInitialConfig;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
 
 /**
  * This mojo will generate a relevant cleanthat configuration in current folder
@@ -60,7 +73,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		classes.add(CodeProviderHelpers.class);
 
 		// Needed to generate default configuration given all knowns languages
-		classes.add(AllLanguagesSpringConfig.class);
+		classes.add(AllEnginesSpringConfig.class);
 
 		return classes;
 	}
@@ -99,14 +112,19 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		ICodeProvider codeProvider = new FileSystemCodeProvider(configPathFile.getParent());
 
 		GenerateInitialConfig generateInitialConfig =
-				new GenerateInitialConfig(appContext.getBeansOfType(ILanguageLintFixerFactory.class).values());
-		CleanthatRepositoryProperties properties;
+				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
+		EngineInitializerResult properties;
 		try {
 			properties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
 		}
-		writeConfiguration(configPathFile, properties);
+		writeConfiguration(configPathFile, properties.getRepoProperties());
+
+		// Prefix with '.' to convert from absolute path (in the Git repository) to relative path (in the FileSystem
+		// root directory)
+		properties.getPathToContents()
+				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve("." + path), content));
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {
@@ -153,6 +171,10 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 			throw new RuntimeException("Issue converting " + properties + " to YAML", e);
 		}
 
+		writeFile(configPathFile, asYaml);
+	}
+
+	private void writeFile(Path configPathFile, String asYaml) {
 		try {
 			// StandardOpenOption.TRUNCATE_EXISTING
 			Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);

@@ -24,5 +24,5 @@ import eu.solven.cleanthat.language.IEngineProperties;
  *
  */
 public interface ILanguageFormatterFactory {
-	ILanguageLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
+	IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
 }

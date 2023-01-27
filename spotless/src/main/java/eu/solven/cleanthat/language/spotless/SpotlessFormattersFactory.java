@@ -15,19 +15,9 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-
 import com.diffplug.spotless.Provisioner;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
-
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -41,6 +31,16 @@ import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.spotless.EnrichedFormatter;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 /**
  * Formatter for Spotless Engine
@@ -61,7 +61,11 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public Set<String> getFileExtentions() {
-		return Set.of("java", "scala", "json");
+		return FormatterFactory.getFormatterIds()
+				.stream()
+				.filter(s -> s.charAt(0) == '.')
+				.map(s -> s.substring(1))
+				.collect(Collectors.toSet());
 	}
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
@@ -136,6 +140,33 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 						.parameters(CleanthatSpotlessStepParametersProperties.builder().build())
 						.build())
 				.build();
+	}
+
+	@Override
+	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+		Map<String, String> pathToContent = new LinkedHashMap<>();
+
+		if (!engineProperties.getSteps().isEmpty()) {
+			CleanthatStepProperties singleSpotlessStep = engineProperties.getSteps().get(0);
+
+			String configuration = (String) singleSpotlessStep.getParameters()
+					.getCustomProperty(CleanthatSpotlessStepParametersProperties.KEY_CONFIGURATION);
+
+			if (configuration != null && configuration.startsWith(CleanthatUrlLoader.PREFIX_CODE)) {
+				String path = configuration.substring(CleanthatUrlLoader.PREFIX_CODE.length());
+
+				SpotlessEngineProperties defaultSpotlessCustomConfig =
+						SpotlessEngineProperties.defaultEngineWithMarkdown();
+				try {
+					pathToContent.put(path,
+							getConfigHelpers().getObjectMapper().writeValueAsString(defaultSpotlessCustomConfig));
+				} catch (JsonProcessingException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
+		}
+
+		return pathToContent;
 	}
 
 }

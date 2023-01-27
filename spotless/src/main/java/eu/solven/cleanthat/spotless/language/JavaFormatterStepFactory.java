@@ -15,36 +15,30 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
 import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
-import com.diffplug.spotless.generic.LicenseHeaderStep;
-import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
 import com.diffplug.spotless.java.ImportOrderStep;
 import com.diffplug.spotless.java.RemoveUnusedImportsStep;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
-import eu.solven.pepper.resource.PepperResourceHelper;
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.springframework.core.io.Resource;
 
 /**
  * Configure Spotless engine for '.java' files
@@ -58,7 +52,6 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/src/**/*.java");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
-	private static final String KEY_FILE = "file";
 	public static final String KEY_ECLIPSE_FILE = KEY_FILE;
 
 	public static final String DEFAULT_ECLIPSE_FILE =
@@ -66,12 +59,10 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 					+ CodeProviderHelpers.PATH_SEPARATOR
 					+ "eclipse_formatter-stylesheet.xml";
 
-	final ICodeProvider codeProvider;
+	public static final String ID_ECLIPSE = "eclipse";
 
 	public JavaFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties formatterProperties) {
 		super(codeProvider, formatterProperties);
-
-		this.codeProvider = codeProvider;
 	}
 
 	@Override
@@ -84,83 +75,21 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		return LICENSE_HEADER_DELIMITER;
 	}
 
-	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
 	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepId = s.getId();
 		switch (stepId) {
+		case "licenseHeader": {
+			return makeLicenseHeader(s);
+		}
 		case "removeUnusedImports": {
 			return RemoveUnusedImportsStep.create(provisioner);
 		}
 		case "importOrder": {
-			// https://stackoverflow.com/questions/34450900/how-to-sort-import-statements-in-eclipse-in-case-insensitive-order
-			boolean wildcardsLast = s.getCustomProperty("wildcardsLast", Boolean.class);
-
-			String ordersFile = s.getCustomProperty(KEY_FILE, String.class);
-			if (ordersFile != null) {
-				return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
-			}
-
-			// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without
-			// blank line, and '\#` prefix for static imports.
-			String ordersString = s.getCustomProperty("order", String.class);
-			if (ordersString == null) {
-				// The default eclipse configuration
-				ordersString = Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
-			}
-			return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
+			return makeImportOrder(s);
 		}
 		case "eclipse": {
-			EclipseBasedStepBuilder eclipseConfig = EclipseJdtFormatterStep.createBuilder(provisioner);
-
-			String eclipseVersion = s.getCustomProperty("version", String.class);
-			if (eclipseVersion == null) {
-				eclipseVersion = EclipseJdtFormatterStep.defaultVersion();
-			}
-			eclipseConfig.setVersion(eclipseVersion);
-
-			String stylesheetFile = s.getCustomProperty(KEY_ECLIPSE_FILE, String.class);
-			if (stylesheetFile != null) {
-				File settingsFile;
-				try {
-					settingsFile = locateFile(stylesheetFile.toString());
-				} catch (IOException e) {
-					throw new UncheckedIOException("Issue processing eclipse.file: " + stylesheetFile, e);
-				}
-				eclipseConfig.setPreferences(Arrays.asList(settingsFile));
-			}
-			return eclipseConfig.build();
-		}
-		case "licenseHeader": {
-			// com.diffplug.spotless.maven.generic.LicenseHeader
-			String delimiter = s.getCustomProperty("delimiter", String.class);
-			if (delimiter == null) {
-				delimiter = licenseHeaderDelimiter();
-			}
-			if (delimiter == null) {
-				throw new IllegalArgumentException("You need to specify 'delimiter'.");
-			}
-			String file = s.getCustomProperty(KEY_FILE, String.class);
-			String content;
-			if (file != null) {
-				if (s.getCustomProperty("content", String.class) != null) {
-					throw new IllegalArgumentException("Can not set both 'file' and 'content'");
-				}
-
-				byte[] fileBytes = PepperResourceHelper.loadAsBinary(CleanthatUrlLoader.loadUrl(codeProvider, file));
-				content = new String(fileBytes, StandardCharsets.UTF_8);
-			} else {
-				content = s.getCustomProperty("content", String.class);
-			}
-			// Enable with next Spotless version
-			// String skipLinesMatching = s.getCustomProperty("skipLinesMatching", String.class);
-
-			YearMode yearMode = YearMode.PRESERVE;
-			return LicenseHeaderStep.headerDelimiter(() -> content, delimiter)
-					.withYearMode(yearMode)
-					// .withSkipLinesMatching(skipLinesMatching)
-					.build()
-					.filterByFile(LicenseHeaderStep.unsupportedJvmFilesFilter());
+			return makeEclipse(s, provisioner);
 		}
 		default: {
 			throw new IllegalArgumentException("Unknown Java step: " + stepId);
@@ -168,20 +97,45 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		}
 	}
 
-	private File locateFile(String stylesheetFile) throws IOException {
-		Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, stylesheetFile);
+	private FormatterStep makeEclipse(SpotlessStepProperties s, Provisioner provisioner) {
+		EclipseBasedStepBuilder eclipseConfig = EclipseJdtFormatterStep.createBuilder(provisioner);
 
-		if (resource.isFile()) {
-			return resource.getFile();
+		String eclipseVersion = s.getCustomProperty("version", String.class);
+		if (eclipseVersion == null) {
+			eclipseVersion = EclipseJdtFormatterStep.defaultVersion();
+		}
+		eclipseConfig.setVersion(eclipseVersion);
+
+		String stylesheetFile = s.getCustomProperty(KEY_ECLIPSE_FILE, String.class);
+		if (stylesheetFile != null) {
+			File settingsFile;
+			try {
+				settingsFile = locateFile(stylesheetFile);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue processing eclipse.file: " + stylesheetFile, e);
+			}
+			eclipseConfig.setPreferences(Arrays.asList(settingsFile));
+		}
+		return eclipseConfig.build();
+	}
+
+	private FormatterStep makeImportOrder(SpotlessStepProperties s) {
+		// https://stackoverflow.com/questions/34450900/how-to-sort-import-statements-in-eclipse-in-case-insensitive-order
+		boolean wildcardsLast = s.getCustomProperty("wildcardsLast", Boolean.class);
+
+		String ordersFile = s.getCustomProperty(KEY_FILE, String.class);
+		if (ordersFile != null) {
+			return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
 		}
 
-		Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml");
-
-		Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
-		File tmpFile = tmpFileAsPath.toFile();
-		tmpFile.deleteOnExit();
-
-		return tmpFile;
+		// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without
+		// blank line, and '\#` prefix for static imports.
+		String ordersString = s.getCustomProperty("order", String.class);
+		if (ordersString == null) {
+			// The default eclipse configuration
+			ordersString = Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
+		}
+		return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersString.split(","));
 	}
 
 	// This is useful to demonstrate all available configuration
@@ -194,7 +148,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		importOrder.putProperty(KEY_FILE, "repository:/.cleanthat/java-importOrder.properties");
 
 		SpotlessStepProperties eclipse = new SpotlessStepProperties();
-		eclipse.setId("eclipse");
+		eclipse.setId(ID_ECLIPSE);
 		eclipse.putProperty("version", EclipseJdtFormatterStep.defaultVersion());
 		eclipse.putProperty(KEY_FILE, "repository:/.cleanthat/java-eclipse_stylesheet.xml");
 
@@ -203,6 +157,15 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 				.add(importOrder)
 				.add(eclipse)
 				.build();
+	}
+
+	public static SpotlessStepProperties makeDefaultEclipseStep() {
+		SpotlessStepProperties eclipseStep = new SpotlessStepProperties();
+		eclipseStep.setId(JavaFormatterStepFactory.ID_ECLIPSE);
+		eclipseStep.putProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE,
+				CleanthatUrlLoader.PREFIX_CODE + JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE);
+
+		return eclipseStep;
 	}
 
 }

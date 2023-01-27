@@ -17,6 +17,11 @@ import eu.solven.cleanthat.formatter.CodeFormatResult;
  */
 public interface IGitRefCleaner {
 
+	/**
+	 * 
+	 * @param branch
+	 * @return true if we succeeded opening a PR with a relevant default configuration.
+	 */
 	boolean tryOpenPRWithCleanThatStandardConfiguration(IGitBranch branch);
 
 	/**

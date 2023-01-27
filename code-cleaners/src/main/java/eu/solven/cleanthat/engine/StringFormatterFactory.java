@@ -26,16 +26,16 @@ import java.util.Map;
  */
 public class StringFormatterFactory implements ILanguageFormatterFactory {
 
-	final Map<String, ILanguageLintFixerFactory> languageToFormatter;
+	final Map<String, IEngineLintFixerFactory> languageToFormatter;
 
-	public StringFormatterFactory(Map<String, ILanguageLintFixerFactory> languageToFormatter) {
+	public StringFormatterFactory(Map<String, IEngineLintFixerFactory> languageToFormatter) {
 		this.languageToFormatter = languageToFormatter;
 	}
 
 	@Override
-	public ILanguageLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties) {
+	public IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties) {
 		String language = languageProperties.getEngine();
-		ILanguageLintFixerFactory formatter = languageToFormatter.get(language);
+		IEngineLintFixerFactory formatter = languageToFormatter.get(language);
 
 		if (formatter == null) {
 			throw new IllegalArgumentException(

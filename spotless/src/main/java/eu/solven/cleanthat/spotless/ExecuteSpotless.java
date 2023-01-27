@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.spotless;
 
+import com.diffplug.spotless.PaddedCell;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,14 +26,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import org.codehaus.plexus.util.MatchPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.diffplug.spotless.PaddedCell;
-
-import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * Trigger Spotless engine
@@ -51,19 +48,15 @@ public class ExecuteSpotless {
 
 	/**
 	 * 
-	 * @param relativePath
+	 * @param pathAndContent
 	 *            the relativePath of current file, relative to the root (which is typically a Git repository root,
 	 *            which may or may not reside on the FileSystem).
-	 * @param rawBytes
 	 * @return
 	 */
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
 	public String doStuff(PathAndContent pathAndContent) {
-		// Path root = formatter.getRootDir();
-		// https://github.com/diffplug/spotless/pull/1525
 		String rawPath = pathAndContent.getPath().toString();
-		File absoluteFilePath = new File(rawPath);
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
@@ -77,7 +70,7 @@ public class ExecuteSpotless {
 			return rawBytes;
 		}
 
-		// root.resolve("." + relativePath).toFile();
+		File absoluteFilePath = new File(rawPath);
 
 		try {
 			PaddedCell.DirtyState dirty = PaddedCell.calculateDirtyState(formatter.formatter,

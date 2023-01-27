@@ -58,6 +58,9 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
 		switch (stepName) {
+		case "licenseHeader": {
+			return makeLicenseHeader(s);
+		}
 		case "flexmark": {
 			String libVersion = s.getCustomProperty("version", String.class);
 			if (libVersion == null) {

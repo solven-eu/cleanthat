@@ -15,6 +15,26 @@
  */
 package eu.solven.cleanthat.formatter;
 
+import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.base.Strings;
+import com.google.common.util.concurrent.AtomicLongMap;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.thread.PepperExecutorsHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystem;
@@ -31,30 +51,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
-
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
-import com.google.common.base.Strings;
-import com.google.common.util.concurrent.AtomicLongMap;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Unclear what is the point of this class
@@ -345,7 +342,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	private EnginePropertiesAndBuildProcessors buildProcessors(IEngineProperties properties,
 			CleanthatSession cleanthatSession) {
-		ILanguageLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
+		IEngineLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
 		return sourceCodeFormatterHelper.compile(properties, cleanthatSession, formattersFactory);
 	}

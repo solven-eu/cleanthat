@@ -18,6 +18,7 @@ package eu.solven.cleanthat.language.spotless;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
@@ -42,8 +43,10 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class CleanthatSpotlessStepParametersProperties
 		implements ICleanthatStepParametersProperties, ICleanthatSpotlessConstants {
+	public static final String KEY_CONFIGURATION = "configuration";
+
 	// The default configuration location is the first option amongst the possible locations
-	private static final String DEFAULT_CONFIGURATION =
+	public static final String DEFAULT_CONFIGURATION =
 			CodeProviderHelpers.PATH_SEPARATOR + CodeProviderHelpers.FILENAME_CLEANTHAT_FOLDER
 					+ CodeProviderHelpers.PATH_SEPARATOR
 					+ "spotless.yaml";
@@ -53,7 +56,7 @@ public class CleanthatSpotlessStepParametersProperties
 
 	@Override
 	public Object getCustomProperty(String key) {
-		if ("configuration".equalsIgnoreCase(key)) {
+		if (KEY_CONFIGURATION.equalsIgnoreCase(key)) {
 			return configuration;
 		}
 		return null;

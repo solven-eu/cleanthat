@@ -1,5 +1,47 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.mvn;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
+import com.google.common.io.ByteStreams;
+import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
+import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
+import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
+import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
+import eu.solven.cleanthat.git.GitIgnoreParser;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
+import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.cleanthat.utils.ResultOrError;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +65,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -37,33 +77,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
-import com.google.common.io.ByteStreams;
-
-import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
-import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
-import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
-import eu.solven.cleanthat.git.GitIgnoreParser;
-import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
-import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
-import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
-import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.
@@ -151,11 +164,11 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
 
-		Path normalizedEclipsePath = normalize(eclipseConfigPath, configPath);
+		Path normalizedEclipsePath = relativizeFromGitRootAsFSRoot(eclipseConfigPath, configPath);
 		injectStylesheetInConfig(appContext, normalizedEclipsePath, configPath);
 	}
 
-	protected Path normalize(Path eclipseConfigPath, Path configPath) {
+	protected Path relativizeFromGitRootAsFSRoot(Path eclipseConfigPath, Path configPath) {
 		Path rootFolder = configPath.getParent();
 		if (rootFolder == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + configPath + " (no root)");
@@ -164,6 +177,16 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		return Paths.get("/").resolve(rootFolder.relativize(eclipseConfigPath));
 	}
 
+	/**
+	 * This will generate an Eclipse stylesheet based on current repository, and persist its configuration into
+	 * cleanthat+spotless configuration files
+	 * 
+	 * @param appContext
+	 * @param eclipseConfigPath
+	 * @param configPath
+	 * @throws MojoFailureException
+	 * @throws IOException
+	 */
 	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)
 			throws MojoFailureException, IOException {
 		LOGGER.info("You need to wire manually the Eclipse stylesheet path (e.g. into '/.cleanthat/spotless.yaml'");
@@ -188,15 +211,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		CleanthatEngineProperties spotlessEngine;
 		if (optSpotlessProperties.isEmpty()) {
-			CleanthatSpotlessStepParametersProperties spotlessSingleStep =
-					CleanthatSpotlessStepParametersProperties.builder().build();
-			spotlessEngine = CleanthatEngineProperties.builder()
-					.engine(CleanthatSpotlessStepParametersProperties.ENGINE_ID)
-					.step(CleanthatStepProperties.builder()
-							.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
-							.parameters(spotlessSingleStep)
-							.build())
-					.build();
+			spotlessEngine = appContext.getBean(SpotlessFormattersFactory.class).makeDefaultProperties();
 
 			loadedConfig.setEngines(ImmutableList.<CleanthatEngineProperties>builder()
 					.addAll(loadedConfig.getEngines())
@@ -210,43 +225,41 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			needToSaveCleanthat = false;
 		}
 
-		String pathToSpotlessConfig =
-				(String) spotlessEngine.getSteps().get(0).getParameters().getCustomProperty("url");
-
 		ConfigHelpers configHelpers = appContext.getBean(ConfigHelpers.class);
+		ObjectMapper objectMapper = configHelpers.getObjectMapper();
 
-		Resource spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
+		ICleanthatStepParametersProperties spotlessParameters = spotlessEngine.getSteps().get(0).getParameters();
+		String pathToSpotlessConfig =
+				objectMapper.convertValue(spotlessParameters, CleanthatSpotlessStepParametersProperties.class)
+						.getConfiguration();
 
-		SpotlessEngineProperties spotlessEngineProperties;
-		try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
-			spotlessEngineProperties =
-					configHelpers.getObjectMapper().convertValue(inputStream, SpotlessEngineProperties.class);
-		}
+		SpotlessEngineProperties spotlessEngineProperties =
+				loadOrInitSpotlessEngineProperties(codeProvider, objectMapper, pathToSpotlessConfig);
 
-		Optional<SpotlessFormatterProperties> optJavaFormatter =
-				spotlessEngineProperties.getFormatters().stream().filter(f -> "java".equals(f.getFormat())).findFirst();
+		Optional<SpotlessFormatterProperties> optJavaFormatter = spotlessEngineProperties.getFormatters()
+				.stream()
+				.filter(f -> FormatterFactory.ID_JAVA.equals(f.getFormat()))
+				.findFirst();
 
 		SpotlessFormatterProperties javaFormatter;
 
-		boolean needToSaveSpotless;
+		boolean needToSaveSpotless = false;
 		if (optJavaFormatter.isEmpty()) {
-			javaFormatter = SpotlessFormatterProperties.builder().format("java").build();
+			javaFormatter = SpotlessFormatterProperties.builder().format(FormatterFactory.ID_JAVA).build();
 
 			LOGGER.info("Append java formatter into Spotless engine");
 			needToSaveSpotless = true;
 		} else {
 			javaFormatter = optJavaFormatter.get();
-			needToSaveSpotless = false;
 		}
 
 		SpotlessStepProperties eclipseStep;
-		Optional<SpotlessStepProperties> optEclipseStep =
-				javaFormatter.getSteps().stream().filter(f -> "eclipse".equalsIgnoreCase(f.getId())).findFirst();
+		Optional<SpotlessStepProperties> optEclipseStep = javaFormatter.getSteps()
+				.stream()
+				.filter(f -> JavaFormatterStepFactory.ID_ECLIPSE.equalsIgnoreCase(f.getId()))
+				.findFirst();
 		if (optEclipseStep.isEmpty()) {
-			eclipseStep = new SpotlessStepProperties();
-			eclipseStep.setId("eclipse");
-			eclipseStep.putProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE,
-					CleanthatUrlLoader.PREFIX_CODE + JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE);
+			eclipseStep = JavaFormatterStepFactory.makeDefaultEclipseStep();
 
 			javaFormatter.setSteps(ImmutableList.<SpotlessStepProperties>builder()
 					.addAll(javaFormatter.getSteps())
@@ -257,7 +270,6 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			needToSaveSpotless = true;
 		} else {
 			eclipseStep = optEclipseStep.get();
-			needToSaveSpotless = false;
 		}
 
 		String eclipseStylesheetFile =
@@ -268,42 +280,32 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			needToSaveSpotless = true;
 		}
 
+		persistConfigurationFiles(appContext, configPath, loadedConfig, needToSaveCleanthat, needToSaveSpotless);
+	}
+
+	private SpotlessEngineProperties loadOrInitSpotlessEngineProperties(ICodeProviderWriter codeProvider,
+			ObjectMapper objectMapper,
+			String pathToSpotlessConfig) throws IOException {
+		SpotlessEngineProperties spotlessEngineProperties;
+
+		Resource spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
+
+		{
+			try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
+				spotlessEngineProperties = objectMapper.convertValue(inputStream, SpotlessEngineProperties.class);
+			}
+		}
+		return spotlessEngineProperties;
+	}
+
+	private void persistConfigurationFiles(ApplicationContext appContext,
+			Path configPath,
+			CleanthatRepositoryProperties loadedConfig,
+			boolean needToSaveCleanthat,
+			boolean needToSaveSpotless) {
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
 		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
-		//
-		// CleanthatEngineProperties javaProperties = optJavaProperties.orElseGet(() -> {
-		// // There is no java language properties
-		// LOGGER.info("We introduce the java language properties");
-		//
-		// // Enable mutations
-		// List<CleanthatEngineProperties> mutableLanguages = new ArrayList<>(loadedConfig.getEngines());
-		// loadedConfig.setEngines(mutableLanguages);
-		//
-		// CleanthatEngineProperties languageProperties =
-		// new JavaFormattersFactory(new ConfigHelpers(objectMappers)).makeDefaultProperties();
-		// mutableLanguages.add(languageProperties);
-		//
-		// return languageProperties;
-		// });
-		//
-		//// Optional<CleanthatStepProperties> optEclipseProperties =
-		//// javaProperties.getSteps().stream().filter(p -> EclipseJavaFormatter.ID.equals(p.getId())).findAny();
-		////
-		//// CleanthatStepProperties eclipseProperties;
-		//// if (optEclipseProperties.isPresent()) {
-		//// eclipseProperties = optEclipseProperties.get();
-		//// } else {
-		//// eclipseProperties = JavaFormattersFactory.makeEclipseFormatterDefaultProperties();
-		//// javaProperties.getSteps().add(eclipseProperties);
-		//// }
-		//
-		//// Optional<Map<String, Object>> optEclipseParameters =
-		//// PepperMapHelper.getOptionalAs(eclipseProperties, ILanguageLintFixerFactory.KEY_PARAMETERS);
-		//
-		// Map<String, Object> eclipseParameters = optEclipseParameters.orElse(new TreeMap<>());
-		// eclipseParameters.put("url", CleanthatUrlLoader.PREFIX_CODE + toString(eclipseConfigPath));
-		//
 
 		if (needToSaveCleanthat) {
 			// Prepare the configuration as yaml

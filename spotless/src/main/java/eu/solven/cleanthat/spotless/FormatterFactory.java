@@ -22,10 +22,13 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.LineEnding;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.GitAttributesLineEndings_InMemory;
+import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.language.MarkdownFormatterStepFactory;
 import eu.solven.cleanthat.spotless.language.PomXmlFormatterStepFactory;
+import eu.solven.cleanthat.spotless.language.ScalaFormatterStepFactory;
 import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
@@ -36,14 +39,13 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.resolver.examples.util.Booter;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -52,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class FormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterFactory.class);
+	public static final String ID_JAVA = "java";
 
 	final FileSystem fileSystem;
 	final ICodeProvider codeProvider;
@@ -64,25 +66,6 @@ public class FormatterFactory {
 
 	// Provisioner provisionner = new CleanthatJvmProvisioner();
 	public static Provisioner makeProvisionner() throws IOException {
-		// DefaultRepositorySystem repositorySystem = new DefaultRepositorySystem();
-		// DependencyCollector dependencyCollector = new DefaultDependencyCollector();
-		// repositorySystem.setDependencyCollector(dependencyCollector);
-		//
-		// DefaultRepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
-		// Path tmpRepo = Files.createTempDirectory("cleanthat-spotless-maven-");
-		// LOGGER.info("We will use as m2 local repository: {}", tmpRepo);
-		// LocalRepository localRepository = new LocalRepository(tmpRepo.toFile());
-		//
-		// DefaultLocalRepositoryProvider localRepositoryProvider = new DefaultLocalRepositoryProvider();
-		// LocalRepositoryManagerFactory localRepositoryManagerFactory = new SimpleLocalRepositoryManagerFactory();
-		// localRepositoryProvider.addLocalRepositoryManagerFactory(localRepositoryManagerFactory);
-		// repositorySystem.setLocalRepositoryProvider(localRepositoryProvider);
-		//
-		// LocalRepositoryManager localRepositoryManager =
-		// repositorySystem.newLocalRepositoryManager(repositorySystemSession, localRepository);
-		// repositorySystemSession.setLocalRepositoryManager(localRepositoryManager);
-		//
-		// List<RemoteRepository> repositories = new ArrayList<>();
 		Log log = new SystemStreamLog();
 
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
@@ -95,11 +78,19 @@ public class FormatterFactory {
 		return provisionner;
 	}
 
-	private AFormatterStepFactory makeFormatterStepFactory(SpotlessFormatterProperties spotlessProperties) {
+	public static Set<String> getFormatterIds() {
+		return ImmutableSet.of(ID_JAVA, "scala", "markdown", "pom");
+	}
+
+	public AFormatterStepFactory makeFormatterStepFactory(SpotlessFormatterProperties spotlessProperties) {
 		String language = spotlessProperties.getFormat();
 		switch (language) {
-		case "java":
+		case ID_JAVA:
 			return new JavaFormatterStepFactory(codeProvider, spotlessProperties);
+		case "scala":
+			return new ScalaFormatterStepFactory(codeProvider, spotlessProperties);
+		case "markdown":
+			return new MarkdownFormatterStepFactory(codeProvider, spotlessProperties);
 		case "pom":
 			return new PomXmlFormatterStepFactory(codeProvider, spotlessProperties);
 
@@ -138,7 +129,7 @@ public class FormatterFactory {
 		}
 		AFormatterStepFactory stepFactory = makeFormatterStepFactory(formatterProperties);
 
-		List<FormatterStep> steps = buildSteps(stepFactory,formatterProperties, provisioner);
+		List<FormatterStep> steps = buildSteps(stepFactory, formatterProperties, provisioner);
 		return new EnrichedFormatter(stepFactory,
 				Formatter.builder()
 						.lineEndingsPolicy(lineEndingsPolicy)
@@ -149,8 +140,9 @@ public class FormatterFactory {
 						.build());
 	}
 
-	private List<FormatterStep> buildSteps(
-			AFormatterStepFactory stepFactory, SpotlessFormatterProperties spotlessProperties, Provisioner provisioner) {
+	private List<FormatterStep> buildSteps(AFormatterStepFactory stepFactory,
+			SpotlessFormatterProperties spotlessProperties,
+			Provisioner provisioner) {
 		return spotlessProperties.getSteps()
 				.stream()
 				.map(s -> stepFactory.makeStep(s, provisioner))

@@ -23,8 +23,10 @@ import org.eclipse.aether.RepositoryEvent;
 
 /**
  * A simplistic repository listener that logs events to the console.
+ * 
+ * @author https://github.com/apache/maven-resolver/
  */
-@SuppressWarnings({ "PMD", "checkstyle" })
+@SuppressWarnings({ "PMD", "checkstyle:AvoidInlineConditionals" })
 public class ConsoleRepositoryListener extends AbstractRepositoryListener {
 
 	private final PrintStream out;

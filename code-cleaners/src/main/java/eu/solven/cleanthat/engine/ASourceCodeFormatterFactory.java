@@ -24,7 +24,7 @@ import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
  *
  * @author Benoit Lacelle
  */
-public abstract class ASourceCodeFormatterFactory implements ILanguageLintFixerFactory {
+public abstract class ASourceCodeFormatterFactory implements IEngineLintFixerFactory {
 	final ConfigHelpers configHelpers;
 
 	public ASourceCodeFormatterFactory(ConfigHelpers configHelpers) {

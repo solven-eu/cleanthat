@@ -18,7 +18,7 @@ package eu.solven.cleanthat.formatter;
 import com.google.common.collect.Maps;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class SourceCodeFormatterHelper {
 
 	public EnginePropertiesAndBuildProcessors compile(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
-			ILanguageLintFixerFactory lintFixerFactory) {
+			IEngineLintFixerFactory lintFixerFactory) {
 		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
 				computeLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
 
@@ -52,7 +52,7 @@ public class SourceCodeFormatterHelper {
 	 */
 	public List<Map.Entry<IEngineProperties, ILintFixer>> computeLintFixers(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
-			ILanguageLintFixerFactory lintFixerFactory) {
+			IEngineLintFixerFactory lintFixerFactory) {
 		List<Map.Entry<IEngineProperties, ILintFixer>> processors = engineProperties.getSteps()
 				.stream()
 				.filter(Predicate.not(CleanthatStepProperties::isSkip))

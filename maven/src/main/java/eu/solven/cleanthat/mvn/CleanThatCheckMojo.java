@@ -1,20 +1,33 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.mvn;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.springframework.context.ApplicationContext;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.lambda.AllLanguagesSpringConfig;
+import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.springframework.context.ApplicationContext;
 
 /**
  * The mojo checking the code is clean
@@ -37,7 +50,7 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 		List<Class<?>> classes = new ArrayList<>();
 
 		classes.add(GithubSpringConfig.class);
-		classes.add(AllLanguagesSpringConfig.class);
+		classes.add(AllEnginesSpringConfig.class);
 		classes.add(CodeProviderHelpers.class);
 
 		return classes;

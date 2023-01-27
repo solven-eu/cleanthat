@@ -25,7 +25,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactor
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import java.io.IOException;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ITGithubPullRequestCleaner {
 	@Autowired
 	List<ObjectMapper> objectMappers;
 	@Autowired
-	List<ILanguageLintFixerFactory> factories;
+	List<IEngineLintFixerFactory> factories;
 	@Autowired
 	ICodeProviderFormatter codeProviderFormatter;
 

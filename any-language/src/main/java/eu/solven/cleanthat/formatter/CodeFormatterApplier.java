@@ -15,6 +15,11 @@
  */
 package eu.solven.cleanthat.formatter;
 
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -23,15 +28,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 
 /**
  * Abstract class for language formatters
@@ -52,13 +50,13 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 
 		engineAndSteps.getLinters().forEach(step -> {
 			try {
-				String input = outputRef.get();
 				IEngineProperties engineProperties = step.getKey();
 				ILintFixer lintFixer = step.getValue();
 				String output = applyProcessor(engineProperties, lintFixer, pathAndContent);
 				if (output == null) {
-					throw new IllegalStateException("Null code. TODO");
+					throw new IllegalStateException("Null code.");
 				}
+				String input = outputRef.get();
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step may clean all previous not relevant changes)

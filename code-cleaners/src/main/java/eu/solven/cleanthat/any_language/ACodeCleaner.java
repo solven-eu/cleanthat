@@ -15,8 +15,18 @@
  */
 package eu.solven.cleanthat.any_language;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -25,19 +35,12 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Asbtract for {@link ICodeCleaner}
@@ -48,15 +51,19 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
 
 	final Collection<ObjectMapper> objectMappers;
-	final Collection<ILanguageLintFixerFactory> factories;
+	private final Collection<IEngineLintFixerFactory> factories;
 	final ICodeProviderFormatter formatterProvider;
 
 	public ACodeCleaner(Collection<ObjectMapper> objectMappers,
-			Collection<ILanguageLintFixerFactory> factories,
+			Collection<IEngineLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
 		this.factories = factories;
 		this.formatterProvider = formatterProvider;
+	}
+
+	protected Collection<ObjectMapper> getObjectMappers() {
+		return objectMappers;
 	}
 
 	public CodeFormatResult formatCode(CleanthatRepositoryProperties properties,
@@ -137,19 +144,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		}
 	}
 
-	protected String toYaml(CleanthatRepositoryProperties config) {
-		try {
-			return ConfigHelpers.getYaml(objectMappers).writeValueAsString(config);
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Inalid configuration: " + config, e);
-		}
-	}
-
-	protected CleanthatRepositoryProperties generateDefaultConfig(ICodeProvider codeProvider) {
-		try {
-			return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+	public Collection<IEngineLintFixerFactory> getFactories() {
+		return factories;
 	}
 }

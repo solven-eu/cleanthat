@@ -15,8 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.spring;
 
+import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import io.spring.javaformat.formatter.Formatter;
 import java.io.IOException;
-
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -24,12 +28,6 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.formatter.PathAndContent;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import io.spring.javaformat.formatter.Formatter;
 
 /**
  * Spring Java {@link IStyleEnforcer}

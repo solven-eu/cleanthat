@@ -18,7 +18,7 @@ package eu.solven.cleanthat.code_provider.github.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.engine.ILanguageLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +31,11 @@ import java.util.Optional;
  */
 public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 	final List<ObjectMapper> objectMappers;
-	final List<ILanguageLintFixerFactory> factories;
+	final List<IEngineLintFixerFactory> factories;
 	final ICodeProviderFormatter formatterProvider;
 
 	public GithubCodeCleanerFactory(List<ObjectMapper> objectMappers,
-			List<ILanguageLintFixerFactory> factories,
+			List<IEngineLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
 		this.factories = factories;

@@ -15,19 +15,21 @@
  */
 package eu.solven.cleanthat.engine;
 
+import java.util.Map;
+import java.util.Set;
+
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
-import java.util.Set;
 
 /**
  * Knows how to format a String
  *
  * @author Benoit Lacelle
  */
-public interface ILanguageLintFixerFactory {
+public interface IEngineLintFixerFactory {
 	String KEY_ENGINE = "engine";
 	String KEY_PARAMETERS = "parameters";
 
@@ -40,9 +42,11 @@ public interface ILanguageLintFixerFactory {
 	 */
 	Set<String> getFileExtentions();
 
-	ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
-			IEngineProperties languageProperties,
+	ILintFixer makeLintFixer(CleanthatStepProperties stepProperties,
+			IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession);
 
 	CleanthatEngineProperties makeDefaultProperties();
+
+	Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties);
 }

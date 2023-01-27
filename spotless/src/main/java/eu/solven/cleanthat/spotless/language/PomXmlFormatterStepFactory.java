@@ -62,6 +62,9 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
 		switch (stepName) {
+		case "licenseHeader": {
+			return makeLicenseHeader(s);
+		}
 		case "sortPom": {
 			SortPomCfg config = new SortPomCfg();
 

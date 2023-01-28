@@ -15,6 +15,6 @@ engines:
 # https://github.com/diffplug/spotless/pull/568
 - engine: "spotless"
   steps:
-  - engine: "spotless"
+  - id: "spotless"
     parameters:
       configuration: "repository:/.cleanthat/spotless.yaml"

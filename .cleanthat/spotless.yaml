@@ -11,20 +11,20 @@ languages:
   source_code:
     excludes:
     - "**/do_not_format_me/**"
-  processors:
-  - engine: "removeUnusedImports"
-  - engine: "eclipse"
+  steps:
+  - id: "removeUnusedImports"
+  - id: "eclipse"
     parameters:
       file: "repository:eclipse/eclipse_java_code_formatter.xml"
-  - engine: "licenseHeader"
+  - id: "licenseHeader"
     parameters:
       content: "/* (C)$YEAR */"
 - language: "pom.xml"
   source_code:
      includes:
      - "regex:**/pom.xml"
-  processors:
-  - engine: "sortPom"
+  steps:
+  - id: "sortPom"
     parameters:
       expandEmptyElements: false
       nrOfIndentSpace: -1

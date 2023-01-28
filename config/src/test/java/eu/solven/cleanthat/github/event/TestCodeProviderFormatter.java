@@ -15,16 +15,14 @@
  */
 package eu.solven.cleanthat.github.event;
 
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 
 // https://facelessuser.github.io/wcmatch/glob/
 public class TestCodeProviderFormatter {

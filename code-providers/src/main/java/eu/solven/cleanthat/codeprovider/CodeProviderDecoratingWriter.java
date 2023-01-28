@@ -16,10 +16,12 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
@@ -44,13 +46,19 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 		this.writerLogicSupplier = writerLogicSupplier;
 	}
 
+	@Override
+	public FileSystem getFileSystem() {
+		return codeProvider.getFileSystem();
+	}
+
 	public ICodeProvider getDecorated() {
 		return codeProvider;
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
-		codeProvider.listFilesForContent(consumer);
+	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+			throws IOException {
+		codeProvider.listFilesForContent(includePatterns, consumer);
 	}
 
 	@Override

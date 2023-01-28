@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.eclipse.jgit.api.CloneCommand;
@@ -94,7 +96,8 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+			throws IOException {
 		LOGGER.debug("About to list files");
 
 		walkFiles(consumer, "");
@@ -303,6 +306,11 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	@Override
 	public void cleanTmpFiles() {
 		LOGGER.info("Nothing to delete for {}", this);
+	}
+
+	@Override
+	public FileSystem getFileSystem() {
+		return workingDir.getFileSystem();
 	}
 
 }

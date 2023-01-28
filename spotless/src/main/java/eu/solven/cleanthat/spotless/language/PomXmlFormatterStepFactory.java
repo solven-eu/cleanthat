@@ -20,19 +20,17 @@ import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.pom.SortPomCfg;
 import com.diffplug.spotless.pom.SortPomStep;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configure Spotless engine for 'pm.xml' files
+ * Configure Spotless engine for 'pom.xml' files
  * 
  * @author Benoit Lacelle
  *
@@ -40,16 +38,10 @@ import org.slf4j.LoggerFactory;
 public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PomXmlFormatterStepFactory.class);
 
-	public PomXmlFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties spotlessProperties) {
-		super(codeProvider, spotlessProperties);
-	}
-
-	/**
-	 * CleanThat will call spotless from the root directory: process any 'pom.xml' file from there
-	 */
-	@Override
-	public Set<String> defaultIncludes() {
-		return ImmutableSet.of("**/pom.xml");
+	public PomXmlFormatterStepFactory(PomXmlFormatterFactory pomXmlFactory,
+			ICodeProvider codeProvider,
+			SpotlessFormatterProperties spotlessProperties) {
+		super(pomXmlFactory, codeProvider, spotlessProperties);
 	}
 
 	@Override
@@ -59,12 +51,9 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
+	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
 		switch (stepName) {
-		case "licenseHeader": {
-			return makeLicenseHeader(s);
-		}
 		case "sortPom": {
 			SortPomCfg config = new SortPomCfg();
 

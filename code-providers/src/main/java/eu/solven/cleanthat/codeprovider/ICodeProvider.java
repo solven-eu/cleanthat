@@ -16,7 +16,10 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -25,14 +28,34 @@ import java.util.function.Consumer;
  * @author Benoit Lacelle
  */
 public interface ICodeProvider {
+	FileSystem getFileSystem();
 
-	void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException;
+	default void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+		listFilesForContent(Set.of("glob:**/*"), consumer);
+	}
 
 	default void listFilesForFilenames(Consumer<ICodeProviderFile> consumer) throws IOException {
-		listFilesForContent(consumer);
+		listFilesForFilenames(Set.of("glob:**/*"), consumer);
+	}
+
+	/**
+	 * 
+	 * @param includes
+	 *            a {@link Set} of pattern like 'glob:**\/src/\**\/*.java' or 'regex:.*\/src/.*\/[^/]*\.java'
+	 * @param consumer
+	 * @throws IOException
+	 */
+	void listFilesForContent(Set<String> includes, Consumer<ICodeProviderFile> consumer) throws IOException;
+
+	default void listFilesForFilenames(Set<String> includes, Consumer<ICodeProviderFile> consumer) throws IOException {
+		listFilesForContent(includes, consumer);
 	}
 
 	Optional<String> loadContentForPath(String path) throws IOException;
+
+	default Optional<String> loadContentForPath(Path path) throws IOException {
+		return loadContentForPath(path.toString());
+	}
 
 	String getRepoUri();
 

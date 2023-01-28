@@ -42,6 +42,7 @@ import java.nio.file.FileSystem;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,10 +77,10 @@ public class TestSpotlessFormatter_Eclipse {
 			.loadRepoConfig(new ClassPathResource("/config/" + "cleanthat_requestSpotless_requestEclipse.yaml"));
 
 	private IEngineProperties getEngineProperties() throws IOException, JsonParseException, JsonMappingException {
-		List<CleanthatEngineProperties> languages = repositoryProperties.getEngines();
-		Assert.assertEquals(1, languages.size());
+		List<CleanthatEngineProperties> engines = repositoryProperties.getEngines();
+		Assert.assertEquals(1, engines.size());
 		IEngineProperties engineP = new ConfigHelpers(Arrays.asList(objectMapper))
-				.mergeEngineProperties(repositoryProperties, languages.get(0));
+				.mergeEngineProperties(repositoryProperties, engines.get(0));
 		return engineP;
 	}
 
@@ -92,13 +93,19 @@ public class TestSpotlessFormatter_Eclipse {
 		}
 
 		@Override
-		public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+		public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+				throws IOException {
 			throw new IllegalArgumentException("Not implemented");
 		}
 
 		@Override
 		public String getRepoUri() {
 			return Thread.currentThread().getContextClassLoader().getName();
+		}
+
+		@Override
+		public FileSystem getFileSystem() {
+			return fileSystem;
 		}
 	};
 

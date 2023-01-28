@@ -15,14 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import java.util.Map;
-import java.util.Set;
-
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Knows how to format a String
@@ -35,13 +34,6 @@ public interface IEngineLintFixerFactory {
 
 	String getEngine();
 
-	/**
-	 * The typical file extensions concerned by this LintFixer
-	 * 
-	 * @return the {@link Set} of relevant file extensions.
-	 */
-	Set<String> getFileExtentions();
-
 	ILintFixer makeLintFixer(CleanthatStepProperties stepProperties,
 			IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession);
@@ -49,4 +41,11 @@ public interface IEngineLintFixerFactory {
 	CleanthatEngineProperties makeDefaultProperties();
 
 	Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties);
+
+	/**
+	 * The typical file concerned by this {@link ILintFixer}
+	 * 
+	 * @return the {@link Set} of relevant include patterns.
+	 */
+	Set<String> getDefaultIncludes();
 }

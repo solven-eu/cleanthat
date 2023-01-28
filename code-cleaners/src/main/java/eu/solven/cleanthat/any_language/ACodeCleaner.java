@@ -15,25 +15,12 @@
  */
 package eu.solven.cleanthat.any_language;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -41,6 +28,11 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Asbtract for {@link ICodeCleaner}

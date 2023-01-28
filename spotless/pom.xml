@@ -149,13 +149,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- For Exclusion in ArtifactResolver  -->
-			<groupId>org.eclipse.aether</groupId>
-			<artifactId>aether-api</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>

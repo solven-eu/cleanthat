@@ -24,10 +24,12 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
@@ -47,13 +49,15 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	final String token;
 	final GHPullRequest pr;
 
-	public GithubPRCodeProvider(String token, GHPullRequest pr) {
+	public GithubPRCodeProvider(FileSystem fs, String token, GHPullRequest pr) {
+		super(fs);
 		this.token = token;
 		this.pr = pr;
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+			throws IOException {
 		pr.listFiles().forEach(prFile -> {
 			if ("deleted".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a deleted file: {}", prFile.getFilename());

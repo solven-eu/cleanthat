@@ -61,7 +61,13 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public FileSystem getFileSystem() {
+		return fs;
+	}
+
+	@Override
+	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+			throws IOException {
 		Predicate<Path> gitIgnorePredicate;
 
 		File gitIgnore = root.resolve(fs.getPath(".gitignore")).toFile();

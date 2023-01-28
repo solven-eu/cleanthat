@@ -26,7 +26,9 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.kohsuke.github.GHCompare;
@@ -50,7 +52,8 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 
 	final Supplier<GHCompare> diffSupplier;
 
-	public AGithubDiffCodeProvider(String token, GHRepository baseRepository) {
+	public AGithubDiffCodeProvider(FileSystem fs, String token, GHRepository baseRepository) {
+		super(fs);
 		this.token = token;
 
 		this.baseRepository = baseRepository;
@@ -70,7 +73,7 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 	protected abstract String getHeadId();
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Set<String> patterns, Consumer<ICodeProviderFile> consumer) throws IOException {
 		GHCompare diff = diffSupplier.get();
 
 		if (diff.getTotalCommits() >= LIMIT_COMMIT_IN_COMPARE) {

@@ -28,6 +28,7 @@ import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +69,9 @@ public class ITGithubPullRequestCleaner {
 		cleaner = new GithubRefCleaner(objectMappers, factories, codeProviderFormatter, githubForRepo);
 
 		GitHub installationGithub = githubForRepo.getGithub();
-		cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper
-				.decorate(GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName))));
+		cleaner.tryOpenPRWithCleanThatStandardConfiguration(
+				Files.createTempDirectory("cleanthat-ITGithubPullRequestCleaner-"),
+				GithubDecoratorHelper
+						.decorate(GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName))));
 	}
 }

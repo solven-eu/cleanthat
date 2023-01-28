@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.config;
+package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import java.util.Map;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.Set;
 
 /**
- * The result of preparing a reasonnable config for CleanThat.
+ * Make {@link ICodeFormatterApplier} for different languages.
  * 
  * @author Benoit Lacelle
  *
  */
-@Data
-@Builder
-public class EngineInitializerResult {
-	final CleanthatRepositoryProperties repoProperties;
+public interface IEngineFormatterFactory {
+	IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
 
-	@Singular
-	final Map<String, String> pathToContents;
-
+	Set<String> getDefaultIncludes(String engine);
 }

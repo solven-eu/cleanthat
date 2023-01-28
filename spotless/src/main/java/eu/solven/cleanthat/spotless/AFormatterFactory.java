@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine;
+package eu.solven.cleanthat.spotless;
 
-import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import java.util.Set;
 
 /**
- * Make {@link ICodeFormatterApplier} for different languages.
+ * Common behavior to any Spotless engine steps factory
  * 
  * @author Benoit Lacelle
  *
  */
-public interface ILanguageFormatterFactory {
-	IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
+// see com.diffplug.spotless.maven.FormatterFactory
+public abstract class AFormatterFactory {
+
+	public abstract Set<String> defaultIncludes();
+
+	public abstract AFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
+			SpotlessFormatterProperties formatterProperties);
+
 }

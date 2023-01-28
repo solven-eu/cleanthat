@@ -25,10 +25,11 @@ import com.diffplug.spotless.extra.GitAttributesLineEndings_InMemory;
 import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
-import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
-import eu.solven.cleanthat.spotless.language.MarkdownFormatterStepFactory;
-import eu.solven.cleanthat.spotless.language.PomXmlFormatterStepFactory;
-import eu.solven.cleanthat.spotless.language.ScalaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
+import eu.solven.cleanthat.spotless.language.MarkdownFormatterFactory;
+import eu.solven.cleanthat.spotless.language.PomXmlFormatterFactory;
+import eu.solven.cleanthat.spotless.language.ScalaFormatterFactory;
+import eu.solven.cleanthat.spotless.language.XmlFormatterFactory;
 import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
@@ -79,24 +80,38 @@ public class FormatterFactory {
 	}
 
 	public static Set<String> getFormatterIds() {
-		return ImmutableSet.of(ID_JAVA, "scala", "markdown", "pom");
+		return ImmutableSet.of(ID_JAVA, "scala", "markdown", "pom", "xml");
 	}
 
-	public AFormatterStepFactory makeFormatterStepFactory(SpotlessFormatterProperties spotlessProperties) {
+	public static Set<String> getDefaultIncludes() {
+		return getFormatterIds().stream()
+				.map(s -> SpotlessFormatterProperties.builder().format(s).build())
+				.map(s -> makeFormatterFactory(s))
+				.flatMap(f -> f.defaultIncludes().stream())
+				.collect(Collectors.toSet());
+	}
+
+	public static AFormatterFactory makeFormatterFactory(SpotlessFormatterProperties spotlessProperties) {
 		String language = spotlessProperties.getFormat();
 		switch (language) {
 		case ID_JAVA:
-			return new JavaFormatterStepFactory(codeProvider, spotlessProperties);
+			return new JavaFormatterFactory();
 		case "scala":
-			return new ScalaFormatterStepFactory(codeProvider, spotlessProperties);
+			return new ScalaFormatterFactory();
 		case "markdown":
-			return new MarkdownFormatterStepFactory(codeProvider, spotlessProperties);
+			return new MarkdownFormatterFactory();
 		case "pom":
-			return new PomXmlFormatterStepFactory(codeProvider, spotlessProperties);
+			return new PomXmlFormatterFactory();
+		case "xml":
+			return new XmlFormatterFactory();
 
 		default:
 			throw new IllegalArgumentException("Not managed language: " + language);
 		}
+	}
+
+	public AFormatterStepFactory makeFormatterStepFactory(SpotlessFormatterProperties spotlessProperties) {
+		return makeFormatterFactory(spotlessProperties).makeStepFactory(codeProvider, spotlessProperties);
 	}
 
 	// com.diffplug.gradle.spotless.SpotlessTask#buildFormatter

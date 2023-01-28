@@ -86,7 +86,7 @@ public class CodeProviderHelpers {
 		if (pathAndContent.getKey().endsWith(".json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
 		} else if (pathAndContent.getKey().endsWith(".yml") || pathAndContent.getKey().endsWith(".yaml")) {
-			objectMapper = ConfigHelpers.getJson(objectMappers);
+			objectMapper = ConfigHelpers.getYaml(objectMappers);
 		} else {
 			throw new IllegalArgumentException("Not managed extention: " + pathAndContent.getKey());
 		}

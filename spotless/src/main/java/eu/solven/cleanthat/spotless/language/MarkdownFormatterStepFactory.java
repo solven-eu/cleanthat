@@ -21,7 +21,6 @@ import com.diffplug.spotless.markdown.FlexmarkStep;
 import com.diffplug.spotless.markdown.FreshMarkStep;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
@@ -29,7 +28,6 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Configure Spotless engine for 'pm.xml' files
@@ -38,14 +36,10 @@ import java.util.Set;
  *
  */
 public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
-	public MarkdownFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties spotlessProperties) {
-		super(codeProvider, spotlessProperties);
-	}
-
-	// CleanThat will call spotless from the root directory: process any 'README.MD' file from there
-	@Override
-	public Set<String> defaultIncludes() {
-		return ImmutableSet.of("**/README.MD");
+	public MarkdownFormatterStepFactory(MarkdownFormatterFactory markdownFactory,
+			ICodeProvider codeProvider,
+			SpotlessFormatterProperties spotlessProperties) {
+		super(markdownFactory, codeProvider, spotlessProperties);
 	}
 
 	@Override
@@ -55,12 +49,9 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
+	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
 		switch (stepName) {
-		case "licenseHeader": {
-			return makeLicenseHeader(s);
-		}
 		case "flexmark": {
 			String libVersion = s.getCustomProperty("version", String.class);
 			if (libVersion == null) {

@@ -22,13 +22,15 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Singular;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * The configuration of what is not related to a language/an engine.
@@ -38,6 +40,8 @@ import lombok.Setter;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
+@Builder
+@Jacksonized
 public class SourceCodeProperties implements ISourceCodeProperties {
 	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
@@ -45,33 +49,35 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	// If multiple, we exclude files matching at least one exclude (OR)
 	// see java.nio.file.FileSystem.getPathMatcher(String)
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<String> excludes = Arrays.asList();
+	@Singular
+	private List<String> excludes;
 
 	// If empty, no file is included
 	// If multiple, we include files matching at least one include (OR)
 	// see java.nio.file.FileSystem.getPathMatcher(String)
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
-	private List<String> includes = Arrays.asList();
+	@Singular
+	private List<String> includes;
 
 	// The encoding of files
-	private String encoding = null;
+	private String encoding;
 
 	// https://stackoverflow.com/questions/51388545/how-to-override-lombok-setter-methods
 	@Setter(AccessLevel.NONE)
 	@Getter(AccessLevel.NONE)
-	private Optional<LineEnding> lineEnding = Optional.empty();
+	// private Optional<LineEnding> lineEnding;
+	private LineEnding lineEnding;
 
-	private LineEnding parseLineEnding(String lineEnding) {
-		return LineEnding.valueOf(lineEnding);
-	}
+	// private LineEnding parseLineEnding(String lineEnding) {
+	// return LineEnding.valueOf(lineEnding);
+	// }
 
 	public static SourceCodeProperties defaultRoot() {
-		SourceCodeProperties root = new SourceCodeProperties();
-
-		root.setEncoding(DEFAULT_ENCODING);
-		root.setLineEndingAsEnum(LineEnding.GIT);
-
-		return root;
+		return SourceCodeProperties.builder()
+				.encoding(DEFAULT_ENCODING)
+				// .lineEnding(Optional.of(LineEnding.GIT))
+				.lineEnding(LineEnding.GIT)
+				.build();
 	}
 
 	// Git has some preference to committing LF
@@ -79,23 +85,26 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	@JsonIgnore
 	@Override
 	public LineEnding getLineEndingAsEnum() {
-		return lineEnding.orElse(null);
+		// return lineEnding.orElse(null);
+		return lineEnding;
 	}
 
 	public String getLineEnding() {
-		return lineEnding.map(Object::toString).orElse(null);
+		// return lineEnding.map(Object::toString).orElse(null);
+		return Optional.ofNullable(lineEnding).map(Object::toString).orElse(null);
 	}
 
 	@JsonIgnore
 	public void setLineEndingAsEnum(LineEnding lineEnding) {
-		this.lineEnding = Optional.ofNullable(lineEnding);
+		// this.lineEnding = Optional.ofNullable(lineEnding);
+		this.lineEnding = lineEnding;
 	}
 
-	public void setLineEnding(String lineEnding) {
-		if (lineEnding == null) {
-			this.lineEnding = Optional.empty();
-		} else {
-			this.lineEnding = Optional.of(parseLineEnding(lineEnding));
-		}
-	}
+	// public void setLineEnding(String lineEnding) {
+	// if (lineEnding == null) {
+	// this.lineEnding = Optional.empty();
+	// } else {
+	// this.lineEnding = Optional.of(parseLineEnding(lineEnding));
+	// }
+	// }
 }

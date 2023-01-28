@@ -21,6 +21,7 @@ import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.List;
@@ -78,16 +79,21 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 		return outputRef.get();
 	}
 
+	// PMD.CloseResource: False positive as we did not open it ourselves
+	@SuppressWarnings("PMD.CloseResource")
 	protected String applyProcessor(IEngineProperties languageProperties,
 			ILintFixer formatter,
 			PathAndContent pathAndContent) throws IOException {
 		Objects.requireNonNull(pathAndContent, "pathAndContent should not be null");
 		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCode();
 
-		String filePath = pathAndContent.getPath().toString();
+		Path filePath = pathAndContent.getPath();
+
+		FileSystem fs = pathAndContent.getPath().getFileSystem();
 
 		// TODO We should skip excluded files BEFORE loading their content
-		List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getIncludes());
+		List<PathMatcher> includeMatchers =
+				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
 		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 		String code = pathAndContent.getContent();
 		if (matchingInclude.isEmpty()) {
@@ -95,7 +101,8 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			return code;
 		}
 
-		List<PathMatcher> excludeMatchers = IncludeExcludeHelpers.prepareMatcher(sourceCodeProperties.getExcludes());
+		List<PathMatcher> excludeMatchers =
+				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getExcludes());
 		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
 		if (matchingExclude.isPresent()) {
 			LOGGER.debug("File {} was initially not-excluded but excluded for processor: {}", filePath, formatter);

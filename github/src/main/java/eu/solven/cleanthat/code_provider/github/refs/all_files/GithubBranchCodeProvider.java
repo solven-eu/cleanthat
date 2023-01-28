@@ -21,6 +21,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -33,8 +34,8 @@ import org.kohsuke.github.GHRepository;
 public class GithubBranchCodeProvider extends AGithubSha1CodeProviderWriter {
 	final GHBranch branch;
 
-	public GithubBranchCodeProvider(String token, GHRepository repo, GHBranch branch) {
-		super(token, repo);
+	public GithubBranchCodeProvider(FileSystem fs, String token, GHRepository repo, GHBranch branch) {
+		super(fs, token, repo);
 		this.branch = branch;
 	}
 

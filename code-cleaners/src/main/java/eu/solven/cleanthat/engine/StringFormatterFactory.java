@@ -17,32 +17,38 @@ package eu.solven.cleanthat.engine;
 
 import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Default implementation for {@link ILanguageFormatterFactory}
+ * Default implementation for {@link IEngineFormatterFactory}
  * 
  * @author Benoit Lacelle
  *
  */
-public class StringFormatterFactory implements ILanguageFormatterFactory {
+public class StringFormatterFactory implements IEngineFormatterFactory {
 
-	final Map<String, IEngineLintFixerFactory> languageToFormatter;
+	final Map<String, IEngineLintFixerFactory> engineToFormatter;
 
 	public StringFormatterFactory(Map<String, IEngineLintFixerFactory> languageToFormatter) {
-		this.languageToFormatter = languageToFormatter;
+		this.engineToFormatter = languageToFormatter;
 	}
 
 	@Override
 	public IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties) {
 		String language = languageProperties.getEngine();
-		IEngineLintFixerFactory formatter = languageToFormatter.get(language);
+		IEngineLintFixerFactory formatter = engineToFormatter.get(language);
 
 		if (formatter == null) {
 			throw new IllegalArgumentException(
-					"There is no formatter for language=" + language + " languages=" + languageToFormatter.keySet());
+					"There is no formatter for language=" + language + " languages=" + engineToFormatter.keySet());
 		}
 
 		return formatter;
+	}
+
+	@Override
+	public Set<String> getDefaultIncludes(String engine) {
+		return engineToFormatter.get(engine).getDefaultIncludes();
 	}
 
 }

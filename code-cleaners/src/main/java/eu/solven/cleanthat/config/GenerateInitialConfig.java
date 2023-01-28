@@ -17,18 +17,23 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
-import com.google.common.io.Files;
+import com.google.common.util.concurrent.AtomicLongMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -61,15 +66,22 @@ public class GenerateInitialConfig {
 
 		CleanthatRepositoryProperties properties = CleanthatRepositoryProperties.defaultRepository();
 
-		Set<String> extentionsFound = scanFileExtentions(codeProvider);
+		List<CleanthatEngineProperties> mutableEngines = new ArrayList<>(properties.getEngines());
+		properties.setEngines(mutableEngines);
 
-		factories.forEach(factory -> {
-			SetView<String> intersection = Sets.intersection(factory.getFileExtentions(), extentionsFound);
-			if (!intersection.isEmpty()) {
-				LOGGER.info("There is a file-extension match ({}) for {}", intersection, factory.getEngine());
+		AtomicLongMap<String> factoryToFileCount = scanFileExtentions(codeProvider, factories);
+
+		factoryToFileCount.asMap().forEach((engine, count) -> {
+			if (count == 0) {
+				LOGGER.debug("Not a single file matched {}", engine);
+			} else {
+				LOGGER.info("Some files ({}) matched {}", count, engine);
+
+				IEngineLintFixerFactory factory =
+						factories.stream().filter(f -> engine.equals(f.getEngine())).findAny().get();
 
 				CleanthatEngineProperties engineProperties = factory.makeDefaultProperties();
-				properties.getEngines().add(engineProperties);
+				mutableEngines.add(engineProperties);
 
 				pathToContent.putAll(factory.makeCustomDefaultFiles(engineProperties));
 			}
@@ -78,19 +90,38 @@ public class GenerateInitialConfig {
 		return EngineInitializerResult.builder().repoProperties(properties).pathToContents(pathToContent).build();
 	}
 
-	public Set<String> scanFileExtentions(ICodeProvider codeProvider) {
-		Set<String> extentionsFound = new TreeSet<>();
+	// PMD.CloseResource: False positive as we did not open it ourselves
+	@SuppressWarnings("PMD.CloseResource")
+	public AtomicLongMap<String> scanFileExtentions(ICodeProvider codeProvider,
+			Collection<IEngineLintFixerFactory> factories) {
+		AtomicLongMap<String> factoryToFileCount = AtomicLongMap.create();
+
+		FileSystem fs = codeProvider.getFileSystem();
 
 		try {
 			// Listing files may be slow if there is many files (e.g. download of repo as zip)
 			LOGGER.info("About to list files to prepare a default configuration");
-			codeProvider.listFilesForFilenames(file -> {
-				String filePath = file.getPath();
 
-				// https://stackoverflow.com/questions/924394/how-to-get-the-filename-without-the-extension-in-java
-				String extention = Files.getFileExtension(filePath);
+			Set<String> allIncludes = new HashSet<>();
 
-				extentionsFound.add(extention);
+			factories.forEach(f -> allIncludes.addAll(f.getDefaultIncludes()));
+
+			codeProvider.listFilesForFilenames(allIncludes, file -> {
+				Path filePath = fs.getPath(file.getPath());
+
+				factories.forEach(factory -> {
+					// Spotless handles only glob patterns
+					Set<String> includes =
+							factory.getDefaultIncludes().stream().map(g -> "glob:" + g).collect(Collectors.toSet());
+
+					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, includes);
+					Optional<PathMatcher> matchingInclude =
+							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+
+					if (matchingInclude.isPresent()) {
+						factoryToFileCount.getAndIncrement(factory.getEngine());
+					}
+				});
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing all files for extentions", e);
@@ -100,9 +131,9 @@ public class GenerateInitialConfig {
 			LOGGER.warn("Issue while processing the repository", e);
 		}
 
-		LOGGER.info("Extentions found in {}: {}", codeProvider, extentionsFound);
+		LOGGER.info("Extentions found in {}: {}", codeProvider, factoryToFileCount);
 
-		return extentionsFound;
+		return factoryToFileCount;
 	}
 
 }

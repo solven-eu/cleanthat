@@ -91,8 +91,7 @@ public class TestConfigHelpers {
 
 		SourceCodeProperties defaultP = SourceCodeProperties.defaultRoot();
 		defaultP.setEncoding(StandardCharsets.ISO_8859_1.name());
-		SourceCodeProperties windowsP = new SourceCodeProperties();
-		windowsP.setLineEndingAsEnum(LineEnding.CRLF);
+		SourceCodeProperties windowsP = SourceCodeProperties.builder().lineEnding(LineEnding.CRLF).build();
 		windowsP.setEncoding(StandardCharsets.US_ASCII.name());
 
 		Assert.assertEquals(LineEnding.GIT, defaultP.getLineEndingAsEnum());
@@ -138,12 +137,11 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
-		defaultP.setExcludes(Arrays.asList(".*/generated/.*"));
+		SourceCodeProperties defaultP = SourceCodeProperties.builder().exclude(".*/generated/.*").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -154,8 +152,7 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -166,9 +163,8 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren and cancel parent exclusion
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
-			childrenP.setIncludes(Arrays.asList(".*/generated/.*"));
+			SourceCodeProperties childrenP =
+					SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").include(".*/generated/.*").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -185,12 +181,11 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
-		defaultP.setIncludes(Arrays.asList(".*\\.xml"));
+		SourceCodeProperties defaultP = SourceCodeProperties.builder().include(".*\\.xml").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -201,8 +196,7 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setIncludes(Arrays.asList("pom.xml"));
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().include("pom.xml").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));

@@ -19,7 +19,6 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.scala.ScalaFmtStep;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
@@ -28,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Configure Spotless engine for '.scala' files
@@ -37,20 +35,12 @@ import java.util.Set;
  *
  */
 public class ScalaFormatterStepFactory extends AFormatterStepFactory {
-	// com.diffplug.spotless.maven.scala.Scala#DEFAULT_INCLUDES
-	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("src/main/scala/**/*.scala",
-			"src/test/scala/**/*.scala",
-			"src/main/scala/**/*.sc",
-			"src/test/scala/**/*.sc");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
-	public ScalaFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties formatterProperties) {
-		super(codeProvider, formatterProperties);
-	}
-
-	@Override
-	public Set<String> defaultIncludes() {
-		return DEFAULT_INCLUDES;
+	public ScalaFormatterStepFactory(ScalaFormatterFactory scalaFactory,
+			ICodeProvider codeProvider,
+			SpotlessFormatterProperties formatterProperties) {
+		super(scalaFactory, codeProvider, formatterProperties);
 	}
 
 	@Override
@@ -60,12 +50,9 @@ public class ScalaFormatterStepFactory extends AFormatterStepFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
+	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepId = s.getId();
 		switch (stepId) {
-		case "licenseHeader": {
-			return makeLicenseHeader(s);
-		}
 		case "scalafmt": {
 			String scalafmtVersion = s.getCustomProperty("version", String.class);
 			if (scalafmtVersion == null) {

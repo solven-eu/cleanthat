@@ -15,15 +15,6 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
@@ -31,14 +22,19 @@ import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.diffplug.spotless.java.ImportOrderStep;
 import com.diffplug.spotless.java.RemoveUnusedImportsStep;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Configure Spotless engine for '.java' files
@@ -47,9 +43,6 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
-	// CleanThat will call spotless from the root directory: process any Java file from there, in some 'src' parent
-	// directory
-	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/src/**/*.java");
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
 	public static final String KEY_ECLIPSE_FILE = KEY_FILE;
@@ -61,13 +54,10 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 	public static final String ID_ECLIPSE = "eclipse";
 
-	public JavaFormatterStepFactory(ICodeProvider codeProvider, SpotlessFormatterProperties formatterProperties) {
-		super(codeProvider, formatterProperties);
-	}
-
-	@Override
-	public Set<String> defaultIncludes() {
-		return DEFAULT_INCLUDES;
+	public JavaFormatterStepFactory(JavaFormatterFactory formatterFactory,
+			ICodeProvider codeProvider,
+			SpotlessFormatterProperties formatterProperties) {
+		super(formatterFactory, codeProvider, formatterProperties);
 	}
 
 	@Override
@@ -76,12 +66,9 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	}
 
 	@Override
-	public FormatterStep makeStep(SpotlessStepProperties s, Provisioner provisioner) {
+	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepId = s.getId();
 		switch (stepId) {
-		case "licenseHeader": {
-			return makeLicenseHeader(s);
-		}
 		case "removeUnusedImports": {
 			return RemoveUnusedImportsStep.create(provisioner);
 		}

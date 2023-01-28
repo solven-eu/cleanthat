@@ -60,12 +60,8 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public Set<String> getFileExtentions() {
-		return FormatterFactory.getFormatterIds()
-				.stream()
-				.filter(s -> s.charAt(0) == '.')
-				.map(s -> s.substring(1))
-				.collect(Collectors.toSet());
+	public Set<String> getDefaultIncludes() {
+		return FormatterFactory.getDefaultIncludes();
 	}
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")

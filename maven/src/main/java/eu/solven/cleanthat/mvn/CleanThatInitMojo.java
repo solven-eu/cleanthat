@@ -109,7 +109,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 					"Something prevents the generation of a configuration");
 		}
 
-		ICodeProvider codeProvider = new FileSystemCodeProvider(configPathFile.getParent());
+		ICodeProvider codeProvider = new FileSystemCodeProvider(getBaseDir().toPath());
 
 		GenerateInitialConfig generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
@@ -174,12 +174,16 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		writeFile(configPathFile, asYaml);
 	}
 
-	private void writeFile(Path configPathFile, String asYaml) {
+	private void writeFile(Path configPathFile, String content) {
+		if (configPathFile.toFile().getParentFile().mkdirs()) {
+			LOGGER.info("We created parent folder(s) for {}", configPathFile);
+		}
+
 		try {
 			// StandardOpenOption.TRUNCATE_EXISTING
-			Files.writeString(configPathFile, asYaml, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);
+			Files.writeString(configPathFile, content, Charsets.UTF_8, StandardOpenOption.CREATE_NEW);
 		} catch (IOException e) {
-			throw new UncheckedIOException("Issue writing YAML into: " + configPathFile, e);
+			throw new UncheckedIOException("Issue writing content into: " + configPathFile, e);
 		}
 	}
 }

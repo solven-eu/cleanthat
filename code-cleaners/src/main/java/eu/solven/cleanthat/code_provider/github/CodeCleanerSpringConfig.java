@@ -20,7 +20,7 @@ import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.ILanguageFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineFormatterFactory;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.engine.StringFormatterFactory;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
@@ -52,7 +52,7 @@ public class CodeCleanerSpringConfig {
 	}
 
 	@Bean
-	public ILanguageFormatterFactory stringFormatterFactory(List<IEngineLintFixerFactory> stringFormatters) {
+	public IEngineFormatterFactory stringFormatterFactory(List<IEngineLintFixerFactory> stringFormatters) {
 		Map<String, IEngineLintFixerFactory> asMap = new LinkedHashMap<>();
 
 		stringFormatters.forEach(sf -> {
@@ -66,7 +66,7 @@ public class CodeCleanerSpringConfig {
 
 	@Bean
 	public ICodeProviderFormatter codeProviderFormatter(ConfigHelpers configHelpers,
-			ILanguageFormatterFactory formatterFactory,
+			IEngineFormatterFactory formatterFactory,
 			ICodeFormatterApplier formatterApplier) {
 		return new CodeProviderFormatter(configHelpers, formatterFactory, formatterApplier);
 	}

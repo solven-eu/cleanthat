@@ -117,9 +117,8 @@ public class ConfigHelpers {
 		}
 	}
 
-	public IEngineProperties mergeEngineProperties(IHasSourceCodeProperties properties,
-			IEngineProperties dirtyLanguageConfig) {
-		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyLanguageConfig);
+	public IEngineProperties mergeEngineProperties(IHasSourceCodeProperties properties, IEngineProperties dirtyEngine) {
+		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyEngine);
 		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageAsMap);
@@ -132,7 +131,7 @@ public class ConfigHelpers {
 			Map<String, ?> dirtyLanguageConfig) {
 		Map<String, ?> rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
 		Map<String, ?> explicitSourceCodeProperties =
-				PepperMapHelper.getRequiredMap(dirtyLanguageConfig, KEY_SOURCE_CODE);
+				PepperMapHelper.<Map<String, ?>>getOptionalAs(dirtyLanguageConfig, KEY_SOURCE_CODE).orElse(Map.of());
 
 		Map<String, Object> sourceConfig =
 				mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);
@@ -222,12 +221,12 @@ public class ConfigHelpers {
 		}
 	}
 
-	public IEngineProperties forceIncludes(IEngineProperties languageP, List<String> includes) {
-		Map<String, Object> languageAsMap = objectMapper.convertValue(languageP, Map.class);
-		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(languageP.getSourceCode(), Map.class);
+	public IEngineProperties forceIncludes(IEngineProperties engine, Collection<String> includes) {
+		Map<String, Object> engineAsMap = objectMapper.convertValue(engine, Map.class);
+		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(engine.getSourceCode(), Map.class);
 		sourceCodeAsMap.put(KEY_INCLUDES, includes);
-		languageAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
-		return objectMapper.convertValue(languageAsMap, CleanthatEngineProperties.class);
+		engineAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
+		return objectMapper.convertValue(engineAsMap, CleanthatEngineProperties.class);
 	}
 
 	public static ObjectMapper getJson(Collection<ObjectMapper> objectMappers) {

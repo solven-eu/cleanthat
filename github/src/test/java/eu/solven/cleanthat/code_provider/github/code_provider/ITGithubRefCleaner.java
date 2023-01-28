@@ -25,6 +25,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactor
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import java.io.IOException;
+import java.nio.file.Files;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHApp;
@@ -64,6 +65,7 @@ public class ITGithubRefCleaner {
 
 		cleanerFactory.makeCleaner(githubForRepo)
 				.get()
-				.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(masterBranch));
+				.tryOpenPRWithCleanThatStandardConfiguration(Files.createTempDirectory("cleanthat-ITGithubRefCleaner-"),
+						GithubDecoratorHelper.decorate(masterBranch));
 	}
 }

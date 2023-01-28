@@ -1,9 +1,23 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -39,6 +53,7 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 		// As we will generate file, we move to a temporary location
 		FileUtils.copyDirectory(readOnlyFolder, readWriteFolder);
 
+		// We need a pom to execute the Mojo (i.e. it is difficult to test the markdown-only case)
 		File pom = new File(readWriteFolder, "pom.xml");
 		assertNotNull(pom);
 		assertTrue(pom.exists());

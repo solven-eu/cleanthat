@@ -41,6 +41,7 @@ import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -180,7 +181,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	// the base branch?
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity", "PMD.ExcessiveMethodLength" })
 	// @Override
-	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
+	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(Path root,
+			ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = githubNoApiWebhookHandler.filterWebhookEventRelevant(githubEvent);
@@ -236,8 +238,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.debug("About to consider creating a default configuration for {} (as default branch)",
 						pushedRef);
 				// Open PR with default relevant configuration
-				boolean initialized = cleaner
-						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
+				boolean initialized = cleaner.tryOpenPRWithCleanThatStandardConfiguration(root,
+						GithubDecoratorHelper.decorate(defaultBranch));
 
 				if (initialized) {
 					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
@@ -254,7 +256,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(offlineResult, dirtyHeadRef, relevantBaseBranches);
+				cleaner.prepareRefToClean(root, offlineResult, dirtyHeadRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
@@ -419,7 +421,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	// @Override
-	public void doExecuteClean(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
+	public void doExecuteClean(Path root,
+			ICodeCleanerFactory cleanerFactory,
+			IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult =
 				githubNoApiWebhookHandler.filterWebhookEventRelevant(externalCodeEvent);
@@ -428,7 +432,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		WebhookRelevancyResult relevancyResult =
-				filterWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
+				filterWebhookEventTargetRelevantBranch(root, cleanerFactory, githubAndBranchAcceptedEvent);
 		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
 			throw new IllegalArgumentException("We should have rejected this earlier");
@@ -455,7 +459,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
 			// clean (e.g. when cleaning a master branch, into a new ref)
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-			CodeFormatResult result = GithubEventHelper.executeCleaning(relevancyResult, cleaner, facade, headSupplier);
+			CodeFormatResult result =
+					GithubEventHelper.executeCleaning(root, relevancyResult, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 			logAfterCleaning(installationId, githubAuthAsInst.getGithub());

@@ -42,18 +42,19 @@ public class TestAGithubSha1CodeProvider {
 	@Test
 	public void testRepoSha1AsZip() throws IOException {
 		GHRepository ghRepo = Mockito.mock(GHRepository.class);
-		AGithubSha1CodeProvider codeProvider = new AGithubSha1CodeProvider("someToken", ghRepo) {
+		AGithubSha1CodeProvider codeProvider =
+				new AGithubSha1CodeProvider(FileSystems.getDefault(), "someToken", ghRepo) {
 
-			@Override
-			public String getSha1() {
-				return someSha1;
-			}
+					@Override
+					public String getSha1() {
+						return someSha1;
+					}
 
-			@Override
-			public String getRef() {
-				return someRef;
-			}
-		};
+					@Override
+					public String getRef() {
+						return someRef;
+					}
+				};
 
 		Path tmpZipFile = Files.createTempFile("cleanthat", "TestAGithubSha1CodeProvider.zip");
 		tmpZipFile.toFile().delete();

@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -283,19 +284,20 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		persistConfigurationFiles(appContext, configPath, loadedConfig, needToSaveCleanthat, needToSaveSpotless);
 	}
 
-	private SpotlessEngineProperties loadOrInitSpotlessEngineProperties(ICodeProviderWriter codeProvider,
+	private SpotlessEngineProperties loadOrInitSpotlessEngineProperties(ICodeProvider codeProvider,
 			ObjectMapper objectMapper,
 			String pathToSpotlessConfig) throws IOException {
-		SpotlessEngineProperties spotlessEngineProperties;
+		return loadSpotlessEngineProperties(codeProvider, objectMapper, pathToSpotlessConfig);
+	}
 
+	public static SpotlessEngineProperties loadSpotlessEngineProperties(ICodeProvider codeProvider,
+			ObjectMapper objectMapper,
+			String pathToSpotlessConfig) throws IOException {
 		Resource spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
 
-		{
-			try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
-				spotlessEngineProperties = objectMapper.convertValue(inputStream, SpotlessEngineProperties.class);
-			}
+		try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
+			return objectMapper.readValue(inputStream, SpotlessEngineProperties.class);
 		}
-		return spotlessEngineProperties;
 	}
 
 	private void persistConfigurationFiles(ApplicationContext appContext,

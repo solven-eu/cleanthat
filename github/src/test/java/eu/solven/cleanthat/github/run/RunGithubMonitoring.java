@@ -78,7 +78,7 @@ public class RunGithubMonitoring {
 			}
 
 			@Override
-			public Set<String> getFileExtentions() {
+			public Set<String> getDefaultIncludes() {
 				throw new UnsupportedOperationException();
 			}
 
@@ -91,6 +91,7 @@ public class RunGithubMonitoring {
 			public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
 				throw new UnsupportedOperationException();
 			}
+
 		};
 	}
 

@@ -64,9 +64,11 @@ public class TestDefaultConfig {
 			// eu.solven.cleanthat.config.GenerateInitialConfig.prepareDefaultConfiguration(ICodeProvider)
 			{
 
-				SourceCodeProperties javaSourceCodeProperties = new SourceCodeProperties();
-				javaSourceCodeProperties
-						.setIncludes(Arrays.asList("regex:.*\\.java", "regex:.*\\.json", "glob:**/pom.xml"));
+				SourceCodeProperties javaSourceCodeProperties = SourceCodeProperties.builder()
+						.include("regex:.*\\.java")
+						.include("regex:.*\\.json")
+						.include("glob:**/pom.xml")
+						.build();
 
 				CleanthatEngineProperties engineProperties = CleanthatEngineProperties.builder()
 						.engine(CleanthatSpotlessStepParametersProperties.ENGINE_ID)

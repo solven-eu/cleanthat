@@ -15,25 +15,37 @@
  */
 package eu.solven.cleanthat.engine;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class TestSourceCodeProperties {
+	final ObjectMapper objectMapper = new ObjectMapper();
+
 	@Test
 	public void testDefaultConstructor() {
-		SourceCodeProperties properties = new SourceCodeProperties();
+		SourceCodeProperties properties = SourceCodeProperties.builder().build();
 
 		// We rely on null so that any other parameter takes precedence
 		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
 	}
 
 	@Test
-	public void testDefaultMethod() {
+	public void testDefaultMethod() throws JsonMappingException, JsonProcessingException {
 		SourceCodeProperties properties = SourceCodeProperties.defaultRoot();
 
 		// By default, neither LR or CRLF as we should not privilege a platform
 		Assertions.assertThat(properties.getLineEndingAsEnum()).isEqualTo(LineEnding.GIT);
+
+		String asString = objectMapper.writeValueAsString(properties);
+		Assertions.assertThat(asString).contains("line_ending", "GIT");
+
+		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
+
+		Assertions.assertThat(asObject).isEqualTo(properties);
 	}
 }

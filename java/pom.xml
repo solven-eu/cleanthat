@@ -37,11 +37,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>io.sentry</groupId>
 			<artifactId>sentry-spring</artifactId>
 			<version>${sentry-spring.version}</version>

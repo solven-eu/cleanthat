@@ -20,7 +20,6 @@ import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;

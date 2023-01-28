@@ -59,7 +59,6 @@ import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
-import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHCommitPointer;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPermissionType;
@@ -91,7 +90,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	final List<ObjectMapper> objectMappers;
 
 	public GithubWebhookHandler(GHApp githubApp, List<ObjectMapper> objectMappers) {
-		this.githubNoApiWebhookHandler = new GithubNoApiWebhookHandler(objectMappers);
+		this.githubNoApiWebhookHandler = new
+
+		GithubNoApiWebhookHandler(objectMappers);
 		this.githubApp = githubApp;
 		this.objectMappers = objectMappers;
 	}

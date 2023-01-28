@@ -61,11 +61,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
-
-		<dependency>
 			<!-- Used to trigger Lambda from Lambda -->
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-lambda</artifactId>
@@ -261,13 +256,6 @@
 						</lambdaFunction>
 					</lambdaFunctions>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>javax.xml.bind</groupId>
-						<artifactId>jaxb-api</artifactId>
-						<version>${javax-jaxb.version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

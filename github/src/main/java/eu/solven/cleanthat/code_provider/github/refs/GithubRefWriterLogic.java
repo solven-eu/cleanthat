@@ -1,13 +1,29 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
+import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCommitBuilder;
 import org.kohsuke.github.GHRef;
@@ -16,9 +32,6 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
-import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 
 /**
  * Default {@link ICodeProviderWriterLogic}
@@ -68,8 +81,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		try {
 			GHTree createdTree = createTree.baseTree(sha).create();
 			String commitMessage = prComments.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
-			GHCommit commit =
-					prepareCommit(repo).message(commitMessage).parent(sha).tree(createdTree.getSha()).create();
+			GHCommitBuilder preparedCommit =
+					prepareCommit(repo).message(commitMessage).parent(sha).tree(createdTree.getSha());
+
+			computeSignature().ifPresent(s -> preparedCommit.withSignature(s));
+
+			GHCommit commit = preparedCommit
+
+					.create();
 
 			String newHead = commit.getSHA1();
 			LOGGER.info("Update {}:{} to {} ({})", repoName, refName, newHead, commit.getHtmlUrl());
@@ -80,7 +99,17 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		}
 	}
 
+	// https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+	// https://github.com/GitbookIO/github-api-signature/blob/master/src/createSignature.ts#L34
+	protected Optional<String> computeSignature() {
+		return Optional.empty();
+	}
+
 	public static GHCommitBuilder prepareCommit(GHRepository repo) {
-		return repo.createCommit().author("CleanThat", "CleanThat", new Date());
+		return repo.createCommit()
+		// https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification#signature-verification-for-bots
+		// No author so that the commit is automatocally marked as Verified by Github
+		// .author("CleanThat", "CleanThat", new Date())
+		;
 	}
 }

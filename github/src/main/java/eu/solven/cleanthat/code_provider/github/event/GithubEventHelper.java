@@ -1,13 +1,19 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.event;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.kohsuke.github.GHCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
@@ -16,6 +22,14 @@ import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import org.kohsuke.github.GHCommit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helps executing logic on GithubEvents
@@ -30,7 +44,8 @@ public class GithubEventHelper {
 		// hidden
 	}
 
-	public static CodeFormatResult executeCleaning(WebhookRelevancyResult relevancyResult,
+	public static CodeFormatResult executeCleaning(Path root,
+			WebhookRelevancyResult relevancyResult,
 			IGitRefCleaner cleaner,
 			GithubRepositoryFacade facade,
 			ILazyGitReference headSupplier) {
@@ -52,8 +67,10 @@ public class GithubEventHelper {
 			// } catch (IOException e) {
 			// throw new UncheckedIOException(e);
 			// }
-			result = cleaner
-					.formatCommitToRefDiff(facade.getRepository(), GithubDecoratorHelper.decorate(base), headSupplier);
+			result = cleaner.formatCommitToRefDiff(root,
+					facade.getRepository(),
+					GithubDecoratorHelper.decorate(base),
+					headSupplier);
 		} else {
 			throw new IllegalArgumentException("Unclear expected behavior");
 			// result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier.getSupplier().get());

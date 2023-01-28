@@ -1,11 +1,43 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.it;
 
+import com.google.common.base.Suppliers;
+import com.nimbusds.jose.JOSEException;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.github.run.ICleanThatITConstants;
+import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHFileNotFoundException;
@@ -19,24 +51,6 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-
-import com.google.common.base.Suppliers;
-import com.nimbusds.jose.JOSEException;
-
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.github.run.ICleanThatITConstants;
-import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 /**
  * This enables running CleanThat cleaning logic directly on given branch
@@ -86,7 +100,9 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			}
 		}).orElseGet(() -> GithubHelper.getDefaultBranch(repo));
 
-		ICodeProvider codeProvider = new GithubBranchCodeProvider(githubAndToken.getToken(), repo, branch);
+		Path root = Files.createTempDirectory("cleanthat");
+		ICodeProvider codeProvider =
+				new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, branch);
 
 		CodeProviderHelpers codeProviderHelpers = appContext.getBean(CodeProviderHelpers.class);
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
@@ -100,25 +116,26 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			branch = repo.getBranch(configureRef);
 
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, branch);
+					new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, branch);
 			mainBranchConfig = codeProviderHelpers.unsafeConfig(configureBranchCodeProvider);
 		}
 
 		if (mainBranchConfig.isEmpty()) {
-			behaveOnLackOfConfig(cleaner, githubAndToken, repo, branch, codeProviderHelpers);
+			behaveOnLackOfConfig(root, cleaner, githubAndToken, repo, branch, codeProviderHelpers);
 		} else {
-			doClean(cleaner, repo, branch);
+			doClean(root, cleaner, repo, branch);
 		}
 	}
 
-	private void doClean(GithubRefCleaner cleaner, GHRepository repo, GHBranch branch) {
+	private void doClean(Path root, GithubRefCleaner cleaner, GHRepository repo, GHBranch branch) {
 		LOGGER.info("CleanThat is configured in the main/configure branch ({})", branch.getName());
 
 		AtomicReference<GHRef> createdPr = new AtomicReference<>();
 
 		GHBranch finalBranch = branch;
 		String refName = CleanthatRefFilterProperties.BRANCHES_PREFIX + finalBranch.getName();
-		CodeFormatResult output = cleaner.formatRef(GithubDecoratorHelper.decorate(repo),
+		CodeFormatResult output = cleaner.formatRef(root,
+				GithubDecoratorHelper.decorate(repo),
 				GithubDecoratorHelper.decorate(finalBranch),
 				new LazyGitReference(refName, Suppliers.memoize(() -> {
 					GHRef pr = GithubHelper.openEmptyRef(repo, finalBranch);
@@ -134,7 +151,8 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 		}
 	}
 
-	private void behaveOnLackOfConfig(GithubRefCleaner cleaner,
+	private void behaveOnLackOfConfig(Path root,
+			GithubRefCleaner cleaner,
 			GithubAndToken githubAndToken,
 			GHRepository repo,
 			GHBranch branch,
@@ -143,7 +161,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 
 		Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(githubAndToken.getToken(), repo, b);
+					new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, b);
 			return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
 		}).findAny();
 		boolean configExistsAnywhere = branchWithConfig.isPresent();
@@ -154,7 +172,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			// At some point, we could prefer remaining silent if we understand the repository tried to integrate
 			// us, but did not completed.
 			LOGGER.info("About to try condiguring CleanThat in the repo");
-			cleaner.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(branch));
+			cleaner.tryOpenPRWithCleanThatStandardConfiguration(root, GithubDecoratorHelper.decorate(branch));
 		}
 	}
 }

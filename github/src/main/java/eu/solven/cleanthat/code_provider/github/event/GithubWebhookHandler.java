@@ -1,7 +1,47 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import eu.solven.cleanthat.utils.ResultOrError;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -36,32 +75,6 @@ import org.kohsuke.github.extras.ImpatientHttpConnector;
 import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
-import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
-import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.git_abstraction.GithubFacade;
-import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.cleanthat.utils.ResultOrError;
-import eu.solven.pepper.collection.PepperMapHelper;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -168,7 +181,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	// the base branch?
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity", "PMD.ExcessiveMethodLength" })
 	// @Override
-	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory cleanerFactory,
+	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(Path root,
+			ICodeCleanerFactory cleanerFactory,
 			IWebhookEvent githubAcceptedEvent) {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = githubNoApiWebhookHandler.filterWebhookEventRelevant(githubEvent);
@@ -224,8 +238,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.debug("About to consider creating a default configuration for {} (as default branch)",
 						pushedRef);
 				// Open PR with default relevant configuration
-				boolean initialized = cleaner
-						.tryOpenPRWithCleanThatStandardConfiguration(GithubDecoratorHelper.decorate(defaultBranch));
+				boolean initialized = cleaner.tryOpenPRWithCleanThatStandardConfiguration(root,
+						GithubDecoratorHelper.decorate(defaultBranch));
 
 				if (initialized) {
 					return WebhookRelevancyResult.dismissed("We just open a PR with default configuration");
@@ -242,7 +256,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(offlineResult, dirtyHeadRef, relevantBaseBranches);
+				cleaner.prepareRefToClean(root, offlineResult, dirtyHeadRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
@@ -407,7 +421,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	// @Override
-	public void doExecuteClean(ICodeCleanerFactory cleanerFactory, IWebhookEvent githubAndBranchAcceptedEvent) {
+	public void doExecuteClean(Path root,
+			ICodeCleanerFactory cleanerFactory,
+			IWebhookEvent githubAndBranchAcceptedEvent) {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult =
 				githubNoApiWebhookHandler.filterWebhookEventRelevant(externalCodeEvent);
@@ -416,7 +432,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
 		WebhookRelevancyResult relevancyResult =
-				filterWebhookEventTargetRelevantBranch(cleanerFactory, githubAndBranchAcceptedEvent);
+				filterWebhookEventTargetRelevantBranch(root, cleanerFactory, githubAndBranchAcceptedEvent);
 		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
 			throw new IllegalArgumentException("We should have rejected this earlier");
@@ -443,7 +459,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
 			// clean (e.g. when cleaning a master branch, into a new ref)
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
-			CodeFormatResult result = GithubEventHelper.executeCleaning(relevancyResult, cleaner, facade, headSupplier);
+			CodeFormatResult result =
+					GithubEventHelper.executeCleaning(root, relevancyResult, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 			logAfterCleaning(installationId, githubAuthAsInst.getGithub());

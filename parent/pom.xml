@@ -8,12 +8,12 @@
 		<artifactId>spring-boot-dependencies</artifactId>
 		<version>2.7.5</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath />
+		<relativePath/>
 	</parent>
 
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.10-SNAPSHOT</version>
+	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<inceptionYear>2020</inceptionYear>
@@ -22,7 +22,7 @@
 		<developer>
 			<id>blacelle</id>
 			<name>Benoit Lacelle</name>
-			<email>benoit.lacelle at gmail.com</email>
+			<email>benoit.lacelle at solven.eu</email>
 			<roles>
 				<role>Project lead</role>
 			</roles>
@@ -46,6 +46,24 @@
 		<!-- https://nodejs.org/en/download/ -->
 		<!-- Stick to the latest LTS -->
 		<node.version>v12.16.1</node.version>
+
+		<!-- https://github.com/solven-eu/pepper/releases -->
+		<pepper.version>4.2</pepper.version>
+
+		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
+		<spotbugs.version>4.7.3.0</spotbugs.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+		<checkstyle.version>10.4</checkstyle.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
+		<maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
+		<pmd.version>6.51.0</pmd.version>
+		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
+		<license-maven-plugin.version>4.1</license-maven-plugin.version>
+
+		<spotless.version>2.31.0</spotless.version>
 
 		<!-- Skip javadoc, especially as it would break mvn:release -->
 		<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -72,60 +90,452 @@
 	</properties>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>enforce</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<failFast>true</failFast>
+								<!-- https://maven.apache.org/enforcer/enforcer-rules/index.html -->
+								<rules>
+									<!-- We have a local site used to upload report in circleci -->
+									<!-- <banDistributionManagement /> -->
+									<banDuplicatePomDependencyVersions/>
+									<!-- TODO Activate this rule requiring to force quite many dependencies -->
+									<!-- <dependencyConvergence /> -->
+									<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
+									<!-- <reactorModuleConvergence /> -->
+									<requireMavenVersion>
+										<version>3.0</version>
+									</requireMavenVersion>
+									<requireJavaVersion>
+										<version>1.11</version>
+									</requireJavaVersion>
+									<!-- We leave some plugin versions to SpringBoot -->
+									<!-- <requirePluginVersions /> -->
+									<requireReleaseDeps>
+										<onlyWhenRelease>true</onlyWhenRelease>
+									</requireReleaseDeps>
+
+									<!-- TODO Activate this rule -->
+									<!-- <requireUpperBoundDeps> -->
+									<!-- <excludes> -->
+									<!--no dependency need to be excluded from this rule -->
+									<!-- </excludes> -->
+									<!-- </requireUpperBoundDeps> -->
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<!-- http://code.mycila.com/license-maven-plugin/ -->
+					<!-- Usage: mvn com.mycila:license-maven-plugin:format -Dlicense.skip=false -->
+					<!-- Beware this will corrupt UTF-16 files (typically XML files) -->
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${license-maven-plugin.version}</version>
+					<configuration>
+						<mapping>
+							<java>SLASHSTAR_STYLE</java>
+							<xml>XML_PER_LINE</xml>
+						</mapping>
+						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
+						<inlineHeader><![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]></inlineHeader>
+						<properties>
+							<owner>SOLVEN</owner>
+							<year>2021</year>
+							<email>benoit.lacelle@solven.eu</email>
+						</properties>
+						<excludes>
+							<exclude>pom.xml</exclude>
+							<exclude>**/*.js</exclude>
+							<exclude>**/*.css</exclude>
+							<exclude>**/*.html</exclude>
+							<exclude>**/*.vue</exclude>
+							<exclude>**/node_modules/**</exclude>
+							<exclude>README.MD</exclude>
+
+							<exclude>pom.xml.versionsBackup</exclude>
+							<exclude>**/.pmd</exclude>
+							<exclude>**/.pmdruleset.xml</exclude>
+							<exclude>**/.checktyle</exclude>
+
+							<!-- Eclipse Launch (Debug/Run) files -->
+							<exclude>**/*.launch</exclude>
+
+							<!-- Useless to License generated files as regeneration will remove license -->
+							<excludes>**/generated/**</excludes>
+
+							<!-- Specific to module gui-web -->
+							<exclude>**/.babelrc</exclude>
+							<exclude>**/.gitkeep</exclude>
+							<exclude>**/*.js.map</exclude>
+							<exclude>**/*.css.map</exclude>
+							<exclude>**/npm</exclude>
+							<exclude>**/node</exclude>
+							<exclude>**/.eslintrc</exclude>
+							<exclude>**/.eslintignore</exclude>
+							<exclude>**/lcov.info</exclude>
+
+							<!-- Specific to Docker -->
+							<exclude>sshd_config</exclude>
+
+							<!-- A marker file typically used to materialize a folder in git -->
+							<exclude>empty</exclude>
+
+							<!-- Leftovers to Logback wiring in files -->
+							<exclude>**/app.log</exclude>
+
+							<!-- Android -->
+							<exclude>**/.gradle/**</exclude>
+
+							<!-- Used to exclude gui-web and gui-back -->
+							<exclude>**/node/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!--https://spotbugs.github.io/spotbugs-maven-plugin/index.html -->
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs.version}</version>
+					<configuration>
+						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
+						<!-- Activate with Pepper1.25 -->
+						<skip>true</skip>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<!-- This dependency holds the default configuration -->
+							<groupId>io.github.solven-eu.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>check</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<!-- default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!-- https://maven.apache.org/plugins/maven-checkstyle-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>${maven-checkstyle-plugin.version}</version>
+					<configuration>
+						<excludes>**/generated/**,**/jwk.test.properties</excludes>
+						<!-- We seem not able to exclude jwk.test.properties with <excludes> -->
+						<includeTestResources>false</includeTestResources>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<!-- This dependency holds the default configuration -->
+							<groupId>io.github.solven-eu.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+						<dependency>
+							<!-- more recent than brought by maven plugin -->
+							<groupId>com.puppycrawl.tools</groupId>
+							<artifactId>checkstyle</artifactId>
+							<version>${checkstyle.version}</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>check</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<!-- default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+							<phase>${staticChecks}</phase>
+							<configuration>
+								<configLocation>style/pepper.checkstyle.xml</configLocation>
+								<encoding>UTF-8</encoding>
+								<consoleOutput>true</consoleOutput>
+								<failsOnError>true</failsOnError>
+								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+								<!-- only with goal checkstyle-aggregate or checkstyle generating a report -->
+								<!--<linkXRef>false</linkXRef> -->
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<!--https://maven.apache.org/plugins/maven-pmd-plugin/ -->
+					<!-- Skip a row by adding '//NOPMD' at the end -->
+					<!-- https://pmd.github.io/pmd-6.6.0/pmd_userdocs_suppressing_warnings.html#nopmd-comment -->
+					<!-- Trigger only pmd with 'mvn pmd:check' -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>${maven-pmd-plugin.version}</version>
+					<configuration>
+						<!-- <includeTests>true</includeTests> -->
+						<indentSize>4</indentSize>
+						<printFailingErrors>true</printFailingErrors>
+
+						<!-- TODO Decrease to 4, then 3, until 1 -->
+						<failurePriority>5</failurePriority>
+						<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
+						<linkXRef>false</linkXRef>
+						<rulesets>
+							<ruleset>style/pepper.pmd.rulesets.xml</ruleset>
+						</rulesets>
+						<excludes>
+							<exclude>**/generated/**</exclude>
+						</excludes>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>io.github.solven-eu.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+						<!-- the orginal version shipped with the plugin, 6.4.0, doesn't handle java11 -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-java</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+						<!-- Enables rules for XML, including pom.xml -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-xml</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+						<!-- maven-pmd-plugin relies by default on some version of PMD which -->
+						<!-- may be incompatible withcustom PMD versions -->
+						<dependency>
+							<groupId>net.sourceforge.pmd</groupId>
+							<artifactId>pmd-core</artifactId>
+							<version>${pmd.version}</version>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<goals>
+								<goal>check</goal>
+								<goal>cpd-check</goal>
+							</goals>
+							<!-- Default phase is verify, which is after tests. -->
+							<!-- We prefer to run static analysis before tests not to wait -->
+
+							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
+							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
+					<groupId>io.github.solven-eu.cleanthat</groupId>
+					<artifactId>cleanthat-maven-plugin</artifactId>
+					<version>1.8</version>
+					<configuration>
+						<!-- Skipped while working on 2.0-SNAPSHOT -->
+						<skip>true</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<id>Clean the code</id>
+							<goals>
+								<goal>cleanthat</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>Check the code is clean</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:apply -->
+					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:check -->
+					<groupId>com.diffplug.spotless</groupId>
+					<artifactId>spotless-maven-plugin</artifactId>
+					<version>${spotless.version}</version>
+					<configuration>
+						<!-- optional: limit format enforcement to just the files changed by this feature branch -->
+						<ratchetFrom>origin/master</ratchetFrom>
+						<formats>
+							<!-- you can define as many formats as you want, each is independent -->
+							<format>
+								<!-- define the files to apply to -->
+								<includes>
+									<include>.gitignore</include>
+								</includes>
+								<!-- define the steps to apply to those files -->
+								<trimTrailingWhitespace/>
+								<endWithNewline/>
+								<indent>
+									<tabs>true</tabs>
+									<spacesPerTab>4</spacesPerTab>
+								</indent>
+							</format>
+						</formats>
+
+						<pom>
+							<includes>
+								<include>pom.xml</include>
+							</includes>
+
+							<!-- https://github.com/diffplug/spotless/tree/main/plugin-maven#sortpom -->
+							<sortPom>
+								<!-- We like empty elements, while plugin default configuration would expand them -->
+								<expandEmptyElements>false</expandEmptyElements>
+
+								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
+								<!-- -1 means '\t' -->
+								<nrOfIndentSpace>-1</nrOfIndentSpace>
+							</sortPom>
+						</pom>
+
+						<markdown>
+							<endWithNewline/>
+							<indent>
+								<tabs>true</tabs>
+								<spacesPerTab>4</spacesPerTab>
+							</indent>
+							<includes>
+								<include>**/*.md</include>
+							</includes>
+
+							<flexmark/>
+						</markdown>
+
+						<!-- define a language-specific format -->
+						<java>
+							<excludes>
+								<!-- TestCases needs to remains not formatted/cleaned -->
+								<exclude>**/do_not_format_me/**</exclude>
+							</excludes>
+
+							<removeUnusedImports/>
+							<importOrder/>
+
+							<eclipse>
+								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
+								<!-- <version>4.18.0</version>-->
+								<file>eclipse/eclipse_java_code_formatter.xml</file>
+							</eclipse>
+
+							<licenseHeader>
+								<file>${maven.multiModuleProjectDirectory}/.cleanthat/spotless.license</file>
+							</licenseHeader>
+						</java>
+
+						<json>
+							<trimTrailingWhitespace/>
+							<endWithNewline/>
+							<indent>
+								<tabs>true</tabs>
+								<spacesPerTab>4</spacesPerTab>
+							</indent>
+
+							<includes>
+								<include>**/*.json</include>
+							</includes>
+
+							<gson/>
+						</json>
+					</configuration>
+
+					<dependencies>
+						<dependency>
+							<groupId>io.github.solven-eu.pepper</groupId>
+							<artifactId>pepper-static</artifactId>
+							<version>${pepper.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+					</dependencies>
+
+					<executions>
+						<execution>
+							<id>applySpotless</id>
+							<goals>
+								<goal>apply</goal>
+							</goals>
+							<phase>process-sources</phase>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>enforce</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<failFast>true</failFast>
-							<!-- https://maven.apache.org/enforcer/enforcer-rules/index.html -->
-							<rules>
-								<!-- We have a local site used to upload report in circleci -->
-								<!-- <banDistributionManagement /> -->
-								<banDuplicatePomDependencyVersions />
-								<!-- TODO Activate this rule requiring to force quite many dependencies -->
-								<!-- <dependencyConvergence /> -->
-								<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
-								<!-- <reactorModuleConvergence /> -->
-								<requireMavenVersion>
-									<version>3.0</version>
-								</requireMavenVersion>
-								<requireJavaVersion>
-									<version>1.11</version>
-								</requireJavaVersion>
-								<!-- We leave some plugin versions to SpringBoot -->
-								<!-- <requirePluginVersions /> -->
-								<requireReleaseDeps>
-									<onlyWhenRelease>true</onlyWhenRelease>
-								</requireReleaseDeps>
-
-								<!-- TODO Activate this rule -->
-								<!-- <requireUpperBoundDeps> -->
-								<!-- <excludes> -->
-								<!--no dependency need to be excluded from this rule -->
-								<!-- </excludes> -->
-								<!-- </requireUpperBoundDeps> -->
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
+			</plugin>
+			<plugin>
+				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
+				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>io.github.solven-eu.cleanthat</groupId>
+				<artifactId>cleanthat-maven-plugin</artifactId>
+				<!-- CleanThat should be executed only in the top-directory -->
+				<inherited>false</inherited>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
 		<profile>
-			<!-- skip everything, test, quality, format,... -->
+			<!-- Skip formatting and refactoring: quality, format,... -->
 			<id>skipStyle</id>
 			<properties>
-				<!--<skipTests>true</skipTests> -->
-				<!--<jacoco.skip>true</jacoco.skip> -->
+				<!-- Code style -->
 				<checkstyle.skip>true</checkstyle.skip>
 				<pmd.skip>true</pmd.skip>
 				<cpd.skip>true</cpd.skip>
@@ -135,6 +545,11 @@
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
 				<cleanthat.skip>true</cleanthat.skip>
+				<skip.npm.style>true</skip.npm.style>
+				<cleanthat.skip>true</cleanthat.skip>
+				<spotless.apply.skip>true</spotless.apply.skip>
+				<spotless.check.skip>true</spotless.check.skip>
+
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
 			</properties>
@@ -163,8 +578,9 @@
 				<skipITs>true</skipITs>
 			</properties>
 		</profile>
+
 		<profile>
-			<!-- skip everything, test, quality, format,... -->
+			<!-- Skip everything: test, quality, format,... -->
 			<id>fast</id>
 			<properties>
 				<!--<skipTests>true</skipTests> -->
@@ -178,25 +594,18 @@
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
 				<cleanthat.skip>true</cleanthat.skip>
+
+				<skip.npm.style>true</skip.npm.style>
+				<cleanthat.skip>true</cleanthat.skip>
+				<spotless.apply.skip>true</spotless.apply.skip>
+				<spotless.check.skip>true</spotless.check.skip>
+
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
 				<!-- Skip tests -->
 				<jacoco.skip>true</jacoco.skip>
+				<skipTests>true</skipTests>
 				<skipITs>true</skipITs>
-			</properties>
-		</profile>
-
-		<!-- Useful to skip JS compilation -->
-		<profile>
-			<id>skipJs</id>
-			<activation>
-				<property>
-					<name>infra</name>
-					<value>heroku</value>
-				</property>
-			</activation>
-			<properties>
-				<skip.npm>true</skip.npm>
 			</properties>
 		</profile>
 

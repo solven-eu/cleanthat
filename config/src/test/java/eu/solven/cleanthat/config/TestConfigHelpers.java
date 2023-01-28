@@ -1,5 +1,26 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.config;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
+import eu.solven.cleanthat.formatter.LineEnding;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -7,22 +28,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.SourceCodeProperties;
 
 public class TestConfigHelpers {
 
@@ -39,6 +52,7 @@ public class TestConfigHelpers {
 		Assertions.assertThat(asString.split(EOL)).hasSize(2);
 	}
 
+	@Ignore("We do not manipulate .json configuration anymore")
 	@Test
 	public void testFromJsonToYaml() throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper jsonObjectMapper = ConfigHelpers.makeJsonObjectMapper();
@@ -75,13 +89,12 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
+		SourceCodeProperties defaultP = SourceCodeProperties.defaultRoot();
 		defaultP.setEncoding(StandardCharsets.ISO_8859_1.name());
-		SourceCodeProperties windowsP = new SourceCodeProperties();
-		windowsP.setLineEndingAsEnum(LineEnding.CRLF);
+		SourceCodeProperties windowsP = SourceCodeProperties.builder().lineEnding(LineEnding.CRLF).build();
 		windowsP.setEncoding(StandardCharsets.US_ASCII.name());
 
-		Assert.assertEquals(LineEnding.UNKNOWN, defaultP.getLineEndingAsEnum());
+		Assert.assertEquals(LineEnding.GIT, defaultP.getLineEndingAsEnum());
 		Assert.assertEquals(LineEnding.CRLF, windowsP.getLineEndingAsEnum());
 
 		Assert.assertEquals("ISO-8859-1", defaultP.getEncoding());
@@ -103,7 +116,7 @@ public class TestConfigHelpers {
 					om.convertValue(defaultP, Map.class));
 			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
-			Assert.assertEquals(LineEnding.CRLF, merged.getLineEndingAsEnum());
+			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
 		}
 
@@ -113,7 +126,7 @@ public class TestConfigHelpers {
 					om.convertValue(defaultP, Map.class));
 			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
-			Assert.assertEquals(LineEnding.UNKNOWN, merged.getLineEndingAsEnum());
+			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
 		}
 	}
@@ -124,12 +137,11 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
-		defaultP.setExcludes(Arrays.asList(".*/generated/.*"));
+		SourceCodeProperties defaultP = SourceCodeProperties.builder().exclude(".*/generated/.*").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -140,8 +152,7 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -152,9 +163,8 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren and cancel parent exclusion
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setExcludes(Arrays.asList(".*/do_not_clean_me/.*"));
-			childrenP.setIncludes(Arrays.asList(".*/generated/.*"));
+			SourceCodeProperties childrenP =
+					SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").include(".*/generated/.*").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -171,12 +181,11 @@ public class TestConfigHelpers {
 		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = new SourceCodeProperties();
-		defaultP.setIncludes(Arrays.asList(".*\\.xml"));
+		SourceCodeProperties defaultP = SourceCodeProperties.builder().include(".*\\.xml").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
@@ -187,8 +196,7 @@ public class TestConfigHelpers {
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = new SourceCodeProperties();
-			childrenP.setIncludes(Arrays.asList("pom.xml"));
+			SourceCodeProperties childrenP = SourceCodeProperties.builder().include("pom.xml").build();
 
 			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));

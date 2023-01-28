@@ -1,31 +1,38 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.any_language;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.GenerateInitialConfig;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Asbtract for {@link ICodeCleaner}
@@ -36,15 +43,19 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
 
 	final Collection<ObjectMapper> objectMappers;
-	final Collection<ILanguageLintFixerFactory> factories;
+	private final Collection<IEngineLintFixerFactory> factories;
 	final ICodeProviderFormatter formatterProvider;
 
 	public ACodeCleaner(Collection<ObjectMapper> objectMappers,
-			Collection<ILanguageLintFixerFactory> factories,
+			Collection<IEngineLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
 		this.factories = factories;
 		this.formatterProvider = formatterProvider;
+	}
+
+	protected Collection<ObjectMapper> getObjectMappers() {
+		return objectMappers;
 	}
 
 	public CodeFormatResult formatCode(CleanthatRepositoryProperties properties,
@@ -54,21 +65,19 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
-		String codeUrl = codeProvider.getHtmlUrl();
-
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATH_CLEANTHAT, codeUrl);
+			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATHES_CLEANTHAT, codeProvider);
 			return ResultOrError.error("No configuration");
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
 		if (version.isEmpty()) {
-			LOGGER.warn("No version on configuration applying to PR {}", codeUrl);
+			LOGGER.warn("No version on configuration applying to PR {}", codeProvider);
 			return ResultOrError.error("No syntax_version in configuration");
 		} else if (!CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION.equals(version.get())) {
 			LOGGER.warn("Version '{}' on configuration is not supported {}" + "(only syntax_version='"
 					+ CleanthatRepositoryProperties.LATEST_SYNTAX_VERSION
-					+ "')", version.get(), codeUrl);
+					+ "')", version.get(), codeProvider);
 			return ResultOrError.error("Invalid syntax_version in configuration");
 		}
 		Map<String, ?> prConfig = optPrConfig.get();
@@ -127,19 +136,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		}
 	}
 
-	protected String toYaml(CleanthatRepositoryProperties config) {
-		try {
-			return ConfigHelpers.getYaml(objectMappers).writeValueAsString(config);
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Inalid configuration: " + config, e);
-		}
-	}
-
-	protected CleanthatRepositoryProperties generateDefaultConfig(ICodeProvider codeProvider) {
-		try {
-			return new GenerateInitialConfig(factories).prepareDefaultConfiguration(codeProvider);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+	public Collection<IEngineLintFixerFactory> getFactories() {
+		return factories;
 	}
 }

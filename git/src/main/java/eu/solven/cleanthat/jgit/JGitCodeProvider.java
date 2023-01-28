@@ -1,10 +1,31 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.jgit;
 
+import com.google.common.base.Strings;
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -12,9 +33,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -32,13 +53,6 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -82,7 +96,8 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+			throws IOException {
 		LOGGER.debug("About to list files");
 
 		walkFiles(consumer, "");
@@ -165,17 +180,12 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public String getHtmlUrl() {
+	public String toString() {
 		try {
 			return jgit.remoteList().call().get(0).getURIs().get(0).getPath();
 		} catch (GitAPIException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public String getTitle() {
-		return "Local JGit";
 	}
 
 	@Override
@@ -296,6 +306,11 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	@Override
 	public void cleanTmpFiles() {
 		LOGGER.info("Nothing to delete for {}", this);
+	}
+
+	@Override
+	public FileSystem getFileSystem() {
+		return workingDir.getFileSystem();
 	}
 
 }

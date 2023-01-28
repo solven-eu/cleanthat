@@ -1,40 +1,27 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCompare;
-import org.kohsuke.github.GHCompare.Commit;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHIssueState;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
@@ -46,15 +33,40 @@ import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.CleanthatConfigInitializer;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.RepoInitializerResult;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.github.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.github.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.github.IGitRefsConstants;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
 import eu.solven.cleanthat.utils.ResultOrError;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCompare;
+import org.kohsuke.github.GHCompare.Commit;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHIssueState;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTree;
+import org.kohsuke.github.GHTreeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default for {@link IGitRefCleaner}
@@ -77,10 +89,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	final GithubAndToken githubAndToken;
 
 	public GithubRefCleaner(List<ObjectMapper> objectMappers,
-			List<ILanguageLintFixerFactory> factories,
+			List<IEngineLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken) {
 		super(objectMappers, factories, formatterProvider);
+
 		this.githubAndToken = githubAndToken;
 	}
 
@@ -89,11 +102,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	// We may have to clean a different ref (e.g. a push to the main branch needs to be cleaned through a PR)
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	public Optional<HeadAndOptionalBase> prepareRefToClean(IExternalWebhookRelevancyResult result,
+	public Optional<HeadAndOptionalBase> prepareRefToClean(Path root,
+			IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 head,
 			// There can be multiple eventBaseBranches in case of push events
 			Set<String> eventBaseRefs) {
-		ICodeProvider codeProvider = getCodeProviderForRef(head);
+		ICodeProvider codeProvider = getCodeProviderForRef(root, head);
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
 
 		if (optConfig.getOptError().isPresent()) {
@@ -105,11 +119,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		List<String> cleanableRefsRegexes = properties.getMeta().getRefs().getBranches();
+		List<String> protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
 
 		String headRef = head.getRef();
-		if (canCleanInPlace(eventBaseRefs, cleanableRefsRegexes, headRef)) {
-			logWhyCanCleanInPlace(eventBaseRefs, cleanableRefsRegexes, result, headRef);
+		if (canCleanInPlace(eventBaseRefs, protectedPatterns, headRef)) {
+			logWhyCanCleanInPlace(eventBaseRefs, protectedPatterns, result, headRef);
 
 			// TODO We should take as base the base from 'canCleanInPlace'
 			// This is especially important in pushes after a rr-open, as the push before the rr-open would not be
@@ -119,13 +133,13 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			return cleanHeadInPlace(result, head);
 		}
 
-		if (canCleanInNewRR(cleanableRefsRegexes, headRef)) {
-			return cleanInNewRR(result, head, cleanableRefsRegexes, headRef);
+		if (canCleanInNewRR(protectedPatterns, headRef)) {
+			return cleanInNewRR(result, head, protectedPatterns, headRef);
 		} else {
 			// Cleanable neither in-place nor in-rr
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
 					headRef,
-					cleanableRefsRegexes,
+					protectedPatterns,
 					eventBaseRefs);
 			return Optional.empty();
 		}
@@ -169,8 +183,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return optHeadMatchingRule.isPresent();
 	}
 
-	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> refToCleanRegexes, String headRef) {
-		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(refToCleanRegexes, headRef);
+	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> protectedPatterns, String headRef) {
+		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(protectedPatterns, headRef);
 		if (optHeadMatchingRule.isPresent()) {
 			// We never clean in place the cleanable branches, as they are considered sensible
 			LOGGER.info("Not cleaning in-place as head={} is a sensible/cleanable ref (rule={})",
@@ -179,7 +193,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			return false;
 		}
 
-		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, protectedPatterns);
 
 		return optBaseMatchingRule.isPresent();
 	}
@@ -209,8 +223,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
-	private Optional<String> selectPatternOfSensibleHead(List<String> cleanableRefsRegexes, String fullRef) {
-		return cleanableRefsRegexes.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
+	private Optional<String> selectPatternOfSensibleHead(List<String> protectedPatterns, String fullRef) {
+		return protectedPatterns.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
 	}
 
 	/**
@@ -283,14 +297,17 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		return ref;
 	}
 
-	public ICodeProvider getCodeProviderForRef(GitRepoBranchSha1 theRef) {
+	public ICodeProvider getCodeProviderForRef(Path root, GitRepoBranchSha1 theRef) {
 		String ref = theRef.getRef();
 
 		try {
 			String repoName = theRef.getRepoFullName();
 			GithubFacade facade = new GithubFacade(githubAndToken.getGithub(), repoName);
 			GHRef refObject = facade.getRef(ref);
-			return new GithubRefCodeProvider(githubAndToken.getToken(), facade.getRepository(), refObject);
+			return new GithubRefCodeProvider(root.getFileSystem(),
+					githubAndToken.getToken(),
+					facade.getRepository(),
+					refObject);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue with ref: " + ref, e);
 		}
@@ -302,7 +319,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
 			// Get the head lazily, else it means we create branch which may remain empty
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			return new GithubRefCodeProvider(githubAndToken.getToken(), theRepo, headWhereToWrite);
+			return new GithubRefCodeProvider(codeProvider.getFileSystem(),
+					githubAndToken.getToken(),
+					theRepo,
+					headWhereToWrite);
 		});
 		return formatCodeGivenConfig(codeProviderWriter, false);
 	}
@@ -310,7 +330,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	@Deprecated(
 			since = "We clean on push events. This would be used on open PR events, but we may still fallback on sha1 diff cleaning")
 	@Override
-	public CodeFormatResult formatRefDiff(IGitRepository repo, IGitReference base, ILazyGitReference headSupplier) {
+	public CodeFormatResult formatRefDiff(Path root,
+			IGitRepository repo,
+			IGitReference base,
+			ILazyGitReference headSupplier) {
 		String refOrSha1 = headSupplier.getFullRefOrSha1();
 		GHRef ghBase = base.getDecorated();
 
@@ -318,12 +341,14 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		GHRepository theRepo = repo.getDecorated();
 		String token = githubAndToken.getToken();
 		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
-		ICodeProvider codeProvider = new GithubRefToCommitDiffCodeProvider(token, theRepo, ghBase, head);
+		ICodeProvider codeProvider =
+				new GithubRefToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
 		return formatRefDiff(theRepo, codeProvider, headSupplier);
 	}
 
 	@Override
-	public CodeFormatResult formatCommitToRefDiff(IGitRepository repo,
+	public CodeFormatResult formatCommitToRefDiff(Path root,
+			IGitRepository repo,
 			IGitCommit base,
 			ILazyGitReference headSupplier) {
 		String refOrSha1 = headSupplier.getFullRefOrSha1();
@@ -333,30 +358,36 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		GHRepository theRepo = repo.getDecorated();
 		String token = githubAndToken.getToken();
 		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
-		ICodeProvider codeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
+		ICodeProvider codeProvider =
+				new GithubCommitToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
 		// Typically used to load the configuration
 		// ICodeProvider headCodeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
 		return formatRefDiff(theRepo, codeProvider, headSupplier);
 	}
 
 	@Override
-	public CodeFormatResult formatRef(IGitRepository repo, IGitBranch branchSupplier, ILazyGitReference headSupplier) {
+	public CodeFormatResult formatRef(Path root,
+			IGitRepository repo,
+			IGitBranch branchSupplier,
+			ILazyGitReference headSupplier) {
 		GHBranch branch = branchSupplier.getDecorated();
 
-		ICodeProviderWriter codeProvider =
-				new GithubBranchCodeProvider(githubAndToken.getToken(), repo.getDecorated(), branch);
+		ICodeProviderWriter codeProvider = new GithubBranchCodeProvider(root.getFileSystem(),
+				githubAndToken.getToken(),
+				repo.getDecorated(),
+				branch);
 		return formatRefDiff(repo.getDecorated(), codeProvider, headSupplier);
 	}
 
 	@Override
-	public boolean tryOpenPRWithCleanThatStandardConfiguration(IGitBranch branch) {
+	public boolean tryOpenPRWithCleanThatStandardConfiguration(Path root, IGitBranch branch) {
 		GHBranch defaultBranch = branch.getDecorated();
 		GHRepository repo = defaultBranch.getOwner();
 
 		String branchName = defaultBranch.getName();
 		String baseRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName;
-		ICodeProvider codeProvider =
-				getCodeProviderForRef(new GitRepoBranchSha1(repo.getFullName(), baseRef, defaultBranch.getSHA1()));
+		ICodeProvider codeProvider = getCodeProviderForRef(root,
+				new GitRepoBranchSha1(repo.getFullName(), baseRef, defaultBranch.getSHA1()));
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isPresent()) {
 			LOGGER.info("There is a configuration (valid or not) in the default branch ({})", branchName);
@@ -366,7 +397,6 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 
 		String headRef = REF_NAME_CONFIGURE;
-		// String fullRefName = GithubFacade.toFullGitRef(refName);
 		Optional<GHRef> optRefToPR;
 		try {
 			try {
@@ -384,8 +414,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		try {
 			if (optRefToPR.isPresent()) {
 				GHRef refToPr = optRefToPR.get();
-				LOGGER.info(
-						"There is already a ref about to introduce a cleanthat default configuration. Do not open a new PR (url={})",
+				LOGGER.info("There is already a ref preparing cleanthat integration. Do not open a new PR (url={})",
 						refToPr.getUrl().toExternalForm());
 				repo.listPullRequests(GHIssueState.ALL).forEach(pr -> {
 					if (headRef.equals(pr.getHead().getRef())) {
@@ -394,18 +423,23 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 				});
 				return false;
 			} else {
-				GHCommit commit = commitConfig(defaultBranch, repo);
+				RepoInitializerResult result = new CleanthatConfigInitializer(codeProvider,
+						ConfigHelpers.getYaml(getObjectMappers()),
+						getFactories()).prepareFile();
+
+				GHCommit commit = commitConfig(defaultBranch, repo, result);
 				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());
 				boolean force = false;
 				refToPr.updateTo(commit.getSHA1(), force);
-				// Let's follow Renovate and its configuration PR
-				// https://github.com/solven-eu/agilea/pull/1
-				String body = readResource("/templates/onboarding-body.md");
-				body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
+
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
 				// TODO What is this issue exactly? We seem to success naming our ref 'cleanthat/configure'
-				GHPullRequest pr =
-						repo.createPullRequest("Configure CleanThat", refToPr.getRef(), baseRef, body, true, false);
+				GHPullRequest pr = repo.createPullRequest("Configure CleanThat",
+						refToPr.getRef(),
+						baseRef,
+						result.getPrBody(),
+						true,
+						false);
 				LOGGER.info("Open PR: {}", pr.getHtmlUrl());
 				return true;
 			}
@@ -415,32 +449,19 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
-	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo) throws IOException {
-		GithubBranchCodeProvider codeProvider =
-				new GithubBranchCodeProvider(githubAndToken.getToken(), repo, defaultBranch);
-		CleanthatRepositoryProperties defaultConfig = generateDefaultConfig(codeProvider);
+	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo, RepoInitializerResult result)
+			throws IOException {
+		GHTreeBuilder baseTreeBuilder = repo.createTree().baseTree(defaultBranch.getSHA1());
 
-		GHTree createTree = repo.createTree()
-				.baseTree(defaultBranch.getSHA1())
-				.add(CodeProviderHelpers.FILENAME_CLEANTHAT_YAML, toYaml(defaultConfig), false)
-				.create();
+		result.getPathToContents().forEach((path, content) -> baseTreeBuilder.add(path, content, false));
+
+		GHTree createTree = baseTreeBuilder.create();
 		GHCommit commit = GithubRefWriterLogic.prepareCommit(repo)
-				.message(readResource("/templates/commit-message.txt"))
+				.message(result.getCommitMessage())
 				.parent(defaultBranch.getSHA1())
 				.tree(createTree.getSha())
 				.create();
 		return commit;
-	}
-
-	private String readResource(String path) {
-		String body;
-		try (InputStreamReader reader =
-				new InputStreamReader(new ClassPathResource(path).getInputStream(), Charsets.UTF_8)) {
-			body = CharStreams.toString(reader);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		return body;
 	}
 
 }

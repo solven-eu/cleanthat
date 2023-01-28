@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
-		<version>1.10-SNAPSHOT</version>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>java</artifactId>
@@ -60,41 +60,6 @@
 			<artifactId>annotations</artifactId>
 			<version>3.0.1u2</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<!-- Beware this is a Maven plugin: it may conflicts wth other plugins 
-				due to META-INF files -->
-			<groupId>net.revelc.code</groupId>
-			<artifactId>impsort-maven-plugin</artifactId>
-			<version>1.8.0</version>
-		</dependency>
-
-		<!-- https://github.com/revelc/formatter-maven-plugin/blob/master/pom.xml#L278 -->
-		<dependency>
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>org.eclipse.jdt.core</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core.manipulation -->
-		<dependency>
-			<!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=178429 -->
-			<!-- Used to rely on Eclipse CleanUp actions -->
-			<groupId>org.eclipse.jdt</groupId>
-			<artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- Used to parse Eclipse XML config files -->
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-digester3</artifactId>
-			<version>3.2</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/google/google-java-format -->
-			<groupId>com.google.googlejavaformat</groupId>
-			<artifactId>google-java-format</artifactId>
-			<version>1.15.0</version>
 		</dependency>
 
 		<dependency>

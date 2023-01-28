@@ -1,9 +1,8 @@
-Welcome to [CleanThat](https://github.com/solven-eu/cleanthat)! 
+Welcome to [CleanThat](https://github.com/solven-eu/cleanthat)!
 
-This is an onboarding PR to help you understand and configure settings before regular Pull Requests begin.
+This onboarding Pull-Request helps you configuring Cleanthat. It can safely be merged right-away.
 
-:vertical_traffic_light: To activate CleanThat, merge this Pull Request. To disable CleanThat, simply close this Pull Request unmerged.
-
+:vertical_traffic_light: To activate CleanThat, merge this Pull-Request. To disable CleanThat, simply close this Pull-Request unmerged.
 
 ---
 
@@ -11,15 +10,14 @@ This is an onboarding PR to help you understand and configure settings before re
 
 Based on the default config's presets, CleanThat will:
 
-  - Apply formatting over '.*\.java' files
+- Apply formatting over '.*\.java' files
 
-:abcd: Would you like to change the way CleanThat is cleaning your code? Simply edit the `cleanthat.json` in this branch with your custom config.
+:abcd: Would you like to change the way CleanThat is cleaning your code? Simply edit the `{DEFAULT_PATH}` in this branch with your custom config.
 
 ### What to Expect
 
-PR being open to clean the default branch
-
-Other branches being automatically linted.
+- Pull-Request being open to clean the default branch.
+- Commits being applied to not protected branches (see `meta.refs.protected_patterns` in `{DEFAULT_PATH}`)
 
 ---
 

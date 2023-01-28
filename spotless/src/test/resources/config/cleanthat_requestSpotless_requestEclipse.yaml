@@ -1,0 +1,22 @@
+syntax_version: "2023-01-09"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    protected_patterns:
+      - master
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  encoding: "UTF-8"
+  line_ending: "NATIVE"
+engines:
+- engine: "spotless"
+  source_code:
+    includes:
+    # For now, Spotless applies only to Java files
+    - "regex:.*\\.java"
+  steps:
+  - id: "spotless"
+    parameters:
+      configuration: "repository:/config/spotless_requestEclipse.yaml"

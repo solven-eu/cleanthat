@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
-		<version>1.10-SNAPSHOT</version>
+		<version>2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>code-providers</artifactId>
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
-		<jacoco.instruction.ratio>0.07</jacoco.instruction.ratio>
+		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
 	</properties>
 
 	<dependencies>

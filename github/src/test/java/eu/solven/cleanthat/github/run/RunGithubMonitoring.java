@@ -1,9 +1,34 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.github.run;
 
+import com.google.common.base.Strings;
+import com.nimbusds.jose.JOSEException;
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.formatter.CleanthatSession;
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
@@ -26,18 +51,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
-import com.google.common.base.Strings;
-import com.nimbusds.jose.JOSEException;
-
-import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.language.ILanguageLintFixerFactory;
-import eu.solven.cleanthat.language.ILanguageProperties;
-import eu.solven.cleanthat.language.LanguageProperties;
-
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })
 public class RunGithubMonitoring {
@@ -49,30 +62,36 @@ public class RunGithubMonitoring {
 	}
 
 	@Bean
-	public ILanguageLintFixerFactory stringFormatter() {
-		return new ILanguageLintFixerFactory() {
+	public IEngineLintFixerFactory stringFormatter() {
+		return new IEngineLintFixerFactory() {
 
 			@Override
-			public ILintFixer makeLintFixer(Map<String, ?> rawProcessor,
-					ILanguageProperties languageProperties,
-					ICodeProvider codeProvider) {
+			public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
+					IEngineProperties languageProperties,
+					CleanthatSession cleanthatSession) {
 				throw new UnsupportedOperationException("Should not format anything");
 			}
 
 			@Override
-			public String getLanguage() {
+			public String getEngine() {
 				return "integration_test";
 			}
 
 			@Override
-			public Set<String> getFileExtentions() {
+			public Set<String> getDefaultIncludes() {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public LanguageProperties makeDefaultProperties() {
+			public CleanthatEngineProperties makeDefaultProperties() {
 				throw new UnsupportedOperationException();
 			}
+
+			@Override
+			public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+				throw new UnsupportedOperationException();
+			}
+
 		};
 	}
 

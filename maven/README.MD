@@ -1,4 +1,15 @@
-# This maven plugin enables CleanThat features
+# Cleanthat-maven-plugin
+
+## Purpose and limitation
+
+For per-module configuration, one should integration spotless-maven-plugin.
+This maven plugin enables reproducing the Github App behavior (which process a repository from its root, not per-module).
+
+It also enable additional features like:
+
+- Generation of a default Eclipse stylesheet based on existing .java files
+
+## This maven plugin enables CleanThat features as done by CleanThat Github App
 
 Its release lifecycle is synchronized with cleanthat. Its latest version is available at:
 
@@ -6,7 +17,7 @@ Its release lifecycle is synchronized with cleanthat. Its latest version is avai
 
 This plugin requires a JDK 11.X
 
-# Configure CleanThat mvn plugin
+## Configure CleanThat mvn plugin
 
 Most CleanThat goals can be execute without a specific configuration in the pom.xml.
 Many CleanThat goals can be execute without any pom.xml (e.g. to call CleanThat logic out of a maven project)
@@ -19,7 +30,7 @@ One can shorten its cleanthat commands by adding in ${user.home}/.m2/settings.xm
 
 reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 
-## Configure within a pom.xml
+### Configure within a pom.xml
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -50,40 +61,34 @@ reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.
 			<plugin>
 				<groupId>io.github.solven-eu.cleanthat</groupId>
 				<artifactId>cleanthat-maven-plugin</artifactId>
-				<!-- CleanThat should be executed only in the top-directory -->
+				<!-- CleanThat should be executed only in/from the top-directory -->
 				<inherited>false</inherited>
 			</plugin>
 		</plugins>
 	</build>
 
 
-# Goals
+## Goals
 
-## cleanthat:init
-
-This will initialize cleanthat configuration with a standard configuration. It essentially generates a /cleanthat.yaml file at the root of the repository.
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
-
-## cleanthat:init
+### cleanthat:init
 
 This will initialize cleanthat configuration with a standard configuration. It essentially generates a /cleanthat.yaml file at the root of the repository.
 
     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
 
-## cleanthat:cleanthat
+### cleanthat:cleanthat
 
 This will apply cleanthat linting logic.
 
     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
     
-## cleanthat:eclipse_formatter-stylesheet
+### cleanthat:eclipse_formatter-stylesheet
 
 CleanThat for Java holds a module to apply an Eclipse Stylesheet. However, generating this stylesheet may be complex if the team not already on it (e.g. IntelliJ users).
 
     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
 
-### Timeout
+#### Timeout
 
 As this process can be very slow, we default a timeout at 1 minute. It can be overriden through:
 
@@ -91,7 +96,7 @@ As this process can be very slow, we default a timeout at 1 minute. It can be ov
 
 Details about the syntax: https://en.wikipedia.org/wiki/ISO_8601#Durations
 
-# Developers
+## Developers
 
 Install the plugin in local mvn repository (if only the plugin has been updated):
 

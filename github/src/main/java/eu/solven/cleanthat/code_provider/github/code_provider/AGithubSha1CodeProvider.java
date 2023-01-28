@@ -1,18 +1,33 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
-
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -27,7 +42,8 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	final GithubSha1CodeProviderHelper helper;
 
-	public AGithubSha1CodeProvider(String token, GHRepository repo) {
+	public AGithubSha1CodeProvider(FileSystem fs, String token, GHRepository repo) {
+		super(fs);
 		this.token = token;
 
 		this.repo = repo;
@@ -50,7 +66,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public void listFilesForFilenames(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForFilenames(Set<String> patterns, Consumer<ICodeProviderFile> consumer) throws IOException {
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		String sha = getSha1();
 
@@ -68,7 +84,7 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
+	public void listFilesForContent(Set<String> patterns, Consumer<ICodeProviderFile> consumer) throws IOException {
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		String sha = getSha1();
 

@@ -1,0 +1,17 @@
+syntax_version: "2023-01-14"
+encoding: "UTF-8"
+line_ending: "GIT_ATTRIBUTES"
+formatters:
+- format: "java"
+  excludes:
+  - "**/do_not_format_me/**"
+  steps:
+  - id: "removeUnusedImports"
+  - id: "importOrder"
+- format: "pom"
+  includes:
+  - "regex:**/pom.xml"
+  steps:
+  - id: "sortPom"
+    expandEmptyElements: false
+    nrOfIndentSpace: -1

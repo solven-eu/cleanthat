@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
+import eu.solven.cleanthat.spotless.language.JsonFormatterFactory;
 import eu.solven.cleanthat.spotless.language.MarkdownFormatterFactory;
 import eu.solven.cleanthat.spotless.language.PomXmlFormatterFactory;
 import eu.solven.cleanthat.spotless.language.ScalaFormatterFactory;
@@ -92,8 +93,8 @@ public class FormatterFactory {
 	}
 
 	public static AFormatterFactory makeFormatterFactory(SpotlessFormatterProperties spotlessProperties) {
-		String language = spotlessProperties.getFormat();
-		switch (language) {
+		String format = spotlessProperties.getFormat();
+		switch (format) {
 		case ID_JAVA:
 			return new JavaFormatterFactory();
 		case "scala":
@@ -104,9 +105,13 @@ public class FormatterFactory {
 			return new PomXmlFormatterFactory();
 		case "xml":
 			return new XmlFormatterFactory();
+		case "json":
+			return new JsonFormatterFactory();
+		case "yaml":
+			return new JsonFormatterFactory();
 
 		default:
-			throw new IllegalArgumentException("Not managed language: " + language);
+			throw new IllegalArgumentException("Not managed format: " + format);
 		}
 	}
 

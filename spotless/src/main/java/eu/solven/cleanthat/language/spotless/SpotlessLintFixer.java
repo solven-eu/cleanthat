@@ -17,6 +17,7 @@ package eu.solven.cleanthat.language.spotless;
 
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.formatter.ILintFixerWithPath;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.spotless.EnrichedFormatter;
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Benoit Lacelle
  *
  */
-public class SpotlessLintFixer implements ILintFixerWithId {
+public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath {
 	final List<EnrichedFormatter> formatters;
 
 	public SpotlessLintFixer(List<EnrichedFormatter> formatters) {
@@ -42,8 +43,13 @@ public class SpotlessLintFixer implements ILintFixerWithId {
 	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
 		AtomicReference<PathAndContent> output = new AtomicReference<>(pathAndContent);
 
-		formatters.stream()
-				.forEach(f -> output.set(pathAndContent.withContent(new ExecuteSpotless(f).doStuff(output.get()))));
+		formatters.stream().forEach(f -> {
+			ExecuteSpotless executeSpotless = new ExecuteSpotless(f);
+
+			if (executeSpotless.acceptPath(pathAndContent.getPath())) {
+				output.set(pathAndContent.withContent(executeSpotless.doStuff(output.get())));
+			}
+		});
 
 		return output.get().getContent();
 	}
@@ -56,6 +62,11 @@ public class SpotlessLintFixer implements ILintFixerWithId {
 	@Override
 	public String toString() {
 		return "Formatters: " + formatters.toString();
+	}
+
+	@Override
+	public String doFormat(String content, LineEnding ending) throws IOException {
+		return doFormat(new PathAndContent(null, content), ending);
 	}
 
 }

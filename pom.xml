@@ -31,6 +31,9 @@
 		<module>java</module>
 		<module>java-eclipse</module>
 
+		<!-- mvn with Java and Kotlin is broken (as we are too weak in Kotlin-->
+		<!--module>kotlin</module-->
+
 		<module>runnable</module>
 		<module>lambda</module>
 
@@ -74,7 +77,7 @@
 		<minimumTokens>80</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument/>
+		<surefire.additionalArgument />
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<!-- https://github.com/jmini/ecentral/tree/master/repo/fr/jmini/ecentral/eclipse-platform-dependencies -->
@@ -328,7 +331,9 @@
 
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
+						<argLine>
+							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]>
+						</argLine>
 					</configuration>
 				</plugin>
 				<plugin>

@@ -10,14 +10,10 @@ source_code:
   - "regex:.*/generated/.*"
   - "regex:.*/do_not_format_me/.*"
   encoding: "UTF-8"
-  line_ending: "AUTO"
+  line_ending: "NATIVE"
 engines:
 # https://github.com/diffplug/spotless/pull/568
 - engine: "spotless"
-  source_code:
-    includes:
-    # For now, Spotless applies only to Java files
-    - "regex:.*\\.java"
   processors:
   - engine: "spotless"
     parameters:

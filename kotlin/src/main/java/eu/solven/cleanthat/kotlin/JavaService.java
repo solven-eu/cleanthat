@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.formatter;
+package eu.solven.cleanthat.kotlin;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Knows how to format a piece of code
- *
+ * 
  * @author Benoit Lacelle
+ *
  */
-public interface ILintFixer {
+public class JavaService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
 
-	String doFormat(String content, LineEnding ending) throws IOException;
+	public void sayHello() {
+		LOGGER.info("Java says 'Hello World!'");
+	}
+
 }

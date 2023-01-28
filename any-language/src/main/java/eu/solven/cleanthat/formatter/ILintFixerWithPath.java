@@ -22,7 +22,7 @@ import java.io.IOException;
  *
  * @author Benoit Lacelle
  */
-public interface ILintFixer {
+public interface ILintFixerWithPath {
 
-	String doFormat(String content, LineEnding ending) throws IOException;
+	String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException;
 }

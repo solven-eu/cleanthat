@@ -13,16 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.formatter;
-
-import java.io.IOException;
+package eu.solven.cleanthat.kotlin;
 
 /**
- * Knows how to format a piece of code
- *
+ * 
  * @author Benoit Lacelle
+ *
  */
-public interface ILintFixer {
+public final class Application {
 
-	String doFormat(String content, LineEnding ending) throws IOException;
+	private static final String JAVA = "java";
+	private static final String KOTLIN = "kotlin";
+
+	private Application() {
+		// hidden
+	}
+
+	public static void main(String[] args) {
+		String language = args[0];
+		switch (language) {
+		case JAVA:
+			new JavaService().sayHello();
+			break;
+		case KOTLIN:
+			new KotlinService().sayHello();
+			break;
+		default:
+			// Do nothing
+			break;
+		}
+	}
 }

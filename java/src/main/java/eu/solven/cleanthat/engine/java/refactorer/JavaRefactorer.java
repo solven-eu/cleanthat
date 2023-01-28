@@ -142,8 +142,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
-		String dirtyCode = pathAndContent.getContent();
+	public String doFormat(String dirtyCode, LineEnding ending) throws IOException {
 		LOGGER.debug("{}", this.properties);
 		String cleanCode = applyTransformers(dirtyCode);
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);

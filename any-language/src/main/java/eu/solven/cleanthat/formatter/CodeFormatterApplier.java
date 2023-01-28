@@ -15,11 +15,6 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -29,8 +24,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
 
 /**
  * Abstract class for language formatters
@@ -118,6 +120,10 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			lineEnding = LineEnding.determineLineEnding(code).orElse(LineEnding.NATIVE);
 		}
 
-		return formatter.doFormat(pathAndContent, lineEnding);
+		if (formatter instanceof ILintFixerWithPath) {
+			return ((ILintFixerWithPath) formatter).doFormat(pathAndContent, lineEnding);
+		} else {
+			return formatter.doFormat(pathAndContent.getContent(), lineEnding);
+		}
 	}
 }

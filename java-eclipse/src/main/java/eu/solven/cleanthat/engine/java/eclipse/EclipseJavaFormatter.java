@@ -63,9 +63,7 @@ public class EclipseJavaFormatter implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
-		String code = pathAndContent.getContent();
-
+	public String doFormat(String code, LineEnding ending) throws IOException {
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 

@@ -49,6 +49,7 @@ public interface IGitRefCleaner {
 	 *         modify directly the dirty branch).
 	 */
 	Optional<HeadAndOptionalBase> prepareRefToClean(Path root,
+			String eventKey,
 			IExternalWebhookRelevancyResult offlineResult,
 			GitRepoBranchSha1 head,
 			Set<String> relevantBaseBranches);

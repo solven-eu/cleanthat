@@ -65,7 +65,7 @@ public class CodeDiffHelper {
 	 * @throws IOException
 	 */
 	protected long computeDiffScore(ILintFixer lintFixer, String content) throws IOException {
-		String formatted = lintFixer.doFormat(new PathAndContent(Paths.get("fake"), content), LineEnding.KEEP);
+		String formatted = lintFixer.doFormat(content, LineEnding.KEEP);
 
 		if (formatted == null) {
 			// It means something failed while formatting

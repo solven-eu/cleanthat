@@ -15,20 +15,24 @@
  */
 package eu.solven.cleanthat.spotless;
 
-import com.diffplug.spotless.PaddedCell;
-import eu.solven.cleanthat.formatter.PathAndContent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 import org.codehaus.plexus.util.MatchPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.diffplug.spotless.PaddedCell;
+
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * Trigger Spotless engine
@@ -44,6 +48,25 @@ public class ExecuteSpotless {
 
 	public ExecuteSpotless(EnrichedFormatter formatter) {
 		this.formatter = formatter;
+	}
+
+	public boolean acceptPath(Path path) {
+		String rawPath = path.toString();
+
+		MatchPatterns includePatterns =
+				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
+		MatchPatterns excludePatterns =
+				MatchPatterns.from(withNormalizedFileSeparators(getExcludes(formatter.formatterStepFactory)));
+
+		if (!includePatterns.matches(rawPath, true)) {
+			LOGGER.debug("Discarded by include: {}", path);
+			return false;
+		} else if (excludePatterns.matches(rawPath, true)) {
+			LOGGER.debug("Discarded by exclude: {}", path);
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**

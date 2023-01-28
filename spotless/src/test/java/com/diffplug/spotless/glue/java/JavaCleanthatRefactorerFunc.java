@@ -15,16 +15,16 @@
  */
 package com.diffplug.spotless.glue.java;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import com.diffplug.spotless.FormatterFunc;
+
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.formatter.PathAndContent;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class JavaCleanthatRefactorerFunc implements FormatterFunc {
 	private List<String> included;
@@ -50,7 +50,7 @@ public class JavaCleanthatRefactorerFunc implements FormatterFunc {
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), refactorerProperties);
 
 		// Spotless calls steps always with LF eol.
-		return refactorer.doFormat(new PathAndContent(Paths.get("fake"), input), LineEnding.LF);
+		return refactorer.doFormat(input, LineEnding.LF);
 	}
 
 }

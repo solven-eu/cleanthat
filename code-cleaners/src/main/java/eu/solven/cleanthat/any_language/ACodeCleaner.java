@@ -15,7 +15,15 @@
  */
 package eu.solven.cleanthat.any_language;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -28,11 +36,6 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Asbtract for {@link ICodeCleaner}
@@ -86,7 +89,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 			properties = prepareConfiguration(prConfig);
 		} catch (RuntimeException e) {
 			// TODO Send a notification, or open a PR requesting to fix the documentation
-			throw new IllegalArgumentException("The configuration file seems invalid", e);
+			throw new IllegalStateException("The configuration file seems invalid", e);
 		}
 		return ResultOrError.result(properties);
 	}
@@ -96,7 +99,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		ResultOrError<CleanthatRepositoryProperties, String> optResult = loadAndCheckConfiguration(codeProvider);
 
 		if (optResult.getOptError().isPresent()) {
-			throw new IllegalArgumentException("Issue with configuration: " + optResult.getOptError().get());
+			throw new IllegalStateException("Issue with configuration: " + optResult.getOptError().get());
 		}
 
 		CleanthatRepositoryProperties properties = optResult.getOptResult().get();
@@ -112,7 +115,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	/**
-	 * Used to migrate the configuration file automatically. Typically to handle changes of keys.
+	 * Used to migrate the configuration file automatically. Typically to handle changes of key names.
 	 * 
 	 * @param properties
 	 */

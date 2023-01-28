@@ -37,7 +37,10 @@ public enum LineEnding {
 	// Rely on '.gitattributes' and similar mechanisms
 	// It may maps different files to different EOL
 	// If not '.gitattributes' is available, it would fallback to 'SYSTEM'
-	GIT(null);
+	GIT(null),
+	// We keep this deprecated value else Jackson will fail early
+	@Deprecated(forRemoval = true, since = "Replaced by NATIVE")
+	AUTO(System.lineSeparator());
 
 	private final String chars;
 

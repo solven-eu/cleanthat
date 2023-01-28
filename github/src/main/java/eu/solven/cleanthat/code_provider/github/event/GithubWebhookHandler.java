@@ -85,9 +85,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
-
-	private static final String PERMISSION_CHECKS = "checks";
-
 	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GHApp githubApp;
 
@@ -161,7 +158,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				// Required to commit cleaned files
 				.put("contents", GHPermissionType.WRITE)
 				// Required to edit the checks associated to the cleaning operation
-				.put(PERMISSION_CHECKS, GHPermissionType.WRITE)
+				.put(GithubCheckRunManager.PERMISSION_CHECKS, GHPermissionType.WRITE)
 				.build();
 	}
 
@@ -255,8 +252,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
 		// meantime (e.g. merged+deleted before cleanthat doing its work)
+		String eventKey = githubEvent.getxGithubDelivery();
 		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(root, offlineResult, dirtyHeadRef, relevantBaseBranches);
+				cleaner.prepareRefToClean(root, eventKey, offlineResult, dirtyHeadRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
@@ -347,32 +345,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return ResultOrError.result(baseRepo);
 	}
 
-	public Optional<GHCheckRun> createCheckRun(GithubAndToken githubAuthAsInst,
-			GHRepository baseRepo,
-			String sha1,
-			String eventKey) {
-		if (GHPermissionType.WRITE == githubAuthAsInst.getPermissions().get(PERMISSION_CHECKS)) {
-			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
-			// https://docs.github.com/en/rest/reference/checks#runs
-			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
-			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1).withExternalID(eventKey);
-			try {
-				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
-
-				return Optional.of(checkRun);
-			} catch (IOException e) {
-				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
-				LOGGER.warn("Issue creating the CheckRun", e);
-				return Optional.empty();
-			}
-		} else {
-			// Invite users to go into:
-			// https://github.com/organizations/solven-eu/settings/installations/9086720
-			LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
-			return Optional.empty();
-		}
-	}
-
 	public ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> checkRefCleanabilityAsHead(GHRepository eventRepo,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
@@ -447,7 +419,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
 			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
-			optCheckRun = createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
+			optCheckRun = new GithubCheckRunManager().createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
 			optCheckRun = Optional.empty();
 		}

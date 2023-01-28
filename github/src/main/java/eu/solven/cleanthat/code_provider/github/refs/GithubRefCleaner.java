@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
@@ -103,6 +105,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public Optional<HeadAndOptionalBase> prepareRefToClean(Path root,
+			String eventKey,
 			IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 head,
 			// There can be multiple eventBaseBranches in case of push events
@@ -111,6 +114,15 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
 
 		if (optConfig.getOptError().isPresent()) {
+			GHRepository repository;
+			String repoName = head.getRepoFullName();
+			try {
+				repository = githubAndToken.getGithub().getRepository(repoName);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue fetching repository: " + repoName, e);
+			}
+			new GithubCheckRunManager().createCheckRun(githubAndToken, repository, head.getSha(), eventKey);
+
 			return Optional.empty();
 		}
 

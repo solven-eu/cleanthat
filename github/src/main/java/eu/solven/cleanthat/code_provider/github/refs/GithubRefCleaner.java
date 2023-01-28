@@ -15,7 +15,34 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
+
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCheckRun.Conclusion;
+import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCompare;
+import org.kohsuke.github.GHCompare.Commit;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHIssueState;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTree;
+import org.kohsuke.github.GHTreeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
@@ -46,28 +73,6 @@ import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.utils.ResultOrError;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.regex.Pattern;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCompare;
-import org.kohsuke.github.GHCompare.Commit;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHIssueState;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default for {@link IGitRefCleaner}
@@ -110,17 +115,17 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			// There can be multiple eventBaseBranches in case of push events
 			Set<String> eventBaseRefs) {
 		ICodeProvider codeProvider = getCodeProviderForRef(root, head);
-		ResultOrError<CleanthatRepositoryProperties, String> optConfig = loadAndCheckConfiguration(codeProvider);
+		ResultOrError<CleanthatRepositoryProperties, String> optConfig;
+		try {
+			optConfig = loadAndCheckConfiguration(codeProvider);
+		} catch (RuntimeException e) {
+			updateCheckRunFailureWithConfig(eventKey, head);
+
+			throw new RuntimeException(e);
+		}
 
 		if (optConfig.getOptError().isPresent()) {
-			GHRepository repository;
-			String repoName = head.getRepoFullName();
-			try {
-				repository = githubAndToken.getGithub().getRepository(repoName);
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue fetching repository: " + repoName, e);
-			}
-			new GithubCheckRunManager().createCheckRun(githubAndToken, repository, head.getSha(), eventKey);
+			updateCheckRunFailureWithConfig(eventKey, head);
 
 			return Optional.empty();
 		}
@@ -154,6 +159,24 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 					eventBaseRefs);
 			return Optional.empty();
 		}
+	}
+
+	private void updateCheckRunFailureWithConfig(String eventKey, GitRepoBranchSha1 head) {
+		GHRepository repository;
+		String repoName = head.getRepoFullName();
+		try {
+			repository = githubAndToken.getGithub().getRepository(repoName);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue fetching repository: " + repoName, e);
+		}
+		new GithubCheckRunManager().createCheckRun(githubAndToken, repository, head.getSha(), eventKey)
+				.ifPresent(cr -> {
+					try {
+						cr.update().withConclusion(Conclusion.ACTION_REQUIRED).withStatus(Status.COMPLETED).create();
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+				});
 	}
 
 	protected Optional<HeadAndOptionalBase> cleanInNewRR(IExternalWebhookRelevancyResult result,

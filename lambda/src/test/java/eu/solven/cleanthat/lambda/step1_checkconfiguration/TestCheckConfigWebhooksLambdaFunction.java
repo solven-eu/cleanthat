@@ -1,8 +1,35 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.lambda.step1_checkconfiguration;
 
+import com.amazonaws.http.SdkHttpMetadata;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import java.io.IOException;
 import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,21 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.amazonaws.http.SdkHttpMetadata;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import com.amazonaws.services.dynamodbv2.model.PutItemResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @RunWith(SpringRunner.class)
 @MockBean({ IGitWebhookHandlerFactory.class, CompositeCodeCleanerFactory.class, ObjectMapper.class })

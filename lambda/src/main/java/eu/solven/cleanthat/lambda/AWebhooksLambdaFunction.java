@@ -1,18 +1,19 @@
+/*
+ * Copyright 2023 Solven
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.lambda;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -21,12 +22,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.seratch.jslack.Slack;
-
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter

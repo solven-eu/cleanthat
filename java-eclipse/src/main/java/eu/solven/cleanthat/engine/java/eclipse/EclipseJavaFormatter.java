@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.eclipse;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.util.Map;

@@ -77,7 +77,7 @@
 		<minimumTokens>80</minimumTokens>
 
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument />
+		<surefire.additionalArgument/>
 
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<!-- https://github.com/jmini/ecentral/tree/master/repo/fr/jmini/ecentral/eclipse-platform-dependencies -->
@@ -116,15 +116,6 @@
 				<version>3.29.0</version>
 			</dependency>
 
-			<!-- Commented-out as we observe unexpected formattings -->
-			<dependency>
-				<groupId>fr.jmini.ecentral</groupId>
-				<artifactId>eclipse-platform-dependencies</artifactId>
-				<version>${eclipse.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
 			<dependency>
 				<groupId>com.nimbusds</groupId>
@@ -147,15 +138,6 @@
 			<!-- </dependency> -->
 		</dependencies>
 	</dependencyManagement>
-
-	<!-- https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
-	<!-- https://jmini.github.io/ecentral/ -->
-	<repositories>
-		<repository>
-			<id>ecentral</id>
-			<url>https://raw.githubusercontent.com/jmini/ecentral/HEAD/repo</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<pluginManagement>
@@ -331,9 +313,7 @@
 
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine>
-							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]>
-						</argLine>
+						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -380,31 +360,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<!-- Given each EclipseJDTCore version may lead to a different formatting, we enable a project to choose its own version, and we need a lambda per version -->
-		<!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
-		<profile>
-			<id>eclipse_4.24</id>
-			<properties>
-				<eclipse.version>4.24</eclipse.version>
-				<lambda.functionNameSuffix>eclipse_4_24</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-		<profile>
-			<id>eclipse_4.23</id>
-			<properties>
-				<eclipse.version>4.23</eclipse.version>
-				<lambda.functionNameSuffix>eclipse_4_23</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-		<profile>
-			<id>eclipse_4.22</id>
-			<properties>
-				<eclipse.version>4.22</eclipse.version>
-				<lambda.functionNameSuffix>eclipse_4_22</lambda.functionNameSuffix>
-			</properties>
-		</profile>
-	</profiles>
-
 </project>

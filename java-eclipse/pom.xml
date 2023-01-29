@@ -10,6 +10,19 @@
 
 	<artifactId>java-eclipse</artifactId>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Commented-out as we observe unexpected formattings -->
+			<dependency>
+				<groupId>fr.jmini.ecentral</groupId>
+				<artifactId>eclipse-platform-dependencies</artifactId>
+				<version>${eclipse.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -94,4 +107,13 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<!-- https://stackoverflow.com/questions/72625637/maven-build-failed-due-to-jdt-dependencies-no-versions-available-for-org-osgi -->
+	<!-- https://jmini.github.io/ecentral/ -->
+	<repositories>
+		<repository>
+			<id>ecentral</id>
+			<url>https://raw.githubusercontent.com/jmini/ecentral/HEAD/repo</url>
+		</repository>
+	</repositories>
 </project>

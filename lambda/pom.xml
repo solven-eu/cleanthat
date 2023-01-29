@@ -94,8 +94,8 @@
 		<plugins>
 			<plugin>
 				<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-git-info -->
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
 			</plugin>
 
 			<plugin>

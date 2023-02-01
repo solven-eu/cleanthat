@@ -56,6 +56,12 @@ import org.eclipse.aether.RepositorySystem;
  *
  */
 public class FormatterFactory {
+	private static final String ID_JSON = "json";
+	private static final String ID_YAML = "yaml";
+	private static final String ID_XML = "xml";
+	private static final String ID_POM = "pom";
+	private static final String ID_MARKDOWN = "markdown";
+	private static final String ID_SCALA = "scala";
 	public static final String ID_JAVA = "java";
 
 	final FileSystem fileSystem;
@@ -81,7 +87,7 @@ public class FormatterFactory {
 	}
 
 	public static Set<String> getFormatterIds() {
-		return ImmutableSet.of(ID_JAVA, "scala", "markdown", "pom", "xml");
+		return ImmutableSet.of(ID_JAVA, ID_SCALA, ID_MARKDOWN, ID_POM, ID_XML, ID_JSON, ID_YAML);
 	}
 
 	public static Set<String> getDefaultIncludes() {
@@ -97,17 +103,17 @@ public class FormatterFactory {
 		switch (format) {
 		case ID_JAVA:
 			return new JavaFormatterFactory();
-		case "scala":
+		case ID_SCALA:
 			return new ScalaFormatterFactory();
-		case "markdown":
+		case ID_MARKDOWN:
 			return new MarkdownFormatterFactory();
-		case "pom":
+		case ID_POM:
 			return new PomXmlFormatterFactory();
-		case "xml":
+		case ID_XML:
 			return new XmlFormatterFactory();
-		case "json":
+		case ID_JSON:
 			return new JsonFormatterFactory();
-		case "yaml":
+		case ID_YAML:
 			return new JsonFormatterFactory();
 
 		default:

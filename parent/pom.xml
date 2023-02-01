@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<!-- Import dependency management from Spring Boot -->
 		<groupId>org.springframework.boot</groupId>
@@ -12,14 +11,14 @@
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
 		<relativePath/>
 	</parent>
-
+	
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
 	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-
+	
 	<inceptionYear>2020</inceptionYear>
-
+	
 	<developers>
 		<developer>
 			<id>blacelle</id>
@@ -30,7 +29,7 @@
 			</roles>
 		</developer>
 	</developers>
-
+	
 	<scm>
 		<!-- SCM is in properties as we can't configure it directly in profile -->
 		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
@@ -38,35 +37,42 @@
 		<tag>HEAD</tag>
 		<url>${scm.url}</url>
 	</scm>
-
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.release>11</maven.compiler.release>
-		<maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
-		<!-- https://nodejs.org/en/download/ -->
-		<!-- Stick to the latest LTS -->
-		<node.version>v12.16.1</node.version>
-
+		<!-- https://stackoverflow.com/questions/20581427/using-maven-release-plugin-with-github-you-cant-push-to-git-github-com -->
+		<scm.developerConnection>scm:git:ssh://git@github.com/solven-eu/cleanthat.git</scm.developerConnection>
+		<scm.connection>scm:git:ssh://github.com/solven-eu/cleanthat.git</scm.connection>
+		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.2</pepper.version>
-
+		<error-prone.version>2.18.0</error-prone.version>
+		<spotless.version>2.31.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 		<spotbugs.version>4.7.3.0</spotbugs.version>
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
-		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
-		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
-		<checkstyle.version>10.6.0</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
-		<maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
+		<maven-pmd-plugin.version>3.20.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
 		<pmd.version>6.54.0</pmd.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+		<maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
+		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+		<checkstyle.version>10.6.0</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
-
-		<spotless.version>2.31.0</spotless.version>
-
+		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
+		<!-- We suppose the developper would see the fixed and include them in his commit. -->
+		<!-- In the CI, we check BEFORE automatic fixes as the CI should report early invalid code -->
+		<staticChecks>process-sources</staticChecks>
+		<!-- By default (i.e. in local environments), check for code linting AFTER trying automatic fixes. -->
+		<lintGoal>lint-autofix</lintGoal>
+		<!-- CPD: We configure as property to enable overriding by sub-modules -->
+		<!-- Code duplication: Lower is better. Default is 100 -->
+		<minimumTokens>80</minimumTokens>
 		<!-- Skip javadoc, especially as it would break mvn:release -->
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<!-- We deploy only into lambda -->
@@ -76,24 +82,23 @@
 		<spotbugs.skip>false</spotbugs.skip>
 		<!-- Execute license-check manually, only before doing a release -->
 		<license.skip>true</license.skip>
-
-		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
-		<!-- We suppose the developper would see the fixed and include them in his commit. -->
-		<!-- In the CI, we check BEFORE automatic fixes as the CI should report early invalid code -->
-		<staticChecks>process-sources</staticChecks>
-
-		<!-- By default (i.e. in local environments), check for code linting AFTER trying automatic fixes. -->
-		<lintGoal>lint-autofix</lintGoal>
-
-		<!-- https://stackoverflow.com/questions/20581427/using-maven-release-plugin-with-github-you-cant-push-to-git-github-com -->
-		<scm.developerConnection>scm:git:ssh://git@github.com/solven-eu/cleanthat.git</scm.developerConnection>
-		<scm.connection>scm:git:ssh://github.com/solven-eu/cleanthat.git</scm.connection>
-		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
 	</properties>
-
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
@@ -125,7 +130,6 @@
 									<requireReleaseDeps>
 										<onlyWhenRelease>true</onlyWhenRelease>
 									</requireReleaseDeps>
-
 									<!-- TODO Activate this rule -->
 									<!-- <requireUpperBoundDeps> -->
 									<!-- <excludes> -->
@@ -137,7 +141,6 @@
 						</execution>
 					</executions>
 				</plugin>
-
 				<plugin>
 					<!-- http://code.mycila.com/license-maven-plugin/ -->
 					<!-- Usage: mvn com.mycila:license-maven-plugin:format -Dlicense.skip=false -->
@@ -165,18 +168,14 @@
 							<exclude>**/*.vue</exclude>
 							<exclude>**/node_modules/**</exclude>
 							<exclude>README.MD</exclude>
-
 							<exclude>pom.xml.versionsBackup</exclude>
 							<exclude>**/.pmd</exclude>
 							<exclude>**/.pmdruleset.xml</exclude>
 							<exclude>**/.checktyle</exclude>
-
 							<!-- Eclipse Launch (Debug/Run) files -->
 							<exclude>**/*.launch</exclude>
-
 							<!-- Useless to License generated files as regeneration will remove license -->
 							<excludes>**/generated/**</excludes>
-
 							<!-- Specific to module gui-web -->
 							<exclude>**/.babelrc</exclude>
 							<exclude>**/.gitkeep</exclude>
@@ -187,19 +186,14 @@
 							<exclude>**/.eslintrc</exclude>
 							<exclude>**/.eslintignore</exclude>
 							<exclude>**/lcov.info</exclude>
-
 							<!-- Specific to Docker -->
 							<exclude>sshd_config</exclude>
-
 							<!-- A marker file typically used to materialize a folder in git -->
 							<exclude>empty</exclude>
-
 							<!-- Leftovers to Logback wiring in files -->
 							<exclude>**/app.log</exclude>
-
 							<!-- Android -->
 							<exclude>**/.gradle/**</exclude>
-
 							<!-- Used to exclude gui-web and gui-back -->
 							<exclude>**/node/**</exclude>
 						</excludes>
@@ -218,9 +212,10 @@
 					<artifactId>spotbugs-maven-plugin</artifactId>
 					<version>${spotbugs.version}</version>
 					<configuration>
-						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
-						<!-- Activate with Pepper1.25 -->
+						<!-- Skipped as we need a Pepper release for the default exclusions -->
 						<skip>true</skip>
+						<!-- Need Pepper release 4.3? -->
+						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
 					</configuration>
 					<dependencies>
 						<dependency>
@@ -301,11 +296,12 @@
 						<!-- <includeTests>true</includeTests> -->
 						<indentSize>4</indentSize>
 						<printFailingErrors>true</printFailingErrors>
-
 						<!-- TODO Decrease to 4, then 3, until 1 -->
 						<failurePriority>5</failurePriority>
 						<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
 						<linkXRef>false</linkXRef>
+						<!-- xml is required to run 'mvn pmd:check' -->
+						<format>xml</format>
 						<rulesets>
 							<ruleset>style/pepper.pmd.rulesets.xml</ruleset>
 						</rulesets>
@@ -333,7 +329,7 @@
 							<version>${pmd.version}</version>
 						</dependency>
 						<!-- maven-pmd-plugin relies by default on some version of PMD which -->
-						<!-- may be incompatible withcustom PMD versions -->
+						<!-- may be incompatible with custom PMD versions -->
 						<dependency>
 							<groupId>net.sourceforge.pmd</groupId>
 							<artifactId>pmd-core</artifactId>
@@ -348,14 +344,12 @@
 							</goals>
 							<!-- Default phase is verify, which is after tests. -->
 							<!-- We prefer to run static analysis before tests not to wait -->
-
 							<!-- PMD should run after impsort auto-cleaning: done by using same phase but ordering plugins properly -->
 							<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 							<phase>${staticChecks}</phase>
 						</execution>
 					</executions>
 				</plugin>
-
 				<plugin>
 					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -381,7 +375,6 @@
 						</execution>
 					</executions>
 				</plugin>
-
 				<plugin>
 					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:apply -->
 					<!-- mvn com.diffplug.spotless:spotless-maven-plugin:check -->
@@ -407,23 +400,19 @@
 								</indent>
 							</format>
 						</formats>
-
 						<pom>
 							<includes>
 								<include>pom.xml</include>
 							</includes>
-
 							<!-- https://github.com/diffplug/spotless/tree/main/plugin-maven#sortpom -->
 							<sortPom>
 								<!-- We like empty elements, while plugin default configuration would expand them -->
 								<expandEmptyElements>false</expandEmptyElements>
-
 								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
 								<!-- -1 means '\t' -->
 								<nrOfIndentSpace>-1</nrOfIndentSpace>
 							</sortPom>
 						</pom>
-
 						<markdown>
 							<endWithNewline/>
 							<indent>
@@ -433,33 +422,31 @@
 							<includes>
 								<include>**/*.md</include>
 							</includes>
-
 							<flexmark/>
 						</markdown>
-
 						<!-- define a language-specific format -->
 						<java>
 							<excludes>
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
-
 							<removeUnusedImports/>
-							<importOrder/>
-
+							<importOrder>
+								<!-- Need Pepper release 4.3? -->
+								<!--file>eclipse/eclipse.importorder</file-->
+								<!--order>java,javax,org,com</order-->
+							</importOrder>
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
 								<!-- <version>4.18.0</version>-->
 								<file>eclipse/eclipse_java_code_formatter.xml</file>
 							</eclipse>
-
 							<licenseHeader>
-							    <!-- https://github.com/diffplug/spotless/issues/1418 -->
+								<!-- https://github.com/diffplug/spotless/issues/1418 -->
 								<delimiter>(package )|(import )</delimiter>
 								<file>${maven.multiModuleProjectDirectory}/.cleanthat/spotless.license</file>
 							</licenseHeader>
 						</java>
-
 						<json>
 							<trimTrailingWhitespace/>
 							<endWithNewline/>
@@ -467,15 +454,12 @@
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
 							</indent>
-
 							<includes>
 								<include>**/*.json</include>
 							</includes>
-
 							<gson/>
 						</json>
 					</configuration>
-
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
@@ -484,7 +468,6 @@
 							<scope>runtime</scope>
 						</dependency>
 					</dependencies>
-
 					<executions>
 						<execution>
 							<id>applySpotless</id>
@@ -497,18 +480,16 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
-				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
-				<groupId>com.diffplug.spotless</groupId>
-				<artifactId>spotless-maven-plugin</artifactId>
-			</plugin>
+			<!-- Apply formatters before checks -->
 			<plugin>
 				<groupId>io.github.solven-eu.cleanthat</groupId>
 				<artifactId>cleanthat-maven-plugin</artifactId>
@@ -516,10 +497,19 @@
 				<inherited>false</inherited>
 			</plugin>
 			<plugin>
+				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
+				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+			</plugin>
+			<!-- Apply checks after formatters -->
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<!-- Skip a row by adding '//NOPMD' at the end -->
+				<!-- http://pmd.sourceforge.net/pmd-4.3.0/suppressing.html -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
 			</plugin>
@@ -533,7 +523,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<profiles>
 		<profile>
 			<!-- Skip formatting and refactoring: quality, format,... -->
@@ -553,7 +542,6 @@
 				<cleanthat.skip>true</cleanthat.skip>
 				<spotless.apply.skip>true</spotless.apply.skip>
 				<spotless.check.skip>true</spotless.check.skip>
-
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
 			</properties>
@@ -582,7 +570,6 @@
 				<skipITs>true</skipITs>
 			</properties>
 		</profile>
-
 		<profile>
 			<!-- Skip everything: test, quality, format,... -->
 			<id>fast</id>
@@ -598,12 +585,10 @@
 				<formatter.skip>true</formatter.skip>
 				<impsort.skip>true</impsort.skip>
 				<cleanthat.skip>true</cleanthat.skip>
-
 				<skip.npm.style>true</skip.npm.style>
 				<cleanthat.skip>true</cleanthat.skip>
 				<spotless.apply.skip>true</spotless.apply.skip>
 				<spotless.check.skip>true</spotless.check.skip>
-
 				<!-- Dependency will be checked with style -->
 				<enforcer.skip>true</enforcer.skip>
 				<!-- Skip tests -->
@@ -612,7 +597,6 @@
 				<skipITs>true</skipITs>
 			</properties>
 		</profile>
-
 		<profile>
 			<id>ci</id>
 			<activation>
@@ -628,11 +612,9 @@
 				<lintGoal>lint</lintGoal>
 			</properties>
 		</profile>
-
 		<profile>
 			<!-- https://central.sonatype.org/publish/publish-maven/#deploying-to-ossrh-with-apache-maven-introduction -->
 			<id>Sonatype</id>
-
 			<!--Requires in settings.xml: <settings> <servers> <server> <id>ossrh</id> <username>your-jira-id</username> <password>your-jira-pwd</password> </server> 
 				</servers> </settings> -->
 			<distributionManagement>
@@ -645,7 +627,6 @@
 					<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 				</snapshotRepository>
 			</distributionManagement>
-
 			<build>
 				<plugins>
 					<!-- http://central.sonatype.org/pages/working-with-pgp-signatures.html -->
@@ -664,7 +645,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
@@ -682,7 +662,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 					<!-- https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin -->
 					<!-- http://www.sonatype.org/nexus/2014/10/08/distribute-project-artifacts-in-maven-central-with-nexus-oss/ -->
 					<plugin>

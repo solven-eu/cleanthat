@@ -4,7 +4,7 @@ source_code:
   - "regex:.*/generated/.*"
   - "regex:.*/do_not_format_me/.*"
   encoding: "UTF-8"
-  line_ending: "AUTO"
+  line_ending: "GIT"
 languages:
 - language: "java"
   language_version: "11"
@@ -13,12 +13,17 @@ languages:
     - "**/do_not_format_me/**"
   steps:
   - id: "removeUnusedImports"
+  - id: "importOrder"
+    parameters:
+      #file: "repository:/static/src/main/resources/eclipse/eclipse.importorder"
+      file: "repository:/.cleanthat/eclipse.importorder"
   - id: "eclipse"
     parameters:
-      file: "repository:eclipse/eclipse_java_code_formatter.xml"
+      #file: "url:https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml"
+      file: "repository:/.cleanthat/eclipse_java_code_formatter.xml"
   - id: "licenseHeader"
     parameters:
-      content: "/* (C)$YEAR */"
+      file: repository:/.cleanthat/spotless.license
 - language: "pom.xml"
   source_code:
      includes:

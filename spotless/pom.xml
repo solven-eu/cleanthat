@@ -1,48 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
 		<version>2.0-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>spotless</artifactId>
-
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
-
 		<spotless.dependency.version>2.34.0</spotless.dependency.version>
-
 		<maven.version>3.8.7</maven.version>
 		<maven-resolver.version>1.6.3</maven-resolver.version>
 	</properties>
-
+	<!-- This block is similar to cleanthat-maven-plugin one -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-plugin-api</artifactId>
 				<version>${maven.version}</version>
-				<scope>provided</scope>
+				<!-- Not provided as spotless is not executed through maven in CleanThat -->
+				<!--scope>provided</scope-->
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-core</artifactId>
 				<version>${maven.version}</version>
-				<scope>provided</scope>
+				<!-- Not provided as spotless is not executed through maven in CleanThat -->
+				<!--scope>provided</scope-->
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-model</artifactId>
 				<version>${maven.version}</version>
-				<scope>provided</scope>
+				<!-- Not provided as spotless is not executed through maven in CleanThat -->
+				<!--scope>provided</scope-->
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -54,7 +51,6 @@
 			<artifactId>code-cleaners</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-lib -->
 		<dependency>
 			<groupId>com.diffplug.spotless</groupId>
@@ -83,33 +79,29 @@
 			<artifactId>concurrent-trees</artifactId>
 			<version>2.6.1</version>
 		</dependency>
-
 		<dependency>
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<!-- Enables MavenProject and MavenSession -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
 		</dependency>
-
 		<!-- dependencies to annotations -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
 			<version>3.7.0</version>
-			<scope>provided</scope>
+			<!-- Not provided as spotless is not executed through maven in CleanThat -->
+			<!-- scope>provided</scope>-->
 		</dependency>
-
 		<!-- Basic dependencies as present in maven-resolver samples -->
 		<dependency>
 			<groupId>org.apache.maven.resolver</groupId>
@@ -126,7 +118,6 @@
 			<artifactId>maven-resolver-transport-http</artifactId>
 			<version>${maven-resolver.version}</version>
 		</dependency>
-
 		<!-- Maven is used to fetch 3rd-parties jars -->
 		<dependency>
 			<!-- https://maven.apache.org/plugin-testing/maven-plugin-testing-harness/getting-started/index.html -->
@@ -147,14 +138,12 @@
 			<artifactId>maven-resolver-api</artifactId>
 			<version>1.9.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<!-- Until adding CleanThat as as official Spotless Java step -->
 			<groupId>io.github.solven-eu.cleanthat</groupId>

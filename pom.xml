@@ -1,94 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>parent</artifactId>
 		<version>2.0-SNAPSHOT</version>
 		<relativePath>parent</relativePath>
 	</parent>
-
 	<artifactId>aggregator-cleanthat</artifactId>
 	<packaging>pom</packaging>
-
 	<modules>
 		<module>parent</module>
-
 		<module>any-language</module>
-
 		<module>code-providers</module>
 		<module>local</module>
 		<module>git</module>
 		<module>github</module>
 		<module>gitlab</module>
-
 		<module>config</module>
-
 		<module>code-cleaners</module>
-
 		<!-- JVM languages -->
 		<module>java</module>
 		<module>java-eclipse</module>
-
 		<!-- mvn with Java and Kotlin is broken (as we are too weak in Kotlin-->
 		<!--module>kotlin</module-->
-
 		<module>runnable</module>
 		<module>lambda</module>
-
 		<module>test-helpers</module>
-
 		<!-- Build automation tools -->
 		<module>maven</module>
 		<!-- <module>gradle</module> -->
-
 		<!-- Enable running spotless in GithubApp -->
 		<!-- (Not enabling cleanthat through spotless) -->
 		<module>spotless</module>
 	</modules>
-
 	<scm>
 		<!-- Only developerConnection was not set in parent po;m as its own parent was not a SNAPSHOT -->
 		<developerConnection>${scm.developerConnection}</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-
 	<properties>
 		<release.suffix>RELEASE</release.suffix>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-release-plugin -->
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
-		<git-commit-id-plugin.version>5.0.0</git-commit-id-plugin.version>
-
 		<sentry-spring.version>6.7.0</sentry-spring.version>
-
 		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2021.0.5</spring-cloud.version>
-
 		<!-- quality properties -->
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.10</jacoco.instruction.ratio>
-		<!-- CPD: We configure as property to enable overriding by sub-modules -->
-		<!-- Code duplication: Lower is better. Default is 100 -->
-		<minimumTokens>80</minimumTokens>
-
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument/>
-
+		<surefire.additionalArgument />
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<!-- https://github.com/jmini/ecentral/tree/master/repo/fr/jmini/ecentral/eclipse-platform-dependencies -->
 		<eclipse.version>4.25</eclipse.version>
-
 		<!-- Deprecated -->
 		<!-- <eclipse.jt.core.version>3.26.0</eclipse.jt.core.version> -->
 		<!-- <eclipse.jt.core.version>3.30.0</eclipse.jt.core.version> -->
 		<!-- <eclipse.jdt.core.manipulation.version>1.16.100</eclipse.jdt.core.manipulation.version> -->
 	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -98,7 +68,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
 			<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-bom -->
 			<dependency>
 				<groupId>com.amazonaws</groupId>
@@ -107,7 +76,6 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
 			<!-- https://mvnrepository.com/artifact/org.checkerframework/checker-qual -->
 			<dependency>
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
@@ -115,14 +83,12 @@
 				<artifactId>checker-qual</artifactId>
 				<version>3.29.0</version>
 			</dependency>
-
 			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
 			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>9.25.6</version>
 			</dependency>
-
 			<!-- <dependency> -->
 			<!-- <groupId>org.eclipse.jdt</groupId> -->
 			<!-- <artifactId>org.eclipse.jdt.core</artifactId> -->
@@ -138,7 +104,6 @@
 			<!-- </dependency> -->
 		</dependencies>
 	</dependencyManagement>
-
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -154,17 +119,31 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<!-- https://maven.apache.org/plugins/maven-source-plugin/ -->
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>attach-sources</id>
-							<goals>
-								<goal>jar-no-fork</goal>
-							</goals>
-						</execution>
-					</executions>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.10.1</version>
+					<configuration>
+						<compilerArgs>
+							<!-- https://errorprone.info/docs/installation -->
+							<arg>-XDcompilePolicy=simple</arg>
+							<!--							<arg>-Xplugin:ErrorProne</arg>-->
+						</compilerArgs>
+						<annotationProcessorPaths>
+							<!-- https://github.com/google/error-prone/issues/3749 -->
+							<!--							<path>-->
+							<!-- https://errorprone.info/docs/installation -->
+							<!--								<groupId>com.google.errorprone</groupId>-->
+							<!--								<artifactId>error_prone_core</artifactId>-->
+							<!--								<version>${error-prone.version}</version>-->
+							<!--							</path>-->
+							<!--							<path>-->
+							<!--								<groupId>org.projectlombok</groupId>-->
+							<!--								<artifactId>lombok</artifactId>-->
+							<!--								<version>${lombok.version}</version>-->
+							<!--							</path>-->
+							<!-- Other annotation processors go here. -->
+						</annotationProcessorPaths>
+					</configuration>
 				</plugin>
 				<plugin>
 					<!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
@@ -176,26 +155,19 @@
 						<!-- https://issues.apache.org/jira/browse/MRELEASE-777 -->
 						<localCheckout>true</localCheckout>
 						<pushChanges>true</pushChanges>
-
 						<!-- This should ensure the next SNAPSHOT does compile, and it installed in local repo -->
 						<!-- TODO Is this useful only for Benoit Lacelle conveniency? -->
 						<!-- <completionGoals>install -DskipTests</completionGoals> -->
-
 						<!-- All modules shall have the same version -->
 						<autoVersionSubmodules>true</autoVersionSubmodules>
-
 						<!-- On each release, we want to deploy jars to Sonatype -->
 						<goals>deploy</goals>
-
 						<!-- Same convention as Spring -->
 						<tagNameFormat>v@{project.version}.${release.suffix}</tagNameFormat>
-
 						<!-- Skip style for faster process -->
 						<!-- We need javadoc to deploy to Sonatype -->
 						<arguments>-Dmaven.javadoc.skip=true -DskipTests -PskipStyle -Dmaven.javadoc.skip=false</arguments>
-
 						<useReleaseProfile>false</useReleaseProfile>
-
 						<!-- http://central.sonatype.org/pages/apache-maven.html -->
 						<!-- Sonatype profile is defined in cleanthat-parent -->
 						<releaseProfiles>Sonatype</releaseProfiles>
@@ -211,7 +183,6 @@
 							<!-- Exclude JooQ generated classes -->
 							<!-- https://stackoverflow.com/questions/27799419/maven-jacoco-configuration-exclude-classes-packages-from-report-not-working -->
 							<exclude>**/generated/**/*</exclude>
-
 							<!-- Hacked in retriever-proxy module (Unclear why the last '*' is needed) -->
 							<exclude>**/org/apache/pdfbox/pdmodel/font/PDSimpleFont.*</exclude>
 						</excludes>
@@ -310,10 +281,11 @@
 						</excludes>
 						<!-- Add ${argLine} to maintain the argument from Jacoco -->
 						<!-- https://groups.google.com/forum/#!topic/jacoco/LzmCezW8VKA -->
-
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
+						<argLine>
+							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]>
+						</argLine>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -325,7 +297,6 @@
 						<format>json</format>
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.json</generateGitPropertiesFilename>
-
 						<!-- https://github.com/ktoso/maven-git-commit-id-plugin/pull/65 -->
 						<injectAllReactorProjects>false</injectAllReactorProjects>
 					</configuration>

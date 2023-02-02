@@ -17,6 +17,7 @@
 		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
 
 		<maven.version>3.8.7</maven.version>
+		<maven-resolver.version>1.6.3</maven-resolver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -37,6 +38,37 @@
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-model</artifactId>
 				<version>${maven.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-api</artifactId>
+				<version>${maven-resolver.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-impl</artifactId>
+				<version>${maven-resolver.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-connector-basic</artifactId>
+				<version>${maven-resolver.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-transport-file</artifactId>
+				<version>${maven-resolver.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.resolver</groupId>
+				<artifactId>maven-resolver-transport-http</artifactId>
+				<version>${maven-resolver.version}</version>
 				<scope>provided</scope>
 			</dependency>
 		</dependencies>

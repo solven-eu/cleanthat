@@ -56,8 +56,6 @@ jobs: # a collection of steps
           key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
       - run: mvn clean install -pl :lambda -am -DskipTests -PskipStyle
       - run: mvn lambda:deploy-lambda -pl :lambda
-      
-
 
 workflows:
   build_and_test:

@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
 		<version>2.0-SNAPSHOT</version>
 	</parent>
-
 	<!-- This is the standard name template for unofficial plugins -->
 	<artifactId>cleanthat-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
-
 		<maven.version>3.8.7</maven.version>
 		<maven-resolver.version>1.6.3</maven-resolver.version>
 	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -37,6 +32,13 @@
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-model</artifactId>
+				<version>${maven.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-resolver-provider</artifactId>
+				<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-resolver-provider -->
 				<version>${maven.version}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -73,20 +75,17 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>local</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>any-language</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>java</artifactId>
@@ -100,7 +99,6 @@
 				<!-- </exclusion> -->
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>java-eclipse</artifactId>
@@ -114,24 +112,20 @@
 				<!-- </exclusion> -->
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>spotless</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<!-- Enables MavenProject and MavenSession -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
 		</dependency>
-
 		<!-- dependencies to annotations -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
@@ -139,7 +133,6 @@
 			<version>3.7.1</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>runnable</artifactId>
@@ -157,7 +150,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -169,7 +161,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<!-- https://maven.apache.org/plugin-testing/maven-plugin-testing-harness/getting-started/index.html -->
 			<groupId>org.apache.maven.plugin-testing</groupId>
@@ -189,7 +180,6 @@
 			<artifactId>maven-resolver-api</artifactId>
 			<version>1.9.4</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
@@ -202,7 +192,6 @@
 			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.pepper</groupId>
 			<artifactId>pepper-unittest</artifactId>
@@ -210,7 +199,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<!-- mvn com.github.cormoran-io.cleanthat:cleanthat-maven-plugin:cleanthat -->

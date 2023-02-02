@@ -1,6 +1,6 @@
 syntax_version: "2023-01-14"
 encoding: "UTF-8"
-line_ending: "GIT"
+line_ending: "GIT_ATTRIBUTES"
 formatters:
 - format: "java"
   excludes:
@@ -19,7 +19,7 @@ formatters:
     parameters:
       delimiter: "(package )|(import )"
       file: repository:/.cleanthat/spotless.license
-- format: "pom.xml"
+- format: "pom"
   includes:
   - "glob:**/pom.xml"
   steps:

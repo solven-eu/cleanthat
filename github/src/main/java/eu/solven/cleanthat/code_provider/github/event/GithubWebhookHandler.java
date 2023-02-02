@@ -15,8 +15,52 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.kohsuke.github.GHApp;
+import org.kohsuke.github.GHAppCreateTokenBuilder;
+import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHAppInstallationToken;
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCheckRun;
+import org.kohsuke.github.GHCheckRun.Conclusion;
+import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder.Output;
+import org.kohsuke.github.GHCommitPointer;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHMarketplaceAccountPlan;
+import org.kohsuke.github.GHPermissionType;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRateLimit;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.HttpConnector;
+import org.kohsuke.github.HttpException;
+import org.kohsuke.github.connector.GitHubConnector;
+import org.kohsuke.github.extras.ImpatientHttpConnector;
+import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Ascii;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
@@ -39,44 +83,6 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.logging.PepperLogHelper;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import org.kohsuke.github.GHApp;
-import org.kohsuke.github.GHAppCreateTokenBuilder;
-import org.kohsuke.github.GHAppInstallation;
-import org.kohsuke.github.GHAppInstallationToken;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCheckRun;
-import org.kohsuke.github.GHCheckRun.Conclusion;
-import org.kohsuke.github.GHCheckRun.Status;
-import org.kohsuke.github.GHCommitPointer;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHMarketplaceAccountPlan;
-import org.kohsuke.github.GHPermissionType;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRateLimit;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.HttpConnector;
-import org.kohsuke.github.HttpException;
-import org.kohsuke.github.connector.GitHubConnector;
-import org.kohsuke.github.extras.ImpatientHttpConnector;
-import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -87,6 +93,9 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
+
+	private static final int LIMIT_SUMMARY = 65_535;
+
 	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GHApp githubApp;
 
@@ -486,7 +495,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (RuntimeException e) {
 			optCheckRun.ifPresent(checkRun -> {
 				try {
-					checkRun.update().withConclusion(Conclusion.FAILURE).withStatus(Status.COMPLETED).create();
+					String stackTrace = Throwables.getStackTraceAsString(e);
+
+					// Summary is limited to 65535 chars
+					String summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
+
+					checkRun.update()
+							.withConclusion(Conclusion.FAILURE)
+							.withStatus(Status.COMPLETED)
+
+							.add(new Output(e.getMessage() + " (" + e.getClass().getName() + ")", summary))
+							.create();
 				} catch (IOException ee) {
 					LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), ee);
 				}

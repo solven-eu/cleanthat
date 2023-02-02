@@ -108,7 +108,11 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 	private FormatterStep makeImportOrder(SpotlessStepProperties s) {
 		// https://stackoverflow.com/questions/34450900/how-to-sort-import-statements-in-eclipse-in-case-insensitive-order
-		boolean wildcardsLast = s.getCustomProperty("wildcardsLast", Boolean.class);
+		Boolean wildcardsLast = s.getCustomProperty("wildcardsLast", Boolean.class);
+		if (wildcardsLast == null) {
+			// https://github.com/diffplug/spotless/tree/main/plugin-maven#java
+			wildcardsLast = false;
+		}
 
 		String ordersFile = s.getCustomProperty(KEY_FILE, String.class);
 		if (ordersFile != null) {

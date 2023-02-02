@@ -19,7 +19,7 @@ formatters:
     parameters:
       delimiter: "(package )|(import )"
       file: repository:/.cleanthat/spotless.license
-- format: "pom.xml"
+- format: "pom"
   includes:
   - "glob:**/pom.xml"
   steps:

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
-import com.google.common.collect.Iterables;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
@@ -77,6 +76,7 @@ public class ConfigHelpers {
 		return objectMapper;
 	}
 
+	@Deprecated
 	public static ObjectMapper makeJsonObjectMapper() {
 		return new ObjectMapper();
 	}

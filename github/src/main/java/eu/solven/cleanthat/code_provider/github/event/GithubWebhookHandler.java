@@ -93,6 +93,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
+	private static final int LIMIT_SUMMARY = 65535;
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
 	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GHApp githubApp;
@@ -496,7 +497,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					String stackTrace = Throwables.getStackTraceAsString(e);
 
 					// Summary is limited to 65535 chars
-					String summary = Ascii.truncate(stackTrace, 65535, "...");
+					String summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
 
 					checkRun.update()
 							.withConclusion(Conclusion.FAILURE)

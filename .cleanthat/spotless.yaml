@@ -1,16 +1,10 @@
 syntax_version: "2023-01-14"
-source_code:
+encoding: "UTF-8"
+line_ending: "GIT"
+formatters:
+- format: "java"
   excludes:
-  - "regex:.*/generated/.*"
-  - "regex:.*/do_not_format_me/.*"
-  encoding: "UTF-8"
-  line_ending: "GIT"
-languages:
-- language: "java"
-  language_version: "11"
-  source_code:
-    excludes:
-    - "**/do_not_format_me/**"
+  - "**/do_not_format_me/**"
   steps:
   - id: "removeUnusedImports"
   - id: "importOrder"
@@ -23,11 +17,11 @@ languages:
       file: "repository:/.cleanthat/eclipse_java_code_formatter.xml"
   - id: "licenseHeader"
     parameters:
+      delimiter: "(package )|(import )"
       file: repository:/.cleanthat/spotless.license
-- language: "pom.xml"
-  source_code:
-     includes:
-     - "regex:**/pom.xml"
+- format: "pom.xml"
+  includes:
+  - "glob:**/pom.xml"
   steps:
   - id: "sortPom"
     parameters:

@@ -50,7 +50,7 @@
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.10</jacoco.instruction.ratio>
 		<!-- By default, there is no additional argument -->
-		<surefire.additionalArgument />
+		<surefire.additionalArgument/>
 		<!-- Beware, changing this version often lead to a change of actual formatting -->
 		<!-- https://github.com/jmini/ecentral/tree/master/repo/fr/jmini/ecentral/eclipse-platform-dependencies -->
 		<eclipse.version>4.25</eclipse.version>
@@ -283,9 +283,7 @@
 						<!-- https://groups.google.com/forum/#!topic/jacoco/LzmCezW8VKA -->
 						<!-- -XX:+StartAttachListener is for http://comments.gmane.org/gmane.comp.java.openjdk.macosx-port.devel/6094 -->
 						<!-- -Djava.util.logging.config.file so that tests fallback on logback -->
-						<argLine>
-							<![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]>
-						</argLine>
+						<argLine><![CDATA[-Xmx256M -XX:+StartAttachListener -Djava.util.logging.config.file=logging.properties -Djdk.attach.allowAttachSelf=true ${surefire.additionalArgument} ${argLine}]]></argLine>
 					</configuration>
 				</plugin>
 				<plugin>

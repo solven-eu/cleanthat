@@ -25,6 +25,8 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Enable a Facade over RewiewRequestProvider
@@ -33,7 +35,7 @@ import org.kohsuke.github.GitHub;
  *
  */
 public class GithubFacade {
-	// private static final Logger LOGGER = LoggerFactory.getLogger(GithubFacade.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubFacade.class);
 
 	final GitHub github;
 	final String repoName;
@@ -49,11 +51,18 @@ public class GithubFacade {
 
 	public static String toFullGitRef(GHCommitPointer ghCommitPointer) {
 		String githubRef = ghCommitPointer.getRef();
-		return toFullGitRef(githubRef);
+		return branchToRef(githubRef);
 	}
 
-	public static String toFullGitRef(String githubRef) {
-		return CleanthatRefFilterProperties.BRANCHES_PREFIX + githubRef;
+	public static String branchToRef(String branchName) {
+		if (branchName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
+			LOGGER.warn("We expected a branchName, not a ref: {}",
+					branchName,
+					new RuntimeException("We want a stackTrace"));
+			return branchName;
+		}
+
+		return CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName;
 	}
 
 	@Deprecated

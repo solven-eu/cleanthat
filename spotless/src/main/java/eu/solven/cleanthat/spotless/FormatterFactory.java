@@ -15,6 +15,19 @@
  */
 package eu.solven.cleanthat.spotless;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.maven.resolver.examples.util.Booter;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+
 import com.diffplug.spotless.FormatExceptionPolicy;
 import com.diffplug.spotless.FormatExceptionPolicyStrict;
 import com.diffplug.spotless.Formatter;
@@ -23,6 +36,7 @@ import com.diffplug.spotless.LineEnding;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.GitAttributesLineEndings_InMemory;
 import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
@@ -35,19 +49,6 @@ import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
-import org.apache.maven.resolver.examples.util.Booter;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -72,17 +73,13 @@ public class FormatterFactory {
 		this.codeProvider = cleanthatSession.getCodeProvider();
 	}
 
-	// Provisioner provisionner = new CleanthatJvmProvisioner();
 	public static Provisioner makeProvisionner() throws IOException {
-		Log log = new SystemStreamLog();
-
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
 		DefaultRepositorySystemSession repositorySystemSession = Booter.newRepositorySystemSession(repositorySystem);
 
 		Provisioner provisionner = MavenProvisioner.create(new ArtifactResolver(repositorySystem,
 				repositorySystemSession,
-				Booter.newRepositories(repositorySystem, repositorySystemSession),
-				log));
+				Booter.newRepositories(repositorySystem, repositorySystemSession)));
 		return provisionner;
 	}
 

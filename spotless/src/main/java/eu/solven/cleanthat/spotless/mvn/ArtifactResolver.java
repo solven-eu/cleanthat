@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.apache.maven.plugin.logging.Log;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -37,6 +36,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Duplicates com.diffplug.spotless.maven.ArtifactResolver, as it is difficult to import from a maven-plugin jar.
@@ -48,24 +49,21 @@ import org.eclipse.aether.resolution.DependencyResult;
  * @see com.diffplug.spotless.maven.ArtifactResolver
  *
  */
-@SuppressWarnings("PMD.ProperLogger")
 public class ArtifactResolver {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactResolver.class);
 
 	private static final Exclusion EXCLUDE_ALL_TRANSITIVES = new Exclusion("*", "*", "*", "*");
 
 	private final RepositorySystem repositorySystem;
 	private final RepositorySystemSession session;
 	private final List<RemoteRepository> repositories;
-	private final Log log;
 
 	public ArtifactResolver(RepositorySystem repositorySystem,
 			RepositorySystemSession session,
-			List<RemoteRepository> repositories,
-			Log log) {
+			List<RemoteRepository> repositories) {
 		this.repositorySystem = Objects.requireNonNull(repositorySystem);
 		this.session = Objects.requireNonNull(session);
 		this.repositories = Objects.requireNonNull(repositories);
-		this.log = Objects.requireNonNull(log);
 	}
 
 	/**
@@ -103,8 +101,6 @@ public class ArtifactResolver {
 	}
 
 	private void logResolved(ArtifactResult artifactResult) {
-		if (log.isDebugEnabled()) {
-			log.debug("Resolved artifact: " + artifactResult);
-		}
+		LOGGER.info("Resolved artifact: {}", artifactResult);
 	}
 }

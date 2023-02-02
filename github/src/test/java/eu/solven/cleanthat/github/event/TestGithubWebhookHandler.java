@@ -70,6 +70,8 @@ public class TestGithubWebhookHandler {
 		Assertions.assertThat(result.optBaseRef().get().getRef()).isEqualTo("refs/heads/master");
 		Assertions.assertThat(result.optBaseRef().get().getRepoFullName()).isEqualTo("solven-eu/cleanthat");
 		Assertions.assertThat(result.optBaseRef().get().getSha()).isEqualTo("957d4697599b1cea7b81f60dddbe3edfb236f2af");
+
+		Assertions.assertThat(result.optOpenPr().get().getBaseRef()).isEqualTo("refs/heads/master");
 	}
 
 	@Test
@@ -109,5 +111,7 @@ public class TestGithubWebhookHandler {
 
 		Assertions.assertThat(result.optPushedRefOrRrHead().get().getRepoFullName()).isEqualTo("solven-eu/cleanthat");
 		Assertions.assertThat(result.optPushedRefOrRrHead().get().getRef()).isEqualTo("refs/heads/renovate/spotbugs");
+
+		Assertions.assertThat(result.optBaseRef().get().getRef()).isEqualTo("refs/heads/renovate/spotbugs");
 	}
 }

@@ -86,7 +86,7 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCodeEol() {
-		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
 		SourceCodeProperties defaultP = SourceCodeProperties.defaultRoot();
@@ -134,7 +134,7 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCode_parentHasExcluded() {
-		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
 		SourceCodeProperties defaultP = SourceCodeProperties.builder().exclude(".*/generated/.*").build();
@@ -178,7 +178,7 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCode_parentHasIncluded() {
-		ObjectMapper om = ConfigHelpers.makeJsonObjectMapper();
+		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
 		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
 
 		SourceCodeProperties defaultP = SourceCodeProperties.builder().include(".*\\.xml").build();

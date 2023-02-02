@@ -113,7 +113,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			} else {
 				// This would happen on Lambda direct invocation
 				// But we always try to rely on events(SQS, DynamoDB, ...)
-				// It may also happens in localhost invocation (e.g. ITCleanEventLocallyInDynamoDb)
+				// It may also happens in localhost invocation (e.g. ITProcessLocallyDynamoDbEvent_ExecuteClean)
 				logEvent(objectMapper, input);
 
 				IWebhookEvent event = wrapAsEvent(input);

@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.codeprovider.git;
 
+import eu.solven.cleanthat.github.IGitRefsConstants;
+
 /**
  * Given PR may be cross repositories, we need to qualify a sha by its repo. A single sha1 may be associated to multiple
  * references.
@@ -33,6 +35,11 @@ public class GitRepoBranchSha1 {
 			throw new IllegalArgumentException("It seems we did not receive a fullName: " + repoName);
 		}
 		this.repoName = repoName;
+
+		if (!ref.startsWith(IGitRefsConstants.REFS_PREFIX)) {
+			throw new IllegalArgumentException("Invalid fullRef: " + ref);
+		}
+
 		this.ref = ref;
 		this.sha = sha;
 	}
@@ -45,6 +52,10 @@ public class GitRepoBranchSha1 {
 		return repoName;
 	}
 
+	/**
+	 * 
+	 * @return a full ref, always starting with 'refs/'
+	 */
 	public String getRef() {
 		return ref;
 	}

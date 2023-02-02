@@ -105,8 +105,8 @@ public class GithubNoApiWebhookHandler {
 			}
 			String githubAction = optAction.get();
 			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
-				String simpleHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
-				String headRef = IGitRefsConstants.BRANCHES_PREFIX + simpleHeadRef;
+				String shortHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
+				String headRef = GithubFacade.branchToRef(shortHeadRef);
 
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
 					// Do not process CleanThat own PR open events
@@ -119,11 +119,10 @@ public class GithubNoApiWebhookHandler {
 				}
 				// Some dirty commits may have been pushed while the PR was closed
 				prOpen = true;
-				// refHasOpenReviewRequest = true;
 				String baseRepoName =
 						PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
-				String simpleBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
-				String baseRef = IGitRefsConstants.BRANCHES_PREFIX + simpleBaseRef;
+				String shortBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
+				String baseRef = GithubFacade.branchToRef(shortBaseRef);
 
 				long prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
 				String headRepoName =
@@ -134,11 +133,9 @@ public class GithubNoApiWebhookHandler {
 				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
 				GitRepoBranchSha1 head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
 				optHeadRef = Optional.of(head);
-				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName,
-						prNumber,
-						GithubFacade.toFullGitRef(base.getRef()),
-						GithubFacade.toFullGitRef(head.getRef())));
+				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prNumber, base.getRef(), head.getRef()));
 
+				LOGGER.info("Event for repository base={} head={}", baseRepoName, headRepoName);
 				LOGGER.info("Event for PR={} {} <- {}", githubAction, base.getRef(), head.getRef());
 
 			} else {
@@ -193,8 +190,9 @@ public class GithubNoApiWebhookHandler {
 					}
 					pushBranch = true;
 					String ref = optFullRefName.get();
-					LOGGER.info("Event for pushing into {}", ref);
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
+					LOGGER.info("Event for repository={}", repoName);
+					LOGGER.info("Event for pushing into {}", ref);
 					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
 					String beforeSha = optBeforeSha.get();

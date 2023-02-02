@@ -354,7 +354,7 @@
 					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
-					<version>1.8</version>
+					<version>1.9</version>
 					<configuration>
 						<!-- Skipped while working on 2.0-SNAPSHOT -->
 						<skip>true</skip>

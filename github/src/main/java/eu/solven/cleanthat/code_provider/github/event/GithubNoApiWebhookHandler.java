@@ -139,6 +139,7 @@ public class GithubNoApiWebhookHandler {
 						GithubFacade.toFullGitRef(base.getRef()),
 						GithubFacade.toFullGitRef(head.getRef())));
 
+				LOGGER.info("Event for repository base={} head={}", baseRepoName, headRepoName);
 				LOGGER.info("Event for PR={} {} <- {}", githubAction, base.getRef(), head.getRef());
 
 			} else {
@@ -193,8 +194,9 @@ public class GithubNoApiWebhookHandler {
 					}
 					pushBranch = true;
 					String ref = optFullRefName.get();
-					LOGGER.info("Event for pushing into {}", ref);
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
+					LOGGER.info("Event for repository={}", repoName);
+					LOGGER.info("Event for pushing into {}", ref);
 					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
 					String beforeSha = optBeforeSha.get();

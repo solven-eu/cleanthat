@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder;
+import org.kohsuke.github.GHCheckRunBuilder.Action;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class GithubCheckRunManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubCheckRunManager.class);
 	public static final String PERMISSION_CHECKS = "checks";
 
+	// https://docs.github.com/fr/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
 	public Optional<GHCheckRun> createCheckRun(GithubAndToken githubAuthAsInst,
 			GHRepository baseRepo,
 			String sha1,
@@ -43,7 +45,15 @@ public class GithubCheckRunManager {
 			// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#check_run
 			// https://docs.github.com/en/rest/reference/checks#runs
 			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
-			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1).withExternalID(eventKey);
+
+			// Limitted to 20 characters
+			String identifier = "cleanthat";
+			// Limitted to 40 characters
+			String description = "CleanThat cleaning/refactoring";
+			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1)
+					.withExternalID(eventKey)
+					.withDetailsURL("https://github.com/solven-eu/cleanthat?event=" + eventKey)
+					.add(new Action("CleanThat", description, identifier));
 			try {
 				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
 

@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.code_provider.github.refs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
@@ -23,6 +24,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
@@ -55,9 +57,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder.Output;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHCompare.Commit;
@@ -84,7 +88,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 
 	public static final String PREFIX_REF_CLEANTHAT =
 			CleanthatRefFilterProperties.BRANCHES_PREFIX + REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH;
-	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure";
+
+	// 2023-01: Renamed from 'cleanthat/configure' to 'cleanthat/configure_v2' as the configuration change
+	// It enables handling easily repository with a PR open a long-time ago, with old configuration
+	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure_v2";
 
 	public static final String PREFIX_REF_CLEANTHAT_TMPHEAD = PREFIX_REF_CLEANTHAT + "headfor-";
 	public static final String PREFIX_REF_CLEANTHAT_MANUAL = PREFIX_REF_CLEANTHAT + "manual-";
@@ -169,7 +176,18 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		new GithubCheckRunManager().createCheckRun(githubAndToken, repository, head.getSha(), eventKey)
 				.ifPresent(cr -> {
 					try {
-						cr.update().withConclusion(Conclusion.ACTION_REQUIRED).withStatus(Status.COMPLETED).create();
+						List<String> summuaryRows = ImmutableList.<String>builder()
+								.add("Check " + CodeProviderHelpers.PATHES_CLEANTHAT.get(0))
+								.add("It may look like: "
+										+ "https://github.com/solven-eu/cleanthat/blob/master/runnable/src/test/resources/config/default-safe.yaml")
+								.build();
+
+						String summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
+						cr.update()
+								.withConclusion(Conclusion.ACTION_REQUIRED)
+								.withStatus(Status.COMPLETED)
+								.add(new Output("Issue with configuration", summary))
+								.create();
 					} catch (IOException e) {
 						throw new UncheckedIOException(e);
 					}

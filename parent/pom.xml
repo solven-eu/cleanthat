@@ -11,14 +11,14 @@
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
 		<relativePath/>
 	</parent>
-	
+
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
 	<version>2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	
+
 	<inceptionYear>2020</inceptionYear>
-	
+
 	<developers>
 		<developer>
 			<id>blacelle</id>
@@ -29,7 +29,7 @@
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<!-- SCM is in properties as we can't configure it directly in profile -->
 		<!-- Do not add developperConnection as parent is not a SNAPSHOT -->
@@ -37,7 +37,7 @@
 		<tag>HEAD</tag>
 		<url>${scm.url}</url>
 	</scm>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>

@@ -42,6 +42,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,10 +62,12 @@ import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCommitPointer;
 import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHMarketplaceAccountPlan;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.HttpConnector;
@@ -90,9 +93,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	final List<ObjectMapper> objectMappers;
 
 	public GithubWebhookHandler(GHApp githubApp, List<ObjectMapper> objectMappers) {
-		this.githubNoApiWebhookHandler = new
-
-		GithubNoApiWebhookHandler(objectMappers);
+		this.githubNoApiWebhookHandler = new GithubNoApiWebhookHandler(objectMappers);
 		this.githubApp = githubApp;
 		this.objectMappers = objectMappers;
 	}
@@ -107,12 +108,19 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		try {
 			GHAppInstallation installationById = getGithubAsApp().getInstallationById(installationId);
 
+			// https://github.com/hub4j/github-api/issues/1613
+			// GitHub githubRoot = getGithubAsApp().getRoot();
+			// checkMarketPlacePlan(installationById, githubRoot);
+
 			Map<String, GHPermissionType> availablePermissions = installationById.getPermissions();
 
 			// This check is dumb, as we should also compare the values
-			if (!availablePermissions.keySet().containsAll(getRequestedPermissions().keySet())) {
-				return ResultOrError.error(WebhookRelevancyResult
-						.dismissed("We lack proper permissions. Available=" + availablePermissions));
+			Map<String, GHPermissionType> requestedPermissions = getRequestedPermissions();
+			if (!availablePermissions.keySet().containsAll(requestedPermissions.keySet())) {
+				return ResultOrError.error(
+						WebhookRelevancyResult.dismissed("We lack proper permissions. Available=" + availablePermissions
+								+ " vs requested="
+								+ requestedPermissions));
 			}
 
 			Map<String, GHPermissionType> permissions = availablePermissions;
@@ -121,7 +129,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// https://github.com/hub4j/github-api/issues/570
 			// Required to open new pull-requests
 			GHAppCreateTokenBuilder installationGithubBuilder =
-					installationById.createToken().permissions(getRequestedPermissions());
+					installationById.createToken().permissions(requestedPermissions);
 
 			GHAppInstallationToken installationToken;
 			try {
@@ -148,6 +156,35 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	protected void checkMarketPlacePlan(GHAppInstallation installationById, GitHub githubRoot) throws IOException {
+		// https://github.com/hub4j/github-api/issues/1613
+		githubRoot.listMarketplacePlans().forEach(plan -> {
+			// Fetching the list for a single account is inefficient
+			List<GHMarketplaceAccountPlan> asList;
+			try {
+				asList = plan.listAccounts().createRequest().toList();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+
+			GHUser account = installationById.getAccount();
+			asList.stream()
+					.filter(accountPlan -> 0 == Long.compare(account.getId(), accountPlan.getId()))
+					.findAny()
+					.ifPresent(accountPlan -> {
+						// accountPlan.toString() is seemingly not overriden
+						Map<String, Object> accountPlanAsMap = new LinkedHashMap<>();
+						accountPlanAsMap.put("id", accountPlan.getId());
+						accountPlanAsMap.put("login", accountPlan.getLogin());
+						accountPlanAsMap.put("organizationBillingEmail", accountPlan.getOrganizationBillingEmail());
+						accountPlanAsMap.put("type", accountPlan.getType());
+						accountPlanAsMap.put("url", accountPlan.getUrl());
+
+						LOGGER.info("Account={} is using plan={}", account.getHtmlUrl(), accountPlanAsMap);
+					});
+		});
 	}
 
 	private ImmutableMap<String, GHPermissionType> getRequestedPermissions() {

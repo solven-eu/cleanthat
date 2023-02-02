@@ -62,7 +62,7 @@ public class ConfigHelpers {
 
 	public ConfigHelpers(Collection<ObjectMapper> objectMappers) {
 		this.objectMappers = objectMappers;
-		this.objectMapper = Iterables.get(objectMappers, 0);
+		this.objectMapper = getYaml(objectMappers);
 	}
 
 	public static ConfigHelpers forTests() {

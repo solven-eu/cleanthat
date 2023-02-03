@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.util.List;
 import java.util.Map;
@@ -58,15 +59,17 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 	@Override
 	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepId = s.getId();
+		SpotlessStepParametersProperties parameters = s.getParameters();
+
 		switch (stepId) {
 		case "simple": {
-			return makeSimple(s, provisioner);
+			return makeSimple(parameters, provisioner);
 		}
 		case "gson": {
-			return makeGson(s, provisioner);
+			return makeGson(parameters, provisioner);
 		}
 		case "jackson": {
-			return makeJackson(s, provisioner);
+			return makeJackson(parameters, provisioner);
 		}
 		default: {
 			throw new IllegalArgumentException("Unknown step: " + stepId);
@@ -74,8 +77,8 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 		}
 	}
 
-	private FormatterStep makeSimple(SpotlessStepProperties s, Provisioner provisioner) {
-		Integer indentSpaces = s.getCustomProperty("indent_spaces", Integer.class);
+	private FormatterStep makeSimple(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
+		Integer indentSpaces = parameters.getCustomProperty("indent_spaces", Integer.class);
 		if (indentSpaces == null) {
 			indentSpaces = DEFAULT_INDENTATION;
 		}
@@ -83,23 +86,23 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 		return JsonSimpleStep.create(indentSpaces, provisioner);
 	}
 
-	private FormatterStep makeGson(SpotlessStepProperties s, Provisioner provisioner) {
-		Integer indentSpaces = s.getCustomProperty("indent_spaces", Integer.class);
+	private FormatterStep makeGson(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
+		Integer indentSpaces = parameters.getCustomProperty("indent_spaces", Integer.class);
 		if (indentSpaces == null) {
 			indentSpaces = DEFAULT_INDENTATION;
 		}
 
-		Boolean sortByKeys = s.getCustomProperty("sort_by_keys", Boolean.class);
+		Boolean sortByKeys = parameters.getCustomProperty("sort_by_keys", Boolean.class);
 		if (sortByKeys == null) {
 			sortByKeys = false;
 		}
 
-		Boolean escapeHtml = s.getCustomProperty("escape_html", Boolean.class);
+		Boolean escapeHtml = parameters.getCustomProperty("escape_html", Boolean.class);
 		if (escapeHtml == null) {
 			escapeHtml = false;
 		}
 
-		String version = s.getCustomProperty("version", String.class);
+		String version = parameters.getCustomProperty("version", String.class);
 		if (version == null) {
 			version = DEFAULT_GSON_VERSION;
 		}
@@ -107,27 +110,27 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 		return GsonStep.create(new GsonConfig(sortByKeys, escapeHtml, indentSpaces, version), provisioner);
 	}
 
-	private FormatterStep makeJackson(SpotlessStepProperties s, Provisioner provisioner) {
+	private FormatterStep makeJackson(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		JacksonJsonConfig jacksonConfig = new JacksonJsonConfig();
 
-		Boolean spaceBeforeSeparator = s.getCustomProperty("space_before_separator", Boolean.class);
+		Boolean spaceBeforeSeparator = parameters.getCustomProperty("space_before_separator", Boolean.class);
 		if (spaceBeforeSeparator != null) {
 			jacksonConfig.setSpaceBeforeSeparator(spaceBeforeSeparator);
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Boolean> features = s.getCustomProperty("features", Map.class);
+		Map<String, Boolean> features = parameters.getCustomProperty("features", Map.class);
 		if (features != null) {
 			jacksonConfig.appendFeatureToToggle(features);
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Boolean> jsonFeatures = s.getCustomProperty("json_features", Map.class);
+		Map<String, Boolean> jsonFeatures = parameters.getCustomProperty("json_features", Map.class);
 		if (features != null) {
 			jacksonConfig.appendJsonFeatureToToggle(jsonFeatures);
 		}
 
-		String version = s.getCustomProperty("version", String.class);
+		String version = parameters.getCustomProperty("version", String.class);
 		if (version == null) {
 			version = JacksonJsonStep.defaultVersion();
 		}
@@ -137,12 +140,13 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 
 	// This is useful to demonstrate all available configuration
 	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties jackson = new SpotlessStepProperties();
-		jackson.setId("jackson");
-		jackson.putProperty("features",
+		SpotlessStepProperties jackson = SpotlessStepProperties.builder().id("jackson").build();
+		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
+		jacksonParameters.putProperty("features",
 				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
-		jackson.putProperty("yaml_features",
+		jacksonParameters.putProperty("yaml_features",
 				ImmutableMap.builder().put(JsonGenerator.Feature.QUOTE_FIELD_NAMES.name(), false).build());
+		jackson.setParameters(jacksonParameters);
 
 		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}

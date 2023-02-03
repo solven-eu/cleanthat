@@ -41,6 +41,7 @@ import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
 import java.io.File;
@@ -86,6 +87,7 @@ import org.springframework.core.io.Resource;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@SuppressWarnings("PMD.GodClass")
 @Mojo(name = CleanThatGenerateEclipseStylesheetMojo.GOAL_ECLIPSE,
 		defaultPhase = LifecyclePhase.NONE,
 		threadSafe = true,
@@ -273,11 +275,17 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			eclipseStep = optEclipseStep.get();
 		}
 
+		SpotlessStepParametersProperties eclipseParameters = eclipseStep.getParameters();
+		if (eclipseParameters == null) {
+			eclipseParameters = JavaFormatterStepFactory.makeDefaultEclipseStep().getParameters();
+			needToSaveSpotless = true;
+		}
+
 		String eclipseStylesheetFile =
-				eclipseStep.getCustomProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, String.class);
+				eclipseParameters.getCustomProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, String.class);
 		if (eclipseStylesheetFile != null && !eclipseStylesheetFile.equals(eclipseStylesheetFile)) {
 			// TODO We would prefer writing the new stylesheet in the previously configured path
-			eclipseStep.putProperty(pathToSpotlessConfig, pathToSpotlessConfig);
+			eclipseParameters.putProperty(pathToSpotlessConfig, pathToSpotlessConfig);
 			needToSaveSpotless = true;
 		}
 

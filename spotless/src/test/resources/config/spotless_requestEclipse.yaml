@@ -8,13 +8,16 @@ formatters:
   steps:
   - id: "removeUnusedImports"
   - id: "eclipse"
-    file: "repository:/config/eclipse_java_code_formatter.xml"
+    parameters:
+      file: "repository:/config/eclipse_java_code_formatter.xml"
   - id: "licenseHeader"
-    content: "/* (C)$YEAR */"
+    parameters:
+      content: "/* (C)$YEAR */"
 - format: "pom"
   includes:
   - "regex:**/pom.xml"
   steps:
   - id: "sortPom"
-    expandEmptyElements: false
-    nrOfIndentSpace: -1
+    parameters:
+      expandEmptyElements: false
+      nrOfIndentSpace: -1

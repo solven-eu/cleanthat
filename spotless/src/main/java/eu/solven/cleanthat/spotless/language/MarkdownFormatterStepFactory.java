@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,9 +52,11 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 	@Override
 	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
+		SpotlessStepParametersProperties parameters = s.getParameters();
+
 		switch (stepName) {
 		case "flexmark": {
-			String libVersion = s.getCustomProperty("version", String.class);
+			String libVersion = parameters.getCustomProperty("version", String.class);
 			if (libVersion == null) {
 				libVersion = FlexmarkStep.defaultVersion();
 			}
@@ -62,12 +65,12 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 		// https://github.com/diffplug/spotless/blob/main/lib/src/main/java/com/diffplug/spotless/markdown/FreshMarkStep.java
 		case "freshmark": {
 			// https://github.com/diffplug/freshmark
-			Object libVersion = s.getCustomProperty("version", String.class);
+			Object libVersion = parameters.getCustomProperty("version", String.class);
 			if (libVersion == null) {
 				libVersion = FreshMarkStep.defaultVersion();
 			}
 
-			Object rawFreshmarkProperties = s.getCustomProperty("properties", Map.class);
+			Object rawFreshmarkProperties = parameters.getCustomProperty("properties", Map.class);
 
 			Map<String, Object> properties;
 			if (rawFreshmarkProperties == null) {
@@ -87,13 +90,15 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 
 	// This is useful to demonstrate all available configuration
 	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties flexmark = new SpotlessStepProperties();
-		flexmark.setId("flexmark");
-		flexmark.putProperty("version", FlexmarkStep.defaultVersion());
+		SpotlessStepProperties flexmark = SpotlessStepProperties.builder().id("flexmark").build();
+		SpotlessStepParametersProperties flexmarkParameters = new SpotlessStepParametersProperties();
+		flexmarkParameters.putProperty("version", FlexmarkStep.defaultVersion());
+		flexmark.setParameters(flexmarkParameters);
 
-		SpotlessStepProperties freshmark = new SpotlessStepProperties();
-		freshmark.setId("freshmark");
-		freshmark.putProperty("properties", Map.of("k1", "v1"));
+		SpotlessStepProperties freshmark = SpotlessStepProperties.builder().id("freshmark").build();
+		SpotlessStepParametersProperties freshmarkParameters = new SpotlessStepParametersProperties();
+		freshmarkParameters.putProperty("properties", Map.of("k1", "v1"));
+		freshmark.setParameters(freshmarkParameters);
 
 		return ImmutableList.<SpotlessStepProperties>builder().add(flexmark).add(freshmark).build();
 	}

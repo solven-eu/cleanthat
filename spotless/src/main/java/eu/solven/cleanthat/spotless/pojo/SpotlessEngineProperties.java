@@ -67,8 +67,7 @@ public class SpotlessEngineProperties {
 	 *         which is most of the time accompanied by a README.MD at the root
 	 */
 	public static SpotlessEngineProperties defaultEngineWithMarkdown() {
-		SpotlessStepProperties flexmark = new SpotlessStepProperties();
-		flexmark.setId("flexmark");
+		SpotlessStepProperties flexmark = SpotlessStepProperties.builder().id("flexmark").build();
 
 		return SpotlessEngineProperties.builder()
 				.formatter(SpotlessFormatterProperties.builder().format("markdown").step(flexmark).build())

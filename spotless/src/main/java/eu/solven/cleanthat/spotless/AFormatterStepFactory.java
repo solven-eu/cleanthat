@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import eu.solven.pepper.resource.PepperResourceHelper;
 import java.io.File;
@@ -107,13 +108,14 @@ public abstract class AFormatterStepFactory {
 	 */
 	protected Optional<FormatterStep> makeCommonStep(SpotlessStepProperties stepProperties, Provisioner provisioner) {
 		String stepName = stepProperties.getId();
+		SpotlessStepParametersProperties parameters = stepProperties.getParameters();
 
 		switch (stepName) {
 		case "licenseHeader": {
-			return Optional.of(makeLicenseHeader(stepProperties));
+			return Optional.of(makeLicenseHeader(parameters));
 		}
 		case "wtpEclipse": {
-			return Optional.of(makeWtpEclipse(stepProperties, provisioner));
+			return Optional.of(makeWtpEclipse(parameters, provisioner));
 		}
 		default: {
 			return Optional.empty();
@@ -139,26 +141,26 @@ public abstract class AFormatterStepFactory {
 		return tmpFile;
 	}
 
-	protected FormatterStep makeLicenseHeader(SpotlessStepProperties stepProperties) {
+	protected FormatterStep makeLicenseHeader(SpotlessStepParametersProperties parameters) {
 		// com.diffplug.spotless.maven.generic.LicenseHeader
-		String delimiter = stepProperties.getCustomProperty("delimiter", String.class);
+		String delimiter = parameters.getCustomProperty("delimiter", String.class);
 		if (delimiter == null) {
 			delimiter = licenseHeaderDelimiter();
 		}
 		if (delimiter == null) {
 			throw new IllegalArgumentException("You need to specify 'delimiter'.");
 		}
-		String file = stepProperties.getCustomProperty(KEY_FILE, String.class);
+		String file = parameters.getCustomProperty(KEY_FILE, String.class);
 		String content;
 		if (file != null) {
-			if (stepProperties.getCustomProperty("content", String.class) != null) {
+			if (parameters.getCustomProperty("content", String.class) != null) {
 				throw new IllegalArgumentException("Can not set both 'file' and 'content'");
 			}
 
 			byte[] fileBytes = PepperResourceHelper.loadAsBinary(CleanthatUrlLoader.loadUrl(codeProvider, file));
 			content = new String(fileBytes, StandardCharsets.UTF_8);
 		} else {
-			content = stepProperties.getCustomProperty("content", String.class);
+			content = parameters.getCustomProperty("content", String.class);
 		}
 		// Enable with next Spotless version
 		// String skipLinesMatching = s.getCustomProperty("skipLinesMatching", String.class);
@@ -171,18 +173,18 @@ public abstract class AFormatterStepFactory {
 				.filterByFile(LicenseHeaderStep.unsupportedJvmFilesFilter());
 	}
 
-	protected FormatterStep makeWtpEclipse(SpotlessStepProperties stepProperties, Provisioner provisioner) {
+	protected FormatterStep makeWtpEclipse(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		EclipseWtpFormatterStep type =
-				EclipseWtpFormatterStep.valueOf(stepProperties.getCustomProperty(KEY_TYPE, String.class));
+				EclipseWtpFormatterStep.valueOf(parameters.getCustomProperty(KEY_TYPE, String.class));
 
 		EclipseBasedStepBuilder eclipseConfig = type.createBuilder(provisioner);
-		String version = stepProperties.getCustomProperty("version", String.class);
+		String version = parameters.getCustomProperty("version", String.class);
 		if (Strings.isNullOrEmpty(version)) {
 			version = EclipseWtpFormatterStep.defaultVersion();
 		}
 		eclipseConfig.setVersion(version);
 		@SuppressWarnings("unchecked")
-		Collection<String> files = stepProperties.getCustomProperty("files", Collection.class);
+		Collection<String> files = parameters.getCustomProperty("files", Collection.class);
 		if (null != files) {
 			eclipseConfig.setPreferences(files.stream().map(file -> {
 				try {

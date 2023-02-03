@@ -16,11 +16,14 @@
 package eu.solven.cleanthat.spotless.pojo;
 
 import com.diffplug.spotless.FormatterStep;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Builder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
 
 /**
  * Helps configuring a {@link FormatterStep}. Any dynamic property is accepted, and available at runtime through
@@ -32,16 +35,23 @@ import lombok.extern.jackson.Jacksonized;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @SuppressWarnings("PMD.ImmutableField")
 @Data
-@Builder
-@Jacksonized
-// @JsonDeserialize(converter = SpotlessStepPropertiesSanitizer.class)
-public class SpotlessStepProperties {
+public class SpotlessStepParametersProperties {
 
-	// the step name/id
-	@lombok.NonNull
-	private final String id;
+	// https://stackoverflow.com/questions/32235993/mix-of-standard-and-dynamic-properties-in-jackson-mapping
+	@JsonIgnore
+	private Map<String, Object> customProperties = new LinkedHashMap<>();
 
-	// the step parameters
-	@Builder.Default
-	private SpotlessStepParametersProperties parameters = new SpotlessStepParametersProperties();
+	@JsonAnySetter
+	public void putProperty(String key, Object value) {
+		customProperties.put(key, value);
+	}
+
+	@JsonAnyGetter
+	public Map<String, Object> getCustomProperties() {
+		return customProperties;
+	}
+
+	public <T> T getCustomProperty(String key, Class<? extends T> clazz) {
+		return clazz.cast(customProperties.get(key));
+	}
 }

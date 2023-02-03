@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.io.File;
 import java.io.IOException;
@@ -52,19 +53,21 @@ public class ScalaFormatterStepFactory extends AFormatterStepFactory {
 	@Override
 	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepId = s.getId();
+		SpotlessStepParametersProperties parameters = s.getParameters();
+
 		switch (stepId) {
 		case "scalafmt": {
-			String scalafmtVersion = s.getCustomProperty("version", String.class);
+			String scalafmtVersion = parameters.getCustomProperty("version", String.class);
 			if (scalafmtVersion == null) {
 				scalafmtVersion = ScalaFmtStep.defaultVersion();
 			}
 
-			String scalaMajorVersion = s.getCustomProperty("scala_major_version", String.class);
+			String scalaMajorVersion = parameters.getCustomProperty("scala_major_version", String.class);
 			if (scalaMajorVersion == null) {
 				scalaMajorVersion = ScalaFmtStep.defaultScalaMajorVersion();
 			}
 
-			String stylesheetFilePath = s.getCustomProperty(KEY_FILE, String.class);
+			String stylesheetFilePath = parameters.getCustomProperty(KEY_FILE, String.class);
 			File stylesheetFile = null;
 			if (stylesheetFilePath != null) {
 				try {
@@ -83,12 +86,13 @@ public class ScalaFormatterStepFactory extends AFormatterStepFactory {
 
 	// This is useful to demonstrate all available configuration
 	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties scalafmt = new SpotlessStepProperties();
-		scalafmt.setId("scalafmt");
-		scalafmt.putProperty("version", ScalaFmtStep.defaultVersion());
-		scalafmt.putProperty("scalaMajorVersion", ScalaFmtStep.defaultScalaMajorVersion());
+		SpotlessStepProperties scalafmt = SpotlessStepProperties.builder().id("scalafmt").build();
+		SpotlessStepParametersProperties scalafmtParameters = new SpotlessStepParametersProperties();
+		scalafmtParameters.putProperty("version", ScalaFmtStep.defaultVersion());
+		scalafmtParameters.putProperty("scalaMajorVersion", ScalaFmtStep.defaultScalaMajorVersion());
 		// https://scalameta.org/scalafmt/docs/configuration.html
-		scalafmt.putProperty(KEY_FILE, "repository:/.cleanthat/.scalafmt.conf");
+		scalafmtParameters.putProperty(KEY_FILE, "repository:/.cleanthat/.scalafmt.conf");
+		scalafmt.setParameters(scalafmtParameters);
 
 		return ImmutableList.<SpotlessStepProperties>builder().add(scalafmt).build();
 	}

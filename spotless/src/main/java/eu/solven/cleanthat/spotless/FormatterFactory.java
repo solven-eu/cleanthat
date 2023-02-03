@@ -84,8 +84,8 @@ public class FormatterFactory {
 	public static Provisioner makeProvisionner() throws IOException {
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
 
-		// This means each run will download its own jars
-		// We have have some logic to share
+		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
+		// JVM/Lambda instance)
 		if (REF_LOCALREPO.get() == null) {
 			REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
 			LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());

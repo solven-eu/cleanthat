@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 DiffPlug
+ * Copyright 2023 SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package eu.solven.cleanthat.spotless;
 
 /**
  * Tracks the number of processed files, typically by a single Formatter for a whole repository
+ * 
+ * @author Benoit Lacelle
  */
 // similar with
 // https://github.com/diffplug/spotless/blob/main/plugin-maven/src/main/java/com/diffplug/spotless/maven/ImpactedFilesTracker.java

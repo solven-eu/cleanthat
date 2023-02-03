@@ -95,12 +95,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GHApp githubApp;
+	final GithubCheckRunManager githubCheckRunManager;
 
 	final List<ObjectMapper> objectMappers;
 
-	public GithubWebhookHandler(GHApp githubApp, List<ObjectMapper> objectMappers) {
+	public GithubWebhookHandler(GHApp githubApp,
+			List<ObjectMapper> objectMappers,
+			GithubCheckRunManager githubCheckRunManager) {
 		this.githubNoApiWebhookHandler = new GithubNoApiWebhookHandler(objectMappers);
 		this.githubApp = githubApp;
+		this.githubCheckRunManager = githubCheckRunManager;
+
 		this.objectMappers = objectMappers;
 	}
 
@@ -463,7 +468,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
 			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
-			optCheckRun = new GithubCheckRunManager().createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
+			optCheckRun = githubCheckRunManager.createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
 			optCheckRun = Optional.empty();
 		}

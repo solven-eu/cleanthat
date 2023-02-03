@@ -21,9 +21,11 @@ import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -35,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GitHub;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -66,7 +69,11 @@ public class ITGithubPullRequestCleaner {
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 
-		cleaner = new GithubRefCleaner(objectMappers, factories, codeProviderFormatter, githubForRepo);
+		cleaner = new GithubRefCleaner(objectMappers,
+				factories,
+				codeProviderFormatter,
+				githubForRepo,
+				new GithubCheckRunManager(Mockito.mock(IGitService.class)));
 
 		GitHub installationGithub = githubForRepo.getGithub();
 		cleaner.tryOpenPRWithCleanThatStandardConfiguration(

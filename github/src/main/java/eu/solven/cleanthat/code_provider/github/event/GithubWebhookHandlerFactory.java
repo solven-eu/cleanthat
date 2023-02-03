@@ -65,9 +65,15 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 
 	final List<ObjectMapper> objectMappers;
 
-	public GithubWebhookHandlerFactory(Environment env, List<ObjectMapper> objectMappers) {
+	final GithubCheckRunManager githubCheckRunManager;
+
+	public GithubWebhookHandlerFactory(Environment env,
+			List<ObjectMapper> objectMappers,
+			GithubCheckRunManager githubCheckRunManager) {
 		this.env = env;
 		this.objectMappers = objectMappers;
+
+		this.githubCheckRunManager = githubCheckRunManager;
 	}
 
 	@Override
@@ -146,7 +152,8 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 				.withConnector(GithubWebhookHandler.createGithubConnector())
 				.build();
 
-		GithubWebhookHandler githubWebhookHandler = new GithubWebhookHandler(github.getApp(), objectMappers);
+		GithubWebhookHandler githubWebhookHandler =
+				new GithubWebhookHandler(github.getApp(), objectMappers, githubCheckRunManager);
 		return githubWebhookHandler;
 	}
 

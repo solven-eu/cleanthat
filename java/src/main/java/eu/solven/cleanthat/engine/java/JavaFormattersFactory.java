@@ -50,19 +50,19 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
-			IEngineProperties languageProperties,
-			CleanthatSession cleanthatSession) {
+	public ILintFixer makeLintFixer(CleanthatSession cleanthatSession,
+			IEngineProperties engineProperties,
+			CleanthatStepProperties stepProperties) {
 		ILintFixerWithId processor;
-		String stepId = rawProcessor.getId();
-		ICleanthatStepParametersProperties parameters = getParameters(rawProcessor);
+		String stepId = stepProperties.getId();
+		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
 
 		LOGGER.debug("Processing: {}", stepId);
 
 		switch (stepId) {
 		case "refactorer": {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
-			processor = new JavaRefactorer(languageProperties, processorConfig);
+			processor = new JavaRefactorer(engineProperties, processorConfig);
 			break;
 		}
 

@@ -38,16 +38,16 @@ import org.slf4j.LoggerFactory;
  *
  */
 // see com.diffplug.spotless.maven.SpotlessApplyMojo
-public class ExecuteSpotless {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteSpotless.class);
+public class SpotlessSession {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessSession.class);
 
-	final EnrichedFormatter formatter;
+	final ImpactedFilesTracker filesTracker = new ImpactedFilesTracker();
 
-	public ExecuteSpotless(EnrichedFormatter formatter) {
-		this.formatter = formatter;
+	public ImpactedFilesTracker getFilesTracker() {
+		return filesTracker;
 	}
 
-	public boolean acceptPath(Path path) {
+	public boolean acceptPath(EnrichedFormatter formatter, Path path) {
 		String rawPath = path.toString();
 
 		MatchPatterns includePatterns =
@@ -75,8 +75,12 @@ public class ExecuteSpotless {
 	 */
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
-	public String doStuff(PathAndContent pathAndContent) {
+	public String doStuff(EnrichedFormatter formatter, PathAndContent pathAndContent) {
 		String rawPath = pathAndContent.getPath().toString();
+
+		if (!rawPath.startsWith("/")) {
+			throw new IllegalArgumentException("We expect an absolutePath. Was: " + rawPath);
+		}
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
@@ -98,16 +102,19 @@ public class ExecuteSpotless {
 					rawBytes.getBytes(StandardCharsets.UTF_8));
 			if (dirty.isClean()) {
 				LOGGER.debug("This is already clean: {}", absoluteFilePath);
+				filesTracker.checkedButAlreadyClean();
 				return rawBytes;
 			} else if (dirty.didNotConverge()) {
 				LOGGER.info("Spotless did not converge. {}",
 						"Run 'spotlessDiagnose' for details https://github.com/diffplug/spotless/blob/main/PADDEDCELL.md");
+				filesTracker.checkedButAlreadyClean();
 				return rawBytes;
 			} else {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 				dirty.writeCanonicalTo(baos);
 
+				filesTracker.cleaned();
 				return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 			}
 		} catch (IOException e) {

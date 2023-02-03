@@ -15,11 +15,13 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import java.util.Set;
 
 /**
  * Configure Spotless engine for '.scala' files
@@ -29,10 +31,12 @@ import java.util.Set;
  */
 public class ScalaFormatterFactory extends AFormatterFactory {
 	// com.diffplug.spotless.maven.scala.Scala#DEFAULT_INCLUDES
-	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("src/main/scala/**/*.scala",
-			"src/test/scala/**/*.scala",
-			"src/main/scala/**/*.sc",
-			"src/test/scala/**/*.sc");
+	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.<String>builder()
+			.add("**/src/main/scala/**/*.scala")
+			.add("**/src/test/scala/**/*.scala")
+			.add("**/src/main/scala/**/*.sc")
+			.add("**/src/test/scala/**/*.sc")
+			.build();
 
 	@Override
 	public Set<String> defaultIncludes() {

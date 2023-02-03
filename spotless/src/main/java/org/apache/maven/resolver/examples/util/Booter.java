@@ -15,9 +15,11 @@
  */
 package org.apache.maven.resolver.examples.util;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -62,10 +64,11 @@ public class Booter {
 		}
 	}
 
-	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
+	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system,
+			Path localRepoPath) {
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
-		LocalRepository localRepo = new LocalRepository("target/local-repo");
+		LocalRepository localRepo = new LocalRepository(localRepoPath.toFile());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
 		session.setTransferListener(new ConsoleTransferListener());

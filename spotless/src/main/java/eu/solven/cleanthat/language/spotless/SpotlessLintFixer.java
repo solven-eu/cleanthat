@@ -21,8 +21,9 @@ import eu.solven.cleanthat.formatter.ILintFixerWithPath;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.spotless.EnrichedFormatter;
-import eu.solven.cleanthat.spotless.ExecuteSpotless;
+import eu.solven.cleanthat.spotless.SpotlessSession;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,9 +34,12 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  */
 public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath {
+
+	final SpotlessSession spotlessSession;
 	final List<EnrichedFormatter> formatters;
 
-	public SpotlessLintFixer(List<EnrichedFormatter> formatters) {
+	public SpotlessLintFixer(SpotlessSession spotlessSession, List<EnrichedFormatter> formatters) {
+		this.spotlessSession = spotlessSession;
 		this.formatters = formatters;
 	}
 
@@ -44,10 +48,16 @@ public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath {
 		AtomicReference<PathAndContent> output = new AtomicReference<>(pathAndContent);
 
 		formatters.stream().forEach(f -> {
-			ExecuteSpotless executeSpotless = new ExecuteSpotless(f);
 
-			if (executeSpotless.acceptPath(pathAndContent.getPath())) {
-				output.set(pathAndContent.withContent(executeSpotless.doStuff(output.get())));
+			Path path = pathAndContent.getPath();
+			if (spotlessSession.acceptPath(f, path)) {
+				String spotlessContent;
+				try {
+					spotlessContent = spotlessSession.doStuff(f, output.get());
+				} catch (RuntimeException e) {
+					throw new RuntimeException("Issue processing " + path + " with format=" + f.getId(), e);
+				}
+				output.set(pathAndContent.withContent(spotlessContent));
 			}
 		});
 

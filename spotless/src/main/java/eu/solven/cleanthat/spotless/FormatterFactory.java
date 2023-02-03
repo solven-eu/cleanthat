@@ -15,6 +15,23 @@
  */
 package eu.solven.cleanthat.spotless;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import org.apache.maven.resolver.examples.util.Booter;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.diffplug.spotless.FormatExceptionPolicy;
 import com.diffplug.spotless.FormatExceptionPolicyStrict;
 import com.diffplug.spotless.Formatter;
@@ -23,6 +40,7 @@ import com.diffplug.spotless.LineEnding;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.GitAttributesLineEndings_InMemory;
 import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
@@ -35,17 +53,6 @@ import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.apache.maven.resolver.examples.util.Booter;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -54,6 +61,8 @@ import org.eclipse.aether.RepositorySystem;
  *
  */
 public class FormatterFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterFactory.class);
+
 	private static final String ID_JSON = "json";
 	private static final String ID_YAML = "yaml";
 	private static final String ID_XML = "xml";
@@ -61,6 +70,8 @@ public class FormatterFactory {
 	private static final String ID_MARKDOWN = "markdown";
 	private static final String ID_SCALA = "scala";
 	public static final String ID_JAVA = "java";
+
+	private static final AtomicReference<Path> REF_LOCALREPO = new AtomicReference<>();
 
 	final FileSystem fileSystem;
 	final ICodeProvider codeProvider;
@@ -72,7 +83,17 @@ public class FormatterFactory {
 
 	public static Provisioner makeProvisionner() throws IOException {
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
-		DefaultRepositorySystemSession repositorySystemSession = Booter.newRepositorySystemSession(repositorySystem);
+
+		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
+		// JVM/Lambda instance)
+		if (REF_LOCALREPO.get() == null) {
+			REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
+			LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());
+		} else {
+			LOGGER.info("We re-use local m2repository: {}", REF_LOCALREPO.get());
+		}
+		DefaultRepositorySystemSession repositorySystemSession =
+				Booter.newRepositorySystemSession(repositorySystem, REF_LOCALREPO.get());
 
 		Provisioner provisionner = MavenProvisioner.create(new ArtifactResolver(repositorySystem,
 				repositorySystemSession,

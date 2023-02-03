@@ -15,9 +15,22 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+
 import com.diffplug.spotless.Provisioner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
+
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -30,17 +43,8 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.spotless.EnrichedFormatter;
 import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.SpotlessSession;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 /**
  * Formatter for Spotless Engine
@@ -70,9 +74,12 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
 	@Override
-	public ILintFixer makeLintFixer(CleanthatStepProperties stepProperties,
-			IEngineProperties languageProperties,
-			CleanthatSession cleanthatSession) {
+	public ILintFixer makeLintFixer(CleanthatSession cleanthatSession,
+			IEngineProperties engineProperties,
+			CleanthatStepProperties stepProperties) {
+
+		SpotlessSession spotlessSession = new SpotlessSession();
+
 		ILintFixerWithId processor;
 		String stepId = stepProperties.getId();
 		// override with explicit configuration
@@ -108,7 +115,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 					.map(formatter -> formatterFactory.makeFormatter(spotlessEngine, formatter, provisionner))
 					.collect(Collectors.toList());
 
-			processor = new SpotlessLintFixer(formatters);
+			processor = new SpotlessLintFixer(spotlessSession, formatters);
 			break;
 		}
 

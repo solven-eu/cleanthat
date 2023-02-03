@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.spotless;
 
 import com.diffplug.spotless.Formatter;
+import com.google.common.base.MoreObjects;
 
 /**
  * Transports a {@link AFormatterStepFactory} next to a {@link Formatter} instance
@@ -32,4 +33,12 @@ public class EnrichedFormatter {
 		this.formatter = formatter;
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("id", getId()).toString();
+	}
+
+	public String getId() {
+		return formatterStepFactory.getClass().getName();
+	}
 }

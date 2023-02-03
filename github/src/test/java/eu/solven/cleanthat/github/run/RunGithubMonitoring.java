@@ -66,9 +66,9 @@ public class RunGithubMonitoring {
 		return new IEngineLintFixerFactory() {
 
 			@Override
-			public ILintFixer makeLintFixer(CleanthatStepProperties rawProcessor,
-					IEngineProperties languageProperties,
-					CleanthatSession cleanthatSession) {
+			public ILintFixer makeLintFixer(CleanthatSession cleanthatSession,
+					IEngineProperties engineProperties,
+					CleanthatStepProperties stepProperties) {
 				throw new UnsupportedOperationException("Should not format anything");
 			}
 

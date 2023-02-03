@@ -66,6 +66,14 @@
 		</dependency>
 
 		<dependency>
+			<!-- Used for MatchPatterns -->
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-utils -->
+			<version>3.5.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>runnable</artifactId>
 			<version>${project.version}</version>

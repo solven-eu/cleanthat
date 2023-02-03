@@ -50,8 +50,12 @@ import org.springframework.core.io.Resource;
 public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessFormattersFactory.class);
 
-	public SpotlessFormattersFactory(ConfigHelpers configHelpers) {
+	final Provisioner provisionner;
+
+	public SpotlessFormattersFactory(ConfigHelpers configHelpers, Provisioner provisionner) {
 		super(configHelpers);
+
+		this.provisionner = provisionner;
 	}
 
 	@Override
@@ -101,7 +105,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 			List<EnrichedFormatter> formatters = spotlessEngine.getFormatters()
 					.stream()
-					.map(formatter -> formatterFactory.makeFormatter(spotlessEngine, formatter, makeProvisionner()))
+					.map(formatter -> formatterFactory.makeFormatter(spotlessEngine, formatter, provisionner))
 					.collect(Collectors.toList());
 
 			processor = new SpotlessLintFixer(formatters);
@@ -119,7 +123,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		return processor;
 	}
 
-	protected Provisioner makeProvisionner() {
+	public static Provisioner makeProvisionner() {
 		try {
 			return FormatterFactory.makeProvisionner();
 		} catch (IOException e) {

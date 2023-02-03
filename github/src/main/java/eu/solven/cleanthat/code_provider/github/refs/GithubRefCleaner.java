@@ -91,6 +91,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 
 	// 2023-01: Renamed from 'cleanthat/configure' to 'cleanthat/configure_v2' as the configuration change
 	// It enables handling easily repository with a PR open a long-time ago, with old configuration
+	@Deprecated
+	public static final String REF_NAME_CONFIGURE_V1 = PREFIX_REF_CLEANTHAT + "configure";
 	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure_v2";
 
 	public static final String PREFIX_REF_CLEANTHAT_TMPHEAD = PREFIX_REF_CLEANTHAT + "headfor-";
@@ -445,6 +447,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			LOGGER.info("There is no configuration in the default branch ({})", branchName);
 		}
 
+		try {
+			closeOldConfigurePr(repo);
+		} catch (RuntimeException e) {
+			LOGGER.warn("New feature is failing", e);
+		}
+
 		String headRef = REF_NAME_CONFIGURE;
 		Optional<GHRef> optRefToPR;
 		try {
@@ -496,6 +504,50 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			// TODO If 401, it probably means the Installation is not allowed to modify given repo
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	private void closeOldConfigurePr(GHRepository repo) {
+		String headRef = REF_NAME_CONFIGURE_V1;
+		Optional<GHRef> optRefToPR;
+		try {
+			try {
+				optRefToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(headRef));
+				LOGGER.info("There is already a ref: " + headRef);
+			} catch (GHFileNotFoundException e) {
+				LOGGER.trace("There is not yet a ref: " + headRef, e);
+				LOGGER.info("There is not yet a ref: " + headRef);
+				optRefToPR = Optional.empty();
+			}
+		} catch (IOException e) {
+			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
+			throw new UncheckedIOException(e);
+		}
+		// try {
+		if (optRefToPR.isPresent()) {
+			GHRef refToPr = optRefToPR.get();
+			LOGGER.info("There is already a ref preparing cleanthat integration. Do not open a new PR (url={})",
+					refToPr.getUrl().toExternalForm());
+			repo.listPullRequests(GHIssueState.OPEN).forEach(pr -> {
+				try {
+					if (headRef.equals(pr.getHead().getRef()) && "CleanThat".equals(pr.getUser().getName())) {
+						String headAuthorName = pr.getHead().getCommit().getAuthor().getName();
+						if ("CleanThat".equals(headAuthorName)) {
+							LOGGER.info("Closing old 'configure' PR: {}", pr.getHtmlUrl());
+						} else {
+							LOGGER.warn("Leaving open old 'configure' PR: {} as head.authorName={}",
+									pr.getHtmlUrl(),
+									headAuthorName);
+						}
+					}
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
+		}
+		// } catch (IOException e) {
+		// // TODO If 401, it probably means the Installation is not allowed to modify given repo
+		// throw new UncheckedIOException(e);
+		// }
 	}
 
 	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo, RepoInitializerResult result)

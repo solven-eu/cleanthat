@@ -15,6 +15,9 @@
  */
 package eu.solven.cleanthat.mvn;
 
+import com.diffplug.spotless.Provisioner;
+import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
+import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import io.sentry.IHub;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +27,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +39,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Mojo relying on a Spring {@link ApplicationContext}
@@ -44,6 +53,15 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 
 	protected static final AtomicReference<ACleanThatSpringMojo> CURRENT_MOJO = new AtomicReference<>();
 
+	@Component
+	private RepositorySystem repositorySystem;
+
+	@Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
+	private RepositorySystemSession repositorySystemSession;
+
+	@Parameter(defaultValue = "${project.remotePluginRepositories}", required = true, readonly = true)
+	private List<RemoteRepository> repositories;
+
 	/**
 	 * The SpringBoot application started within maven Mojo
 	 * 
@@ -55,6 +73,14 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 
 		@Autowired
 		ApplicationContext appContext;
+
+		@Bean
+		public Provisioner mvnCliProvisionner() {
+			ACleanThatSpringMojo mojo = CURRENT_MOJO.get();
+			ArtifactResolver resolver =
+					new ArtifactResolver(mojo.repositorySystem, mojo.repositorySystemSession, mojo.repositories);
+			return MavenProvisioner.create(resolver);
+		}
 
 		@Override
 		public void run(String... args) throws Exception {

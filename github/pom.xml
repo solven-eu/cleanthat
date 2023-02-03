@@ -77,6 +77,13 @@
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
 		</dependency>
+		
+		<dependency>
+			<!-- https://github.com/hub4j/github-api/issues/1202 -->
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.9.1</version>
+		</dependency>
 
 		<dependency>
 			<!-- Enables loading a PEM file -->

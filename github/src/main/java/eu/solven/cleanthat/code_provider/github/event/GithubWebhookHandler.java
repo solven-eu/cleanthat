@@ -15,10 +15,50 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.kohsuke.github.GHApp;
+import org.kohsuke.github.GHAppCreateTokenBuilder;
+import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GHAppInstallationToken;
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCheckRun;
+import org.kohsuke.github.GHCheckRun.Conclusion;
+import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder.Output;
+import org.kohsuke.github.GHCommitPointer;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHMarketplaceAccountPlan;
+import org.kohsuke.github.GHPermissionType;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRateLimit;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.HttpException;
+import org.kohsuke.github.connector.GitHubConnector;
+import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Ascii;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
@@ -41,45 +81,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.logging.PepperLogHelper;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import org.kohsuke.github.GHApp;
-import org.kohsuke.github.GHAppCreateTokenBuilder;
-import org.kohsuke.github.GHAppInstallation;
-import org.kohsuke.github.GHAppInstallationToken;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCheckRun;
-import org.kohsuke.github.GHCheckRun.Conclusion;
-import org.kohsuke.github.GHCheckRun.Status;
-import org.kohsuke.github.GHCheckRunBuilder.Output;
-import org.kohsuke.github.GHCommitPointer;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHMarketplaceAccountPlan;
-import org.kohsuke.github.GHPermissionType;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRateLimit;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.HttpConnector;
-import org.kohsuke.github.HttpException;
-import org.kohsuke.github.connector.GitHubConnector;
-import org.kohsuke.github.extras.ImpatientHttpConnector;
-import org.kohsuke.github.internal.GitHubConnectorHttpConnectorAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import okhttp3.OkHttpClient;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -217,10 +219,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	}
 
 	public static GitHubConnector createGithubConnector() {
-		// return DefaultGitHubConnector.create();
-		// Object httpClient;
-		// return new OkHttpGitHubConnector(new OkHttpClient.Builder().build());
-		return new GitHubConnectorHttpConnectorAdapter(new ImpatientHttpConnector(HttpConnector.DEFAULT));
+		// https://github.com/hub4j/github-api/issues/1202#issuecomment-890362069
+		return new OkHttpGitHubConnector(new OkHttpClient());
 	}
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in

@@ -34,7 +34,7 @@ public class TestCleanThatGenerateEclipseStylesheetMojoTest extends ACleanThatMo
 						CleanThatGenerateEclipseStylesheetMojo.GOAL_ECLIPSE);
 		assertNotNull(myMojo);
 
-		File cleanthatYaml = new File(readWriteFolder, ".cleanthat/eclipse_formatter-stylesheet.xml");
+		File cleanthatYaml = new File(readWriteFolder, ".cleanthat/eclipse_java-stylesheet.xml");
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();

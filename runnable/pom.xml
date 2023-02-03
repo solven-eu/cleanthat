@@ -101,6 +101,7 @@
 	<build>
 		<plugins>
 			<plugin>
+				<!-- Is this useful in this module ? -->
 				<groupId>io.github.git-commit-id</groupId>
 				<artifactId>git-commit-id-maven-plugin</artifactId>
 			</plugin>

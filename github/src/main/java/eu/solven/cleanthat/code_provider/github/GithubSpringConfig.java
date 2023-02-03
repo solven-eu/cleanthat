@@ -16,8 +16,10 @@
 package eu.solven.cleanthat.code_provider.github;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import java.util.List;
@@ -37,14 +39,23 @@ import org.springframework.core.env.Environment;
 @Import({ CodeCleanerSpringConfig.class })
 public class GithubSpringConfig {
 	@Bean
-	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env, List<ObjectMapper> objectMappers) {
-		return new GithubWebhookHandlerFactory(env, objectMappers);
+	public GithubCheckRunManager githubCheckRunManager(IGitService gitService) {
+		return new GithubCheckRunManager(gitService);
+	}
+
+	@Bean
+	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env,
+			List<ObjectMapper> objectMappers,
+			GithubCheckRunManager githubCheckRunManager) {
+		return new GithubWebhookHandlerFactory(env, objectMappers, githubCheckRunManager);
 	}
 
 	@Bean
 	public GithubCodeCleanerFactory githubCodeCleanerFactory(List<ObjectMapper> objectMappers,
 			List<IEngineLintFixerFactory> factories,
-			ICodeProviderFormatter formatterProvider) {
-		return new GithubCodeCleanerFactory(objectMappers, factories, formatterProvider);
+			ICodeProviderFormatter formatterProvider,
+			GithubCheckRunManager githubCheckRunManager) {
+		return new GithubCodeCleanerFactory(objectMappers, factories, formatterProvider, githubCheckRunManager);
 	}
+
 }

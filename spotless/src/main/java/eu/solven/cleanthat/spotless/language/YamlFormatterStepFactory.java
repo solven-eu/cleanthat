@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class YamlFormatterStepFactory extends AFormatterStepFactory {
 		String stepId = s.getId();
 		switch (stepId) {
 		case "jackson": {
-			return makeJackson(s, provisioner);
+			return makeJackson(s.getParameters(), provisioner);
 		}
 		default: {
 			throw new IllegalArgumentException("Unknown step: " + stepId);
@@ -63,22 +64,22 @@ public class YamlFormatterStepFactory extends AFormatterStepFactory {
 		}
 	}
 
-	private FormatterStep makeJackson(SpotlessStepProperties s, Provisioner provisioner) {
+	private FormatterStep makeJackson(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		JacksonYamlConfig jacksonConfig = new JacksonYamlConfig();
 
 		@SuppressWarnings("unchecked")
-		Map<String, Boolean> features = s.getCustomProperty("features", Map.class);
+		Map<String, Boolean> features = parameters.getCustomProperty("features", Map.class);
 		if (features != null) {
 			jacksonConfig.appendFeatureToToggle(features);
 		}
 
 		@SuppressWarnings("unchecked")
-		Map<String, Boolean> yamlFeatures = s.getCustomProperty("yaml_features", Map.class);
+		Map<String, Boolean> yamlFeatures = parameters.getCustomProperty("yaml_features", Map.class);
 		if (features != null) {
 			jacksonConfig.appendYamlFeatureToToggle(yamlFeatures);
 		}
 
-		String version = s.getCustomProperty("version", String.class);
+		String version = parameters.getCustomProperty("version", String.class);
 		if (version == null) {
 			version = JacksonJsonStep.defaultVersion();
 		}
@@ -88,12 +89,13 @@ public class YamlFormatterStepFactory extends AFormatterStepFactory {
 
 	// This is useful to demonstrate all available configuration
 	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties jackson = new SpotlessStepProperties();
-		jackson.setId("jackson");
-		jackson.putProperty("features",
+		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
+		jacksonParameters.putProperty("features",
 				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
-		jackson.putProperty("yaml_features",
+		jacksonParameters.putProperty("yaml_features",
 				ImmutableMap.builder().put(YAMLGenerator.Feature.MINIMIZE_QUOTES.name(), true).build());
+		SpotlessStepProperties jackson =
+				SpotlessStepProperties.builder().id("jackson").parameters(jacksonParameters).build();
 
 		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}

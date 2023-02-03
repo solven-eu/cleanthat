@@ -69,7 +69,8 @@ public class TestSpotlessFormatter_Eclipse {
 	}
 
 	final SpotlessFormattersFactory formatter =
-			new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)));
+			new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)),
+					SpotlessFormattersFactory.makeProvisionner());
 	final ICodeFormatterApplier applier = new CodeFormatterApplier();
 	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper();
 

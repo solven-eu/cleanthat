@@ -13,5 +13,6 @@ formatters:
   - "regex:**/pom.xml"
   steps:
   - id: "sortPom"
-    expandEmptyElements: false
-    nrOfIndentSpace: -1
+    parameters:
+      expandEmptyElements: false
+      nrOfIndentSpace: -1

@@ -33,13 +33,16 @@ public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 	final List<ObjectMapper> objectMappers;
 	final List<IEngineLintFixerFactory> factories;
 	final ICodeProviderFormatter formatterProvider;
+	final GithubCheckRunManager githubCheckRunManager;
 
 	public GithubCodeCleanerFactory(List<ObjectMapper> objectMappers,
 			List<IEngineLintFixerFactory> factories,
-			ICodeProviderFormatter formatterProvider) {
+			ICodeProviderFormatter formatterProvider,
+			GithubCheckRunManager githubCheckRunManager) {
 		this.objectMappers = objectMappers;
 		this.factories = factories;
 		this.formatterProvider = formatterProvider;
+		this.githubCheckRunManager = githubCheckRunManager;
 	}
 
 	@Override
@@ -48,7 +51,8 @@ public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 			GithubRefCleaner refCleaner = new GithubRefCleaner(objectMappers,
 					factories,
 					formatterProvider,
-					(GithubAndToken) somethingInteresting);
+					(GithubAndToken) somethingInteresting,
+					githubCheckRunManager);
 			return Optional.of(refCleaner);
 		}
 		return Optional.empty();

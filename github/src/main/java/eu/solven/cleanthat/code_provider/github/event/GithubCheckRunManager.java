@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import com.google.common.base.Ascii;
+import eu.solven.cleanthat.config.IGitService;
 import java.io.IOException;
 import java.util.Optional;
 import org.kohsuke.github.GHCheckRun;
@@ -33,8 +35,15 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class GithubCheckRunManager {
+	private static final int LIMIT_IDENTIFIER = 20;
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubCheckRunManager.class);
 	public static final String PERMISSION_CHECKS = "checks";
+
+	final IGitService gitService;
+
+	public GithubCheckRunManager(IGitService gitService) {
+		this.gitService = gitService;
+	}
 
 	// https://docs.github.com/fr/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
 	public Optional<GHCheckRun> createCheckRun(GithubAndToken githubAuthAsInst,
@@ -47,7 +56,7 @@ public class GithubCheckRunManager {
 			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
 
 			// Limitted to 20 characters
-			String identifier = "cleanthat";
+			String identifier = Ascii.truncate(gitService.getSha1(), LIMIT_IDENTIFIER, "");
 			// Limitted to 40 characters
 			String description = "CleanThat cleaning/refactoring";
 			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1)

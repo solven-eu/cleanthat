@@ -12,69 +12,11 @@
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
-		<maven.version>3.8.7</maven.version>
+
 		<maven-resolver.version>1.6.3</maven-resolver.version>
+		<!-- Not provided as spotless is not executed through maven in CleanThat -->
+		<maven.scope>provided</maven.scope>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-plugin-api</artifactId>
-				<version>${maven.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-core</artifactId>
-				<version>${maven.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-model</artifactId>
-				<version>${maven.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-resolver-provider</artifactId>
-				<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-resolver-provider -->
-				<version>${maven.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.apache.maven.resolver</groupId>
-				<artifactId>maven-resolver-api</artifactId>
-				<version>${maven-resolver.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.resolver</groupId>
-				<artifactId>maven-resolver-impl</artifactId>
-				<version>${maven-resolver.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.resolver</groupId>
-				<artifactId>maven-resolver-connector-basic</artifactId>
-				<version>${maven-resolver.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.resolver</groupId>
-				<artifactId>maven-resolver-transport-file</artifactId>
-				<version>${maven-resolver.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.resolver</groupId>
-				<artifactId>maven-resolver-transport-http</artifactId>
-				<version>${maven-resolver.version}</version>
-				<scope>provided</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -90,14 +32,6 @@
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>java</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<!-- <exclusion> -->
-				<!-- We exclude this artifact as this is a maven plugin: it conflicts with META-INF -->
-				<!-- TODO We would exclude only in unit-tests -->
-				<!-- <groupId>net.revelc.code</groupId> -->
-				<!-- <artifactId>impsort-maven-plugin</artifactId> -->
-				<!-- </exclusion> -->
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
@@ -117,10 +51,7 @@
 			<artifactId>spotless</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-		</dependency>
+
 		<dependency>
 			<!-- Enables MavenProject and MavenSession -->
 			<groupId>org.apache.maven</groupId>
@@ -133,6 +64,15 @@
 			<version>3.7.1</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<!-- Used for MatchPatterns -->
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-utils -->
+			<version>3.5.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>runnable</artifactId>
@@ -174,11 +114,6 @@
 			<artifactId>maven-compat</artifactId>
 			<version>${maven.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.resolver</groupId>
-			<artifactId>maven-resolver-api</artifactId>
-			<version>1.9.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>

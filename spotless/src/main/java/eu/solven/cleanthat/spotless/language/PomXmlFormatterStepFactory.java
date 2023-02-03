@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -53,11 +54,13 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 	@Override
 	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
+		SpotlessStepParametersProperties parameters = s.getParameters();
+
 		switch (stepName) {
 		case "sortPom": {
 			SortPomCfg config = new SortPomCfg();
 
-			s.getCustomProperties().forEach((customKey, customValue) -> {
+			parameters.getCustomProperties().forEach((customKey, customValue) -> {
 				Field field;
 				try {
 					field = SortPomCfg.class.getField(customKey);
@@ -84,16 +87,17 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 
 	// This is useful to demonstrate all available configuration
 	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties sortPom = new SpotlessStepProperties();
-		sortPom.setId("sortPom");
+		SpotlessStepProperties sortPom = SpotlessStepProperties.builder().id("sortPom").build();
+		SpotlessStepParametersProperties sortPomParameters = new SpotlessStepParametersProperties();
 		SortPomCfg defaultSortPomConfig = new SortPomCfg();
 		for (Field f : SortPomCfg.class.getFields()) {
 			try {
-				sortPom.putProperty(f.getName(), f.get(defaultSortPomConfig));
+				sortPomParameters.putProperty(f.getName(), f.get(defaultSortPomConfig));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				LOGGER.warn("Issue fethcing default value for field={}", f, e);
 			}
 		}
+		sortPom.setParameters(sortPomParameters);
 
 		return ImmutableList.<SpotlessStepProperties>builder().add(sortPom).build();
 	}

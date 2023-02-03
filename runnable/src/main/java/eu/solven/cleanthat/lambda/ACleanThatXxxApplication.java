@@ -15,11 +15,14 @@
  */
 package eu.solven.cleanthat.lambda;
 
+import com.diffplug.spotless.Provisioner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -45,6 +48,11 @@ public abstract class ACleanThatXxxApplication implements ApplicationContextAwar
 
 	public ApplicationContext getAppContext() {
 		return appContext;
+	}
+
+	@Bean
+	public Provisioner mvnAetherProvisioner() {
+		return SpotlessFormattersFactory.makeProvisionner();
 	}
 
 }

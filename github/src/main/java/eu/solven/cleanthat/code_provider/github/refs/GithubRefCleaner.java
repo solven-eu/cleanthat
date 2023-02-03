@@ -63,6 +63,7 @@ import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder.Output;
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCommitPointer;
 import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHCompare.Commit;
 import org.kohsuke.github.GHFileNotFoundException;
@@ -91,6 +92,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 
 	// 2023-01: Renamed from 'cleanthat/configure' to 'cleanthat/configure_v2' as the configuration change
 	// It enables handling easily repository with a PR open a long-time ago, with old configuration
+	@Deprecated
+	public static final String REF_NAME_CONFIGURE_V1 = PREFIX_REF_CLEANTHAT + "configure";
 	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure_v2";
 
 	public static final String PREFIX_REF_CLEANTHAT_TMPHEAD = PREFIX_REF_CLEANTHAT + "headfor-";
@@ -98,13 +101,18 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 
 	final GithubAndToken githubAndToken;
 
+	final GithubCheckRunManager githubCheckRunManager;
+
 	public GithubRefCleaner(List<ObjectMapper> objectMappers,
 			List<IEngineLintFixerFactory> factories,
 			ICodeProviderFormatter formatterProvider,
-			GithubAndToken githubAndToken) {
+			GithubAndToken githubAndToken,
+			GithubCheckRunManager githubCheckRunManager) {
 		super(objectMappers, factories, formatterProvider);
 
 		this.githubAndToken = githubAndToken;
+
+		this.githubCheckRunManager = githubCheckRunManager;
 	}
 
 	// We may have no ref to clean (e.g. there is no cleanthat configuration, or the ref is excluded)
@@ -173,25 +181,24 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue fetching repository: " + repoName, e);
 		}
-		new GithubCheckRunManager().createCheckRun(githubAndToken, repository, head.getSha(), eventKey)
-				.ifPresent(cr -> {
-					try {
-						List<String> summuaryRows = ImmutableList.<String>builder()
-								.add("Check " + CodeProviderHelpers.PATHES_CLEANTHAT.get(0))
-								.add("It may look like: "
-										+ "https://github.com/solven-eu/cleanthat/blob/master/runnable/src/test/resources/config/default-safe.yaml")
-								.build();
+		githubCheckRunManager.createCheckRun(githubAndToken, repository, head.getSha(), eventKey).ifPresent(cr -> {
+			try {
+				List<String> summuaryRows = ImmutableList.<String>builder()
+						.add("Check " + CodeProviderHelpers.PATHES_CLEANTHAT.get(0))
+						.add("It may look like: "
+								+ "https://github.com/solven-eu/cleanthat/blob/master/runnable/src/test/resources/config/default-safe.yaml")
+						.build();
 
-						String summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
-						cr.update()
-								.withConclusion(Conclusion.ACTION_REQUIRED)
-								.withStatus(Status.COMPLETED)
-								.add(new Output("Issue with configuration", summary))
-								.create();
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
-					}
-				});
+				String summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
+				cr.update()
+						.withConclusion(Conclusion.ACTION_REQUIRED)
+						.withStatus(Status.COMPLETED)
+						.add(new Output("Issue with configuration", summary))
+						.create();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
 	}
 
 	protected Optional<HeadAndOptionalBase> cleanInNewRR(IExternalWebhookRelevancyResult result,
@@ -445,21 +452,14 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			LOGGER.info("There is no configuration in the default branch ({})", branchName);
 		}
 
-		String headRef = REF_NAME_CONFIGURE;
-		Optional<GHRef> optRefToPR;
 		try {
-			try {
-				optRefToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(headRef));
-				LOGGER.info("There is already a ref: " + headRef);
-			} catch (GHFileNotFoundException e) {
-				LOGGER.trace("There is not yet a ref: " + headRef, e);
-				LOGGER.info("There is not yet a ref: " + headRef);
-				optRefToPR = Optional.empty();
-			}
-		} catch (IOException e) {
-			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
-			throw new UncheckedIOException(e);
+			closeOldConfigurePr(repo);
+		} catch (RuntimeException e) {
+			LOGGER.warn("New feature is failing", e);
 		}
+
+		String headRef = REF_NAME_CONFIGURE;
+		Optional<GHRef> optRefToPR = optRef(repo, headRef);
 		try {
 			if (optRefToPR.isPresent()) {
 				GHRef refToPr = optRefToPR.get();
@@ -495,6 +495,51 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		} catch (IOException e) {
 			// TODO If 401, it probably means the Installation is not allowed to modify given repo
 			throw new UncheckedIOException(e);
+		}
+	}
+
+	private Optional<GHRef> optRef(GHRepository repo, String headRef) {
+		Optional<GHRef> optRefToPR;
+		try {
+			try {
+				optRefToPR = Optional.of(new GithubRepositoryFacade(repo).getRef(headRef));
+				LOGGER.info("There is already a ref: " + headRef);
+			} catch (GHFileNotFoundException e) {
+				LOGGER.trace("There is not yet a ref: " + headRef, e);
+				LOGGER.info("There is not yet a ref: " + headRef);
+				optRefToPR = Optional.empty();
+			}
+		} catch (IOException e) {
+			// TODO If 401, it probably means the Installation is not allowed to see/modify given repository
+			throw new UncheckedIOException(e);
+		}
+		return optRefToPR;
+	}
+
+	private void closeOldConfigurePr(GHRepository repo) {
+		String headRef = REF_NAME_CONFIGURE_V1;
+		Optional<GHRef> optRefToPR = optRef(repo, headRef);
+		if (optRefToPR.isPresent()) {
+			GHRef refToPr = optRefToPR.get();
+			LOGGER.info("There is already a ref preparing cleanthat integration. Do not open a new PR (url={})",
+					refToPr.getUrl().toExternalForm());
+			repo.listPullRequests(GHIssueState.OPEN).forEach(pr -> {
+				GHCommitPointer prHead = pr.getHead();
+				try {
+					if (headRef.equals(prHead.getRef()) && "CleanThat".equals(pr.getUser().getName())) {
+						String headAuthorName = prHead.getCommit().getAuthor().getName();
+						if ("CleanThat".equals(headAuthorName)) {
+							LOGGER.info("Closing old 'configure' PR: {}", pr.getHtmlUrl());
+						} else {
+							LOGGER.warn("Leaving open old 'configure' PR: {} as head.authorName={}",
+									pr.getHtmlUrl(),
+									headAuthorName);
+						}
+					}
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
 		}
 	}
 

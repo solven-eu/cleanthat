@@ -20,6 +20,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubNoApiWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
@@ -28,6 +29,7 @@ import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import java.io.File;
@@ -43,6 +45,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kohsuke.github.GHApp;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -81,8 +84,9 @@ public class ITGithub {
 		// env.setProperty("github.app.app-id", GithubWebhookHandlerFactory.GITHUB_DEFAULT_APP_ID);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
 
-		GithubWebhookHandlerFactory factory =
-				new GithubWebhookHandlerFactory(env, Arrays.asList(ConfigHelpers.makeJsonObjectMapper()));
+		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env,
+				Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
+				new GithubCheckRunManager(Mockito.mock(IGitService.class)));
 		GithubNoApiWebhookHandler noauth = factory.makeUnderlyingNoAuth();
 		IGithubWebhookHandler fresh = factory.makeGithubWebhookHandler();
 		GHApp app = fresh.getGithubAsApp();

@@ -27,6 +27,8 @@
 			<groupId>fr.inria.gforge.spoon</groupId>
 			<artifactId>spoon-core</artifactId>
 			<version>10.2.0</version>
+			<!-- Spoon is added for reference, but not used for now -->
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<!-- https://github.com/javaparser/javaparser -->

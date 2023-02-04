@@ -45,7 +45,7 @@
 		<scm.connection>scm:git:ssh://github.com/solven-eu/cleanthat.git</scm.connection>
 		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
 		<!-- https://github.com/solven-eu/pepper/releases -->
-		<pepper.version>4.2</pepper.version>
+		<pepper.version>4.3</pepper.version>
 		<error-prone.version>2.18.0</error-prone.version>
 		<spotless.version>2.31.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->

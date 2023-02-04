@@ -152,7 +152,8 @@ public abstract class AFormatterStepFactory {
 		}
 		String file = parameters.getCustomProperty(KEY_FILE, String.class);
 		String content;
-		if (file != null) {
+		if (file 
+				!= null) {
 			if (parameters.getCustomProperty("content", String.class) != null) {
 				throw new IllegalArgumentException("Can not set both 'file' and 'content'");
 			}

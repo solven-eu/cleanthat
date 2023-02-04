@@ -53,6 +53,11 @@
 
 	<!-- .getDefaultTestExecutionListenerClassNames prints quite long lines -->
 	<logger name="org.springframework.test.context.support.DefaultTestContextBootstrapper" level="WARN" />
+	
+	<!-- We are not interested in the details of downloaded files -->
+	<logger name="org.apache.maven.resolver.examples.util.LoggingRepositoryListener" level="WARN" />
+	<logger name="org.apache.maven.resolver.examples.util.LoggingTransferListener" level="WARN" />
+	
 
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />

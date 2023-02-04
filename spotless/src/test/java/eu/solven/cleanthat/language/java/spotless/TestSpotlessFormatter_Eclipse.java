@@ -24,7 +24,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
@@ -179,7 +179,7 @@ public class TestSpotlessFormatter_Eclipse {
 
 		IEngineProperties languageP = getEngineProperties();
 
-		EnginePropertiesAndBuildProcessors compile = helper.compile(languageP, cleanthatSession, formatter);
+		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
 		String cleaned = applier.applyProcessors(compile,
 				new PathAndContent(
 						cleanthatSession.getFileSystem()

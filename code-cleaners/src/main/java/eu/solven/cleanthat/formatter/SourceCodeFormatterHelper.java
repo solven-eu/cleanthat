@@ -15,15 +15,14 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import com.google.common.collect.Maps;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
-import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.engine.EngineAndLinters;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository
@@ -33,13 +32,12 @@ import java.util.stream.Collectors;
  */
 public class SourceCodeFormatterHelper {
 
-	public EnginePropertiesAndBuildProcessors compile(IEngineProperties engineProperties,
+	public EngineAndLinters compile(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			IEngineLintFixerFactory lintFixerFactory) {
-		List<Map.Entry<IEngineProperties, ILintFixer>> processors =
-				computeLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
+		List<ILintFixer> linters = prepareLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
 
-		return new EnginePropertiesAndBuildProcessors(processors);
+		return new EngineAndLinters(engineProperties, linters);
 	}
 
 	/**
@@ -50,18 +48,14 @@ public class SourceCodeFormatterHelper {
 	 * @param lintFixerFactory
 	 * @return
 	 */
-	public List<Map.Entry<IEngineProperties, ILintFixer>> computeLintFixers(IEngineProperties engineProperties,
+	public List<ILintFixer> prepareLintFixers(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			IEngineLintFixerFactory lintFixerFactory) {
 
-		List<Map.Entry<IEngineProperties, ILintFixer>> processors = engineProperties.getSteps()
+		return engineProperties.getSteps()
 				.stream()
 				.filter(Predicate.not(CleanthatStepProperties::isSkip))
-				.map(step -> {
-					ILintFixer formatter = lintFixerFactory.makeLintFixer(cleanthatSession, engineProperties, step);
-					return Maps.immutableEntry(engineProperties, formatter);
-				})
+				.map(step -> lintFixerFactory.makeLintFixer(cleanthatSession, engineProperties, step))
 				.collect(Collectors.toList());
-		return processors;
 	}
 }

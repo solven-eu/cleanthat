@@ -70,8 +70,8 @@ public class Booter {
 		LocalRepository localRepo = new LocalRepository(localRepoPath.toFile());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
-		session.setTransferListener(new ConsoleTransferListener());
-		session.setRepositoryListener(new ConsoleRepositoryListener());
+		session.setTransferListener(new LoggingTransferListener());
+		session.setRepositoryListener(new LoggingRepositoryListener());
 
 		// uncomment to generate dirty trees
 		// session.setDependencyGraphTransformer( null );

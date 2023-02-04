@@ -15,25 +15,6 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import com.google.common.base.Strings;
-import com.google.common.util.concurrent.AtomicLongMap;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.IEngineFormatterFactory;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
-import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
-import eu.solven.pepper.thread.PepperExecutorsHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystem;
@@ -52,7 +33,29 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
+
+import com.google.common.base.Strings;
+import com.google.common.util.concurrent.AtomicLongMap;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.EngineAndLinters;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.engine.IEngineFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.language.ISourceCodeProperties;
+import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
  * Unclear what is the point of this class
@@ -208,8 +211,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	protected AtomicLongMap<String> processFiles(CleanthatSession cleanthatSession,
 			AtomicLongMap<String> languageToNbMutatedFiles,
 			Map<String, String> pathToMutatedContent,
-			IEngineProperties languageP) {
-		ISourceCodeProperties sourceCodeProperties = languageP.getSourceCode();
+			IEngineProperties engineP) {
+		ISourceCodeProperties sourceCodeProperties = engineP.getSourceCode();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
@@ -223,7 +226,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
-		EnginePropertiesAndBuildProcessors compiledProcessors = buildProcessors(languageP, cleanthatSession);
+		// We rely on a ThreadLocal as Engines may not be threadSafe
+		// Engine, each new thread will compile its own engine
+		ThreadLocal<EngineAndLinters> currentThreadEngine =
+				ThreadLocal.withInitial(() -> buildProcessors(engineP, cleanthatSession));
 
 		try {
 			cleanthatSession.getCodeProvider().listFilesForContent(file -> {
@@ -234,8 +240,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				if (matchingInclude.isPresent()) {
 					if (matchingExclude.isEmpty()) {
 						cs.submit(() -> {
+							EngineAndLinters engineSteps = currentThreadEngine.get();
+
 							try {
-								return doFormat(cleanthatSession, compiledProcessors, pathToMutatedContent, filePath);
+								return doFormat(cleanthatSession, engineSteps, pathToMutatedContent, filePath);
 							} catch (IOException e) {
 								throw new UncheckedIOException("Issue with file: " + filePath, e);
 							} catch (RuntimeException e) {
@@ -271,7 +279,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				boolean result = polled.get();
 
 				if (result) {
-					languageToNbMutatedFiles.incrementAndGet(languageP.getEngine());
+					languageToNbMutatedFiles.incrementAndGet(engineP.getEngine());
 					languageCounters.incrementAndGet("nb_files_formatted");
 				} else {
 					languageCounters.incrementAndGet("nb_files_already_formatted");
@@ -288,7 +296,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private boolean doFormat(CleanthatSession cleanthatSession,
-			EnginePropertiesAndBuildProcessors compiledProcessors,
+			EngineAndLinters engineAndLinters,
 			Map<String, String> pathToMutatedContent,
 			Path filePath) throws IOException {
 		// Rely on the latest code (possibly formatted by a previous processor)
@@ -302,9 +310,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		String code = optCode.get();
 
 		LOGGER.debug("Processing path={}", filePath);
-		String output = doFormat(compiledProcessors, new PathAndContent(filePath, code));
+		String output = doFormat(engineAndLinters, new PathAndContent(filePath, code));
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
-			LOGGER.info("Path={} successfully cleaned by {}", filePath, compiledProcessors);
+			LOGGER.info("Path={} successfully cleaned by {}", filePath, engineAndLinters);
 			pathToMutatedContent.put(filePath.toString(), output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES
@@ -342,15 +350,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 	}
 
-	private EnginePropertiesAndBuildProcessors buildProcessors(IEngineProperties properties,
-			CleanthatSession cleanthatSession) {
+	private EngineAndLinters buildProcessors(IEngineProperties properties, CleanthatSession cleanthatSession) {
 		IEngineLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
 		return sourceCodeFormatterHelper.compile(properties, cleanthatSession, formattersFactory);
 	}
 
-	private String doFormat(EnginePropertiesAndBuildProcessors compiledProcessors, PathAndContent pathAndContent)
-			throws IOException {
+	private String doFormat(EngineAndLinters compiledProcessors, PathAndContent pathAndContent) throws IOException {
 		return formatterApplier.applyProcessors(compiledProcessors, pathAndContent);
 	}
 }

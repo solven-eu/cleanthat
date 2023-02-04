@@ -17,7 +17,6 @@ package org.apache.maven.resolver.examples.util;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;

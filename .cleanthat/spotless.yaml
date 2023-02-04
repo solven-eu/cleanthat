@@ -18,7 +18,7 @@ formatters:
   - id: "licenseHeader"
     parameters:
       delimiter: "(package )|(import )"
-      file: repository:/.cleanthat/spotless.license
+      file: "repository:/.cleanthat/spotless.license"
 - format: "pom"
   includes:
   - "glob:**/pom.xml"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Solven
+ * Copyright 2023 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.Set;
-
 import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import java.util.Set;
 
 /**
  * Configure Spotless engine for '.scala' files

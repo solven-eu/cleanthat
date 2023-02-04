@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Solven
+ * Copyright 2023 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.Maps;
-
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository

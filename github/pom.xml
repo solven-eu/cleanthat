@@ -77,7 +77,7 @@
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<!-- https://github.com/hub4j/github-api/issues/1202 -->
 			<groupId>com.squareup.okhttp3</groupId>

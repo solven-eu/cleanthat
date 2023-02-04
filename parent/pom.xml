@@ -10,7 +10,7 @@
 		<!-- https://github.com/aleph0io/aws-lambda-java-base-images proposes a JDK17 base image-->
 		<version>2.7.8</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath />
+		<relativePath/>
 	</parent>
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
@@ -110,7 +110,7 @@
 								<rules>
 									<!-- We have a local site used to upload report in circleci -->
 									<!-- <banDistributionManagement /> -->
-									<banDuplicatePomDependencyVersions />
+									<banDuplicatePomDependencyVersions/>
 									<!-- TODO Activate this rule requiring to force quite many dependencies -->
 									<!-- <dependencyConvergence /> -->
 									<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
@@ -150,9 +150,7 @@
 							<xml>XML_PER_LINE</xml>
 						</mapping>
 						<!-- Single row header prevent many issues, especially regarding formatting and XMLs -->
-						<inlineHeader>
-							<![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]>
-						</inlineHeader>
+						<inlineHeader><![CDATA[Copyright © ${year} ${owner} (${email}). Unauthorized copying of this file, via any medium is strictly prohibited. Proprietary and confidential]]></inlineHeader>
 						<properties>
 							<owner>SOLVEN</owner>
 							<year>2021</year>
@@ -390,8 +388,8 @@
 									<include>.gitignore</include>
 								</includes>
 								<!-- define the steps to apply to those files -->
-								<trimTrailingWhitespace />
-								<endWithNewline />
+								<trimTrailingWhitespace/>
+								<endWithNewline/>
 								<indent>
 									<tabs>true</tabs>
 									<spacesPerTab>4</spacesPerTab>
@@ -412,7 +410,7 @@
 							</sortPom>
 						</pom>
 						<markdown>
-							<endWithNewline />
+							<endWithNewline/>
 							<indent>
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
@@ -420,7 +418,7 @@
 							<includes>
 								<include>**/*.md</include>
 							</includes>
-							<flexmark />
+							<flexmark/>
 						</markdown>
 						<!-- define a language-specific format -->
 						<java>
@@ -428,7 +426,7 @@
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
-							<removeUnusedImports />
+							<removeUnusedImports/>
 							<importOrder>
 								<!-- Need Pepper release 4.3? -->
 								<!--file>eclipse/eclipse.importorder</file-->
@@ -446,8 +444,8 @@
 							</licenseHeader>
 						</java>
 						<json>
-							<trimTrailingWhitespace />
-							<endWithNewline />
+							<trimTrailingWhitespace/>
+							<endWithNewline/>
 							<indent>
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
@@ -455,7 +453,7 @@
 							<includes>
 								<include>**/*.json</include>
 							</includes>
-							<gson />
+							<gson/>
 						</json>
 					</configuration>
 					<dependencies>

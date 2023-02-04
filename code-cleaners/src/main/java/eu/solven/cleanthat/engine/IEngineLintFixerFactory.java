@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Solven
+ * Copyright 2023 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import java.util.Map;
-import java.util.Set;
-
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Knows how to format a String

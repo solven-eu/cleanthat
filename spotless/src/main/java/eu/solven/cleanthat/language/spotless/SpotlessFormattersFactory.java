@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Solven
+ * Copyright 2023 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,9 @@
  */
 package eu.solven.cleanthat.language.spotless;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-
 import com.diffplug.spotless.Provisioner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
-
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -45,6 +32,16 @@ import eu.solven.cleanthat.spotless.EnrichedFormatter;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.SpotlessSession;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 /**
  * Formatter for Spotless Engine

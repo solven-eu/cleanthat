@@ -15,18 +15,12 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
@@ -43,8 +37,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	public static final AtomicInteger NB_EXCEPTIONS = new AtomicInteger();
 
 	@Override
-	public String applyProcessors(EngineAndLinters engineAndSteps, PathAndContent pathAndContent)
-			throws IOException {
+	public String applyProcessors(EngineAndLinters engineAndSteps, PathAndContent pathAndContent) throws IOException {
 		String code = pathAndContent.getContent();
 		Path filepath = pathAndContent.getPath();
 		AtomicReference<String> outputRef = new AtomicReference<>(code);

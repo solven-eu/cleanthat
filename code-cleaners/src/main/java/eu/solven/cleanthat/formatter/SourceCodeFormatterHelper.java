@@ -15,14 +15,13 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Helps compiling CodeProcessors in the context of a repository

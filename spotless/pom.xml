@@ -10,7 +10,7 @@
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
-		<spotless.dependency.version>2.34.0</spotless.dependency.version>
+		<spotless.dependency.version>2.34.1</spotless.dependency.version>
 	</properties>
 	<dependencies>
 		<dependency>

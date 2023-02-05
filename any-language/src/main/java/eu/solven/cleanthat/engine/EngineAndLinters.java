@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Computed processors, to be applicable to any file of a given repository
@@ -26,14 +25,20 @@ import java.util.Map;
  * @author Benoit Lacelle
  *
  */
-public class EnginePropertiesAndBuildProcessors {
-	final List<Map.Entry<IEngineProperties, ILintFixer>> linters;
+public class EngineAndLinters {
+	final IEngineProperties engineProperties;
+	final List<ILintFixer> linters;
 
-	public EnginePropertiesAndBuildProcessors(List<Map.Entry<IEngineProperties, ILintFixer>> linters) {
+	public EngineAndLinters(IEngineProperties engineProperties, List<ILintFixer> linters) {
+		this.engineProperties = engineProperties;
 		this.linters = linters;
 	}
 
-	public List<Map.Entry<IEngineProperties, ILintFixer>> getLinters() {
+	public IEngineProperties getEngineProperties() {
+		return engineProperties;
+	}
+
+	public List<ILintFixer> getLinters() {
 		return linters;
 	}
 

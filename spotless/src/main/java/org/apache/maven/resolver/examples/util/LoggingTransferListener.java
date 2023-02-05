@@ -17,7 +17,6 @@ package org.apache.maven.resolver.examples.util;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -27,6 +26,8 @@ import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simplistic transfer listener that logs uploads/downloads to the console.
@@ -34,28 +35,19 @@ import org.eclipse.aether.transfer.TransferResource;
  * @author https://github.com/apache/maven-resolver/
  */
 @SuppressWarnings({ "PMD", "checkstyle:JavadocType", "checkstyle:AvoidInlineConditionals", "checkstyle:MagicNumber" })
-public class ConsoleTransferListener extends AbstractTransferListener {
-
-	private final PrintStream out;
+public class LoggingTransferListener extends AbstractTransferListener {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingTransferListener.class);
 
 	private final Map<TransferResource, Long> downloads = new ConcurrentHashMap<>();
 
 	private int lastLength;
-
-	public ConsoleTransferListener() {
-		this(null);
-	}
-
-	public ConsoleTransferListener(PrintStream out) {
-		this.out = (out != null) ? out : System.out;
-	}
 
 	@Override
 	public void transferInitiated(TransferEvent event) {
 		requireNonNull(event, "event cannot be null");
 		String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-		out.println(message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
+		LOGGER.info(message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
 	}
 
 	@Override
@@ -78,7 +70,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
 		pad(buffer, pad);
 		buffer.append('\r');
 
-		out.print(buffer);
+		LOGGER.info("{}", buffer);
 	}
 
 	private String getStatus(long complete, long total) {
@@ -122,7 +114,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
 				throughput = " at " + format.format(kbPerSec) + " KB/sec";
 			}
 
-			out.println(type + ": "
+			LOGGER.info(type + ": "
 					+ resource.getRepositoryUrl()
 					+ resource.getResourceName()
 					+ " ("
@@ -138,7 +130,7 @@ public class ConsoleTransferListener extends AbstractTransferListener {
 		transferCompleted(event);
 
 		if (!(event.getException() instanceof MetadataNotFoundException)) {
-			event.getException().printStackTrace(out);
+			LOGGER.warn("transferFailed", new RuntimeException("Need the stack", event.getException()));
 		}
 	}
 
@@ -149,12 +141,12 @@ public class ConsoleTransferListener extends AbstractTransferListener {
 		StringBuilder buffer = new StringBuilder(64);
 		pad(buffer, lastLength);
 		buffer.append('\r');
-		out.print(buffer);
+		LOGGER.info("{}", buffer);
 	}
 
 	public void transferCorrupted(TransferEvent event) {
 		requireNonNull(event, "event cannot be null");
-		event.getException().printStackTrace(out);
+		LOGGER.warn("transferCorrupted", new RuntimeException("Need the stack", event.getException()));
 	}
 
 	@SuppressWarnings("checkstyle:magicnumber")

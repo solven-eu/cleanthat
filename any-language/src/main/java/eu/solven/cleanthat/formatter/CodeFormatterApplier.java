@@ -15,18 +15,12 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import eu.solven.cleanthat.config.IncludeExcludeHelpers;
-import eu.solven.cleanthat.engine.EnginePropertiesAndBuildProcessors;
+import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
@@ -43,17 +37,15 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 	public static final AtomicInteger NB_EXCEPTIONS = new AtomicInteger();
 
 	@Override
-	public String applyProcessors(EnginePropertiesAndBuildProcessors engineAndSteps, PathAndContent pathAndContent)
-			throws IOException {
+	public String applyProcessors(EngineAndLinters engineAndSteps, PathAndContent pathAndContent) throws IOException {
 		String code = pathAndContent.getContent();
 		Path filepath = pathAndContent.getPath();
 		AtomicReference<String> outputRef = new AtomicReference<>(code);
 
-		engineAndSteps.getLinters().forEach(step -> {
+		IEngineProperties engineProperties = engineAndSteps.getEngineProperties();
+		engineAndSteps.getLinters().forEach(linter -> {
 			try {
-				IEngineProperties engineProperties = step.getKey();
-				ILintFixer lintFixer = step.getValue();
-				String output = applyProcessor(engineProperties, lintFixer, pathAndContent);
+				String output = applyProcessor(engineProperties, linter, pathAndContent);
 				if (output == null) {
 					throw new IllegalStateException("Null code.");
 				}
@@ -61,53 +53,27 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 				if (!input.equals(output)) {
 					// Beware each processor may change a file, but the combined changes leads to a no change (e.g. the
 					// final formatting step may clean all previous not relevant changes)
-					LOGGER.debug("Mutated a file given: {}", step);
+					LOGGER.debug("Mutated a file given: {}", linter);
 					outputRef.set(output);
 				}
 			} catch (IOException | RuntimeException e) {
 				NB_EXCEPTIONS.incrementAndGet();
 				// Log and move to next processor
-				LOGGER.warn(
-						"Issue over file='" + filepath
-								+ "' with processor="
-								+ step
-								+ ". Please report it to: "
-								+ "https://github.com/solven-eu/cleanthat/issues",
-						e);
+				LOGGER.warn("Issue over file='" + filepath
+						+ "' with linter="
+						+ linter
+						+ " in engine={}. Please report it to: "
+						+ "https://github.com/solven-eu/cleanthat/issues", engineProperties.getEngine(), e);
 			}
 		});
 		return outputRef.get();
 	}
 
-	// PMD.CloseResource: False positive as we did not open it ourselves
-	@SuppressWarnings("PMD.CloseResource")
 	protected String applyProcessor(IEngineProperties languageProperties,
 			ILintFixer formatter,
 			PathAndContent pathAndContent) throws IOException {
 		Objects.requireNonNull(pathAndContent, "pathAndContent should not be null");
-		ISourceCodeProperties sourceCodeProperties = languageProperties.getSourceCode();
 
-		Path filePath = pathAndContent.getPath();
-
-		FileSystem fs = pathAndContent.getPath().getFileSystem();
-
-		// TODO We should skip excluded files BEFORE loading their content
-		List<PathMatcher> includeMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
-		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-		String code = pathAndContent.getContent();
-		if (matchingInclude.isEmpty()) {
-			LOGGER.debug("File {} was initially included but not included for processor: {}", filePath, formatter);
-			return code;
-		}
-
-		List<PathMatcher> excludeMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getExcludes());
-		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
-		if (matchingExclude.isPresent()) {
-			LOGGER.debug("File {} was initially not-excluded but excluded for processor: {}", filePath, formatter);
-			return code;
-		}
 		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
 
 		if (lineEnding == LineEnding.GIT) {
@@ -115,6 +81,7 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 			LOGGER.warn("We switch lineEnding from {} to {}", lineEnding, LineEnding.NATIVE);
 			lineEnding = LineEnding.NATIVE;
 		} else if (lineEnding == LineEnding.KEEP) {
+			String code = pathAndContent.getContent();
 			lineEnding = LineEnding.determineLineEnding(code).orElse(LineEnding.NATIVE);
 		}
 

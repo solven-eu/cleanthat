@@ -24,6 +24,5 @@ import java.io.IOException;
  * @author Benoit Lacelle
  */
 public interface ICodeFormatterApplier {
-	String applyProcessors(EnginePropertiesAndBuildProcessors languageProperties, PathAndContent pathAndContent)
-			throws IOException;
+	String applyProcessors(EngineAndLinters languageProperties, PathAndContent pathAndContent) throws IOException;
 }

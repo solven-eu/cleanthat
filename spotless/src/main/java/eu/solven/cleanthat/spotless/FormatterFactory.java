@@ -107,6 +107,8 @@ public class FormatterFactory {
 				.map(s -> SpotlessFormatterProperties.builder().format(s).build())
 				.map(s -> makeFormatterFactory(s))
 				.flatMap(f -> f.defaultIncludes().stream())
+				// Spotless patterns are always implicitly glob
+				.map(s -> "glob:" + s)
 				.collect(Collectors.toSet());
 	}
 

@@ -80,6 +80,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
+		// if (codeProvider instanceof GithubComm)
+
 		writerLogicSupplier.get().persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 

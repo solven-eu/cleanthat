@@ -8,6 +8,7 @@
 		<!-- SprintBoot requires JDK17 while AWS Lambda requires JDK11 -->
 		<!-- https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html -->
 		<!-- https://github.com/aleph0io/aws-lambda-java-base-images proposes a JDK17 base image-->
+		<!-- https://github.com/aws/aws-lambda-base-images/issues/29 -->
 		<version>2.7.8</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
 		<relativePath/>
@@ -404,6 +405,10 @@
 							<sortPom>
 								<!-- We like empty elements, while plugin default configuration would expand them -->
 								<expandEmptyElements>false</expandEmptyElements>
+								
+								<!-- https://github.com/Ekryd/sortpom/issues/75 -->
+								<spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+								
 								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
 								<!-- -1 means '\t' -->
 								<nrOfIndentSpace>-1</nrOfIndentSpace>

@@ -160,7 +160,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 			// }
 		} else {
-			LOGGER.info("(No config change) About to check and possibly commit {} files into {}",
+			LOGGER.info("(No config change) About to commit+push {} files into {}",
 					languageToNbAddedFiles.sum(),
 					codeWriter);
 			if (dryRun) {

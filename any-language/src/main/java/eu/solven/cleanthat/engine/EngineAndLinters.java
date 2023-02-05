@@ -15,9 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
+import java.util.List;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
+
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
-import java.util.List;
 
 /**
  * Computed processors, to be applicable to any file of a given repository
@@ -42,4 +46,14 @@ public class EngineAndLinters {
 		return linters;
 	}
 
+	@Override
+	public String toString() {
+		ToStringHelper builder = MoreObjects.toStringHelper(this).add("engine", engineProperties.getEngine());
+
+		for (int i = 0; i < linters.size(); i++) {
+			builder.add("step_" + i, linters.get(i).getClass().getSimpleName());
+		}
+
+		return builder.toString();
+	}
 }

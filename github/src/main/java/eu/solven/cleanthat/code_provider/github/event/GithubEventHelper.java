@@ -60,13 +60,6 @@ public class GithubEventHelper {
 
 			GHCommit base = facade.getCommit(sha1);
 
-			// If the base does not exist, then something is wrong: let's check right away it is available
-			// GHRef base;
-			// try {
-			// base = facade.getRef(baseAsObject.getRef());
-			// } catch (IOException e) {
-			// throw new UncheckedIOException(e);
-			// }
 			result = cleaner.formatCommitToRefDiff(root,
 					facade.getRepository(),
 					GithubDecoratorHelper.decorate(base),

@@ -144,7 +144,8 @@ public class FormatterFactory {
 			SpotlessFormatterProperties formatterProperties,
 			Provisioner provisioner) {
 		// In our virtual fileSystem, we process from the root (as root of the repository)
-		Path tmpRoot = fileSystem.getPath("/");
+		Path tmpRoot = fileSystem.
+				getPath("/");
 
 		// File baseDir;
 		// Supplier<Iterable<File>> filesProvider;

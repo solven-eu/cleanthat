@@ -15,17 +15,20 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
 import eu.solven.pepper.logging.PepperLogHelper;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Turns '!o.isEmpty()' into 'o.isPresent()'
@@ -78,19 +81,19 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 		}
 
 		Expression scope = optScope.get();
-		boolean localTransformed = false;
+		String newMethod;
+
 		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
-			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_PRESENT);
-			LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-			if (unaryExpr.replace(replacement)) {
-				localTransformed = true;
-			}
+			newMethod = METHOD_IS_PRESENT;
 		} else {
-			MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_IS_EMPTY);
-			LOGGER.info("Turning '{}' into '{}'", unaryExpr, replacement);
-			if (unaryExpr.replace(replacement)) {
-				localTransformed = true;
-			}
+			newMethod = METHOD_IS_EMPTY;
+		}
+
+		boolean localTransformed = false;
+		MethodCallExpr replacement = new MethodCallExpr(scope, newMethod);
+		LOGGER.info("Turning {} into {}", unaryExpr, replacement);
+		if (unaryExpr.replace(replacement)) {
+			localTransformed = true;
 		}
 		// TODO Add a rule to replace such trivial 'if else return'
 		if (localTransformed) {

@@ -173,6 +173,9 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(requiredType)) {
 			// We are calling 'isEmpty' not on an Optional object
 			isCorrectClass = true;
+		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
+			// For a primitive double, requiredType is 'double'
+			isCorrectClass = true;
 		}
 		if (!isCorrectClass) {
 			return false;

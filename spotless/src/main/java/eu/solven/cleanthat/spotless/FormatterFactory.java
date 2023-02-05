@@ -78,7 +78,7 @@ public class FormatterFactory {
 		this.codeProvider = cleanthatSession.getCodeProvider();
 	}
 
-	public static Provisioner makeProvisionner() throws IOException {
+	public static Provisioner makeProvisioner() throws IOException {
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
 
 		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
@@ -144,8 +144,7 @@ public class FormatterFactory {
 			SpotlessFormatterProperties formatterProperties,
 			Provisioner provisioner) {
 		// In our virtual fileSystem, we process from the root (as root of the repository)
-		Path tmpRoot = fileSystem.
-				getPath("/");
+		Path tmpRoot = fileSystem.getPath("/");
 
 		// File baseDir;
 		// Supplier<Iterable<File>> filesProvider;

@@ -52,7 +52,7 @@ public abstract class ACleanThatXxxApplication implements ApplicationContextAwar
 
 	@Bean
 	public Provisioner mvnAetherProvisioner() {
-		return SpotlessFormattersFactory.makeProvisionner();
+		return SpotlessFormattersFactory.makeProvisioner();
 	}
 
 }

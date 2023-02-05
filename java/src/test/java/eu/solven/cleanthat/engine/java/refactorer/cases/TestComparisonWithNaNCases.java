@@ -17,9 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.ComparisonWithNaNCases;
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.OptionalNotEmptyCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import java.io.IOException;
 import java.util.Collection;

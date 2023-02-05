@@ -15,11 +15,6 @@
  */
 package eu.solven.cleanthat.config;
 
-import com.google.common.util.concurrent.AtomicLongMap;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileSystem;
@@ -33,9 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.util.concurrent.AtomicLongMap;
+
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}
@@ -70,7 +72,7 @@ public class GenerateInitialConfig {
 
 		factoryToFileCount.asMap().forEach((engine, count) -> {
 			if (count == 0) {
-				LOGGER.debug("Not a single file matched {}", engine);
+				LOGGER.info("Not a single file matched {}", engine);
 			} else {
 				LOGGER.info("Some files ({}) matched {}", count, engine);
 
@@ -107,9 +109,7 @@ public class GenerateInitialConfig {
 				Path filePath = fs.getPath(file.getPath());
 
 				factories.forEach(factory -> {
-					// Spotless handles only glob patterns
-					Set<String> includes =
-							factory.getDefaultIncludes().stream().map(g -> "glob:" + g).collect(Collectors.toSet());
+					Set<String> includes = factory.getDefaultIncludes();
 
 					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, includes);
 					Optional<PathMatcher> matchingInclude =

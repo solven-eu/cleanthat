@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine;
+package eu.solven.cleanthat.language.java.spotless;
 
-import java.util.Set;
+import com.diffplug.spotless.pom.SortPomCfg;
+import org.junit.Test;
 
-import eu.solven.cleanthat.language.IEngineProperties;
-
-/**
- * Make {@link ICodeFormatterApplier} for different languages.
- * 
- * @author Benoit Lacelle
- *
- */
-public interface IEngineFormatterFactory {
-	IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
-
-	/**
-	 * 
-	 * @param engine
-	 * @return the default included patterns (glob or regex) for this engine
-	 */
-	Set<String> getDefaultIncludes(String engine);
+public class TestSpotlessMetadataConsumption {
+	@Test
+	public void testLoadingManyTimes() {
+		SortPomCfg config = new SortPomCfg();
+	}
 }

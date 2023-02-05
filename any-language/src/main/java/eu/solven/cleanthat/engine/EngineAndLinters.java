@@ -15,13 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import java.util.List;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Computed processors, to be applicable to any file of a given repository
@@ -29,7 +29,9 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  *
  */
-public class EngineAndLinters {
+public class EngineAndLinters implements AutoCloseable {
+	private static final Logger LOGGER = LoggerFactory.getLogger(EngineAndLinters.class);
+
 	final IEngineProperties engineProperties;
 	final List<ILintFixer> linters;
 
@@ -55,5 +57,18 @@ public class EngineAndLinters {
 		}
 
 		return builder.toString();
+	}
+
+	@Override
+	public void close() {
+		linters.forEach(lf -> {
+			if (lf instanceof AutoCloseable) {
+				try {
+					((AutoCloseable) lf).close();
+				} catch (Exception e) {
+					LOGGER.warn("Issue closing {}", lf, e);
+				}
+			}
+		});
 	}
 }

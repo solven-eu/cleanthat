@@ -16,14 +16,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidFileStream;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 public class AvoidFileStreamCases extends ARefactorerCases {
 	@Override
-	public IClassTransformer getTransformer() {
+	public IMutator getTransformer() {
 		return new AvoidFileStream();
 	}
 

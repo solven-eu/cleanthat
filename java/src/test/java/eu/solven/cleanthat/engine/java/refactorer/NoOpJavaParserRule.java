@@ -16,16 +16,16 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import com.github.javaparser.ast.Node;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 
 /**
- * This {@link AJavaParserRule} does not modify the AST, but always report it as changed. It can be useful to checkthe
+ * This {@link AJavaParserMutator} does not modify the AST, but always report it as changed. It can be useful to checkthe
  * default behavior of JavaParser.
  *
  * @author Benoit Lacelle
  */
-public class NoOpJavaParserRule extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
+public class NoOpJavaParserRule extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
 	@Override
 	public String getId() {
 		return "NoOp";

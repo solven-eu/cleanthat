@@ -20,8 +20,8 @@ import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -34,12 +34,17 @@ import org.slf4j.LoggerFactory;
  */
 // https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIndexOfChar extends AJavaParserRule implements IClassTransformer {
+public class UseIndexOfChar extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);
 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public boolean isProductionReady() {
+		return true;
 	}
 
 	@Override

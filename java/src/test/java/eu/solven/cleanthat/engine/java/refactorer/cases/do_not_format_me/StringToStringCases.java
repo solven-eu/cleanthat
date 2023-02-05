@@ -8,13 +8,13 @@ import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class StringToStringCases extends ARefactorerCases {
 	@Override
-	public IClassTransformer getTransformer() {
+	public IMutator getTransformer() {
 		return new StringToString();
 	}
 

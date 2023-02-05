@@ -21,8 +21,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryFullyQualifiedName extends AJavaParserRule implements IClassTransformer {
+public class UnnecessaryFullyQualifiedName extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
 	// Optional exists since 8

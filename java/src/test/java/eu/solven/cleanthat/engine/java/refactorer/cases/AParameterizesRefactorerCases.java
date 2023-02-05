@@ -23,7 +23,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
@@ -69,7 +69,7 @@ public abstract class AParameterizesRefactorerCases extends ATestCases {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
 
 		ARefactorerCases cases = getCases();
-		IClassTransformer transformer = cases.getTransformer();
+		IMutator transformer = cases.getTransformer();
 
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {
 			doTestMethod(transformer, testCase);

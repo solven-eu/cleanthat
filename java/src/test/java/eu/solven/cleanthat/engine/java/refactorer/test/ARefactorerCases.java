@@ -15,13 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 public abstract class ARefactorerCases {
 	public String getId() {
 		return getTransformer().getClass().getName();
 	}
 
-	public abstract IClassTransformer getTransformer();
+	public abstract IMutator getTransformer();
 
 }

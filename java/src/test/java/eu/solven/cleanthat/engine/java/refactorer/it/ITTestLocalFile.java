@@ -19,7 +19,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ITTestLocalFile {
 				rulesJavaMutator.parseRawCode(rulesJavaMutator.makeJavaParser(), pathAsString);
 
 		// TODO Refactor to rely on RulesJavaMutator
-		IClassTransformer rule = new LiteralsFirstInComparisons();
+		IMutator rule = new LiteralsFirstInComparisons();
 		boolean changed = rule.walkNode(compilationUnit);
 
 		if (!changed) {

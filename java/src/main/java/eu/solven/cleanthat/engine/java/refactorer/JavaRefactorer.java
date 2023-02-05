@@ -15,6 +15,17 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
@@ -28,32 +39,15 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.VersionWrapper;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveBoxedForString;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is dedicated to refactoring. Most rules will refactor code to a better (e.g. shorter, faster, safer, etc)
@@ -63,34 +57,29 @@ import org.slf4j.LoggerFactory;
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class JavaRefactorer implements ILintFixerWithId {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
-	private final IEngineProperties languageProperties;
-	private final JavaRefactorerProperties properties;
+	public static final String ID_REFACTORER = "refactorer";
 
-	private static final List<IClassTransformer> ALL_TRANSFORMERS = Arrays.asList(new CreateTempFilesUsingNio(),
-			new EnumsWithoutEquals(),
-			new PrimitiveBoxedForString(),
-			new OptionalNotEmpty(),
-			new ModifierOrder(),
-			new UseDiamondOperator(),
-			new UseDiamondOperatorJdk8(),
-			new UseIsEmptyOnCollections(),
-			new LiteralsFirstInComparisons(),
-			new StreamAnyMatch());
+	private final IEngineProperties engineProperties;
+	private final JavaRefactorerProperties refactorerProperties;
 
-	private final List<IClassTransformer> transformers;
+	private static final List<IMutator> ALL_TRANSFORMERS = ImmutableList.copyOf(new MutatorsScanner().getMutators());
+
+	private final List<IMutator> transformers;
 
 	public static final List<String> getAllIncluded() {
-		return ALL_TRANSFORMERS.stream().map(ct -> Iterables.getOnlyElement(ct.getIds())).collect(Collectors.toList());
+		return ALL_TRANSFORMERS.stream()
+				.map(ct -> Iterables.getOnlyElement(ct.getIds()))
+				.sorted()
+				.collect(Collectors.toList());
 	}
 
-	public JavaRefactorer(IEngineProperties languageProperties, JavaRefactorerProperties properties) {
-		this.languageProperties = languageProperties;
-		this.properties = properties;
+	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
+		this.engineProperties = engineProperties;
+		this.refactorerProperties = properties;
 
-		VersionWrapper languageVersion = new VersionWrapper(languageProperties.getEngineVersion());
+		VersionWrapper engineVersion = new VersionWrapper(engineProperties.getEngineVersion());
 
 		List<String> includedRules = properties.getIncluded();
 		List<String> excludedRules = properties.getExcluded();
@@ -99,8 +88,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
 			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
 
-			// Ensure the code has lower version than the rule minimalVersion
-			return languageVersion.compareTo(transformerVersion) >= 0;
+			// Ensure the code has higher-or-equal version than the rule minimalVersion
+			return engineVersion.compareTo(transformerVersion) >= 0;
 		}).filter(ct -> {
 			boolean isExcluded = excludedRules.stream().anyMatch(excludedRule -> ct.getIds().contains(excludedRule));
 
@@ -133,16 +122,16 @@ public class JavaRefactorer implements ILintFixerWithId {
 
 	@Override
 	public String getId() {
-		return "rules";
+		return ID_REFACTORER;
 	}
 
-	public List<IClassTransformer> getTransformers() {
+	public List<IMutator> getTransformers() {
 		return transformers;
 	}
 
 	@Override
 	public String doFormat(String dirtyCode, LineEnding ending) throws IOException {
-		LOGGER.debug("{}", this.properties);
+		LOGGER.debug("{}", this.refactorerProperties);
 		String cleanCode = applyTransformers(dirtyCode);
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);
 	}
@@ -156,19 +145,12 @@ public class JavaRefactorer implements ILintFixerWithId {
 		JavaParser parser = makeJavaParser();
 
 		transformers.stream().filter(ct -> {
-			int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(ct.minimalJavaVersion());
-			int codeVersion = IJdkVersionConstants.ORDERED.indexOf(languageProperties.getEngineVersion());
+			int ruleMinimal = getVersionIndex(ct.minimalJavaVersion());
+			int codeVersion = getVersionIndex(engineProperties.getEngineVersion());
 
 			if (ruleMinimal > codeVersion) {
-				LOGGER.debug("We skip {} as {} > {}",
-						ct,
-						ct.minimalJavaVersion(),
-						languageProperties.getEngineVersion());
+				LOGGER.debug("We skip {} as {} > {}", ct, ct.minimalJavaVersion(), engineProperties.getEngineVersion());
 				return false;
-			}
-
-			if (!ct.minimalJavaVersion().equals(languageProperties.getEngineVersion())) {
-				LOGGER.debug("TODO Implement a rule to skip incompatible rules");
 			}
 
 			return true;
@@ -209,6 +191,14 @@ public class JavaRefactorer implements ILintFixerWithId {
 		return refCleanCode.get();
 	}
 
+	private static int getVersionIndex(String v) {
+		int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(v);
+		if (ruleMinimal < 0) {
+			throw new IllegalArgumentException("Unknown version: " + v);
+		}
+		return ruleMinimal;
+	}
+
 	public CompilationUnit parseRawCode(JavaParser parser, String sourceCode) {
 		ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
 		CompilationUnit compilationUnit = parsed.getResult().get();
@@ -233,7 +223,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 		}
 
 		String lineEndingChars =
-				LineEnding.getOrGuess(languageProperties.getSourceCode().getLineEndingAsEnum(), () -> cleanCode);
+				LineEnding.getOrGuess(engineProperties.getSourceCode().getLineEndingAsEnum(), () -> cleanCode);
 		Optional<LineEnding> optLineEnding = LineEnding.determineLineEnding(lineEndingChars);
 
 		if (optLineEnding.isEmpty()) {

@@ -16,8 +16,8 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -30,7 +30,7 @@ import java.io.FileWriter;
  *
  */
 @Deprecated(since = "Not-ready")
-public class AvoidFileStream extends ATodoJavaParserRule implements IClassTransformer {
+public class AvoidFileStream extends ATodoJavaParserMutator implements IMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;

@@ -21,8 +21,8 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public class ModifierOrder extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
+public class ModifierOrder extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",

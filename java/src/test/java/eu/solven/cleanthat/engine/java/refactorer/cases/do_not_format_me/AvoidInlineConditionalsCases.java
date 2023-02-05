@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class AvoidInlineConditionalsCases extends ARefactorerCases {
 	@Override
-	public IClassTransformer getTransformer() {
+	public IMutator getTransformer() {
 		return new AvoidInlineConditionals();
 	}
 

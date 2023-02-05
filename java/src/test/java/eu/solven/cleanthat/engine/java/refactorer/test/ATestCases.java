@@ -27,7 +27,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -46,7 +46,7 @@ public class ATestCases {
 		testCasesIn(cases.getClass(), cases.getTransformer());
 	}
 
-	protected void testCasesIn(Class<?> casesClass, IClassTransformer transformer) throws IOException {
+	protected void testCasesIn(Class<?> casesClass, IMutator transformer) throws IOException {
 		String path = LocalClassTestHelper.loadClassAsString(casesClass);
 
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
@@ -66,7 +66,7 @@ public class ATestCases {
 						|| c.getAnnotationByClass(UnchangedMethod.class).isPresent());
 	}
 
-	private void checkMethodCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+	private void checkMethodCases(IMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> methodCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareMethods.class).isPresent());
 		methodCases.forEach(oneCase -> {
@@ -77,7 +77,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doTestMethod(IClassTransformer transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doTestMethod(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 		MethodDeclaration post = getMethodWithName(oneCase, "post");
@@ -108,7 +108,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkMethodUnchangedCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+	private void checkMethodUnchangedCases(IMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> unchangedMethods = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(UnchangedMethod.class).isPresent());
 		unchangedMethods.stream().forEach(oneCase -> {
@@ -119,7 +119,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCheckUnchanged(IClassTransformer transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCheckUnchanged(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration post = getMethodWithName(oneCase, "pre");
 		// Check the transformer is impact-less on already clean code
@@ -152,7 +152,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkTypeCases(IClassTransformer transformer, CompilationUnit compilationUnit) {
+	private void checkTypeCases(IMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareTypes.class).isPresent());
 		typeCases.forEach(oneCase -> {
@@ -163,7 +163,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCompareTypes(IClassTransformer transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCompareTypes(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		TypeDeclaration<?> pre = oneCase.getMembers()
 				.stream()
@@ -196,7 +196,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkClasses(JavaParser javaParser, IClassTransformer transformer, CompilationUnit compilationUnit) {
+	private void checkClasses(JavaParser javaParser, IMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareClasses.class).isPresent());
 		typeCases.forEach(oneCase -> {
@@ -208,7 +208,7 @@ public class ATestCases {
 	}
 
 	protected void doCompareClasses(JavaParser javaParser,
-			IClassTransformer transformer,
+			IMutator transformer,
 			ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 

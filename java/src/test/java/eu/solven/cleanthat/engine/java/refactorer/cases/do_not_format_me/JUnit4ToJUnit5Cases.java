@@ -5,13 +5,13 @@ import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.junit4t
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.junit4tojunit5.BeforeAfterTestPre;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.junit4tojunit5.BeforeAfterTest_wildcardImport_Post;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.junit4tojunit5.BeforeAfterTest_wildcardImport_Pre;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.JUnit4ToJUnit5;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class JUnit4ToJUnit5Cases extends ARefactorerCases {
 	@Override
-	public IClassTransformer getTransformer() {
+	public IMutator getTransformer() {
 		return new JUnit4ToJUnit5();
 	}
 

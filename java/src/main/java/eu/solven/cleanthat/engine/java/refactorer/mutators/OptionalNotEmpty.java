@@ -20,8 +20,8 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public class OptionalNotEmpty extends AJavaParserRule implements IClassTransformer {
+public class OptionalNotEmpty extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
 
 	private static final String METHOD_IS_PRESENT = "isPresent";
@@ -43,6 +43,11 @@ public class OptionalNotEmpty extends AJavaParserRule implements IClassTransform
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_11;
+	}
+
+	@Override
+	public boolean isProductionReady() {
+		return true;
 	}
 
 	@Override

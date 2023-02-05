@@ -20,7 +20,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
@@ -38,10 +38,10 @@ public class TestRulesJavaMutator {
 	@Test
 	public void testFilterOnVersion() {
 		languageProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
-		List<IClassTransformer> transformers5 = new JavaRefactorer(languageProperties, properties).getTransformers();
+		List<IMutator> transformers5 = new JavaRefactorer(languageProperties, properties).getTransformers();
 
 		languageProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
-		List<IClassTransformer> transformers11 = new JavaRefactorer(languageProperties, properties).getTransformers();
+		List<IMutator> transformers11 = new JavaRefactorer(languageProperties, properties).getTransformers();
 
 		// We expect less rules compatible with Java5 than Java11
 		Assertions.assertThat(transformers5.size()).isLessThan(transformers11.size());
@@ -55,28 +55,28 @@ public class TestRulesJavaMutator {
 
 		{
 			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
-			List<IClassTransformer> transformers5 =
+			List<IMutator> transformers5 =
 					new JavaRefactorer(languageProperties, properties).getTransformers();
 
 			Assertions.assertThat(transformers5)
-					.flatMap(IClassTransformer::getIds)
+					.flatMap(IMutator::getIds)
 					.doesNotContain(rule.getPmdId().get());
 		}
 
 		{
 			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_8);
-			List<IClassTransformer> transformers5 =
+			List<IMutator> transformers5 =
 					new JavaRefactorer(languageProperties, properties).getTransformers();
 
-			Assertions.assertThat(transformers5).flatMap(IClassTransformer::getIds).contains(rule.getPmdId().get());
+			Assertions.assertThat(transformers5).flatMap(IMutator::getIds).contains(rule.getPmdId().get());
 		}
 
 		{
 			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
-			List<IClassTransformer> transformers11 =
+			List<IMutator> transformers11 =
 					new JavaRefactorer(languageProperties, properties).getTransformers();
 
-			Assertions.assertThat(transformers11).flatMap(IClassTransformer::getIds).contains(rule.getPmdId().get());
+			Assertions.assertThat(transformers11).flatMap(IMutator::getIds).contains(rule.getPmdId().get());
 		}
 	}
 
@@ -88,17 +88,17 @@ public class TestRulesJavaMutator {
 		String oneRuleId = oneRule.getIds().stream().findFirst().get();
 
 		{
-			List<IClassTransformer> allTransformers =
+			List<IMutator> allTransformers =
 					new JavaRefactorer(languageProperties, properties).getTransformers();
-			Assertions.assertThat(allTransformers).flatMap(IClassTransformer::getIds).contains(oneRuleId);
+			Assertions.assertThat(allTransformers).flatMap(IMutator::getIds).contains(oneRuleId);
 		}
 
 		{
 			properties.setExcluded(Arrays.asList(oneRuleId));
 
-			List<IClassTransformer> fileredTransformers =
+			List<IMutator> fileredTransformers =
 					new JavaRefactorer(languageProperties, properties).getTransformers();
-			Assertions.assertThat(fileredTransformers).flatMap(IClassTransformer::getIds).doesNotContain(oneRuleId);
+			Assertions.assertThat(fileredTransformers).flatMap(IMutator::getIds).doesNotContain(oneRuleId);
 		}
 	}
 

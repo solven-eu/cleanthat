@@ -15,19 +15,21 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
-import com.github.javaparser.ast.Node;
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.github.javaparser.ast.Node;
+
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 
 /**
  * For classes knowing how to modify code
  *
  * @author Benoit Lacelle
  */
-public interface IClassTransformer {
+public interface IMutator {
 
 	// For java, prefer Checkstyle name, else PMD name
 	@Deprecated
@@ -72,7 +74,8 @@ public interface IClassTransformer {
 	}
 
 	default boolean isProductionReady() {
-		return true;
+		// default is false so that we explicitly set a rule as production-ready
+		return false;
 	}
 
 	/**

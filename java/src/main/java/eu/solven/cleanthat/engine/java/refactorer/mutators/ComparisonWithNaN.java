@@ -25,8 +25,8 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public class ComparisonWithNaN extends AJavaParserRule implements IClassTransformer {
+public class ComparisonWithNaN extends AJavaParserMutator implements IMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonWithNaN.class);
 
@@ -46,6 +46,11 @@ public class ComparisonWithNaN extends AJavaParserRule implements IClassTransfor
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_11;
+	}
+
+	@Override
+	public boolean isProductionReady() {
+		return true;
 	}
 
 	@Override

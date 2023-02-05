@@ -24,7 +24,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollectio
  *
  * @author Benoit Lacelle
  */
-public interface IRuleDescriber {
+public interface IMutatorDescriber {
 
 	/**
 	 * 

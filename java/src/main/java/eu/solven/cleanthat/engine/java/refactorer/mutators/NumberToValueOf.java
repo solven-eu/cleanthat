@@ -15,12 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
+import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
 
 /**
  * Switch new Double(d) to Double.valueOf(d)
  *
  * @author Benoit Lacelle
  */
-public class NumberToValueOf extends ATodoJavaParserRule {
+public class NumberToValueOf extends ATodoJavaParserMutator {
 }

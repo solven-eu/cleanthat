@@ -528,7 +528,10 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	 * @return the different values to consider for given Eclipse {@link IStyleEnforcer} option
 	 */
 	// see DefaultCodeFormatterOptions
-	@SuppressWarnings({ "checkstyle:MagicNumber", "PMD.ExcessiveMethodLength", "PMD.CognitiveComplexity" })
+	@SuppressWarnings({ "checkstyle:MagicNumber",
+			"checkstyle:MethodLength",
+			"PMD.ExcessiveMethodLength",
+			"PMD.CognitiveComplexity" })
 	private Set<String> possibleOptions(String parameterToSwitch) {
 		if ("org.eclipse.jdt.core.formatter.enabling_tag".equals(parameterToSwitch)
 				|| "org.eclipse.jdt.core.formatter.disabling_tag".equals(parameterToSwitch)) {

@@ -12,6 +12,7 @@ Related projects:
 - https://jsparrow.github.io/ (paid)
 - https://github.com/JnRouvignac/AutoRefactor (free)
 - https://github.com/openrewrite/rewrite-migrate-java (free)
+- https://eslint.org/docs/latest/extend/custom-formatters (free)
 
 # Compatibility
 

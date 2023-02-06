@@ -46,8 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is dedicated to refactoring. Most rules will refactor code to a better (e.g. shorter, faster, safer, etc)
- * but with (sometimes strictly, sometimes rougly) equivalent runtime behavior.
+ * This class is dedicated to refactoring. Most mutators will refactor code to a better (e.g. shorter, faster, safer,
+ * etc) but with [strictly|roughly] equivalent runtime behavior.
  *
  * @author Benoit Lacelle
  */

@@ -221,7 +221,6 @@
 					<!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>${maven-release-plugin.version}</version>
 					<configuration>
 						<!-- Prevent git to clone the whole repo which is quite slow -->
 						<!-- https://issues.apache.org/jira/browse/MRELEASE-777 -->

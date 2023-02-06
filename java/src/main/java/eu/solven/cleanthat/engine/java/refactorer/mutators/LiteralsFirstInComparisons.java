@@ -32,8 +32,8 @@ import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleDescriber;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -44,15 +44,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public class LiteralsFirstInComparisons extends AJavaParserRule implements IRuleDescriber {
+public class LiteralsFirstInComparisons extends AJavaParserMutator implements IMutatorDescriber {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 
 	private static final String METHOD_EQUALS = "equals";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public boolean isProductionReady() {
+		return true;
 	}
 
 	@Override
@@ -65,6 +69,9 @@ public class LiteralsFirstInComparisons extends AJavaParserRule implements IRule
 		return Optional.of("LiteralsFirstInComparisons");
 	}
 
+	/**
+	 * {@link LiteralsFirstInComparisons} may turn NullPointerException into false.
+	 */
 	@Override
 	public boolean isPreventingExceptions() {
 		return true;

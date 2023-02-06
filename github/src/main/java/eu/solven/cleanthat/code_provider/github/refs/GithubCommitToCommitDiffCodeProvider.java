@@ -22,7 +22,7 @@ import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 
 /**
- * An {@link ICodeProvider} from a ref to a commit
+ * An {@link ICodeProvider} from a commit to a commit
  *
  * @author Benoit Lacelle
  */

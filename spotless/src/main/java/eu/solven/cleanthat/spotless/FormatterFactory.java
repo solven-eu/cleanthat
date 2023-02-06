@@ -78,7 +78,7 @@ public class FormatterFactory {
 		this.codeProvider = cleanthatSession.getCodeProvider();
 	}
 
-	public static Provisioner makeProvisionner() throws IOException {
+	public static Provisioner makeProvisioner() throws IOException {
 		RepositorySystem repositorySystem = Booter.newRepositorySystem(Booter.selectFactory(new String[0]));
 
 		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
@@ -107,6 +107,8 @@ public class FormatterFactory {
 				.map(s -> SpotlessFormatterProperties.builder().format(s).build())
 				.map(s -> makeFormatterFactory(s))
 				.flatMap(f -> f.defaultIncludes().stream())
+				// Spotless patterns are always implicitly glob
+				.map(s -> "glob:" + s)
 				.collect(Collectors.toSet());
 	}
 

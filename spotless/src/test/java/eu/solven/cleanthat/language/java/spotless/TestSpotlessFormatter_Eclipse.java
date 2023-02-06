@@ -50,6 +50,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -70,7 +71,7 @@ public class TestSpotlessFormatter_Eclipse {
 
 	final SpotlessFormattersFactory formatter =
 			new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)),
-					SpotlessFormattersFactory.makeProvisionner());
+					SpotlessFormattersFactory.makeProvisioner());
 	final ICodeFormatterApplier applier = new CodeFormatterApplier();
 	final SourceCodeFormatterHelper helper = new SourceCodeFormatterHelper();
 
@@ -186,5 +187,46 @@ public class TestSpotlessFormatter_Eclipse {
 								.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
 						sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
+	}
+
+	@Ignore("https://github.com/diffplug/spotless/issues/1555")
+	@Test
+	public void testCompileManyTimes() throws JsonParseException, JsonMappingException, IOException {
+
+		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+				"",
+				"import java.time.LocalDate;",
+				"import java.time.LocalDateTime;",
+				"",
+				"public class CleanClass {",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"	final LocalDate someLocalDate;",
+				"",
+				"	final LocalDateTime someLocalDateTime;",
+				"",
+				"	public CleanClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {",
+				"		super();",
+				"		this.someLocalDate = someLocalDate;",
+				"		this.someLocalDateTime = someLocalDateTime;",
+				"	}",
+				"}",
+				"",
+				"").collect(Collectors.joining(System.lineSeparator()));
+		IEngineProperties languageP = getEngineProperties();
+		while (true) {
+			EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
+			applier.applyProcessors(compile,
+					new PathAndContent(
+							cleanthatSession.getFileSystem()
+									.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
+							sourceCode));
+
+			compile.close();
+		}
 	}
 }

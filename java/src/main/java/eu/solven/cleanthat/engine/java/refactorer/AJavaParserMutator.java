@@ -23,7 +23,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,9 +35,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserRule.class);
+public abstract class AJavaParserMutator implements IMutator, IRuleExternalUrls {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
@@ -172,6 +171,9 @@ public abstract class AJavaParserRule implements IClassTransformer, IRuleExterna
 		}
 		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(requiredType)) {
 			// We are calling 'isEmpty' not on an Optional object
+			isCorrectClass = true;
+		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
+			// For a primitive double, requiredType is 'double'
 			isCorrectClass = true;
 		}
 		if (!isCorrectClass) {

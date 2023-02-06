@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +69,7 @@ public class GenerateInitialConfig {
 
 		factoryToFileCount.asMap().forEach((engine, count) -> {
 			if (count == 0) {
-				LOGGER.debug("Not a single file matched {}", engine);
+				LOGGER.info("Not a single file matched {}", engine);
 			} else {
 				LOGGER.info("Some files ({}) matched {}", count, engine);
 
@@ -107,9 +106,7 @@ public class GenerateInitialConfig {
 				Path filePath = fs.getPath(file.getPath());
 
 				factories.forEach(factory -> {
-					// Spotless handles only glob patterns
-					Set<String> includes =
-							factory.getDefaultIncludes().stream().map(g -> "glob:" + g).collect(Collectors.toSet());
+					Set<String> includes = factory.getDefaultIncludes();
 
 					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, includes);
 					Optional<PathMatcher> matchingInclude =

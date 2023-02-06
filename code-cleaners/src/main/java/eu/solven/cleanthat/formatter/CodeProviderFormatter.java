@@ -63,7 +63,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final String EOL = "\r\n";
-	private static final int CORES_FORMATTER = 16;
 	private static final int MAX_LOG_MANY_FILES = 128;
 
 	final IEngineFormatterFactory formatterFactory;
@@ -160,7 +159,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 			// }
 		} else {
-			LOGGER.info("(No config change) About to check and possibly commit {} files into {}",
+			LOGGER.info("(No config change) About to commit+push {} files into {}",
 					languageToNbAddedFiles.sum(),
 					codeWriter);
 			if (dryRun) {
@@ -219,8 +218,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		List<PathMatcher> excludeMatchers =
 				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getExcludes());
 
-		ListeningExecutorService executor =
-				PepperExecutorsHelper.newShrinkableFixedThreadPool(CORES_FORMATTER, "CodeFormatter");
+		// https://github.com/diffplug/spotless/issues/1555
+		// If too many threads, we would load too many Spotless engines
+		ListeningExecutorService executor = PepperExecutorsHelper.newShrinkableFixedThreadPool("CodeFormatter");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		// We rely on a ThreadLocal as Engines may not be threadSafe

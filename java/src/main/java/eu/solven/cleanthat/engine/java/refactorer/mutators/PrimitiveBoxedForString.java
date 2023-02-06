@@ -23,8 +23,8 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Optional;
@@ -39,8 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 // https://jsparrow.github.io/rules/primitive-boxed-for-string.html
 // https://rules.sonarsource.com/java/RSPEC-1158
-public class PrimitiveBoxedForString extends AJavaParserRule implements IClassTransformer, IRuleExternalUrls {
-
+public class PrimitiveBoxedForString extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 
 	@Override

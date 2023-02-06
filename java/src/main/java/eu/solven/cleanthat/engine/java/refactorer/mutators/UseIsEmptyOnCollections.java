@@ -23,8 +23,8 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Collection;
 import java.util.Map;
@@ -39,11 +39,16 @@ import org.slf4j.LoggerFactory;
  */
 // https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIsEmptyOnCollections extends AJavaParserRule implements IClassTransformer {
+public class UseIsEmptyOnCollections extends AJavaParserMutator implements IMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
+
+	@Override
+	public boolean isProductionReady() {
+		return true;
+	}
 
 	@Override
 	public String minimalJavaVersion() {

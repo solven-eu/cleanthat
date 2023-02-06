@@ -31,8 +31,8 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableMap;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 // https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-tips
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
-public class JUnit4ToJUnit5 extends AJavaParserRule implements IClassTransformer {
+public class JUnit4ToJUnit5 extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
 
 	// Duplicated from com.github.javaparser.ast.CompilationUnit.JAVA_LANG

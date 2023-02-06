@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  *
  * @author Benoit Lacelle
  */
-public interface IClassTransformer {
+public interface IMutator {
 
 	// For java, prefer Checkstyle name, else PMD name
 	@Deprecated
@@ -72,7 +72,8 @@ public interface IClassTransformer {
 	}
 
 	default boolean isProductionReady() {
-		return true;
+		// default is false so that we explicitly set a rule as production-ready
+		return false;
 	}
 
 	/**

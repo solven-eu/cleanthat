@@ -8,9 +8,10 @@
 		<!-- SprintBoot requires JDK17 while AWS Lambda requires JDK11 -->
 		<!-- https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html -->
 		<!-- https://github.com/aleph0io/aws-lambda-java-base-images proposes a JDK17 base image-->
+		<!-- https://github.com/aws/aws-lambda-base-images/issues/29 -->
 		<version>2.7.8</version>
 		<!-- http://stackoverflow.com/questions/6003831/parent-relativepath-points-at-my-com-mycompanymyproject-instead-of-org-apache -->
-		<relativePath/>
+		<relativePath />
 	</parent>
 	<groupId>io.github.solven-eu.cleanthat</groupId>
 	<artifactId>parent</artifactId>
@@ -47,7 +48,7 @@
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.2</pepper.version>
 		<error-prone.version>2.18.0</error-prone.version>
-		<spotless.version>2.31.0</spotless.version>
+		<spotless.version>2.32.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 		<spotbugs.version>4.7.3.0</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
@@ -110,7 +111,7 @@
 								<rules>
 									<!-- We have a local site used to upload report in circleci -->
 									<!-- <banDistributionManagement /> -->
-									<banDuplicatePomDependencyVersions/>
+									<banDuplicatePomDependencyVersions />
 									<!-- TODO Activate this rule requiring to force quite many dependencies -->
 									<!-- <dependencyConvergence /> -->
 									<!-- reactorModuleConvergence seems not to handle outer BOM (e.g. from SpringBoot) -->
@@ -388,8 +389,8 @@
 									<include>.gitignore</include>
 								</includes>
 								<!-- define the steps to apply to those files -->
-								<trimTrailingWhitespace/>
-								<endWithNewline/>
+								<trimTrailingWhitespace />
+								<endWithNewline />
 								<indent>
 									<tabs>true</tabs>
 									<spacesPerTab>4</spacesPerTab>
@@ -404,13 +405,17 @@
 							<sortPom>
 								<!-- We like empty elements, while plugin default configuration would expand them -->
 								<expandEmptyElements>false</expandEmptyElements>
+
+								<!-- https://github.com/Ekryd/sortpom/issues/75 -->
+								<spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+
 								<!-- https://github.com/Ekryd/sortpom/wiki/Parameters#for-both-the-sort-and-verify-goal -->
 								<!-- -1 means '\t' -->
 								<nrOfIndentSpace>-1</nrOfIndentSpace>
 							</sortPom>
 						</pom>
 						<markdown>
-							<endWithNewline/>
+							<endWithNewline />
 							<indent>
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
@@ -418,7 +423,7 @@
 							<includes>
 								<include>**/*.md</include>
 							</includes>
-							<flexmark/>
+							<flexmark />
 						</markdown>
 						<!-- define a language-specific format -->
 						<java>
@@ -426,7 +431,7 @@
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
-							<removeUnusedImports/>
+							<removeUnusedImports />
 							<importOrder>
 								<!-- Need Pepper release 4.3? -->
 								<!--file>eclipse/eclipse.importorder</file-->
@@ -444,8 +449,8 @@
 							</licenseHeader>
 						</java>
 						<json>
-							<trimTrailingWhitespace/>
-							<endWithNewline/>
+							<trimTrailingWhitespace />
+							<endWithNewline />
 							<indent>
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
@@ -453,7 +458,7 @@
 							<includes>
 								<include>**/*.json</include>
 							</includes>
-							<gson/>
+							<gson />
 						</json>
 					</configuration>
 					<dependencies>

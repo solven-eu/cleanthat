@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Benoit Lacelle
  *
  */
-public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath {
+public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath, AutoCloseable {
 
 	final SpotlessSession spotlessSession;
 	final List<EnrichedFormatter> formatters;
@@ -77,6 +77,13 @@ public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath {
 	@Override
 	public String doFormat(String content, LineEnding ending) throws IOException {
 		return doFormat(new PathAndContent(null, content), ending);
+	}
+
+	@Override
+	public void close() {
+		formatters.forEach(ef -> {
+			ef.getFormatter().close();
+		});
 	}
 
 }

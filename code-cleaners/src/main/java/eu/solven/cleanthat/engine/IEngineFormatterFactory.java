@@ -27,5 +27,10 @@ import java.util.Set;
 public interface IEngineFormatterFactory {
 	IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties);
 
+	/**
+	 * 
+	 * @param engine
+	 * @return the default included patterns (glob or regex) for this engine
+	 */
 	Set<String> getDefaultIncludes(String engine);
 }

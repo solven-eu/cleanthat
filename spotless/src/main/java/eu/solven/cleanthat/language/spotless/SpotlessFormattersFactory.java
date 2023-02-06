@@ -127,9 +127,9 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		return processor;
 	}
 
-	public static Provisioner makeProvisionner() {
+	public static Provisioner makeProvisioner() {
 		try {
-			return FormatterFactory.makeProvisionner();
+			return FormatterFactory.makeProvisioner();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

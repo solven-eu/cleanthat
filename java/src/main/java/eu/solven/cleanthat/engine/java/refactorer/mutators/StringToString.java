@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.UnaryExpr;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -28,15 +27,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Turns '!o.isEmpty()' into 'o.isPresent()'
+ * Turns '"someString".toString()' into '"someString"'
  *
  * @author Benoit Lacelle
  */
-public class OptionalNotEmpty extends AJavaParserMutator implements IMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
+public class StringToString extends AJavaParserMutator implements IMutator {
 
-	private static final String METHOD_IS_PRESENT = "isPresent";
-	private static final String METHOD_IS_EMPTY = "isEmpty";
+	private static final Logger LOGGER = LoggerFactory.getLogger(StringToString.class);
+
+	private static final String METHOD_TO_STRING = "toString";
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11
@@ -46,13 +45,13 @@ public class OptionalNotEmpty extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public boolean isProductionReady() {
-		return true;
+	public String getId() {
+		return "StringToString";
 	}
 
 	@Override
-	public String getId() {
-		return "OptionalNotEmpty";
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#stringtostring";
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
@@ -64,39 +63,27 @@ public class OptionalNotEmpty extends AJavaParserMutator implements IMutator {
 		}
 		MethodCallExpr methodCall = (MethodCallExpr) node;
 		String methodCallIdentifier = methodCall.getName().getIdentifier();
-		if (!METHOD_IS_EMPTY.equals(methodCallIdentifier) && !METHOD_IS_PRESENT.equals(methodCallIdentifier)) {
+		if (!METHOD_TO_STRING.equals(methodCallIdentifier)) {
 			return false;
 		}
 		Optional<Node> optParent = methodCall.getParentNode();
-		// We looks for a negated expression '!optional.isEmpty()'
-		if (methodCall.getScope().isEmpty() || optParent.isEmpty() || !(optParent.get() instanceof UnaryExpr)) {
-			return false;
-		}
-		UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
-		if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
+		if (methodCall.getScope().isEmpty() || optParent.isEmpty()) {
 			return false;
 		}
 		Optional<Expression> optScope = methodCall.getScope();
 
-		if (!scopeHasRequiredType(optScope, Optional.class)) {
+		if (!scopeHasRequiredType(optScope, String.class)) {
 			return false;
 		}
 
 		Expression scope = optScope.get();
-		String newMethod;
-
-		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
-			newMethod = METHOD_IS_PRESENT;
-		} else {
-			newMethod = METHOD_IS_EMPTY;
-		}
-
 		boolean localTransformed = false;
-		MethodCallExpr replacement = new MethodCallExpr(scope, newMethod);
-		LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-		if (unaryExpr.replace(replacement)) {
+		MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_TO_STRING);
+		LOGGER.info("Turning {} into {}", node, replacement);
+		if (node.replace(scope)) {
 			localTransformed = true;
 		}
+
 		// TODO Add a rule to replace such trivial 'if else return'
 		if (localTransformed) {
 			return true;

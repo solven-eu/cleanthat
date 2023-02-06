@@ -16,8 +16,8 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.util.Optional;
 
 /**
@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author Benoit Lacelle
  */
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperatorJdk8 extends ATodoJavaParserRule implements IClassTransformer {
+public class UseDiamondOperatorJdk8 extends ATodoJavaParserMutator implements IMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;

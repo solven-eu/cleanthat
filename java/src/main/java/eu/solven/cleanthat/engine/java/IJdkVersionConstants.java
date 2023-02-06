@@ -43,9 +43,11 @@ public interface IJdkVersionConstants {
 
 	String JDK_11 = "11";
 
+	String JDK_17 = "17";
+
 	@Deprecated(
 			since = "Unclear if safe given this is doomed to be deprecated (as JDK won't stop releasing new versions)")
-	String JDK_LATEST = JDK_11;
+	String JDK_LATEST = JDK_17;
 
-	List<String> ORDERED = ImmutableList.of(JDK_1, JDK_4, JDK_5, JDK_6, JDK_7, JDK_8, JDK_9, JDK_11);
+	List<String> ORDERED = ImmutableList.of(JDK_1, JDK_4, JDK_5, JDK_6, JDK_7, JDK_8, JDK_9, JDK_11, JDK_17);
 }

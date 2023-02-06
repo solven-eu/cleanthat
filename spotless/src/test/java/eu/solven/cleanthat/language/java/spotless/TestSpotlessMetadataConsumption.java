@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.mutators;
+package eu.solven.cleanthat.language.java.spotless;
 
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserRule;
+import com.diffplug.spotless.pom.SortPomCfg;
+import org.junit.Test;
 
-/**
- * Switch new Double(d) to Double.valueOf(d)
- *
- * @author Benoit Lacelle
- */
-public class NumberToValueOf extends ATodoJavaParserRule {
+public class TestSpotlessMetadataConsumption {
+	@Test
+	public void testLoadingManyTimes() {
+		SortPomCfg config = new SortPomCfg();
+	}
 }

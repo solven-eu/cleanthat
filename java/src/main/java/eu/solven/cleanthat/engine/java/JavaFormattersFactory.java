@@ -60,7 +60,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		LOGGER.debug("Processing: {}", stepId);
 
 		switch (stepId) {
-		case "refactorer": {
+		case JavaRefactorer.ID_REFACTORER: {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
 			processor = new JavaRefactorer(engineProperties, processorConfig);
 			break;
@@ -82,7 +82,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		return CleanthatEngineProperties.builder()
 				.engine(getEngine())
 				.step(CleanthatStepProperties.builder()
-						.id("refactorer")
+						.id(JavaRefactorer.ID_REFACTORER)
 						.parameters(JavaRefactorerProperties.defaults())
 						.build())
 				.build();

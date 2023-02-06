@@ -41,4 +41,8 @@ public class EnrichedFormatter {
 	public String getId() {
 		return formatterStepFactory.getClass().getName();
 	}
+
+	public Formatter getFormatter() {
+		return formatter;
+	}
 }

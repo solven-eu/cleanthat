@@ -17,7 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 
 import com.github.javaparser.ast.Node;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IClassTransformer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benoit Lacelle
  */
-public abstract class ATodoJavaParserRule extends AJavaParserRule implements IClassTransformer {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserRule.class);
+public abstract class ATodoJavaParserMutator extends AJavaParserMutator implements IMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override
 	public boolean isProductionReady() {

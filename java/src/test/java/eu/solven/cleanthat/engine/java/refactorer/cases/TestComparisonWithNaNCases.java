@@ -17,21 +17,19 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.SwitchNumberToValueOfCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.ComparisonWithNaNCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import java.io.IOException;
 import java.util.Collection;
 import org.junit.runners.Parameterized.Parameters;
 
-public class TestSwitchNumberToValueOfCases extends AParameterizesRefactorerCases {
+public class TestComparisonWithNaNCases extends AParameterizesRefactorerCases {
 
 	private static ARefactorerCases getStaticRefactorerCases() {
-		return new SwitchNumberToValueOfCases();
+		return new ComparisonWithNaNCases();
 	}
 
-	public TestSwitchNumberToValueOfCases(JavaParser javaParser,
-			String testName,
-			ClassOrInterfaceDeclaration testCase) {
+	public TestComparisonWithNaNCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);
 	}
 
@@ -46,5 +44,4 @@ public class TestSwitchNumberToValueOfCases extends AParameterizesRefactorerCase
 	protected ARefactorerCases getCases() {
 		return getStaticRefactorerCases();
 	}
-
 }

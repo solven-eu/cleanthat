@@ -156,4 +156,5 @@ public class SpotlessSession {
 				.map(pattern -> pattern.replace('\\', File.separatorChar))
 				.collect(Collectors.toSet());
 	}
+
 }

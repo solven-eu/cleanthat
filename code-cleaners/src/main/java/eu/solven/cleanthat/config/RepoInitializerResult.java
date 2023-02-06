@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.Singular;
 
 /**
- * The result of preparing a reasonnable config for CleanThat.
+ * The result of preparing a reasonable config for CleanThat.
  * 
  * @author Benoit Lacelle
  *

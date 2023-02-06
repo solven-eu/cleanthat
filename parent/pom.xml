@@ -653,6 +653,9 @@
 						<configuration>
 							<!-- http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html -->
 							<doclint>none</doclint>
+
+							<!-- https://github.com/projectlombok/lombok/issues/2737 -->
+							<failOnError>false</failOnError>
 						</configuration>
 						<executions>
 							<execution>

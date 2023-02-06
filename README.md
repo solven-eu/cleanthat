@@ -131,3 +131,12 @@ If it fails, upload manually:
 ## Re-run locally events in AWS:
 
 See ITProcessLocallyDynamoDbEvent_CheckConfig
+
+## Release Issues
+
+Issue with Javadoc. For instance:
+
+- https://github.com/projectlombok/lombok/issues/2737
+
+> mvn org.apache.maven.plugins:maven-javadoc-plugin:3.4.1:jar -Dmaven.javadoc.skip=false -PSonatype
+

@@ -1,5 +1,21 @@
+/*
+ * Copyright 2023 Benoit Lacelle - SOLVEN
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -10,11 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * Scans dynamically for available rules
@@ -24,6 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  */
 // https://stackoverflow.com/questions/520328/can-you-find-all-classes-in-a-package-using-reflection
 public class MutatorsScanner {
+	private static final String SUFFIX_DOT_CLASS = ".class";
 	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
 	public List<IMutator> getMutators() {
@@ -36,9 +50,9 @@ public class MutatorsScanner {
 			return Collections.emptyList();
 		}
 
-		return Stream.of(classes).filter(c -> c.isAssignableFrom(IMutator.class)).map(c -> {
+		return Stream.of(classes).filter(c -> IMutator.class.isAssignableFrom(c)).map(c -> {
 			try {
-				return (IMutator) c.getConstructor().newInstance();
+				return c.asSubclass(IMutator.class).getConstructor().newInstance();
 			} catch (ReflectiveOperationException e) {
 				LOGGER.error("Issue with {}", c, e);
 				return null;
@@ -55,7 +69,7 @@ public class MutatorsScanner {
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
-	private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+	private static Class<?>[] getClasses(String packageName) throws ClassNotFoundException, IOException {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		assert classLoader != null;
 		String path = packageName.replace('.', '/');
@@ -65,11 +79,11 @@ public class MutatorsScanner {
 			URL resource = resources.nextElement();
 			dirs.add(new File(resource.getFile()));
 		}
-		ArrayList<Class> classes = new ArrayList<Class>();
+		List<Class<?>> classes = new ArrayList<>();
 		for (File directory : dirs) {
 			classes.addAll(findClasses(directory, packageName));
 		}
-		return classes.toArray(new Class[classes.size()]);
+		return classes.toArray(new Class[0]);
 	}
 
 	/**
@@ -82,8 +96,8 @@ public class MutatorsScanner {
 	 * @return The classes
 	 * @throws ClassNotFoundException
 	 */
-	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<Class>();
+	private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
@@ -92,9 +106,9 @@ public class MutatorsScanner {
 			if (file.isDirectory()) {
 				assert !file.getName().contains(".");
 				classes.addAll(findClasses(file, packageName + "." + file.getName()));
-			} else if (file.getName().endsWith(".class")) {
-				classes.add(
-						Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+			} else if (file.getName().endsWith(SUFFIX_DOT_CLASS)) {
+				classes.add(Class.forName(packageName + '.'
+						+ file.getName().substring(0, file.getName().length() - SUFFIX_DOT_CLASS.length())));
 			}
 		}
 		return classes;

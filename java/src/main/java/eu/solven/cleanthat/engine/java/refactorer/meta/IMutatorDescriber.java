@@ -16,7 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.NumberToValueOf;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 
 /**
@@ -55,6 +55,7 @@ public interface IMutatorDescriber {
 	 * @return true if the rule helps preventing exceptions.
 	 * 
 	 * @see UseIsEmptyOnCollections
+	 * @see LiteralsFirstInComparisons
 	 */
 	default boolean isPreventingExceptions() {
 		return false;

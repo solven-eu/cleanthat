@@ -20,8 +20,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
 
 /**
- * This {@link AJavaParserMutator} does not modify the AST, but always report it as changed. It can be useful to checkthe
- * default behavior of JavaParser.
+ * This {@link AJavaParserMutator} does not modify the AST, but always report it as changed. It can be useful to
+ * checkthe default behavior of JavaParser.
  *
  * @author Benoit Lacelle
  */

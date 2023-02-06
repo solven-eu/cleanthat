@@ -207,9 +207,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCompareClasses(JavaParser javaParser,
-			IMutator transformer,
-			ClassOrInterfaceDeclaration oneCase) {
+	protected void doCompareClasses(JavaParser javaParser, IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 
 		String qualifiedName = oneCase.getFullyQualifiedName().get();

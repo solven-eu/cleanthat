@@ -24,12 +24,16 @@ import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.pepper.memory.IPepperMemoryConstants;
 import eu.solven.pepper.resource.PepperResourceHelper;
 import java.io.File;
 import java.io.IOException;
@@ -38,9 +42,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.springframework.core.io.Resource;
 
@@ -54,6 +60,9 @@ import org.springframework.core.io.Resource;
 public abstract class AFormatterStepFactory {
 	public static final String KEY_FILE = "file";
 	public static final String KEY_TYPE = "type";
+
+	private static final Cache<String, File> CONTENT_TO_FILE =
+			CacheBuilder.newBuilder().maximumSize(IPepperMemoryConstants.KB).build();
 
 	final AFormatterFactory formatterFactory;
 	final SpotlessFormatterProperties spotlessProperties;
@@ -132,13 +141,24 @@ public abstract class AFormatterStepFactory {
 			return resource.getFile();
 		}
 
-		Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml");
+		byte[] content = ByteStreams.toByteArray(resource.getInputStream());
 
-		Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
-		File tmpFile = tmpFileAsPath.toFile();
-		tmpFile.deleteOnExit();
+		File locatedFile;
+		try {
+			locatedFile = CONTENT_TO_FILE.get(Base64.getEncoder().encodeToString(content), () -> {
+				Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml");
 
-		return tmpFile;
+				Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
+				File tmpFile = tmpFileAsPath.toFile();
+				tmpFile.deleteOnExit();
+
+				return tmpFile;
+			});
+		} catch (ExecutionException e) {
+			throw new RuntimeException("Issue provisioning tmpFile for " + resource.getFilename(), e);
+		}
+
+		return locatedFile;
 	}
 
 	protected FormatterStep makeLicenseHeader(SpotlessStepParametersProperties parameters) {

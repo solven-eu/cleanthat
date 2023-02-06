@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Optional;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}
@@ -37,8 +38,8 @@ public class AvoidFileStream extends ATodoJavaParserMutator implements IMutator 
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "";
+	public Optional<String> getPmdId() {
+		return Optional.of("AvoidFileStream");
 	}
 
 	@Override

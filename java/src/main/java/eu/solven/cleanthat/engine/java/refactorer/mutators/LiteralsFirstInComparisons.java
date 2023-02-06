@@ -69,6 +69,9 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 		return Optional.of("LiteralsFirstInComparisons");
 	}
 
+	/**
+	 * {@link LiteralsFirstInComparisons} may turn NullPointerException into false.
+	 */
 	@Override
 	public boolean isPreventingExceptions() {
 		return true;

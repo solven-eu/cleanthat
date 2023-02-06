@@ -46,6 +46,11 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator implements IMuta
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
 
 	@Override
+	public boolean isProductionReady() {
+		return true;
+	}
+
+	@Override
 	public String minimalJavaVersion() {
 		// java.util.Collection.isEmpty() exists since 1.2
 		// java.lang.String.isEmpty() exists since 1.6

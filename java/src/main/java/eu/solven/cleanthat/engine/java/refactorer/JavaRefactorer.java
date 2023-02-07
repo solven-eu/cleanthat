@@ -15,6 +15,19 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.DeltaType;
@@ -28,22 +41,15 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.VersionWrapper;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is dedicated to refactoring. Most mutators will refactor code to a better (e.g. shorter, faster, safer,
@@ -60,12 +66,17 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
 
-	private static final List<IMutator> ALL_TRANSFORMERS = ImmutableList.copyOf(new MutatorsScanner().getMutators());
+	private static final Supplier<List<IMutator>> ALL_TRANSFORMERS =
+			Suppliers.memoize(() -> ImmutableList.copyOf(new MutatorsScanner().getMutators()));
 
 	private final List<IMutator> transformers;
 
-	public static final List<String> getAllIncluded() {
-		return ALL_TRANSFORMERS.stream().flatMap(ct -> ct.getIds().stream()).sorted().collect(Collectors.toList());
+	public static final Set<String> getAllIncluded() {
+		return ALL_TRANSFORMERS.get()
+				.stream()
+				.flatMap(ct -> ct.getIds().stream())
+				.sorted()
+				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
@@ -79,7 +90,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 		boolean productionReadyOnly = properties.isProductionReadyOnly();
 
 		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
-		this.transformers = ALL_TRANSFORMERS.stream().filter(ct -> {
+		this.transformers = ALL_TRANSFORMERS.get().stream().filter(ct -> {
 			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
 
 			// Ensure the code has higher-or-equal version than the rule minimalVersion

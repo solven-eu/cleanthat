@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.code_provider.github.event;
 
 import java.util.Map;
+
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GitHub;
 

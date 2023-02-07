@@ -9,7 +9,6 @@ formatters:
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:
-      #file: "repository:/static/src/main/resources/eclipse/eclipse.importorder"
       file: "repository:/.cleanthat/eclipse.importorder"
   - id: "eclipse"
     parameters:

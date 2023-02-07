@@ -15,16 +15,13 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import com.diffplug.spotless.Provisioner;
-import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
-import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
-import io.sentry.IHub;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -40,6 +37,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import com.diffplug.spotless.Provisioner;
+
+import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
+import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
+import io.sentry.IHub;
 
 /**
  * Mojo relying on a Spring {@link ApplicationContext}

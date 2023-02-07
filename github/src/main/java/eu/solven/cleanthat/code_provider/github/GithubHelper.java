@@ -15,9 +15,6 @@
  */
 package eu.solven.cleanthat.code_provider.github;
 
-import com.google.common.base.Strings;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashSet;
@@ -25,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
@@ -32,6 +30,11 @@ import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 /**
  * Helps working with Github

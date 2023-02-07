@@ -15,25 +15,28 @@
  */
 package eu.solven.cleanthat.config;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
-import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 public class TestDefaultConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestDefaultConfig.class);

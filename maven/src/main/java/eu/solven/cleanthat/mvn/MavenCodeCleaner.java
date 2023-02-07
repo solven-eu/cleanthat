@@ -15,11 +15,13 @@
  */
 package eu.solven.cleanthat.mvn;
 
+import java.util.Collection;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import java.util.Collection;
 
 /**
  * A default {@link ACodeCleaner} for maven

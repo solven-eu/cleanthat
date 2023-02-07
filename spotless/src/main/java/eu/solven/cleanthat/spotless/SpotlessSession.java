@@ -15,8 +15,6 @@
  */
 package eu.solven.cleanthat.spotless;
 
-import com.diffplug.spotless.PaddedCell;
-import eu.solven.cleanthat.formatter.PathAndContent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +25,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 import org.codehaus.plexus.util.MatchPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.diffplug.spotless.PaddedCell;
+
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * Trigger Spotless engine

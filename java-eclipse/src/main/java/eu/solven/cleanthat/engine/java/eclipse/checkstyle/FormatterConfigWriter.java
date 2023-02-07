@@ -18,8 +18,10 @@ package eu.solven.cleanthat.engine.java.eclipse.checkstyle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;

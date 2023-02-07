@@ -15,10 +15,11 @@
  */
 package eu.solven.cleanthat.language;
 
+import java.util.List;
+
 import eu.solven.cleanthat.config.ISkippable;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
-import java.util.List;
 
 /**
  * The common configuration on a per-engine basis

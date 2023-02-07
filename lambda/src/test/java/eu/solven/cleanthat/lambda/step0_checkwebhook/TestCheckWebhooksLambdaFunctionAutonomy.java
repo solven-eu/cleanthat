@@ -15,13 +15,9 @@
  */
 package eu.solven.cleanthat.lambda.step0_checkwebhook;
 
-import com.google.common.collect.ImmutableMap;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
-import eu.solven.cleanthat.lambda.step1_checkconfiguration.TestCheckConfigWebhooksLambdaFunctionAutonomy;
 import java.util.Map;
 import java.util.Optional;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -30,6 +26,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.google.common.collect.ImmutableMap;
+
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.lambda.step1_checkconfiguration.TestCheckConfigWebhooksLambdaFunctionAutonomy;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

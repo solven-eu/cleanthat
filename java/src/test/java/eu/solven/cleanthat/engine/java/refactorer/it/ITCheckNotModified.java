@@ -15,18 +15,20 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.it;
 
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.google.common.collect.ImmutableMap;
 
 // TODO Move this to somewhere not specific to lambda?
 // https://github.com/javaparser/javaparser/issues/3317

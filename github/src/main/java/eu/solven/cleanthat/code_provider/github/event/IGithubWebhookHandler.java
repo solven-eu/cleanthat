@@ -15,10 +15,11 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.utils.ResultOrError;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
+
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * Knows how to process a Github webhook

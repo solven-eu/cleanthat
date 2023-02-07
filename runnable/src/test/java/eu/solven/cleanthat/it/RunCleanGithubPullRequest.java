@@ -15,27 +15,13 @@
  */
 package eu.solven.cleanthat.it;
 
-import com.google.common.base.Suppliers;
-import com.nimbusds.jose.JOSEException;
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHFileNotFoundException;
@@ -49,6 +35,23 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+
+import com.google.common.base.Suppliers;
+import com.nimbusds.jose.JOSEException;
+
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 @Deprecated(since = "DELETEME")
 public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {

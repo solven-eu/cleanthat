@@ -15,22 +15,24 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import eu.solven.cleanthat.any_language.ICodeCleaner;
-import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import eu.solven.cleanthat.any_language.ICodeCleaner;
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 
 /**
  * The mojo doing actual cleaning

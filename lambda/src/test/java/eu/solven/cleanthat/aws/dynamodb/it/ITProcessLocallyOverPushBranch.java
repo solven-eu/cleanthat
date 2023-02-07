@@ -15,13 +15,9 @@
  */
 package eu.solven.cleanthat.aws.dynamodb.it;
 
-import com.google.common.collect.ImmutableMap;
-import com.nimbusds.jose.JOSEException;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 import java.io.IOException;
 import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,6 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.google.common.collect.ImmutableMap;
+import com.nimbusds.jose.JOSEException;
+
+import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 
 /**
  * This enables processing similarly that on a push event over given branch

@@ -15,20 +15,23 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Will turn 'Arrays.asList("1", 2).stream()' into 'arrays.stream("1", 2)'
+ * Turns 'Arrays.asList("1", 2).stream()' into 'Arrays.stream("1", 2)'
  * 
  * @author Benoit Lacelle
  *

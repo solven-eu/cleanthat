@@ -15,9 +15,10 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import com.google.common.base.Suppliers;
 import java.nio.file.Path;
 import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 
 /**
  * Couple a {@link Path} (which may not be based on FileSystems.default()) and its content. The content is fetched

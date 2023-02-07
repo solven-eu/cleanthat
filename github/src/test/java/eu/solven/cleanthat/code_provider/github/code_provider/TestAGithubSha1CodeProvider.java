@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -28,12 +27,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.function.InputStreamFunction;
 import org.mockito.Mockito;
 import org.springframework.core.io.FileSystemResource;
+
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 public class TestAGithubSha1CodeProvider {
 	final String someRef = "someRef";

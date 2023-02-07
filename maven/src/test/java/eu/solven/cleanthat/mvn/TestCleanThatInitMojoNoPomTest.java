@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;

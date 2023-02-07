@@ -15,15 +15,17 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

@@ -15,20 +15,10 @@
  */
 package eu.solven.cleanthat.github.run;
 
-import com.google.common.base.Strings;
-import com.nimbusds.jose.JOSEException;
-import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
-import eu.solven.cleanthat.formatter.CleanthatSession;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHAppInstallationToken;
@@ -50,6 +40,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+
+import com.google.common.base.Strings;
+import com.nimbusds.jose.JOSEException;
+
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.formatter.CleanthatSession;
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.language.IEngineProperties;
 
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })

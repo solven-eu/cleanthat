@@ -15,19 +15,22 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.google.common.io.ByteStreams;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.google.common.io.ByteStreams;
+
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
+import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 
 public class TestLiteralsFirstInComparisonsCustoms extends ATestCases {
 

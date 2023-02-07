@@ -15,13 +15,16 @@
  */
 package eu.solven.cleanthat.engine;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.MoreObjects.ToStringHelper;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
+
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
  * Computed processors, to be applicable to any file of a given repository

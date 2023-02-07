@@ -15,8 +15,17 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
@@ -27,12 +36,6 @@ import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.jvm.GCInspector;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for IGithubWebhookHandler

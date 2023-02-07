@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.eclipse.cleanup;
 
 import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;

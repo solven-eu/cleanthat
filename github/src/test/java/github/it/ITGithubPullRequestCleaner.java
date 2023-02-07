@@ -15,8 +15,24 @@
  */
 package github.it;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.kohsuke.github.GHApp;
+import org.kohsuke.github.GHAppInstallation;
+import org.kohsuke.github.GitHub;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
+
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
@@ -29,19 +45,6 @@ import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.kohsuke.github.GHApp;
-import org.kohsuke.github.GHAppInstallation;
-import org.kohsuke.github.GitHub;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })

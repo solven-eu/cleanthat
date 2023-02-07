@@ -15,18 +15,21 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import com.google.common.collect.Sets;
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
+
+import com.google.common.collect.Sets;
+
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 public class TestGithubHelper {
 	final GHRepository repo = Mockito.mock(GHRepository.class);

@@ -15,25 +15,28 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.CreateTempFilesUsingNioCases;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TestCreateTempFilesUsingNio extends AParameterizesRefactorerCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNio.class);

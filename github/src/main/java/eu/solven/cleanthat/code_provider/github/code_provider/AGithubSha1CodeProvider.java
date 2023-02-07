@@ -15,19 +15,21 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

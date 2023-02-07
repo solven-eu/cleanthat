@@ -15,6 +15,19 @@
  */
 package eu.solven.cleanthat.github.refs;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Map;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.mockito.Mockito;
+
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
@@ -24,17 +37,6 @@ import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.mockito.Mockito;
 
 public class TestGithubRefCleaner {
 	@Test

@@ -15,16 +15,18 @@
  */
 package eu.solven.cleanthat.config;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.RepoInitializerResult.RepoInitializerResultBuilder;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.pepper.resource.PepperResourceHelper;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collection;
-import java.util.regex.Pattern;
 
 /**
  * This will help configuration CleanThat by proposing a reasonnable default configuration.

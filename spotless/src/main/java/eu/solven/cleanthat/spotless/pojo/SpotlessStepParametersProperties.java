@@ -15,14 +15,16 @@
  */
 package eu.solven.cleanthat.spotless.pojo;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.diffplug.spotless.FormatterStep;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.LinkedHashMap;
-import java.util.Map;
+
 import lombok.Data;
 
 /**

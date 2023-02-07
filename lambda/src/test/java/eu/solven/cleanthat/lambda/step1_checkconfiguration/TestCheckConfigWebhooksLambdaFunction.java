@@ -15,21 +15,9 @@
  */
 package eu.solven.cleanthat.lambda.step1_checkconfiguration;
 
-import com.amazonaws.http.SdkHttpMetadata;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import com.amazonaws.services.dynamodbv2.model.PutItemResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import java.io.IOException;
 import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +27,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.amazonaws.http.SdkHttpMetadata;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.PutItemResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @RunWith(SpringRunner.class)
 @MockBean({ IGitWebhookHandlerFactory.class, CompositeCodeCleanerFactory.class, ObjectMapper.class })

@@ -15,12 +15,14 @@
  */
 package eu.solven.cleanthat.git;
 
-import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
+
+import com.google.common.io.ByteStreams;
 
 public class TestGitIgnoreParser {
 	// https://github.com/codemix/gitignore-parser/blob/master/test/index.js

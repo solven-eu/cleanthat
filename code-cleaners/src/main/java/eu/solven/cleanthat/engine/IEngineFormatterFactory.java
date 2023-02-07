@@ -15,8 +15,9 @@
  */
 package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.Set;
+
+import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
  * Make {@link ICodeFormatterApplier} for different languages.

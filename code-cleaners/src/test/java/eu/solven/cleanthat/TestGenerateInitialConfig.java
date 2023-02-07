@@ -15,16 +15,18 @@
  */
 package eu.solven.cleanthat;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class TestGenerateInitialConfig {
 	@Test

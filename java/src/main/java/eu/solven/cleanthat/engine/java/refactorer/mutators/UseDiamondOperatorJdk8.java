@@ -15,10 +15,11 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.Optional;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import java.util.Optional;
 
 /**
  * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8

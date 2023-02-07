@@ -15,17 +15,20 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse;
 
-import com.google.common.io.ByteStreams;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.core.io.Resource;
+
+import com.google.common.io.ByteStreams;
+
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 
 public class TestEclipseJavaFormatterProcessorProperties {
 	@Test

@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
-import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -23,6 +22,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.formatter.linewrap.WrapPreparator;
@@ -30,6 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+
+import com.google.common.io.ByteStreams;
 
 // Beware this test is very slow: any performance improvment would be welcome
 public class TestEclipseStylesheetGenerator_OverBigFiles {

@@ -15,8 +15,9 @@
  */
 package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.formatter.PathAndContent;
 import java.io.IOException;
+
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * Knows how to format a String

@@ -15,16 +15,18 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+
+import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
 
 public class TestEclipseStylesheet {
 	final EclipseStylesheetGenerator generator = new EclipseStylesheetGenerator();

@@ -15,9 +15,10 @@
  */
 package eu.solven.cleanthat.engine;
 
-import eu.solven.cleanthat.language.IEngineProperties;
 import java.util.Map;
 import java.util.Set;
+
+import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
  * Default implementation for {@link IEngineFormatterFactory}

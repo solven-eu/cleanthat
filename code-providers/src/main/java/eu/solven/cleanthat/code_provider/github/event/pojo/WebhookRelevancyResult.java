@@ -15,9 +15,10 @@
  */
 package eu.solven.cleanthat.code_provider.github.event.pojo;
 
+import java.util.Optional;
+
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import java.util.Optional;
 
 /**
  * POJO indicating if an event has to be processed or not

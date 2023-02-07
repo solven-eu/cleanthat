@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.config;
 
 import java.util.Map;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;

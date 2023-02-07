@@ -15,13 +15,15 @@
  */
 package eu.solven.cleanthat.github.refs;
 
-import eu.solven.cleanthat.IGitTestConstants;
-import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import java.io.IOException;
+
 import org.junit.Test;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
+
+import eu.solven.cleanthat.IGitTestConstants;
+import eu.solven.cleanthat.git_abstraction.GithubFacade;
 
 public class TestGithubFacade implements IGitTestConstants {
 	@Test

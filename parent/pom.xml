@@ -433,8 +433,7 @@
 							</excludes>
 							<removeUnusedImports />
 							<importOrder>
-								<!-- Need Pepper release 4.3? -->
-								<!--file>eclipse/eclipse.importorder</file-->
+								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
 							<eclipse>

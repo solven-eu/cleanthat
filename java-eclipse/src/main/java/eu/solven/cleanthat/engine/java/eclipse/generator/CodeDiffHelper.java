@@ -15,21 +15,24 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.DeltaType;
-import com.github.difflib.patch.Patch;
-import com.github.difflib.patch.PatchFailedException;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.formatter.LineEnding;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
+
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.DeltaType;
+import com.github.difflib.patch.Patch;
+import com.github.difflib.patch.PatchFailedException;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
+import eu.solven.cleanthat.formatter.ILintFixer;
+import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * Helps computing a difference score between code source

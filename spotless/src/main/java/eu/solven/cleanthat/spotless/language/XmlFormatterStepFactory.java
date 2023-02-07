@@ -15,16 +15,18 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
+
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
 import com.google.common.collect.ImmutableList;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
-import java.util.List;
 
 /**
  * Configure Spotless engine for XML files

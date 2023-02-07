@@ -15,15 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
-import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -44,12 +35,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jdt.internal.formatter.DefaultCodeFormatterOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
+
+import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
+import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Default implementation for {@link IEclipseStylesheetGenerator}

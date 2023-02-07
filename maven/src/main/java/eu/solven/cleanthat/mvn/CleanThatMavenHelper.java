@@ -15,14 +15,17 @@
  */
 package eu.solven.cleanthat.mvn;
 
+import java.io.File;
+import java.util.Collection;
+
+import org.springframework.context.ApplicationContext;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
-import java.io.File;
-import java.util.Collection;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Helper methods in the context of a mvn plugin

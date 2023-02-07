@@ -15,11 +15,13 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import java.util.Set;
 
 /**
  * Configure Spotless engine for '.java' files

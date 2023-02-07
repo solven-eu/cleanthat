@@ -15,12 +15,14 @@
  */
 package eu.solven.cleanthat.code_provider.github.event.pojo;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.google.common.base.Strings;
+
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * a POJO holding details about Github webhooks

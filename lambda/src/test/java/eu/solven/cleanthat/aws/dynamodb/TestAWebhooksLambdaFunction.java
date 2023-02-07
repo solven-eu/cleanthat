@@ -15,17 +15,10 @@
  */
 package eu.solven.cleanthat.aws.dynamodb;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.solven.cleanthat.aws.dynamodb.TestAWebhooksLambdaFunction.ForTestsWebhooksLambdaFunction;
-import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +26,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.solven.cleanthat.aws.dynamodb.TestAWebhooksLambdaFunction.ForTestsWebhooksLambdaFunction;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { ForTestsWebhooksLambdaFunction.class })

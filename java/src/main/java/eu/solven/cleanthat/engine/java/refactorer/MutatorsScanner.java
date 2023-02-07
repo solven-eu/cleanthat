@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import com.google.common.reflect.ClassPath;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -23,13 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.reflect.ClassPath;
-
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * Scans dynamically for available rules

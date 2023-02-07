@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.engine.java;
 
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 /**
  * List the JDK versions

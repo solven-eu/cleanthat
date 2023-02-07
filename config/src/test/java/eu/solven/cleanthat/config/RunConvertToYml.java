@@ -15,18 +15,15 @@
  */
 package eu.solven.cleanthat.config;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import java.io.IOException;
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 
 public class RunConvertToYml {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RunConvertToYml.class);

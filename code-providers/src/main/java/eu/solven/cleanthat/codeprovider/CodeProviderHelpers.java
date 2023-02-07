@@ -15,6 +15,10 @@
  */
 package eu.solven.cleanthat.codeprovider;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import eu.solven.cleanthat.config.ConfigHelpers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,15 +27,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-
-import eu.solven.cleanthat.config.ConfigHelpers;
 
 /**
  * Helpers working for any {@link ICodeProvider}

@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import org.kohsuke.github.GHRepository;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import org.kohsuke.github.GHRepository;
 
 /**
  * Specific to Github sha1 {@link ICodeProvider}

@@ -15,16 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import org.junit.runners.Parameterized.Parameters;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.EnumsWithoutEqualsCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import java.io.IOException;
+import java.util.Collection;
+import org.junit.runners.Parameterized.Parameters;
 
 public class TestEnumsWithoutEquals extends AParameterizesRefactorerCases {
 

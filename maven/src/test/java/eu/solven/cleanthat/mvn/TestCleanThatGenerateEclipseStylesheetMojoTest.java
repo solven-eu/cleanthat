@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
-
 import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

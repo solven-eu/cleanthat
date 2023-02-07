@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.IOException;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;

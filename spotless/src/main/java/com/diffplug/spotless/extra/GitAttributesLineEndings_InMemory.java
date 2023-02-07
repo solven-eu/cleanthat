@@ -15,6 +15,15 @@
  */
 package com.diffplug.spotless.extra;
 
+import com.diffplug.spotless.FileSignature;
+import com.diffplug.spotless.LazyForwardingEquality;
+import com.diffplug.spotless.LineEnding;
+import com.diffplug.spotless.LineEnding.Policy;
+import com.google.common.base.Strings;
+import com.googlecode.concurrenttrees.radix.ConcurrentRadixTree;
+import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharSequenceNodeFactory;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.spotless.pojo.SpotlessGitProperties;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-
 import javax.annotation.Nullable;
-
 import org.eclipse.jgit.attributes.Attribute;
 import org.eclipse.jgit.attributes.AttributesNode;
 import org.eclipse.jgit.attributes.AttributesRule;
@@ -45,17 +52,6 @@ import org.eclipse.jgit.lib.CoreConfig.AutoCRLF;
 import org.eclipse.jgit.lib.CoreConfig.EOL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.diffplug.spotless.FileSignature;
-import com.diffplug.spotless.LazyForwardingEquality;
-import com.diffplug.spotless.LineEnding;
-import com.diffplug.spotless.LineEnding.Policy;
-import com.google.common.base.Strings;
-import com.googlecode.concurrenttrees.radix.ConcurrentRadixTree;
-import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharSequenceNodeFactory;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.spotless.pojo.SpotlessGitProperties;
 
 /**
  * Uses <a href="https://git-scm.com/docs/gitattributes">.gitattributes</a> to determine the appropriate line ending.

@@ -15,23 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import org.kohsuke.github.GHCompare;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
 import eu.solven.cleanthat.code_provider.github.code_provider.FileIsTooBigException;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
@@ -39,6 +24,18 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.pepper.logging.PepperLogHelper;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import org.kohsuke.github.GHCompare;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

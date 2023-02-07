@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.lambda.jackson;
 
-import java.util.Locale;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import java.util.Locale;
 
 /**
  * Helps interpreting fields in capital case

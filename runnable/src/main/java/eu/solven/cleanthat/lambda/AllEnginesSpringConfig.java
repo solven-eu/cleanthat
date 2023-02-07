@@ -15,10 +15,9 @@
  */
 package eu.solven.cleanthat.lambda;
 
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 /**
  * Spring configuration wrapping all available languages

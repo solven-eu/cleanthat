@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.language.java.spotless;
 
-import org.junit.Test;
-
 import com.diffplug.spotless.pom.SortPomCfg;
+import org.junit.Test;
 
 public class TestSpotlessMetadataConsumption {
 	@Test

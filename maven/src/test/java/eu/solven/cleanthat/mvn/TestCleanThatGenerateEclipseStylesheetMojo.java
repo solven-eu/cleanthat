@@ -17,7 +17,6 @@ package eu.solven.cleanthat.mvn;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.apache.commons.lang3.SystemUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;

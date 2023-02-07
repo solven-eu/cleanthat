@@ -15,6 +15,35 @@
  */
 package eu.solven.cleanthat.mvn;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
+import com.google.common.io.ByteStreams;
+import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
+import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
+import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
+import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
+import eu.solven.cleanthat.git.GitIgnoreParser;
+import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
+import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
+import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
+import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.cleanthat.utils.ResultOrError;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,10 +67,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -52,37 +79,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
-import com.google.common.io.ByteStreams;
-
-import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
-import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
-import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
-import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
-import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
-import eu.solven.cleanthat.git.GitIgnoreParser;
-import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
-import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
-import eu.solven.cleanthat.spotless.FormatterFactory;
-import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
-import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
-import eu.solven.cleanthat.utils.ResultOrError;
 
 /**
  * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.

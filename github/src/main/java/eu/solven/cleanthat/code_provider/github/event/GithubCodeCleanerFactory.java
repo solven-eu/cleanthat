@@ -15,15 +15,13 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link ICodeCleanerFactory} specialized for GitHub

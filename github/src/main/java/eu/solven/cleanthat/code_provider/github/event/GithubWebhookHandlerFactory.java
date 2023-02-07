@@ -15,18 +15,6 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-import org.springframework.core.env.Environment;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
 import com.nimbusds.jose.JOSEException;
@@ -37,11 +25,20 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.springframework.core.env.Environment;
 
 /**
  * Factory for {@link GitHub}, on a per-installation basis

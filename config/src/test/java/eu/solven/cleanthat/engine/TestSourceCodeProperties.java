@@ -15,15 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class TestSourceCodeProperties {
 	final ObjectMapper objectMapper = new ObjectMapper();

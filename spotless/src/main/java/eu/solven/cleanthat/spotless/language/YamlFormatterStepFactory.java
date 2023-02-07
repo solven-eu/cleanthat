@@ -15,9 +15,6 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.List;
-import java.util.Map;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.json.JacksonJsonStep;
@@ -27,12 +24,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Configure Spotless engine for JSON files

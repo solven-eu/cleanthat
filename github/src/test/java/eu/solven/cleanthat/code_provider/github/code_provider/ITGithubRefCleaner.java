@@ -15,9 +15,17 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
+import com.nimbusds.jose.JOSEException;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import java.io.IOException;
 import java.nio.file.Files;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.GHApp;
@@ -28,17 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.nimbusds.jose.JOSEException;
-
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
-import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })

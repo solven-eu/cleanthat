@@ -15,14 +15,12 @@
  */
 package eu.solven.cleanthat.spotless.pojo;
 
-import org.eclipse.jgit.lib.ConfigConstants;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
+import org.eclipse.jgit.lib.ConfigConstants;
 
 /**
  * Used to configure Spotless regarding the simulation of a local .git/config

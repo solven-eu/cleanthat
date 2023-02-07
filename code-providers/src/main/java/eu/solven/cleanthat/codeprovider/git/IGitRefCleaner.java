@@ -15,16 +15,15 @@
  */
 package eu.solven.cleanthat.codeprovider.git;
 
-import java.nio.file.Path;
-import java.util.Optional;
-import java.util.Set;
-
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
 import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Holds the logic to clean a Ref (e.g. a PR, a Ref, a Branch, etc)

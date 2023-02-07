@@ -15,6 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
+import com.github.difflib.patch.PatchFailedException;
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
+import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
+import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
+import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,23 +31,12 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.eclipse.jdt.internal.formatter.DefaultCodeFormatterOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-
-import com.github.difflib.patch.PatchFailedException;
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteStreams;
-
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
-import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
-import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
 
 /**
  * Execute the procedure to generate a minimizing Eclipse Formatter configuration

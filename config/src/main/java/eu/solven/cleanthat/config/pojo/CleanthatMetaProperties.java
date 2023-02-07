@@ -15,14 +15,12 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 
 /**

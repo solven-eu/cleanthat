@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 

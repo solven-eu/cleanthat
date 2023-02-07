@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.language;
 
-import java.util.List;
-
 import eu.solven.cleanthat.formatter.LineEnding;
+import java.util.List;
 
 /**
  * The common configuration on a per-language basis

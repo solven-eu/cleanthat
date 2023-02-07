@@ -18,7 +18,6 @@ package eu.solven.cleanthat.mvn;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;

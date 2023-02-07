@@ -15,23 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.NoOpJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
@@ -39,6 +28,14 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ATestCases {
 

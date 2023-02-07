@@ -21,7 +21,6 @@ import java.nio.file.PathMatcher;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 

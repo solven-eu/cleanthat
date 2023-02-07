@@ -15,10 +15,9 @@
  */
 package eu.solven.cleanthat.spotless;
 
-import java.util.Set;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import java.util.Set;
 
 /**
  * Common behavior to any Spotless engine steps factory

@@ -15,18 +15,16 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 
 public class TestEclipseJavaFormatterConfiguration {
 	final ICodeProvider codeProvider = Mockito.mock(ICodeProvider.class);

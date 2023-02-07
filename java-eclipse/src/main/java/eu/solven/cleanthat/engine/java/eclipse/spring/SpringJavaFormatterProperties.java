@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.eclipse.spring;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 
 /**

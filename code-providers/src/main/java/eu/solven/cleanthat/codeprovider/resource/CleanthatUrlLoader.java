@@ -15,16 +15,14 @@
  */
 package eu.solven.cleanthat.codeprovider.resource;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
  * Knows how to load resource given a URL, with a flexible format handling 'classpath:' to load from the classpath, and

@@ -15,18 +15,15 @@
  */
 package eu.solven.cleanthat.github;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
 
 /**
  * Equivalent of {@link CheckWebhooksLambdaFunction}, but in the test classpath, which has

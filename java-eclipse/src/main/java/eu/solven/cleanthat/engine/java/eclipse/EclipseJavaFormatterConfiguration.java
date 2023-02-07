@@ -15,6 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReadException;
+import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReader;
+import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -24,22 +31,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-
+import lombok.Data;
 import org.eclipse.jdt.core.JavaCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
-import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReadException;
-import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReader;
-import eu.solven.cleanthat.language.IEngineProperties;
-import lombok.Data;
 
 /**
  * Load the configuration. It is useful to be cached, as it may rely on an external {@link URL}

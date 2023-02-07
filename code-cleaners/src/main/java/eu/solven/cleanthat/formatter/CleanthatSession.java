@@ -15,10 +15,9 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.nio.file.FileSystem;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import java.nio.file.FileSystem;
 import lombok.Data;
 
 /**

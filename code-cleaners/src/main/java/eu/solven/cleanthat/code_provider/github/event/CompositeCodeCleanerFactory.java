@@ -15,10 +15,9 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import java.util.List;
 import java.util.Optional;
-
-import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 
 /**
  * Factory for {@link IGitRefCleaner}

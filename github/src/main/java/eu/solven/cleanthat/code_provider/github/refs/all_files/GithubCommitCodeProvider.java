@@ -15,13 +15,11 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import java.nio.file.FileSystem;
-
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
-
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import java.nio.file.FileSystem;
+import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHRepository;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

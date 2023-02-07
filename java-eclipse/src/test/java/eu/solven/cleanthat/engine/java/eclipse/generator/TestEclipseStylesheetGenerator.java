@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.eclipse.generator;
 
+import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -22,13 +23,10 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Map;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-
-import com.google.common.io.ByteStreams;
 
 public class TestEclipseStylesheetGenerator {
 	final EclipseStylesheetGenerator generator = new EclipseStylesheetGenerator() {

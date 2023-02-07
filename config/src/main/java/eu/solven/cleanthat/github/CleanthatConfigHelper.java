@@ -15,11 +15,9 @@
  */
 package eu.solven.cleanthat.github;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import java.util.Map;
 
 /**
  * Helps manipulating CleanThat.json files

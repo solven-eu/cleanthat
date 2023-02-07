@@ -15,10 +15,16 @@
  */
 package eu.solven.cleanthat.lambda.step1_checkconfiguration;
 
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -30,15 +36,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
-import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

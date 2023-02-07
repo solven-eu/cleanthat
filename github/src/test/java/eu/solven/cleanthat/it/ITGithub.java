@@ -15,31 +15,10 @@
  */
 package eu.solven.cleanthat.it;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.kohsuke.github.GHApp;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.env.MockEnvironment;
-
 import com.google.common.io.Files;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
-
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubNoApiWebhookHandler;
@@ -53,6 +32,24 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.kohsuke.github.GHApp;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.env.MockEnvironment;
 
 //https://github-api.kohsuke.org/githubappjwtauth.html
 public class ITGithub {

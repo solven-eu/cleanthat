@@ -15,16 +15,14 @@
  */
 package local;
 
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 
 public class TestFileSystemCodeProvider {
 	final File tmpFolder = org.assertj.core.util.Files.newTemporaryFolder();

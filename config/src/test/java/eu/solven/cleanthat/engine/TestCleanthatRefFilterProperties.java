@@ -15,16 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import java.util.Arrays;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 public class TestCleanthatRefFilterProperties {
 	final ObjectMapper objectMapper = new ObjectMapper();

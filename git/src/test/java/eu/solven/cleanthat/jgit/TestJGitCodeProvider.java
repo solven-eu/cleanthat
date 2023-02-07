@@ -15,16 +15,14 @@
  */
 package eu.solven.cleanthat.jgit;
 
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
-
 import org.assertj.core.api.Assertions;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 
 public class TestJGitCodeProvider {
 

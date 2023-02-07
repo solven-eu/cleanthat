@@ -15,14 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
+import com.github.javaparser.ast.Node;
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.github.javaparser.ast.Node;
-
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 
 /**
  * For classes knowing how to modify code

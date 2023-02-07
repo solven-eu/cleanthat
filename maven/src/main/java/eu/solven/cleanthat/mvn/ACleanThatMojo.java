@@ -15,17 +15,15 @@
  */
 package eu.solven.cleanthat.mvn;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import java.io.File;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 /**
  * The mojo of the mvn plugin

@@ -15,23 +15,20 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.pom.SortPomCfg;
 import com.diffplug.spotless.pom.SortPomStep;
 import com.google.common.collect.ImmutableList;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.lang.reflect.Field;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configure Spotless engine for 'pom.xml' files

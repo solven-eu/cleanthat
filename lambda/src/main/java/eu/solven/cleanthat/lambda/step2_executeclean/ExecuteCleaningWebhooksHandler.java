@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.lambda.step2_executeclean;
 
 import java.util.Map;
-
 import org.springframework.cloud.function.adapter.aws.SpringBootRequestHandler;
 
 /**

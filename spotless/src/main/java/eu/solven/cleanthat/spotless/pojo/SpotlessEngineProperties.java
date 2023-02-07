@@ -15,13 +15,11 @@
  */
 package eu.solven.cleanthat.spotless.pojo;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import com.diffplug.spotless.LineEnding;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;

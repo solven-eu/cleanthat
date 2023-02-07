@@ -15,6 +15,11 @@
  */
 package eu.solven.cleanthat.code_provider.local;
 
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.git.GitIgnoreParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -32,15 +37,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.git.GitIgnoreParser;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}

@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.config;
 
-import java.util.Map;
-
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;

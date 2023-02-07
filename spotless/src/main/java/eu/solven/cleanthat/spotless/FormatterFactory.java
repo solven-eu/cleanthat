@@ -15,23 +15,6 @@
  */
 package eu.solven.cleanthat.spotless;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-
-import org.apache.maven.resolver.examples.util.Booter;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.diffplug.spotless.FormatExceptionPolicy;
 import com.diffplug.spotless.FormatExceptionPolicyStrict;
 import com.diffplug.spotless.Formatter;
@@ -40,7 +23,6 @@ import com.diffplug.spotless.LineEnding;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.GitAttributesLineEndings_InMemory;
 import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
@@ -53,6 +35,21 @@ import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import org.apache.maven.resolver.examples.util.Booter;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}

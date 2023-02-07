@@ -15,16 +15,13 @@
  */
 package eu.solven.cleanthat.language.java.spotless;
 
-import java.util.Map;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class TestSpotlessStepProperties {
 	@Test

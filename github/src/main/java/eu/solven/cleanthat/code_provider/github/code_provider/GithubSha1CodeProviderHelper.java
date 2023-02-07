@@ -15,6 +15,11 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
+import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import eu.solven.cleanthat.jgit.JGitCodeProvider;
+import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,18 +31,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
-
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
-import eu.solven.cleanthat.jgit.JGitCodeProvider;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Helper for Github sha1

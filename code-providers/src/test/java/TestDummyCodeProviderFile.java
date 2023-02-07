@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 
 public class TestDummyCodeProviderFile {
 	@Test

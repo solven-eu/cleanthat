@@ -15,9 +15,10 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import com.google.common.base.Ascii;
+import eu.solven.cleanthat.config.IGitService;
 import java.io.IOException;
 import java.util.Optional;
-
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder;
@@ -26,10 +27,6 @@ import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Ascii;
-
-import eu.solven.cleanthat.config.IGitService;
 
 /**
  * manages CheckRun in GitHub API

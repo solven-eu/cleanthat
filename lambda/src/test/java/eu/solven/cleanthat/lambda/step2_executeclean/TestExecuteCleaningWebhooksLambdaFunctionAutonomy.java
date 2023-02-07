@@ -15,8 +15,10 @@
  */
 package eu.solven.cleanthat.lambda.step2_executeclean;
 
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.lambda.step1_checkconfiguration.TestCheckConfigWebhooksLambdaFunctionAutonomy;
 import java.util.Map;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.lambda.step1_checkconfiguration.TestCheckConfigWebhooksLambdaFunctionAutonomy;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

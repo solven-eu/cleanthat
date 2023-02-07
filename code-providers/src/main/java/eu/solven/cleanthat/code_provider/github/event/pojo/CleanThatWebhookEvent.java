@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.event.pojo;
 
-import java.util.Map;
-
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import java.util.Map;
 
 /**
  * A generate {@link IWebhookEvent} used internally in CleanThat pipeline

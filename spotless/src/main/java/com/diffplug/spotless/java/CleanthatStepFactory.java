@@ -15,18 +15,17 @@
  */
 package com.diffplug.spotless.java;
 
+import com.diffplug.spotless.FormatterFunc;
+import com.diffplug.spotless.FormatterStep;
+import com.diffplug.spotless.JarState;
+import com.diffplug.spotless.Jvm;
+import com.diffplug.spotless.Provisioner;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
-
-import com.diffplug.spotless.FormatterFunc;
-import com.diffplug.spotless.FormatterStep;
-import com.diffplug.spotless.JarState;
-import com.diffplug.spotless.Jvm;
-import com.diffplug.spotless.Provisioner;
 
 /**
  * Enables CleanThat as a SpotLess step. This may be moved to Spotless own repo

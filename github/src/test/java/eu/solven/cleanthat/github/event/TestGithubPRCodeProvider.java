@@ -15,11 +15,11 @@
  */
 package eu.solven.cleanthat.github.event;
 
+import eu.solven.cleanthat.code_provider.github.refs.GithubPRCodeProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.kohsuke.github.GHCommitPointer;
@@ -28,8 +28,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
-
-import eu.solven.cleanthat.code_provider.github.refs.GithubPRCodeProvider;
 
 public class TestGithubPRCodeProvider {
 

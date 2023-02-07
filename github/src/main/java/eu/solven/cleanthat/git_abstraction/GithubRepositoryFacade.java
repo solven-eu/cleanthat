@@ -15,12 +15,15 @@
  */
 package eu.solven.cleanthat.git_abstraction;
 
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
@@ -28,11 +31,6 @@ import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 
 /**
  * Enable a Facade over RewiewRequestProvider

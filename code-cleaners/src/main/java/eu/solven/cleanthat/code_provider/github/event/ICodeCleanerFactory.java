@@ -15,9 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import java.util.Optional;
-
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import java.util.Optional;
 
 /**
  * Enables returning an {@link IGitRefCleaner} for the target installation

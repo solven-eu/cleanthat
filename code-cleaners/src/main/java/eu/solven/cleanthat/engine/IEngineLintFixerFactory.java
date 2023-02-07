@@ -15,14 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import java.util.Map;
-import java.util.Set;
-
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Knows how to format a String

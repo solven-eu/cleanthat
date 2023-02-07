@@ -15,17 +15,7 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
-import java.util.Arrays;
-
-import org.apache.maven.project.MavenProject;
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.core.io.FileSystemResource;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -34,7 +24,14 @@ import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProp
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import java.io.File;
+import java.util.Arrays;
 import junit.framework.AssertionFailedError;
+import org.apache.maven.project.MavenProject;
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.core.io.FileSystemResource;
 
 public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 

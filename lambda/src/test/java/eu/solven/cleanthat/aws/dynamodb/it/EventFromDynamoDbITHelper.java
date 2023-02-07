@@ -15,16 +15,14 @@
  */
 package eu.solven.cleanthat.aws.dynamodb.it;
 
-import java.util.Map;
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.internal.InternalUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
-
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
+import java.util.Map;
 
 public class EventFromDynamoDbITHelper {
 

@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.eclipse;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import lombok.Data;

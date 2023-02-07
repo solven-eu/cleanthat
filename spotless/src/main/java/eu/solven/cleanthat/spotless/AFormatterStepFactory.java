@@ -17,6 +17,24 @@ package eu.solven.cleanthat.spotless;
 
 import static java.util.Collections.emptySet;
 
+import com.diffplug.spotless.FormatterStep;
+import com.diffplug.spotless.Provisioner;
+import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
+import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
+import com.diffplug.spotless.generic.LicenseHeaderStep;
+import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
+import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.pepper.memory.IPepperMemoryConstants;
+import eu.solven.pepper.resource.PepperResourceHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -30,28 +48,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
 import org.springframework.core.io.Resource;
-
-import com.diffplug.spotless.FormatterStep;
-import com.diffplug.spotless.Provisioner;
-import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
-import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
-import com.diffplug.spotless.generic.LicenseHeaderStep;
-import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
-import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Sets;
-import com.google.common.io.ByteStreams;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
-import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
-import eu.solven.pepper.memory.IPepperMemoryConstants;
-import eu.solven.pepper.resource.PepperResourceHelper;
 
 /**
  * COmmon behavior to any Spotless engine steps factory

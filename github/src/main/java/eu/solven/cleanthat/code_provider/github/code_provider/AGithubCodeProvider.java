@@ -15,17 +15,14 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.FileSystem;
-
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github code. Sub-classes manages PR, ref/branches/...

@@ -21,7 +21,6 @@ import java.util.Set;
 
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -64,23 +63,27 @@ public interface IGitRefCleaner {
 	 * @return
 	 */
 	CodeFormatResult formatRef(Path root,
+			String eventKey,
 			IGitRepository repo,
 			IGitBranch branchSupplier,
 			ILazyGitReference headSupplier);
 
-	@Deprecated
-	CodeFormatResult formatRefDiff(Path root, IGitRepository repo, IGitReference base, ILazyGitReference headSupplier);
+	// @Deprecated
+	// CodeFormatResult formatRefDiff(Path root, IGitRepository repo, IGitReference base, ILazyGitReference
+	// headSupplier);
 
 	/**
 	 * Format a ref, based on its diff with a base commit
+	 * 
+	 * @param eventKey
 	 * 
 	 * @param repo
 	 * @param base
 	 * @param headSupplier
 	 * @return
 	 */
-	// @Deprecated(since = "unused?")
 	CodeFormatResult formatCommitToRefDiff(Path root,
+			String eventKey,
 			IGitRepository repo,
 			IGitCommit base,
 			ILazyGitReference headSupplier);

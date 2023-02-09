@@ -70,18 +70,6 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 	// private Optional<LineEnding> lineEnding;
 	private LineEnding lineEnding;
 
-	// private LineEnding parseLineEnding(String lineEnding) {
-	// return LineEnding.valueOf(lineEnding);
-	// }
-
-	public static SourceCodeProperties defaultRoot() {
-		return SourceCodeProperties.builder()
-				.encoding(DEFAULT_ENCODING)
-				// .lineEnding(Optional.of(LineEnding.GIT))
-				.lineEnding(LineEnding.GIT)
-				.build();
-	}
-
 	// Git has some preference to committing LF
 	// https://code.revelc.net/formatter-maven-plugin/format-mojo.html#lineEnding
 	@JsonIgnore
@@ -102,11 +90,16 @@ public class SourceCodeProperties implements ISourceCodeProperties {
 		this.lineEnding = lineEnding;
 	}
 
-	// public void setLineEnding(String lineEnding) {
-	// if (lineEnding == null) {
-	// this.lineEnding = Optional.empty();
-	// } else {
-	// this.lineEnding = Optional.of(parseLineEnding(lineEnding));
-	// }
-	// }
+	public static SourceCodeProperties defaultRoot() {
+		return SourceCodeProperties.builder()
+				.encoding(DEFAULT_ENCODING)
+				// .lineEnding(Optional.of(LineEnding.GIT))
+				.lineEnding(LineEnding.GIT)
+				.build();
+	}
+
+	public static SourceCodeProperties defaultChild() {
+		return SourceCodeProperties.builder().build();
+	}
+
 }

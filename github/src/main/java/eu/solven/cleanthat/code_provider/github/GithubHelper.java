@@ -28,13 +28,14 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
 
 /**
  * Helps working with Github
@@ -95,7 +96,10 @@ public class GithubHelper {
 
 	public static GHRef openEmptyRef(GHRepository repo, GHBranch base) {
 		String cleanThatPrId = UUID.randomUUID().toString();
-		String refName = GithubRefCleaner.PREFIX_REF_CLEANTHAT_MANUAL + cleanThatPrId;
+		String refName = ICleanthatGitRefsConstants.PREFIX_REF_CLEANTHAT_MANUAL
+				+ base.getName().replace('/', '_').replace('-', '_')
+				+ "---"
+				+ cleanThatPrId;
 		try {
 			// https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-reference
 			// If it doesn't start with 'refs' and have at least two slashes, it will be rejected.
@@ -117,6 +121,14 @@ public class GithubHelper {
 					true);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue opening PR (" + ghRef + " -> " + base + ")", e);
+		}
+	}
+
+	public static boolean isCleanthatAuthor(GHUser user) {
+		try {
+			return "CleanThat".equals(user.getName());
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue reading user.id=" + user.getId(), e);
 		}
 	}
 }

@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.code_provider.github.refs;
+package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
 import java.nio.file.FileSystem;
+import java.util.Objects;
 
-import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
@@ -28,22 +29,33 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class GithubCommitToRefDiffCodeProviderWriter extends AGithubHeadRefDiffCodeProvider {
-	final GHCommit base;
+public class GithubRefCodeReadWriter extends AGithubSha1CodeProviderWriter {
+	final GHRef ref;
 
-	public GithubCommitToRefDiffCodeProviderWriter(FileSystem fs,
-			String token,
-			GHRepository baseRepository,
-			GHCommit base,
-			GHRef head) {
-		super(fs, token, baseRepository, head);
+	public GithubRefCodeReadWriter(FileSystem fs, String token, String eventKey, GHRepository repo, GHRef ref) {
+		super(fs, token, eventKey, repo);
 
-		this.base = base;
+		this.ref = Objects.requireNonNull(ref, "ref is null");
 	}
 
 	@Override
-	protected String getBaseId() {
-		return base.getSHA1();
+	public String getSha1() {
+		return ref.getObject().getSha();
+	}
+
+	@Override
+	public String getRef() {
+		return ref.getRef();
+	}
+
+	@Override
+	protected GHRef getAsGHRef() {
+		return ref;
+	}
+
+	@Override
+	public String toString() {
+		return ref.getUrl().toExternalForm();
 	}
 
 }

@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
@@ -142,7 +143,7 @@ public class GithubRepositoryFacade {
 			throw new IllegalArgumentException("Invalid ref: " + refName);
 		}
 
-		// repository.getRef expects a ref name without the leading 'refs/'
+		// GHRepository.getRef expects a ref name without the leading 'refs/'
 		String githubRefName = refName.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
 
 		return repository.getRef(githubRefName);
@@ -159,6 +160,22 @@ public class GithubRepositoryFacade {
 			throw new UncheckedIOException(
 					"Issue fetching commit for sha1=" + sha1 + " (repo=" + repository.getHtmlUrl() + ")",
 					e);
+		}
+	}
+
+	public Optional<GHRef> optRef(GitRepoBranchSha1 ref) {
+		String repoName = getRepoFullName();
+		if (!repoName.equals(ref.getRepoFullName())) {
+			throw new IllegalArgumentException("Inconsistent repo: " + repoName + "and " + ref.getRepoFullName());
+		}
+
+		try {
+			return Optional.of(getRef(ref.getRef()));
+		} catch (GHFileNotFoundException e) {
+			LOGGER.debug("There is no ref matching: '{}'", ref.getRef());
+			return Optional.empty();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

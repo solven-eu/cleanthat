@@ -50,4 +50,17 @@ public class TestSourceCodeProperties {
 
 		Assertions.assertThat(asObject).isEqualTo(properties);
 	}
+
+	@Test
+	public void testDefaultChild() throws JsonMappingException, JsonProcessingException {
+		SourceCodeProperties properties = SourceCodeProperties.defaultChild();
+
+		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
+
+		String asString = objectMapper.writeValueAsString(properties);
+
+		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
+
+		Assertions.assertThat(asObject).isEqualTo(properties);
+	}
 }

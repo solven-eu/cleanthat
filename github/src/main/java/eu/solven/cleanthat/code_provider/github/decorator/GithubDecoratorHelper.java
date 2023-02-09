@@ -47,6 +47,11 @@ public class GithubDecoratorHelper {
 		public <T> T getDecorated() {
 			return (T) repository;
 		}
+
+		@Override
+		public boolean isPrivate() {
+			return repository.isPrivate();
+		}
 	}
 
 	protected static class DecoratedGHReference implements IGitReference {

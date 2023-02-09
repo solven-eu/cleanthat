@@ -52,7 +52,8 @@ public class CleanthatEngineProperties implements IEngineProperties {
 	@Builder.Default
 	private boolean skip = false;
 
-	private SourceCodeProperties sourceCode;
+	@Builder.Default
+	private SourceCodeProperties sourceCode = SourceCodeProperties.defaultChild();
 
 	// The (ordered) steps to apply
 	@Singular

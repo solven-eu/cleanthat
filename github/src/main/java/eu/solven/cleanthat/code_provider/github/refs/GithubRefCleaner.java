@@ -18,11 +18,11 @@ package eu.solven.cleanthat.code_provider.github.refs;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -41,6 +41,7 @@ import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeBuilder;
+import org.kohsuke.github.GHUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +52,15 @@ import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
-import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeReadWriter;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeReadWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
 import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
 import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
@@ -68,6 +69,7 @@ import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -76,6 +78,7 @@ import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.utils.ResultOrError;
 
@@ -84,23 +87,8 @@ import eu.solven.cleanthat.utils.ResultOrError;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
+public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, ICleanthatGitRefsConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
-
-	private static final String REF_DOMAIN_CLEANTHAT = "cleanthat";
-	public static final String REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH = REF_DOMAIN_CLEANTHAT + "/";
-
-	public static final String PREFIX_REF_CLEANTHAT =
-			CleanthatRefFilterProperties.BRANCHES_PREFIX + REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH;
-
-	// 2023-01: Renamed from 'cleanthat/configure' to 'cleanthat/configure_v2' as the configuration change
-	// It enables handling easily repository with a PR open a long-time ago, with old configuration
-	@Deprecated
-	public static final String REF_NAME_CONFIGURE_V1 = PREFIX_REF_CLEANTHAT + "configure";
-	public static final String REF_NAME_CONFIGURE = PREFIX_REF_CLEANTHAT + "configure_v2";
-
-	public static final String PREFIX_REF_CLEANTHAT_TMPHEAD = PREFIX_REF_CLEANTHAT + "headfor-";
-	public static final String PREFIX_REF_CLEANTHAT_MANUAL = PREFIX_REF_CLEANTHAT + "manual-";
 
 	final GithubAndToken githubAndToken;
 
@@ -121,7 +109,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	// We may have no ref to clean (e.g. there is no cleanthat configuration, or the ref is excluded)
 	// We may have to clean current ref (e.g. a PR is open, and we want to clean the PR head)
 	// We may have to clean a different ref (e.g. a push to the main branch needs to be cleaned through a PR)
-	@SuppressWarnings("PMD.CognitiveComplexity")
+	// @SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	public Optional<HeadAndOptionalBase> prepareRefToClean(Path root,
 			String eventKey,
@@ -167,7 +155,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		if (canCleanInNewRR(protectedPatterns, headRef)) {
 			return cleanInNewRR(result, head, protectedPatterns, headRef);
 		} else {
-			// Cleanable neither in-place nor in-rr
+			// Cleanable neither in-place (e.g. protected branch) nor in-rr
 			LOGGER.info("This branch seems not cleanable: {}. Regex: {}. eventBaseBranches: {}",
 					headRef,
 					protectedPatterns,
@@ -188,8 +176,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			try {
 				List<String> summuaryRows = ImmutableList.<String>builder()
 						.add("Check " + CodeProviderHelpers.PATHES_CLEANTHAT.get(0))
-						.add("It may look like: "
-								+ "https://github.com/solven-eu/cleanthat/blob/master/runnable/src/test/resources/config/default-safe.yaml")
+						.add("It may look like: " + IDocumentationConstants.URL_REPO
+								+ "/blob/master/runnable/src/test/resources/config/default-safe.yaml")
 						.build();
 
 				String summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
@@ -322,24 +310,29 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			GitRepoBranchSha1 head) {
 		// The base is cleanable: we are allowed to clean its head in-place
 		Optional<GitRepoBranchSha1> optBase = result.optBaseRef();
-		if (optBase.isPresent() && IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT.equals(optBase.get().getSha())) {
-			// Typically a refs has been created, or forced-push
-			// Its base would be the ancestor commit which is in the default branch
-			GitRepoBranchSha1 ambiguousBase = optBase.get();
-			try {
-				GHRepository repo = githubAndToken.getGithub().getRepository(ambiguousBase.getRepoFullName());
-				GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
+		if (optBase.isPresent()) {
+			GitRepoBranchSha1 base = optBase.get();
 
-				// https://docs.github.com/en/rest/commits/commits#compare-two-commits
-				GHCompare compare = repo.getCompare(defaultBranch.getSHA1(), head.getSha());
-				Commit mergeBase = compare.getMergeBaseCommit();
+			if (IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT.equals(base.getSha())) {
+				// Typically a refs has been created, or forced-push
+				// Its base would be the ancestor commit which is in the default branch
+				try {
+					GHRepository repo = githubAndToken.getGithub().getRepository(base.getRepoFullName());
 
-				GitRepoBranchSha1 newBase =
-						new GitRepoBranchSha1(ambiguousBase.getRef(), ambiguousBase.getRef(), mergeBase.getSHA1());
-				LOGGER.info("We will use as base: {}", newBase);
-				optBase = Optional.of(newBase);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+					// BEWARE What-if head is a commit of the defaultBranch?
+					GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
+
+					// https://docs.github.com/en/rest/commits/commits#compare-two-commits
+					GHCompare compare = repo.getCompare(defaultBranch.getSHA1(), head.getSha());
+					Commit mergeBaseCommit = compare.getMergeBaseCommit();
+
+					GitRepoBranchSha1 newBase =
+							new GitRepoBranchSha1(base.getRef(), base.getRef(), mergeBaseCommit.getSHA1());
+					LOGGER.info("We will use as base={} to clean head={}", newBase, head);
+					optBase = Optional.of(newBase);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 			}
 		}
 
@@ -350,9 +343,15 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 	 * @return a new/unique reference, useful when opening a branch to clean a cleanable branch.
 	 */
 	public String prepareRefNameForHead(String baseToClean) {
-		UUID random = UUID.randomUUID();
-		String ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + "-" + random;
-		LOGGER.info("We generated a temporary ref: {}", ref);
+		// We do not want to open a ref on every event, so we should not hand a random suffix.
+		// We do not want to resurect previous branch each time a head has to be created, so we need a suffix
+		// We now suggest opening a RR at most once per day. We may not open it if there is a previous day RR still open
+		String nowSuffix = "-" + LocalDate.now();
+
+		String ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + nowSuffix;
+		LOGGER.info("We provisioned a (temporary, not-materialized yet) head branch={} to clean base branch={}",
+				ref,
+				baseToClean);
 		return ref;
 	}
 
@@ -372,41 +371,42 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 		}
 	}
 
-	private CodeFormatResult formatRefDiff(GHRepository theRepo,
+	private CodeFormatResult formatRefDiff(String eventKey,
+			GHRepository theRepo,
 			ICodeProvider codeProvider,
 			ILazyGitReference headSupplier) {
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
 			// Get the head lazily, else it means we create branch which may remain empty
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			return new GithubRefCodeProvider(codeProvider.getFileSystem(),
-					githubAndToken.getToken(),
-					theRepo,
-					headWhereToWrite);
+			return new GithubRefCodeReadWriter(codeProvider
+					.getFileSystem(), githubAndToken.getToken(), eventKey, theRepo, headWhereToWrite);
 		});
-		return formatCodeGivenConfig(codeProviderWriter, false);
+		return formatCodeGivenConfig(eventKey, codeProviderWriter, false);
 	}
 
-	@Deprecated(
-			since = "We clean on push events. This would be used on open PR events, but we may still fallback on sha1 diff cleaning")
-	@Override
-	public CodeFormatResult formatRefDiff(Path root,
-			IGitRepository repo,
-			IGitReference base,
-			ILazyGitReference headSupplier) {
-		String refOrSha1 = headSupplier.getFullRefOrSha1();
-		GHRef ghBase = base.getDecorated();
-
-		LOGGER.info("Base: {} Head: {}", ghBase.getRef(), refOrSha1);
-		GHRepository theRepo = repo.getDecorated();
-		String token = githubAndToken.getToken();
-		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
-		ICodeProvider codeProvider =
-				new GithubRefToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
-		return formatRefDiff(theRepo, codeProvider, headSupplier);
-	}
+	// @Deprecated(
+	// since = "We clean on push events. This would be used on open PR events, but we may still fallback on sha1 diff
+	// cleaning")
+	// @Override
+	// public CodeFormatResult formatRefDiff(Path root,
+	// IGitRepository repo,
+	// IGitReference base,
+	// ILazyGitReference headSupplier) {
+	// String refOrSha1 = headSupplier.getFullRefOrSha1();
+	// GHRef ghBase = base.getDecorated();
+	//
+	// LOGGER.info("Base: {} Head: {}", ghBase.getRef(), refOrSha1);
+	// GHRepository theRepo = repo.getDecorated();
+	// String token = githubAndToken.getToken();
+	// GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
+	// ICodeProvider codeProvider =
+	// new GithubRefToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
+	// return formatRefDiff(theRepo, codeProvider, headSupplier);
+	// }
 
 	@Override
 	public CodeFormatResult formatCommitToRefDiff(Path root,
+			String eventKey,
 			IGitRepository repo,
 			IGitCommit base,
 			ILazyGitReference headSupplier) {
@@ -421,21 +421,20 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 				new GithubCommitToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
 		// Typically used to load the configuration
 		// ICodeProvider headCodeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
-		return formatRefDiff(theRepo, codeProvider, headSupplier);
+		return formatRefDiff(eventKey, theRepo, codeProvider, headSupplier);
 	}
 
 	@Override
 	public CodeFormatResult formatRef(Path root,
+			String eventKey,
 			IGitRepository repo,
 			IGitBranch branchSupplier,
 			ILazyGitReference headSupplier) {
 		GHBranch branch = branchSupplier.getDecorated();
 
-		ICodeProviderWriter codeProvider = new GithubBranchCodeProvider(root.getFileSystem(),
-				githubAndToken.getToken(),
-				repo.getDecorated(),
-				branch);
-		return formatRefDiff(repo.getDecorated(), codeProvider, headSupplier);
+		ICodeProviderWriter codeProvider = new GithubBranchCodeReadWriter(root
+				.getFileSystem(), githubAndToken.getToken(), eventKey, repo.getDecorated(), branch);
+		return formatRefDiff(eventKey, repo.getDecorated(), codeProvider, headSupplier);
 	}
 
 	@Override
@@ -477,7 +476,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			} else {
 				RepoInitializerResult result = new CleanthatConfigInitializer(codeProvider,
 						ConfigHelpers.getYaml(getObjectMappers()),
-						getFactories()).prepareFile();
+						getFactories()).prepareFile(repo.isPrivate());
 
 				GHCommit commit = commitConfig(defaultBranch, repo, result);
 				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());
@@ -529,9 +528,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner {
 			repo.listPullRequests(GHIssueState.OPEN).forEach(pr -> {
 				GHCommitPointer prHead = pr.getHead();
 				try {
-					if (headRef.equals(prHead.getRef()) && "CleanThat".equals(pr.getUser().getName())) {
-						String headAuthorName = prHead.getCommit().getAuthor().getName();
-						if ("CleanThat".equals(headAuthorName)) {
+					if (headRef.equals(prHead.getRef()) && GithubHelper.isCleanthatAuthor(pr.getUser())) {
+						GHUser author = prHead.getCommit().getAuthor();
+						String headAuthorName = author.getName();
+						if (GithubHelper.isCleanthatAuthor(author)) {
 							LOGGER.info("Closing old 'configure' PR: {}", pr.getHtmlUrl());
 						} else {
 							LOGGER.warn("Leaving open old 'configure' PR: {} as head.authorName={}",

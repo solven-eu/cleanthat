@@ -138,6 +138,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 		GHBranch finalBranch = branch;
 		String refName = CleanthatRefFilterProperties.BRANCHES_PREFIX + finalBranch.getName();
 		CodeFormatResult output = cleaner.formatRef(root,
+				"RunCleanGithubBranch",
 				GithubDecoratorHelper.decorate(repo),
 				GithubDecoratorHelper.decorate(finalBranch),
 				new LazyGitReference(refName, Suppliers.memoize(() -> {

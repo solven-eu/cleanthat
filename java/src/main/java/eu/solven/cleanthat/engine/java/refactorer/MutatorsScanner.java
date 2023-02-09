@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.reflect.ClassPath;
 
+import eu.solven.cleanthat.config.GitService;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -52,7 +53,9 @@ public class MutatorsScanner {
 		}
 
 		if (classes.isEmpty()) {
-			LOGGER.error("CleanThat failed detecting a single mutator in {}", packageName);
+			String cleanThatSha1 = GitService.safeGetSha1();
+
+			LOGGER.error("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
 		}
 
 		return classes.stream().map(s -> {

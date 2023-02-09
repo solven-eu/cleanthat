@@ -92,6 +92,6 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-		codeCleaner.formatCodeGivenConfig(codeProvider, isDryRun());
+		codeCleaner.formatCodeGivenConfig("CleanThatCleanThatMojo", codeProvider, isDryRun());
 	}
 }

@@ -74,4 +74,15 @@ public class GitService implements IGitService, InitializingBean {
 		}
 		return PepperMapHelper.getRequiredString(properties, KEY_GIT_COMMIT_ID);
 	}
+
+	public static String safeGetSha1() {
+		GitService gitService = new GitService();
+		try {
+			gitService.afterPropertiesSet();
+		} catch (IOException e) {
+			LOGGER.warn("Issue fetching git.sha1", e);
+			return "error";
+		}
+		return gitService.getSha1();
+	}
 }

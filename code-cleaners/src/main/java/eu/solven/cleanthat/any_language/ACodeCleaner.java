@@ -95,7 +95,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	@Override
-	public CodeFormatResult formatCodeGivenConfig(ICodeProviderWriter codeProvider, boolean dryRun) {
+	public CodeFormatResult formatCodeGivenConfig(String eventKey, ICodeProviderWriter codeProvider, boolean dryRun) {
 		ResultOrError<CleanthatRepositoryProperties, String> optResult = loadAndCheckConfiguration(codeProvider);
 
 		if (optResult.getOptError().isPresent()) {

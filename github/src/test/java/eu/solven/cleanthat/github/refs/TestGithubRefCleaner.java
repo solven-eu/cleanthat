@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.github.refs;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -47,6 +48,8 @@ public class TestGithubRefCleaner {
 		Mockito.when(gitHub.getRepository("someUser/someRepoName")).thenReturn(repository);
 
 		GHRef ref = Mockito.mock(GHRef.class);
+		Mockito.when(ref.getUrl()).thenReturn(new URL("https://api.github.com/whatever"));
+
 		Mockito.when(repository.getRef("heads/someRef")).thenReturn(ref);
 
 		GithubCheckRunManager checkRunManager = new GithubCheckRunManager(Mockito.mock(IGitService.class));

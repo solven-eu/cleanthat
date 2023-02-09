@@ -36,8 +36,12 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 		implements ICodeProviderWriter, IGithubSha1CodeProvider {
 	// private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProviderWriter.class);
 
-	public AGithubSha1CodeProviderWriter(FileSystem fs, String token, GHRepository repo) {
+	final String eventKey;
+
+	public AGithubSha1CodeProviderWriter(FileSystem fs, String token, String eventKey, GHRepository repo) {
 		super(fs, token, repo);
+
+		this.eventKey = eventKey;
 	}
 
 	protected abstract GHRef getAsGHRef();
@@ -46,7 +50,8 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		new GithubRefWriterLogic(repo, getAsGHRef()).persistChanges(pathToMutatedContent, prComments, prLabels);
+		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef());
+		githubRefWriterLogic.persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
 	@Override

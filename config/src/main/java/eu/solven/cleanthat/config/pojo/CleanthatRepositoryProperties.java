@@ -54,7 +54,8 @@ public final class CleanthatRepositoryProperties implements IHasSourceCodeProper
 	private CleanthatMetaProperties meta = new CleanthatMetaProperties();
 
 	// Properties to apply to each children
-	private SourceCodeProperties sourceCode;
+	@Builder.Default
+	private SourceCodeProperties sourceCode = SourceCodeProperties.defaultChild();
 
 	// @JsonProperty(index = -999)
 	@Singular

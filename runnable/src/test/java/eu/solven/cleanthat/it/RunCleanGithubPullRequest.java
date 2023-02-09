@@ -145,6 +145,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			GHBranch finalDefaultBranch = defaultBranch;
 			String refName = CleanthatRefFilterProperties.BRANCHES_PREFIX + finalDefaultBranch.getName();
 			CodeFormatResult output = cleaner.formatRef(fs.getPath("/"),
+					"RunCleanGithubPullRequest",
 					GithubDecoratorHelper.decorate(repo),
 					GithubDecoratorHelper.decorate(defaultBranch),
 					new LazyGitReference(refName, Suppliers.memoize(() -> {

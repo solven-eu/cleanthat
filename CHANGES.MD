@@ -3,6 +3,8 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
+### Changes
+* CleanThat Robot will open a single Review-Request per protected-branch (instead of opening one for each dirty event, with a random). The naming convention is `cleanthat/headfor-XXX-yyyy-MM-dd` where `XXX` is the protected branch name and `yyyy-MM-dd` is current day.
 
 ## [2.1] - 2023-01-07
 ### Fixed

@@ -39,6 +39,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.IGitRefsConstants;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -49,11 +50,15 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
 	final String token;
+	final String eventKey;
+
 	final GHPullRequest pr;
 
-	public GithubPRCodeProvider(FileSystem fs, String token, GHPullRequest pr) {
+	public GithubPRCodeProvider(FileSystem fs, String token, String eventKey, GHPullRequest pr) {
 		super(fs);
 		this.token = token;
+		this.eventKey = eventKey;
+
 		this.pr = pr;
 	}
 
@@ -85,14 +90,14 @@ public class GithubPRCodeProvider extends AGithubCodeProvider implements IListOn
 			List<String> prComments,
 			Collection<String> prLabels) {
 		GHRepository repo = pr.getRepository();
-		String fullRefName = "refs/heads/" + pr.getHead().getRef();
+		String fullRefName = IGitRefsConstants.BRANCHES_PREFIX + pr.getHead().getRef();
 		GHRef ref;
 		try {
 			ref = new GithubRepositoryFacade(repo).getRef(fullRefName);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue fetching refName=" + fullRefName, e);
 		}
-		new GithubRefWriterLogic(repo, ref).persistChanges(pathToMutatedContent, prComments, prLabels);
+		new GithubRefWriterLogic(eventKey, repo, ref).persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
 	// @Override

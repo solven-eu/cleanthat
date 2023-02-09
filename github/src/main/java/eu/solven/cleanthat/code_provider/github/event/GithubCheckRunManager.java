@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Ascii;
 
+import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.IGitService;
 
 /**
@@ -64,8 +65,8 @@ public class GithubCheckRunManager {
 			String description = "CleanThat cleaning/refactoring";
 			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1)
 					.withExternalID(eventKey)
-					.withDetailsURL("https://github.com/solven-eu/cleanthat?event=" + eventKey)
-					.add(new Action("CleanThat", description, identifier));
+					.withDetailsURL(IDocumentationConstants.URL_REPO + "?event=" + eventKey)
+					.add(new Action(IDocumentationConstants.GITHUB_APP, description, identifier));
 			try {
 				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
 

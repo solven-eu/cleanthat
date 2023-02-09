@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.any_language;
-
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
+package eu.solven.cleanthat.config;
 
 /**
- * Knows how to clean code
+ * Constants related to documentation
  * 
  * @author Benoit Lacelle
  *
  */
-public interface ICodeCleaner {
-
-	CodeFormatResult formatCodeGivenConfig(String eventKey, ICodeProviderWriter codeProvider, boolean dryRun);
-
+public interface IDocumentationConstants {
+	String URL_REPO = "https://github.com/solven-eu/cleanthat";
+	String GITHUB_APP = "Cleanthat";
 }

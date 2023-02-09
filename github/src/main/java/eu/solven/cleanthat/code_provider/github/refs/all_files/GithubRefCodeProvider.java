@@ -21,7 +21,7 @@ import java.util.Objects;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
@@ -29,15 +29,13 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
  *
  * @author Benoit Lacelle
  */
-public class GithubRefCodeProvider extends AGithubSha1CodeProviderWriter {
+public class GithubRefCodeProvider extends AGithubSha1CodeProvider {
 	final GHRef ref;
 
 	public GithubRefCodeProvider(FileSystem fs, String token, GHRepository repo, GHRef ref) {
 		super(fs, token, repo);
 
-		Objects.requireNonNull(ref, "ref is null");
-
-		this.ref = ref;
+		this.ref = Objects.requireNonNull(ref, "ref is null");
 	}
 
 	@Override
@@ -48,11 +46,6 @@ public class GithubRefCodeProvider extends AGithubSha1CodeProviderWriter {
 	@Override
 	public String getRef() {
 		return ref.getRef();
-	}
-
-	@Override
-	protected GHRef getAsGHRef() {
-		return ref;
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-		CodeFormatResult result = codeCleaner.formatCodeGivenConfig(codeProvider, true);
+		CodeFormatResult result = codeCleaner.formatCodeGivenConfig("CleanThatCheckMojo", codeProvider, true);
 
 		if (!result.isEmpty()) {
 			throw new MojoFailureException("ARG",

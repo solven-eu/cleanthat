@@ -28,4 +28,6 @@ public interface IGitRepository {
 	 * @return the raw underlying item
 	 */
 	<T> T getDecorated();
+
+	boolean isPrivate();
 }

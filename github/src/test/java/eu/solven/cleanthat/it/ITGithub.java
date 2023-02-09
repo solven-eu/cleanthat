@@ -127,7 +127,8 @@ public class ITGithub {
 		}
 		{
 			GithubFacade itsRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT_ITS);
-			GithubRefWriterLogic writer = new GithubRefWriterLogic(itsRepo.getRepository(),
+			GithubRefWriterLogic writer = new GithubRefWriterLogic("ITGithub",
+					itsRepo.getRepository(),
 					itsRepo.getRef(IGitRefsConstants.BRANCHES_PREFIX + "master"));
 
 			GithubBranchCodeProvider codeProvider = new GithubBranchCodeProvider(FileSystems.getDefault(),

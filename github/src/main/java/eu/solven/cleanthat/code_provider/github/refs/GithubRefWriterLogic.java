@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
+import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCommitBuilder;
 import org.kohsuke.github.GHCompare;
@@ -35,9 +36,6 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
-import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 
 /**
  * Default {@link ICodeProviderWriterLogic}

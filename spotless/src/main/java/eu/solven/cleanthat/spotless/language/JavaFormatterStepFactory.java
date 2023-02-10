@@ -116,8 +116,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		Boolean wildcardsLast = parameters.getCustomProperty("wildcardsLast", Boolean.class);
 		if (wildcardsLast == null) {
 			// https://github.com/diffplug/spotless/tree/main/plugin-maven#java
-			wildcardsLast = 
-					false;
+			wildcardsLast = false;
 		}
 
 		String ordersFile = parameters.getCustomProperty(KEY_FILE, String.class);

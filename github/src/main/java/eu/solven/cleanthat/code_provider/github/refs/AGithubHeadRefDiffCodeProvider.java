@@ -15,11 +15,13 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import java.nio.file.FileSystem;
+
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
+
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

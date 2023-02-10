@@ -15,14 +15,16 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import java.nio.file.FileSystem;
 import java.util.Objects;
+
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests

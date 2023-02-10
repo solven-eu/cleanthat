@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.github.event;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Status;
@@ -71,7 +70,7 @@ public class GithubCheckRunManager {
 				Optional<GHCheckRun> optExisting = baseRepo.getCheckRuns(sha1)
 						.toList()
 						.stream()
-						.filter(cr -> cr.getName().equalsIgnoreCase(ID_CLEANTHAT))
+						.filter(cr -> ID_CLEANTHAT.equalsIgnoreCase(cr.getName()))
 						.findAny();
 
 				if (optExisting.isEmpty()) {

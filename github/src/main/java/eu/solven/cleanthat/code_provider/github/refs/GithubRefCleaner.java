@@ -380,7 +380,12 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			// Get the head lazily, to prevent creating empty branches
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
 			FileSystem fs = codeProvider.getFileSystem();
-			return new GithubRefCodeReadWriter(fs, githubAndToken.getToken(), eventKey, theRepo, headWhereToWrite,headSupplier.getFullRefOrSha1());
+			return new GithubRefCodeReadWriter(fs,
+					githubAndToken.getToken(),
+					eventKey,
+					theRepo,
+					headWhereToWrite,
+					headSupplier.getFullRefOrSha1());
 		});
 		return formatCodeGivenConfig(eventKey, codeProviderWriter, false);
 	}

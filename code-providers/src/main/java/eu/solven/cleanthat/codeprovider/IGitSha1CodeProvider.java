@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.code_provider.github.code_provider;
-
-import org.kohsuke.github.GHRepository;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.IGitSha1CodeProvider;
+package eu.solven.cleanthat.codeprovider;
 
 /**
- * Specific to Github sha1 {@link ICodeProvider}
+ * Specific to Git sha1 {@link ICodeProvider}
  * 
  * @author Benoit Lacelle
  *
  */
-public interface IGithubSha1CodeProvider extends IGitSha1CodeProvider {
+public interface IGitSha1CodeProvider {
 
-	GHRepository getRepo();
+	String getSha1();
 
-	String getToken();
+	String getRef();
 
 }

@@ -15,19 +15,23 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import com.google.common.base.Ascii;
-import eu.solven.cleanthat.config.IDocumentationConstants;
-import eu.solven.cleanthat.config.IGitService;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Status;
-import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHCheckRunBuilder.Action;
+import org.kohsuke.github.GHCheckRunBuilder.Output;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Ascii;
+
+import eu.solven.cleanthat.config.IDocumentationConstants;
+import eu.solven.cleanthat.config.IGitService;
 
 /**
  * manages CheckRun in GitHub API
@@ -36,8 +40,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class GithubCheckRunManager {
-	private static final int LIMIT_IDENTIFIER = 20;
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubCheckRunManager.class);
+
+	private static final String ID_CLEANTHAT = "Cleanthat";
+	private static final int LIMIT_IDENTIFIER = 20;
 	public static final String PERMISSION_CHECKS = "checks";
 
 	final IGitService gitService;
@@ -59,18 +65,35 @@ public class GithubCheckRunManager {
 			// Limitted to 20 characters
 			String identifier = Ascii.truncate(gitService.getSha1(), LIMIT_IDENTIFIER, "");
 			// Limitted to 40 characters
-			String description = "CleanThat cleaning/refactoring";
-			GHCheckRunBuilder checkRunBuilder = baseRepo.createCheckRun("CleanThat", sha1)
-					.withExternalID(eventKey)
-					.withDetailsURL(IDocumentationConstants.URL_REPO + "?event=" + eventKey)
-					.add(new Action(IDocumentationConstants.GITHUB_APP, description, identifier));
-			try {
-				GHCheckRun checkRun = checkRunBuilder.withStatus(Status.IN_PROGRESS).create();
+			String description = "Cleanthat cleaning/refactoring";
 
-				return Optional.of(checkRun);
+			try {
+				Optional<GHCheckRun> optExisting = baseRepo.getCheckRuns(sha1)
+						.toList()
+						.stream()
+						.filter(cr -> cr.getName().equalsIgnoreCase(ID_CLEANTHAT))
+						.findAny();
+
+				if (optExisting.isEmpty()) {
+					try {
+						GHCheckRun newCheckRun = baseRepo.createCheckRun(ID_CLEANTHAT, sha1)
+								.withExternalID(eventKey)
+								.withDetailsURL(IDocumentationConstants.URL_REPO + "?event=" + eventKey)
+								.add(new Action(IDocumentationConstants.GITHUB_APP, description, identifier))
+								.add(new Output("eventKey", eventKey))
+								.withStatus(Status.IN_PROGRESS)
+								.create();
+
+						optExisting = Optional.of(newCheckRun);
+					} catch (IOException e) {
+						// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
+						LOGGER.warn("Issue creating the CheckRun", e);
+						optExisting = Optional.empty();
+					}
+				}
+
+				return optExisting;
 			} catch (IOException e) {
-				// https://github.community/t/resource-not-accessible-when-trying-to-read-write-checkrun/193493
-				LOGGER.warn("Issue creating the CheckRun", e);
 				return Optional.empty();
 			}
 		} else {

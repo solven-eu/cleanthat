@@ -32,8 +32,6 @@ import org.kohsuke.github.GHRepository;
  */
 public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvider
 		implements ICodeProviderWriter, IGithubSha1CodeProvider {
-	// private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProviderWriter.class);
-
 	final String eventKey;
 
 	public AGithubSha1CodeProviderWriter(FileSystem fs, String token, String eventKey, GHRepository repo) {
@@ -48,7 +46,7 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef());
+		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef(), getSha1());
 		githubRefWriterLogic.persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 

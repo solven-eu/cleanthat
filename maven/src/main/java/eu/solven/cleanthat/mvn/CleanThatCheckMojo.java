@@ -15,21 +15,19 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.springframework.context.ApplicationContext;
-
 import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.springframework.context.ApplicationContext;
 
 /**
  * The mojo checking the code is clean
@@ -68,7 +66,7 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-		CodeFormatResult result = codeCleaner.formatCodeGivenConfig(codeProvider, true);
+		CodeFormatResult result = codeCleaner.formatCodeGivenConfig("CleanThatCheckMojo", codeProvider, true);
 
 		if (!result.isEmpty()) {
 			throw new MojoFailureException("ARG",

@@ -15,11 +15,11 @@
  */
 package eu.solven.cleanthat.github.event;
 
+import eu.solven.cleanthat.code_provider.github.refs.GithubPRCodeProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.kohsuke.github.GHCommitPointer;
@@ -28,8 +28,6 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHRepository;
 import org.mockito.Mockito;
-
-import eu.solven.cleanthat.code_provider.github.refs.GithubPRCodeProvider;
 
 public class TestGithubPRCodeProvider {
 
@@ -47,7 +45,7 @@ public class TestGithubPRCodeProvider {
 		Mockito.when(repository.getFileContent("someFileName", "headSha")).thenReturn(ghContent);
 		Mockito.when(ghContent.read())
 				.thenReturn(new ByteArrayInputStream("someContent".getBytes(StandardCharsets.UTF_8)));
-		String content = new GithubPRCodeProvider(FileSystems.getDefault(), "someToken", pr)
+		String content = new GithubPRCodeProvider(FileSystems.getDefault(), "someToken", "someEventKey", pr)
 				.loadContentForPath(file.getFilename())
 				.get();
 		Assert.assertEquals("someContent", content);

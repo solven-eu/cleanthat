@@ -15,19 +15,6 @@
  */
 package eu.solven.cleanthat.github.refs;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.mockito.Mockito;
-
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
@@ -37,6 +24,18 @@ import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.mockito.Mockito;
 
 public class TestGithubRefCleaner {
 	@Test
@@ -47,6 +46,8 @@ public class TestGithubRefCleaner {
 		Mockito.when(gitHub.getRepository("someUser/someRepoName")).thenReturn(repository);
 
 		GHRef ref = Mockito.mock(GHRef.class);
+		Mockito.when(ref.getUrl()).thenReturn(new URL("https://api.github.com/whatever"));
+
 		Mockito.when(repository.getRef("heads/someRef")).thenReturn(ref);
 
 		GithubCheckRunManager checkRunManager = new GithubCheckRunManager(Mockito.mock(IGitService.class));

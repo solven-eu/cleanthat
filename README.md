@@ -14,6 +14,10 @@ Related projects:
 - https://github.com/openrewrite/rewrite-migrate-java (free)
 - https://eslint.org/docs/latest/extend/custom-formatters (free)
 
+# Changes
+
+See [CHANGES.MD](CHANGES.MD)
+
 # Compatibility
 
 Cleanthat is currently compatible with the following languages:

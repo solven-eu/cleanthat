@@ -15,23 +15,18 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import java.nio.file.FileSystem;
-
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
-
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
-public class GithubCommitToRefDiffCodeProviderWriter extends AGithubHeadRefDiffCodeProvider
-		implements IListOnlyModifiedFiles, ICodeProviderWriter {
+public class GithubCommitToRefDiffCodeProviderWriter extends AGithubHeadRefDiffCodeProvider {
 	final GHCommit base;
 
 	public GithubCommitToRefDiffCodeProviderWriter(FileSystem fs,

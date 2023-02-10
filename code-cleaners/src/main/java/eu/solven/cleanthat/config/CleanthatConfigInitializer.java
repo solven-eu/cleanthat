@@ -15,18 +15,16 @@
  */
 package eu.solven.cleanthat.config;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Collection;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.RepoInitializerResult.RepoInitializerResultBuilder;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.pepper.resource.PepperResourceHelper;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.regex.Pattern;
 
 /**
  * This will help configuration CleanThat by proposing a reasonnable default configuration.
@@ -35,6 +33,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  *
  */
 public class CleanthatConfigInitializer {
+	public static final String TEMPLATES_FOLDER = "/templates";
+
 	final ICodeProvider codeProvider;
 	final ObjectMapper objectMapper;
 	final Collection<IEngineLintFixerFactory> factories;
@@ -47,18 +47,22 @@ public class CleanthatConfigInitializer {
 		this.factories = factories;
 	}
 
-	public RepoInitializerResult prepareFile() {
+	public RepoInitializerResult prepareFile(boolean isPrivate) {
 		String defaultRepoPropertiesPath = CodeProviderHelpers.PATHES_CLEANTHAT.get(0);
 
 		// Let's follow Renovate and its configuration PR
 		// https://github.com/solven-eu/agilea/pull/1
-		String body = PepperResourceHelper.loadAsString("/templates/onboarding-body.md");
+		String body = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/onboarding-body.md");
 		// body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 		body = body.replaceAll(Pattern.quote("${DEFAULT_PATH}"), defaultRepoPropertiesPath);
 
+		if (!isPrivate) {
+			body += "\r\n" + "---" + "\r\n" + "@blacelle please look at me";
+		}
+
 		RepoInitializerResultBuilder resultBuilder = RepoInitializerResult.builder()
 				.prBody(body)
-				.commitMessage(PepperResourceHelper.loadAsString("/templates/commit-message.txt"));
+				.commitMessage(PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt"));
 
 		GenerateInitialConfig generateInitialConfig = new GenerateInitialConfig(factories);
 		EngineInitializerResult repoProperties;

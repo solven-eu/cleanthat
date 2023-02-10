@@ -15,15 +15,13 @@
  */
 package eu.solven.cleanthat.engine;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class TestSourceCodeProperties {
 	final ObjectMapper objectMapper = new ObjectMapper();
@@ -45,6 +43,19 @@ public class TestSourceCodeProperties {
 
 		String asString = objectMapper.writeValueAsString(properties);
 		Assertions.assertThat(asString).contains("line_ending", "GIT");
+
+		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
+
+		Assertions.assertThat(asObject).isEqualTo(properties);
+	}
+
+	@Test
+	public void testDefaultChild() throws JsonMappingException, JsonProcessingException {
+		SourceCodeProperties properties = SourceCodeProperties.defaultChild();
+
+		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
+
+		String asString = objectMapper.writeValueAsString(properties);
 
 		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
 

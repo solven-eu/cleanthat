@@ -15,6 +15,9 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import com.google.common.reflect.ClassPath;
+import eu.solven.cleanthat.config.GitService;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -23,13 +26,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.reflect.ClassPath;
-
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * Scans dynamically for available rules
@@ -52,7 +50,9 @@ public class MutatorsScanner {
 		}
 
 		if (classes.isEmpty()) {
-			LOGGER.error("CleanThat failed detecting a single mutator in {}", packageName);
+			String cleanThatSha1 = GitService.safeGetSha1();
+
+			LOGGER.error("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
 		}
 
 		return classes.stream().map(s -> {

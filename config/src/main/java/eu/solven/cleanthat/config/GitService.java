@@ -15,19 +15,16 @@
  */
 package eu.solven.cleanthat.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.solven.pepper.collection.PepperMapHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.core.io.ClassPathResource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps providing information about Git through a REST api. It implements {@link BeanFactoryPostProcessor} to ensure
@@ -73,5 +70,16 @@ public class GitService implements IGitService, InitializingBean {
 			throw new UncheckedIOException(e);
 		}
 		return PepperMapHelper.getRequiredString(properties, KEY_GIT_COMMIT_ID);
+	}
+
+	public static String safeGetSha1() {
+		GitService gitService = new GitService();
+		try {
+			gitService.afterPropertiesSet();
+		} catch (IOException e) {
+			LOGGER.warn("Issue fetching git.sha1", e);
+			return "error";
+		}
+		return gitService.getSha1();
 	}
 }

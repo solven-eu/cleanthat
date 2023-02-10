@@ -15,18 +15,17 @@
  */
 package eu.solven.cleanthat.formatter;
 
+import eu.solven.cleanthat.config.IDocumentationConstants;
+import eu.solven.cleanthat.engine.EngineAndLinters;
+import eu.solven.cleanthat.engine.ICodeFormatterApplier;
+import eu.solven.cleanthat.language.IEngineProperties;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.engine.EngineAndLinters;
-import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
  * Abstract class for language formatters
@@ -65,7 +64,8 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 						+ "' with linter="
 						+ linter
 						+ " in engine={}. Please report it to: "
-						+ "https://github.com/solven-eu/cleanthat/issues", engineProperties.getEngine(), e);
+						+ IDocumentationConstants.URL_REPO
+						+ "/issues", engineProperties.getEngine(), e);
 			}
 		});
 		return outputRef.get();

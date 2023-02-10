@@ -15,6 +15,32 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Ascii;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
+import eu.solven.cleanthat.code_provider.github.GithubHelper;
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.git_abstraction.GithubFacade;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import eu.solven.cleanthat.utils.ResultOrError;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -28,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
+import okhttp3.OkHttpClient;
 import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
@@ -44,6 +70,7 @@ import org.kohsuke.github.GHMarketplaceAccountPlan;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRateLimit;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -53,35 +80,6 @@ import org.kohsuke.github.connector.GitHubConnector;
 import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Ascii;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
-
-import eu.solven.cleanthat.code_provider.github.GithubHelper;
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
-import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
-import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
-import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.git_abstraction.GithubFacade;
-import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.cleanthat.utils.ResultOrError;
-import eu.solven.pepper.collection.PepperMapHelper;
-import eu.solven.pepper.logging.PepperLogHelper;
-import okhttp3.OkHttpClient;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -464,9 +462,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId).getOptResult().get();
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
+		String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
+
 		Optional<GHCheckRun> optCheckRun;
 		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
-			String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
 			optCheckRun = githubCheckRunManager.createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
@@ -478,10 +477,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated = new AtomicReference<>();
 			// We fetch the head lazily as it may be a Ref to be created lazily, only if there is indeed something to
-			// clean (e.g. when cleaning a master branch, into a new ref)
+			// commit
 			ILazyGitReference headSupplier = prepareHeadSupplier(relevancyResult, repo, facade, refLazyRefCreated);
 			CodeFormatResult result =
-					GithubEventHelper.executeCleaning(root, relevancyResult, cleaner, facade, headSupplier);
+					GithubEventHelper.executeCleaning(root, relevancyResult, eventKey, cleaner, facade, headSupplier);
 			GithubEventHelper.optCreateBranchOpenPr(relevancyResult, facade, refLazyRefCreated, result);
 
 			logAfterCleaning(installationId, githubAuthAsInst.getGithub());
@@ -536,19 +535,39 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		checkBranchProtection(repo, refName);
 
-		String sha = refToProcess.getSha();
+		String sha;
+
+		boolean headIsMaterialized;
+		if (refName.startsWith(ICleanthatGitRefsConstants.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
+			Optional<GHRef> optAlreadyExisting = optRef(repo, refName);
+
+			if (optAlreadyExisting.isPresent()) {
+				sha = optAlreadyExisting.get().getObject().getSha();
+				LOGGER.info("The ref {} already exists, with sha1={}", refName, sha);
+				headIsMaterialized = true;
+			} else {
+				sha = refToProcess.getSha();
+				headIsMaterialized = false;
+			}
+		} else {
+			sha = refToProcess.getSha();
+			headIsMaterialized = false;
+		}
 
 		Supplier<IGitReference> headSupplier = () -> {
 			String repoName = facade.getRepoFullName();
-			if (refName.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
+			if (!headIsMaterialized) {
+				Optional<GHRef> optAlreadyExisting = optRef(repo, refName);
 
-				try {
-					repo.createRef(refName, sha);
-					LOGGER.info("We created ref={} onto sha1={}", refName, sha);
-				} catch (IOException e) {
-					// TODO If already exists, should we stop the process, or continue?
-					// Another process may be already working on this ref
-					throw new UncheckedIOException("Issue creating ref=" + refName, e);
+				if (!optAlreadyExisting.isPresent()) {
+					try {
+						repo.createRef(refName, sha);
+						LOGGER.info("We materialized ref={} onto sha1={}", refName, sha);
+					} catch (IOException e) {
+						// TODO If already exists, should we stop the process, or continue?
+						// Another process may be already working on this ref
+						throw new UncheckedIOException("Issue materializing ref=" + refName, e);
+					}
 				}
 				refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
 			}
@@ -575,13 +594,25 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		};
 	}
 
+	private Optional<GHRef> optRef(GHRepository repo, String refName) {
+		Optional<GHRef> optAlreadyExisting;
+		try {
+			GHRef ref = repo.getRef(refName);
+			optAlreadyExisting = Optional.of(ref);
+		} catch (IOException e) {
+			LOGGER.info("The ref={} does not exists yet", refName);
+			optAlreadyExisting = Optional.empty();
+		}
+		return optAlreadyExisting;
+	}
+
 	private void checkBranchProtection(GHRepository repo, String refName) {
 		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
 		// Or to any protected branch?
 		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
 			String branchName = refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
 
-			if (branchName.startsWith(GithubRefCleaner.REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH)) {
+			if (branchName.startsWith(ICleanthatGitRefsConstants.REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH)) {
 				LOGGER.info(
 						"We skip branch-protection validation for cleanthat branches (branch={}),"
 								+ " as we are allowed more stuff on them, and they may not exist yet anyway",

@@ -10,7 +10,7 @@ source_code:
   - "regex:.*/generated/.*"
   - "regex:.*/do_not_format_me/.*"
   encoding: "UTF-8"
-  line_ending: "NATIVE"
+  line_ending: "GIT"
 engines:
 # https://github.com/diffplug/spotless/pull/568
 - engine: "spotless"

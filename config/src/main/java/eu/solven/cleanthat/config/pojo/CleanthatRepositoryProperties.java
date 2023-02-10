@@ -15,14 +15,12 @@
  */
 package eu.solven.cleanthat.config.pojo;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import eu.solven.cleanthat.github.IHasSourceCodeProperties;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -54,7 +52,8 @@ public final class CleanthatRepositoryProperties implements IHasSourceCodeProper
 	private CleanthatMetaProperties meta = new CleanthatMetaProperties();
 
 	// Properties to apply to each children
-	private SourceCodeProperties sourceCode;
+	@Builder.Default
+	private SourceCodeProperties sourceCode = SourceCodeProperties.defaultChild();
 
 	// @JsonProperty(index = -999)
 	@Singular

@@ -15,23 +15,26 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
+import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
+import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
+import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.CleanthatConfigInitializer;
+import eu.solven.cleanthat.formatter.CodeFormatResult;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import eu.solven.pepper.resource.PepperResourceHelper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
-import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
-import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 
 /**
  * Helps executing logic on GithubEvents
@@ -48,6 +51,7 @@ public class GithubEventHelper {
 
 	public static CodeFormatResult executeCleaning(Path root,
 			WebhookRelevancyResult relevancyResult,
+			String eventKey,
 			IGitRefCleaner cleaner,
 			GithubRepositoryFacade facade,
 			ILazyGitReference headSupplier) {
@@ -56,16 +60,14 @@ public class GithubEventHelper {
 			GitRepoBranchSha1 baseAsObject = relevancyResult.optBaseForHead().get();
 
 			// We use as base a commit, and not a ref
-			// Else, a compare within a single ref would lead to no diff (as the ref would take by default the most
-			// recent commit, not the commit before the push)
+			// Else, a compare within a single ref would lead to weird result (as the ref would take by default the most
+			// recent commit, not the commit before the push, which may be even more recent than the head)
 			String sha1 = baseAsObject.getSha();
 
 			GHCommit base = facade.getCommit(sha1);
 
-			result = cleaner.formatCommitToRefDiff(root,
-					facade.getRepository(),
-					GithubDecoratorHelper.decorate(base),
-					headSupplier);
+			IGitCommit decoratedBase = GithubDecoratorHelper.decorate(base);
+			result = cleaner.formatCommitToRefDiff(root, eventKey, facade.getRepository(), decoratedBase, headSupplier);
 		} else {
 			throw new IllegalArgumentException("Unclear expected behavior");
 			// result = cleaner.formatRef(GithubDecoratorHelper.decorate(repo), headSupplier.getSupplier().get());
@@ -80,19 +82,13 @@ public class GithubEventHelper {
 		if (refLazyRefCreated.get() != null) {
 			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
 			if (relevancyResult.optBaseForHead().isEmpty()) {
+				// TODO Document when this would happen
 				LOGGER.warn("We created a tmpRef but there is no base");
 			} else {
 				if (result.isEmpty()) {
-					LOGGER.info("Clean is done but no files impacted: the temporary ref ({}) is about to be removed",
-							lazyRefCreated);
-					try {
-						// TODO This ref should never have been created
-						// TODO We should remove a ref only if CleanThat is the only writer, else it means a human has
-						// made some work on it
-						facade.removeRef(lazyRefCreated);
-					} catch (IOException e) {
-						LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
-					}
+					facade.optRef(lazyRefCreated).ifPresent(ref -> {
+						tryRemoveTmpRef(facade, lazyRefCreated, ref);
+					});
 				} else {
 					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
 					doOpenPr(relevancyResult, facade, lazyRefCreated);
@@ -100,6 +96,40 @@ public class GithubEventHelper {
 			}
 		} else {
 			LOGGER.debug("The changes would have been committed directly in the head branch");
+		}
+	}
+
+	private static void tryRemoveTmpRef(GithubRepositoryFacade facade, GitRepoBranchSha1 lazyRefCreated, GHRef ref) {
+		// TODO This ref should never have been created
+		LOGGER.info("Clean is done but no files were impacted: the temporary ref ({}) is about to be removed",
+				lazyRefCreated);
+
+		String refSha = ref.getObject().getSha();
+
+		String expectedHeadSha1 = lazyRefCreated.getSha();
+		if (expectedHeadSha1.equals(refSha)) {
+			// TODO We should remove a ref only if CleanThat is the only writer, else it means a human
+			// has made some work on it
+			try {
+				ref.delete();
+			} catch (IOException e) {
+				LOGGER.warn("Issue removing a temporary ref (" + lazyRefCreated + ")", e);
+			}
+		} else {
+			GHCommit refHead = facade.getCommit(refSha);
+			try {
+				GHUser author = refHead.getAuthor();
+				LOGGER.info(
+						"The ref={} is to be removed, but its head (sha1={}) not have the expected sha1={} (author={} name={} id={})",
+						ref.getRef(),
+						refSha,
+						expectedHeadSha1,
+						author.getHtmlUrl(),
+						author.getName(),
+						author.getId());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 	}
 
@@ -112,7 +142,13 @@ public class GithubEventHelper {
 		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
 		try {
 			// TODO Add details about the event triggering this
-			String body = "Cleanthat\r\n@blacelle please look at me";
+			String body = PepperResourceHelper
+					.loadAsString(CleanthatConfigInitializer.TEMPLATES_FOLDER + "/cleaning-body.md");
+
+			if (!facade.getRepository().isPrivate()) {
+				body += "\r\n" + "@blacelle please look at me";
+			}
+
 			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", body);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

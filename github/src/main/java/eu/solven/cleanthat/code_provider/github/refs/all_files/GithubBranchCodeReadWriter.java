@@ -15,11 +15,15 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
+import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.FileSystem;
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 
 /**
@@ -27,11 +31,15 @@ import org.kohsuke.github.GHRepository;
  *
  * @author Benoit Lacelle
  */
-public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
+public class GithubBranchCodeReadWriter extends AGithubSha1CodeProviderWriter {
 	final GHBranch branch;
 
-	public GithubBranchCodeProvider(FileSystem fs, String token, GHRepository repo, GHBranch branch) {
-		super(fs, token, repo);
+	public GithubBranchCodeReadWriter(FileSystem fs,
+			String token,
+			String eventKey,
+			GHRepository repo,
+			GHBranch branch) {
+		super(fs, token, eventKey, repo);
 		this.branch = branch;
 	}
 
@@ -48,6 +56,16 @@ public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
 	@Override
 	public String getRef() {
 		return CleanthatRefFilterProperties.BRANCHES_PREFIX + branch.getName();
+	}
+
+	@Override
+	protected GHRef getAsGHRef() {
+		String refName = getRef();
+		try {
+			return new GithubRepositoryFacade(getRepo()).getRef(refName);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Issue fetching ref=" + refName, e);
+		}
 	}
 
 }

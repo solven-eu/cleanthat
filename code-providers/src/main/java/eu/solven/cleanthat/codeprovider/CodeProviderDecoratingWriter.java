@@ -59,7 +59,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	@Override
 	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
 			throws IOException {
-		codeProvider.listFilesForContent(includePatterns, consumer);
+		codeProvider.
+		listFilesForContent(includePatterns, consumer);
 	}
 
 	@Override

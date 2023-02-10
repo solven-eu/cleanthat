@@ -45,7 +45,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.VersionWrapper;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;

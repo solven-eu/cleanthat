@@ -48,7 +48,7 @@
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.3</pepper.version>
 		<error-prone.version>2.18.0</error-prone.version>
-		<spotless.version>2.32.0</spotless.version>
+		<spotless.version>2.33.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 		<spotbugs.version>4.7.3.0</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
@@ -436,6 +436,9 @@
 								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
+							
+							<!-- cleanthat /-->
+							
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
 								<!-- <version>4.18.0</version>-->

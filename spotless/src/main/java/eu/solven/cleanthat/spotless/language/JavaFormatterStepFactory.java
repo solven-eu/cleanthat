@@ -27,6 +27,7 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
 import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
+import com.diffplug.spotless.java.CleanthatJavaStep;
 import com.diffplug.spotless.java.ImportOrderStep;
 import com.diffplug.spotless.java.RemoveUnusedImportsStep;
 import com.google.common.collect.ImmutableList;
@@ -83,10 +84,32 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		case "eclipse": {
 			return makeEclipse(parameters, provisioner);
 		}
+		case "cleanthat": {
+			return makeCleanthat(parameters, provisioner);
+		}
 		default: {
 			throw new IllegalArgumentException("Unknown Java step: " + stepId);
 		}
 		}
+	}
+
+	private FormatterStep makeCleanthat(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
+		String cleanthatVersion = parameters.getCustomProperty("version", String.class);
+		if (cleanthatVersion == null) {
+			cleanthatVersion = CleanthatJavaStep.defaultVersion();
+		}
+
+		String sourceJdk = parameters.getCustomProperty("source_jdk", String.class);
+		if (sourceJdk == null) {
+			throw new IllegalArgumentException(
+					"The property spotless.java.cleanthat.source_jdk is mandatory (e.g. set it to '1.8' or '11')");
+		}
+
+		List<String> mutators = parameters.getCustomProperty("mutators", List.class);
+		List<String> excludedMutators = parameters.getCustomProperty("excluded_mutators", List.class);
+		String defaultGroupArtifact = CleanthatJavaStep.defaultGroupArtifact();
+		return CleanthatJavaStep
+				.create(defaultGroupArtifact, cleanthatVersion, sourceJdk, mutators, excludedMutators, provisioner);
 	}
 
 	private FormatterStep makeEclipse(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
@@ -116,8 +139,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		Boolean wildcardsLast = parameters.getCustomProperty("wildcardsLast", Boolean.class);
 		if (wildcardsLast == null) {
 			// https://github.com/diffplug/spotless/tree/main/plugin-maven#java
-			wildcardsLast = 
-					false;
+			wildcardsLast = false;
 		}
 
 		String ordersFile = parameters.getCustomProperty(KEY_FILE, String.class);
@@ -149,6 +171,12 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		SpotlessStepParametersProperties importOrderParameters = new SpotlessStepParametersProperties();
 		importOrderParameters.putProperty(KEY_FILE, "repository:/.cleanthat/java-importOrder.properties");
 		importOrder.setParameters(importOrderParameters);
+
+		// Cleanthat before Eclipse as CleanThat may break the style
+		SpotlessStepProperties cleanthat = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();
+		SpotlessStepParametersProperties cleanthatParameters = new SpotlessStepParametersProperties();
+		cleanthatParameters.putProperty(KEY_FILE, "11");
+		cleanthat.setParameters(cleanthatParameters);
 
 		SpotlessStepProperties eclipse = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();
 		SpotlessStepParametersProperties eclipseParameters = new SpotlessStepParametersProperties();

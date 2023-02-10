@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -38,7 +37,8 @@ public abstract class ATodoJavaParserMutator extends AJavaParserMutator implemen
 
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_LATEST;
+		// A fake Java version which will never be reached
+		return "99.9";
 	}
 
 	@Override

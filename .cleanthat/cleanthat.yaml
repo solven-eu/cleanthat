@@ -14,8 +14,8 @@ source_code:
 engines:
 # https://github.com/diffplug/spotless/pull/568
 - engine: "spotless"
+  skip: false
   steps:
   - id: "spotless"
-    skip: true
     parameters:
       configuration: "repository:/.cleanthat/spotless.yaml"

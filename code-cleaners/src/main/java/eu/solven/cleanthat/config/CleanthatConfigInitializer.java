@@ -62,9 +62,9 @@ public class CleanthatConfigInitializer {
 			body += "\r\n" + "---" + "\r\n" + "@blacelle please look at me";
 		}
 
-		RepoInitializerResultBuilder resultBuilder = RepoInitializerResult.builder()
-				.prBody(body)
-				.commitMessage(PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt"));
+		String commitMessage = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt");
+		RepoInitializerResultBuilder resultBuilder =
+				RepoInitializerResult.builder().prBody(body).commitMessage(commitMessage);
 
 		GenerateInitialConfig generateInitialConfig = new GenerateInitialConfig(factories);
 		EngineInitializerResult repoProperties;

@@ -12,12 +12,12 @@ Based on the default config's presets, CleanThat will:
 
 - Apply formatting over 'glob:**/*.MD' (markdown) files with the help of [Spotless](https://github.com/diffplug/spotless)
 
-:abcd: Would you like to change the way CleanThat is cleaning your code? Simply edit the `{DEFAULT_PATH}` in this branch with your custom config.
+:abcd: Would you like to change the way CleanThat is cleaning your code? Simply edit the `${DEFAULT_PATH}` in this branch with your custom config.
 
 ### What to Expect
 
 - Pull-Request being open to clean the default branch.
-- Commits being applied to not protected branches (see `meta.refs.protected_patterns` in `{DEFAULT_PATH}`)
+- Commits being applied to not protected branches (see `meta.refs.protected_patterns` in `${DEFAULT_PATH}`)
 
 ---
 

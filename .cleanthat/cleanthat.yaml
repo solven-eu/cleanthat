@@ -16,5 +16,6 @@ engines:
 - engine: "spotless"
   steps:
   - id: "spotless"
+    skip: true
     parameters:
       configuration: "repository:/.cleanthat/spotless.yaml"

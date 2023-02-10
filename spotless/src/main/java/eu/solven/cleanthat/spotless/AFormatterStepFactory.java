@@ -149,7 +149,8 @@ public abstract class AFormatterStepFactory {
 		File locatedFile;
 		try {
 			locatedFile = CONTENT_TO_FILE.get(Base64.getEncoder().encodeToString(content), () -> {
-				Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-eclipse-", ".xml");
+				String fileExt = com.google.common.io.Files.getFileExtension(stylesheetFile);
+				Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-", "." + fileExt);
 
 				Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
 				File tmpFile = tmpFileAsPath.toFile();

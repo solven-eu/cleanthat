@@ -15,14 +15,15 @@
  */
 package eu.solven.cleanthat.code_provider.github.decorator;
 
-import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
-import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
-import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
-import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
+
+import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
+import eu.solven.cleanthat.codeprovider.decorator.IGitCommit;
+import eu.solven.cleanthat.codeprovider.decorator.IGitReference;
+import eu.solven.cleanthat.codeprovider.decorator.IGitRepository;
 
 /**
  * Abstract

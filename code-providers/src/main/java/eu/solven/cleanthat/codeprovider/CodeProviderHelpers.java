@@ -68,6 +68,7 @@ public class CodeProviderHelpers {
 	}
 
 	// TODO Get the merged configuration head -> base
+	// Could be done by relying on the merge commit given a PR
 	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
 		Optional<Map.Entry<String, String>> optPathAndContent;
@@ -85,7 +86,14 @@ public class CodeProviderHelpers {
 
 		ObjectMapper objectMapper;
 		Map.Entry<String, String> pathAndContent = optPathAndContent.get();
-		LOGGER.info("Loaded config from {}", pathAndContent.getKey());
+
+		String sha1ForLog;
+		if (codeProvider instanceof IGitSha1CodeProvider) {
+			sha1ForLog = ((IGitSha1CodeProvider) codeProvider).getSha1();
+		} else {
+			sha1ForLog = codeProvider.getClass().getName();
+		}
+		LOGGER.info("Loaded config from {} from sha1={}", pathAndContent.getKey(), sha1ForLog);
 		if (pathAndContent.getKey().endsWith(".json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
 		} else if (pathAndContent.getKey().endsWith(".yml") || pathAndContent.getKey().endsWith(".yaml")) {

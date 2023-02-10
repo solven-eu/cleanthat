@@ -76,8 +76,8 @@ public class GithubNoApiWebhookHandler {
 				organizationUrl.orElse("<missing>"));
 
 		// We are interested in 2 kind of events:
-		// PR being (re)open: it is a good time to clean PR-head modified files (if not in a readonly branch)
-		// Commit to branches:
+		// 1- PR being (re)open: it is a good time to clean PR-head modified files (if not in a readonly branch)
+		// 2- Commit to branches: a push to some branch
 		// Either there is a PR associated to the branch: it is relevant to keep the PR clean
 		// Or there is no PR associate to the branch, but the branch is to be maintained clean
 		// In this later case, we may clean right away on given branch (a bad-practice)

@@ -119,8 +119,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
 
-		// We make a FileSystem per ICodeProvider
-		// try (FileSystem fileSystem = MemoryFileSystemBuilder.newEmpty().build()) {
 		CleanthatSession cleanthatSession =
 				new CleanthatSession(codeWriter.getFileSystem(), codeWriter, repoProperties);
 
@@ -143,9 +141,6 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				languagesCounters.addAndGet(l, c);
 			});
 		});
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
 
 		boolean isEmpty;
 		if (languageToNbAddedFiles.isEmpty() && !configIsChanged.get()) {

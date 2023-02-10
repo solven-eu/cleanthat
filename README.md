@@ -34,18 +34,25 @@ See README: https://github.com/solven-eu/cleanthat/tree/master/maven
 
 Pending for Spotless integration: https://github.com/diffplug/spotless/tree/main/plugin-gradle
 
-## Github (Paid)
+## Github (Free+Paid)
 
-If your repository is hosted on Github.com:
+If your repository is hosted on Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/)
 
-        https://github.com/marketplace/cleanthat/
+It can configured through a `/.cleanthat/cleanthat.yaml` file at the root of the repository (e.g. [https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml](https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml)).
 
-It is configured through a cleanthat.yaml file at the root of the repository (e.g. https://github.com/solven-eu/cleanthat/blob/master/cleanthat.yml).
-
-It differs with mvn integration by fetching only relevant (e.g. modified) files, based on Github Events.
+It differs from mvn/gradle integration by fetching only relevant (e.g. modified) files, based on Github Events.
 
 - https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent
 - https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pushevent
+
+### Key Features
+
+- Clean branches which are not protected, but which are head of a a PullRequest
+
+### Example configurations of happy Users:
+
+- [Cleanthat](https://github.com/solven-eu/cleanthat/tree/master/.cleanthat) itself
+- [Pepper](https://github.com/solven-eu/pepper/tree/master/.cleanthat)
 
 # Key design decisions
 

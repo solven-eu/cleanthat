@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
@@ -31,11 +34,16 @@ import eu.solven.cleanthat.language.IEngineProperties;
  *
  */
 public class SourceCodeFormatterHelper {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SourceCodeFormatterHelper.class);
 
 	public EngineAndLinters compile(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			IEngineLintFixerFactory lintFixerFactory) {
 		List<ILintFixer> linters = prepareLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
+
+		String engine = engineProperties.getEngine();
+		LOGGER.info("engine={} has prepared {} lintFixers", engine, linters.size());
+		linters.forEach(lf -> LOGGER.info("engine={} relies on {}", engine, lf.getClass().getName()));
 
 		return new EngineAndLinters(engineProperties, linters);
 	}

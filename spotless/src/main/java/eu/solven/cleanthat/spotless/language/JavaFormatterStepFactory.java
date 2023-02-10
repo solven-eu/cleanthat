@@ -121,7 +121,13 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 		String ordersFile = parameters.getCustomProperty(KEY_FILE, String.class);
 		if (ordersFile != null) {
-			return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
+			File orderFileAsFile;
+			try {
+				orderFileAsFile = locateFile(ordersFile);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue locating " + ordersFile, e);
+			}
+			return ImportOrderStep.forJava().createFrom(wildcardsLast, orderFileAsFile);
 		}
 
 		// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without

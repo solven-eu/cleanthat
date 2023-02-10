@@ -15,8 +15,40 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCheckRun.Conclusion;
+import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder.Output;
+import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCommitPointer;
+import org.kohsuke.github.GHCompare;
+import org.kohsuke.github.GHCompare.Commit;
+import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHIssueState;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRef;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTree;
+import org.kohsuke.github.GHTreeBuilder;
+import org.kohsuke.github.GHUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+
 import eu.solven.cleanthat.any_language.ACodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
@@ -50,34 +82,6 @@ import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.utils.ResultOrError;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCheckRun.Conclusion;
-import org.kohsuke.github.GHCheckRun.Status;
-import org.kohsuke.github.GHCheckRunBuilder.Output;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCommitPointer;
-import org.kohsuke.github.GHCompare;
-import org.kohsuke.github.GHCompare.Commit;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHIssueState;
-import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRef;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeBuilder;
-import org.kohsuke.github.GHUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default for {@link IGitRefCleaner}
@@ -373,10 +377,15 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			ICodeProvider codeProvider,
 			ILazyGitReference headSupplier) {
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
-			// Get the head lazily, else it means we create branch which may remain empty
+			// Get the head lazily, to prevent creating empty branches
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			return new GithubRefCodeReadWriter(codeProvider
-					.getFileSystem(), githubAndToken.getToken(), eventKey, theRepo, headWhereToWrite);
+			FileSystem fs = codeProvider.getFileSystem();
+			return new GithubRefCodeReadWriter(fs,
+					githubAndToken.getToken(),
+					eventKey,
+					theRepo,
+					headWhereToWrite,
+					headSupplier.getFullRefOrSha1());
 		});
 		return formatCodeGivenConfig(eventKey, codeProviderWriter, false);
 	}
@@ -545,9 +554,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 
 	private GHCommit commitConfig(GHBranch defaultBranch, GHRepository repo, RepoInitializerResult result)
 			throws IOException {
-		GHTreeBuilder baseTreeBuilder = repo.createTree().baseTree(defaultBranch.getSHA1());
-
-		result.getPathToContents().forEach((path, content) -> baseTreeBuilder.add(path, content, false));
+		GHTreeBuilder baseTreeBuilder = GithubRefWriterLogic.prepareBuilderTree(repo, result.getPathToContents())
+				.baseTree(defaultBranch.getSHA1());
 
 		GHTree createTree = baseTreeBuilder.create();
 		GHCommit commit = GithubRefWriterLogic.prepareCommit(repo)

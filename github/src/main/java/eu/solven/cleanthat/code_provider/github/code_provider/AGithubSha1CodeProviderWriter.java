@@ -15,15 +15,17 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import java.nio.file.FileSystem;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
+
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -32,8 +34,6 @@ import org.kohsuke.github.GHRepository;
  */
 public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvider
 		implements ICodeProviderWriter, IGithubSha1CodeProvider {
-	// private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProviderWriter.class);
-
 	final String eventKey;
 
 	public AGithubSha1CodeProviderWriter(FileSystem fs, String token, String eventKey, GHRepository repo) {
@@ -48,7 +48,7 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 	public void persistChanges(Map<String, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef());
+		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef(), getSha1());
 		githubRefWriterLogic.persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 

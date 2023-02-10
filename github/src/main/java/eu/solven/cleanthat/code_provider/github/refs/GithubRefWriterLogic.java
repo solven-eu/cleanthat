@@ -107,6 +107,60 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, headSha1);
 		}
 
+		Map<String, String> pathToCommitableContent =
+				filterOutPathsHavingDiverged(pathToMutatedContent, refName, refTargetSha);
+
+		if (pathToCommitableContent.isEmpty()) {
+			LOGGER.warn("Due to ref update, there is not a single file to commit");
+			return;
+		}
+
+		try {
+			doCommitContent(prComments, repoName, refName, refTargetSha, pathToCommitableContent);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private void doCommitContent(List<String> prComments,
+			String repoName,
+			String refName,
+			String refTargetSha,
+			Map<String, String> pathToCommitableContent) throws IOException {
+		GHTreeBuilder createTree = prepareBuilderTree(repo, pathToCommitableContent);
+		GHTree createdTree = createTree.baseTree(refTargetSha).create();
+
+		List<String> allCommitRows = new ArrayList<>();
+		allCommitRows.addAll(prComments);
+		allCommitRows.add("eventKey: " + eventKey);
+
+		String commitMessage = allCommitRows.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
+		GHCommitBuilder preparedCommit =
+				prepareCommit(repo).message(commitMessage).parent(refTargetSha).tree(createdTree.getSha());
+
+		computeSignature().ifPresent(s -> preparedCommit.withSignature(s));
+
+		GHCommit commit = preparedCommit.create();
+
+		String newHead = commit.getSHA1();
+		LOGGER.info("Update {} files in {}:{} to {} ({})",
+				pathToCommitableContent.size(),
+				repoName,
+				refName,
+				newHead,
+				commit.getHtmlUrl());
+
+		try {
+			// https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#update-a-reference
+			target.updateTo(newHead);
+		} catch (IOException e) {
+			throw new UncheckedIOException("The ref has been updated in the meantime?", e);
+		}
+	}
+
+	private Map<String, String> filterOutPathsHavingDiverged(Map<String, String> pathToMutatedContent,
+			String refName,
+			String refTargetSha) {
 		Map<String, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
 		{
 			GHCompare compareContentWithHead;
@@ -150,48 +204,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 				}
 			});
 		}
-
-		if (pathToCommitableContent.isEmpty()) {
-			LOGGER.warn("Due to ref update, there is not a single file to commit");
-			return;
-		}
-
-		GHTreeBuilder createTree = prepareBuilderTree(repo, pathToCommitableContent);
-
-		try {
-			GHTree createdTree = createTree.baseTree(refTargetSha).create();
-
-			List<String> allCommitRows = new ArrayList<>();
-			allCommitRows.addAll(prComments);
-			allCommitRows.add("eventKey: " + eventKey);
-
-			String commitMessage = allCommitRows.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
-			GHCommitBuilder preparedCommit =
-					prepareCommit(repo).message(commitMessage).parent(refTargetSha).tree(createdTree.getSha());
-
-			computeSignature().ifPresent(s -> preparedCommit.withSignature(s));
-
-			GHCommit commit = preparedCommit.create();
-
-			String newHead = commit.getSHA1();
-			LOGGER.info("Update {} files in {}:{} to {} ({})",
-					pathToCommitableContent.size(),
-					repoName,
-					refName,
-					newHead,
-					commit.getHtmlUrl());
-
-			try {
-				// https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#update-a-reference
-				target.updateTo(newHead);
-			} catch (IOException e) {
-				throw new UncheckedIOException("The ref has been updated in the meantime?", e);
-			}
-		} catch (
-
-		IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return pathToCommitableContent;
 	}
 
 	public static GHTreeBuilder prepareBuilderTree(GHRepository repo, Map<String, String> pathToMutatedContent) {

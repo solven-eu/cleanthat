@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,11 +151,11 @@ public class JavaRefactorer implements ILintFixerWithId {
 		JavaParser parser = makeJavaParser();
 
 		transformers.stream().filter(ct -> {
-			int ruleMinimal = getVersionIndex(ct.minimalJavaVersion());
-			int codeVersion = getVersionIndex(engineProperties.getEngineVersion());
+			JavaVersion ruleMinimal = JavaVersion.parse(ct.minimalJavaVersion());
+			JavaVersion codeVersion = JavaVersion.parse(engineProperties.getEngineVersion());
 
-			if (ruleMinimal > codeVersion) {
-				LOGGER.debug("We skip {} as {} > {}", ct, ct.minimalJavaVersion(), engineProperties.getEngineVersion());
+			if (codeVersion.isBefore(ruleMinimal)) {
+				LOGGER.debug("We skip {} as {} < {}", ct, codeVersion, ruleMinimal);
 				return false;
 			}
 
@@ -194,14 +195,6 @@ public class JavaRefactorer implements ILintFixerWithId {
 			}
 		});
 		return refCleanCode.get();
-	}
-
-	private static int getVersionIndex(String v) {
-		int ruleMinimal = IJdkVersionConstants.ORDERED.indexOf(v);
-		if (ruleMinimal < 0) {
-			throw new IllegalArgumentException("Unknown version: " + v);
-		}
-		return ruleMinimal;
 	}
 
 	public CompilationUnit parseRawCode(JavaParser parser, String sourceCode) {

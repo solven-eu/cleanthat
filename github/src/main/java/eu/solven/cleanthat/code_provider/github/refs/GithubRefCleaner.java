@@ -318,7 +318,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 				// Typically a refs has been created, or forced-push
 				// Its base would be the ancestor commit which is in the default branch
 				try {
-					GHRepository repo = githubAndToken.getGithub().getRepository(base.getRepoFullName());
+					String baseRepoFullName = base.getRepoFullName();
+					GHRepository repo = githubAndToken.getGithub().getRepository(baseRepoFullName);
 
 					// BEWARE What-if head is a commit of the defaultBranch?
 					GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
@@ -328,7 +329,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 					Commit mergeBaseCommit = compare.getMergeBaseCommit();
 
 					GitRepoBranchSha1 newBase =
-							new GitRepoBranchSha1(base.getRef(), base.getRef(), mergeBaseCommit.getSHA1());
+							new GitRepoBranchSha1(baseRepoFullName, base.getRef(), mergeBaseCommit.getSHA1());
 					LOGGER.info("We will use as base={} to clean head={}", newBase, head);
 					optBase = Optional.of(newBase);
 				} catch (IOException e) {

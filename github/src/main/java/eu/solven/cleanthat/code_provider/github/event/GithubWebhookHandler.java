@@ -31,6 +31,7 @@ import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
+import eu.solven.cleanthat.config.GitService;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
@@ -544,14 +545,14 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			if (optAlreadyExisting.isPresent()) {
 				sha = optAlreadyExisting.get().getObject().getSha();
 				LOGGER.info("The ref {} already exists, with sha1={}", refName, sha);
-				headIsMaterialized = true;
+				headIsMaterialized = false;
 			} else {
 				sha = refToProcess.getSha();
-				headIsMaterialized = false;
+				headIsMaterialized = true;
 			}
 		} else {
 			sha = refToProcess.getSha();
-			headIsMaterialized = false;
+			headIsMaterialized = true;
 		}
 
 		Supplier<IGitReference> headSupplier = () -> {

@@ -98,8 +98,13 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		String refTargetSha = updatedTarget.getObject().getSha();
 
 		String oldTargetSha1 = target.getObject().getSha();
-		if (refTargetSha.equals(oldTargetSha1)) {
-			LOGGER.warn("The ref '{}' has been updated {} -> {}", refName, oldTargetSha1, refTargetSha);
+		if (!refTargetSha.equals(oldTargetSha1)) {
+			// Happens if a commit is pushed during the cleaning
+			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, refTargetSha);
+		}
+		if (!refTargetSha.equals(headSha1)) {
+			// Happens if a commit is pushed after the original event (which may be retried much later)
+			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, headSha1);
 		}
 
 		Map<String, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
@@ -113,12 +118,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 
 			int aheadBy = compareContentWithHead.getAheadBy();
 			if (aheadBy > 0) {
-				LOGGER.info("The cleaned sha1 is ahead by {}", aheadBy);
+				// Some commits has been pushed in the meantime
+				LOGGER.warn("Target '{}' is ahead by {} commits", refName, aheadBy);
 			}
 
 			int behindBy = compareContentWithHead.getBehindBy();
 			if (behindBy > 0) {
-				LOGGER.info("The cleaned sha1 is behind by {}", behindBy);
+				// The ref has been forced push to a commit in the past, even before the head of the event?
+				LOGGER.error("Target '{}' is  behind by {}", refName, behindBy);
 			}
 			LOGGER.info("The cleaned sha1 status is {}", compareContentWithHead.getStatus());
 
@@ -126,14 +133,19 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			// However, the head may be quite old, and some other commits may have been pushed onto the ref
 			Stream.of(compareContentWithHead.getFiles()).forEach(committedFile -> {
 				String previousFilename = committedFile.getPreviousFilename();
+				String concurrentSha = committedFile.getSha();
 				if (previousFilename != null) {
 					if (null != pathToCommitableContent.remove("/" + previousFilename)) {
-						LOGGER.warn("We discarded commit of clean file given a concurrent change: {}", committedFile);
+						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
+								committedFile,
+								concurrentSha);
 					}
 				} else {
 					String filename = committedFile.getFileName();
 					if (null != pathToCommitableContent.remove("/" + filename)) {
-						LOGGER.warn("We discarded commit of clean file given a concurrent change: {}", committedFile);
+						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
+								filename,
+								concurrentSha);
 					}
 				}
 			});

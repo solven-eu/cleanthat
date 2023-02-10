@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
@@ -376,10 +377,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			ICodeProvider codeProvider,
 			ILazyGitReference headSupplier) {
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
-			// Get the head lazily, else it means we create branch which may remain empty
+			// Get the head lazily, to prevent creating empty branches
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			return new GithubRefCodeReadWriter(codeProvider
-					.getFileSystem(), githubAndToken.getToken(), eventKey, theRepo, headWhereToWrite);
+			FileSystem fs = codeProvider.getFileSystem();
+			return new GithubRefCodeReadWriter(fs, githubAndToken.getToken(), eventKey, theRepo, headWhereToWrite,headSupplier.getFullRefOrSha1());
 		});
 		return formatCodeGivenConfig(eventKey, codeProviderWriter, false);
 	}

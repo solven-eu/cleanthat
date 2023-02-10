@@ -21,6 +21,8 @@ import java.nio.file.FileSystem;
 import java.util.Objects;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -28,17 +30,31 @@ import org.kohsuke.github.GHRepository;
  * @author Benoit Lacelle
  */
 public class GithubRefCodeReadWriter extends AGithubSha1CodeProviderWriter {
-	final GHRef ref;
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCodeReadWriter.class);
 
-	public GithubRefCodeReadWriter(FileSystem fs, String token, String eventKey, GHRepository repo, GHRef ref) {
+	final GHRef ref;
+	final String sha1;
+
+	public GithubRefCodeReadWriter(FileSystem fs,
+			String token,
+			String eventKey,
+			GHRepository repo,
+			GHRef ref,
+			String sha1) {
 		super(fs, token, eventKey, repo);
 
 		this.ref = Objects.requireNonNull(ref, "ref is null");
+		this.sha1 = sha1;
+
+		if (!this.sha1.equals(ref.getObject().getSha())) {
+			// This typically happens when executing an old event
+			LOGGER.debug("We are considering writing into a ref, given a (read) sha1 which is not the head");
+		}
 	}
 
 	@Override
 	public String getSha1() {
-		return ref.getObject().getSha();
+		return sha1;
 	}
 
 	@Override

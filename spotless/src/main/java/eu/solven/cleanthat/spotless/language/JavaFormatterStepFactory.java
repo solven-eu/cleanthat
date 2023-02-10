@@ -18,8 +18,12 @@ package eu.solven.cleanthat.spotless.language;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -121,7 +125,13 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 		String ordersFile = parameters.getCustomProperty(KEY_FILE, String.class);
 		if (ordersFile != null) {
-			return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersFile);
+			File orderFileAsFile;
+			try {
+				orderFileAsFile = locateFile(ordersFile);
+			} catch (IOException e) {
+				throw new UncheckedIOException("Issue locating " + ordersFile, e);
+			}
+			return ImportOrderStep.forJava().createFrom(wildcardsLast, orderFileAsFile);
 		}
 
 		// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without
@@ -132,6 +142,26 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			ordersString = Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
 		}
 		return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersString.split(","));
+	}
+
+	public static List<String> getImportOrder(File importsFile) {
+		try (Stream<String> lines = Files.lines(importsFile.toPath())) {
+			return lines.filter(line -> !line.startsWith("#"))
+					// parse 0=input
+					.map(JavaFormatterStepFactory::splitIntoIndexAndName)
+					.sorted(Map.Entry.comparingByKey())
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toCollection(ArrayList::new));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private static Map.Entry<Integer, String> splitIntoIndexAndName(String line) {
+		String[] pieces = line.split("=");
+		Integer index = Integer.valueOf(pieces[0]);
+		String name = pieces.length == 2 ? pieces[1] : "";
+		return new SimpleImmutableEntry<>(index, name);
 	}
 
 	// This is useful to demonstrate all available configuration

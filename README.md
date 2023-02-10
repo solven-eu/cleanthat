@@ -45,6 +45,10 @@ It differs from mvn/gradle integration by fetching only relevant (e.g. modified)
 - https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent
 - https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pushevent
 
+### Key Features
+
+- Clean branches which are not protected, but which are head of a a PullRequest
+
 ### Example configurations of happy Users:
 
 - [Cleanthat](https://github.com/solven-eu/cleanthat/tree/master/.cleanthat) itself

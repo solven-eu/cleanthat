@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -73,13 +74,13 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	}
 
 	@Override
-	public void persistChanges(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<Path, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		commitIntoRef(pathToMutatedContent, prComments);
 	}
 
-	protected void commitIntoRef(Map<String, String> pathToMutatedContent, List<String> prComments) {
+	protected void commitIntoRef(Map<Path, String> pathToMutatedContent, List<String> prComments) {
 		String repoName = repo.getFullName();
 		String refName = target.getRef();
 		LOGGER.debug("Persisting into {}:{}", repoName, refName);
@@ -107,7 +108,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, headSha1);
 		}
 
-		Map<String, String> pathToCommitableContent =
+		Map<Path, String> pathToCommitableContent =
 				filterOutPathsHavingDiverged(pathToMutatedContent, refName, refTargetSha);
 
 		if (pathToCommitableContent.isEmpty()) {
@@ -126,7 +127,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			String repoName,
 			String refName,
 			String refTargetSha,
-			Map<String, String> pathToCommitableContent) throws IOException {
+			Map<Path, String> pathToCommitableContent) throws IOException {
 		GHTreeBuilder createTree = prepareBuilderTree(repo, pathToCommitableContent);
 		GHTree createdTree = createTree.baseTree(refTargetSha).create();
 
@@ -158,10 +159,16 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		}
 	}
 
-	private Map<String, String> filterOutPathsHavingDiverged(Map<String, String> pathToMutatedContent,
+	private Map<Path, String> filterOutPathsHavingDiverged(Map<Path, String> pathToMutatedContent,
 			String refName,
 			String refTargetSha) {
-		Map<String, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
+		if (pathToMutatedContent.isEmpty()) {
+			return pathToMutatedContent;
+		}
+
+		Path root = pathToMutatedContent.keySet().iterator().next();
+
+		Map<Path, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
 		{
 			GHCompare compareContentWithHead;
 			try {
@@ -189,14 +196,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 				String previousFilename = committedFile.getPreviousFilename();
 				String concurrentSha = committedFile.getSha();
 				if (previousFilename != null) {
-					if (null != pathToCommitableContent.remove("/" + previousFilename)) {
+					if (null != pathToCommitableContent.remove(root.resolve(previousFilename))) {
 						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
 								committedFile,
 								concurrentSha);
 					}
 				} else {
 					String filename = committedFile.getFileName();
-					if (null != pathToCommitableContent.remove("/" + filename)) {
+					if (null != pathToCommitableContent.remove(root.resolve(filename))) {
 						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
 								filename,
 								concurrentSha);
@@ -207,18 +214,18 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		return pathToCommitableContent;
 	}
 
-	public static GHTreeBuilder prepareBuilderTree(GHRepository repo, Map<String, String> pathToMutatedContent) {
+	public static GHTreeBuilder prepareBuilderTree(GHRepository repo, Map<Path, String> pathToMutatedContent) {
 		GHTreeBuilder createTree = repo.createTree();
 		pathToMutatedContent.forEach((path, content) -> {
-			if (!path.startsWith("/")) {
+			if (!path.isAbsolute()) {
 				throw new IllegalStateException("We expect to receive only rooted path: " + path);
 			}
 
 			// Remove the leading '/'
-			path = path.substring("/".length());
+			String gitPath = path.toString().substring("/".length());
 
 			// TODO isExecutable isn't a parameter from the original file?
-			createTree.add(path, content, false);
+			createTree.add(gitPath, content, false);
 		});
 		return createTree;
 	}

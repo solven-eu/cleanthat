@@ -130,7 +130,8 @@ public final class GitAttributesLineEndings_InMemory {
 		private static final long serialVersionUID = -2534772773057900619L;
 
 		/** this is transient, to simulate PathSensitive.RELATIVE */
-		final transient String rootDir;
+		// CleanThat: we removed the transient keyword as the purpose is unclear, and Spotbugs was complaining
+		final String rootDir;
 		/** the line ending used for most files */
 		final String defaultEnding;
 		/** any exceptions to that default, in terms of relative path from rootDir */

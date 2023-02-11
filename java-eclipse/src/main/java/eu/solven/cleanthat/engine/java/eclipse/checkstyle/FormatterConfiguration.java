@@ -23,6 +23,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Class containing all configurations for a eclipse-formatter-profile.
  * 
@@ -85,6 +87,7 @@ public class FormatterConfiguration {
 	 * @param settings
 	 *            A eclipse-formatter-configuration.
 	 */
+	@SuppressFBWarnings("WMI_WRONG_MAP_ITERATOR")
 	public void addConfiguration(final FormatterConfiguration settings) {
 		// add local settings
 		final Map<String, String> localSettings = settings.getFormatterSettings();

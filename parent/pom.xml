@@ -493,7 +493,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
-			
+
 			<!-- Apply formatters before checks -->
 			<!-- CleanThat is disabled as it conflicts with Spotless (around Aether) -->
 			<!--			<plugin>-->
@@ -508,7 +508,7 @@
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
 			</plugin>
-			
+
 			<!-- Apply checks after formatters -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

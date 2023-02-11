@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.config;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import lombok.Builder;
@@ -34,6 +35,6 @@ public class RepoInitializerResult {
 	final String prBody;
 
 	@Singular
-	final Map<String, String> pathToContents;
+	final Map<Path, String> pathToContents;
 
 }

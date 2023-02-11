@@ -152,11 +152,11 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		consumer.accept(new DummyCodeProviderFile(path, path));
 	}
 
-	protected Path resolvePath(String path) {
+	protected Path resolvePath(Path path) {
 		if (path.startsWith("/")) {
 			// We receive absolute path, considering as root the git repository
 			// Hence we clean the leading '/' to build a path relative to the actual root
-			path = path.substring(1);
+			path = path.getRoot().relativize(path);
 		} else {
 			LOGGER.debug("TODO Should we reject this? lack of leading '/' in {}", path);
 		}
@@ -192,7 +192,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<Path, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		pathToMutatedContent.forEach((k, v) -> {
@@ -246,7 +246,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolvedPath = resolvePath(path);
+		Path resolvedPath = resolvePath(getFileSystem().getPath(path));
 
 		if (resolvedPath.toFile().isFile()) {
 			return Optional.of(new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8));

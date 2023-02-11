@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,6 +63,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -181,7 +183,13 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			throw new IllegalArgumentException("Issue with configPath: " + configPath + " (no root)");
 		}
 
-		return Paths.get("/").resolve(rootFolder.relativize(eclipseConfigPath));
+		return getMemoryRoot().resolve(rootFolder.relativize(eclipseConfigPath));
+	}
+
+	@SuppressFBWarnings("DMI_HARDCODED_ABSOLUTE_FILENAME")
+	// TODO We should not rely on default FS
+	private Path getMemoryRoot() {
+		return Paths.get("/");
 	}
 
 	/**
@@ -287,7 +295,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		String eclipseStylesheetFile =
 				eclipseParameters.getCustomProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, String.class);
-		if (eclipseStylesheetFile != null && !eclipseStylesheetFile.equals(eclipseStylesheetFile)) {
+		if (eclipseStylesheetFile != null) {
 			// TODO We would prefer writing the new stylesheet in the previously configured path
 			eclipseParameters.putProperty(pathToSpotlessConfig, pathToSpotlessConfig);
 			needToSaveSpotless = true;
@@ -412,7 +420,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			String gitIgnoreContent;
 			try {
 				gitIgnoreContent =
-						new String(ByteStreams.toByteArray(new FileSystemResource(gitIgnoreFile).getInputStream()));
+						new String(ByteStreams.toByteArray(new FileSystemResource(gitIgnoreFile).getInputStream()),
+								StandardCharsets.UTF_8);
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue loading: " + gitIgnore, e);
 			}
@@ -479,7 +488,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			}
 		} else {
 			LOGGER.info("About to write Eclipse configuration at: {}", whereToWriteAsFile);
-			whereToWriteAsFile.getParentFile().mkdirs();
+			if (whereToWriteAsFile.getParentFile().mkdirs()) {
+				LOGGER.info(".mkdirs() successful on {}", whereToWriteAsFile.getParentFile());
+			}
 		}
 
 		try (InputStream is = XmlProfileWriter.writeFormatterProfileToStream("cleanthat", settings);

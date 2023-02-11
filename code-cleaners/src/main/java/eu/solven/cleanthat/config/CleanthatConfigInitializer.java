@@ -72,10 +72,12 @@ public class CleanthatConfigInitializer {
 			repoProperties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
 
 			String repoPropertiesYaml = objectMapper.writeValueAsString(repoProperties.getRepoProperties());
-			resultBuilder.pathToContent(defaultRepoPropertiesPath, repoPropertiesYaml);
+			resultBuilder.pathToContent(codeProvider.getFileSystem().getPath(defaultRepoPropertiesPath),
+					repoPropertiesYaml);
 
 			// Register the custom files of the engine
-			repoProperties.getPathToContents().forEach(resultBuilder::pathToContent);
+			repoProperties.getPathToContents()
+					.forEach((k, v) -> resultBuilder.pathToContent(codeProvider.getFileSystem().getPath(k), v));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
 		}

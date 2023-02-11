@@ -117,7 +117,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
-		Map<String, String> pathToMutatedContent = new LinkedHashMap<>();
+		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
 		CleanthatSession cleanthatSession =
 				new CleanthatSession(codeWriter.getFileSystem(), codeWriter, repoProperties);
@@ -204,7 +204,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.CloseResource" })
 	protected AtomicLongMap<String> processFiles(CleanthatSession cleanthatSession,
 			AtomicLongMap<String> languageToNbMutatedFiles,
-			Map<String, String> pathToMutatedContent,
+			Map<Path, String> pathToMutatedContent,
 			IEngineProperties engineP) {
 		ISourceCodeProperties sourceCodeProperties = engineP.getSourceCode();
 
@@ -292,7 +292,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 	private boolean doFormat(CleanthatSession cleanthatSession,
 			EngineAndLinters engineAndLinters,
-			Map<String, String> pathToMutatedContent,
+			Map<Path, String> pathToMutatedContent,
 			Path filePath) throws IOException {
 		// Rely on the latest code (possibly formatted by a previous processor)
 		Optional<String> optCode =
@@ -308,7 +308,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		String output = doFormat(engineAndLinters, new PathAndContent(filePath, code));
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
 			LOGGER.info("Path={} successfully cleaned by {}", filePath, engineAndLinters);
-			pathToMutatedContent.put(filePath.toString(), output);
+			pathToMutatedContent.put(filePath, output);
 
 			if (pathToMutatedContent.size() > MAX_LOG_MANY_FILES
 					&& Integer.bitCount(pathToMutatedContent.size()) == 1) {
@@ -330,7 +330,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	 * @return an {@link Optional} of the content.
 	 */
 	public Optional<String> loadCodeOptMutated(ICodeProvider codeProvider,
-			Map<String, String> pathToMutatedContent,
+			Map<Path, String> pathToMutatedContent,
 			Path filePath) {
 		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
 

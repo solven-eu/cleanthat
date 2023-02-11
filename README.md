@@ -14,6 +14,7 @@ Related projects:
 - https://github.com/openrewrite/rewrite-migrate-java (free)
 - https://www.moderne.io/ (paid)
 - https://eslint.org/docs/latest/extend/custom-formatters (free)
+- https://errorprone.info/docs/refaster (free)
 
 # Changes
 

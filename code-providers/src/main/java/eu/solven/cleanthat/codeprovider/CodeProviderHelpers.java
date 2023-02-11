@@ -18,7 +18,6 @@ package eu.solven.cleanthat.codeprovider;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -53,7 +53,7 @@ public class CodeProviderHelpers {
 	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
 
 	public static final List<String> PATHES_CLEANTHAT =
-			Arrays.asList(PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
+			ImmutableList.of(PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
 					PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,
 					PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
 					PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,

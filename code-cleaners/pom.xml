@@ -45,7 +45,7 @@
 			<!-- This enables manipulating Path not dependent on a local FileSystem -->
 			<groupId>com.github.marschall</groupId>
 			<artifactId>memoryfilesystem</artifactId>
-			<version>2.4.0</version>
+			<version>2.5.0</version>
 		</dependency>
 
 		<dependency>

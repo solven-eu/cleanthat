@@ -18,6 +18,8 @@ package eu.solven.cleanthat.it;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -137,12 +139,12 @@ public class ITGithub {
 					itsRepo.getRepository(),
 					itsRepo.getRepository().getBranch("master"));
 
-			Map<String, String> changes = new LinkedHashMap<>();
+			Map<Path, String> changes = new LinkedHashMap<>();
 
 			// We write now in any now files
 			codeProvider.listFilesForFilenames(file -> {
 				if (file.getPath().endsWith("now")) {
-					changes.put(file.getPath(), OffsetDateTime.now().toString());
+					changes.put(Paths.get(file.getPath()), OffsetDateTime.now().toString());
 				}
 			});
 

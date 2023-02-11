@@ -52,6 +52,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://junit.org/junit5/docs/current/user-guide/#migrating-from-junit4-tips
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
+// https://docs.openrewrite.org/running-recipes/popular-recipe-guides/migrate-from-junit-4-to-junit-5
 public class JUnit4ToJUnit5 extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
 

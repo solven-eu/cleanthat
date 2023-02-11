@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Utility class to write eclipse formatter/cleanup profile XML files.
  *
@@ -76,6 +78,7 @@ public final class XmlProfileWriter {
 		return writeProfileToStream(name, FORMATTER_PROFILE_VERSION, FORMATTER_PROFILE_KIND, settings);
 	}
 
+	@SuppressFBWarnings("WMI_WRONG_MAP_ITERATOR")
 	private static InputStream writeProfileToStream(String name,
 			String profileVersion,
 			String profileKind,

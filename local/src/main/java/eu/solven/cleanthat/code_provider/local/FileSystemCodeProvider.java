@@ -124,8 +124,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		return root.toAbsolutePath().toString();
 	}
 
-	protected Path resolvePath(String path) {
-		if (!path.startsWith("/")) {
+	protected Path resolvePath(Path path) {
+		if (!path.isAbsolute()) {
 			throw new IllegalArgumentException(
 					"We expect only absolute path, consider the root of the git repository as the root (path=" + path
 							+ ")");
@@ -135,16 +135,16 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<Path, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
-		pathToMutatedContent.forEach((path, content) -> {
-			Path resolved = resolvePath(path);
+		pathToMutatedContent.forEach((inMemoryPath, content) -> {
+			Path resolved = resolvePath(inMemoryPath);
 			try {
-				LOGGER.info("Write file: {}", path);
+				LOGGER.info("Write file: {}", resolved);
 				Files.write(resolved, content.getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e) {
-				throw new UncheckedIOException("Issue on: " + path + " (resolved into " + resolved + ")", e);
+				throw new UncheckedIOException("Issue on: " + inMemoryPath + " (resolved into " + resolved + ")", e);
 			}
 		});
 	}
@@ -162,7 +162,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolved = resolvePath(path);
+		Path resolved = resolvePath(getFileSystem().getPath(path));
 		if (resolved.toFile().isFile()) {
 			return Optional.of(Files.readString(resolved));
 		} else {

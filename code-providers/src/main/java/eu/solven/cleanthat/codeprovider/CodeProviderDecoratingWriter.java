@@ -17,6 +17,7 @@ package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<String, String> pathToMutatedContent,
+	public void persistChanges(Map<Path, String> pathToMutatedContent,
 			List<String> prComments,
 			Collection<String> prLabels) {
 		// if (codeProvider instanceof GithubComm)

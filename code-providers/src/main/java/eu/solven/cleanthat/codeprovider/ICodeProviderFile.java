@@ -21,6 +21,7 @@ package eu.solven.cleanthat.codeprovider;
  *
  */
 public interface ICodeProviderFile {
+	@Deprecated(since = "We should return a Path")
 	String getPath();
 
 	/**

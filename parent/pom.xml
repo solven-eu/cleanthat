@@ -493,19 +493,22 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
+			
 			<!-- Apply formatters before checks -->
-			<plugin>
-				<groupId>io.github.solven-eu.cleanthat</groupId>
-				<artifactId>cleanthat-maven-plugin</artifactId>
-				<!-- CleanThat should be executed only in the top-directory -->
-				<inherited>false</inherited>
-			</plugin>
+			<!-- CleanThat is disabled as it conflicts with Spotless (around Aether) -->
+			<!--			<plugin>-->
+			<!--				<groupId>io.github.solven-eu.cleanthat</groupId>-->
+			<!--				<artifactId>cleanthat-maven-plugin</artifactId>-->
+			<!-- CleanThat should be executed only in the top-directory -->
+			<!--				<inherited>false</inherited>-->
+			<!--			</plugin>-->
 			<plugin>
 				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
 			</plugin>
+			
 			<!-- Apply checks after formatters -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

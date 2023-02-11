@@ -38,6 +38,8 @@ public interface IJdkVersionConstants {
 	// https://www.infoq.com/news/2015/12/java-version-strings-evolve/
 	String JDK_9 = "9";
 
+	String JDK_10 = "10";
+
 	String JDK_11 = "11";
 
 	String JDK_17 = "17";

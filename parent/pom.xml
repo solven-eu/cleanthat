@@ -436,9 +436,9 @@
 								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
-							
+
 							<!-- cleanthat /-->
-							
+
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
 								<!-- <version>4.18.0</version>-->

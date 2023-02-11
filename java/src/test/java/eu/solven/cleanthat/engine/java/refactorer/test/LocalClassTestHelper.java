@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +26,8 @@ import org.springframework.core.io.ClassPathResource;
 public class LocalClassTestHelper {
 
 	public static Path getProjectTestSourceCode() throws IOException {
-		Path srcMainResource = new ClassPathResource("logback-test.xml").getFile().getParentFile().toPath();
+		File someResourceInSrcTestResources = new ClassPathResource("/logback-test.xml").getFile();
+		Path srcMainResource = someResourceInSrcTestResources.getParentFile().toPath();
 		Assert.assertEquals("test-classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
 		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
 		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());

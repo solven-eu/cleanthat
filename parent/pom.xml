@@ -38,13 +38,16 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
+
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.release>11</maven.compiler.release>
+
 		<!-- https://stackoverflow.com/questions/20581427/using-maven-release-plugin-with-github-you-cant-push-to-git-github-com -->
 		<scm.developerConnection>scm:git:ssh://git@github.com/solven-eu/cleanthat.git</scm.developerConnection>
 		<scm.connection>scm:git:ssh://github.com/solven-eu/cleanthat.git</scm.connection>
 		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
+
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.3</pepper.version>
 		<error-prone.version>2.18.0</error-prone.version>
@@ -61,22 +64,19 @@
 		<checkstyle.version>10.6.0</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
+
 		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
 		<!-- We suppose the developper would see the fixed and include them in his commit. -->
 		<!-- In the CI, we check BEFORE automatic fixes as the CI should report early invalid code -->
 		<staticChecks>process-sources</staticChecks>
-		<!-- By default (i.e. in local environments), check for code linting AFTER trying automatic fixes. -->
-		<lintGoal>lint-autofix</lintGoal>
 		<!-- CPD: We configure as property to enable overriding by sub-modules -->
 		<!-- Code duplication: Lower is better. Default is 100 -->
 		<minimumTokens>80</minimumTokens>
+
 		<!-- Skip javadoc, especially as it would break mvn:release -->
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<!-- We deploy only into lambda -->
 		<maven.deploy.skip>true</maven.deploy.skip>
-		<!-- We have many false positive related to NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE -->
-		<!-- https://github.com/spotbugs/spotbugs/issues/756 -->
-		<spotbugs.skip>false</spotbugs.skip>
 		<!-- Execute license-check manually, only before doing a release -->
 		<license.skip>true</license.skip>
 	</properties>
@@ -210,7 +210,7 @@
 					<version>${spotbugs.version}</version>
 					<configuration>
 						<!-- Skipped as we need a Pepper release for the default exclusions -->
-						<skip>true</skip>
+						<skip>false</skip>
 						<!-- Need Pepper release 4.3? -->
 						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
 					</configuration>
@@ -271,7 +271,6 @@
 							<phase>${staticChecks}</phase>
 							<configuration>
 								<configLocation>style/pepper.checkstyle.xml</configLocation>
-								<encoding>UTF-8</encoding>
 								<consoleOutput>true</consoleOutput>
 								<failsOnError>true</failsOnError>
 								<!-- Prevent [WARNING] Unable to locate Source XRef to link to - DISABLED -->
@@ -351,9 +350,9 @@
 					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
-					<version>1.8</version>
+					<version>2.0</version>
 					<configuration>
-						<!-- Skipped while working on 2.0-SNAPSHOT -->
+						<!-- Skipped as it conflicts with Spotless (around Aether) -->
 						<skip>true</skip>
 					</configuration>
 					<executions>
@@ -436,9 +435,9 @@
 								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
-							
-							<!-- cleanthat /-->
-							
+
+							<cleanthat />
+
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->
 								<!-- <version>4.18.0</version>-->
@@ -613,8 +612,6 @@
 			<properties>
 				<!-- In CI environments, we should check code formatting before trying to autofix it -->
 				<staticChecks>validate</staticChecks>
-				<!-- In CI, we should not auto-fix, but only checking/linting -->
-				<lintGoal>lint</lintGoal>
 			</properties>
 		</profile>
 		<profile>

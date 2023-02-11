@@ -67,7 +67,7 @@ public class TestDefaultSpotlessConfig {
 			Assertions.assertThat(safeRebuiltFromEmpty.getFormatters())
 					.hasSize(1)
 					.singleElement()
-					.matches(p -> p.getFormat().equals("markdown"));
+					.matches(p -> "markdown".equals(p.getFormat()));
 		}
 
 		// This is useful to convert the Java class of processors into Map (like it will happen when loading from the

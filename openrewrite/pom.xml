@@ -1,71 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
 		<version>2.2-SNAPSHOT</version>
 	</parent>
-
-	<artifactId>code-cleaners</artifactId>
-
+	<artifactId>openrewrite</artifactId>
+	
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
+		<openrewrite.dependency.version>1.14.0</openrewrite.dependency.version>
 	</properties>
-
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.openrewrite.recipe</groupId>
+				<artifactId>rewrite-recipe-bom</artifactId>
+				<version>${openrewrite.dependency.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<dependencies>
-		<dependency>
-			<groupId>io.github.solven-eu.pepper</groupId>
-			<artifactId>pepper</artifactId>
-			<version>${pepper.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>code-providers</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
-			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
-		<dependency>
-			<!-- Enable processing YAMLs -->
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
-
-		<!-- https://github.com/marschall/memoryfilesystem -->
-		<dependency>
-			<!-- This enables manipulating Path not dependent on a local FileSystem -->
-			<groupId>com.github.marschall</groupId>
-			<artifactId>memoryfilesystem</artifactId>
-			<version>2.5.0</version>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>code-cleaners</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		
-		<!-- https://github.com/google/jimfs -->
 		<dependency>
-			<groupId>com.google.jimfs</groupId>
-			<artifactId>jimfs</artifactId>
-			<version>1.2</version>
+			<groupId>org.openrewrite</groupId>
+			<artifactId>rewrite-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openrewrite</groupId>
+			<artifactId>rewrite-java-11</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
-			<!-- For Eclipse, given downloaded jar: 'java -jar lombok.jar' -->
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- Until adding CleanThat as as official Spotless Java step -->
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>java</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

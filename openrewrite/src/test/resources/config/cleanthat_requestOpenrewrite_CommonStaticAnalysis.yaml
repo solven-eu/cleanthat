@@ -1,0 +1,23 @@
+syntax_version: "2023-01-09"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    protected_patterns:
+      - master
+source_code:
+  excludes:
+  - "regex:.*/generated/.*"
+  encoding: "UTF-8"
+  line_ending: "NATIVE"
+engines:
+- engine: "openrewrite"
+  source_code:
+    includes:
+    # For now, Openrewrite applies only to Java files
+    - "regex:.*\\.java"
+  steps:
+  - id: "openrewrite"
+    parameters:
+      recipes:
+      - "org.openrewrite.java.cleanup.CommonStaticAnalysis"

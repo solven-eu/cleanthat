@@ -35,11 +35,11 @@
 			<!-- JavaParser seems a better option to later handle more languages -->
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-symbol-solver-core</artifactId>
-			<version>3.24.10</version>
+			<version>3.25.0</version>
 		</dependency>
-		
+
 		<dependency>
-				<!-- Used to parse Java versions with JavaVersion -->
+			<!-- Used to parse Java versions with JavaVersion -->
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-java</artifactId>
 			<version>1.1.2</version>

@@ -91,6 +91,8 @@ public class ATestCases {
 			boolean transformed = transformer.walkNode(pre);
 			// Rename the method before checking full equality
 			pre.setName("post");
+
+			// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
 			Assert.assertEquals("Should have mutated " + clonedPre
 					+ " into "
 					+ post
@@ -106,7 +108,7 @@ public class ATestCases {
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			MethodDeclaration postBeforeWalk = post.clone();
-			Assert.assertFalse(transformer.walkNode(post));
+			Assert.assertFalse("Unexpected transformation on code just transformed", transformer.walkNode(post));
 			Assert.assertEquals(postBeforeWalk, post);
 		}
 	}

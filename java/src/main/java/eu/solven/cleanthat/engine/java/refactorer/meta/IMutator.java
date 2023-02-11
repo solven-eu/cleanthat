@@ -38,7 +38,7 @@ public interface IMutator {
 	}
 
 	default Set<String> getIds() {
-		Set<String> ids = Stream.of(Optional.of(getId()), getCheckstyleId(), getPmdId())
+		Set<String> ids = Stream.of(Optional.of(getId()), getCheckstyleId(), getPmdId(), getSonarId())
 				.flatMap(Optional::stream)
 				.filter(s -> !"TODO".equals(s))
 				.collect(Collectors.toSet());
@@ -54,6 +54,10 @@ public interface IMutator {
 	}
 
 	default Optional<String> getCheckstyleId() {
+		return Optional.empty();
+	}
+
+	default Optional<String> getSonarId() {
 		return Optional.empty();
 	}
 

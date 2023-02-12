@@ -17,6 +17,7 @@ package eu.solven.cleanthat.codeprovider;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -124,6 +125,14 @@ public class CodeProviderHelpers {
 				.findAny()
 				.orElseThrow(() -> new IllegalStateException(
 						"No configuration at pathes: " + CodeProviderHelpers.PATHES_CLEANTHAT));
+	}
+
+	public static Path getRoot(Path path) {
+		return getRoot(path.getFileSystem());
+	}
+
+	public static Path getRoot(FileSystem fs) {
+		return fs.getPath(fs.getSeparator());
 	}
 
 }

@@ -30,6 +30,7 @@ import org.openrewrite.config.CompositeRecipe;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.tree.J;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.ILintFixerWithPath;
@@ -64,7 +65,7 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 		Files.createDirectories(path.getParent());
 		Files.writeString(path, pathAndContent.getContent());
 
-		Path root = path.getFileSystem().getPath("/");
+		Path root = CodeProviderHelpers.getRoot(path);
 
 		// determine your project directory and provide a list of
 		// paths to jars that represent the project's classpath
@@ -83,10 +84,12 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 		// collect results
 		List<Result> results = recipe.run(cus, ctx).getResults();
 
+		if (results.size() != 1) {
+			throw new IllegalStateException("We expected a single result in return. Got: " + results.size());
+		}
+
 		for (Result result : results) {
 			output.set(pathAndContent.withContent(result.getAfter().printAll()));
-
-			// result.getRecipeErrors().forEach(null)
 		}
 
 		return output.get().getContent();

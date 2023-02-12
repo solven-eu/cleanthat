@@ -18,10 +18,11 @@ package eu.solven.cleanthat.lambda;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import eu.solven.cleanthat.language.openrewrite.OpenrewriteFormattersFactory;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 /**
- * Spring configuration wrapping all available languages
+ * Spring configuration wrapping all available engines
  * 
  * @author Benoit Lacelle
  *
@@ -31,6 +32,7 @@ import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 		// JavaFormattersFactory.class,
 		SpotlessFormattersFactory.class,
+		OpenrewriteFormattersFactory.class,
 
 })
 public class AllEnginesSpringConfig {

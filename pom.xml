@@ -21,12 +21,14 @@
 		<module>config</module>
 		<module>code-cleaners</module>
 
+		<module>refactorer</module>
+		
 		<!-- JVM languages -->
 		<module>java</module>
 		<module>java-eclipse</module>
 		<!-- mvn with Java and Kotlin is broken (as we are too weak in Kotlin-->
 		<!--module>kotlin</module-->
-
+		
 		<module>runnable</module>
 		<module>lambda</module>
 

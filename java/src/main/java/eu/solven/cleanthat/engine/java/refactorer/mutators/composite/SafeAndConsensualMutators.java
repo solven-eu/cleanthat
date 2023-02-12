@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveBoxedForString;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
@@ -41,6 +42,7 @@ public class SafeAndConsensualMutators extends CompositeMutator {
 			.add(new ModifierOrder(),
 					new UseIndexOfChar(),
 					new UseIsEmptyOnCollections(),
+					new OptionalNotEmpty(),
 					new StreamAnyMatch(),
 					new PrimitiveBoxedForString())
 			.build();

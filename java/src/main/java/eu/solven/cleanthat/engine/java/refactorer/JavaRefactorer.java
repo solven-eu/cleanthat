@@ -116,30 +116,11 @@ public class JavaRefactorer implements ILintFixerWithId {
 				if (!matchingMutators.isEmpty()) {
 					return matchingMutators.stream();
 				}
-				try {
-					// https://www.baeldung.com/java-check-class-exists
-					ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-					Class<? extends IMutator> mutatorClass =
-							(Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
 
-					IMutator mutator;
-					if (CompositeMutator.class.isAssignableFrom(mutatorClass)) {
-						Constructor<? extends IMutator> ctor = mutatorClass.getConstructor(JavaVersion.class);
-						mutator = ctor.newInstance(sourceCodeVersion);
-					} else {
-						Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
-						mutator = ctor.newInstance(sourceCodeVersion);
-					}
+				Optional<IMutator> optFromClassName = loadMutatorFromClass(sourceCodeVersion, includedRule);
 
-					return Stream.of(mutator);
-				} catch (ClassNotFoundException e) {
-					LOGGER.debug("includedMutator {} is not present classname", includedRule, e);
-				} catch (NoSuchMethodException e) {
-					throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
-				} catch (InstantiationException e) {
-					throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					throw new IllegalArgumentException("Issue instanciating includedMutator=" + includedRule, e);
+				if (optFromClassName.isPresent()) {
+					return optFromClassName.stream();
 				}
 
 				LOGGER.warn("includedMutator={} did not matched any mutator", includedRule);
@@ -147,16 +128,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 			}
 		}).collect(Collectors.toList());
 
-		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
-		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
-			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
-				if (m instanceof CompositeMutator) {
-					return ((CompositeMutator) m).getUnderlyings().stream();
-				} else {
-					return Stream.of(m);
-				}
-			}).collect(Collectors.toList());
-		}
+		// We unroll composite to enable exclusion of included mutators
+		List<IMutator> mutatorsNotComposite = unrollCompositeMutators(mutatorsMayComposite);
 
 		// TODO '.distinct()' to handle multiple composites bringing the same mutator
 		return mutatorsNotComposite.stream().filter(mutator -> {
@@ -178,6 +151,49 @@ public class JavaRefactorer implements ILintFixerWithId {
 			}
 		}).collect(Collectors.toList());
 
+	}
+
+	private static Optional<IMutator> loadMutatorFromClass(JavaVersion sourceCodeVersion, String includedRule) {
+		try {
+			// https://www.baeldung.com/java-check-class-exists
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			Class<? extends IMutator> mutatorClass =
+					(Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
+
+			IMutator mutator;
+			if (CompositeMutator.class.isAssignableFrom(mutatorClass)) {
+				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor(JavaVersion.class);
+				mutator = ctor.newInstance(sourceCodeVersion);
+			} else {
+				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
+				mutator = ctor.newInstance(sourceCodeVersion);
+			}
+
+			return Optional.of(mutator);
+		} catch (ClassNotFoundException e) {
+			LOGGER.debug("includedMutator {} is not present classname", includedRule, e);
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
+		} catch (InstantiationException e) {
+			throw new IllegalArgumentException("Invalid class for includedMutator=" + includedRule, e);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalArgumentException("Issue instanciating includedMutator=" + includedRule, e);
+		}
+		return Optional.empty();
+	}
+
+	private static List<IMutator> unrollCompositeMutators(List<IMutator> mutatorsMayComposite) {
+		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
+		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
+			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
+				if (m instanceof CompositeMutator) {
+					return ((CompositeMutator) m).getUnderlyings().stream();
+				} else {
+					return Stream.of(m);
+				}
+			}).collect(Collectors.toList());
+		}
+		return mutatorsNotComposite;
 	}
 
 	@Override

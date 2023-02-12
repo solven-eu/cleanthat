@@ -46,7 +46,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.VersionWrapper;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
@@ -83,25 +82,37 @@ public class JavaRefactorer implements ILintFixerWithId {
 		this.engineProperties = engineProperties;
 		this.refactorerProperties = properties;
 
-		VersionWrapper engineVersion = new VersionWrapper(engineProperties.getEngineVersion());
+		JavaVersion engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
 
 		List<String> includedRules = properties.getIncluded();
 		List<String> excludedRules = properties.getExcluded();
 		boolean productionReadyOnly = properties.isProductionReadyOnly();
 
 		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
-		this.mutators = ALL_TRANSFORMERS.get().stream().filter(ct -> {
-			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
+		this.mutators = filterRules(engineVersion, includedRules, excludedRules, productionReadyOnly);
+
+		this.mutators.forEach(ct -> {
+			LOGGER.debug("Using transformer: {}", ct.getIds());
+		});
+	}
+
+	public static List<IMutator> filterRules(JavaVersion sourceCodeVersion,
+			List<String> includedRules,
+			List<String> excludedRules,
+			boolean productionReadyOnly) {
+		return ALL_TRANSFORMERS.get().stream().filter(ct -> {
+			JavaVersion transformerVersion = JavaVersion.parse(ct.minimalJavaVersion());
 
 			// Ensure the code has higher-or-equal version than the rule minimalVersion
-			return engineVersion.compareTo(transformerVersion) >= 0;
+			return sourceCodeVersion.isAtLeast(transformerVersion);
 		}).filter(ct -> {
 			boolean isExcluded = excludedRules.stream().anyMatch(excludedRule -> ct.getIds().contains(excludedRule));
 
 			// If the inclusion list if
 			boolean isIncluded = includedRules.isEmpty() || includedRules.stream()
 					.filter(includedRule -> JavaRefactorerProperties.WILDCARD.equals(includedRule)
-							|| ct.getIds().contains(includedRule))
+							|| ct.getIds().contains(includedRule)
+							|| ct.getClass().getName().equals(includedRule))
 					.findAny()
 					.isPresent();
 
@@ -119,10 +130,6 @@ public class JavaRefactorer implements ILintFixerWithId {
 				return true;
 			}
 		}).collect(Collectors.toList());
-
-		this.mutators.forEach(ct -> {
-			LOGGER.debug("Using transformer: {}", ct.getIds());
-		});
 	}
 
 	@Override
@@ -149,17 +156,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 
 		JavaParser parser = makeJavaParser();
 
-		mutators.stream().filter(ct -> {
-			JavaVersion ruleMinimal = JavaVersion.parse(ct.minimalJavaVersion());
-			JavaVersion codeVersion = JavaVersion.parse(engineProperties.getEngineVersion());
-
-			if (codeVersion.isBefore(ruleMinimal)) {
-				LOGGER.debug("We skip {} as {} < {}", ct, codeVersion, ruleMinimal);
-				return false;
-			}
-
-			return true;
-		}).forEach(ct -> {
+		mutators.forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
 
 			// Fill cache

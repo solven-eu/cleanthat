@@ -8,6 +8,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * Fixes ImportOrderStep when the ordersFile parameters is used.
 * Handle any source JDK version (with the help of [JavaVersion](https://github.com/codehaus-plexus/plexus-languages/blob/master/plexus-java/src/main/java/org/codehaus/plexus/languages/java/version/JavaVersion.java))
 * Additional mutator: `LocalVariableTypeInference` turns `int i = 10;` into `var i = 10;`
+* Mutators can be included by their fully-qualified class name
 
 ## [2.1] - 2023-01-07
 ### Fixed

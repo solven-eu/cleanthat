@@ -166,7 +166,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 				mutator = ctor.newInstance(sourceCodeVersion);
 			} else {
 				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
-				mutator = ctor.newInstance(sourceCodeVersion);
+				mutator = ctor.newInstance();
 			}
 
 			return Optional.of(mutator);

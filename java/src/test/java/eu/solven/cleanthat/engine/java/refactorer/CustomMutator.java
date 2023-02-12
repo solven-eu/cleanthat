@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.util.Set;
+
 import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -26,6 +28,11 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  *
  */
 public class CustomMutator implements IMutator {
+
+	@Override
+	public Set<String> getIds() {
+		return Set.of("MyCustomMutator");
+	}
 
 	@Override
 	public boolean walkNode(Node pre) {

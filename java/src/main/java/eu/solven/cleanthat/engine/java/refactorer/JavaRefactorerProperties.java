@@ -38,6 +38,7 @@ import lombok.Data;
 @SuppressWarnings("PMD.ImmutableField")
 @Data
 public class JavaRefactorerProperties implements ICleanthatStepParametersProperties {
+	@Deprecated(since = "One should rather rely on a CompositeMutator")
 	public static final String WILDCARD = "*";
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules

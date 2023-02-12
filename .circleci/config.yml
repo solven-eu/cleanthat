@@ -22,7 +22,7 @@ aliases:
 
 jobs: # a collection of steps
   build: # runs not using Workflows must have a `build` job as entry point
-    working_directory: ~/circleci-demo-java-spring # directory where steps will run
+    working_directory: ~/cleanthat # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/openjdk:11-jdk
 
@@ -30,12 +30,12 @@ jobs: # a collection of steps
       - checkout # check out source code to working directory
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
+          key: circleci-cleanthat-{{ checksum "pom.xml" }}
       - run: mvn package -DskipTests
       - save_cache: # saves the project dependencies
           paths:
             - ~/.m2
-          key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
+          key: circleci-cleanthat-{{ checksum "pom.xml" }}
       - run: mvn package # run the actual tests
       
       # This will enable quickly seeing failed tests in CircleCI GUI
@@ -45,7 +45,7 @@ jobs: # a collection of steps
           path: ~/test-results/junit
 
   deploy-lambda: # runs not using Workflows must have a `build` job as entry point
-    working_directory: ~/circleci-demo-java-spring # directory where steps will run
+    working_directory: ~/circleci-cleanthat # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/openjdk:11-jdk
 
@@ -53,8 +53,8 @@ jobs: # a collection of steps
       - checkout # check out source code to working directory
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
-      - run: mvn clean install -pl :lambda -am -DskipTests -PskipStyle
+          key: circleci-cleanthat-{{ checksum "pom.xml" }}
+      - run: mvn clean install -pl :lambda -am -Pfast
       - run: mvn lambda:deploy-lambda -pl :lambda
 
 workflows:
@@ -67,7 +67,6 @@ workflows:
       # We might require a manual click in CircleCI UI: https://circleci.com/docs/2.0/workflows/#holding-a-workflow-for-a-manual-approval
       - build:
           context: slack-secrets
-          filters: *include-deploy-prd
       - deploy-lambda:
           # https://ideas.circleci.com/cloud-feature-requests/p/multiple-contexts-in-a-workflow
           context: aws-cleanthat

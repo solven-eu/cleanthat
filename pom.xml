@@ -21,8 +21,6 @@
 		<module>config</module>
 		<module>code-cleaners</module>
 
-		<module>refactorer</module>
-		
 		<!-- JVM languages -->
 		<module>java</module>
 		<module>java-eclipse</module>

@@ -59,8 +59,6 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 
 	@Override
 	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
-		AtomicReference<PathAndContent> output = new AtomicReference<>(pathAndContent);
-
 		Path path = pathAndContent.getPath();
 		Files.createDirectories(path.getParent());
 		Files.writeString(path, pathAndContent.getContent());
@@ -88,11 +86,8 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 			throw new IllegalStateException("We expected a single result in return. Got: " + results.size());
 		}
 
-		for (Result result : results) {
-			output.set(pathAndContent.withContent(result.getAfter().printAll()));
-		}
+		return results.get(0).getAfter().printAll();
 
-		return output.get().getContent();
 	}
 
 	@Override

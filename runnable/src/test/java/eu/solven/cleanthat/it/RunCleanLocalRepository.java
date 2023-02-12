@@ -32,7 +32,7 @@ import org.springframework.core.io.FileSystemResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -88,7 +88,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 		// codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
 		// } else {
 		LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)", root);
-		codeProvider = new FileSystemCodeProvider(root);
+		codeProvider = new FileSystemGitCodeProvider(root);
 		// }
 		return codeProvider;
 	}

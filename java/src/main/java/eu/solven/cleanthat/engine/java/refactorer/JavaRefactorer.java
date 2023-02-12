@@ -69,7 +69,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private static final Supplier<List<IMutator>> ALL_TRANSFORMERS =
 			Suppliers.memoize(() -> ImmutableList.copyOf(new MutatorsScanner().getMutators()));
 
-	private final List<IMutator> transformers;
+	private final List<IMutator> mutators;
 
 	public static final Set<String> getAllIncluded() {
 		return ALL_TRANSFORMERS.get()
@@ -90,7 +90,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 		boolean productionReadyOnly = properties.isProductionReadyOnly();
 
 		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
-		this.transformers = ALL_TRANSFORMERS.get().stream().filter(ct -> {
+		this.mutators = ALL_TRANSFORMERS.get().stream().filter(ct -> {
 			VersionWrapper transformerVersion = new VersionWrapper(ct.minimalJavaVersion());
 
 			// Ensure the code has higher-or-equal version than the rule minimalVersion
@@ -120,7 +120,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 			}
 		}).collect(Collectors.toList());
 
-		this.transformers.forEach(ct -> {
+		this.mutators.forEach(ct -> {
 			LOGGER.debug("Using transformer: {}", ct.getIds());
 		});
 	}
@@ -131,7 +131,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 	}
 
 	public List<IMutator> getMutators() {
-		return transformers;
+		return mutators;
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 
 		JavaParser parser = makeJavaParser();
 
-		transformers.stream().filter(ct -> {
+		mutators.stream().filter(ct -> {
 			JavaVersion ruleMinimal = JavaVersion.parse(ct.minimalJavaVersion());
 			JavaVersion codeVersion = JavaVersion.parse(engineProperties.getEngineVersion());
 

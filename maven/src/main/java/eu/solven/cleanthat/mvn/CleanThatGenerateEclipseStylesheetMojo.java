@@ -453,7 +453,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 					// Enable mutability
 					Map<Path, String> gitIgnoreFiltered = new HashMap<>(fileToContent);
 
-					gitIgnoreFiltered.keySet().removeIf(path -> !GitIgnoreParser.accept(gitIgnorePatterns, path));
+					gitIgnoreFiltered.keySet().removeIf(path -> !GitIgnoreParser.match(gitIgnorePatterns, path));
 
 					nbFilteredByGitignore.addAndGet(fileToContent.size() - gitIgnoreFiltered.size());
 					fileToContent = gitIgnoreFiltered;

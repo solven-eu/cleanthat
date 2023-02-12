@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.git;
 
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -54,17 +53,17 @@ public class GitIgnoreParser {
 
 	// In this implementation, we assume rawPath is a file, not a directly
 	// It can be considered true if we process files recursively
-	public static boolean accept(Set<String> patterns, String rawPath) {
+	public static boolean match(Set<String> patterns, String rawPath) {
 		if (!rawPath.startsWith("/")) {
 			rawPath = "/" + rawPath;
 		}
 
 		Path p = Paths.get(rawPath);
 
-		return accept(patterns, p);
+		return match(patterns, p);
 	}
 
-	public static boolean accept(Set<String> patterns, Path path) {
+	public static boolean match(Set<String> patterns, Path path) {
 		Set<String> ignoredPatterns = patterns.stream().filter(s -> !s.startsWith("!")).collect(Collectors.toSet());
 		boolean doMatch = doMatch(ignoredPatterns, path);
 
@@ -79,17 +78,18 @@ public class GitIgnoreParser {
 
 			if (doMatchUnignored) {
 				// Matches unignored: it is accepted
-				return true;
+				return false;
 			}
 
 			// It is rejected
-			return false;
+			return true;
 		} else {
 			// Not ignored: it is accepted
-			return true;
+			return false;
 		}
 	}
 
+	// https://git-scm.com/docs/gitignore
 	private static boolean doMatch(Set<String> patterns, Path p) {
 		return patterns.stream().map(s -> {
 			if (!s.startsWith("/")) {
@@ -106,10 +106,17 @@ public class GitIgnoreParser {
 			//
 			// return s;
 		}).flatMap(s -> {
+			// https://git-scm.com/docs/gitignore#_pattern_format
+			// If there is a separator at the end of the pattern then the pattern will only match directories, otherwise
+			// the pattern can match both files and directories.
 			if (s.endsWith("/")) {
+				// We add the directory as its own file: it will reject file named like directory (which is bad but
+				// rate)
+				// But it will enable rejecting a directory as soon as we encounter it
+				String directoryAsFile = s.substring(0, s.length() - 1);
 				// We reject input folder: hence we reject any children
 				s = s + "**";
-				return Stream.of(s);
+				return Stream.of(directoryAsFile, s);
 			} else {
 				// Accept any children
 				return Stream.of(s, s + "/**");
@@ -118,7 +125,7 @@ public class GitIgnoreParser {
 			// p.ge
 
 			// https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns
-			boolean matches = FileSystems.getDefault().getPathMatcher("glob:" + s).matches(p);
+			boolean matches = p.getFileSystem().getPathMatcher("glob:" + s).matches(p);
 			if (matches) {
 				LOGGER.trace("{} accepted {}", s, p);
 			}

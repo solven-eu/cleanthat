@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -49,6 +49,6 @@ public class CleanThatMavenHelper {
 	// Process the root of current module
 	public static ICodeProviderWriter makeCodeProviderWriter(ACleanThatMojo cleanThatCleanThatMojo) {
 		File baseDir = cleanThatCleanThatMojo.getBaseDir();
-		return new FileSystemCodeProvider(baseDir.toPath());
+		return new FileSystemGitCodeProvider(baseDir.toPath());
 	}
 }

@@ -28,6 +28,21 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- https://github.com/marschall/memoryfilesystem -->
+		<dependency>
+			<!-- This enables manipulating Path not dependent on a local FileSystem -->
+			<groupId>com.github.marschall</groupId>
+			<artifactId>memoryfilesystem</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+
+		<!-- https://github.com/google/jimfs -->
+		<dependency>
+			<groupId>com.google.jimfs</groupId>
+			<artifactId>jimfs</artifactId>
+			<version>1.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>

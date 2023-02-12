@@ -29,20 +29,12 @@ bin
 # JavaMissionControl
 *.jfr
 
-# SSL Certificates
-*.pfx
-
 #netbeans
 nbproject
 
 # hs_err
 *.log
 *.log.gz
-
-#android
-gen
-proguard
-local.properties
 
 #IntelliJ
 *.iml
@@ -53,13 +45,6 @@ Thumbs.db
 # Used by jenv under MacOS
 .java-version
 
-
-.java-version
-
-#Crashlytics
-crashlytics-build.properties
-com_crashlytics_export_strings.xml
-/pricestore/src/main/resources/nbproject/private/
 
 #Android Studio
 #http://stackoverflow.com/questions/16736856/what-should-be-in-my-gitignore-for-an-android-studio-project
@@ -79,23 +64,9 @@ screenshots
 node
 node_modules
 
-# Karma
-coverage
-
-# SSL Certificates
-*.m-itrust.com.pfx
-
 .pmd
 .pmdruleset.xml
 .checkstyle
-
-dist/
-dist-filtered/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-/test/unit/coverage/
-lcov-report
 
 # Editor directories and files
 .vscode

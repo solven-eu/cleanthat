@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -112,7 +112,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 					"Something prevents the generation of a configuration");
 		}
 
-		ICodeProvider codeProvider = new FileSystemCodeProvider(getBaseDir().toPath());
+		ICodeProvider codeProvider = new FileSystemGitCodeProvider(getBaseDir().toPath());
 
 		GenerateInitialConfig generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());

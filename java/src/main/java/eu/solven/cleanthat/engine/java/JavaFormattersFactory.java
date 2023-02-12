@@ -64,7 +64,10 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		switch (stepId) {
 		case JavaRefactorer.ID_REFACTORER: {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
-			processor = new JavaRefactorer(engineProperties, processorConfig);
+			JavaRefactorer javaRefactorer = new JavaRefactorer(engineProperties, processorConfig);
+
+			LOGGER.info("Mutators: {}", javaRefactorer.getMutators());
+			processor = javaRefactorer;
 			break;
 		}
 

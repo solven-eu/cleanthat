@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VarType;
@@ -73,13 +74,11 @@ public class LocalVariableTypeInference extends AJavaParserMutator implements IM
 			return false;
 		}
 
-		if (type.isClassOrInterfaceType() && type.asClassOrInterfaceType().getTypeArguments().isPresent()) {
-			// https://github.com/javaparser/javaparser/issues/3898
-			return false;
-		}
-
-		singleVariableDeclaration.setType(new VarType());
-
-		return true;
+		// https://github.com/javaparser/javaparser/issues/3898
+		// We can not change the Type, as it would fail in the case of Type with Diamond
+		Expression initializer = singleVariableDeclaration.getInitializer().orElse(null);
+		VariableDeclarator newVariableDeclarator =
+				new VariableDeclarator(new VarType(), singleVariableDeclaration.getName(), initializer);
+		return singleVariableDeclaration.replace(newVariableDeclarator);
 	}
 }

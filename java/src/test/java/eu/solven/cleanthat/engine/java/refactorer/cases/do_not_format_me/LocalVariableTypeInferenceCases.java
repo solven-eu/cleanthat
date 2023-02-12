@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
@@ -47,8 +45,8 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
-	@UnchangedMethod
-	// @CompareMethods
+	// @UnchangedMethod
+	@CompareMethods
 	public static class CaseDifferentType {
 		public Object pre() {
 			List<?> i = new ArrayList<String>();
@@ -62,8 +60,8 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
-	@UnchangedMethod
-	// @CompareMethods
+	// @UnchangedMethod
+	@CompareMethods
 	public static class CaseAnonymous {
 		public Object pre() {
 			Map<String, Object> i = new HashMap<>() {
@@ -120,7 +118,7 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 	@UnchangedMethod
 	public static class ClassField {
 		public Object pre() {
-			Map<String, Object> i = new HashMap<>() {
+			return new HashMap<>() {
 				private static final long serialVersionUID = -7496095234003248150L;
 
 				final int i = 10;
@@ -129,8 +127,6 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 					put("k", i);
 				}
 			};
-
-			return i;
 		}
 	}
 }

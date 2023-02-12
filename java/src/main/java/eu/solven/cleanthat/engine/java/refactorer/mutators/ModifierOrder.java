@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +56,6 @@ public class ModifierOrder extends AJavaParserMutator implements IMutator, IRule
 			"strictfp");
 
 	@Override
-	public String getId() {
-		// Same name as checkstyle
-		return "ModifierOrder";
-	}
-
-	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
 	}
@@ -68,6 +63,11 @@ public class ModifierOrder extends AJavaParserMutator implements IMutator, IRule
 	@Override
 	public String checkstyleUrl() {
 		return "https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/modifier/ModifierOrderCheck.html";
+	}
+
+	@Override
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("ModifierOrder");
 	}
 
 	@Override

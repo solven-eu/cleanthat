@@ -30,6 +30,7 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
@@ -47,7 +48,7 @@ public class PrimitiveBoxedForString extends AJavaParserMutator implements IMuta
 
 	@Override
 	public String minimalJavaVersion() {
-		return "1.1";
+		return IJdkVersionConstants.JDK_1DOT1;
 	}
 
 	@Override

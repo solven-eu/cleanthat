@@ -25,6 +25,8 @@ public interface IJdkVersionConstants {
 
 	String JDK_1 = "1";
 
+	String JDK_1DOT1 = "1.1";
+
 	String JDK_4 = "1.4";
 
 	String JDK_5 = "1.5";
@@ -33,6 +35,9 @@ public interface IJdkVersionConstants {
 
 	String JDK_7 = "1.7";
 
+	/**
+	 * Introduced Lambdas and Streams
+	 */
 	String JDK_8 = "1.8";
 
 	// https://www.infoq.com/news/2015/12/java-version-strings-evolve/
@@ -40,7 +45,16 @@ public interface IJdkVersionConstants {
 
 	String JDK_10 = "10";
 
+	/**
+	 * Introduced 'var' keyword
+	 */
 	String JDK_11 = "11";
 
 	String JDK_17 = "17";
+
+	/**
+	 * A fake java version, used to represent the last JDK version which would ever be released.
+	 */
+	String LAST = "99.999";
+
 }

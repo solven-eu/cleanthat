@@ -35,21 +35,18 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class StringToString extends AJavaParserMutator implements IMutator {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(StringToString.class);
 
 	private static final String METHOD_TO_STRING = "toString";
 
-	// Optional exists since 8
-	// Optional.isPresent exists since 11
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_11;
+		return IJdkVersionConstants.JDK_1;
 	}
 
 	@Override
-	public String getId() {
-		return "StringToString";
+	public Optional<String> getPmdId() {
+		return Optional.of("StringToString");
 	}
 
 	@Override

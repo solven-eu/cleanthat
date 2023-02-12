@@ -33,7 +33,9 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
 public class TestJavaRefactorer {
@@ -130,6 +132,34 @@ public class TestJavaRefactorer {
 	public void testIncludeRuleByClassName() {
 		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
 				Collections.singletonList(LocalVariableTypeInference.class.getName()),
+				Collections.emptyList(),
+				false);
+
+		Assertions.assertThat(rules).hasSize(1);
+	}
+
+	@Test
+	public void testIncludeRuleByClassName_composite() {
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse(IJdkVersionConstants.LAST),
+				Collections.singletonList(PMDMutators.class.getName()),
+				Collections.emptyList(),
+				false);
+
+		Assertions.assertThat(rules).hasSizeGreaterThan(3);
+
+		List<IMutator> rulesExcluding = JavaRefactorer.filterRules(JavaVersion.parse(IJdkVersionConstants.LAST),
+				Collections.singletonList(PMDMutators.class.getName()),
+				Collections.singletonList(UseIndexOfChar.class.getName()),
+				false);
+
+		// Check the exclusion succeeded
+		Assertions.assertThat(rulesExcluding).hasSize(rules.size() - 1);
+	}
+
+	@Test
+	public void testIncludeRuleByClassName_custom() {
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
+				Collections.singletonList(CustomMutator.class.getName()),
 				Collections.emptyList(),
 				false);
 

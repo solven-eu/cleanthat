@@ -16,14 +16,15 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
@@ -42,10 +43,12 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllEvenNotProductionReadyMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
@@ -65,17 +68,10 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
 
-	private static final Supplier<List<IMutator>> ALL_TRANSFORMERS =
-			Suppliers.memoize(() -> ImmutableList.copyOf(new MutatorsScanner().getMutators()));
-
 	private final List<IMutator> mutators;
 
 	public static final Set<String> getAllIncluded() {
-		return ALL_TRANSFORMERS.get()
-				.stream()
-				.flatMap(ct -> ct.getIds().stream())
-				.sorted()
-				.collect(Collectors.toCollection(TreeSet::new));
+		return new AllMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
 	}
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
@@ -100,29 +96,80 @@ public class JavaRefactorer implements ILintFixerWithId {
 			List<String> includedRules,
 			List<String> excludedRules,
 			boolean productionReadyOnly) {
-		return ALL_TRANSFORMERS.get().stream().filter(ct -> {
-			JavaVersion transformerVersion = JavaVersion.parse(ct.minimalJavaVersion());
 
-			// Ensure the code has higher-or-equal version than the rule minimalVersion
-			return sourceCodeVersion.isAtLeast(transformerVersion);
-		}).filter(ct -> {
-			boolean isExcluded = excludedRules.stream().anyMatch(excludedRule -> ct.getIds().contains(excludedRule));
+		List<IMutator> allMutators;
+		if (productionReadyOnly) {
+			allMutators = new AllMutators(sourceCodeVersion).getUnderlyings();
+		} else {
+			allMutators = new AllEvenNotProductionReadyMutators(sourceCodeVersion).getUnderlyings();
+		}
 
-			// If the inclusion list if
-			boolean isIncluded = includedRules.isEmpty() || includedRules.stream()
-					.filter(includedRule -> JavaRefactorerProperties.WILDCARD.equals(includedRule)
-							|| ct.getIds().contains(includedRule)
-							|| ct.getClass().getName().equals(includedRule))
-					.findAny()
-					.isPresent();
+		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
+			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
+				return allMutators.stream();
+			} else {
+				List<IMutator> matchingMutators = allMutators.stream()
+						.filter(someMutator -> someMutator.getIds().contains(includedRule)
+								|| someMutator.getClass().getName().equals(includedRule))
+						.collect(Collectors.toList());
+
+				if (!matchingMutators.isEmpty()) {
+					return matchingMutators.stream();
+				}
+				try {
+					// https://www.baeldung.com/java-check-class-exists
+					ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+					Class<? extends IMutator> mutatorClass =
+							(Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
+
+					IMutator mutator;
+					if (CompositeMutator.class.isAssignableFrom(mutatorClass)) {
+						Constructor<? extends IMutator> ctor = mutatorClass.getConstructor(JavaVersion.class);
+						mutator = ctor.newInstance(sourceCodeVersion);
+					} else {
+						Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
+						mutator = ctor.newInstance(sourceCodeVersion);
+					}
+
+					return Stream.of(mutator);
+				} catch (ClassNotFoundException e) {
+					LOGGER.debug("includedMutator {} is not present classname", includedRule, e);
+				} catch (NoSuchMethodException e) {
+					throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
+				} catch (InstantiationException e) {
+					throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new IllegalArgumentException("Issue instanciating includedMutator=" + includedRule, e);
+				}
+
+				LOGGER.warn("includedMutator={} did not matched any mutator", includedRule);
+				return Stream.empty();
+			}
+		}).collect(Collectors.toList());
+
+		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
+		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
+			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
+				if (m instanceof CompositeMutator) {
+					return ((CompositeMutator) m).getUnderlyings().stream();
+				} else {
+					return Stream.of(m);
+				}
+			}).collect(Collectors.toList());
+		}
+
+		// TODO '.distinct()' to handle multiple composites bringing the same mutator
+		return mutatorsNotComposite.stream().filter(mutator -> {
+			boolean isExcluded = excludedRules.contains(mutator.getClass().getName())
+					|| excludedRules.stream().anyMatch(excludedRule -> mutator.getIds().contains(excludedRule));
 
 			if (isExcluded) {
-				LOGGER.info("We exclude '{}'", ct.getIds());
-			} else if (!isIncluded) {
-				LOGGER.info("We do not include '{}'", ct.getIds());
+				LOGGER.info("We exclude '{}'", mutator.getIds());
+			} else {
+				LOGGER.info("We include '{}'", mutator.getIds());
 			}
 
-			return !isExcluded && isIncluded;
+			return !isExcluded;
 		}).filter(ct -> {
 			if (productionReadyOnly) {
 				return ct.isProductionReady();
@@ -130,6 +177,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 				return true;
 			}
 		}).collect(Collectors.toList());
+
 	}
 
 	@Override

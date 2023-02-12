@@ -51,12 +51,11 @@ public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
 	}
 
 	protected Predicate<Path> makeGitIgnorePredicate() throws IOException {
-		Predicate<Path> gitIgnorePredicate;
-
 		Path gitIgnore = resolvePath(getFileSystem().getPath("/.gitignore"));
 
 		// TODO Beware there could be .gitignore in subfolders
 		// TODO Spotless implements this logic
+		Predicate<Path> gitIgnorePredicate;
 		if (Files.exists(gitIgnore)) {
 			String gitIgnoreContent = Files.readString(gitIgnore, StandardCharsets.UTF_8);
 
@@ -64,7 +63,7 @@ public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
 
 			gitIgnorePredicate = p -> GitIgnoreParser.match(patterns, p);
 		} else {
-			gitIgnorePredicate = p -> true;
+			gitIgnorePredicate = p -> false;
 		}
 		return gitIgnorePredicate;
 	}

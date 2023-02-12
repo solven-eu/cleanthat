@@ -16,6 +16,9 @@
 package eu.solven.cleanthat.git;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
@@ -23,9 +26,13 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.jimfs.Jimfs;
 
 public class TestGitIgnoreParser {
 	// https://github.com/codemix/gitignore-parser/blob/master/test/index.js
+
+	final FileSystem fs = Jimfs.newFileSystem();
+
 	@Test
 	public void testCodeMix() throws IOException {
 		String gitIgnoreContent = new String(ByteStreams
@@ -69,9 +76,16 @@ public class TestGitIgnoreParser {
 	@Test
 	public void testGitDocumentation_foo() throws IOException {
 		Set<String> helloStar = Set.of("foo/");
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "foo/bar")).isTrue();
 
-		// Accepted as we assume input path are files, never directory
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "foo")).isFalse();
+		Path pathToFoo = fs.getPath("foo");
+
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo.resolve("bar"))).isTrue();
+
+		Files.createFile(pathToFoo);
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo)).isFalse();
+
+		Files.delete(pathToFoo);
+		Files.createDirectory(pathToFoo);
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo)).isTrue();
 	}
 }

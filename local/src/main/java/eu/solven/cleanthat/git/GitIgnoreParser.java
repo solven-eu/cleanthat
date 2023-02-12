@@ -15,9 +15,11 @@
  */
 package eu.solven.cleanthat.git;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,13 +93,18 @@ public class GitIgnoreParser {
 
 	// https://git-scm.com/docs/gitignore
 	private static boolean doMatch(Set<String> patterns, Path p) {
-		return patterns.stream().map(s -> {
+		return patterns.stream().flatMap(s -> {
+			Set<String> allowedPatterns = new TreeSet<>();
+
+			// We do not require prefix '**/' as we may hit the root
+			allowedPatterns.add(s);
+
 			if (!s.startsWith("/")) {
 				// This enables working with gitignore entries not starting with '/', hence accepting any parent folder
-				s = "**/" + s;
+				allowedPatterns.add("**/" + s);
 			}
 
-			return s;
+			return allowedPatterns.stream();
 			// }).map(s -> {
 			// if (!s.endsWith("**")) {
 			// // Any gitignore entries
@@ -110,20 +117,21 @@ public class GitIgnoreParser {
 			// If there is a separator at the end of the pattern then the pattern will only match directories, otherwise
 			// the pattern can match both files and directories.
 			if (s.endsWith("/")) {
-				// We add the directory as its own file: it will reject file named like directory (which is bad but
-				// rate)
-				// But it will enable rejecting a directory as soon as we encounter it
-				String directoryAsFile = s.substring(0, s.length() - 1);
-				// We reject input folder: hence we reject any children
-				s = s + "**";
-				return Stream.of(directoryAsFile, s);
+				if (Files.isDirectory(p)) {
+					// We add the directory as its own file: it will reject file named like directory (which is bad but
+					// rate)
+					// But it will enable rejecting a directory as soon as we encounter it
+					String directoryAsFile = s.substring(0, s.length() - 1);
+					return Stream.of(directoryAsFile);
+				} else {
+					s = s + "**";
+					return Stream.of(s);
+				}
 			} else {
 				// Accept any children
 				return Stream.of(s, s + "/**");
 			}
 		}).anyMatch(s -> {
-			// p.ge
-
 			// https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns
 			boolean matches = p.getFileSystem().getPathMatcher("glob:" + s).matches(p);
 			if (matches) {

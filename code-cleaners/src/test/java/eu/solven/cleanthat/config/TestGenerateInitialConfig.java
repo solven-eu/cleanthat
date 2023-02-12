@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat;
+package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.GenerateInitialConfig;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 

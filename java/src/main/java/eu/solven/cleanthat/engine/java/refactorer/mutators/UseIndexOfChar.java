@@ -31,11 +31,10 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
- * Migrate from 's.indexOf("s")’ to ’s.indexOf('s')'.
+ * Turns 's.indexOf("s")’ into ’s.indexOf('s')'.
  *
  * @author Benoit Lacelle
  */
-// https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
 public class UseIndexOfChar extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);
@@ -58,6 +57,16 @@ public class UseIndexOfChar extends AJavaParserMutator implements IMutator {
 	@Override
 	public Optional<String> getPmdId() {
 		return Optional.of("UseIndexOfChar");
+	}
+
+	@Override
+	public String sonarUrl() {
+		return "https://rules.sonarsource.com/java/RSPEC-1155";
+	}
+
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-1155");
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")

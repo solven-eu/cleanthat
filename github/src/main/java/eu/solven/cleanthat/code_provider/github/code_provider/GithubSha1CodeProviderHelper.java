@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
@@ -156,7 +156,7 @@ public class GithubSha1CodeProviderHelper {
 			throw new UncheckedIOException(e);
 		}
 
-		return new FileSystemCodeProvider(repoPath);
+		return new FileSystemGitCodeProvider(repoPath);
 	}
 
 	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder

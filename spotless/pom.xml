@@ -39,7 +39,7 @@
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<!-- Used by GitAttributesLineEndings_InMemory -->
 			<groupId>com.diffplug.durian</groupId>
@@ -52,14 +52,14 @@
 			<artifactId>concurrent-trees</artifactId>
 			<version>2.6.1</version>
 		</dependency>
-		
+
 		<dependency>
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- Maven is used to fetch 3rd-parties jars -->
 		<!-- Basic dependencies as present in maven-resolver samples -->
 		<dependency>

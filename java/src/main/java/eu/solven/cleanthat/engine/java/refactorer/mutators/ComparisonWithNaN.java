@@ -57,8 +57,8 @@ public class ComparisonWithNaN extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public String getId() {
-		return "ComparisonWithNaN";
+	public Optional<String> getPmdId() {
+		return Optional.of("ComparisonWithNaN");
 	}
 
 	@Override

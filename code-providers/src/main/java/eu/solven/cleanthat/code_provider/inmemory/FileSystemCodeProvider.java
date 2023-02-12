@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.code_provider.local;
+package eu.solven.cleanthat.code_provider.inmemory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -32,15 +31,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
 
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.git.GitIgnoreParser;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}
@@ -62,44 +63,40 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		this(root.getFileSystem(), root);
 	}
 
+	@SuppressWarnings("PMD.CloseResource")
+	public static FileSystemCodeProvider forTests() throws IOException {
+		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+		return new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
+	}
+
 	@Override
 	public FileSystem getFileSystem() {
 		return fs;
 	}
 
 	@Override
-	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
+	public void listFilesForContent(Set<String> includes, Consumer<ICodeProviderFile> consumer) throws IOException {
+		listFilesForContent(p -> false, consumer);
+	}
+
+	protected void listFilesForContent(Predicate<Path> ignorePredicate, Consumer<ICodeProviderFile> consumer)
 			throws IOException {
-		Predicate<Path> gitIgnorePredicate;
-
-		File gitIgnore = root.resolve(fs.getPath(".gitignore")).toFile();
-
-		// TODO Beware there could be .gitignore in subfolders
-		if (gitIgnore.isFile()) {
-			String gitIgnoreContent = Files.readString(gitIgnore.toPath(), StandardCharsets.UTF_8);
-
-			Set<String> patterns = GitIgnoreParser.parsePatterns(gitIgnoreContent);
-
-			gitIgnorePredicate = p -> GitIgnoreParser.accept(patterns, p);
-		} else {
-			gitIgnorePredicate = p -> true;
-		}
 		// https://stackoverflow.com/questions/22867286/files-walk-calculate-total-size/22868706#22868706
 		Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
 
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				if (gitIgnorePredicate.test(dir)) {
-					return FileVisitResult.CONTINUE;
-				} else {
+				if (ignorePredicate.test(dir)) {
 					// We skip folders which are ignored, not to process each of their files
 					return FileVisitResult.SKIP_SUBTREE;
+				} else {
+					return FileVisitResult.CONTINUE;
 				}
 			}
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				if (!gitIgnorePredicate.test(file)) {
+				if (ignorePredicate.test(file)) {
 					return FileVisitResult.CONTINUE;
 				}
 
@@ -109,12 +106,23 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
 				Path relativized = root.relativize(file);
-				// We get '\' under Windows
-				String pathWithSlash = "/" + relativized.toString().replaceAll("\\\\", "/");
 
-				consumer.accept(new DummyCodeProviderFile(pathWithSlash, file));
+				String unixLikePath = toUnixPath(relativized);
+
+				consumer.accept(new DummyCodeProviderFile("/" + unixLikePath, file));
 
 				return FileVisitResult.CONTINUE;
+			}
+
+			private String toUnixPath(Path relativized) {
+				String unixLikePath;
+				if ("\\".equals(relativized.getFileSystem().getSeparator())) {
+					// We get '\' under Windows
+					unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
+				} else {
+					unixLikePath = relativized.toString();
+				}
+				return unixLikePath;
 			}
 		});
 	}
@@ -124,14 +132,15 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		return root.toAbsolutePath().toString();
 	}
 
-	protected Path resolvePath(Path path) {
-		if (!path.isAbsolute()) {
+	protected Path resolvePath(Path inMemoryPath) {
+		if (!inMemoryPath.isAbsolute()) {
 			throw new IllegalArgumentException(
-					"We expect only absolute path, consider the root of the git repository as the root (path=" + path
+					"We expect only absolute path, consider the root of the git repository as the root (path="
+							+ inMemoryPath
 							+ ")");
 		}
 
-		return root.resolve("." + path);
+		return root.resolve("." + inMemoryPath);
 	}
 
 	@Override
@@ -141,6 +150,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			Path resolved = resolvePath(inMemoryPath);
 			try {
+				Files.createDirectories(inMemoryPath.getParent());
+
 				LOGGER.info("Write file: {}", resolved);
 				Files.write(resolved, content.getBytes(StandardCharsets.UTF_8));
 			} catch (IOException e) {
@@ -148,17 +159,6 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 			}
 		});
 	}
-
-	// @Override
-	// public String deprecatedLoadContent(Object file) throws IOException {
-	// return Files.readString((Path) file);
-	// }
-	//
-	// @Override
-	// public String deprecatedGetFilePath(Object rawFile) {
-	// Path file = (Path) rawFile;
-	// return file.subpath(root.getNameCount(), file.getNameCount()).toString();
-	// }
 
 	@Override
 	public Optional<String> loadContentForPath(String path) throws IOException {
@@ -179,4 +179,5 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	public void cleanTmpFiles() {
 		LOGGER.info("Nothing to delete for {}", this);
 	}
+
 }

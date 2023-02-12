@@ -26,7 +26,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
@@ -80,7 +80,9 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		String url = stepParameters.getConfiguration();
 
 		SpotlessEngineProperties spotlessConfigResource = CleanThatGenerateEclipseStylesheetMojo
-				.loadSpotlessEngineProperties(new FileSystemCodeProvider(readWriteFolder.toPath()), objectMapper, url);
+				.loadSpotlessEngineProperties(new FileSystemGitCodeProvider(readWriteFolder.toPath()),
+						objectMapper,
+						url);
 
 		// TODO We should add spotlessSteps dynamically
 		Assert.assertEquals(1, spotlessConfigResource.getFormatters().size());
@@ -136,7 +138,9 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		String url = stepParameters.getConfiguration();
 
 		SpotlessEngineProperties spotlessConfigResource = CleanThatGenerateEclipseStylesheetMojo
-				.loadSpotlessEngineProperties(new FileSystemCodeProvider(readWriteFolder.toPath()), objectMapper, url);
+				.loadSpotlessEngineProperties(new FileSystemGitCodeProvider(readWriteFolder.toPath()),
+						objectMapper,
+						url);
 
 		// TODO We should add spotlessSteps dynamically
 		Assert.assertEquals(1, spotlessConfigResource.getFormatters().size());

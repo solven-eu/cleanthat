@@ -40,21 +40,6 @@
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 
-		<!-- https://github.com/marschall/memoryfilesystem -->
-		<dependency>
-			<!-- This enables manipulating Path not dependent on a local FileSystem -->
-			<groupId>com.github.marschall</groupId>
-			<artifactId>memoryfilesystem</artifactId>
-			<version>2.5.0</version>
-		</dependency>
-		
-		<!-- https://github.com/google/jimfs -->
-		<dependency>
-			<groupId>com.google.jimfs</groupId>
-			<artifactId>jimfs</artifactId>
-			<version>1.2</version>
-		</dependency>
-
 		<dependency>
 			<!-- For Eclipse, given downloaded jar: 'java -jar lombok.jar' -->
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->

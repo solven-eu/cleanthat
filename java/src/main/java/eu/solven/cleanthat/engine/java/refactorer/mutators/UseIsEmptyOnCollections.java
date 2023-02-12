@@ -40,10 +40,8 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-// https://rules.sonarsource.com/java/RSPEC-1155
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
 public class UseIsEmptyOnCollections extends AJavaParserMutator implements IMutator {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
@@ -69,6 +67,16 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator implements IMuta
 	@Override
 	public Optional<String> getPmdId() {
 		return Optional.of("UseCollectionIsEmpty");
+	}
+
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-1155");
+	}
+
+	@Override
+	public String sonarUrl() {
+		return "https://rules.sonarsource.com/java/RSPEC-1155";
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")

@@ -22,7 +22,15 @@ See [CHANGES.MD](CHANGES.MD)
 
 # Compatibility
 
-Cleanthat is currently compatible with the following languages:
+Cleanthat Robot is currently compatible with the following languages:
+
+- java (Spotless and OpenRewrite)
+- pom.xml (Spotless)
+- json (Spotless)
+- yaml (Spotless)
+- kotlin (Spotless)
+
+Cleanthat Refactorer is currently compatible with the following languages:
 
 - java
 

@@ -16,6 +16,9 @@
 package eu.solven.cleanthat.git;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
@@ -23,9 +26,13 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.jimfs.Jimfs;
 
 public class TestGitIgnoreParser {
 	// https://github.com/codemix/gitignore-parser/blob/master/test/index.js
+
+	final FileSystem fs = Jimfs.newFileSystem();
+
 	@Test
 	public void testCodeMix() throws IOException {
 		String gitIgnoreContent = new String(ByteStreams
@@ -36,42 +43,49 @@ public class TestGitIgnoreParser {
 		Assertions.assertThat(patterns).isNotEmpty().contains("*.log", "/node_modules", "/nonexistent", "*.swp");
 
 		// should accept the given filenames
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "test/index.js")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "wat/test/index.js")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "test/index.js")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "wat/test/index.js")).isFalse();
 
 		// should not accept the given filenames
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "test.swp")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "node_modules/wat.js")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "foo/bar.wat")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "test.swp")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "node_modules/wat.js")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "foo/bar.wat")).isTrue();
 
 		// should not accept the given directory
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "nonexistent")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "nonexistent/bar")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/bar")).isTrue();
 
 		// should accept unignored files in ignored directories
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "nonexistent/foo")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/foo")).isFalse();
 
 		// hould accept nested unignored files in ignored directories
-		Assertions.assertThat(GitIgnoreParser.accept(patterns, "nonexistent/foo/wat")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/foo/wat")).isFalse();
 	}
 
 	@Test
 	public void testGitDocumentation_hello() throws IOException {
 		Set<String> helloStar = Set.of("hello.*");
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "hello.")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "hello.alice")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "alice/hello.bob")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello.")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello.alice")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, "alice/hello.bob")).isTrue();
 
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "hello")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "alice_hello.bob")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, "alice_hello.bob")).isFalse();
 	}
 
 	@Test
 	public void testGitDocumentation_foo() throws IOException {
 		Set<String> helloStar = Set.of("foo/");
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "foo/bar")).isFalse();
 
-		// Accepted as we assume input path are files, never directory
-		Assertions.assertThat(GitIgnoreParser.accept(helloStar, "foo")).isTrue();
+		Path pathToFoo = fs.getPath("foo");
+
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo.resolve("bar"))).isTrue();
+
+		Files.createFile(pathToFoo);
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo)).isFalse();
+
+		Files.delete(pathToFoo);
+		Files.createDirectory(pathToFoo);
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo)).isTrue();
 	}
 }

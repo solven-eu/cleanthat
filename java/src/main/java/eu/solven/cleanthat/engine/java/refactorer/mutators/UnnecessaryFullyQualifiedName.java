@@ -34,18 +34,16 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
- * Prefer 'o.isPresent()' over 'o.isEmpty() == 0'
+ * Turns 'java.lang.String' into 'String'
  *
  * @author Benoit Lacelle
  */
 public class UnnecessaryFullyQualifiedName extends AJavaParserMutator implements IMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
-	// Optional exists since 8
-	// Optional.isPresent exists since 11
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_11;
+		return IJdkVersionConstants.JDK_1;
 	}
 
 	@Override

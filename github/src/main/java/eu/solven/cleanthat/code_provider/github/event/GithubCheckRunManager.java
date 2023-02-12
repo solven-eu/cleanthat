@@ -79,7 +79,7 @@ public class GithubCheckRunManager {
 								.withExternalID(eventKey)
 								.withDetailsURL(IDocumentationConstants.URL_REPO + "?event=" + eventKey)
 								.add(new Action(IDocumentationConstants.GITHUB_APP, description, identifier))
-								.add(new Output("eventKey", eventKey))
+								.add(new Output("Initial event from Github", eventKey))
 								.withStatus(Status.IN_PROGRESS)
 								.create();
 

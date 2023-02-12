@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.meta;
+package eu.solven.cleanthat.engine.java.refactorer;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import java.util.Set;
 
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import com.github.javaparser.ast.Node;
 
-public class TestVersionWrapper {
-	@Test
-	public void testCompareVersions() {
-		Assertions.assertThat(new VersionWrapper(IJdkVersionConstants.JDK_7))
-				.isGreaterThan(new VersionWrapper(IJdkVersionConstants.JDK_1))
-				.isGreaterThan(new VersionWrapper(IJdkVersionConstants.JDK_6))
-				.isLessThan(new VersionWrapper(IJdkVersionConstants.JDK_11));
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+
+/**
+ * This is used to test the inclusion of a custom {@link IMutator} (e.g. for a third-party jar)
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public class CustomMutator implements IMutator {
+
+	@Override
+	public Set<String> getIds() {
+		return Set.of("MyCustomMutator");
 	}
+
+	@Override
+	public boolean walkNode(Node pre) {
+		return false;
+	}
+
 }

@@ -24,15 +24,15 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider;
+import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 
-public class TestFileSystemCodeProvider {
+public class TestFileSystemGitCodeProvider {
 	final File tmpFolder = org.assertj.core.util.Files.newTemporaryFolder();
 
 	@Test
 	public void testLoadAbsolutePathAsRelative() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
+		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
@@ -45,7 +45,7 @@ public class TestFileSystemCodeProvider {
 	@Test
 	public void testLoadRelativePath() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
+		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
@@ -60,7 +60,7 @@ public class TestFileSystemCodeProvider {
 	@Test
 	public void testLoadNotExistingFile() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
-		FileSystemCodeProvider codeProvider = new FileSystemCodeProvider(tmpFolderAsPath);
+		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");

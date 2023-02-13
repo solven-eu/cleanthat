@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.code_provider.inmemory;
 
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

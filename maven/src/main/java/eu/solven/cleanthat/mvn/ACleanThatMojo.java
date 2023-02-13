@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-
 /**
  * The mojo of the mvn plugin
  * 

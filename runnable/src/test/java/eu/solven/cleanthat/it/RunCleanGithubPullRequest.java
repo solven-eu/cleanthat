@@ -40,7 +40,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 
-import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;

@@ -3,8 +3,14 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
+### Fixed
+* `CreateTempFilesUsingNioCases` now handle a null directory
+### Fixed
+* Additional mutator: `EmptyControlStatement` turns `{}` into ``
+* Additional mutator: `UnnecessaryModifier` turns `public static final` into `` in interfaces
 ### Changes
 * `OptionalNotEmpty` is promoted in `SafeAndConsensualMutators`
+* `UnnecessaryModifier` is promoted in `SafeAndConsensualMutators`
 
 ## [2.2] - 2023-01-07
 ### Fixed

@@ -45,6 +45,7 @@ public class CreateTempFilesUsingNioCases extends ARefactorerCases {
 		}
 	}
 
+	// TODO Add test case where directory is explicitely null
 	@CompareMethods
 	public static class CaseWithDirectory {
 		public Object pre(File directory) throws IOException {
@@ -52,7 +53,7 @@ public class CreateTempFilesUsingNioCases extends ARefactorerCases {
 		}
 
 		public Object post(File directory) throws IOException {
-			return Files.createTempFile(directory.toPath(), "myFile", ".tmp").toFile();
+			return (directory == null ? Files.createTempFile( "myFile", ".tmp") : Files.createTempFile(directory.toPath(), "myFile", ".tmp")).toFile();
 		}
 	}
 

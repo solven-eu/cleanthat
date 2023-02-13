@@ -33,7 +33,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -43,7 +43,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  */
 // https://jsparrow.github.io/rules/primitive-boxed-for-string.html
 // https://rules.sonarsource.com/java/RSPEC-1158
-public class PrimitiveBoxedForString extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
+public class PrimitiveBoxedForString extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
 
 	@Override

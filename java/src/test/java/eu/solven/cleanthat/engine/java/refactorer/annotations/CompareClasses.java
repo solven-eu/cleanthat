@@ -20,7 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method, both returning a
- * Class<?> with a loadeable source-code.
+ * Class<?> with a loadeable source-code (i.e. classes which are alone in their own java source file).
  * 
  * @author Benoit Lacelle
  *

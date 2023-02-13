@@ -16,16 +16,17 @@
 package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method. They can take and
- * return any argument. The 'pre' and 'post' should have identical signature in most cases.
+ * This marker interface should be applied to a method holding two annotations (named 'Pre' and 'Post')
  * 
  * @author Benoit Lacelle
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CompareMethods {
-
+public @interface CompareInnerClasses {
 }

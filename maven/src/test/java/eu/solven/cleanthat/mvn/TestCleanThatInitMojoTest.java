@@ -127,8 +127,9 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2023-01-09", config.getSyntaxVersion());
-		Assert.assertEquals(1, config.getEngines().size());
+		Assert.assertEquals(2, config.getEngines().size());
 		Assert.assertEquals("spotless", config.getEngines().get(0).getEngine());
+		Assert.assertEquals("openrewrite", config.getEngines().get(1).getEngine());
 
 		Assertions.assertThat(config.getEngines().get(0).getSteps()).hasSize(1);
 		CleanthatStepProperties singleStep = config.getEngines().get(0).getSteps().get(0);

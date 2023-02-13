@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.meta;
+package eu.solven.cleanthat.engine.java.refactorer.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Helps understand why a rule is relevant, given other systems implementing the rule
- *
+ * This marker interface should be applied to a method holding two annotations (named 'Pre' and 'Post')
+ * 
  * @author Benoit Lacelle
+ *
  */
-public interface IRuleExternalUrls {
-
-	default String sonarUrl() {
-		return "";
-	}
-
-	default String pmdUrl() {
-		return "";
-	}
-
-	default String checkstyleUrl() {
-		return "";
-	}
-
-	default String jsparrowUrl() {
-		return "";
-	}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface CompareInnerAnnotations {
 }

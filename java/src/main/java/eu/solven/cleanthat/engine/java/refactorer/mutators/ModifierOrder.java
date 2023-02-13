@@ -32,14 +32,14 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * Order modifiers according the the Java specification.
  *
  * @author Benoit Lacelle
  */
-public class ModifierOrder extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
+public class ModifierOrder extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",
@@ -61,13 +61,23 @@ public class ModifierOrder extends AJavaParserMutator implements IMutator, IRule
 	}
 
 	@Override
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("ModifierOrder");
+	}
+
+	@Override
 	public String checkstyleUrl() {
 		return "https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/modifier/ModifierOrderCheck.html";
 	}
 
 	@Override
-	public Optional<String> getCheckstyleId() {
-		return Optional.of("ModifierOrder");
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-1124");
+	}
+
+	@Override
+	public String sonarUrl() {
+		return "https://rules.sonarsource.com/java/RSPEC-1124";
 	}
 
 	@Override

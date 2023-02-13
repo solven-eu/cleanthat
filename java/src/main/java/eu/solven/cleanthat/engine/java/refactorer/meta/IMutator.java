@@ -29,7 +29,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
  *
  * @author Benoit Lacelle
  */
-public interface IMutator {
+public interface IMutator extends IRuleExternalReferences {
 
 	// For java, prefer Checkstyle name, else PMD name
 	@Deprecated
@@ -47,18 +47,6 @@ public interface IMutator {
 			throw new IllegalStateException("We miss an id for : " + this.getClass());
 		}
 		return ids;
-	}
-
-	default Optional<String> getPmdId() {
-		return Optional.empty();
-	}
-
-	default Optional<String> getCheckstyleId() {
-		return Optional.empty();
-	}
-
-	default Optional<String> getSonarId() {
-		return Optional.empty();
 	}
 
 	/**

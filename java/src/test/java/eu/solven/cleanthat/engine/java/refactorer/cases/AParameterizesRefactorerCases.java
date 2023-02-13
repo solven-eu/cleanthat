@@ -32,6 +32,8 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
@@ -82,12 +84,20 @@ public abstract class AParameterizesRefactorerCases extends ATestCases {
 			doCompareTypes(transformer, testCase);
 		}
 
+		if (testCase.getAnnotationByClass(UnchangedMethod.class).isPresent()) {
+			doCheckUnchanged(transformer, testCase);
+		}
+
 		if (testCase.getAnnotationByClass(CompareClasses.class).isPresent()) {
 			doCompareClasses(javaParser, transformer, testCase);
 		}
 
-		if (testCase.getAnnotationByClass(UnchangedMethod.class).isPresent()) {
-			doCheckUnchanged(transformer, testCase);
+		if (testCase.getAnnotationByClass(CompareInnerClasses.class).isPresent()) {
+			doCompareInnerClasses(javaParser, transformer, testCase);
+		}
+
+		if (testCase.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()) {
+			doCompareInnerClasses(javaParser, transformer, testCase);
 		}
 	}
 

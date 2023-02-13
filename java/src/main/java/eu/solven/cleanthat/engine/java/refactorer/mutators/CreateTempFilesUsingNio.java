@@ -25,9 +25,14 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.BinaryExpr.Operator;
+import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
@@ -114,7 +119,7 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator implements IMuta
 
 	private boolean process(MethodCallExpr methodExp) {
 		List<Expression> arguments = methodExp.getArguments();
-		Optional<MethodCallExpr> optToPath;
+		Optional<Expression> optToPath;
 		NameExpr newStaticClass = new NameExpr("Files");
 		String newStaticMethod = "createTempFile";
 		int minArgSize = 2;
@@ -137,8 +142,21 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator implements IMuta
 								arg1);
 				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
 			} else if (arg3.isNameExpr()) {
-				NodeList<Expression> replaceArguments = new NodeList<>(new MethodCallExpr(arg3, "toPath"), arg0, arg1);
-				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
+				// The directory may be null, in which case case, we'll rely on the default tmp directory
+				BinaryExpr fileIsNull = new BinaryExpr(arg3, new NullLiteralExpr(), Operator.EQUALS);
+
+				NodeList<Expression> replaceArgumentsIfNull = new NodeList<>(arg0, arg1);
+				MethodCallExpr callIfNull = new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsIfNull);
+
+				NodeList<Expression> replaceArgumentsNotNull =
+						new NodeList<>(new MethodCallExpr(arg3, "toPath"), arg0, arg1);
+				MethodCallExpr callNotNull =
+						new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsNotNull);
+
+				// We need to enclose the ternary between '(...)' as we will call .toFile() right-away
+				Expression enclosedTernary = new EnclosedExpr(new ConditionalExpr(fileIsNull, callIfNull, callNotNull));
+
+				optToPath = Optional.of(enclosedTernary);
 			} else if (arg3.isNullLiteralExpr()) {
 				// 'null' is managed specifically as Files.createTempFile does not accept a null as directory
 				NodeList<Expression> replaceArguments = new NodeList<>(arg0, arg1);

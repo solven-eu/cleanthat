@@ -27,7 +27,7 @@ import com.github.javaparser.ast.type.VarType;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * Turns 'int i = 10;' into 'var i = 10'
@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/issues/1656
-public class LocalVariableTypeInference extends AJavaParserMutator implements IMutator, IRuleExternalUrls {
+public class LocalVariableTypeInference extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	@Override
 	public boolean isProductionReady() {
 		return false;

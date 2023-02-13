@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.lambda;
+package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-
-import eu.solven.cleanthat.language.openrewrite.OpenrewriteFormattersFactory;
-import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Spring configuration wrapping all available engines
+ * This marker interface should be applied to a method holding two annotations (named 'Pre' and 'Post')
  * 
  * @author Benoit Lacelle
  *
  */
-@Configuration
-@Import({
-
-		// JavaFormattersFactory.class,
-		SpotlessFormattersFactory.class,
-		OpenrewriteFormattersFactory.class,
-
-})
-public class AllEnginesSpringConfig {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface CompareInnerClasses {
 }

@@ -31,14 +31,14 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalUrls;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * Enables common behavior to JavaParser-based rules
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserMutator implements IMutator, IRuleExternalUrls {
+public abstract class AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {

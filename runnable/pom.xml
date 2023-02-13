@@ -43,7 +43,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- TODO Remove these 2 dependencies as this module should be agnostic of the language and code-provider -->
+		<!-- TODO Remove these 3 dependencies as this module should be agnostic of the language and code-provider -->
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>github</artifactId>
@@ -52,6 +52,11 @@
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>spotless</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>openrewrite</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

@@ -27,14 +27,17 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.NoOpJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
@@ -44,29 +47,30 @@ public class ATestCases {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
-	@Deprecated
-	protected void testCasesIn(ARefactorerCases cases) throws IOException {
-		testCasesIn(cases.getClass(), cases.getTransformer());
-	}
+	// @Deprecated
+	// protected void testCasesIn(ARefactorerCases cases) throws IOException {
+	// testCasesIn(cases.getClass(), cases.getTransformer());
+	// }
 
-	protected void testCasesIn(Class<?> casesClass, IMutator transformer) throws IOException {
-		String path = LocalClassTestHelper.loadClassAsString(casesClass);
-
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(path).getResult().get();
-
-		checkMethodCases(transformer, compilationUnit);
-		checkMethodUnchangedCases(transformer, compilationUnit);
-		checkTypeCases(transformer, compilationUnit);
-		checkClasses(javaParser, transformer, compilationUnit);
-	}
+	// protected void testCasesIn(Class<?> casesClass, IMutator transformer) throws IOException {
+	// String path = LocalClassTestHelper.loadClassAsString(casesClass);
+	//
+	// JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
+	// CompilationUnit compilationUnit = javaParser.parse(path).getResult().get();
+	//
+	// checkMethodCases(transformer, compilationUnit);
+	// checkMethodUnchangedCases(transformer, compilationUnit);
+	// checkTypeCases(transformer, compilationUnit);
+	// checkClasses(javaParser, transformer, compilationUnit);
+	// }
 
 	protected static List<ClassOrInterfaceDeclaration> getAllCases(CompilationUnit compilationUnit) {
 		return compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareTypes.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethods.class).isPresent()
 						|| c.getAnnotationByClass(CompareClasses.class).isPresent()
-						|| c.getAnnotationByClass(UnchangedMethod.class).isPresent());
+						|| c.getAnnotationByClass(UnchangedMethod.class).isPresent()
+						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent());
 	}
 
 	private void checkMethodCases(IMutator transformer, CompilationUnit compilationUnit) {
@@ -84,13 +88,22 @@ public class ATestCases {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 		MethodDeclaration post = getMethodWithName(oneCase, "post");
+
+		doCompareExpectedChanges(transformer, oneCase, pre, post);
+	}
+
+	private <T extends Node & NodeWithSimpleName<?>> void doCompareExpectedChanges(IMutator transformer,
+			ClassOrInterfaceDeclaration oneCase,
+			T pre,
+			T post) {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			MethodDeclaration clonedPre = pre.clone();
+			Node clonedPre = pre.clone();
 			boolean transformed = transformer.walkNode(pre);
 			// Rename the method before checking full equality
-			pre.setName("post");
+			// method are lowerCase while classes are camel case
+			pre.setName(post.getName());
 
 			// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
 			Assert.assertEquals("Should have mutated " + clonedPre
@@ -107,7 +120,7 @@ public class ATestCases {
 		// This is a less relevant test: to be done later
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
-			MethodDeclaration postBeforeWalk = post.clone();
+			Node postBeforeWalk = post.clone();
 			Assert.assertFalse("Unexpected transformation on code just transformed", transformer.walkNode(post));
 			Assert.assertEquals(postBeforeWalk, post);
 		}
@@ -246,6 +259,35 @@ public class ATestCases {
 		Assertions.assertThat(pre.getTypes()).hasSize(1);
 		Assertions.assertThat(post.getTypes()).hasSize(1);
 
+		// Re-use common comparison method, but it will process the type: it will not process imports
+		doCompareExpectedChanges(transformer, oneCase, pre.getType(0), post.getType(0));
+
+		// This will also compare imports
+		doCompareClasses(transformer, pre, post);
+	}
+
+	protected void doCompareInnerClasses(JavaParser javaParser,
+			IMutator transformer,
+			ClassOrInterfaceDeclaration oneCase) {
+		LOGGER.info("Processing the case: {}", oneCase.getName());
+		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, "Pre");
+		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, "Post");
+
+		doCompareExpectedChanges(transformer, oneCase, pre, post);
+	}
+
+	protected void doCompareInnerAnnotations(JavaParser javaParser,
+			IMutator transformer,
+			ClassOrInterfaceDeclaration oneCase) {
+		LOGGER.info("Processing the case: {}", oneCase.getName());
+		AnnotationDeclaration pre = getAnnotationWithName(oneCase, "Pre");
+		AnnotationDeclaration post = getAnnotationWithName(oneCase, "Post");
+
+		doCompareExpectedChanges(transformer, oneCase, pre, post);
+	}
+
+	protected void doCompareClasses(IMutator transformer, CompilationUnit pre, CompilationUnit post) {
+
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
@@ -273,5 +315,29 @@ public class ATestCases {
 		}
 		MethodDeclaration pre = preMethods.get(0);
 		return pre;
+	}
+
+	public static ClassOrInterfaceDeclaration getClassWithName(ClassOrInterfaceDeclaration oneCase, String name) {
+		List<ClassOrInterfaceDeclaration> matching =
+				oneCase.findAll(ClassOrInterfaceDeclaration.class, n -> name.equals(n.getNameAsString()));
+
+		if (matching.size() != 1) {
+			throw new IllegalStateException(
+					"We expected a single interface/class named '" + name + "' but they were: " + matching.size());
+		}
+
+		return matching.get(0);
+	}
+
+	public static AnnotationDeclaration getAnnotationWithName(ClassOrInterfaceDeclaration oneCase, String name) {
+		List<AnnotationDeclaration> matching =
+				oneCase.findAll(AnnotationDeclaration.class, n -> name.equals(n.getNameAsString()));
+
+		if (matching.size() != 1) {
+			throw new IllegalStateException(
+					"We expected a single annotation named '" + name + "' but they were: " + matching.size());
+		}
+
+		return matching.get(0);
 	}
 }

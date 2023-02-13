@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 
 /**
  * Helpers knowing what could be the impact of given rule

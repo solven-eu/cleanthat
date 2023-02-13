@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -66,7 +67,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	@SuppressWarnings("PMD.CloseResource")
 	public static FileSystemCodeProvider forTests() throws IOException {
 		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
-		return new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
+		return new FileSystemCodeProvider(CodeProviderHelpers.getRoot(fs));
 	}
 
 	@Override

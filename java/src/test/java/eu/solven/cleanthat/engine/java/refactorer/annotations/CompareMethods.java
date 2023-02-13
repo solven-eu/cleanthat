@@ -15,6 +15,9 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
 /**
  * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method. They can take and
  * return any argument. The 'pre' and 'post' should have identical signature in most cases.
@@ -22,6 +25,7 @@ package eu.solven.cleanthat.engine.java.refactorer.annotations;
  * @author Benoit Lacelle
  *
  */
+@Target(ElementType.TYPE)
 public @interface CompareMethods {
 
 }

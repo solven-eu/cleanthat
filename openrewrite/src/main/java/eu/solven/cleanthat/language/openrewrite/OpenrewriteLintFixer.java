@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
@@ -30,6 +29,7 @@ import org.openrewrite.config.CompositeRecipe;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.tree.J;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.ILintFixerWithPath;
@@ -58,13 +58,11 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 
 	@Override
 	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
-		AtomicReference<PathAndContent> output = new AtomicReference<>(pathAndContent);
-
 		Path path = pathAndContent.getPath();
 		Files.createDirectories(path.getParent());
 		Files.writeString(path, pathAndContent.getContent());
 
-		Path root = path.getFileSystem().getPath("/");
+		Path root = CodeProviderHelpers.getRoot(path);
 
 		// determine your project directory and provide a list of
 		// paths to jars that represent the project's classpath
@@ -83,13 +81,12 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 		// collect results
 		List<Result> results = recipe.run(cus, ctx).getResults();
 
-		for (Result result : results) {
-			output.set(pathAndContent.withContent(result.getAfter().printAll()));
-
-			// result.getRecipeErrors().forEach(null)
+		if (results.size() != 1) {
+			throw new IllegalStateException("We expected a single result in return. Got: " + results.size());
 		}
 
-		return output.get().getContent();
+		return results.get(0).getAfter().printAll();
+
 	}
 
 	@Override

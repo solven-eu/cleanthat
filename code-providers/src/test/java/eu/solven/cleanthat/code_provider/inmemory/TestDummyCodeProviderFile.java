@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.code_provider.inmemory;
 
+import java.nio.file.Paths;
+
 /*
  * Copyright 2023 Benoit Lacelle - SOLVEN
  *
@@ -38,18 +40,18 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 public class TestDummyCodeProviderFile {
 	@Test
 	public void testMissingSlash() {
-		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile("dir/file", null))
+		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile(Paths.get("dir/file"), null))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
 	public void testTrailingDoubleSlash() {
-		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile("//dir/file", null))
+		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile(Paths.get("//dir/file"), null))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
 	public void testOk() {
-		new DummyCodeProviderFile("/dir/file", null);
+		new DummyCodeProviderFile(Paths.get("/dir/file"), null).getPath();
 	}
 }

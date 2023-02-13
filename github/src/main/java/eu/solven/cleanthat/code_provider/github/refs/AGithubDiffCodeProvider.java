@@ -17,7 +17,7 @@ package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -55,8 +55,8 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 
 	final Supplier<GHCompare> diffSupplier;
 
-	public AGithubDiffCodeProvider(FileSystem fs, String token, GHRepository baseRepository) {
-		super(fs);
+	public AGithubDiffCodeProvider(Path repositoryRoot, String token, GHRepository baseRepository) {
+		super(repositoryRoot);
 		this.token = token;
 
 		this.baseRepository = baseRepository;
@@ -87,12 +87,11 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 
 		Stream.of(diff.getFiles()).forEach(prFile -> {
 			// Github does not prefix with '/'
-			// TODO What is the rational of requiring leading '/'?
-			String fileName = "/" + prFile.getFileName();
+			String fileName = prFile.getFileName();
 			if ("removed".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a removed file: {}", fileName);
 			} else {
-				consumer.accept(new DummyCodeProviderFile(fileName, prFile));
+				consumer.accept(new DummyCodeProviderFile(getRepositoryRoot().resolve(fileName), prFile));
 			}
 		});
 	}
@@ -103,9 +102,10 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
+	public Optional<String> loadContentForPath(Path path) throws IOException {
 		try {
-			return Optional.of(loadContent(baseRepository, path, getHeadId()));
+			return Optional
+					.of(loadContent(baseRepository, getRepositoryRoot().relativize(path).toString(), getHeadId()));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);

@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -92,8 +93,8 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 	final ICodeProvider classpathCodeProvider = new ICodeProvider() {
 
 		@Override
-		public Optional<String> loadContentForPath(String path) throws IOException {
-			return Optional.of(PepperResourceHelper.loadAsString(path));
+		public Optional<String> loadContentForPath(Path path) throws IOException {
+			return Optional.of(PepperResourceHelper.loadAsString(path.toString()));
 		}
 
 		@Override
@@ -108,8 +109,8 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 		}
 
 		@Override
-		public FileSystem getFileSystem() {
-			return fileSystem;
+		public Path getRepositoryRoot() {
+			return fileSystem.getPath(fileSystem.getSeparator());
 		}
 	};
 

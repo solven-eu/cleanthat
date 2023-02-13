@@ -105,7 +105,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 
 		Path root = Files.createTempDirectory("cleanthat");
 		ICodeProvider codeProvider =
-				new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, branch);
+				new GithubBranchCodeProvider(root.getRoot(), githubAndToken.getToken(), repo, branch);
 
 		CodeProviderHelpers codeProviderHelpers = appContext.getBean(CodeProviderHelpers.class);
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
@@ -119,7 +119,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			branch = repo.getBranch(configureRef);
 
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, branch);
+					new GithubBranchCodeProvider(root.getRoot(), githubAndToken.getToken(), repo, branch);
 			mainBranchConfig = codeProviderHelpers.unsafeConfig(configureBranchCodeProvider);
 		}
 
@@ -165,7 +165,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 
 		Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(root.getFileSystem(), githubAndToken.getToken(), repo, b);
+					new GithubBranchCodeProvider(root.getRoot(), githubAndToken.getToken(), repo, b);
 			return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
 		}).findAny();
 		boolean configExistsAnywhere = branchWithConfig.isPresent();

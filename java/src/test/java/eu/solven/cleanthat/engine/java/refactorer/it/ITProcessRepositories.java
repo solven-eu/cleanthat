@@ -18,9 +18,13 @@ package eu.solven.cleanthat.engine.java.refactorer.it;
 import java.util.stream.Stream;
 
 public class ITProcessRepositories {
-	public static void main(String[] args) {
-		Stream.of("https://github.com/spring-projects/spring-boot").forEach(repoHumanUrl -> {
 
-		});
+	final static String CHECKOUT = "/Users/blacelle/workspace3/cleanthat_checkouts";
+
+	public static void main(String[] args) {
+		Stream.of("https://github.com/spring-projects/spring-boot", "https://github.com/openjdk/jdk")
+				.forEach(repoHumanUrl -> {
+					// new JGitCodeProv
+				});
 	}
 }

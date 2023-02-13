@@ -17,7 +17,7 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
@@ -35,15 +35,15 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 public abstract class AGithubCodeProvider implements ICodeProvider {
 	// private static final Logger LOGGER = LoggerFactory.getLogger(AGithubCodeProvider.class);
 
-	final FileSystem fs;
+	final Path repositoryRoot;
 
-	public AGithubCodeProvider(FileSystem fs) {
-		this.fs = fs;
+	public AGithubCodeProvider(Path repositoryRoot) {
+		this.repositoryRoot = repositoryRoot;
 	}
 
 	@Override
-	public FileSystem getFileSystem() {
-		return fs;
+	public Path getRepositoryRoot() {
+		return repositoryRoot;
 	}
 
 	public static String loadContent(GHRepository repository, String filename, String sha1) throws IOException {

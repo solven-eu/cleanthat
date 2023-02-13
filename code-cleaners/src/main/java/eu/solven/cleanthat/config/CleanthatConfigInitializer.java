@@ -17,6 +17,7 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -67,17 +68,17 @@ public class CleanthatConfigInitializer {
 				RepoInitializerResult.builder().prBody(body).commitMessage(commitMessage);
 
 		GenerateInitialConfig generateInitialConfig = new GenerateInitialConfig(factories);
-		EngineInitializerResult repoProperties;
 		try {
-			repoProperties = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
+			EngineInitializerResult engineConfig = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
 
-			String repoPropertiesYaml = objectMapper.writeValueAsString(repoProperties.getRepoProperties());
-			resultBuilder.pathToContent(codeProvider.getFileSystem().getPath(defaultRepoPropertiesPath),
-					repoPropertiesYaml);
+			// Write the main config files (cleanthat.yaml)
+			String repoPropertiesYaml = objectMapper.writeValueAsString(engineConfig.getRepoProperties());
+			Path repositoryRoot = codeProvider.getRepositoryRoot();
+			resultBuilder.pathToContent(repositoryRoot.resolve("." + defaultRepoPropertiesPath), repoPropertiesYaml);
 
 			// Register the custom files of the engine
-			repoProperties.getPathToContents()
-					.forEach((k, v) -> resultBuilder.pathToContent(codeProvider.getFileSystem().getPath(k), v));
+			engineConfig.getPathToContents()
+					.forEach((k, v) -> resultBuilder.pathToContent(repositoryRoot.resolve("." + k), v));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
 		}

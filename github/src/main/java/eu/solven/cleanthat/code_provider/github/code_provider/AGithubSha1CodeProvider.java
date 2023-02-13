@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -44,8 +45,8 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	final GithubSha1CodeProviderHelper helper;
 
-	public AGithubSha1CodeProvider(FileSystem fs, String token, GHRepository repo) {
-		super(fs);
+	public AGithubSha1CodeProvider(Path repositoryRoot, String token, GHRepository repo) {
+		super(repositoryRoot);
 		this.token = token;
 
 		this.repo = repo;
@@ -114,7 +115,8 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		tree.getTree().forEach(ghTreeEntry -> {
 			if ("blob".equals(ghTreeEntry.getType())) {
-				consumer.accept(new DummyCodeProviderFile("/" + ghTreeEntry.getPath(), ghTreeEntry));
+				consumer.accept(
+						new DummyCodeProviderFile(getRepositoryRoot().resolve(ghTreeEntry.getPath()), ghTreeEntry));
 			} else if ("tree".equals(ghTreeEntry.getType())) {
 				LOGGER.debug("Discard tree as original call for tree was recursive: {}", ghTreeEntry);
 
@@ -133,13 +135,13 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
+	public Optional<String> loadContentForPath(Path path) throws IOException {
 		if (helper.localClone.get() != null) {
 			// We have a local clone: load the file from it
 			return helper.localClone.get().loadContentForPath(path);
 		} else {
 			try {
-				return Optional.of(loadContent(repo, path, getSha1()));
+				return Optional.of(loadContent(repo, getRepositoryRoot().relativize(path).toString(), getSha1()));
 			} catch (GHFileNotFoundException e) {
 				LOGGER.trace("We miss: {}", path, e);
 				LOGGER.debug("We miss: {}", path);

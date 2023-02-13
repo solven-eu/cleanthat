@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHRepository;
@@ -32,8 +32,8 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 public class GithubBranchCodeProvider extends AGithubSha1CodeProvider {
 	final GHBranch branch;
 
-	public GithubBranchCodeProvider(FileSystem fs, String token, GHRepository repo, GHBranch branch) {
-		super(fs, token, repo);
+	public GithubBranchCodeProvider(Path repositoryRoot, String token, GHRepository repo, GHBranch branch) {
+		super(repositoryRoot, token, repo);
 		this.branch = branch;
 	}
 

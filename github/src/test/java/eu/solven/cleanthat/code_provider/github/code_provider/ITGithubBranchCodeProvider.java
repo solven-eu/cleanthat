@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 
 import org.junit.Assert;
@@ -30,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
@@ -60,10 +62,10 @@ public class ITGithubBranchCodeProvider {
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = cleanthatRepo.getBranch("master");
 
-		GithubSha1CodeProviderHelper codeProvider = new GithubBranchCodeProvider(FileSystems.getDefault(),
-				githubForRepo.getToken(),
-				cleanthatRepo,
-				masterBranch).getHelper();
+		FileSystem fs = Jimfs.newFileSystem();
+		GithubSha1CodeProviderHelper codeProvider =
+				new GithubBranchCodeProvider(fs.getPath("/"), githubForRepo.getToken(), cleanthatRepo, masterBranch)
+						.getHelper();
 
 		// First call: we do clone
 		Assert.assertTrue(codeProvider.ensureLocalClone());

@@ -18,6 +18,7 @@ package eu.solven.cleanthat.it;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,6 +38,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
 import com.google.common.base.Suppliers;
+import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
@@ -100,9 +102,11 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
 		GHBranch consideredBranch = defaultBranch;
 
-		FileSystem fs = FileSystems.getDefault();
+		FileSystem fs = Jimfs.newFileSystem();
 
-		ICodeProvider codeProvider = new GithubBranchCodeProvider(fs, githubAndToken.getToken(), repo, defaultBranch);
+		Path repositoryRoot = fs.getPath("/");
+		ICodeProvider codeProvider =
+				new GithubBranchCodeProvider(repositoryRoot, githubAndToken.getToken(), repo, defaultBranch);
 
 		CodeProviderHelpers codeProviderHelpers = appContext.getBean(CodeProviderHelpers.class);
 		Optional<Map<String, ?>> mainBranchConfig = codeProviderHelpers.unsafeConfig(codeProvider);
@@ -116,7 +120,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 			consideredBranch = repo.getBranch(configureRef);
 
 			ICodeProvider configureBranchCodeProvider =
-					new GithubBranchCodeProvider(fs, githubAndToken.getToken(), repo, consideredBranch);
+					new GithubBranchCodeProvider(repositoryRoot, githubAndToken.getToken(), repo, consideredBranch);
 			mainBranchConfig = codeProviderHelpers.unsafeConfig(configureBranchCodeProvider);
 		}
 
@@ -125,7 +129,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 			Optional<GHBranch> branchWithConfig = repo.getBranches().values().stream().filter(b -> {
 				ICodeProvider configureBranchCodeProvider =
-						new GithubBranchCodeProvider(fs, githubAndToken.getToken(), repo, b);
+						new GithubBranchCodeProvider(repositoryRoot, githubAndToken.getToken(), repo, b);
 				return codeProviderHelpers.unsafeConfig(configureBranchCodeProvider).isPresent();
 			}).findAny();
 			boolean configExistsAnywhere = branchWithConfig.isPresent();
@@ -144,7 +148,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 			GHBranch finalDefaultBranch = defaultBranch;
 			String refName = CleanthatRefFilterProperties.BRANCHES_PREFIX + finalDefaultBranch.getName();
-			CodeFormatResult output = cleaner.formatRef(fs.getPath("/"),
+			CodeFormatResult output = cleaner.formatRef(repositoryRoot,
 					"RunCleanGithubPullRequest",
 					GithubDecoratorHelper.decorate(repo),
 					GithubDecoratorHelper.decorate(defaultBranch),

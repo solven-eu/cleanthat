@@ -36,7 +36,7 @@ public class TestFileSystemCodeProvider {
 	@Test
 	public void testInMemoryFileSystem() throws IOException {
 		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
-		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath("/"));
+		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
 		cp.listFilesForContent(file -> {
 			Assertions.fail("The FS is empty");
@@ -56,5 +56,33 @@ public class TestFileSystemCodeProvider {
 				throw new UncheckedIOException(e);
 			}
 		});
+	}
+
+	@Test
+	public void testLoadFileOutOfRoot() throws IOException {
+		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+
+		Path secretPath = fs.getPath(fs.getSeparator(), "secretFile");
+		Files.writeString(secretPath, "secretContent");
+
+		Path notSecretPath = fs.getPath(fs.getSeparator(), "project", "notSecretFile");
+		Files.createDirectories(notSecretPath.getParent());
+		Files.writeString(notSecretPath, "notSecretContent");
+
+		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator(), "project"));
+
+		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(secretPath))
+				.isInstanceOf(IllegalArgumentException.class);
+
+		Assertions
+				.assertThatThrownBy(
+						() -> cp.loadContentForPath(fs.getPath(fs.getSeparator(), "project", "..", "secretFile")))
+				.isInstanceOf(IllegalArgumentException.class);
+
+		Assertions.assertThat(cp.loadContentForPath(notSecretPath)).contains("notSecretContent");
+		Assertions
+				.assertThat(
+						cp.loadContentForPath(fs.getPath(fs.getSeparator(), "project", "..", "project", "secretFile")))
+				.contains("notSecretContent");
 	}
 }

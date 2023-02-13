@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.config;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class TestGenerateInitialConfig {
 		GenerateInitialConfig generator = new GenerateInitialConfig(Arrays.asList(factory));
 
 		ICodeProvider codeProvider = Mockito.mock(ICodeProvider.class);
-		Mockito.when(codeProvider.loadContentForPath("/.mvn/wrapper/maven-wrapper.properties"))
+		Mockito.when(codeProvider.loadContentForPath(Paths.get("/.mvn/wrapper/maven-wrapper.properties")))
 				.thenReturn(Optional.of("somePropertiesFileContent"));
 
 		CleanthatRepositoryProperties config = generator.prepareDefaultConfiguration(codeProvider).getRepoProperties();

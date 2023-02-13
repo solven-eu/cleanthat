@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -64,20 +63,21 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
  */
 @SuppressWarnings("PMD.GodClass")
 public class JGitCodeProvider implements ICodeProviderWriter {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(JGitCodeProvider.class);
 
+	final boolean commitPush;
 	final Path workingDir;
 	final Git jgit;
 	final String commit;
 
-	protected JGitCodeProvider(Path workingDir, Git jgit, String commit) {
+	protected JGitCodeProvider(Path workingDir, Git jgit, String commit, boolean commitPush) {
 		this.workingDir = workingDir;
 		this.jgit = jgit;
 		this.commit = commit;
+		this.commitPush = commitPush;
 	}
 
-	public static JGitCodeProvider wrap(Path workingDir, Git jgit, String commit) {
+	public static JGitCodeProvider wrap(Path workingDir, Git jgit, String expectedHeadName, boolean commitPush) {
 		Status status;
 		try {
 			status = jgit.status().call();
@@ -89,11 +89,13 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		}
 
 		String head = getHeadName(jgit.getRepository());
-		if (!commit.equals(head)) {
-			throw new IllegalArgumentException("Invalid current sh1: " + head + " (expected: " + commit + ")");
+
+		if (!expectedHeadName.equals(head)) {
+			throw new IllegalArgumentException(
+					"Invalid current sha1: " + head + " (expected: " + expectedHeadName + ")");
 		}
 
-		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, commit);
+		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, expectedHeadName, commitPush);
 
 		return wrapped;
 	}
@@ -148,17 +150,17 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	protected void acceptLocalTreeWalk(Consumer<ICodeProviderFile> consumer, TreeWalk treeWalk) {
-		String path = "/" + treeWalk.getPathString();
+		Path path = getRepositoryRoot().resolve(treeWalk.getPathString());
 		consumer.accept(new DummyCodeProviderFile(path, path));
 	}
 
 	protected Path resolvePath(Path path) {
-		if (path.startsWith("/")) {
+		if (path.isAbsolute()) {
 			// We receive absolute path, considering as root the git repository
 			// Hence we clean the leading '/' to build a path relative to the actual root
 			path = path.getRoot().relativize(path);
 		} else {
-			LOGGER.debug("TODO Should we reject this? lack of leading '/' in {}", path);
+			throw new IllegalArgumentException("We expected an absolute path");
 		}
 
 		return workingDir.resolve(path);
@@ -198,14 +200,27 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		pathToMutatedContent.forEach((k, v) -> {
 			Path resolvedPath = resolvePath(k);
 
+			if (resolvedPath.getFileSystem().isReadOnly()) {
+				throw new IllegalArgumentException("The fileSystem is readOnly: " + resolvedPath.getFileSystem());
+			}
+
 			try {
-				Files.writeString(resolvedPath, v, StandardOpenOption.TRUNCATE_EXISTING);
+				// Typically needed for ".cleanthat" directory
+				Files.createDirectories(resolvedPath.getParent());
+				Files.writeString(resolvedPath,
+						v,
+						// We may create new files (e.g. when initializing cleanthat configuration)
+						StandardOpenOption.CREATE,
+						// In most cases, we overwrite existing files
+						StandardOpenOption.TRUNCATE_EXISTING);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		});
 
-		addCommitPush(prComments);
+		if (commitPush) {
+			addCommitPush(prComments);
+		}
 	}
 
 	private void addCommitPush(List<String> prComments) {
@@ -232,21 +247,9 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		}
 	}
 
-	// @Override
-	// public String deprecatedLoadContent(Object file) throws IOException {
-	// Path resolvedPath = resolvePath((String) file);
-	//
-	// return new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8);
-	// }
-	//
-	// @Override
-	// public String deprecatedGetFilePath(Object file) {
-	// return file.toString();
-	// }
-
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolvedPath = resolvePath(getFileSystem().getPath(path));
+	public Optional<String> loadContentForPath(Path path) throws IOException {
+		Path resolvedPath = resolvePath(path);
 
 		if (resolvedPath.toFile().isFile()) {
 			return Optional.of(new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8));
@@ -312,8 +315,8 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public FileSystem getFileSystem() {
-		return workingDir.getFileSystem();
+	public Path getRepositoryRoot() {
+		return workingDir;
 	}
 
 }

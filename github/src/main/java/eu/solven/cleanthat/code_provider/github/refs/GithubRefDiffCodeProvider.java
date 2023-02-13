@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -30,8 +30,12 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 public class GithubRefDiffCodeProvider extends AGithubHeadRefDiffCodeProvider {
 	final GHRef base;
 
-	public GithubRefDiffCodeProvider(FileSystem fs, String token, GHRepository baseRepository, GHRef base, GHRef head) {
-		super(fs, token, baseRepository, head);
+	public GithubRefDiffCodeProvider(Path repositoryRoot,
+			String token,
+			GHRepository baseRepository,
+			GHRef base,
+			GHRef head) {
+		super(repositoryRoot, token, baseRepository, head);
 		this.base = base;
 	}
 

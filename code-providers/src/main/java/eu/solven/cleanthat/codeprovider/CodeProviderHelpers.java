@@ -75,7 +75,8 @@ public class CodeProviderHelpers {
 		Optional<Map.Entry<String, String>> optPathAndContent;
 		optPathAndContent = PATHES_CLEANTHAT.stream().map(p -> {
 			try {
-				return codeProvider.loadContentForPath(p).map(content -> Maps.immutableEntry(p, content));
+				Path resolvedPath = codeProvider.getRepositoryRoot().resolve("." + p);
+				return codeProvider.loadContentForPath(resolvedPath).map(content -> Maps.immutableEntry(p, content));
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e);
 			}
@@ -112,7 +113,7 @@ public class CodeProviderHelpers {
 		});
 	}
 
-	public static File pathToConfig(Path localFolder) {
+	public static Optional<File> pathToConfig(Path localFolder) {
 		return CodeProviderHelpers.PATHES_CLEANTHAT.stream().map(s -> {
 			String prefix = PATH_SEPARATOR;
 			if (!s.startsWith(prefix)) {
@@ -120,11 +121,7 @@ public class CodeProviderHelpers {
 			}
 			File file = localFolder.resolve(s.substring(prefix.length())).toFile();
 			return file;
-		})
-				.filter(File::exists)
-				.findAny()
-				.orElseThrow(() -> new IllegalStateException(
-						"No configuration at pathes: " + CodeProviderHelpers.PATHES_CLEANTHAT));
+		}).filter(File::exists).findAny();
 	}
 
 	public static Path getRoot(Path path) {

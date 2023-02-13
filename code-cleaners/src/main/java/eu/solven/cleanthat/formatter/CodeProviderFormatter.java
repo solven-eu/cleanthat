@@ -102,7 +102,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				codeWriter.listFilesForFilenames(fileChanged -> {
-					if (CodeProviderHelpers.PATHES_CLEANTHAT.contains(fileChanged.getPath())) {
+					if (CodeProviderHelpers.PATHES_CLEANTHAT.contains(fileChanged.getPath().toString())) {
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
 					}
@@ -120,7 +120,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
 		CleanthatSession cleanthatSession =
-				new CleanthatSession(codeWriter.getFileSystem(), codeWriter, repoProperties);
+				new CleanthatSession(codeWriter.getRepositoryRoot().getFileSystem(), codeWriter, repoProperties);
 
 		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
 			IEngineProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
@@ -161,6 +161,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					languageToNbAddedFiles.sum(),
 					codeWriter);
 			if (dryRun) {
+				// TODO Nice-diff like in eu.solven.cleanthat.engine.java.refactorer.it.ITTestLocalFile
 				LOGGER.info("Skip persisting changes as dryRun=true");
 				isEmpty = true;
 			} else {
@@ -228,7 +229,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		try {
 			cleanthatSession.getCodeProvider().listFilesForContent(file -> {
-				Path filePath = fs.getPath(file.getPath());
+				Path filePath = file.getPath();
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);

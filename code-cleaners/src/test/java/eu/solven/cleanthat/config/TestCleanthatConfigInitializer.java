@@ -42,7 +42,7 @@ public class TestCleanthatConfigInitializer {
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(1)
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "cleanthat.yaml"))
+				.containsKey(codeProvider.getRepositoryRoot().resolve("./.cleanthat/cleanthat.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("syntax_version: \"2023-01-09\""), ""));
 	}
 }

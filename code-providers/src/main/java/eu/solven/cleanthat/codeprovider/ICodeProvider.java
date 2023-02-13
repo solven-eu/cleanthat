@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -28,7 +27,7 @@ import java.util.function.Consumer;
  * @author Benoit Lacelle
  */
 public interface ICodeProvider {
-	FileSystem getFileSystem();
+	Path getRepositoryRoot();
 
 	default void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		listFilesForContent(Set.of("glob:**/*"), consumer);
@@ -51,10 +50,20 @@ public interface ICodeProvider {
 		listFilesForContent(includes, consumer);
 	}
 
-	Optional<String> loadContentForPath(String path) throws IOException;
+	Optional<String> loadContentForPath(Path path) throws IOException;
 
-	default Optional<String> loadContentForPath(Path path) throws IOException {
-		return loadContentForPath(path.toString());
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	default Optional<String> loadContentForPath(String path) throws IOException {
+		if (!path.startsWith("/")) {
+			throw new IllegalArgumentException("We expected a rooted path, considering '/' as the repository root");
+		}
+
+		return loadContentForPath(getRepositoryRoot().resolve("." + path));
 	}
 
 	String getRepoUri();

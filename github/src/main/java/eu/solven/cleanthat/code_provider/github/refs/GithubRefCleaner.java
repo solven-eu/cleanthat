@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
@@ -364,10 +363,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			String repoName = theRef.getRepoFullName();
 			GithubFacade facade = new GithubFacade(githubAndToken.getGithub(), repoName);
 			GHRef refObject = facade.getRef(ref);
-			return new GithubRefCodeProvider(root.getFileSystem(),
-					githubAndToken.getToken(),
-					facade.getRepository(),
-					refObject);
+			return new GithubRefCodeProvider(root, githubAndToken.getToken(), facade.getRepository(), refObject);
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue with ref: " + ref, e);
 		}
@@ -380,8 +376,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
 			// Get the head lazily, to prevent creating empty branches
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			FileSystem fs = codeProvider.getFileSystem();
-			return new GithubRefCodeReadWriter(fs,
+			Path repositoryRoot = codeProvider.getRepositoryRoot();
+			return new GithubRefCodeReadWriter(repositoryRoot,
 					githubAndToken.getToken(),
 					eventKey,
 					theRepo,
@@ -424,8 +420,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		GHRepository theRepo = repo.getDecorated();
 		String token = githubAndToken.getToken();
 		GHCommit head = new GithubRepositoryFacade(theRepo).getCommit(refOrSha1);
-		ICodeProvider codeProvider =
-				new GithubCommitToCommitDiffCodeProvider(root.getFileSystem(), token, theRepo, ghBase, head);
+		ICodeProvider codeProvider = new GithubCommitToCommitDiffCodeProvider(root, token, theRepo, ghBase, head);
 		// Typically used to load the configuration
 		// ICodeProvider headCodeProvider = new GithubCommitToCommitDiffCodeProvider(token, theRepo, ghBase, head);
 		return formatRefDiff(eventKey, theRepo, codeProvider, headSupplier);
@@ -439,8 +434,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			ILazyGitReference headSupplier) {
 		GHBranch branch = branchSupplier.getDecorated();
 
-		ICodeProviderWriter codeProvider = new GithubBranchCodeReadWriter(root
-				.getFileSystem(), githubAndToken.getToken(), eventKey, repo.getDecorated(), branch);
+		ICodeProviderWriter codeProvider =
+				new GithubBranchCodeReadWriter(root, githubAndToken.getToken(), eventKey, repo.getDecorated(), branch);
 		return formatRefDiff(eventKey, repo.getDecorated(), codeProvider, headSupplier);
 	}
 

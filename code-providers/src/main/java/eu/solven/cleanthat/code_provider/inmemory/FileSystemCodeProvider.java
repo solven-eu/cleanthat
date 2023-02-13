@@ -55,13 +55,9 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	final FileSystem fs;
 	final Path root;
 
-	public FileSystemCodeProvider(FileSystem fs, Path root) {
-		this.fs = fs;
-		this.root = root;
-	}
-
 	public FileSystemCodeProvider(Path root) {
-		this(root.getFileSystem(), root);
+		this.fs = root.getFileSystem();
+		this.root = root.normalize();
 	}
 
 	@SuppressWarnings("PMD.CloseResource")
@@ -71,8 +67,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public FileSystem getFileSystem() {
-		return fs;
+	public Path getRepositoryRoot() {
+		return root;
 	}
 
 	@Override
@@ -110,7 +106,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 				String unixLikePath = toUnixPath(relativized);
 
-				consumer.accept(new DummyCodeProviderFile("/" + unixLikePath, file));
+				consumer.accept(new DummyCodeProviderFile(root.resolve(unixLikePath), file));
 
 				return FileVisitResult.CONTINUE;
 			}
@@ -162,10 +158,20 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolved = resolvePath(getFileSystem().getPath(path));
-		if (resolved.toFile().isFile()) {
-			return Optional.of(Files.readString(resolved));
+	public Optional<String> loadContentForPath(Path path) throws IOException {
+		Path pathForRootFS;
+		if (path.getFileSystem().equals(fs)) {
+			pathForRootFS = path;
+		} else {
+			pathForRootFS = resolvePath(path);
+		}
+
+		if (!pathForRootFS.normalize().startsWith(root.normalize())) {
+			throw new IllegalArgumentException("Illegal path: " + path);
+		}
+
+		if (Files.exists(pathForRootFS)) {
+			return Optional.of(Files.readString(pathForRootFS));
 		} else {
 			return Optional.empty();
 		}

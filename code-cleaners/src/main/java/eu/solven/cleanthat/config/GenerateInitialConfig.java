@@ -95,7 +95,7 @@ public class GenerateInitialConfig {
 			Collection<IEngineLintFixerFactory> factories) {
 		AtomicLongMap<String> factoryToFileCount = AtomicLongMap.create();
 
-		FileSystem fs = codeProvider.getFileSystem();
+		Path repoRoot = codeProvider.getRepositoryRoot();
 
 		try {
 			// Listing files may be slow if there is many files (e.g. download of repo as zip)
@@ -111,7 +111,7 @@ public class GenerateInitialConfig {
 				factories.forEach(factory -> {
 					Set<String> includes = factory.getDefaultIncludes();
 
-					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, includes);
+					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
 					Optional<PathMatcher> matchingInclude =
 							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 

@@ -60,9 +60,9 @@ public class TestRepo_GenerateInitiaConfiguration {
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(2)
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "cleanthat.yaml"))
+				.containsKey(codeProvider.getRepositoryRoot().resolve("./.cleanthat/cleanthat.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("id: \"spotless\""), ""))
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "spotless.yaml"))
+				.containsKey(codeProvider.getRepositoryRoot().resolve("./.cleanthat/spotless.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("format: \"markdown\""), ""));
 	}
 }

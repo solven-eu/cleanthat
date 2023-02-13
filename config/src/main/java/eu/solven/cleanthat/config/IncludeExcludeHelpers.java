@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.config;
 
-import java.io.File;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -58,7 +57,6 @@ public class IncludeExcludeHelpers {
 	// https://stackoverflow.com/questions/44388227/sonar-raises-blocker-issue-on-java-filesystems-getdefault
 	@SuppressWarnings("PMD.CloseResource")
 	public static List<PathMatcher> prepareMatcher(FileSystem fs, Collection<String> globOrRegex) {
-		// FileSystem fs = FileSystems.getDefault();
 		return globOrRegex.stream().map(r -> {
 			try {
 				if (!r.startsWith("glob:") && !r.startsWith("regex:")) {
@@ -69,10 +67,10 @@ public class IncludeExcludeHelpers {
 
 				String newPattern;
 				// https://stackoverflow.com/questions/64102053/java-pathmatcher-not-working-properly-on-windows
-				if ("\\".equals(File.separator)) {
+				if ("\\".equals(fs.getSeparator())) {
 					// We are under Windows
 					newPattern = r.replace("/", "\\\\");
-					LOGGER.info("File.separator='{}' so we switched regex to: {}", File.separator, newPattern);
+					LOGGER.info("File.separator='{}' so we switched regex to: {}", fs.getSeparator(), newPattern);
 				} else {
 					// We are under Linux
 					newPattern = r;

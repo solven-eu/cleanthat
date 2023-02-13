@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.language.openrewrite;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -59,8 +60,8 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
 		Path path = pathAndContent.getPath();
 
-		// Files.createDirectories(path.getParent());
-		// Files.writeString(path, pathAndContent.getContent());
+		Files.createDirectories(path.getParent());
+		Files.writeString(path, pathAndContent.getContent());
 
 		Path root = CodeProviderHelpers.getRoot(path);
 

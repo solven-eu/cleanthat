@@ -29,6 +29,13 @@ import java.util.function.Consumer;
 public interface ICodeProvider {
 	Path getRepositoryRoot();
 
+	/**
+	 * this will call the consumer on each {@link ICodeProviderFile}. The path will be absolute, considering '/' as the
+	 * repository root, with the same FileSystem as {@link ICodeProvider} root.
+	 * 
+	 * @param consumer
+	 * @throws IOException
+	 */
 	default void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		listFilesForContent(Set.of("glob:**/*"), consumer);
 	}
@@ -63,7 +70,7 @@ public interface ICodeProvider {
 			throw new IllegalArgumentException("We expected a rooted path, considering '/' as the repository root");
 		}
 
-		return loadContentForPath(getRepositoryRoot().resolve("." + path));
+		return loadContentForPath(getRepositoryRoot().resolve(path.substring("/".length())));
 	}
 
 	String getRepoUri();

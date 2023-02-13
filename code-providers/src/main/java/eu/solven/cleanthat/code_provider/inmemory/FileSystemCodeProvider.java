@@ -58,6 +58,10 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	public FileSystemCodeProvider(Path root) {
 		this.fs = root.getFileSystem();
 		this.root = root.normalize();
+
+		if (!this.root.equals(root)) {
+			throw new IllegalArgumentException("The root is illegal: " + root);
+		}
 	}
 
 	@SuppressWarnings("PMD.CloseResource")
@@ -104,23 +108,23 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
 				Path relativized = root.relativize(file);
 
-				String unixLikePath = toUnixPath(relativized);
+				// String unixLikePath = toUnixPath(relativized);
 
-				consumer.accept(new DummyCodeProviderFile(root.resolve(unixLikePath), file));
+				consumer.accept(new DummyCodeProviderFile(relativized, file));
 
 				return FileVisitResult.CONTINUE;
 			}
 
-			private String toUnixPath(Path relativized) {
-				String unixLikePath;
-				if ("\\".equals(relativized.getFileSystem().getSeparator())) {
-					// We get '\' under Windows
-					unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
-				} else {
-					unixLikePath = relativized.toString();
-				}
-				return unixLikePath;
-			}
+			// private String toUnixPath(Path relativized) {
+			// String unixLikePath;
+			// if ("\\".equals(relativized.getFileSystem().getSeparator())) {
+			// // We get '\' under Windows
+			// unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
+			// } else {
+			// unixLikePath = relativized.toString();
+			// }
+			// return unixLikePath;
+			// }
 		});
 	}
 
@@ -159,6 +163,12 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(Path path) throws IOException {
+		if (!path.equals(path.normalize())) {
+			throw new IllegalArgumentException("Illegal path: " + path);
+		} else if (path.isAbsolute()) {
+			throw new IllegalArgumentException("We expect a path relative to the repository root");
+		}
+
 		Path pathForRootFS;
 		if (path.getFileSystem().equals(fs)) {
 			pathForRootFS = path;

@@ -15,9 +15,11 @@
  */
 package eu.solven.cleanthat.code_provider.inmemory;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
@@ -25,13 +27,17 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 public class TestDummyCodeProviderFile {
 	@Test
 	public void testMissingSlash() {
-		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile(Paths.get("dir/file"), null))
+		Assertions
+				.assertThatThrownBy(() -> new DummyCodeProviderFile(FileSystems.getDefault().getPath("dir/file"), null))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
+	@Ignore("Irrelevant since we consume Path, and Path will remove the leading '//' into '/'")
 	@Test
 	public void testTrailingDoubleSlash() {
-		Assertions.assertThatThrownBy(() -> new DummyCodeProviderFile(Paths.get("//dir/file"), null))
+		Assertions
+				.assertThatThrownBy(
+						() -> new DummyCodeProviderFile(FileSystems.getDefault().getPath("//dir/file"), null))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 

@@ -35,10 +35,6 @@ import eu.solven.cleanthat.git.GitIgnoreParser;
  * @author Benoit Lacelle
  */
 public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
-	public FileSystemGitCodeProvider(FileSystem fs, Path root) {
-		super(fs, root);
-	}
-
 	public FileSystemGitCodeProvider(Path root) {
 		super(root);
 	}
@@ -51,7 +47,7 @@ public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
 	}
 
 	protected Predicate<Path> makeGitIgnorePredicate() throws IOException {
-		Path gitIgnore = resolvePath(getFileSystem().getPath("/.gitignore"));
+		Path gitIgnore = resolvePath(getRepositoryRoot().resolve(".gitignore"));
 
 		// TODO Beware there could be .gitignore in subfolders
 		// TODO Spotless implements this logic

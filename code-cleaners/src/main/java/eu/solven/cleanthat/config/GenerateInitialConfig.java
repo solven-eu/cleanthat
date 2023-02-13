@@ -105,7 +105,7 @@ public class GenerateInitialConfig {
 			factories.forEach(f -> allIncludes.addAll(f.getDefaultIncludes()));
 
 			codeProvider.listFilesForFilenames(allIncludes, file -> {
-				Path filePath = fs.getPath(file.getPath());
+				Path filePath = file.getPath();
 
 				factories.forEach(factory -> {
 					Set<String> includes = factory.getDefaultIncludes();

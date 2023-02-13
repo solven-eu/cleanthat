@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -106,7 +107,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				}
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
-				Path relativized = root.relativize(file);
+				String rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, file);
+				Path relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
 
 				// String unixLikePath = toUnixPath(relativized);
 

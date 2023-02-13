@@ -63,7 +63,7 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 	protected void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
 		checkParameters();
 
-		getLog().info("Path: " + getConfigPath());
+		getLog().info("Path: " + getRepositoryConfigPath());
 		getLog().info("URL: " + getConfigUrl());
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);

@@ -97,7 +97,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 			getLog().debug("Not required to be executed at root");
 		}
 
-		String configPath = getConfigPath();
+		String configPath = getRepositoryConfigPath();
 		if (Strings.isNullOrEmpty(configPath)) {
 			throw new IllegalArgumentException("We need a not-empty configPath to run the 'init' mojo");
 		}

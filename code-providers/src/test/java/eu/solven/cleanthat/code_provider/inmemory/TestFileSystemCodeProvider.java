@@ -42,9 +42,8 @@ public class TestFileSystemCodeProvider {
 			Assertions.fail("The FS is empty");
 		});
 
-		cp.persistChanges(Map.of(fs.getPath("/").resolve(fs.getPath("root", "directory", "file.txt")), "newContent"),
-				Arrays.asList(),
-				Collections.emptyList());
+		cp.persistChanges(Map.of(fs.getPath(fs.getSeparator()).resolve(fs.getPath("root", "directory", "file.txt")),
+				"newContent"), Arrays.asList(), Collections.emptyList());
 
 		cp.listFilesForContent(file -> {
 			Assertions.assertThat(file.getPath().toString()).isEqualTo("/root/directory/file.txt");

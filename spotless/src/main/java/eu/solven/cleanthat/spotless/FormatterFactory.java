@@ -17,7 +17,6 @@ package eu.solven.cleanthat.spotless;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -73,11 +72,9 @@ public class FormatterFactory {
 
 	private static final AtomicReference<Path> REF_LOCALREPO = new AtomicReference<>();
 
-	final FileSystem fileSystem;
 	final ICodeProvider codeProvider;
 
 	public FormatterFactory(CleanthatSession cleanthatSession) {
-		this.fileSystem = cleanthatSession.getFileSystem();
 		this.codeProvider = cleanthatSession.getCodeProvider();
 	}
 
@@ -147,7 +144,7 @@ public class FormatterFactory {
 			SpotlessFormatterProperties formatterProperties,
 			Provisioner provisioner) {
 		// In our virtual fileSystem, we process from the root (as root of the repository)
-		Path tmpRoot = fileSystem.getPath("/");
+		// Path tmpRoot = fileSystem.getPath(fileSystem.getSeparator());
 
 		// File baseDir;
 		// Supplier<Iterable<File>> filesProvider;
@@ -157,7 +154,7 @@ public class FormatterFactory {
 			// LineEnding.createPolicy(File, Supplier<Iterable<File>>) is file-system oriented
 			lineEndingsPolicy = GitAttributesLineEndings_InMemory.create(codeProvider,
 					engineProperties.getGit(),
-					fileSystem.getPath("/"),
+					codeProvider.getRepositoryRoot(),
 					() -> Collections.emptyList());
 		} else {
 			lineEndingsPolicy = lineEnding.createPolicy();
@@ -177,7 +174,7 @@ public class FormatterFactory {
 				Formatter.builder()
 						.lineEndingsPolicy(lineEndingsPolicy)
 						.encoding(Charset.forName(encoding))
-						.rootDir(tmpRoot)
+						.rootDir(codeProvider.getRepositoryRoot())
 						.steps(steps)
 						.exceptionPolicy(exceptionPolicy)
 						.build());

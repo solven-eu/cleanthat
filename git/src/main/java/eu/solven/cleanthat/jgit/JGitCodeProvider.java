@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -150,7 +151,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	protected void acceptLocalTreeWalk(Consumer<ICodeProviderFile> consumer, TreeWalk treeWalk) {
-		Path path = getRepositoryRoot().resolve(treeWalk.getPathString());
+		Path path = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), treeWalk.getPathString());
 		consumer.accept(new DummyCodeProviderFile(path, path));
 	}
 

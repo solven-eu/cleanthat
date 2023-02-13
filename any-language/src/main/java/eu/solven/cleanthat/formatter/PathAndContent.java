@@ -20,6 +20,8 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
+
 /**
  * Couple a {@link Path} (which may not be based on FileSystems.default()) and its content. The content is fetched
  * lazily. Once it is fetched, it is cached.
@@ -32,6 +34,8 @@ public class PathAndContent {
 	final Supplier<String> contentSupplier;
 
 	public PathAndContent(Path path, Supplier<String> contentSupplier) {
+		CleanthatPathHelpers.checkContentPath(path);
+
 		this.path = path;
 		this.contentSupplier = Suppliers.memoize(contentSupplier::get);
 	}

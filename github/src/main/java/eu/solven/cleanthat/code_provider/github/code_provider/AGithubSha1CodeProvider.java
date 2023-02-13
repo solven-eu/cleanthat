@@ -27,6 +27,7 @@ import org.kohsuke.github.GHTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -114,8 +115,8 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 		// https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
 		tree.getTree().forEach(ghTreeEntry -> {
 			if ("blob".equals(ghTreeEntry.getType())) {
-				consumer.accept(
-						new DummyCodeProviderFile(getRepositoryRoot().resolve(ghTreeEntry.getPath()), ghTreeEntry));
+				Path contentPath = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), ghTreeEntry.getPath());
+				consumer.accept(new DummyCodeProviderFile(contentPath, ghTreeEntry));
 			} else if ("tree".equals(ghTreeEntry.getType())) {
 				LOGGER.debug("Discard tree as original call for tree was recursive: {}", ghTreeEntry);
 
@@ -134,16 +135,17 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(Path path) throws IOException {
+	public Optional<String> loadContentForPath(Path contentPath) throws IOException {
 		if (helper.localClone.get() != null) {
 			// We have a local clone: load the file from it
-			return helper.localClone.get().loadContentForPath(path);
+			return helper.localClone.get().loadContentForPath(contentPath);
 		} else {
 			try {
-				return Optional.of(loadContent(repo, getRepositoryRoot().relativize(path).toString(), getSha1()));
+				String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), contentPath);
+				return Optional.of(loadContent(repo, rawPath, getSha1()));
 			} catch (GHFileNotFoundException e) {
-				LOGGER.trace("We miss: {}", path, e);
-				LOGGER.debug("We miss: {}", path);
+				LOGGER.trace("We miss: {}", contentPath, e);
+				LOGGER.debug("We miss: {}", contentPath);
 				return Optional.empty();
 			}
 		}

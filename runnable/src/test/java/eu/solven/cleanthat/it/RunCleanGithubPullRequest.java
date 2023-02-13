@@ -40,6 +40,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
@@ -103,7 +104,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 		FileSystem fs = Jimfs.newFileSystem();
 
-		Path repositoryRoot = fs.getPath("/");
+		Path repositoryRoot = fs.getPath(fs.getSeparator());
 		ICodeProvider codeProvider =
 				new GithubBranchCodeProvider(repositoryRoot, githubAndToken.getToken(), repo, defaultBranch);
 

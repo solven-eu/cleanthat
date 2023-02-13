@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
 import eu.solven.cleanthat.code_provider.github.code_provider.FileIsTooBigException;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
@@ -91,7 +92,8 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 			if ("removed".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a removed file: {}", fileName);
 			} else {
-				consumer.accept(new DummyCodeProviderFile(getRepositoryRoot().resolve(fileName), prFile));
+				Path contentPath = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), fileName);
+				consumer.accept(new DummyCodeProviderFile(contentPath, prFile));
 			}
 		});
 	}

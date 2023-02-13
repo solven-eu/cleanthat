@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.formatter;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -30,7 +30,7 @@ import lombok.Data;
  */
 @Data
 public class CleanthatSession {
-	final FileSystem fileSystem;
+	final Path repositoryRoot;
 	final ICodeProvider codeProvider;
 	final CleanthatRepositoryProperties repositoryProperties;
 

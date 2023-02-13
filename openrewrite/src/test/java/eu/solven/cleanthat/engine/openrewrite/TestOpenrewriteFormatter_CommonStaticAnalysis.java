@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.jimfs.Jimfs;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -123,7 +124,9 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 		// } catch (IOException e) {
 		// throw new UncheckedIOException(e);
 		// }
-		cleanthatSession = new CleanthatSession(fileSystem, classpathCodeProvider, repositoryProperties);
+		cleanthatSession = new CleanthatSession(fileSystem.getPath(fileSystem.getSeparator()),
+				classpathCodeProvider,
+				repositoryProperties);
 	}
 
 	@Before
@@ -156,11 +159,10 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 		IEngineProperties languageP = getEngineProperties();
 
 		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-		String cleaned = applier.applyProcessors(compile,
-				new PathAndContent(
-						cleanthatSession.getFileSystem()
-								.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
-						sourceCode));
+		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+				"someModule/src/main/java/some_package/someFilePath.java");
+
+		String cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
 	}
 }

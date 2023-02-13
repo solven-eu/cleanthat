@@ -73,7 +73,7 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 			return;
 		}
 
-		String configPath = getConfigPath();
+		String configPath = getRepositoryConfigPath();
 		getLog().info("Path: " + configPath);
 		getLog().info("URL: " + getConfigUrl());
 

@@ -123,8 +123,9 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
 					IWebhookEvent input) {
 				try (FileSystem fs = MemoryFileSystemBuilder.newEmpty().build()) {
-					return githubWebhookHandler
-							.filterWebhookEventTargetRelevantBranch(fs.getPath("/"), codeCleanerFactory, input);
+					return githubWebhookHandler.filterWebhookEventTargetRelevantBranch(fs.getPath(fs.getSeparator()),
+							codeCleanerFactory,
+							input);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -134,7 +135,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			public void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input) {
 				// We make a FileSystem per ICodeProvider
 				try (FileSystem fs = MemoryFileSystemBuilder.newEmpty().build()) {
-					githubWebhookHandler.doExecuteClean(fs.getPath("/"), codeCleanerFactory, input);
+					githubWebhookHandler.doExecuteClean(fs.getPath(fs.getSeparator()), codeCleanerFactory, input);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}

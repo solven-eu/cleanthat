@@ -120,7 +120,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
 		CleanthatSession cleanthatSession =
-				new CleanthatSession(codeWriter.getRepositoryRoot().getFileSystem(), codeWriter, repoProperties);
+				new CleanthatSession(codeWriter.getRepositoryRoot(), codeWriter, repoProperties);
 
 		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
 			IEngineProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
@@ -211,7 +211,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-		FileSystem fs = cleanthatSession.getFileSystem();
+		FileSystem fs = cleanthatSession.getRepositoryRoot().getFileSystem();
 		List<PathMatcher> includeMatchers =
 				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
 		List<PathMatcher> excludeMatchers =
@@ -219,7 +219,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		// https://github.com/diffplug/spotless/issues/1555
 		// If too many threads, we would load too many Spotless engines
-		ListeningExecutorService executor = PepperExecutorsHelper.newShrinkableFixedThreadPool("CodeFormatter");
+		ListeningExecutorService executor =
+				PepperExecutorsHelper.newShrinkableFixedThreadPool("Cleanthat-CodeFormatter-");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		// We rely on a ThreadLocal as Engines may not be threadSafe

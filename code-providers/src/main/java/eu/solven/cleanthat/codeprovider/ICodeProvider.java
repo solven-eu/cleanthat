@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
+
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
  *
@@ -65,12 +67,10 @@ public interface ICodeProvider {
 	 * @return
 	 * @throws IOException
 	 */
-	default Optional<String> loadContentForPath(String path) throws IOException {
-		if (!path.startsWith("/")) {
-			throw new IllegalArgumentException("We expected a rooted path, considering '/' as the repository root");
-		}
+	default Optional<String> loadContentForPath(String rawPath) throws IOException {
+		Path path = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), rawPath);
 
-		return loadContentForPath(getRepositoryRoot().resolve(path.substring("/".length())));
+		return loadContentForPath(path);
 	}
 
 	String getRepoUri();

@@ -32,6 +32,7 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -80,7 +81,8 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 			if ("deleted".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a deleted file: {}", prFile.getFilename());
 			} else {
-				consumer.accept(new DummyCodeProviderFile(getRepositoryRoot().resolve(prFile.getFilename()), prFile));
+				Path contentPath = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), prFile.getFilename());
+				consumer.accept(new DummyCodeProviderFile(contentPath, prFile));
 			}
 		});
 	}
@@ -116,9 +118,8 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 	@Override
 	public Optional<String> loadContentForPath(Path path) throws IOException {
 		try {
-			return Optional.of(loadContent(pr.getRepository(),
-					getRepositoryRoot().relativize(path).toString(),
-					pr.getHead().getSha()));
+			String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), path);
+			return Optional.of(loadContent(pr.getRepository(), rawPath, pr.getHead().getSha()));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);

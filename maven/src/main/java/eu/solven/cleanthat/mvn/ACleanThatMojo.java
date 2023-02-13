@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+
 /**
  * The mojo of the mvn plugin
  * 
@@ -52,8 +54,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// The following is not compatible with goals executable without a pom.xml
 	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
 	// The following is not compatible with UnitTests
-	@Parameter(property = "cleanthat.configPath", defaultValue = "${session.executionRootDirectory}/cleanthat.yaml")
-	private String configPath;
+	// To be synced with CodeProviderHelpers.PATHES_CLEANTHAT.get(0)
+	@Parameter(property = "cleanthat.configPath",
+			defaultValue = "${session.executionRootDirectory}/.cleanthat/cleanthat.yaml")
+	private String cleanthatRepositoryConfigPath;
 
 	@Parameter(property = "cleanthat.configUrl")
 	private String configUrl;
@@ -102,7 +106,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	}
 
 	protected void checkParameters() {
-		String configPath = getConfigPath();
+		String configPath = getRepositoryConfigPath();
 		String configUrl = getConfigUrl();
 
 		if (Strings.isNullOrEmpty(configPath) && Strings.isNullOrEmpty(configUrl)) {
@@ -130,16 +134,16 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		return baseDir;
 	}
 
-	public String getConfigPath() {
-		if (configPath != null && configPath.contains("${")) {
+	public String getRepositoryConfigPath() {
+		if (cleanthatRepositoryConfigPath != null && cleanthatRepositoryConfigPath.contains("${")) {
 			// session.get
 			// project.getBasedir();
 			// session.getExecutionRootDirectory();
 			// session.getBas
-			throw new IllegalStateException("Issue with configPath: '" + configPath + "'");
+			throw new IllegalStateException("Issue with configPath: '" + cleanthatRepositoryConfigPath + "'");
 		}
 
-		return configPath;
+		return cleanthatRepositoryConfigPath;
 	}
 
 	@VisibleForTesting

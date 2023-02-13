@@ -43,34 +43,34 @@ public class TestGitIgnoreParser {
 		Assertions.assertThat(patterns).isNotEmpty().contains("*.log", "/node_modules", "/nonexistent", "*.swp");
 
 		// should accept the given filenames
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "test/index.js")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "wat/test/index.js")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("test/index.js"))).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("wat/test/index.js"))).isFalse();
 
 		// should not accept the given filenames
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "test.swp")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "node_modules/wat.js")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "foo/bar.wat")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("test.swp"))).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("node_modules/wat.js"))).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("foo/bar.wat"))).isTrue();
 
 		// should not accept the given directory
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/bar")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("nonexistent"))).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("nonexistent/bar"))).isTrue();
 
 		// should accept unignored files in ignored directories
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/foo")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("nonexistent/foo"))).isFalse();
 
 		// hould accept nested unignored files in ignored directories
-		Assertions.assertThat(GitIgnoreParser.match(patterns, "nonexistent/foo/wat")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(patterns, fs.getPath("nonexistent/foo/wat"))).isFalse();
 	}
 
 	@Test
 	public void testGitDocumentation_hello() throws IOException {
 		Set<String> helloStar = Set.of("hello.*");
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello.")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello.alice")).isTrue();
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "alice/hello.bob")).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("hello."))).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("hello.alice"))).isTrue();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("alice/hello.bob"))).isTrue();
 
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "hello")).isFalse();
-		Assertions.assertThat(GitIgnoreParser.match(helloStar, "alice_hello.bob")).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("hello"))).isFalse();
+		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("alice_hello.bob"))).isFalse();
 	}
 
 	@Test

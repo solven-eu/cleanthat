@@ -39,7 +39,9 @@ public class TestJGitCodeProvider {
 				new JGitCodeProvider(fs.getPath("/any"), Mockito.mock(Git.class), "someSha1", true);
 
 		Consumer<ICodeProviderFile> consumer = file -> {
-			Assertions.assertThat(file.getPath().toString()).startsWith("/").isEqualTo("/any/root/folder/file");
+			Assertions.assertThat(file.getPath().toString())
+					.startsWith(fs.getSeparator())
+					.isEqualTo("/any/root/folder/file");
 		};
 		TreeWalk treeWalk = Mockito.mock(TreeWalk.class);
 		Mockito.when(treeWalk.getPathString()).thenReturn("root/folder/file");

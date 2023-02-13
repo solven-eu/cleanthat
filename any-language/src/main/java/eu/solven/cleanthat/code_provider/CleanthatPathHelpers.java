@@ -167,4 +167,20 @@ public class CleanthatPathHelpers {
 	private static boolean isEmptyPath(Path p) {
 		return p.getRoot() == null && p.getNameCount() == 1 && p.getName(0).toString().isEmpty();
 	}
+
+	public static Path makeContentPath(Path repositoryRoot, String pathString) {
+		// Safe resolution of the content path
+		Path contentPath = resolveChild(repositoryRoot, pathString);
+
+		// Check the contentPath is really safe
+		checkContentPath(contentPath);
+
+		return contentPath;
+	}
+
+	public static String makeContentRawPath(Path repositoryRoot, Path contentPath) {
+		Path childrenAbsolutePath = resolveChild(repositoryRoot, contentPath);
+
+		return repositoryRoot.relativize(childrenAbsolutePath).toString();
+	}
 }

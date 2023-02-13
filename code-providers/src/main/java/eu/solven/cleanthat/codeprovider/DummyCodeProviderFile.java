@@ -17,6 +17,8 @@ package eu.solven.cleanthat.codeprovider;
 
 import java.nio.file.Path;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
+
 /**
  * Simply wraps an {@link Object}
  * 
@@ -38,12 +40,7 @@ public class DummyCodeProviderFile implements ICodeProviderFile {
 			throw new IllegalArgumentException("input can not be an instance of " + this.getClass());
 		}
 
-		String rawPath = path.toString();
-		if (!rawPath.startsWith("/")) {
-			throw new IllegalArgumentException("Invalid path: " + rawPath + " (missing '/' at the beginning)");
-		} else if (rawPath.startsWith("//")) {
-			throw new IllegalArgumentException("Invalid path: " + rawPath + " ('//' at the beginning)");
-		}
+		CleanthatPathHelpers.checkContentPath(path);
 
 		this.path = path;
 		this.raw = raw;

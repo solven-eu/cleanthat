@@ -53,18 +53,6 @@ public class GitIgnoreParser {
 				.collect(Collectors.toSet());
 	}
 
-	// In this implementation, we assume rawPath is a file, not a directly
-	// It can be considered true if we process files recursively
-	public static boolean match(Set<String> patterns, String rawPath) {
-		if (!rawPath.startsWith("/")) {
-			rawPath = "/" + rawPath;
-		}
-
-		Path p = Paths.get(rawPath);
-
-		return match(patterns, p);
-	}
-
 	public static boolean match(Set<String> patterns, Path path) {
 		Set<String> ignoredPatterns = patterns.stream().filter(s -> !s.startsWith("!")).collect(Collectors.toSet());
 		boolean doMatch = doMatch(ignoredPatterns, path);

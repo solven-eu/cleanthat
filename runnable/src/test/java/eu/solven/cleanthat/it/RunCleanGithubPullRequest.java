@@ -17,7 +17,6 @@ package eu.solven.cleanthat.it;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;

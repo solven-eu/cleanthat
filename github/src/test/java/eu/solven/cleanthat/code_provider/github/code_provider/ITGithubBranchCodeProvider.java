@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 import org.junit.Assert;
 import org.junit.Test;

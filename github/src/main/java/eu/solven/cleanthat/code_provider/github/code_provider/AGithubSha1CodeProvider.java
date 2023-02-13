@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;

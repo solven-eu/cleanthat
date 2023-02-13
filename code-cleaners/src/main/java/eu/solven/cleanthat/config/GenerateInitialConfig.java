@@ -17,7 +17,6 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
@@ -111,7 +110,8 @@ public class GenerateInitialConfig {
 				factories.forEach(factory -> {
 					Set<String> includes = factory.getDefaultIncludes();
 
-					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
+					List<PathMatcher> includeMatchers =
+							IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
 					Optional<PathMatcher> matchingInclude =
 							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 

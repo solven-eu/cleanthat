@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,6 +23,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllEvenNotProductionReadyMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import lombok.Data;
 
 /**
@@ -43,7 +47,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */
-	private List<String> included = List.of(WILDCARD);
+	private List<String> included = List.of(SafeAndConsensualMutators.class.getName());
 
 	/**
 	 * A {@link List} of excluded rules (by ID)
@@ -68,8 +72,37 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 		return null;
 	}
 
+	/**
+	 * 
+	 * @return a {@link JavaRefactorerProperties} based on {@link SafeAndConsensualMutators}
+	 */
 	public static JavaRefactorerProperties defaults() {
 		return new JavaRefactorerProperties();
+	}
+
+	/**
+	 * 
+	 * @return a {@link JavaRefactorerProperties} based on {@link AllMutators}
+	 */
+	public static JavaRefactorerProperties allProductionReady() {
+		JavaRefactorerProperties properties = new JavaRefactorerProperties();
+
+		properties.setIncluded(Arrays.asList(AllMutators.class.getName()));
+
+		return properties;
+	}
+
+	/**
+	 * 
+	 * @return a {@link JavaRefactorerProperties} based on {@link AllEvenNotProductionReadyMutators}
+	 */
+	@Deprecated
+	public static JavaRefactorerProperties allEvenNotProductionReady() {
+		JavaRefactorerProperties properties = new JavaRefactorerProperties();
+
+		properties.setIncluded(Arrays.asList(AllMutators.class.getName()));
+
+		return properties;
 	}
 
 }

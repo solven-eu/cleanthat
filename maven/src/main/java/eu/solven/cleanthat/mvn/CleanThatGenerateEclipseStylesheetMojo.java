@@ -57,13 +57,12 @@ import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -143,6 +142,12 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	@Override
 	public void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
+		String rawRepositoryConfigPath = getRepositoryConfigPath();
+		if (Strings.isNullOrEmpty(rawRepositoryConfigPath)) {
+			LOGGER.warn("configPath is empty (-Dcleanthat.configPath=xxx)");
+			return;
+		}
+
 		IEclipseStylesheetGenerator generator = appContext.getBean(IEclipseStylesheetGenerator.class);
 
 		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
@@ -157,39 +162,25 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		Map<String, String> settings = generator.generateSettings(timeLimit, pathToContent);
 		Path eclipseConfigPath = writeSettings(settings);
 
-		String rawConfigPath = getConfigPath();
-		if (Strings.isNullOrEmpty(rawConfigPath)) {
-			LOGGER.warn(
-					"configPath is empty (-Dcleanthat.configPath=xxx): please adjust your cleanthat.yaml manually, in order to rely on '{}'",
-					eclipseConfigPath);
-			return;
+		Path cleanthatConfigPath = Paths.get(rawRepositoryConfigPath);
+
+		// TODO In fact, we go through Spotless to do so
+		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, rawRepositoryConfigPath);
+
+		// We expect configPath to be like '.../.cleanthat/cleanthat.yaml'
+		Path dotCleanthatFolder = cleanthatConfigPath.getParent();
+		if (dotCleanthatFolder == null) {
+			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
+		} else if (!".cleanthat".equals(dotCleanthatFolder.getFileName().toString())) {
+			throw new IllegalArgumentException(
+					"Issue with configPath: " + cleanthatConfigPath + " (not in .cleanthat)");
+		}
+		Path repositoryRoot = dotCleanthatFolder.getParent();
+		if (repositoryRoot == null) {
+			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
 		}
 
-		Path configPath = Paths.get(rawConfigPath);
-		if (!configPath.toFile().isFile()) {
-			LOGGER.warn("configPath={} does not exists: please adjust your cleanthat.yaml manually", eclipseConfigPath);
-			return;
-		}
-
-		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, rawConfigPath);
-
-		Path normalizedEclipsePath = relativizeFromGitRootAsFSRoot(eclipseConfigPath, configPath);
-		injectStylesheetInConfig(appContext, normalizedEclipsePath, configPath);
-	}
-
-	protected Path relativizeFromGitRootAsFSRoot(Path eclipseConfigPath, Path configPath) {
-		Path rootFolder = configPath.getParent();
-		if (rootFolder == null) {
-			throw new IllegalArgumentException("Issue with configPath: " + configPath + " (no root)");
-		}
-
-		return getMemoryRoot().resolve(rootFolder.relativize(eclipseConfigPath));
-	}
-
-	@SuppressFBWarnings("DMI_HARDCODED_ABSOLUTE_FILENAME")
-	// TODO We should not rely on default FS
-	private Path getMemoryRoot() {
-		return Paths.get("/");
+		injectStylesheetInConfig(appContext, repositoryRoot, cleanthatConfigPath, eclipseConfigPath);
 	}
 
 	/**
@@ -197,13 +188,16 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	 * cleanthat+spotless configuration files
 	 * 
 	 * @param appContext
+	 * @param repoRoot
+	 * @param cleanthatConfigPath
 	 * @param eclipseConfigPath
-	 * @param configPath
 	 * @throws MojoFailureException
 	 * @throws IOException
 	 */
-	public void injectStylesheetInConfig(ApplicationContext appContext, Path eclipseConfigPath, Path configPath)
-			throws MojoFailureException, IOException {
+	public void injectStylesheetInConfig(ApplicationContext appContext,
+			Path repoRoot,
+			Path cleanthatConfigPath,
+			Path eclipseConfigPath) throws MojoFailureException, IOException {
 		LOGGER.info("You need to wire manually the Eclipse stylesheet path (e.g. into '/.cleanthat/spotless.yaml'");
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		MavenCodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
@@ -215,9 +209,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			throw new MojoFailureException("ARG", error, error);
 		}
 
-		CleanthatRepositoryProperties loadedConfig = optResult.getOptResult().get();
+		CleanthatRepositoryProperties repositoryProperties = optResult.getOptResult().get();
 
-		Optional<CleanthatEngineProperties> optSpotlessProperties = loadedConfig.getEngines()
+		Optional<CleanthatEngineProperties> optSpotlessProperties = repositoryProperties.getEngines()
 				.stream()
 				.filter(lp -> CleanthatSpotlessStepParametersProperties.ENGINE_ID.equals(lp.getEngine()))
 				.findAny();
@@ -228,8 +222,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		if (optSpotlessProperties.isEmpty()) {
 			spotlessEngine = appContext.getBean(SpotlessFormattersFactory.class).makeDefaultProperties();
 
-			loadedConfig.setEngines(ImmutableList.<CleanthatEngineProperties>builder()
-					.addAll(loadedConfig.getEngines())
+			repositoryProperties.setEngines(ImmutableList.<CleanthatEngineProperties>builder()
+					.addAll(repositoryProperties.getEngines())
 					.add(spotlessEngine)
 					.build());
 
@@ -244,12 +238,12 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		ObjectMapper objectMapper = configHelpers.getObjectMapper();
 
 		ICleanthatStepParametersProperties spotlessParameters = spotlessEngine.getSteps().get(0).getParameters();
-		String pathToSpotlessConfig =
+		String rawPathToSpotlessConfig =
 				objectMapper.convertValue(spotlessParameters, CleanthatSpotlessStepParametersProperties.class)
 						.getConfiguration();
 
 		SpotlessEngineProperties spotlessEngineProperties =
-				loadOrInitSpotlessEngineProperties(codeProvider, objectMapper, pathToSpotlessConfig);
+				loadOrInitSpotlessEngineProperties(codeProvider, objectMapper, rawPathToSpotlessConfig);
 
 		Optional<SpotlessFormatterProperties> optJavaFormatter = spotlessEngineProperties.getFormatters()
 				.stream()
@@ -261,6 +255,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		boolean needToSaveSpotless = false;
 		if (optJavaFormatter.isEmpty()) {
 			javaFormatter = SpotlessFormatterProperties.builder().format(FormatterFactory.ID_JAVA).build();
+			spotlessEngineProperties.getFormatters().add(javaFormatter);
 
 			LOGGER.info("Append java formatter into Spotless engine");
 			needToSaveSpotless = true;
@@ -296,12 +291,21 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		String eclipseStylesheetFile =
 				eclipseParameters.getCustomProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, String.class);
 		if (eclipseStylesheetFile != null) {
-			// TODO We would prefer writing the new stylesheet in the previously configured path
-			eclipseParameters.putProperty(pathToSpotlessConfig, pathToSpotlessConfig);
+			LOGGER.debug("TODO We should have written eclipse in this location");
+		} else {
+			eclipseParameters.putProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE, eclipseConfigPath.toString());
 			needToSaveSpotless = true;
 		}
 
-		persistConfigurationFiles(appContext, configPath, loadedConfig, needToSaveCleanthat, needToSaveSpotless);
+		if (needToSaveCleanthat) {
+			String rawCleanthatConfigPath = CleanthatPathHelpers.makeContentRawPath(repoRoot, cleanthatConfigPath);
+			Path cleanthatConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawCleanthatConfigPath);
+			persistConfigurationFiles(appContext, codeProvider, cleanthatConfigContentPath, repositoryProperties);
+		}
+		if (needToSaveSpotless) {
+			Path spotlessConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawPathToSpotlessConfig);
+			persistConfigurationFiles(appContext, codeProvider, spotlessConfigContentPath, spotlessEngineProperties);
+		}
 	}
 
 	private SpotlessEngineProperties loadOrInitSpotlessEngineProperties(ICodeProvider codeProvider,
@@ -321,47 +325,22 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	}
 
 	private void persistConfigurationFiles(ApplicationContext appContext,
+			ICodeProviderWriter codeWriter,
 			Path configPath,
-			CleanthatRepositoryProperties loadedConfig,
-			boolean needToSaveCleanthat,
-			boolean needToSaveSpotless) {
+			Object properties) {
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
 		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
 
-		if (needToSaveCleanthat) {
-			// Prepare the configuration as yaml
-			String asYaml;
-			try {
-				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
-			}
-
-			// Write at given path
-			try {
-				Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
-			}
+		// Prepare the configuration as yaml
+		String asYaml;
+		try {
+			asYaml = yamlObjectMapper.writeValueAsString(properties);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Issue converting " + properties + " to YAML", e);
 		}
 
-		if (needToSaveSpotless) {
-			// Prepare the configuration as yaml
-			String asYaml;
-			try {
-				asYaml = yamlObjectMapper.writeValueAsString(loadedConfig);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Issue converting " + loadedConfig + " to YAML", e);
-			}
-
-			// Write at given path
-			try {
-				Files.writeString(configPath, asYaml, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue writing YAML into: " + configPath, e);
-			}
-		}
+		codeWriter.persistChanges(Map.of(configPath, asYaml), Collections.emptyList(), Collections.emptyList());
 	}
 
 	/**

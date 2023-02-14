@@ -44,6 +44,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.EngineInitializerResult;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
@@ -97,7 +98,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 			getLog().debug("Not required to be executed at root");
 		}
 
-		String configPath = getConfigPath();
+		String configPath = getRepositoryConfigPath();
 		if (Strings.isNullOrEmpty(configPath)) {
 			throw new IllegalArgumentException("We need a not-empty configPath to run the 'init' mojo");
 		}
@@ -127,7 +128,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		// Prefix with '.' to convert from absolute path (in the Git repository) to relative path (in the FileSystem
 		// root directory)
 		properties.getPathToContents()
-				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve("." + path), content));
+				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve(path), content));
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {
@@ -141,10 +142,13 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		} else {
 			File baseFir = project.getBasedir();
 
-			Path configPathFileParent = configPathFile.getParent();
-			if (!configPathFileParent.equals(baseFir.toPath())) {
-				LOGGER.info("We'll init only in a module containing the configuration at its root: {}",
-						configPathFileParent);
+			Path relativized = baseFir.toPath().relativize(configPathFile);
+
+			String expectedConfigPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
+
+			if (!relativized.toString().equals(expectedConfigPath)) {
+				LOGGER.info("We'll init only in a module containing the configuration in relative path {}",
+						baseFir.toPath().resolve(ICleanthatConfigConstants.PATHES_CLEANTHAT.get(0)));
 				isValid = false;
 			}
 		}

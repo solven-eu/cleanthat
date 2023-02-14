@@ -29,6 +29,7 @@ import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
@@ -70,7 +71,9 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isEmpty()) {
-			LOGGER.info("There is no configuration ({}) on {}", CodeProviderHelpers.PATHES_CLEANTHAT, codeProvider);
+			LOGGER.info("There is no configuration ({}) on {}",
+					ICleanthatConfigConstants.PATHES_CLEANTHAT,
+					codeProvider);
 			return ResultOrError.error("No configuration");
 		}
 		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");

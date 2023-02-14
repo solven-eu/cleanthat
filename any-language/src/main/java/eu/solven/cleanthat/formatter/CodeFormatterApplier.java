@@ -82,7 +82,10 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 
 		if (lineEnding == LineEnding.GIT) {
 			// see GitAttributesLineEndings_InMemory
-			LOGGER.warn("We switch lineEnding from {} to {}", lineEnding, LineEnding.NATIVE);
+			LOGGER.warn("We switch lineEnding from {} to {} for '{}'",
+					lineEnding,
+					LineEnding.NATIVE,
+					pathAndContent.getPath());
 			lineEnding = LineEnding.NATIVE;
 		} else if (lineEnding == LineEnding.KEEP) {
 			String code = pathAndContent.getContent();

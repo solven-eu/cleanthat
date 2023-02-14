@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
@@ -31,8 +31,8 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 public class GithubCommitCodeProvider extends AGithubSha1CodeProvider {
 	final GHCommit commit;
 
-	public GithubCommitCodeProvider(FileSystem fs, String token, GHRepository repo, GHCommit commit) {
-		super(fs, token, repo);
+	public GithubCommitCodeProvider(Path repositoryRoot, String token, GHRepository repo, GHCommit commit) {
+		super(repositoryRoot, token, repo);
 		this.commit = commit;
 	}
 

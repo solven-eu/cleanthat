@@ -22,6 +22,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.pepper.unittest.ILogDisabler;
 import eu.solven.pepper.unittest.PepperTestHelper;
 
@@ -32,7 +33,8 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		File cleanthatYaml =
+				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -50,7 +52,8 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		File cleanthatYaml =
+				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -69,7 +72,8 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		File cleanthatYaml =
+				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);

@@ -16,11 +16,12 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 
 /**
  * Abstract the various ways to iterate over code (Github PR, Gitlab MR, local folder, ...)
@@ -28,8 +29,15 @@ import java.util.function.Consumer;
  * @author Benoit Lacelle
  */
 public interface ICodeProvider {
-	FileSystem getFileSystem();
+	Path getRepositoryRoot();
 
+	/**
+	 * this will call the consumer on each {@link ICodeProviderFile}. The path will be absolute, considering '/' as the
+	 * repository root, with the same FileSystem as {@link ICodeProvider} root.
+	 * 
+	 * @param consumer
+	 * @throws IOException
+	 */
 	default void listFilesForContent(Consumer<ICodeProviderFile> consumer) throws IOException {
 		listFilesForContent(Set.of("glob:**/*"), consumer);
 	}
@@ -51,10 +59,18 @@ public interface ICodeProvider {
 		listFilesForContent(includes, consumer);
 	}
 
-	Optional<String> loadContentForPath(String path) throws IOException;
+	Optional<String> loadContentForPath(Path path) throws IOException;
 
-	default Optional<String> loadContentForPath(Path path) throws IOException {
-		return loadContentForPath(path.toString());
+	/**
+	 * 
+	 * @param rawPath
+	 * @return
+	 * @throws IOException
+	 */
+	default Optional<String> loadContentForPath(String rawPath) throws IOException {
+		Path path = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), rawPath);
+
+		return loadContentForPath(path);
 	}
 
 	String getRepoUri();

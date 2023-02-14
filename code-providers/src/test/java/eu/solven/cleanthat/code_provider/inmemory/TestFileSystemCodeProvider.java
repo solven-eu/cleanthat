@@ -36,18 +36,17 @@ public class TestFileSystemCodeProvider {
 	@Test
 	public void testInMemoryFileSystem() throws IOException {
 		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
-		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath("/"));
+		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
 		cp.listFilesForContent(file -> {
 			Assertions.fail("The FS is empty");
 		});
 
-		cp.persistChanges(Map.of(fs.getPath("/").resolve(fs.getPath("root", "directory", "file.txt")), "newContent"),
-				Arrays.asList(),
-				Collections.emptyList());
+		cp.persistChanges(Map.of(fs.getPath(fs.getSeparator()).resolve(fs.getPath("root", "directory", "file.txt")),
+				"newContent"), Arrays.asList(), Collections.emptyList());
 
 		cp.listFilesForContent(file -> {
-			Assertions.assertThat(file.getPath()).isEqualTo("/root/directory/file.txt");
+			Assertions.assertThat(file.getPath().toString()).isEqualTo("root/directory/file.txt");
 
 			Path raw = (Path) file.getRaw();
 			try {
@@ -56,5 +55,34 @@ public class TestFileSystemCodeProvider {
 				throw new UncheckedIOException(e);
 			}
 		});
+	}
+
+	@Test
+	public void testLoadFileOutOfRoot() throws IOException {
+		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+
+		Path secretPath = fs.getPath(fs.getSeparator(), "secretFile");
+		Files.writeString(secretPath, "secretContent");
+
+		Path notSecretPath = fs.getPath(fs.getSeparator(), "project", "notSecretFile");
+		Files.createDirectories(notSecretPath.getParent());
+		Files.writeString(notSecretPath, "notSecretContent");
+
+		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator(), "project"));
+
+		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(secretPath))
+				.isInstanceOf(IllegalArgumentException.class);
+
+		Assertions
+				.assertThatThrownBy(
+						() -> cp.loadContentForPath(fs.getPath(fs.getSeparator(), "project", "..", "secretFile")))
+				.isInstanceOf(IllegalArgumentException.class);
+
+		Assertions.assertThat(cp.loadContentForPath(cp.getRepositoryRoot().relativize(notSecretPath)))
+				.contains("notSecretContent");
+		Path illegalLookingValid = fs.getPath(fs.getSeparator(), "project", "..", "project", "notSecretFile");
+		Assertions.assertThat(illegalLookingValid.normalize()).isEqualTo(notSecretPath);
+		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(illegalLookingValid))
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 }

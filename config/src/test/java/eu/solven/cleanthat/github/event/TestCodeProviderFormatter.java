@@ -48,7 +48,7 @@ public class TestCodeProviderFormatter {
 
 		Optional<PathMatcher> matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("SomeClass.java"));
 
-		Assert.assertTrue(matching.isEmpty());
+		Assert.assertTrue(matching.isPresent());
 	}
 
 	@Test

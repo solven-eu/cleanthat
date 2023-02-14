@@ -15,9 +15,9 @@
  */
 package eu.solven.cleanthat.git;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -51,18 +51,6 @@ public class GitIgnoreParser {
 				// A line starting with # serves as a comment.
 				.filter(s -> !s.startsWith("#"))
 				.collect(Collectors.toSet());
-	}
-
-	// In this implementation, we assume rawPath is a file, not a directly
-	// It can be considered true if we process files recursively
-	public static boolean match(Set<String> patterns, String rawPath) {
-		if (!rawPath.startsWith("/")) {
-			rawPath = "/" + rawPath;
-		}
-
-		Path p = Paths.get(rawPath);
-
-		return match(patterns, p);
 	}
 
 	public static boolean match(Set<String> patterns, Path path) {
@@ -132,8 +120,16 @@ public class GitIgnoreParser {
 				return Stream.of(s, s + "/**");
 			}
 		}).anyMatch(s -> {
+			Path pToTEst;
+			FileSystem fs = p.getFileSystem();
+			if (s.startsWith("/") && !p.isAbsolute()) {
+				pToTEst = fs.getPath(fs.getSeparator()).resolve(p);
+			} else {
+				pToTEst = p;
+			}
+
 			// https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns
-			boolean matches = p.getFileSystem().getPathMatcher("glob:" + s).matches(p);
+			boolean matches = fs.getPathMatcher("glob:" + s).matches(pToTEst);
 			if (matches) {
 				LOGGER.trace("{} accepted {}", s, p);
 			}

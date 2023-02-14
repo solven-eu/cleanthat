@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.config;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.assertj.core.api.Assertions;
@@ -23,6 +24,7 @@ import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.inmemory.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
@@ -40,9 +42,10 @@ public class TestCleanthatConfigInitializer {
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
+		Path root = codeProvider.getRepositoryRoot();
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(1)
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "cleanthat.yaml"))
+				.containsKey(CleanthatPathHelpers.makeContentPath(root, ".cleanthat/cleanthat.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("syntax_version: \"2023-01-09\""), ""));
 	}
 }

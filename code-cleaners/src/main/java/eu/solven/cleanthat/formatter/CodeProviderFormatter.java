@@ -41,11 +41,11 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -102,7 +102,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				codeWriter.listFilesForFilenames(fileChanged -> {
-					if (CodeProviderHelpers.PATHES_CLEANTHAT.contains(fileChanged.getPath())) {
+					if (fileChanged.getPath().startsWith(ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER)) {
+						// We hit on any change in the '.cleanthat' directory
+						// Then we catch changes in spotless (or any other engine)
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
 					}
@@ -120,7 +122,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
 		CleanthatSession cleanthatSession =
-				new CleanthatSession(codeWriter.getFileSystem(), codeWriter, repoProperties);
+				new CleanthatSession(codeWriter.getRepositoryRoot(), codeWriter, repoProperties);
 
 		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
 			IEngineProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
@@ -161,6 +163,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					languageToNbAddedFiles.sum(),
 					codeWriter);
 			if (dryRun) {
+				// TODO Nice-diff like in eu.solven.cleanthat.engine.java.refactorer.it.ITTestLocalFile
 				LOGGER.info("Skip persisting changes as dryRun=true");
 				isEmpty = true;
 			} else {
@@ -210,7 +213,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-		FileSystem fs = cleanthatSession.getFileSystem();
+		FileSystem fs = cleanthatSession.getRepositoryRoot().getFileSystem();
 		List<PathMatcher> includeMatchers =
 				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
 		List<PathMatcher> excludeMatchers =
@@ -218,7 +221,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		// https://github.com/diffplug/spotless/issues/1555
 		// If too many threads, we would load too many Spotless engines
-		ListeningExecutorService executor = PepperExecutorsHelper.newShrinkableFixedThreadPool("CodeFormatter");
+		ListeningExecutorService executor =
+				PepperExecutorsHelper.newShrinkableFixedThreadPool("Cleanthat-CodeFormatter-");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		// We rely on a ThreadLocal as Engines may not be threadSafe
@@ -228,7 +232,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		try {
 			cleanthatSession.getCodeProvider().listFilesForContent(file -> {
-				Path filePath = fs.getPath(file.getPath());
+				Path filePath = file.getPath();
 
 				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);

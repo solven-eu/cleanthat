@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.github.refs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -55,8 +55,8 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 
 	final GHPullRequest pr;
 
-	public GithubPRCodeProvider(FileSystem fs, String token, String eventKey, GHPullRequest pr) {
-		super(fs, token, pr.getRepository());
+	public GithubPRCodeProvider(Path repositoryRoot, String token, String eventKey, GHPullRequest pr) {
+		super(repositoryRoot, token, pr.getRepository());
 		this.eventKey = eventKey;
 
 		this.pr = pr;
@@ -81,7 +81,8 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 			if ("deleted".equals(prFile.getStatus())) {
 				LOGGER.debug("Skip a deleted file: {}", prFile.getFilename());
 			} else {
-				consumer.accept(new DummyCodeProviderFile(prFile.getFilename(), prFile));
+				Path contentPath = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), prFile.getFilename());
+				consumer.accept(new DummyCodeProviderFile(contentPath, prFile));
 			}
 		});
 	}
@@ -114,20 +115,11 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 				.persistChanges(pathToMutatedContent, prComments, prLabels);
 	}
 
-	// @Override
-	// public String deprecatedLoadContent(Object file) throws IOException {
-	// return loadContent(pr, ((GHPullRequestFileDetail) file).getFilename());
-	// }
-	//
-	// @Override
-	// public String deprecatedGetFilePath(Object file) {
-	// return ((GHPullRequestFileDetail) file).getFilename();
-	// }
-
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
+	public Optional<String> loadContentForPath(Path path) throws IOException {
 		try {
-			return Optional.of(loadContent(pr.getRepository(), path, pr.getHead().getSha()));
+			String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), path);
+			return Optional.of(loadContent(pr.getRepository(), rawPath, pr.getHead().getSha()));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace("We miss: {}", path, e);
 			LOGGER.debug("We miss: {}", path);

@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
@@ -31,8 +31,8 @@ import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 public abstract class AGithubHeadRefDiffCodeProvider extends AGithubDiffCodeProvider implements IListOnlyModifiedFiles {
 	final GHRef head;
 
-	public AGithubHeadRefDiffCodeProvider(FileSystem fs, String token, GHRepository baseRepository, GHRef head) {
-		super(fs, token, baseRepository);
+	public AGithubHeadRefDiffCodeProvider(Path repositoryRoot, String token, GHRepository baseRepository, GHRef head) {
+		super(repositoryRoot, token, baseRepository);
 		this.head = head;
 	}
 

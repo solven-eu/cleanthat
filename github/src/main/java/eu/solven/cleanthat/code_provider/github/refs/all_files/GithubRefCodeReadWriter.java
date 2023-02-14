@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import org.kohsuke.github.GHRef;
@@ -37,13 +37,13 @@ public class GithubRefCodeReadWriter extends AGithubSha1CodeProviderWriter {
 	final GHRef ref;
 	final String sha1;
 
-	public GithubRefCodeReadWriter(FileSystem fs,
+	public GithubRefCodeReadWriter(Path repositoryRoot,
 			String token,
 			String eventKey,
 			GHRepository repo,
 			GHRef ref,
 			String sha1) {
-		super(fs, token, eventKey, repo);
+		super(repositoryRoot, token, eventKey, repo);
 
 		this.ref = Objects.requireNonNull(ref, "ref is null");
 		this.sha1 = sha1;

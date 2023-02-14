@@ -21,6 +21,8 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -42,11 +44,13 @@ import org.springframework.util.FileCopyUtils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.jimfs.Jimfs;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.EngineAndLinters;
@@ -57,6 +61,7 @@ import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
+import eu.solven.cleanthat.spotless.language.PomXmlFormatterFactory;
 import eu.solven.pepper.resource.PepperResourceHelper;
 
 public class TestSpotlessFormatter_Eclipse {
@@ -93,8 +98,8 @@ public class TestSpotlessFormatter_Eclipse {
 	final ICodeProvider classpathCodeProvider = new ICodeProvider() {
 
 		@Override
-		public Optional<String> loadContentForPath(String path) throws IOException {
-			return Optional.of(PepperResourceHelper.loadAsString(path));
+		public Optional<String> loadContentForPath(Path path) throws IOException {
+			return Optional.of(PepperResourceHelper.loadAsString(path.toString()));
 		}
 
 		@Override
@@ -109,19 +114,22 @@ public class TestSpotlessFormatter_Eclipse {
 		}
 
 		@Override
-		public FileSystem getFileSystem() {
-			return fileSystem;
+		public Path getRepositoryRoot() {
+			return fileSystem.getPath(fileSystem.getSeparator());
 		}
 	};
 
 	CleanthatSession cleanthatSession;
 	{
-		try {
-			fileSystem = MemoryFileSystemBuilder.newEmpty().build();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-		cleanthatSession = new CleanthatSession(fileSystem, classpathCodeProvider, repositoryProperties);
+		// try {
+		// fileSystem = MemoryFileSystemBuilder.newEmpty().build();
+		// } catch (IOException e) {
+		// throw new UncheckedIOException(e);
+		// }
+		fileSystem = Jimfs.newFileSystem();
+		cleanthatSession = new CleanthatSession(fileSystem.getPath(fileSystem.getSeparator()),
+				classpathCodeProvider,
+				repositoryProperties);
 	}
 
 	@Before
@@ -184,11 +192,9 @@ public class TestSpotlessFormatter_Eclipse {
 		IEngineProperties languageP = getEngineProperties();
 
 		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-		String cleaned = applier.applyProcessors(compile,
-				new PathAndContent(
-						cleanthatSession.getFileSystem()
-								.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
-						sourceCode));
+		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+				"someModule/src/main/java/some_package/someFilePath.java");
+		String cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
 	}
 
@@ -221,15 +227,48 @@ public class TestSpotlessFormatter_Eclipse {
 				"",
 				"").collect(Collectors.joining(System.lineSeparator()));
 		IEngineProperties languageP = getEngineProperties();
+		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+				"someModule/src/main/java/some_package/someFilePath.java");
+
 		while (true) {
 			EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-			applier.applyProcessors(compile,
-					new PathAndContent(
-							cleanthatSession.getFileSystem()
-									.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
-							sourceCode));
+			applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 
 			compile.close();
 		}
+	}
+
+	@Test
+	public void testDetectFiles_pomXml() {
+		Path root = cleanthatSession.getRepositoryRoot();
+		Set<String> includes = new PomXmlFormatterFactory().defaultIncludes();
+
+		{
+			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pom.xml");
+
+			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
+			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+
+			Assertions.assertThat(matchingInclude).isPresent();
+		}
+
+		{
+			Path filePath = CleanthatPathHelpers.makeContentPath(root, "directory/pom.xml");
+
+			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
+			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+
+			Assertions.assertThat(matchingInclude).isPresent();
+		}
+
+		{
+			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pre_pom.xml");
+
+			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
+			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+
+			Assertions.assertThat(matchingInclude).isEmpty();
+		}
+
 	}
 }

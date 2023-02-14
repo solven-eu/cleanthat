@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +36,8 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 		implements ICodeProviderWriter, IGithubSha1CodeProvider {
 	final String eventKey;
 
-	public AGithubSha1CodeProviderWriter(FileSystem fs, String token, String eventKey, GHRepository repo) {
-		super(fs, token, repo);
+	public AGithubSha1CodeProviderWriter(Path repositoryRoot, String token, String eventKey, GHRepository repo) {
+		super(repositoryRoot, token, repo);
 
 		this.eventKey = eventKey;
 	}

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,10 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 
 /**
  * Helpers working for any {@link ICodeProvider}
@@ -41,26 +41,7 @@ import eu.solven.cleanthat.config.ConfigHelpers;
  *
  */
 public class CodeProviderHelpers {
-	// We consider only paths with Unix-like path separator
-	public static final String PATH_SEPARATOR = "/";
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
-
-	public static final String FILENAME_CLEANTHAT_FOLDER = ".cleanthat";
-
-	public static final String FILENAME_CLEANTHAT_YAML = "cleanthat.yaml";
-	public static final String FILENAME_CLEANTHAT_YML = "cleanthat.yml";
-	@Deprecated
-	public static final String FILENAME_CLEANTHAT_JSON = "cleanthat.json";
-
-	public static final List<String> PATHES_CLEANTHAT =
-			ImmutableList.of(PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
-					PATH_SEPARATOR + FILENAME_CLEANTHAT_FOLDER + PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,
-					PATH_SEPARATOR + FILENAME_CLEANTHAT_YAML,
-					PATH_SEPARATOR + FILENAME_CLEANTHAT_YML,
-					PATH_SEPARATOR + FILENAME_CLEANTHAT_JSON);
-
-	// public static final String PATH_CLEANTHAT_JSON = "/" + FILENAME_CLEANTHAT_JSON;
 
 	protected Collection<ObjectMapper> objectMappers;
 
@@ -73,9 +54,10 @@ public class CodeProviderHelpers {
 	// It will enable cleaning a PR given the configuration of the base branch
 	public Optional<Map<String, ?>> unsafeConfig(ICodeProvider codeProvider) {
 		Optional<Map.Entry<String, String>> optPathAndContent;
-		optPathAndContent = PATHES_CLEANTHAT.stream().map(p -> {
+		optPathAndContent = ICleanthatConfigConstants.PATHES_CLEANTHAT.stream().map(p -> {
 			try {
-				return codeProvider.loadContentForPath(p).map(content -> Maps.immutableEntry(p, content));
+				Path resolvedPath = CleanthatPathHelpers.makeContentPath(codeProvider.getRepositoryRoot(), p);
+				return codeProvider.loadContentForPath(resolvedPath).map(content -> Maps.immutableEntry(p, content));
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e);
 			}
@@ -112,19 +94,11 @@ public class CodeProviderHelpers {
 		});
 	}
 
-	public static File pathToConfig(Path localFolder) {
-		return CodeProviderHelpers.PATHES_CLEANTHAT.stream().map(s -> {
-			String prefix = PATH_SEPARATOR;
-			if (!s.startsWith(prefix)) {
-				throw new IllegalArgumentException("We expect cleanpath config pathes to start with '" + prefix + "'");
-			}
-			File file = localFolder.resolve(s.substring(prefix.length())).toFile();
+	public static Optional<File> pathToConfig(Path localFolder) {
+		return ICleanthatConfigConstants.PATHES_CLEANTHAT.stream().map(s -> {
+			File file = CleanthatPathHelpers.resolveChild(localFolder, s).toFile();
 			return file;
-		})
-				.filter(File::exists)
-				.findAny()
-				.orElseThrow(() -> new IllegalStateException(
-						"No configuration at pathes: " + CodeProviderHelpers.PATHES_CLEANTHAT));
+		}).filter(File::exists).findAny();
 	}
 
 	public static Path getRoot(Path path) {

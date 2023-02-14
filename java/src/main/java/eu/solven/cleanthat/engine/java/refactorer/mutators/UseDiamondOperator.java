@@ -51,8 +51,8 @@ public class UseDiamondOperator extends AJavaParserMutator implements IMutator, 
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-2293";
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-2293");
 	}
 
 	@Override

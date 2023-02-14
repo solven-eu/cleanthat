@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.jgit;
 
+import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
@@ -24,16 +25,23 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.google.common.jimfs.Jimfs;
+
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 
 public class TestJGitCodeProvider {
 
 	@Test
 	public void testAcceptPath() {
-		JGitCodeProvider codeProvider = new JGitCodeProvider(Paths.get("any"), Mockito.mock(Git.class), "someSha1");
+		FileSystem fs = Jimfs.newFileSystem();
+
+		JGitCodeProvider codeProvider =
+				new JGitCodeProvider(fs.getPath("/any"), Mockito.mock(Git.class), "someSha1", true);
 
 		Consumer<ICodeProviderFile> consumer = file -> {
-			Assertions.assertThat(file.getPath()).startsWith("/").isEqualTo("/root/folder/file");
+			Assertions.assertThat(file.getPath().toString())
+					.doesNotStartWith(fs.getSeparator())
+					.isEqualTo("root/folder/file");
 		};
 		TreeWalk treeWalk = Mockito.mock(TreeWalk.class);
 		Mockito.when(treeWalk.getPathString()).thenReturn("root/folder/file");
@@ -43,7 +51,7 @@ public class TestJGitCodeProvider {
 	@Test
 	public void testResolvePath() {
 		JGitCodeProvider codeProvider =
-				new JGitCodeProvider(Paths.get("/git_root/git_folder"), Mockito.mock(Git.class), "someSha1");
+				new JGitCodeProvider(Paths.get("/git_root/git_folder"), Mockito.mock(Git.class), "someSha1", true);
 
 		Assertions.assertThat(codeProvider.resolvePath(Paths.get("/root/folder/file")).toString().replace('\\', '/'))
 				.isEqualTo("/git_root/git_folder/root/folder/file");

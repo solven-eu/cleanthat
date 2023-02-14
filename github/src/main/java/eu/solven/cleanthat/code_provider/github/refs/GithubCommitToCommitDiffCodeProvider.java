@@ -15,7 +15,7 @@
  */
 package eu.solven.cleanthat.code_provider.github.refs;
 
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
@@ -32,12 +32,12 @@ public class GithubCommitToCommitDiffCodeProvider extends AGithubDiffCodeProvide
 	final GHCommit base;
 	final GHCommit head;
 
-	public GithubCommitToCommitDiffCodeProvider(FileSystem fs,
+	public GithubCommitToCommitDiffCodeProvider(Path repositoryRoot,
 			String token,
 			GHRepository baseRepository,
 			GHCommit base,
 			GHCommit head) {
-		super(fs, token, baseRepository);
+		super(repositoryRoot, token, baseRepository);
 
 		this.base = base;
 		this.head = head;

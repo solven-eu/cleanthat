@@ -73,18 +73,22 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 			return;
 		}
 
-		String configPath = getConfigPath();
+		String configPath = getRepositoryConfigPath();
 		getLog().info("Path: " + configPath);
 		getLog().info("URL: " + getConfigUrl());
 
 		File baseDir = getBaseDir();
 
 		Path configPathFile = Paths.get(configPath);
-		Path configPathFileParent = configPathFile.getParent();
-		getLog().info("configPathFileParent: " + configPathFileParent);
 
-		if (!configPathFileParent.equals(baseDir.toPath())) {
-			LOGGER.info("We'll clean only in a module containing the configuration: {}", configPathFileParent);
+		Path dotCleanthatPath = configPathFile.getParent();
+		getLog().info("dotCleanthatPath: " + dotCleanthatPath);
+
+		Path supposedlyRootPath = dotCleanthatPath.getParent();
+		getLog().info("supposedlyRootPath: " + supposedlyRootPath);
+
+		if (!supposedlyRootPath.equals(baseDir.toPath())) {
+			LOGGER.info("We'll clean only in a module containing the configuration: {}", dotCleanthatPath);
 			return;
 		}
 

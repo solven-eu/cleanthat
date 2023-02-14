@@ -31,13 +31,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -55,13 +55,13 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	final FileSystem fs;
 	final Path root;
 
-	public FileSystemCodeProvider(FileSystem fs, Path root) {
-		this.fs = fs;
-		this.root = root;
-	}
-
 	public FileSystemCodeProvider(Path root) {
-		this(root.getFileSystem(), root);
+		this.fs = root.getFileSystem();
+		this.root = root.normalize();
+
+		if (!this.root.equals(root)) {
+			throw new IllegalArgumentException("The root is illegal: " + root);
+		}
 	}
 
 	@SuppressWarnings("PMD.CloseResource")
@@ -71,8 +71,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public FileSystem getFileSystem() {
-		return fs;
+	public Path getRepositoryRoot() {
+		return root;
 	}
 
 	@Override
@@ -106,25 +106,29 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				}
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
-				Path relativized = root.relativize(file);
 
-				String unixLikePath = toUnixPath(relativized);
+				Path relativized2 = root.relativize(file);
 
-				consumer.accept(new DummyCodeProviderFile("/" + unixLikePath, file));
+				String rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, relativized2);
+				Path relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
+
+				// String unixLikePath = toUnixPath(relativized);
+
+				consumer.accept(new DummyCodeProviderFile(relativized, file));
 
 				return FileVisitResult.CONTINUE;
 			}
 
-			private String toUnixPath(Path relativized) {
-				String unixLikePath;
-				if ("\\".equals(relativized.getFileSystem().getSeparator())) {
-					// We get '\' under Windows
-					unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
-				} else {
-					unixLikePath = relativized.toString();
-				}
-				return unixLikePath;
-			}
+			// private String toUnixPath(Path relativized) {
+			// String unixLikePath;
+			// if ("\\".equals(relativized.getFileSystem().getSeparator())) {
+			// // We get '\' under Windows
+			// unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
+			// } else {
+			// unixLikePath = relativized.toString();
+			// }
+			// return unixLikePath;
+			// }
 		});
 	}
 
@@ -162,10 +166,13 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
-		Path resolved = resolvePath(getFileSystem().getPath(path));
-		if (resolved.toFile().isFile()) {
-			return Optional.of(Files.readString(resolved));
+	public Optional<String> loadContentForPath(Path path) throws IOException {
+		CleanthatPathHelpers.checkContentPath(path);
+
+		Path pathForRootFS = CleanthatPathHelpers.resolveChild(getRepositoryRoot(), path);
+
+		if (Files.exists(pathForRootFS)) {
+			return Optional.of(Files.readString(pathForRootFS));
 		} else {
 			return Optional.empty();
 		}

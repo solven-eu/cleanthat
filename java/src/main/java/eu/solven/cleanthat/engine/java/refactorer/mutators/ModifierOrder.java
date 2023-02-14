@@ -76,11 +76,6 @@ public class ModifierOrder extends AJavaParserMutator implements IMutator, IRule
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-1124";
-	}
-
-	@Override
 	public String jsparrowUrl() {
 		return "https://jsparrow.github.io/rules/reorder-modifiers.html";
 	}

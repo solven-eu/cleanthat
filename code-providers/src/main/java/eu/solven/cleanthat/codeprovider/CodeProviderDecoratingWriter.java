@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -49,8 +48,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public FileSystem getFileSystem() {
-		return codeProvider.getFileSystem();
+	public Path getRepositoryRoot() {
+		return codeProvider.getRepositoryRoot();
 	}
 
 	public ICodeProvider getDecorated() {
@@ -69,7 +68,7 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(String path) throws IOException {
+	public Optional<String> loadContentForPath(Path path) throws IOException {
 		return codeProvider.loadContentForPath(path);
 	}
 

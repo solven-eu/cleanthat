@@ -17,7 +17,6 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public class GenerateInitialConfig {
 			Collection<IEngineLintFixerFactory> factories) {
 		AtomicLongMap<String> factoryToFileCount = AtomicLongMap.create();
 
-		FileSystem fs = codeProvider.getFileSystem();
+		Path repoRoot = codeProvider.getRepositoryRoot();
 
 		try {
 			// Listing files may be slow if there is many files (e.g. download of repo as zip)
@@ -106,12 +105,13 @@ public class GenerateInitialConfig {
 			factories.forEach(f -> allIncludes.addAll(f.getDefaultIncludes()));
 
 			codeProvider.listFilesForFilenames(allIncludes, file -> {
-				Path filePath = fs.getPath(file.getPath());
+				Path filePath = file.getPath();
 
 				factories.forEach(factory -> {
 					Set<String> includes = factory.getDefaultIncludes();
 
-					List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, includes);
+					List<PathMatcher> includeMatchers =
+							IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
 					Optional<PathMatcher> matchingInclude =
 							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 

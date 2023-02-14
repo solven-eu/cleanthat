@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.jimfs.Jimfs;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -92,8 +94,8 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 	final ICodeProvider classpathCodeProvider = new ICodeProvider() {
 
 		@Override
-		public Optional<String> loadContentForPath(String path) throws IOException {
-			return Optional.of(PepperResourceHelper.loadAsString(path));
+		public Optional<String> loadContentForPath(Path path) throws IOException {
+			return Optional.of(PepperResourceHelper.loadAsString(path.toString()));
 		}
 
 		@Override
@@ -108,15 +110,23 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 		}
 
 		@Override
-		public FileSystem getFileSystem() {
-			return fileSystem;
+		public Path getRepositoryRoot() {
+			return fileSystem.getPath(fileSystem.getSeparator());
 		}
 	};
 
 	CleanthatSession cleanthatSession;
 	{
+		// https://github.com/marschall/memoryfilesystem/issues/141
 		fileSystem = Jimfs.newFileSystem();
-		cleanthatSession = new CleanthatSession(fileSystem, classpathCodeProvider, repositoryProperties);
+		// try {
+		// fileSystem = MemoryFileSystemBuilder.newEmpty().build();
+		// } catch (IOException e) {
+		// throw new UncheckedIOException(e);
+		// }
+		cleanthatSession = new CleanthatSession(fileSystem.getPath(fileSystem.getSeparator()),
+				classpathCodeProvider,
+				repositoryProperties);
 	}
 
 	@Before
@@ -131,7 +141,7 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 
 	// https://docs.openrewrite.org/reference/recipes/java/cleanup/emptyblock
 	@Test
-	public void testFormat_EmptyBLock() throws IOException {
+	public void testFormat_EmptyBlock() throws IOException {
 		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"public class CleanClass {",
 				"	public CleanClass() {",
@@ -149,11 +159,10 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 		IEngineProperties languageP = getEngineProperties();
 
 		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-		String cleaned = applier.applyProcessors(compile,
-				new PathAndContent(
-						cleanthatSession.getFileSystem()
-								.getPath("/someModule/src/main/java/some_package/someFilePath.java"),
-						sourceCode));
+		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+				"someModule/src/main/java/some_package/someFilePath.java");
+
+		String cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
 	}
 }

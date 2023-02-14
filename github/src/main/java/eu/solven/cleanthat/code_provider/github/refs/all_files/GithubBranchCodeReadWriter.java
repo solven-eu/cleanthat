@@ -17,7 +17,7 @@ package eu.solven.cleanthat.code_provider.github.refs.all_files;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHRef;
@@ -36,12 +36,12 @@ import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 public class GithubBranchCodeReadWriter extends AGithubSha1CodeProviderWriter {
 	final GHBranch branch;
 
-	public GithubBranchCodeReadWriter(FileSystem fs,
+	public GithubBranchCodeReadWriter(Path repositoryRoot,
 			String token,
 			String eventKey,
 			GHRepository repo,
 			GHBranch branch) {
-		super(fs, token, eventKey, repo);
+		super(repositoryRoot, token, eventKey, repo);
 		this.branch = branch;
 	}
 

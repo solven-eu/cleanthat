@@ -61,7 +61,7 @@ public class TestEclipseJavaFormatterConfiguration {
 
 	@Test
 	public void testLoadConfig_fromFile() throws IOException {
-		String path = "/config/eclipse_java_code_formatter.xml";
+		String path = "config/eclipse_java_code_formatter.xml";
 
 		processorConfig.setUrl("code:" + path);
 

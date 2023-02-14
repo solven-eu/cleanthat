@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.diffplug.spotless.PaddedCell;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
@@ -79,11 +80,9 @@ public class SpotlessSession {
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
 	public String doStuff(EnrichedFormatter formatter, PathAndContent pathAndContent) {
-		String rawPath = pathAndContent.getPath().toString();
+		CleanthatPathHelpers.checkContentPath(pathAndContent.getPath());
 
-		if (!rawPath.startsWith("/")) {
-			throw new IllegalArgumentException("We expect an absolutePath. Was: " + rawPath);
-		}
+		String rawPath = pathAndContent.getPath().toString();
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));

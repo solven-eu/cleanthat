@@ -17,9 +17,8 @@ package eu.solven.cleanthat.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -38,6 +37,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.env.MockEnvironment;
 
 import com.google.common.io.Files;
+import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
@@ -134,7 +134,8 @@ public class ITGithub {
 					itsRepo.getRef(IGitRefsConstants.BRANCHES_PREFIX + "master"),
 					"ITGithub");
 
-			GithubBranchCodeProvider codeProvider = new GithubBranchCodeProvider(FileSystems.getDefault(),
+			FileSystem fs = Jimfs.newFileSystem();
+			GithubBranchCodeProvider codeProvider = new GithubBranchCodeProvider(fs.getPath(fs.getSeparator()),
 					gitHubInstallation.getToken(),
 					itsRepo.getRepository(),
 					itsRepo.getRepository().getBranch("master"));
@@ -144,7 +145,7 @@ public class ITGithub {
 			// We write now in any now files
 			codeProvider.listFilesForFilenames(file -> {
 				if (file.getPath().endsWith("now")) {
-					changes.put(Paths.get(file.getPath()), OffsetDateTime.now().toString());
+					changes.put(file.getPath(), OffsetDateTime.now().toString());
 				}
 			});
 

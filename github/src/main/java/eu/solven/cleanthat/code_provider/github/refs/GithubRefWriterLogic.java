@@ -37,6 +37,7 @@ import org.kohsuke.github.GHTreeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 
@@ -217,15 +218,10 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	public static GHTreeBuilder prepareBuilderTree(GHRepository repo, Map<Path, String> pathToMutatedContent) {
 		GHTreeBuilder createTree = repo.createTree();
 		pathToMutatedContent.forEach((path, content) -> {
-			if (!path.isAbsolute()) {
-				throw new IllegalStateException("We expect to receive only rooted path: " + path);
-			}
-
-			// Remove the leading '/'
-			String gitPath = path.toString().substring("/".length());
+			CleanthatPathHelpers.checkContentPath(path);
 
 			// TODO isExecutable isn't a parameter from the original file?
-			createTree.add(gitPath, content, false);
+			createTree.add(path.toString(), content, false);
 		});
 		return createTree;
 	}

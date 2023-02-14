@@ -44,8 +44,12 @@ public class TestAGithubSha1CodeProvider {
 	@Test
 	public void testRepoSha1AsZip() throws IOException {
 		GHRepository ghRepo = Mockito.mock(GHRepository.class);
+
+		Path tmpZipFile = Files.createTempFile("cleanthat", "TestAGithubSha1CodeProvider.zip");
+		tmpZipFile.toFile().delete();
+
 		AGithubSha1CodeProvider codeProvider =
-				new AGithubSha1CodeProvider(FileSystems.getDefault(), "someToken", ghRepo) {
+				new AGithubSha1CodeProvider(tmpZipFile.getParent(), "someToken", ghRepo) {
 
 					@Override
 					public String getSha1() {
@@ -57,9 +61,6 @@ public class TestAGithubSha1CodeProvider {
 						return someRef;
 					}
 				};
-
-		Path tmpZipFile = Files.createTempFile("cleanthat", "TestAGithubSha1CodeProvider.zip");
-		tmpZipFile.toFile().delete();
 
 		// https://github.com/google/jimfs
 		// https://stackoverflow.com/questions/44459152/provider-not-found-exception-when-creating-a-filesystem-for-my-zip
@@ -102,9 +103,9 @@ public class TestAGithubSha1CodeProvider {
 
 		Set<String> paths = new HashSet<>();
 		localCodeProvider.listFilesForContent(file -> {
-			paths.add(file.getPath());
+			paths.add(file.getPath().toString());
 		});
 
-		Assertions.assertThat(paths).contains("/root.txt", "/dir/toto.txt");
+		Assertions.assertThat(paths).contains("root.txt", "dir/toto.txt");
 	}
 }

@@ -15,14 +15,15 @@
  */
 package eu.solven.cleanthat.codeprovider;
 
+import java.nio.file.Path;
+
 /**
  * 
  * @author Benoit Lacelle
  *
  */
 public interface ICodeProviderFile {
-	@Deprecated(since = "We should return a Path")
-	String getPath();
+	Path getPath();
 
 	/**
 	 * The core object materializing this object/blob/path

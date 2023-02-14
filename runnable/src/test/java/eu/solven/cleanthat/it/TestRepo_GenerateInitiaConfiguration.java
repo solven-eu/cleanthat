@@ -17,6 +17,7 @@ package eu.solven.cleanthat.it;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.assertj.core.api.Assertions;
@@ -27,6 +28,7 @@ import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.CleanthatConfigInitializer;
@@ -58,11 +60,12 @@ public class TestRepo_GenerateInitiaConfiguration {
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
+		Path root = codeProvider.getRepositoryRoot();
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(2)
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "cleanthat.yaml"))
+				.containsKey(CleanthatPathHelpers.makeContentPath(root, ".cleanthat/cleanthat.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("id: \"spotless\""), ""))
-				.containsKey(codeProvider.getFileSystem().getPath("/", ".cleanthat", "spotless.yaml"))
+				.containsKey(CleanthatPathHelpers.makeContentPath(root, ".cleanthat/spotless.yaml"))
 				.hasValueSatisfying(new Condition<String>(v -> v.contains("format: \"markdown\""), ""));
 	}
 }

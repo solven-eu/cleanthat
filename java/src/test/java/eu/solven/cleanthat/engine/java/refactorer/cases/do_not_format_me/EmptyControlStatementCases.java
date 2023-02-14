@@ -55,6 +55,7 @@ public class EmptyControlStatementCases extends ARefactorerCases {
 
 	// In edgy-cases, one would consider this as a feature (e.g. if one wants a custom class)
 	@Ignore("This may deserve a dedicated mutator")
+	// https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#doublebraceinitialization
 	@CompareMethods
 	public static class AnonymousClass {
 		public Object pre() {

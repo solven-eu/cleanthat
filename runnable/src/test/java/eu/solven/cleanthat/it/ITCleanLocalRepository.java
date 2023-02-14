@@ -19,7 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Optional;
 
+import org.eclipse.jgit.api.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -35,9 +38,13 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
+import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
 /**
@@ -49,11 +56,11 @@ import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
  * @author Benoit Lacelle
  *
  */
-public class RunCleanLocalRepository extends ACleanThatXxxApplication {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanLocalRepository.class);
+public class ITCleanLocalRepository extends ACleanThatXxxApplication {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ITCleanLocalRepository.class);
 
 	public static void main(String[] args) {
-		SpringApplication springApp = new SpringApplication(RunCleanLocalRepository.class);
+		SpringApplication springApp = new SpringApplication(ITCleanLocalRepository.class);
 
 		springApp.setWebApplicationType(WebApplicationType.NONE);
 
@@ -63,7 +70,7 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		// One can adjust this to any local folder
-		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace3", "spring-boot");
+		Path repoFolder = Paths.get(System.getProperty("user.home"), "cleanthat-ITs", "spring-boot");
 
 		LOGGER.info("About to process {}", repoFolder);
 
@@ -71,7 +78,19 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 
 		ApplicationContext appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
-		File pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder).get();
+		Optional<File> optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
+		if (optConfig.isEmpty()) {
+			LOGGER.info("Generate an initial configuration");
+			CleanthatConfigInitializer initializer = new CleanthatConfigInitializer(codeProvider,
+					appContext.getBean(ConfigHelpers.class).getObjectMapper(),
+					appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
+			RepoInitializerResult result = initializer.prepareFile(false);
+
+			codeProvider.persistChanges(result.getPathToContents(), Arrays.asList(), Arrays.asList());
+
+			optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
+		}
+		File pathToConfig = optConfig.get();
 
 		ConfigHelpers configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
 		CleanthatRepositoryProperties properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
@@ -83,15 +102,15 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 		ICodeProviderWriter codeProvider;
 
 		// We do not rely on JGit as we do not want to add/commit/push when processing local repository
-		// if (root.resolve(".git").toFile().isDirectory()) {
-		// LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
-		// Git jgit = Git.open(root.toFile());
-		//
-		// codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()));
-		// } else {
-		LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)", root);
-		codeProvider = new FileSystemGitCodeProvider(root);
-		// }
+		if (root.resolve(".git").toFile().isDirectory()) {
+			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
+			Git jgit = Git.open(root.toFile());
+
+			codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()), false);
+		} else {
+			LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)", root);
+			codeProvider = new FileSystemGitCodeProvider(root);
+		}
 		return codeProvider;
 	}
 

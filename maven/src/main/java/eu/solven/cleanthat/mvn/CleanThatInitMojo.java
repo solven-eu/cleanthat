@@ -128,7 +128,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		// Prefix with '.' to convert from absolute path (in the Git repository) to relative path (in the FileSystem
 		// root directory)
 		properties.getPathToContents()
-				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve("." + path), content));
+				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve(path), content));
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {

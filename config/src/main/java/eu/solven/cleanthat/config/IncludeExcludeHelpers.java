@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,26 +58,41 @@ public class IncludeExcludeHelpers {
 	// https://stackoverflow.com/questions/44388227/sonar-raises-blocker-issue-on-java-filesystems-getdefault
 	@SuppressWarnings("PMD.CloseResource")
 	public static List<PathMatcher> prepareMatcher(FileSystem fs, Collection<String> globOrRegex) {
-		return globOrRegex.stream().map(r -> {
+		return globOrRegex.stream().flatMap(r -> {
+
+			if (!r.startsWith("glob:") && !r.startsWith("regex:")) {
+				String newPattern = "glob:" + r;
+				LOGGER.info("We implied glob from implicit syntax: {} -> {}", r, newPattern);
+				r = newPattern;
+			}
+
+			// https://stackoverflow.com/questions/18722471/when-to-use-double-star-in-glob-syntax-within-java
+			// In glob, the separator may be always '/'
+			// Hence, replacement with '\\' would be necessary only under windows
+
+			String newPattern;
+			// https://stackoverflow.com/questions/64102053/java-pathmatcher-not-working-properly-on-windows
+			if ("\\".equals(fs.getSeparator())) {
+				// We are under Windows
+				newPattern = r.replace("/", "\\\\");
+				LOGGER.info("File.separator='{}' so we switched regex to: {}", fs.getSeparator(), newPattern);
+			} else {
+				// We are under Linux
+				newPattern = r;
+			}
+
+			if (r.startsWith("glob:**/")) {
+				// https://gitlab.com/gitlab-org/gitlab-foss/-/issues/66096
+				// https://github.com/fish-shell/fish-shell/issues/7222
+				String patternFromRoot = "glob:" + r.substring("glob:**/".length());
+				return Stream.of(newPattern, patternFromRoot);
+			} else {
+				return Stream.of(newPattern);
+			}
+
+		}).map(r -> {
 			try {
-				if (!r.startsWith("glob:") && !r.startsWith("regex:")) {
-					String newPattern = "glob:" + r;
-					LOGGER.info("We implied glob from implicit syntax: {} -> {}", r, newPattern);
-					r = newPattern;
-				}
-
-				String newPattern;
-				// https://stackoverflow.com/questions/64102053/java-pathmatcher-not-working-properly-on-windows
-				if ("\\".equals(fs.getSeparator())) {
-					// We are under Windows
-					newPattern = r.replace("/", "\\\\");
-					LOGGER.info("File.separator='{}' so we switched regex to: {}", fs.getSeparator(), newPattern);
-				} else {
-					// We are under Linux
-					newPattern = r;
-				}
-
-				return fs.getPathMatcher(newPattern);
+				return fs.getPathMatcher(r);
 			} catch (RuntimeException e) {
 				throw new IllegalArgumentException("Invalid regex: " + r, e);
 			}

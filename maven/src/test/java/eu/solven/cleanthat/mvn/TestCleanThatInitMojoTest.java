@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
@@ -59,7 +60,8 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, CleanThatInitMojo.MOJO_INIT);
 		assertNotNull(myMojo);
 
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		File cleanthatYaml =
+				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();
@@ -117,7 +119,8 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, CleanThatInitMojo.MOJO_INIT);
 		assertNotNull(myMojo);
 
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		File cleanthatYaml =
+				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();

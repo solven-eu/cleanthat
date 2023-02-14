@@ -171,7 +171,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		Path dotCleanthatFolder = cleanthatConfigPath.getParent();
 		if (dotCleanthatFolder == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
-		} else if (".cleanthat".equals(dotCleanthatFolder.getFileName().toString())) {
+		} else if (!".cleanthat".equals(dotCleanthatFolder.getFileName().toString())) {
 			throw new IllegalArgumentException(
 					"Issue with configPath: " + cleanthatConfigPath + " (not in .cleanthat)");
 		}

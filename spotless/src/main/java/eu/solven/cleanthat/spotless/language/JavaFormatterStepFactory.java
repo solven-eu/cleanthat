@@ -32,9 +32,9 @@ import com.diffplug.spotless.java.ImportOrderStep;
 import com.diffplug.spotless.java.RemoveUnusedImportsStep;
 import com.google.common.collect.ImmutableList;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
@@ -52,8 +52,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	public static final String KEY_ECLIPSE_FILE = KEY_FILE;
 
 	public static final String DEFAULT_ECLIPSE_FILE =
-			CodeProviderHelpers.PATH_SEPARATOR + CodeProviderHelpers.FILENAME_CLEANTHAT_FOLDER
-					+ CodeProviderHelpers.PATH_SEPARATOR
+			ICleanthatConfigConstants.PATH_SEPARATOR + ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER
+					+ ICleanthatConfigConstants.PATH_SEPARATOR
 					+ "eclipse_java-stylesheet.xml";
 
 	public static final String ID_ECLIPSE = "eclipse";

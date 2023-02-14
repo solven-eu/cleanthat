@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 Benoit Lacelle - SOLVEN
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.solven.cleanthat.code_provider;
 
 import java.nio.file.FileSystem;
@@ -13,6 +28,7 @@ import java.nio.file.Path;
  * @author Benoit Lacelle
  *
  */
+@SuppressWarnings("PMD.AvoidUncheckedExceptionsInSignatures")
 public class CleanthatPathHelpers {
 	protected CleanthatPathHelpers() {
 		// hidden
@@ -20,7 +36,7 @@ public class CleanthatPathHelpers {
 
 	/**
 	 * Ensure any path is a valid content path. At some point, we wanted a repository path to be absolute, considering
-	 * '/' as the repositoy root. Doing so is OK with fake FileSystem. But in some edge-cases, we rely on the
+	 * '/' as the repository root. Doing so is OK with fake FileSystem. But in some edge-cases, we rely on the
 	 * default/real {@link FileSystem}.
 	 * 
 	 * @param path
@@ -89,6 +105,7 @@ public class CleanthatPathHelpers {
 	 * @see #resolveDirectChild(Path)
 	 */
 	// https://bugs.openjdk.org/browse/JDK-8262822
+	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 	public static Path resolveChild(Path parent, Path child) throws IllegalArgumentException {
 		/*
 		 * Don't permit any root: - If different root, result would not be child of this -> have to throw exception - If
@@ -97,10 +114,9 @@ public class CleanthatPathHelpers {
 		 */
 		if (child.getRoot() != null) {
 			throw new IllegalArgumentException("Child path has root");
-		}
-		// Don't permit absolute because when resolved against this, would
-		// discard path of this
-		else if (child.isAbsolute()) {
+		} else if (child.isAbsolute()) {
+			// Don't permit absolute because when resolved against this, would
+			// discard path of this
 			throw new IllegalArgumentException("Child path is absolute");
 		}
 
@@ -142,10 +158,9 @@ public class CleanthatPathHelpers {
 			if (isEmptyPath(resultNormalized)) {
 				throw new IllegalArgumentException("Invalid child path");
 			}
-		}
-		// Only perform further checks when `this` is not empty path "" because for "".resolve(other)
-		// startsWith(...) will be false
-		else {
+		} else {
+			// Only perform further checks when `this` is not empty path "" because for "".resolve(other)
+			// startsWith(...) will be false
 			minDiff = 1;
 			// Sanity check; probably already covered by normalization checks above
 			if (!resultNormalized.startsWith(thisNormalized)) {
@@ -170,12 +185,14 @@ public class CleanthatPathHelpers {
 
 	public static Path makeContentPath(Path repositoryRoot, String pathString) {
 		// Safe resolution of the content path
-		Path contentPath = resolveChild(repositoryRoot, pathString);
+		Path absoluteContentPath = resolveChild(repositoryRoot, pathString);
+
+		Path relativeContentPath = repositoryRoot.relativize(absoluteContentPath);
 
 		// Check the contentPath is really safe
-		checkContentPath(contentPath);
+		checkContentPath(relativeContentPath);
 
-		return contentPath;
+		return relativeContentPath;
 	}
 
 	public static String makeContentRawPath(Path repositoryRoot, Path contentPath) {

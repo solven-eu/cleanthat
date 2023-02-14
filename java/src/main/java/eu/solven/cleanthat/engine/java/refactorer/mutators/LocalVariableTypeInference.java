@@ -47,11 +47,6 @@ public class LocalVariableTypeInference extends AJavaParserMutator implements IM
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-6212";
-	}
-
-	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-6212");
 	}

@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import lombok.Builder;
 import lombok.Data;
@@ -47,8 +47,8 @@ public class CleanthatSpotlessStepParametersProperties
 
 	// The default configuration location is the first option amongst the possible locations
 	public static final String DEFAULT_CONFIGURATION =
-			CodeProviderHelpers.PATH_SEPARATOR + CodeProviderHelpers.FILENAME_CLEANTHAT_FOLDER
-					+ CodeProviderHelpers.PATH_SEPARATOR
+			ICleanthatConfigConstants.PATH_SEPARATOR + ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER
+					+ ICleanthatConfigConstants.PATH_SEPARATOR
 					+ "spotless.yaml";
 
 	@Builder.Default

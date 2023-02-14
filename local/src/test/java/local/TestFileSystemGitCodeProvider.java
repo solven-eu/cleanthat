@@ -30,27 +30,27 @@ public class TestFileSystemGitCodeProvider {
 	final File tmpFolder = org.assertj.core.util.Files.newTemporaryFolder();
 
 	@Test
-	public void testLoadAbsolutePathAsRelative() throws IOException {
+	public void testRelative() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
 		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
 
-		Optional<String> optContent = codeProvider.loadContentForPath("/cleanthat.yml");
+		Optional<String> optContent = codeProvider.loadContentForPath("cleanthat.yml");
 
 		Assertions.assertThat(optContent).isPresent().contains("something");
 	}
 
 	@Test
-	public void testLoadRelativePath() throws IOException {
+	public void testNotSimpleRelative() throws IOException {
 		Path tmpFolderAsPath = tmpFolder.toPath();
 		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
 
-		Assertions.assertThatThrownBy(() -> codeProvider.loadContentForPath("cleanthat.yml"))
+		Assertions.assertThatThrownBy(() -> codeProvider.loadContentForPath("/cleanthat.yml"))
 				.isInstanceOf(IllegalArgumentException.class);
 
 		Assertions.assertThatThrownBy(() -> codeProvider.loadContentForPath("./cleanthat.yml"))
@@ -65,7 +65,7 @@ public class TestFileSystemGitCodeProvider {
 		// Consider a file at the root of given folder
 		Files.writeString(tmpFolderAsPath.resolve("cleanthat.yml"), "something");
 
-		Optional<String> optContent = codeProvider.loadContentForPath("/doesNotExist.yml");
+		Optional<String> optContent = codeProvider.loadContentForPath("doesNotExist.yml");
 
 		Assertions.assertThat(optContent).isEmpty();
 	}

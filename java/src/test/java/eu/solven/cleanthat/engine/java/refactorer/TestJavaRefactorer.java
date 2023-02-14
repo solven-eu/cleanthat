@@ -35,21 +35,22 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInfe
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllEvenNotProductionReadyMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
 public class TestJavaRefactorer {
-	final CleanthatEngineProperties languageProperties =
+	final CleanthatEngineProperties engineProperties =
 			CleanthatEngineProperties.builder().engine("java").engineVersion(IJdkVersionConstants.JDK_8).build();
-	final JavaRefactorerProperties properties = new JavaRefactorerProperties();
+	final JavaRefactorerProperties mutatorsProperties = JavaRefactorerProperties.allProductionReady();
 
 	@Test
 	public void testFilterOnVersion() {
-		languageProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
-		List<IMutator> transformers5 = new JavaRefactorer(languageProperties, properties).getMutators();
+		engineProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
+		List<IMutator> transformers5 = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 
-		languageProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
-		List<IMutator> transformers11 = new JavaRefactorer(languageProperties, properties).getMutators();
+		engineProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
+		List<IMutator> transformers11 = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 
 		// We expect less rules compatible with Java5 than Java11
 		Assertions.assertThat(transformers5.size()).isLessThan(transformers11.size());
@@ -59,25 +60,26 @@ public class TestJavaRefactorer {
 	public void testFilterOnVersion_UseDiamondOperatorJdk8() {
 		UseDiamondOperatorJdk8 rule = new UseDiamondOperatorJdk8();
 		// UseDiamondOperatorJdk8 is not productionReady
-		properties.setProductionReadyOnly(false);
+		mutatorsProperties.setIncluded(Arrays.asList(AllEvenNotProductionReadyMutators.class.getName()));
+		mutatorsProperties.setProductionReadyOnly(false);
 
 		{
-			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
-			List<IMutator> transformers5 = new JavaRefactorer(languageProperties, properties).getMutators();
+			engineProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
+			List<IMutator> transformers5 = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 
 			Assertions.assertThat(transformers5).flatMap(IMutator::getIds).doesNotContain(rule.getPmdId().get());
 		}
 
 		{
-			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_8);
-			List<IMutator> transformers5 = new JavaRefactorer(languageProperties, properties).getMutators();
+			engineProperties.setEngineVersion(IJdkVersionConstants.JDK_8);
+			List<IMutator> transformers8 = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 
-			Assertions.assertThat(transformers5).flatMap(IMutator::getIds).contains(rule.getPmdId().get());
+			Assertions.assertThat(transformers8).flatMap(IMutator::getIds).contains(rule.getPmdId().get());
 		}
 
 		{
-			languageProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
-			List<IMutator> transformers11 = new JavaRefactorer(languageProperties, properties).getMutators();
+			engineProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
+			List<IMutator> transformers11 = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 
 			Assertions.assertThat(transformers11).flatMap(IMutator::getIds).contains(rule.getPmdId().get());
 		}
@@ -85,20 +87,20 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testFilterOnExcluded() {
-		languageProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
+		engineProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
 
 		UseIsEmptyOnCollections oneRule = new UseIsEmptyOnCollections();
 		String oneRuleId = oneRule.getIds().stream().findFirst().get();
 
 		{
-			List<IMutator> allTransformers = new JavaRefactorer(languageProperties, properties).getMutators();
+			List<IMutator> allTransformers = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 			Assertions.assertThat(allTransformers).flatMap(IMutator::getIds).contains(oneRuleId);
 		}
 
 		{
-			properties.setExcluded(Arrays.asList(oneRuleId));
+			mutatorsProperties.setExcluded(Arrays.asList(oneRuleId));
 
-			List<IMutator> fileredTransformers = new JavaRefactorer(languageProperties, properties).getMutators();
+			List<IMutator> fileredTransformers = new JavaRefactorer(engineProperties, mutatorsProperties).getMutators();
 			Assertions.assertThat(fileredTransformers).flatMap(IMutator::getIds).doesNotContain(oneRuleId);
 		}
 	}
@@ -108,7 +110,7 @@ public class TestJavaRefactorer {
 		Class<JavaparserDirtyMe> classToLoad = JavaparserDirtyMe.class;
 		String dirtyCode = LocalClassTestHelper.loadClassAsString(classToLoad);
 
-		JavaRefactorer rulesJavaMutator = new JavaRefactorer(languageProperties, properties);
+		JavaRefactorer rulesJavaMutator = new JavaRefactorer(engineProperties, mutatorsProperties);
 
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(true);
 		CompilationUnit compilationUnit = javaParser.parse(dirtyCode).getResult().get();

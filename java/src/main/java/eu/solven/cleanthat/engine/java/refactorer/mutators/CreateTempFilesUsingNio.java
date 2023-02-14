@@ -62,8 +62,8 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator implements IMuta
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-2976";
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-2976");
 	}
 
 	@Override

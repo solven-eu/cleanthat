@@ -141,7 +141,7 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 
 	// https://docs.openrewrite.org/reference/recipes/java/cleanup/emptyblock
 	@Test
-	public void testFormat_EmptyBLock() throws IOException {
+	public void testFormat_EmptyBlock() throws IOException {
 		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"public class CleanClass {",
 				"	public CleanClass() {",

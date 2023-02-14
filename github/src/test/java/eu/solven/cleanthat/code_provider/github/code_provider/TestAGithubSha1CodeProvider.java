@@ -106,6 +106,6 @@ public class TestAGithubSha1CodeProvider {
 			paths.add(file.getPath().toString());
 		});
 
-		Assertions.assertThat(paths).contains("/root.txt", "/dir/toto.txt");
+		Assertions.assertThat(paths).contains("root.txt", "dir/toto.txt");
 	}
 }

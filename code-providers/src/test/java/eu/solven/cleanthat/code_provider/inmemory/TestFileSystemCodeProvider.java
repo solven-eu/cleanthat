@@ -46,7 +46,7 @@ public class TestFileSystemCodeProvider {
 				"newContent"), Arrays.asList(), Collections.emptyList());
 
 		cp.listFilesForContent(file -> {
-			Assertions.assertThat(file.getPath().toString()).isEqualTo("/root/directory/file.txt");
+			Assertions.assertThat(file.getPath().toString()).isEqualTo("root/directory/file.txt");
 
 			Path raw = (Path) file.getRaw();
 			try {
@@ -78,7 +78,8 @@ public class TestFileSystemCodeProvider {
 						() -> cp.loadContentForPath(fs.getPath(fs.getSeparator(), "project", "..", "secretFile")))
 				.isInstanceOf(IllegalArgumentException.class);
 
-		Assertions.assertThat(cp.loadContentForPath(notSecretPath)).contains("notSecretContent");
+		Assertions.assertThat(cp.loadContentForPath(cp.getRepositoryRoot().relativize(notSecretPath)))
+				.contains("notSecretContent");
 		Path illegalLookingValid = fs.getPath(fs.getSeparator(), "project", "..", "project", "notSecretFile");
 		Assertions.assertThat(illegalLookingValid.normalize()).isEqualTo(notSecretPath);
 		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(illegalLookingValid))

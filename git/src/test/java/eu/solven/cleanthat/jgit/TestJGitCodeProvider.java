@@ -40,8 +40,8 @@ public class TestJGitCodeProvider {
 
 		Consumer<ICodeProviderFile> consumer = file -> {
 			Assertions.assertThat(file.getPath().toString())
-					.startsWith(fs.getSeparator())
-					.isEqualTo("/any/root/folder/file");
+					.doesNotStartWith(fs.getSeparator())
+					.isEqualTo("root/folder/file");
 		};
 		TreeWalk treeWalk = Mockito.mock(TreeWalk.class);
 		Mockito.when(treeWalk.getPathString()).thenReturn("root/folder/file");

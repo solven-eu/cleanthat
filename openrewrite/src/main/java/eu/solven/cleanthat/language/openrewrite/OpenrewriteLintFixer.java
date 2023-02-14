@@ -29,7 +29,6 @@ import org.openrewrite.config.CompositeRecipe;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.java.tree.J;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.ILintFixerWithPath;
@@ -60,10 +59,13 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
 		Path path = pathAndContent.getPath();
 
-		Files.createDirectories(path.getParent());
-		Files.writeString(path, pathAndContent.getContent());
+		if (!Files.exists(path)) {
+			// This code should be done for any ILintFIxer ? Or those implementing some interface?
+			Files.createDirectories(path.getParent());
+			Files.writeString(path, pathAndContent.getContent());
+		}
 
-		Path root = CodeProviderHelpers.getRoot(path);
+		// Path root = CodeProviderHelpers.getRoot(path);
 
 		// determine your project directory and provide a list of
 		// paths to jars that represent the project's classpath
@@ -77,7 +79,7 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 
 		// parser the source files into LSTs
 		// Beware Path implements Iterable<Path>
-		List<J.CompilationUnit> cus = javaParser.parse(Collections.singleton(path), root, ctx);
+		List<J.CompilationUnit> cus = javaParser.parse(Collections.singleton(path), null, ctx);
 
 		// collect results
 		List<Result> results = recipe.run(cus, ctx).getResults();

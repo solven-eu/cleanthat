@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.RepoInitializerResult.RepoInitializerResultBuilder;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
@@ -51,7 +51,7 @@ public class CleanthatConfigInitializer {
 	}
 
 	public RepoInitializerResult prepareFile(boolean isPrivate) {
-		String defaultRepoPropertiesPath = CodeProviderHelpers.PATHES_CLEANTHAT.get(0);
+		String defaultRepoPropertiesPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
 
 		// Let's follow Renovate and its configuration PR
 		// https://github.com/solven-eu/agilea/pull/1
@@ -74,11 +74,13 @@ public class CleanthatConfigInitializer {
 			// Write the main config files (cleanthat.yaml)
 			String repoPropertiesYaml = objectMapper.writeValueAsString(engineConfig.getRepoProperties());
 			Path repositoryRoot = codeProvider.getRepositoryRoot();
-			resultBuilder.pathToContent(repositoryRoot.resolve("." + defaultRepoPropertiesPath), repoPropertiesYaml);
+			resultBuilder.pathToContent(CleanthatPathHelpers.makeContentPath(repositoryRoot, defaultRepoPropertiesPath),
+					repoPropertiesYaml);
 
 			// Register the custom files of the engine
 			engineConfig.getPathToContents()
-					.forEach((k, v) -> resultBuilder.pathToContent(repositoryRoot.resolve("." + k), v));
+					.forEach((k, v) -> resultBuilder
+							.pathToContent(CleanthatPathHelpers.makeContentPath(repositoryRoot, k), v));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
 		}

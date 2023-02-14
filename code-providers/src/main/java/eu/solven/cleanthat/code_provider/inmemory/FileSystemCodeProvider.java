@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +106,10 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				}
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
-				String rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, file);
+
+				Path relativized2 = root.relativize(file);
+
+				String rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, relativized2);
 				Path relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
 
 				// String unixLikePath = toUnixPath(relativized);
@@ -165,22 +167,9 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(Path path) throws IOException {
-		if (!path.equals(path.normalize())) {
-			throw new IllegalArgumentException("Illegal path: " + path);
-		} else if (path.isAbsolute()) {
-			throw new IllegalArgumentException("We expect a path relative to the repository root");
-		}
+		CleanthatPathHelpers.checkContentPath(path);
 
-		Path pathForRootFS;
-		if (path.getFileSystem().equals(fs)) {
-			pathForRootFS = path;
-		} else {
-			pathForRootFS = resolvePath(path);
-		}
-
-		if (!pathForRootFS.normalize().startsWith(root.normalize())) {
-			throw new IllegalArgumentException("Illegal path: " + path);
-		}
+		Path pathForRootFS = CleanthatPathHelpers.resolveChild(getRepositoryRoot(), path);
 
 		if (Files.exists(pathForRootFS)) {
 			return Optional.of(Files.readString(pathForRootFS));

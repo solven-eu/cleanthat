@@ -41,11 +41,11 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -102,7 +102,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				codeWriter.listFilesForFilenames(fileChanged -> {
-					if (CodeProviderHelpers.PATHES_CLEANTHAT.contains(fileChanged.getPath().toString())) {
+					if (fileChanged.getPath().startsWith(ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER)) {
+						// We hit on any change in the '.cleanthat' directory
+						// Then we catch changes in spotless (or any other engine)
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
 					}

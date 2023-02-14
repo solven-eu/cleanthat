@@ -33,6 +33,7 @@ import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
@@ -149,6 +150,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 				.build();
 	}
 
+	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 	@Override
 	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
 		Map<String, String> pathToContent = new LinkedHashMap<>();
@@ -161,6 +163,10 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 			if (configuration != null && configuration.startsWith(CleanthatUrlLoader.PREFIX_CODE)) {
 				String path = configuration.substring(CleanthatUrlLoader.PREFIX_CODE.length());
+
+				if (path.startsWith(ICleanthatConfigConstants.PATH_SEPARATOR)) {
+					path = path.substring(ICleanthatConfigConstants.PATH_SEPARATOR.length());
+				}
 
 				SpotlessEngineProperties defaultSpotlessCustomConfig =
 						SpotlessEngineProperties.defaultEngineWithMarkdown();

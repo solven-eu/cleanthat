@@ -75,11 +75,6 @@ public class UnnecessaryModifier extends AJavaParserMutator implements IMutator 
 		return Optional.of("RSPEC-2333");
 	}
 
-	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-2333";
-	}
-
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

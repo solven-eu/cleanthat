@@ -73,6 +73,11 @@ public class CleanthatUrlLoader {
 	}
 
 	public static Resource loadFromRepository(ICodeProvider codeProvider, String path) {
+		if (path.startsWith("/")) {
+			// It is legit to consider a path absolute, with '/' representing the root of the repository
+			path = path.substring("/".length());
+		}
+
 		Optional<String> optContent;
 		try {
 			optContent = codeProvider.loadContentForPath(path);

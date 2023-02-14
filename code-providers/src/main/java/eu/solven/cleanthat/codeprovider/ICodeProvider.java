@@ -63,7 +63,7 @@ public interface ICodeProvider {
 
 	/**
 	 * 
-	 * @param path
+	 * @param rawPath
 	 * @return
 	 * @throws IOException
 	 */

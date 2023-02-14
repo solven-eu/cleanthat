@@ -56,7 +56,6 @@ import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeR
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeReadWriter;
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
-import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.decorator.IGitBranch;
@@ -69,6 +68,7 @@ import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
@@ -175,7 +175,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		githubCheckRunManager.createCheckRun(githubAndToken, repository, head.getSha(), eventKey).ifPresent(cr -> {
 			try {
 				List<String> summuaryRows = ImmutableList.<String>builder()
-						.add("Check " + CodeProviderHelpers.PATHES_CLEANTHAT.get(0))
+						.add("Check " + ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT)
 						.add("It may look like: " + IDocumentationConstants.URL_REPO
 								+ "/blob/master/runnable/src/test/resources/config/default-safe.yaml")
 						.build();

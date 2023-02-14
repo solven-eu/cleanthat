@@ -65,8 +65,13 @@ public class EmptyControlStatement extends AJavaParserMutator implements IMutato
 	}
 
 	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-1116";
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("EmptyStatementCheck");
+	}
+
+	@Override
+	public String checkstyleUrl() {
+		return "https://javadoc.io/static/com.puppycrawl.tools/checkstyle/8.37/com/puppycrawl/tools/checkstyle/checks/coding/EmptyStatementCheck.html";
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })

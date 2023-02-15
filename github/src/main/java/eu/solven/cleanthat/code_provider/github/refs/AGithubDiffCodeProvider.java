@@ -104,20 +104,22 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 	}
 
 	@Override
-	public Optional<String> loadContentForPath(Path path) throws IOException {
+	public Optional<String> loadContentForPath(Path contentPath) throws IOException {
+		String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), contentPath);
 		try {
-			return Optional
-					.of(loadContent(baseRepository, getRepositoryRoot().relativize(path).toString(), getHeadId()));
+			return Optional.of(loadContent(baseRepository, rawPath, getHeadId()));
 		} catch (GHFileNotFoundException e) {
-			LOGGER.trace("We miss: {}", path, e);
-			LOGGER.debug("We miss: {}", path);
+			LOGGER.trace("We miss: {}", contentPath, e);
+			LOGGER.debug("We miss: {}", contentPath);
 			return Optional.empty();
 		} catch (FileIsTooBigException e) {
 			LOGGER.trace("File is too big to be processed: {} ({})",
-					path,
+					contentPath,
 					PepperLogHelper.humanBytes(e.getLength()),
 					e);
-			LOGGER.warn("File is too big to be processed: {} ({})", path, PepperLogHelper.humanBytes(e.getLength()));
+			LOGGER.warn("File is too big to be processed: {} ({})",
+					contentPath,
+					PepperLogHelper.humanBytes(e.getLength()));
 			return Optional.empty();
 		}
 	}

@@ -22,8 +22,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -32,6 +34,8 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
+
+import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -156,7 +160,19 @@ public class GithubSha1CodeProviderHelper {
 			throw new UncheckedIOException(e);
 		}
 
-		return new FileSystemGitCodeProvider(repoPath);
+		// Github will generate a ZIP with the content in a root directory
+		List<Path> zipRoots;
+		try {
+			zipRoots = Files.list(repoPath).collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		if (zipRoots.size() != 1) {
+			throw new IllegalStateException("We expected a single directory in the root. Were: " + zipRoots);
+		}
+
+		return new FileSystemGitCodeProvider(Iterables.getOnlyElement(zipRoots));
 	}
 
 	// https://stackoverflow.com/questions/10633595/java-zip-how-to-unzip-folder

@@ -43,6 +43,7 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
@@ -50,6 +51,7 @@ import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeP
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.decorator.LazyGitReference;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.github.run.ICleanThatITConstants;
@@ -80,11 +82,13 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		GithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
-		GithubRefCleaner cleaner = appContext.getBean(GithubRefCleaner.class);
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
 		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+
+		IGitRefCleaner cleaner = appContext.getBean(GithubCodeCleanerFactory.class).makeCleaner(githubAndToken).get();
+
 		GitHub github = githubAndToken.getGithub();
 
 		GHRepository repo;
@@ -130,7 +134,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 		}
 	}
 
-	private void doClean(Path root, GithubRefCleaner cleaner, GHRepository repo, GHBranch branch) {
+	private void doClean(Path root, IGitRefCleaner cleaner, GHRepository repo, GHBranch branch) {
 		LOGGER.info("CleanThat is configured in the main/configure branch ({})", branch.getName());
 
 		AtomicReference<GHRef> createdPr = new AtomicReference<>();
@@ -156,7 +160,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 	}
 
 	private void behaveOnLackOfConfig(Path root,
-			GithubRefCleaner cleaner,
+			IGitRefCleaner cleaner,
 			GithubAndToken githubAndToken,
 			GHRepository repo,
 			GHBranch branch,

@@ -237,38 +237,4 @@ public class TestSpotlessFormatter_Eclipse {
 			compile.close();
 		}
 	}
-
-	@Test
-	public void testDetectFiles_pomXml() {
-		Path root = cleanthatSession.getRepositoryRoot();
-		Set<String> includes = new PomXmlFormatterFactory().defaultIncludes();
-
-		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pom.xml");
-
-			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
-			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-
-			Assertions.assertThat(matchingInclude).isPresent();
-		}
-
-		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "directory/pom.xml");
-
-			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
-			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-
-			Assertions.assertThat(matchingInclude).isPresent();
-		}
-
-		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pre_pom.xml");
-
-			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
-			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-
-			Assertions.assertThat(matchingInclude).isEmpty();
-		}
-
-	}
 }

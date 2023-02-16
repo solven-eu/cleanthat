@@ -5,12 +5,16 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ## [Unreleased]
 ### Fixed
 * `CreateTempFilesUsingNioCases` now handle a null directory
-### Fixed
+### Added
 * Additional mutator: `EmptyControlStatement` turns `{}` into ``
 * Additional mutator: `UnnecessaryModifier` turns `public static final` into `` in interfaces
+* Implemented generic `trimTrailingWhitespace`, `endWithNewline` and `index` from Spotless
 ### Changes
 * `OptionalNotEmpty` is promoted in `SafeAndConsensualMutators`
 * `UnnecessaryModifier` is promoted in `SafeAndConsensualMutators`
+* `UnnecessaryFullyQualifiedName` is promoted in `SafeAndConsensualMutators`
+* `MarkdownFormatterFactory` includes pattern is now defaulted to `*.MD` and `*.md`
+* `JsonFormatterFactory` includes pattern is now defaulted to `*.json`
 
 ## [2.2] - 2023-01-07
 ### Fixed

@@ -75,15 +75,18 @@ public class TestAGithubSha1CodeProvider {
 			URI uri = URI.create("jar:" + tmpZipFile.toUri());
 
 			try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+
+				Files.createDirectory(zipfs.getPath("/repository_branch_random"));
+
 				// Path externalTxtFile = Paths.get("/codeSamples/zipfs/SomeTextFile.txt");
 				{
-					Path pathInZipfile = zipfs.getPath("/root.txt");
+					Path pathInZipfile = zipfs.getPath("/repository_branch_random/root.txt");
 
 					Files.copy(new ByteArrayInputStream("someTiti".getBytes(StandardCharsets.UTF_8)), pathInZipfile);
 				}
 
 				{
-					Path pathInZipfile = zipfs.getPath("/dir/toto.txt");
+					Path pathInZipfile = zipfs.getPath("/repository_branch_random/dir/toto.txt");
 
 					Files.createDirectories(pathInZipfile.getParent());
 

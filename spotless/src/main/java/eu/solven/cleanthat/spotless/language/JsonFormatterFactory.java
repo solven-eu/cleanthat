@@ -24,15 +24,15 @@ import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 
 /**
- * Configure Spotless engine for '.xml' files
+ * Configure Spotless engine for '.json' files
  * 
  * @author Benoit Lacelle
  *
  */
 public class JsonFormatterFactory extends AFormatterFactory {
-	// We consider any xml in a 'src/main/resources' to be cleaned. This is more an example template than a 100%
-	// guarantee rules
-	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/src/*/resources/**/*.json");
+	// We consider any json to be cleaned. This is more an example template than a 100%
+	// guarantee rules. One may prefer '**/src/**/*.json'
+	private static final Set<String> DEFAULT_INCLUDES = ImmutableSet.of("**/*.json");
 
 	@Override
 	public Set<String> defaultIncludes() {

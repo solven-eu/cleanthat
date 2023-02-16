@@ -30,10 +30,10 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
  *
  */
 public class MarkdownFormatterFactory extends AFormatterFactory {
-	// CleanThat will call spotless from the root directory: process any 'README.MD' file from there
+	// CleanThat will call spotless from the root directory: process any '*.MD' file from there
 	@Override
 	public Set<String> defaultIncludes() {
-		return ImmutableSet.of("**/README.MD");
+		return ImmutableSet.of("**/*.MD", "**/*.md");
 	}
 
 	@Override

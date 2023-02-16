@@ -37,8 +37,11 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
 import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
+import com.diffplug.spotless.generic.EndWithNewlineStep;
+import com.diffplug.spotless.generic.IndentStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
+import com.diffplug.spotless.generic.TrimTrailingWhitespaceStep;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -123,12 +126,47 @@ public abstract class AFormatterStepFactory {
 		SpotlessStepParametersProperties parameters = stepProperties.getParameters();
 
 		switch (stepName) {
+		case "trimTrailingWhitespace": {
+			return Optional.of(TrimTrailingWhitespaceStep.create());
+		}
+		case "endWithNewline": {
+			return Optional.of(EndWithNewlineStep.create());
+		}
+		case "indent": {
+			Integer spacesPerTab = parameters.getCustomProperty("spacesPerTab", Integer.class);
+			if (spacesPerTab == null) {
+				spacesPerTab = IndentStep.defaultNumSpacesPerTab();
+			}
+
+			Boolean spaces = parameters.getCustomProperty("spaces", Boolean.class);
+			if (spaces == null) {
+				spaces = false;
+			}
+			Boolean tabs = parameters.getCustomProperty("tabs", Boolean.class);
+			if (tabs == null) {
+				tabs = false;
+			}
+
+			FormatterStep indentStep;
+			if (spaces ^ tabs) {
+				if (spaces) {
+					indentStep = IndentStep.create(IndentStep.Type.SPACE, spacesPerTab);
+				} else {
+					indentStep = IndentStep.create(IndentStep.Type.TAB, spacesPerTab);
+				}
+			} else {
+				throw new IllegalArgumentException("Must specify exactly one of 'spaces: true' or 'tabs: true'.");
+			}
+
+			return Optional.of(indentStep);
+		}
 		case "licenseHeader": {
 			return Optional.of(makeLicenseHeader(parameters));
 		}
 		case "wtpEclipse": {
 			return Optional.of(makeWtpEclipse(parameters, provisioner));
 		}
+
 		default: {
 			return Optional.empty();
 		}

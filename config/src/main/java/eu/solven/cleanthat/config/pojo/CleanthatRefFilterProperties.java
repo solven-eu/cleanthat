@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.config.pojo;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -63,14 +64,12 @@ public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	/**
 	 * 
 	 * @param protectedPatterns
-	 *            the branches-patterns considered as protected. Fact is these branches should never be cleaned by
-	 *            themselves, but only through RR. They would also be used as referential branches (i.e. given a branch,
-	 *            we consider existing RR given these protected branches).
+	 *            the branches-patterns considered as protected. These branches should never be cleaned by themselves,
+	 *            but only through RR.
 	 * 
-	 *            A pattern is prefixed by 'refs/heads' is not prefixed by 'refs/'. The rationale is to consider with an
-	 *            inmplicit ref is considered a branch ref.
+	 *            A pattern is prefixed by 'refs/heads' if not prefixed by 'refs/'.
 	 * 
-	 *            The pattern is later tested with java Pattern.matches
+	 *            The pattern is later tested with java {@link Pattern#matches(String, CharSequence)}
 	 */
 	public void setProtectedPatterns(List<String> protectedPatterns) {
 		protectedPatterns = protectedPatterns.stream().map(branch -> {

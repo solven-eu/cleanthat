@@ -47,6 +47,10 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
+	private static final List<String> DEFAULT_MUTATORS = ImmutableList.<String>builder()
+			.add("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators")
+			.build();
+
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
 	public static final String KEY_ECLIPSE_FILE = KEY_FILE;
@@ -81,7 +85,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		case "importOrder": {
 			return makeImportOrder(parameters);
 		}
-		case "eclipse": {
+		case ID_ECLIPSE: {
 			return makeEclipse(parameters, provisioner);
 		}
 		case "cleanthat": {
@@ -106,6 +110,10 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		}
 
 		List<String> mutators = parameters.getCustomProperty("mutators", List.class);
+		if (mutators == null || mutators.isEmpty()) {
+			mutators = DEFAULT_MUTATORS;
+		}
+
 		List<String> excludedMutators = parameters.getCustomProperty("excluded_mutators", List.class);
 		String defaultGroupArtifact = CleanthatJavaStep.defaultGroupArtifact();
 		return CleanthatJavaStep
@@ -169,13 +177,14 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 		SpotlessStepProperties importOrder = SpotlessStepProperties.builder().id("importOrder").build();
 		SpotlessStepParametersProperties importOrderParameters = new SpotlessStepParametersProperties();
-		importOrderParameters.putProperty(KEY_FILE, "repository:/.cleanthat/java-importOrder.properties");
+		importOrderParameters.putProperty(KEY_FILE, "repository:/.cleanthat/java-importorder.properties");
 		importOrder.setParameters(importOrderParameters);
 
 		// Cleanthat before Eclipse as CleanThat may break the style
-		SpotlessStepProperties cleanthat = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();
+		SpotlessStepProperties cleanthat = SpotlessStepProperties.builder().id("cleanthat").build();
 		SpotlessStepParametersProperties cleanthatParameters = new SpotlessStepParametersProperties();
-		cleanthatParameters.putProperty(KEY_FILE, "11");
+		cleanthatParameters.putProperty("source_jdk", "11");
+		cleanthatParameters.putProperty("mutators", DEFAULT_MUTATORS);
 		cleanthat.setParameters(cleanthatParameters);
 
 		SpotlessStepProperties eclipse = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();

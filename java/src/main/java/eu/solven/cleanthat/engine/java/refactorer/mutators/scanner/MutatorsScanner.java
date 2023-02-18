@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer;
+package eu.solven.cleanthat.engine.java.refactorer.mutators.scanner;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -42,8 +43,14 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public class MutatorsScanner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
-	public List<IMutator> getMutators() {
-		String packageName = "eu.solven.cleanthat.engine.java.refactorer.mutators";
+	/**
+	 * The package is not search recursively.
+	 * 
+	 * @param packageName
+	 *            a package qualified name like 'eu.solven.cleanthat.engine.java.refactorer.mutators'
+	 * @return a {@link List} of {@link IMutator} detected in given package.
+	 */
+	public List<IMutator> getPackageMutators(String packageName) {
 		Set<String> classes;
 		try {
 			classes = getClasses(packageName);
@@ -55,7 +62,7 @@ public class MutatorsScanner {
 		if (classes.isEmpty()) {
 			String cleanThatSha1 = GitService.safeGetSha1();
 
-			LOGGER.error("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
+			LOGGER.warn("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
 		}
 
 		return classes.stream().map(s -> {
@@ -100,5 +107,9 @@ public class MutatorsScanner {
 		}
 
 		return classNames;
+	}
+
+	public static Collection<IMutator> scanPackageMutators(String packageName) {
+		return new MutatorsScanner().getPackageMutators(packageName);
 	}
 }

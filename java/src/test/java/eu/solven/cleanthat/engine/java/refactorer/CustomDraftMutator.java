@@ -13,33 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
+package eu.solven.cleanthat.engine.java.refactorer;
 
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import org.codehaus.plexus.languages.java.version.JavaVersion;
-
-import com.google.common.base.Suppliers;
+import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * This mutator will apply all {@link IMutator} fixing a PMD rules.
+ * This is used to test the inclusion of a custom {@link IMutator} (e.g. for a third-party jar)
  * 
  * @author Benoit Lacelle
  *
  */
-public class PMDMutators extends CompositeMutator {
+public class CustomDraftMutator implements IMutator {
 
-	static final Supplier<List<IMutator>> PMD = Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
-			.stream()
-			.filter(m -> m.getPmdId().isPresent())
-			.collect(Collectors.toList()));
+	@Override
+	public boolean isDraft() {
+		return true;
+	}
 
-	public PMDMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, PMD.get()));
+	@Override
+	public Set<String> getIds() {
+		return Set.of("MyDraftCustomMutator");
+	}
+
+	@Override
+	public boolean walkNode(Node pre) {
+		return false;
 	}
 
 }

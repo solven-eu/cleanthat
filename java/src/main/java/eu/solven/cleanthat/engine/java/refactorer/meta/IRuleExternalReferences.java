@@ -24,6 +24,14 @@ import java.util.Optional;
  */
 public interface IRuleExternalReferences {
 
+	/**
+	 * 
+	 * @return an id crafted by CleanThat. Useful when no 3rd-party linter has already a rule ID
+	 */
+	default Optional<String> getCleanthatId() {
+		return Optional.empty();
+	}
+
 	default Optional<String> getPmdId() {
 		return Optional.empty();
 	}

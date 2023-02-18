@@ -46,7 +46,7 @@ public class UnnecessaryModifier extends AJavaParserMutator implements IMutator 
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return false;
 	}
 

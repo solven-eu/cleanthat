@@ -33,8 +33,11 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  */
 public class SonarMutators extends CompositeMutator {
 
-	static final Supplier<List<IMutator>> SONAR = Suppliers.memoize(
-			() -> AllMutators.ALL.get().stream().filter(m -> m.getSonarId().isPresent()).collect(Collectors.toList()));
+	static final Supplier<List<IMutator>> SONAR =
+			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
+					.stream()
+					.filter(m -> m.getSonarId().isPresent())
+					.collect(Collectors.toList()));
 
 	public SonarMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, SONAR.get()));

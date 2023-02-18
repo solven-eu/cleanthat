@@ -37,7 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 // https://github.com/openrewrite/rewrite/issues/1656
 public class LocalVariableTypeInference extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return false;
 	}
 

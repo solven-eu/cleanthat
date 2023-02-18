@@ -57,7 +57,7 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator implements IMuta
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

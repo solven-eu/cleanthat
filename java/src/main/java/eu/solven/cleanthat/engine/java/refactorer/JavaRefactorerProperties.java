@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllEvenNotProductionReadyMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import lombok.Data;
 
@@ -58,7 +58,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	 * One may activate not-production-ready rules. It may be useful to test a new rule over some external repository
 	 */
 	@Deprecated
-	private boolean productionReadyOnly = true;
+	private boolean includeDraft = false;
 
 	@Override
 	public Object getCustomProperty(String key) {
@@ -66,8 +66,8 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 			return included;
 		} else if ("excluded".equalsIgnoreCase(key)) {
 			return excluded;
-		} else if ("production_ready_only".equalsIgnoreCase(key)) {
-			return productionReadyOnly;
+		} else if ("include_draft".equalsIgnoreCase(key)) {
+			return includeDraft;
 		}
 		return null;
 	}
@@ -82,25 +82,27 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 
 	/**
 	 * 
-	 * @return a {@link JavaRefactorerProperties} based on {@link AllMutators}
+	 * @return a {@link JavaRefactorerProperties} based on {@link AllIncludingDraftSingleMutators}
 	 */
 	public static JavaRefactorerProperties allProductionReady() {
 		JavaRefactorerProperties properties = new JavaRefactorerProperties();
 
-		properties.setIncluded(Arrays.asList(AllMutators.class.getName()));
+		properties.setIncludeDraft(false);
+		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
 
 		return properties;
 	}
 
 	/**
 	 * 
-	 * @return a {@link JavaRefactorerProperties} based on {@link AllEvenNotProductionReadyMutators}
+	 * @return a {@link JavaRefactorerProperties} based on {@link AllIncludingDraftSingleMutators}
 	 */
 	@Deprecated
 	public static JavaRefactorerProperties allEvenNotProductionReady() {
 		JavaRefactorerProperties properties = new JavaRefactorerProperties();
 
-		properties.setIncluded(Arrays.asList(AllMutators.class.getName()));
+		properties.setIncludeDraft(true);
+		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
 
 		return properties;
 	}

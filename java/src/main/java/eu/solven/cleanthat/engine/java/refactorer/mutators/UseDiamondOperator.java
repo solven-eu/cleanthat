@@ -41,7 +41,7 @@ public class UseDiamondOperator extends AJavaParserMutator implements IMutator, 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return false;
 	}
 

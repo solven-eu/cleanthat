@@ -6,6 +6,11 @@ formatters:
   excludes:
   - "**/do_not_format_me/**"
   steps:
+  - id: "cleanthat"
+    parameters:
+      mutators:
+      - eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators
+      - LiteralsFirstInComparisons
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:

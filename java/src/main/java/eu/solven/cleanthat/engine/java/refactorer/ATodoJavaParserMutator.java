@@ -31,7 +31,7 @@ public abstract class ATodoJavaParserMutator extends AJavaParserMutator implemen
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return false;
 	}
 

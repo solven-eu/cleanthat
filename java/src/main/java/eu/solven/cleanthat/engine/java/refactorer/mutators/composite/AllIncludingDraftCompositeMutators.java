@@ -15,16 +15,18 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 
-import eu.solven.cleanthat.engine.java.refactorer.MutatorsScanner;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
 /**
  * This mutator will apply all {@link IMutator}s,even those considered not production-ready
@@ -32,13 +34,23 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  *
  */
-public class AllEvenNotProductionReadyMutators extends CompositeMutator {
+public class AllIncludingDraftCompositeMutators extends CompositeMutator {
+	// This packageName is not part of the public API
+	@Deprecated
+	static final String PACKAGE_COMPOSITE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators.composite";
 
-	static final Supplier<List<IMutator>> ALL_EVENNOTREADY =
-			Suppliers.memoize(() -> ImmutableList.copyOf(new MutatorsScanner().getMutators()));
+	static final Supplier<List<IMutator>> ALL_INCLUDINGDRAFT =
+			Suppliers.memoize(() -> ImmutableList.copyOf(MutatorsScanner.scanPackageMutators(PACKAGE_COMPOSITE_MUTATORS)
+					.stream()
+					// Exclude itself
+					.filter(m -> !m.getClass().equals(AllIncludingDraftCompositeMutators.class))
 
-	public AllEvenNotProductionReadyMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, ALL_EVENNOTREADY.get()));
+					// Sort by className, to always apply mutators in the same order
+					.sorted(Comparator.comparing(m -> m.getClass().getName()))
+					.collect(Collectors.toList())));
+
+	public AllIncludingDraftCompositeMutators(JavaVersion sourceJdkVersion) {
+		super(filterWithJdk(sourceJdkVersion, ALL_INCLUDINGDRAFT.get()));
 	}
 
 }

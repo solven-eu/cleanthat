@@ -30,6 +30,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 /**
  * This mutator make it easy to composite multiple {@link IMutator}s in a single one.
  * 
+ * The extended classes should generally implement a constructor taking a JavaVersions as single argument.
+ * 
  * @author Benoit Lacelle
  *
  */
@@ -37,7 +39,7 @@ public class CompositeMutator implements IMutator {
 
 	final List<IMutator> mutators;
 
-	public CompositeMutator(List<IMutator> mutators) {
+	protected CompositeMutator(List<IMutator> mutators) {
 		this.mutators = ImmutableList.copyOf(mutators);
 	}
 

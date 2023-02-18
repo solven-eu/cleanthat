@@ -17,12 +17,13 @@ package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.Node;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 
 /**
  * For classes knowing how to modify code
@@ -38,10 +39,12 @@ public interface IMutator extends IRuleExternalReferences {
 	}
 
 	default Set<String> getIds() {
-		Set<String> ids = Stream.of(Optional.of(getId()), getCheckstyleId(), getPmdId(), getSonarId())
+		Set<String> ids = Stream.of(Optional.of(getId()), getCheckstyleId(), getPmdId(), getSonarId(), getCleanthatId())
 				.flatMap(Optional::stream)
 				.filter(s -> !"TODO".equals(s))
-				.collect(Collectors.toSet());
+				// Not sorted to privilege PMD over SONAR
+				// .sorted()
+				.collect(ImmutableSet.toImmutableSet());
 
 		if (ids.isEmpty()) {
 			throw new IllegalStateException("We miss an id for : " + this.getClass());
@@ -65,9 +68,15 @@ public interface IMutator extends IRuleExternalReferences {
 		return IJdkVersionConstants.JDK_1;
 	}
 
-	default boolean isProductionReady() {
-		// default is false so that we explicitly set a rule as production-ready
-		return false;
+	/**
+	 * Draft mutators are excluded by default from {@link CompositeMutator}. They may be included to check the
+	 * {@link IMutator} behavior on the author code, until beinh considered production-grade for all users.
+	 * 
+	 * @return true if this mutator is considered draft.
+	 */
+	default boolean isDraft() {
+		// default is true so mutators are by default excluded. This is a safety mechanism.
+		return true;
 	}
 
 	/**

@@ -47,7 +47,7 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator implements IMuta
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

@@ -65,10 +65,12 @@ public abstract class AJavaParserMutator implements IMutator, IRuleExternalRefer
 			} catch (RuntimeException e) {
 				String faultyCode = node.toString();
 
-				throw new IllegalArgumentException("Issue with a cleanthat mutatyor. Please report it to '"
-						+ "https://github.com/solven-eu/cleanthat/issues"
-						+ "' with as testCase: \r\n\r\n"
-						+ faultyCode);
+				throw new IllegalArgumentException(
+						"Issue with a cleanthat mutatyor. Please report it to '"
+								+ "https://github.com/solven-eu/cleanthat/issues"
+								+ "' with as testCase: \r\n\r\n"
+								+ faultyCode,
+						e);
 			}
 
 			if (hasTransformed) {

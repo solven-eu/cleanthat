@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.kohsuke.github.GHCheckRun;
+import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder.Action;
 import org.kohsuke.github.GHCheckRunBuilder.Output;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Ascii;
+import com.google.common.base.Throwables;
 
 import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.IGitService;
@@ -44,6 +46,8 @@ public class GithubCheckRunManager {
 	private static final String ID_CLEANTHAT = "Cleanthat";
 	private static final int LIMIT_IDENTIFIER = 20;
 	public static final String PERMISSION_CHECKS = "checks";
+
+	private static final int LIMIT_SUMMARY = 65_535;
 
 	final IGitService gitService;
 
@@ -100,6 +104,24 @@ public class GithubCheckRunManager {
 			// https://github.com/organizations/solven-eu/settings/installations/9086720
 			LOGGER.warn("We are not allowed to write checks (permissions=checks:write)");
 			return Optional.empty();
+		}
+	}
+
+	public void reportFailure(GHCheckRun checkRun, RuntimeException e) {
+		try {
+			String stackTrace = Throwables.getStackTraceAsString(e);
+
+			// Summary is limited to 65535 chars
+			String summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
+
+			checkRun.update()
+					.withConclusion(Conclusion.FAILURE)
+					.withStatus(Status.COMPLETED)
+
+					.add(new Output(e.getMessage() + " (" + e.getClass().getName() + ")", summary))
+					.create();
+		} catch (IOException ee) {
+			LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), ee);
 		}
 	}
 }

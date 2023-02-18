@@ -46,7 +46,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -101,21 +101,21 @@ public class JavaRefactorer implements ILintFixerWithId {
 			List<String> excludedRules,
 			boolean includeDraft) {
 
-		List<IMutator> allMutators;
-		if (includeDraft) {
-			allMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
-		} else {
-			allMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
-		}
+		List<IMutator> allSingleMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
+		List<IMutator> allCompositeMutators =
+				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
 
 		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
 			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
-				return allMutators.stream();
+				// We suppose there is no mutator from Composite which is not a single mutator
+				// Hence we return all single mutators
+				return allSingleMutators.stream();
 			} else {
-				List<IMutator> matchingMutators = allMutators.stream()
-						.filter(someMutator -> someMutator.getIds().contains(includedRule)
-								|| someMutator.getClass().getName().equals(includedRule))
-						.collect(Collectors.toList());
+				List<IMutator> matchingMutators =
+						Stream.concat(allSingleMutators.stream(), allCompositeMutators.stream())
+								.filter(someMutator -> someMutator.getIds().contains(includedRule)
+										|| someMutator.getClass().getName().equals(includedRule))
+								.collect(Collectors.toList());
 
 				if (!matchingMutators.isEmpty()) {
 					return matchingMutators.stream();

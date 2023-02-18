@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,11 @@ public class SonarMutators extends CompositeMutator {
 
 	public SonarMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, SONAR.get()));
+	}
+
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("Sonar");
 	}
 
 }

@@ -45,7 +45,7 @@ public class UseIndexOfChar extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

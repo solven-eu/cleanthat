@@ -120,7 +120,7 @@
 										<version>3.0</version>
 									</requireMavenVersion>
 									<requireJavaVersion>
-										<version>1.11</version>
+										<version>11</version>
 									</requireJavaVersion>
 									<!-- We leave some plugin versions to SpringBoot -->
 									<!-- <requirePluginVersions /> -->

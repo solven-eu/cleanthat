@@ -23,27 +23,31 @@ import java.util.stream.Collectors;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
 /**
- * This mutator will apply all {@link IMutator}s
+ * This mutator will apply all {@link IMutator}s,even those considered not production-ready
  * 
  * @author Benoit Lacelle
  *
  */
-public class AllMutators extends CompositeMutator {
+public class AllIncludingDraftSingleMutators extends CompositeMutator {
+	// This packageName is not part of the public API
+	@Deprecated
+	static final String PACKAGE_SINGLE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators";
 
-	static final Supplier<List<IMutator>> ALL =
-			Suppliers.memoize(() -> AllEvenNotProductionReadyMutators.ALL_EVENNOTREADY.get()
+	static final Supplier<List<IMutator>> ALL_INCLUDINGDRAFT =
+			Suppliers.memoize(() -> ImmutableList.copyOf(MutatorsScanner.scanPackageMutators(PACKAGE_SINGLE_MUTATORS)
 					.stream()
 					// Sort by className, to always apply mutators in the same order
 					.sorted(Comparator.comparing(m -> m.getClass().getName()))
-					.filter(m -> m.isProductionReady())
-					.collect(Collectors.toList()));
+					.collect(Collectors.toList())));
 
-	public AllMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, ALL.get()));
+	public AllIncludingDraftSingleMutators(JavaVersion sourceJdkVersion) {
+		super(filterWithJdk(sourceJdkVersion, ALL_INCLUDINGDRAFT.get()));
 	}
 
 }

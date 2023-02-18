@@ -59,9 +59,23 @@ public abstract class AJavaParserMutator implements IMutator, IRuleExternalRefer
 	public boolean walkNode(Node tree) {
 		AtomicBoolean transformed = new AtomicBoolean();
 		tree.walk(node -> {
-			if (processNotRecursively(node)) {
+			boolean hasTransformed;
+			try {
+				hasTransformed = processNotRecursively(node);
+			} catch (RuntimeException e) {
+				String faultyCode = node.toString();
+
+				throw new IllegalArgumentException(
+						"Issue with a cleanthat mutatyor. Please report it to '"
+								+ "https://github.com/solven-eu/cleanthat/issues"
+								+ "' with as testCase: \r\n\r\n"
+								+ faultyCode,
+						e);
+			}
+
+			if (hasTransformed) {
 				// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
-				if (!this.getIds().contains("NoOp") && processNotRecursively(node)) {
+				if (!this.getIds().contains("NoOp") && hasTransformed) {
 					// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
 					// to again 'a.equals(b)')
 					LOGGER.warn("Applying {} over {} is not idem-potent. It is a bug!", this, tree);

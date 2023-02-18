@@ -58,7 +58,7 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

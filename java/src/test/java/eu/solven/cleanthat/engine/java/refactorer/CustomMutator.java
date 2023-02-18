@@ -30,6 +30,11 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public class CustomMutator implements IMutator {
 
 	@Override
+	public boolean isDraft() {
+		return false;
+	}
+
+	@Override
 	public Set<String> getIds() {
 		return Set.of("MyCustomMutator");
 	}

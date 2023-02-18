@@ -54,7 +54,7 @@ public class OptionalNotEmpty extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,11 +34,19 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  */
 public class PMDMutators extends CompositeMutator {
 
-	static final Supplier<List<IMutator>> PMD = Suppliers.memoize(
-			() -> AllMutators.ALL.get().stream().filter(m -> m.getPmdId().isPresent()).collect(Collectors.toList()));
+	static final Supplier<List<IMutator>> PMD =
+			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
+					.stream()
+					.filter(m -> m.getPmdId().isPresent())
+					.collect(Collectors.toList()));
 
 	public PMDMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, PMD.get()));
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("PMD");
 	}
 
 }

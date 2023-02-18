@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,13 +34,18 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  */
 public class CheckStyleMutators extends CompositeMutator {
 
-	static final Supplier<List<IMutator>> CHECKSTYLE = Suppliers.memoize(() -> AllMutators.ALL.get()
-			.stream()
-			.filter(m -> m.getCheckstyleId().isPresent())
-			.collect(Collectors.toList()));
+	static final Supplier<List<IMutator>> CHECKSTYLE =
+			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
+					.stream()
+					.filter(m -> m.getCheckstyleId().isPresent())
+					.collect(Collectors.toList()));
 
 	public CheckStyleMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, CHECKSTYLE.get()));
 	}
 
+	@Override
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("CheckStyle");
+	}
 }

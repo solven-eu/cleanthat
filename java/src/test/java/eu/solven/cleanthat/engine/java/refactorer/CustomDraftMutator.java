@@ -15,35 +15,33 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * Helps preparing rules
- *
+ * This is used to test the inclusion of a custom {@link IMutator} (e.g. for a third-party jar)
+ * 
  * @author Benoit Lacelle
+ *
  */
-public abstract class ATodoJavaParserMutator extends AJavaParserMutator implements IMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
+public class CustomDraftMutator implements IMutator {
 
 	@Override
 	public boolean isDraft() {
-		return false;
+		return true;
 	}
 
 	@Override
-	public String minimalJavaVersion() {
-		// A fake Java version which will never be reached
-		return "99.9";
+	public Set<String> getIds() {
+		return Set.of("MyDraftCustomMutator");
 	}
 
 	@Override
-	public boolean walkNode(Node tree) {
-		LOGGER.debug("TODO");
+	public boolean walkNode(Node pre) {
 		return false;
 	}
+
 }

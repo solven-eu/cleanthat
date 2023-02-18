@@ -44,7 +44,7 @@ public class EmptyControlStatement extends AJavaParserMutator implements IMutato
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return false;
 	}
 

@@ -16,12 +16,14 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveBoxedForString;
@@ -33,7 +35,10 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollectio
 
 /**
  * This mutator will apply all {@link IMutator} considered safe (e.g. by not impacting the {@link Runtime}, or only with
- * ultra-safe changes).
+ * ultra-safe changes). It is also restricted to changes considered as consensual.
+ * 
+ * Example of not consensual mutator: {@link LocalVariableTypeInference} as some people prefer manipulating an object
+ * through its interface.
  * 
  * @author Benoit Lacelle
  *
@@ -56,4 +61,8 @@ public class SafeAndConsensualMutators extends CompositeMutator {
 		super(filterWithJdk(sourceJdkVersion, SAFE_AND_CONSENSUAL));
 	}
 
+	@Override
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("SafeAndConsensual");
+	}
 }

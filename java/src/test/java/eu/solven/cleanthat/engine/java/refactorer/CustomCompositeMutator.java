@@ -13,40 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
+package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
-import com.google.common.base.Suppliers;
-
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 
 /**
- * This mutator will apply all {@link IMutator} fixing a Sonar rule.
+ * A custom {@link CompositeMutator} holding both a draft and production-ready {@link IMutator}
  * 
  * @author Benoit Lacelle
  *
  */
-public class SonarMutators extends CompositeMutator {
+public class CustomCompositeMutator extends CompositeMutator {
 
-	static final Supplier<List<IMutator>> SONAR =
-			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
-					.stream()
-					.filter(m -> m.getSonarId().isPresent())
-					.collect(Collectors.toList()));
-
-	public SonarMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, SONAR.get()));
+	public CustomCompositeMutator(JavaVersion sourceJdkVersion) {
+		super(filterWithJdk(sourceJdkVersion, defaultUnderlyings()));
 	}
 
-	@Override
-	public Optional<String> getSonarId() {
-		return Optional.of("Sonar");
+	public CustomCompositeMutator(List<IMutator> mutators) {
+		super(mutators);
+	}
+
+	private static List<IMutator> defaultUnderlyings() {
+		return Arrays.asList(new CustomMutator(), new CustomDraftMutator());
+	}
+
+	public static CustomCompositeMutator customMutators() {
+		return new CustomCompositeMutator(defaultUnderlyings());
 	}
 
 }

@@ -53,7 +53,7 @@ public class StreamAnyMatch extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public boolean isProductionReady() {
+	public boolean isDraft() {
 		return true;
 	}
 

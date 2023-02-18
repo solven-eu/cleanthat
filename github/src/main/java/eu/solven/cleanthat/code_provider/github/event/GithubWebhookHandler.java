@@ -56,8 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Ascii;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
@@ -93,8 +91,6 @@ import okhttp3.OkHttpClient;
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
-
-	private static final int LIMIT_SUMMARY = 65_535;
 
 	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GHApp githubApp;
@@ -255,6 +251,68 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GHRepository baseRepo = baseRepoOrError.getOptResult().get();
 
 		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
+
+		String eventKey = githubEvent.getxGithubDelivery();
+		Optional<GHCheckRun> optCheckRun =
+				githubCheckRunManager.createCheckRun(githubAuthAsInst, baseRepo, pushedRefOrRrHead.getSha(), eventKey);
+		optCheckRun.ifPresent(cr -> {
+			try {
+				cr.update().add(new Output("Branch verification", "Start verification")).create();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
+
+		try {
+			WebhookRelevancyResult result = doVerifyBranch(root,
+					cleanerFactory,
+					offlineResult,
+					githubAuthAsInst,
+					baseRepo,
+					pushedRefOrRrHead,
+					eventKey);
+
+			optCheckRun.ifPresent(checkRun -> {
+				Optional<String> optRejectedReason = result.optRejectedReason();
+
+				try {
+					if (optRejectedReason.isPresent()) {
+						checkRun.update()
+								.withConclusion(Conclusion.NEUTRAL)
+								.withStatus(Status.COMPLETED)
+
+								.add(new Output("Rejected due to branch or configuration", optRejectedReason.get()))
+								.create();
+					} else {
+						checkRun.update()
+								// Not completed as this is to be followed by the cleaning
+								.withStatus(Status.IN_PROGRESS)
+
+								.add(new Output("Branch is accepted for cleaning", "Nice"))
+								.create();
+					}
+				} catch (IOException e) {
+					LOGGER.warn("Issue updating CheckRun", e);
+				}
+			});
+
+			return result;
+		} catch (RuntimeException e) {
+			optCheckRun.ifPresent(checkRun -> {
+				githubCheckRunManager.reportFailure(checkRun, e);
+			});
+
+			throw new RuntimeException(e);
+		}
+	}
+
+	private WebhookRelevancyResult doVerifyBranch(Path root,
+			ICodeCleanerFactory cleanerFactory,
+			GitWebhookRelevancyResult offlineResult,
+			GithubAndToken githubAuthAsInst,
+			GHRepository baseRepo,
+			GitRepoBranchSha1 pushedRefOrRrHead,
+			String eventKey) {
 		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
 
 		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optHead =
@@ -300,9 +358,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Set<String> relevantBaseBranches =
 				computeRelevantBaseBranches(offlineResult, pushedRefOrRrHead, facade, optOpenPr);
 
-		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in the
-		// meantime (e.g. merged+deleted before cleanthat doing its work)
-		String eventKey = githubEvent.getxGithubDelivery();
+		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in
+		// the meantime (e.g. merged+deleted before cleanthat doing its work)
 		Optional<HeadAndOptionalBase> refToClean =
 				cleaner.prepareRefToClean(root, eventKey, offlineResult, dirtyHeadRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
@@ -468,8 +525,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 
 		Optional<GHCheckRun> optCheckRun;
-		if (offlineResult.isPushRef() && offlineResult.optPushedRefOrRrHead().isPresent()) {
-			String sha1 = offlineResult.optPushedRefOrRrHead().get().getSha();
+		Optional<GitRepoBranchSha1> optHead = offlineResult.optPushedRefOrRrHead();
+		if (optHead.isPresent()) {
+			String sha1 = optHead.get().getSha();
 			optCheckRun = githubCheckRunManager.createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
 			optCheckRun = Optional.empty();
@@ -498,21 +556,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			});
 		} catch (RuntimeException e) {
 			optCheckRun.ifPresent(checkRun -> {
-				try {
-					String stackTrace = Throwables.getStackTraceAsString(e);
-
-					// Summary is limited to 65535 chars
-					String summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
-
-					checkRun.update()
-							.withConclusion(Conclusion.FAILURE)
-							.withStatus(Status.COMPLETED)
-
-							.add(new Output(e.getMessage() + " (" + e.getClass().getName() + ")", summary))
-							.create();
-				} catch (IOException ee) {
-					LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), ee);
-				}
+				githubCheckRunManager.reportFailure(checkRun, e);
 			});
 
 			throw new RuntimeException("Propagate", e);

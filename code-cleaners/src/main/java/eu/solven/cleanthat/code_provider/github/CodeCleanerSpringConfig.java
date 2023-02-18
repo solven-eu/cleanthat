@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
 import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
@@ -73,7 +74,9 @@ public class CodeCleanerSpringConfig {
 		return new CodeProviderFormatter(configHelpers, formatterFactory, formatterApplier);
 	}
 
+	// @Primary as it is the one to be injected instead of each individual ICodeCleanerFactory
 	@Bean
+	@Primary
 	public ICodeCleanerFactory compositeCodeCleanerFactory(List<ICodeCleanerFactory> specialized) {
 		return new CompositeCodeCleanerFactory(specialized);
 	}

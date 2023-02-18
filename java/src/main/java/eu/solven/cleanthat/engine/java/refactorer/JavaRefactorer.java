@@ -46,8 +46,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllEvenNotProductionReadyMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
@@ -71,47 +71,51 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private final List<IMutator> mutators;
 
 	public static final Set<String> getAllIncluded() {
-		return new AllMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
+		return new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
 	}
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
 		this.engineProperties = engineProperties;
 		this.refactorerProperties = properties;
 
-		JavaVersion engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
-
-		List<String> includedRules = properties.getIncluded();
-		List<String> excludedRules = properties.getExcluded();
-		boolean productionReadyOnly = properties.isProductionReadyOnly();
-
-		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
-		this.mutators = filterRules(engineVersion, includedRules, excludedRules, productionReadyOnly);
+		this.mutators = filterRules(engineProperties, properties);
 
 		this.mutators.forEach(ct -> {
 			LOGGER.debug("Using transformer: {}", ct.getIds());
 		});
 	}
 
+	public static List<IMutator> filterRules(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
+		JavaVersion engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
+
+		List<String> includedRules = properties.getIncluded();
+		List<String> excludedRules = properties.getExcluded();
+		boolean includeDraft = properties.isIncludeDraft();
+
+		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
+		return filterRules(engineVersion, includedRules, excludedRules, includeDraft);
+	}
+
 	public static List<IMutator> filterRules(JavaVersion sourceCodeVersion,
 			List<String> includedRules,
 			List<String> excludedRules,
-			boolean productionReadyOnly) {
+			boolean includeDraft) {
 
-		List<IMutator> allMutators;
-		if (productionReadyOnly) {
-			allMutators = new AllMutators(sourceCodeVersion).getUnderlyings();
-		} else {
-			allMutators = new AllEvenNotProductionReadyMutators(sourceCodeVersion).getUnderlyings();
-		}
+		List<IMutator> allSingleMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
+		List<IMutator> allCompositeMutators =
+				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
 
 		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
 			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
-				return allMutators.stream();
+				// We suppose there is no mutator from Composite which is not a single mutator
+				// Hence we return all single mutators
+				return allSingleMutators.stream();
 			} else {
-				List<IMutator> matchingMutators = allMutators.stream()
-						.filter(someMutator -> someMutator.getIds().contains(includedRule)
-								|| someMutator.getClass().getName().equals(includedRule))
-						.collect(Collectors.toList());
+				List<IMutator> matchingMutators =
+						Stream.concat(allSingleMutators.stream(), allCompositeMutators.stream())
+								.filter(someMutator -> someMutator.getIds().contains(includedRule)
+										|| someMutator.getClass().getName().equals(includedRule))
+								.collect(Collectors.toList());
 
 				if (!matchingMutators.isEmpty()) {
 					return matchingMutators.stream();
@@ -136,18 +140,22 @@ public class JavaRefactorer implements ILintFixerWithId {
 			boolean isExcluded = excludedRules.contains(mutator.getClass().getName())
 					|| excludedRules.stream().anyMatch(excludedRule -> mutator.getIds().contains(excludedRule));
 
+			// debug as it seems Spotless instantiate this quite often / for each file
 			if (isExcluded) {
-				LOGGER.info("We exclude '{}'", mutator.getIds());
+				LOGGER.debug("We exclude '{}'", mutator.getIds());
 			} else {
-				LOGGER.info("We include '{}'", mutator.getIds());
+				LOGGER.debug("We include '{}'", mutator.getIds());
 			}
 
 			return !isExcluded;
 		}).filter(ct -> {
-			if (productionReadyOnly) {
-				return ct.isProductionReady();
-			} else {
+			if (includeDraft) {
 				return true;
+			} else if (mutatorsMayComposite.contains(ct)) {
+				LOGGER.debug("Draft are not included by default but {} was listed explicitely", ct.getIds());
+				return true;
+			} else {
+				return !ct.isDraft();
 			}
 		}).collect(Collectors.toList());
 

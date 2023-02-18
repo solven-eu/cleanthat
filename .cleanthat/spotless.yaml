@@ -8,7 +8,7 @@ formatters:
   steps:
   - id: "cleanthat"
     parameters:
-      source_jdk: 11.0
+      source_jdk: "11.0"
       mutators:
       - eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators
       - LiteralsFirstInComparisons

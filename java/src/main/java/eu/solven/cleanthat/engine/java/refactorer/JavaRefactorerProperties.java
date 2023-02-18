@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import lombok.Data;
 

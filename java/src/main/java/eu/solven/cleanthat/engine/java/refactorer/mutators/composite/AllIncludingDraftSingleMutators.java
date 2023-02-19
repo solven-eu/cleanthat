@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
@@ -34,20 +34,20 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  * @author Benoit Lacelle
  *
  */
-public class AllIncludingDraftSingleMutators extends CompositeMutator {
+public class AllIncludingDraftSingleMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
 	// This packageName is not part of the public API
 	@Deprecated
 	static final String PACKAGE_SINGLE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators";
 
-	static final Supplier<List<IMutator>> ALL_INCLUDINGDRAFT =
-			Suppliers.memoize(() -> ImmutableList.copyOf(MutatorsScanner.scanPackageMutators(PACKAGE_SINGLE_MUTATORS)
+	static final Supplier<List<Class<? extends IMutator>>> ALL_INCLUDINGDRAFT =
+			Suppliers.memoize(() -> MutatorsScanner.scanPackageMutators(PACKAGE_SINGLE_MUTATORS)
 					.stream()
 					// Sort by className, to always apply mutators in the same order
-					.sorted(Comparator.comparing(m -> m.getClass().getName()))
-					.collect(Collectors.toList())));
+					.sorted(Comparator.comparing(m -> m.getName()))
+					.collect(Collectors.toList()));
 
 	public AllIncludingDraftSingleMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, ALL_INCLUDINGDRAFT.get()));
+		super(filterWithJdk(sourceJdkVersion, MutatorsScanner.instantiate(sourceJdkVersion, ALL_INCLUDINGDRAFT.get())));
 	}
 
 }

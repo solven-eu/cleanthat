@@ -70,7 +70,7 @@ public interface IMutator extends IRuleExternalReferences {
 
 	/**
 	 * Draft mutators are excluded by default from {@link CompositeMutator}. They may be included to check the
-	 * {@link IMutator} behavior on the author code, until beinh considered production-grade for all users.
+	 * {@link IMutator} behavior on the author code, until being considered production-grade for all users.
 	 * 
 	 * @return true if this mutator is considered draft.
 	 */

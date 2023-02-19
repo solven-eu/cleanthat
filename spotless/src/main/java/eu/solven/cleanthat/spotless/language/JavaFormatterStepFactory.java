@@ -47,9 +47,8 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
-	private static final List<String> DEFAULT_MUTATORS = ImmutableList.<String>builder()
-			.add("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators")
-			.build();
+	private static final List<String> DEFAULT_MUTATORS =
+			ImmutableList.<String>builder().add("SafeAndConsensualMutators").build();
 
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 

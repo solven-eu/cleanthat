@@ -24,7 +24,10 @@ import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
 /**
  * This mutator will apply all {@link IMutator} fixing a PMD rules.
@@ -32,13 +35,14 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  *
  */
-public class PMDMutators extends CompositeMutator {
+public class PMDMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
 
-	static final Supplier<List<IMutator>> PMD =
-			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
-					.stream()
-					.filter(m -> m.getPmdId().isPresent())
-					.collect(Collectors.toList()));
+	static final Supplier<List<IMutator>> PMD = Suppliers.memoize(() -> MutatorsScanner
+			.instantiate(JavaVersion.parse(IJdkVersionConstants.LAST),
+					AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get())
+			.stream()
+			.filter(m -> m.getPmdId().isPresent())
+			.collect(Collectors.toList()));
 
 	public PMDMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, PMD.get()));

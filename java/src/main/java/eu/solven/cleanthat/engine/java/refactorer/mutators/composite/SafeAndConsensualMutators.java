@@ -22,6 +22,8 @@ import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
@@ -43,8 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollectio
  * @author Benoit Lacelle
  *
  */
-public class SafeAndConsensualMutators extends CompositeMutator {
-
+public class SafeAndConsensualMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
 	// BEWARE: Could we add `EmptyControlStatement`?
 	public static final List<IMutator> SAFE_AND_CONSENSUAL = ImmutableList.<IMutator>builder()
 			.add(new ModifierOrder(),
@@ -62,7 +63,7 @@ public class SafeAndConsensualMutators extends CompositeMutator {
 	}
 
 	@Override
-	public Optional<String> getCheckstyleId() {
-		return Optional.of("SafeAndConsensual");
+	public Optional<String> getCleanthatId() {
+		return Optional.of(JavaRefactorerProperties.SAFE_AND_CONSENSUAL);
 	}
 }

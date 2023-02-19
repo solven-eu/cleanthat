@@ -24,7 +24,10 @@ import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
 /**
  * This mutator will apply all {@link IMutator} fixing a Sonar rule.
@@ -32,13 +35,14 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  *
  */
-public class SonarMutators extends CompositeMutator {
+public class SonarMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
 
-	static final Supplier<List<IMutator>> SONAR =
-			Suppliers.memoize(() -> AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get()
-					.stream()
-					.filter(m -> m.getSonarId().isPresent())
-					.collect(Collectors.toList()));
+	static final Supplier<List<IMutator>> SONAR = Suppliers.memoize(() -> MutatorsScanner
+			.instantiate(JavaVersion.parse(IJdkVersionConstants.LAST),
+					AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get())
+			.stream()
+			.filter(m -> m.getSonarId().isPresent())
+			.collect(Collectors.toList()));
 
 	public SonarMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, SONAR.get()));

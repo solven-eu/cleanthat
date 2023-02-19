@@ -43,6 +43,12 @@ import lombok.Data;
 public class JavaRefactorerProperties implements ICleanthatStepParametersProperties {
 	@Deprecated(since = "One should rather rely on a CompositeMutator")
 	public static final String WILDCARD = "*";
+
+	/**
+	 * This is the identifier of the default mutators to be safely applied to most project
+	 */
+	public static final String SAFE_AND_CONSENSUAL = "SafeAndConsensual";
+
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */

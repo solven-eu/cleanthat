@@ -350,7 +350,7 @@
 					<!-- mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat -->
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
-					<version>2.2</version>
+					<version>2.4</version>
 					<configuration>
 						<!-- Skipped as it conflicts with Spotless (around Aether) -->
 						<skip>true</skip>

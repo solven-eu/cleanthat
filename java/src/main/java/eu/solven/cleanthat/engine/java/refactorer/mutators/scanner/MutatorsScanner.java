@@ -25,12 +25,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.reflect.ClassPath;
 
 import eu.solven.cleanthat.config.GitService;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -43,43 +45,59 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public class MutatorsScanner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
-	/**
-	 * The package is not search recursively.
-	 * 
-	 * @param packageName
-	 *            a package qualified name like 'eu.solven.cleanthat.engine.java.refactorer.mutators'
-	 * @return a {@link List} of {@link IMutator} detected in given package.
-	 */
-	public List<IMutator> getPackageMutators(String packageName) {
-		Set<String> classes;
+	public List<Class<? extends IMutator>> getPackageMutatorClasses(String packageName) {
+		Set<String> classNames;
 		try {
-			classes = getClasses(packageName);
+			classNames = getClasses(packageName);
 		} catch (ClassNotFoundException | IOException e) {
 			LOGGER.error("Issue loading mutators from {}", packageName, e);
 			return Collections.emptyList();
 		}
 
-		if (classes.isEmpty()) {
+		if (classNames.isEmpty()) {
 			String cleanThatSha1 = GitService.safeGetSha1();
 
 			LOGGER.warn("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
 		}
 
-		return classes.stream().map(s -> {
+		List<Class<? extends IMutator>> classes = classNames.stream().map(s -> {
 			try {
 				return Class.forName(s);
 			} catch (ClassNotFoundException e) {
 				LOGGER.error("Issue with {}", s, e);
 				return null;
 			}
-		}).filter(c -> c != null).filter(c -> IMutator.class.isAssignableFrom(c)).map(c -> {
-			try {
-				return c.asSubclass(IMutator.class).getConstructor().newInstance();
-			} catch (ReflectiveOperationException e) {
-				LOGGER.error("Issue with {}", c, e);
-				return null;
-			}
+		})
+				.filter(c -> IMutator.class.isAssignableFrom(c))
+				.map(c -> (Class<? extends IMutator>) c.asSubclass(IMutator.class))
+				.collect(Collectors.toList());
+		return classes;
+	}
+
+	/**
+	 * The package is not search recursively.
+	 * 
+	 * @param classes
+	 *            The IMutator classes to instantiate
+	 * @return a {@link List} of {@link IMutator} detected in given package.
+	 */
+	public static List<IMutator> instantiate(JavaVersion sourceJdkVersion, List<Class<? extends IMutator>> classes) {
+		return classes.stream().filter(c -> c != null).filter(c -> IMutator.class.isAssignableFrom(c)).map(c -> {
+			return instantiate(sourceJdkVersion, c);
 		}).filter(Objects::nonNull).collect(Collectors.toList());
+	}
+
+	public static IMutator instantiate(JavaVersion sourceJdkVersion, Class<? extends IMutator> mutatorClass) {
+		try {
+			if (IConstructorNeedsJdkVersion.class.isAssignableFrom(mutatorClass)) {
+				return mutatorClass.getConstructor(JavaVersion.class).newInstance(sourceJdkVersion);
+			} else {
+				return mutatorClass.getConstructor().newInstance();
+			}
+		} catch (ReflectiveOperationException e) {
+			LOGGER.error("Issue with {}", mutatorClass, e);
+			return null;
+		}
 	}
 
 	/**
@@ -109,7 +127,8 @@ public class MutatorsScanner {
 		return classNames;
 	}
 
-	public static Collection<IMutator> scanPackageMutators(String packageName) {
-		return new MutatorsScanner().getPackageMutators(packageName);
+	public static Collection<Class<? extends IMutator>> scanPackageMutators(String packageName) {
+		return new MutatorsScanner().getPackageMutatorClasses(packageName);
 	}
+
 }

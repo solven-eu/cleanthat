@@ -26,7 +26,6 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -34,7 +33,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class StringToString extends AJavaParserMutator implements IMutator {
+public class StringToString extends AJavaParserMutator  {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StringToString.class);
 
 	private static final String METHOD_TO_STRING = "toString";

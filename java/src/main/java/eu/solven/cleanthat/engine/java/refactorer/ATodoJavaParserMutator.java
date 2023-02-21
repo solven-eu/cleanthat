@@ -20,14 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-
 /**
  * Helps preparing rules
  *
  * @author Benoit Lacelle
  */
-public abstract class ATodoJavaParserMutator extends AJavaParserMutator implements IMutator {
+public abstract class ATodoJavaParserMutator extends AJavaParserMutator  {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override

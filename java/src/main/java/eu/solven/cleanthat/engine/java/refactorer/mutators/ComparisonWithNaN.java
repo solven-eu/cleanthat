@@ -32,7 +32,6 @@ import com.github.javaparser.ast.expr.NullLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -40,7 +39,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class ComparisonWithNaN extends AJavaParserMutator implements IMutator {
+public class ComparisonWithNaN extends AJavaParserMutator  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonWithNaN.class);
 

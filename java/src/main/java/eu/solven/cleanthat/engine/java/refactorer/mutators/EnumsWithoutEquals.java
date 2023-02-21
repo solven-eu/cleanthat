@@ -29,7 +29,6 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -39,7 +38,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 // https://stackoverflow.com/questions/1750435/comparing-java-enum-members-or-equals
-public class EnumsWithoutEquals extends AJavaParserMutator implements IMutator {
+public class EnumsWithoutEquals extends AJavaParserMutator  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 

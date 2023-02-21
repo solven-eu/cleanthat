@@ -28,8 +28,6 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * Use the diamond operation {@code <>} whenever possible.
@@ -37,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
  * @author Benoit Lacelle
  */
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperator extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
+public class UseDiamondOperator extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override

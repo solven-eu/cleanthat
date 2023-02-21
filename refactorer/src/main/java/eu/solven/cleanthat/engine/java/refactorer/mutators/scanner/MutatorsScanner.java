@@ -87,7 +87,7 @@ public class MutatorsScanner {
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
-	public static IMutator instantiate(JavaVersion sourceJdkVersion, Class<? extends IMutator> mutatorClass) {
+	public static <T extends IMutator> T instantiate(JavaVersion sourceJdkVersion, Class<? extends T> mutatorClass) {
 		try {
 			if (IConstructorNeedsJdkVersion.class.isAssignableFrom(mutatorClass)) {
 				return mutatorClass.getConstructor(JavaVersion.class).newInstance(sourceJdkVersion);

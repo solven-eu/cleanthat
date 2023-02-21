@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import lombok.Data;
 
 /**
@@ -52,7 +51,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */
-	private List<String> included = List.of(SafeAndConsensualMutators.class.getName());
+	private List<String> included = List.of(SAFE_AND_CONSENSUAL);
 
 	/**
 	 * A {@link List} of excluded rules (by ID)

@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}
@@ -32,7 +31,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  *
  */
 @Deprecated(since = "Not-ready")
-public class AvoidFileStream extends ATodoJavaParserMutator implements IMutator {
+public class AvoidFileStream extends ATodoJavaParserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;

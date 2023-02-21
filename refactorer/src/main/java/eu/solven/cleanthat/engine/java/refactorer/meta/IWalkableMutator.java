@@ -15,14 +15,22 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableSet;
+
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 
 /**
- * For {@link IMutator} with behavior depending on source JDK version (e.g. CompositeMutator, or mutator with additional
- * rules with later IJdkVersion like {@link UseDiamondOperator})
+ * For classes knowing how to modify code
  *
  * @author Benoit Lacelle
  */
-public interface IConstructorNeedsJdkVersion {
+public interface IWalkableMutator<AST> extends IMutator {
 
+
+	boolean walkNode(AST pre);
 }

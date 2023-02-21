@@ -26,7 +26,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
  *
  * @author Benoit Lacelle
  */
-public class NoOpJavaParserRule extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
+public class NoOpJavaParserRule extends AJavaParserMutator {
 	@Override
 	public String getId() {
 		return IMutator.ID_NOOP;

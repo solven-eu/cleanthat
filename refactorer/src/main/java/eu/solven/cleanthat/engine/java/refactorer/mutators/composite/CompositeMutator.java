@@ -54,7 +54,7 @@ public class CompositeMutator<T extends IMutator> implements IMutator {
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	public static <T extends IMutator> List<T> filterWithJdk(JavaVersion sourceJdkVersion, List<T> mutators) {
+	public static <T extends IMutator> List<T> filterWithJdk(JavaVersion sourceJdkVersion, List<? extends T> mutators) {
 		return mutators.stream()
 				.filter(m -> sourceJdkVersion.isAtLeast(m.minimalJavaVersion()))
 				.collect(Collectors.toList());

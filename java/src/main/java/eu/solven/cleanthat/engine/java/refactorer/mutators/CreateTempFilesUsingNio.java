@@ -38,7 +38,6 @@ import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -46,7 +45,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Sébastien Collard
  */
-public class CreateTempFilesUsingNio extends AJavaParserMutator implements IMutator {
+public class CreateTempFilesUsingNio extends AJavaParserMutator  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 

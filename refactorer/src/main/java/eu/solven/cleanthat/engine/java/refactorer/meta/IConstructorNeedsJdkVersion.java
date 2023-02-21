@@ -15,19 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
-import com.github.javaparser.ast.Node;
-
 /**
- * An {@link IMutator} which can edit a JavaParser {@link Node}
+ * For {@link IMutator} with behavior depending on source JDK version (e.g. CompositeMutator, or mutator with additional
+ * rules with later IJdkVersion like {@link UseDiamondOperator})
  *
  * @author Benoit Lacelle
  */
-public interface IJavaparserMutator extends IWalkableMutator<Node> {
-	/**
-	 * 
-	 * @param pre
-	 * @return true if the AST has been modified.
-	 */
-	boolean walkNode(Node pre);
+public interface IConstructorNeedsJdkVersion {
 
 }

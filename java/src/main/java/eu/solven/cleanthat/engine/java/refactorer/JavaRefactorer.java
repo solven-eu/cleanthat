@@ -54,7 +54,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, IJavaparserMutator> {
+public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
 	public static final String ID_REFACTORER = "refactorer";

@@ -16,21 +16,17 @@
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import com.google.common.collect.ImmutableSet;
-
-import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 
 /**
  * For classes knowing how to modify code
  *
  * @author Benoit Lacelle
  */
-public interface IWalkableMutator<AST> extends IMutator {
+public interface IWalkableMutator<AST, R> extends IMutator {
 
+	default boolean walkNode(AST pre) {
+		return walkNode2(pre).isPresent();
+	}
 
-	boolean walkNode(AST pre);
+	Optional<R> walkNode2(AST pre);
 }

@@ -45,7 +45,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public abstract class AAstRefactorer<AST, P, M extends IWalkableMutator<AST>> implements ILintFixerWithId {
+public abstract class AAstRefactorer<AST, P, R, M extends IWalkableMutator<AST, R>> implements ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
 
@@ -94,20 +94,20 @@ public abstract class AAstRefactorer<AST, P, M extends IWalkableMutator<AST>> im
 			}
 
 			AST compilationUnit = optCompilationUnit.get();
-			boolean walkNodeResult;
+			Optional<R> walkNodeResult;
 			try {
-				walkNodeResult = ct.walkNode(compilationUnit);
+				walkNodeResult = ct.walkNode2(compilationUnit);
 			} catch (RuntimeException e) {
 				throw new IllegalArgumentException("Issue with classTransformer: " + ct, e);
 			}
-			if (walkNodeResult) {
+			if (walkNodeResult.isPresent()) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
 				// We rely on javaParser source-code only if the rule has actually impacted the AST
 				LOGGER.debug("A rule based on JavaParser actually modified the code");
 
 				// One relevant change: building source-code from the AST
-				refCleanCode.set(toString(compilationUnit));
+				refCleanCode.set(toString(walkNodeResult.get()));
 
 				// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits
 				optCompilationUnit.set(null);
@@ -237,5 +237,5 @@ public abstract class AAstRefactorer<AST, P, M extends IWalkableMutator<AST>> im
 		return mutatorsNotComposite;
 	}
 
-	protected abstract String toString(AST compilationUnit);
+	protected abstract String toString(R walkResult);
 }

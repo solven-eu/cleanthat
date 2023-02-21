@@ -32,6 +32,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
@@ -40,16 +41,10 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserMutator implements IMutator, IRuleExternalReferences {
+public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
-
-	@Deprecated
-	@VisibleForTesting
-	public static int getWarnCount() {
-		return WARNS_IDEMPOTENCY_COUNT.get();
-	}
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
@@ -60,6 +55,12 @@ public abstract class AJavaParserMutator implements IMutator, IRuleExternalRefer
 		ts.add(new ReflectionTypeSolver(jreOnly));
 		return JavaParserFacade.get(ts);
 	});
+
+	@Deprecated
+	@VisibleForTesting
+	public static int getWarnCount() {
+		return WARNS_IDEMPOTENCY_COUNT.get();
+	}
 
 	protected final JavaParserFacade getThreadJavaParser() {
 		return TL_JAVAPARSER.get();

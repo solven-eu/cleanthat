@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  * @author Benoit Lacelle
  *
  */
-public class SonarMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
+public class SonarMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 
 	static final Supplier<List<IMutator>> SONAR = Suppliers.memoize(() -> MutatorsScanner
 			.instantiate(JavaVersion.parse(IJdkVersionConstants.LAST),

@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.github.javaparser.ast.Node;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -81,12 +80,5 @@ public interface IMutator extends IRuleExternalReferences {
 		// default is true so mutators are by default excluded. This is a safety mechanism.
 		return true;
 	}
-
-	/**
-	 * 
-	 * @param pre
-	 * @return true if the AST has been modified.
-	 */
-	boolean walkNode(Node pre);
 
 }

@@ -41,7 +41,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasse
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
 public class ATestCases {
 
@@ -52,7 +52,7 @@ public class ATestCases {
 	// testCasesIn(cases.getClass(), cases.getTransformer());
 	// }
 
-	// protected void testCasesIn(Class<?> casesClass, IMutator transformer) throws IOException {
+	// protected void testCasesIn(Class<?> casesClass, IJavaparserMutator transformer) throws IOException {
 	// String path = LocalClassTestHelper.loadClassAsString(casesClass);
 	//
 	// JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
@@ -73,7 +73,7 @@ public class ATestCases {
 						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent());
 	}
 
-	private void checkMethodCases(IMutator transformer, CompilationUnit compilationUnit) {
+	private void checkMethodCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> methodCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareMethods.class).isPresent());
 		methodCases.forEach(oneCase -> {
@@ -84,7 +84,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doTestMethod(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doTestMethod(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration pre = getMethodWithName(oneCase, "pre");
 		MethodDeclaration post = getMethodWithName(oneCase, "post");
@@ -92,7 +92,7 @@ public class ATestCases {
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
 
-	private <T extends Node & NodeWithSimpleName<?>> void doCompareExpectedChanges(IMutator transformer,
+	private <T extends Node & NodeWithSimpleName<?>> void doCompareExpectedChanges(IJavaparserMutator transformer,
 			ClassOrInterfaceDeclaration oneCase,
 			T pre,
 			T post) {
@@ -126,7 +126,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkMethodUnchangedCases(IMutator transformer, CompilationUnit compilationUnit) {
+	private void checkMethodUnchangedCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> unchangedMethods = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(UnchangedMethod.class).isPresent());
 		unchangedMethods.stream().forEach(oneCase -> {
@@ -137,7 +137,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCheckUnchanged(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCheckUnchanged(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration post = getMethodWithName(oneCase, "pre");
 		// Check the transformer is impact-less on already clean code
@@ -170,7 +170,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkTypeCases(IMutator transformer, CompilationUnit compilationUnit) {
+	private void checkTypeCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareTypes.class).isPresent());
 		typeCases.forEach(oneCase -> {
@@ -181,7 +181,7 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCompareTypes(IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCompareTypes(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		TypeDeclaration<?> pre = oneCase.getMembers()
 				.stream()
@@ -214,7 +214,7 @@ public class ATestCases {
 		}
 	}
 
-	private void checkClasses(JavaParser javaParser, IMutator transformer, CompilationUnit compilationUnit) {
+	private void checkClasses(JavaParser javaParser, IJavaparserMutator transformer, CompilationUnit compilationUnit) {
 		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareClasses.class).isPresent());
 		typeCases.forEach(oneCase -> {
@@ -225,7 +225,9 @@ public class ATestCases {
 		});
 	}
 
-	protected void doCompareClasses(JavaParser javaParser, IMutator transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCompareClasses(JavaParser javaParser,
+			IJavaparserMutator transformer,
+			ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 
 		String qualifiedName = oneCase.getFullyQualifiedName().get();
@@ -267,7 +269,7 @@ public class ATestCases {
 	}
 
 	protected void doCompareInnerClasses(JavaParser javaParser,
-			IMutator transformer,
+			IJavaparserMutator transformer,
 			ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, "Pre");
@@ -277,7 +279,7 @@ public class ATestCases {
 	}
 
 	protected void doCompareInnerAnnotations(JavaParser javaParser,
-			IMutator transformer,
+			IJavaparserMutator transformer,
 			ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		AnnotationDeclaration pre = getAnnotationWithName(oneCase, "Pre");
@@ -286,7 +288,7 @@ public class ATestCases {
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
 
-	protected void doCompareClasses(IMutator transformer, CompilationUnit pre, CompilationUnit post) {
+	protected void doCompareClasses(IJavaparserMutator transformer, CompilationUnit pre, CompilationUnit post) {
 
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first

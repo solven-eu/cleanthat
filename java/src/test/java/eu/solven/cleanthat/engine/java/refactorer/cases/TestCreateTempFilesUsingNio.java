@@ -33,7 +33,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.CreateTempFilesUsingNioCases;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
@@ -73,7 +73,7 @@ public class TestCreateTempFilesUsingNio extends AParameterizesRefactorerCases {
 		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
 			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
 		});
-		IMutator transformer = new CreateTempFilesUsingNio();
+		IJavaparserMutator transformer = new CreateTempFilesUsingNio();
 		cases.forEach(oneCase -> {
 			LOGGER.info("Processing the case: {}", oneCase.getName());
 			MethodDeclaration pre = getMethodWithName(oneCase, "pre");

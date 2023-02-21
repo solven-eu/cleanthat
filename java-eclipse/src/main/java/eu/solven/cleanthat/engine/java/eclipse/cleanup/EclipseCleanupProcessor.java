@@ -86,13 +86,14 @@ public class EclipseCleanupProcessor {
 				+ "		this.someLocalDate = someLocalDate;\n"
 				+ "		this.someLocalDateTime = someLocalDateTime;\n"
 				+ "	}\n"
-				+ "}\n"
-				+ "";
+				+ "}\n";
 
 		ASTParser parser = ASTParser.newParser(AST.getJLSLatest());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setSource(sourceCode.toCharArray());
 		parser.setResolveBindings(true);
 		CompilationUnit cUnit = (CompilationUnit) parser.createAST(null);
+
+		LOGGER.info("{}", cUnit);
 	}
 }

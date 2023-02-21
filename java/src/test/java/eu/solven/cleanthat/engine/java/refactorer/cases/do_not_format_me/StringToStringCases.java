@@ -1,20 +1,17 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class StringToStringCases extends ARefactorerCases {
 	@Override
-	public IMutator getTransformer() {
+	public IJavaparserMutator getTransformer() {
 		return new StringToString();
 	}
 

@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.test;
+package eu.solven.cleanthat.engine.java.refactorer.meta;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import com.github.javaparser.ast.Node;
 
-public abstract class ARefactorerCases {
-	public String getId() {
-		return getTransformer().getClass().getName();
-	}
-
-	public abstract IJavaparserMutator getTransformer();
+/**
+ * An {@link IMutator} which can edit a JavaParser {@link Node}
+ *
+ * @author Benoit Lacelle
+ */
+public interface IJavaparserMutator extends IMutator {
+	/**
+	 * 
+	 * @param pre
+	 * @return true if the AST has been modified.
+	 */
+	boolean walkNode(Node pre);
 
 }

@@ -29,7 +29,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
  * @author Benoit Lacelle
  *
  */
-public class CustomCompositeMutator extends CompositeMutator {
+public class CustomCompositeMutator extends CompositeMutator<IMutator> {
 
 	public CustomCompositeMutator(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, defaultUnderlyings()));

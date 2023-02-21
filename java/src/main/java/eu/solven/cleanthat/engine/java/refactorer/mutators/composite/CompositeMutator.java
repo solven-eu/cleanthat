@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
-import com.github.javaparser.ast.Node;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -35,15 +34,15 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  *
  */
-public class CompositeMutator implements IMutator {
+public class CompositeMutator<T extends IMutator> implements IMutator {
 
-	final List<IMutator> mutators;
+	final List<T> mutators;
 
-	protected CompositeMutator(List<IMutator> mutators) {
+	protected CompositeMutator(List<T> mutators) {
 		this.mutators = ImmutableList.copyOf(mutators);
 	}
 
-	public List<IMutator> getUnderlyings() {
+	public List<T> getUnderlyings() {
 		return mutators;
 	}
 
@@ -55,18 +54,7 @@ public class CompositeMutator implements IMutator {
 				.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	@Override
-	public boolean walkNode(Node pre) {
-		boolean modified = false;
-
-		for (IMutator mutator : mutators) {
-			modified |= mutator.walkNode(pre);
-		}
-
-		return modified;
-	}
-
-	public static List<IMutator> filterWithJdk(JavaVersion sourceJdkVersion, List<IMutator> mutators) {
+	public static <T extends IMutator> List<T> filterWithJdk(JavaVersion sourceJdkVersion, List<T> mutators) {
 		return mutators.stream()
 				.filter(m -> sourceJdkVersion.isAtLeast(m.minimalJavaVersion()))
 				.collect(Collectors.toList());

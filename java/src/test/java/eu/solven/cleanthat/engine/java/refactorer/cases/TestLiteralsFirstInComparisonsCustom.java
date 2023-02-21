@@ -28,7 +28,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 
@@ -42,7 +42,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		IMutator transformer = new LiteralsFirstInComparisons();
+		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
@@ -58,7 +58,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		IMutator transformer = new LiteralsFirstInComparisons();
+		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
@@ -73,7 +73,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		String asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		IMutator transformer = new LiteralsFirstInComparisons();
+		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 

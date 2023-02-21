@@ -8,41 +8,13 @@
 		<version>2.5-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>java</artifactId>
+	<artifactId>refactorer</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>refactorer</artifactId>
+			<artifactId>config</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.solven-eu.cleanthat</groupId>
-			<artifactId>code-cleaners</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/INRIA/spoon -->
-			<groupId>fr.inria.gforge.spoon</groupId>
-			<artifactId>spoon-core</artifactId>
-			<version>10.2.0</version>
-			<!-- Spoon is added for reference, but not used for now -->
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<!-- https://github.com/javaparser/javaparser -->
-			<!-- JavaParser seems a better option to later handle more languages -->
-			<groupId>com.github.javaparser</groupId>
-			<artifactId>javaparser-symbol-solver-core</artifactId>
-			<version>3.25.0</version>
-		</dependency>
-
-		<dependency>
-			<!-- Used to parse Java versions with JavaVersion -->
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-java</artifactId>
-			<version>1.1.2</version>
 		</dependency>
 
 		<dependency>
@@ -64,13 +36,6 @@
 			<artifactId>annotations</artifactId>
 			<version>3.0.1u2</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/spring-io/spring-javaformat -->
-			<groupId>io.spring.javaformat</groupId>
-			<artifactId>spring-javaformat-formatter</artifactId>
-			<version>0.0.35</version>
 		</dependency>
 
 		<dependency>

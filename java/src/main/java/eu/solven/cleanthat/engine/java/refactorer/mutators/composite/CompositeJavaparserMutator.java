@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer;
+package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
-import java.util.Set;
+import java.util.List;
 
 import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * This is used to test the inclusion of a custom {@link IMutator} (e.g. for a third-party jar)
+ * A {@link CompositeMutator} dedicated for {@link IJavaparserMutator}
  * 
  * @author Benoit Lacelle
  *
  */
-public class CustomMutator implements IJavaparserMutator {
+@Deprecated(since = "Is there a real usage for this?")
+public class CompositeJavaparserMutator extends CompositeMutator<IJavaparserMutator> implements IJavaparserMutator {
 
-	@Override
-	public boolean isDraft() {
-		return false;
-	}
-
-	@Override
-	public Set<String> getIds() {
-		return Set.of("MyCustomMutator");
+	protected CompositeJavaparserMutator(List<IJavaparserMutator> mutators) {
+		super(mutators);
 	}
 
 	@Override
 	public boolean walkNode(Node pre) {
-		return false;
+		boolean modified = false;
+
+		for (IJavaparserMutator mutator : mutators) {
+			modified |= mutator.walkNode(pre);
+		}
+
+		return modified;
 	}
 
 }

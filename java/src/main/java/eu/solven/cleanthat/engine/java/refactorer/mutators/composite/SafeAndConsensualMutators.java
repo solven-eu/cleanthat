@@ -45,7 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollectio
  * @author Benoit Lacelle
  *
  */
-public class SafeAndConsensualMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
+public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	// BEWARE: Could we add `EmptyControlStatement`?
 	public static final List<IMutator> SAFE_AND_CONSENSUAL = ImmutableList.<IMutator>builder()
 			.add(new ModifierOrder(),

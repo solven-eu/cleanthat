@@ -7,6 +7,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * Invalid reports of any IMutators as not being idempotent
 * `CreateTempFilesUsingNioCases` now handle a null directory
 * `LocalVariableTypeInference` does not replace assignments with different types (e.g. `ArrayList` assigned to a `List` variable)
+* Introduces `IJavaparserMutator`, paving the way for other mutators (from Eclipse Cleanup, OpenRewrite, etc)
 
 ## [2.4] - 2023-02-19
 ### Fixed

@@ -45,6 +45,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
@@ -68,7 +69,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
 
-	private final List<IMutator> mutators;
+	private final List<IJavaparserMutator> mutators;
 
 	public static final Set<String> getAllIncluded() {
 		return new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
@@ -78,7 +79,10 @@ public class JavaRefactorer implements ILintFixerWithId {
 		this.engineProperties = engineProperties;
 		this.refactorerProperties = properties;
 
-		this.mutators = filterRules(engineProperties, properties);
+		this.mutators = filterRules(engineProperties, properties).stream()
+				.filter(c -> IJavaparserMutator.class.isAssignableFrom(c.getClass()))
+				.map(IJavaparserMutator.class::cast)
+				.collect(Collectors.toList());
 
 		this.mutators.forEach(ct -> {
 			LOGGER.debug("Using transformer: {}", ct.getIds());
@@ -192,12 +196,14 @@ public class JavaRefactorer implements ILintFixerWithId {
 
 	private static List<IMutator> unrollCompositeMutators(List<IMutator> mutatorsMayComposite) {
 		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
+
+		// Iterate until all CompositeMutators has been unrolled
 		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
 			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
 				if (m instanceof CompositeMutator) {
-					return ((CompositeMutator) m).getUnderlyings().stream();
+					return ((CompositeMutator<?>) m).getUnderlyings().stream();
 				} else {
-					return Stream.of(m);
+					return Stream.<IMutator>of(m);
 				}
 			}).collect(Collectors.toList());
 		}
@@ -209,8 +215,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 		return ID_REFACTORER;
 	}
 
-	public List<IMutator> getMutators() {
-		return mutators;
+	public Set<String> getMutators() {
+		return mutators.stream().flatMap(m -> m.getIds().stream()).sorted().collect(Collectors.toSet());
 	}
 
 	@Override

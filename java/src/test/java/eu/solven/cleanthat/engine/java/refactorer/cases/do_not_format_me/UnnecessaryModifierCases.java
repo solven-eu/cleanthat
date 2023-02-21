@@ -2,13 +2,13 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class UnnecessaryModifierCases extends ARefactorerCases {
 	@Override
-	public IMutator getTransformer() {
+	public IJavaparserMutator getTransformer() {
 		return new UnnecessaryModifier();
 	}
 

@@ -3,14 +3,14 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.math.RoundingMode;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 public class EnumsWithoutEqualsCases extends ARefactorerCases {
 	@Override
-	public IMutator getTransformer() {
+	public IJavaparserMutator getTransformer() {
 		return new EnumsWithoutEquals();
 	}
 

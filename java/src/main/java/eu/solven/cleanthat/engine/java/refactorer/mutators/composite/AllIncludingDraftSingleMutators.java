@@ -34,7 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  * @author Benoit Lacelle
  *
  */
-public class AllIncludingDraftSingleMutators extends CompositeMutator implements IConstructorNeedsJdkVersion {
+public class AllIncludingDraftSingleMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	// This packageName is not part of the public API
 	@Deprecated
 	static final String PACKAGE_SINGLE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators";

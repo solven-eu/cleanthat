@@ -32,6 +32,9 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
  */
 public interface IMutator extends IRuleExternalReferences {
 
+	@Deprecated(since = "This is for tests purposes")
+	String ID_NOOP = "NoOp";
+
 	// For java, prefer Checkstyle name, else PMD name
 	@Deprecated
 	default String getId() {

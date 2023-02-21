@@ -23,6 +23,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VarType;
+import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
@@ -72,8 +73,25 @@ public class LocalVariableTypeInference extends AJavaParserMutator implements IM
 		// https://github.com/javaparser/javaparser/issues/3898
 		// We can not change the Type, as it would fail in the case of Type with Diamond
 		Expression initializer = singleVariableDeclaration.getInitializer().orElse(null);
+
+		if (!isReplaceableAssignement(type, initializer)) {
+			return false;
+		}
+
 		VariableDeclarator newVariableDeclarator =
 				new VariableDeclarator(new VarType(), singleVariableDeclaration.getName(), initializer);
 		return singleVariableDeclaration.replace(newVariableDeclarator);
+	}
+
+	private boolean isReplaceableAssignement(Type type, Expression initializer) {
+		Optional<ResolvedType> optType = optResolvedType(initializer);
+
+		if (optType.isEmpty()) {
+			return false;
+		}
+
+		// If the variable was List but allocating an ArrayList, it means we can assign later any List
+		// `var` would forbid assigning anything but an ArrayLit
+		return optType.get().toDescriptor().equals(type.toDescriptor());
 	}
 }

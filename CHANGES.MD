@@ -4,6 +4,16 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 ### Fixed
+* Invalid reports of any IMutators as not being idempotent
+* `CreateTempFilesUsingNioCases` now handle a null directory
+* `LocalVariableTypeInference` does not replace assignments with different types (e.g. `ArrayList` assigned to a `List` variable)
+
+## [2.4] - 2023-02-19
+### Fixed
+* `AllIncludingDraftCompositeMutators` was misbehaving given `MutatorsScanner`
+
+## [2.3] - 2023-02-19
+### Fixed
 * `CreateTempFilesUsingNioCases` now handle a null directory
 ### Added
 * Additional mutator: `EmptyControlStatement` turns `{}` into ``

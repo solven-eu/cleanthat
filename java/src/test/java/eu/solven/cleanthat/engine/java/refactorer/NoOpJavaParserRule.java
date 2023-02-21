@@ -29,7 +29,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 public class NoOpJavaParserRule extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	@Override
 	public String getId() {
-		return "NoOp";
+		return IMutator.ID_NOOP;
 	}
 
 	@Override

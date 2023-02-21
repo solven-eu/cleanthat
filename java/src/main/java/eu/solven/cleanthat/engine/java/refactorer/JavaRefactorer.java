@@ -127,7 +127,7 @@ public class JavaRefactorer implements ILintFixerWithId {
 					return optFromClassName.stream();
 				}
 
-				LOGGER.warn("includedMutator={} did not matched any mutator", includedRule);
+				LOGGER.warn("includedMutator={} did not match any mutator", includedRule);
 				return Stream.empty();
 			}
 		}).collect(Collectors.toList());

@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -40,6 +42,14 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
  */
 public abstract class AJavaParserMutator implements IMutator, IRuleExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
+
+	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
+
+	@Deprecated
+	@VisibleForTesting
+	public static int getWarnCount() {
+		return WARNS_IDEMPOTENCY_COUNT.get();
+	}
 
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
 		CombinedTypeSolver ts = new CombinedTypeSolver();
@@ -63,27 +73,42 @@ public abstract class AJavaParserMutator implements IMutator, IRuleExternalRefer
 			try {
 				hasTransformed = processNotRecursively(node);
 			} catch (RuntimeException e) {
-				String faultyCode = node.toString();
-
-				throw new IllegalArgumentException(
-						"Issue with a cleanthat mutatyor. Please report it to '"
-								+ "https://github.com/solven-eu/cleanthat/issues"
-								+ "' with as testCase: \r\n\r\n"
-								+ faultyCode,
-						e);
+				String messageForIssueReporting = messageForIssueReporting(this, node);
+				throw new IllegalArgumentException("Issue with a cleanthat mutator. " + messageForIssueReporting, e);
 			}
 
 			if (hasTransformed) {
-				// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
-				if (!this.getIds().contains("NoOp") && hasTransformed) {
-					// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
-					// to again 'a.equals(b)')
-					LOGGER.warn("Applying {} over {} is not idem-potent. It is a bug!", this, tree);
-				}
+				idempotencySanityCheck(node);
 				transformed.set(true);
 			}
 		});
 		return transformed.get();
+	}
+
+	private void idempotencySanityCheck(Node node) {
+		boolean transformAgain = processNotRecursively(node);
+		// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
+		if (!this.getIds().contains(IMutator.ID_NOOP) && transformAgain) {
+			// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
+			// to again 'a.equals(b)')
+			WARNS_IDEMPOTENCY_COUNT.incrementAndGet();
+			String messageForIssueReporting = messageForIssueReporting(this, node);
+			LOGGER.warn("Applying {} over {} is not idem-potent. It is a bug! {}",
+					this,
+					node,
+					messageForIssueReporting);
+		}
+	}
+
+	public static String messageForIssueReporting(IMutator mutator, Node node) {
+		String faultyCode = node.toString();
+
+		String messageForIssueReporting = "Please report it to '" + "https://github.com/solven-eu/cleanthat/issues"
+				+ "' referring the faulty mutator: '"
+				+ mutator.getClass().getName()
+				+ "' with as testCase: \r\n\r\n"
+				+ faultyCode;
+		return messageForIssueReporting;
 	}
 
 	protected boolean processNotRecursively(Node node) {

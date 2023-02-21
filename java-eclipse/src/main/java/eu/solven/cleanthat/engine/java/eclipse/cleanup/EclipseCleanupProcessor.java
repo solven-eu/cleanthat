@@ -21,6 +21,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.manipulation.CleanUpContextCore;
 import org.eclipse.jdt.core.manipulation.CleanUpRequirementsCore;
@@ -37,6 +39,9 @@ import org.slf4j.LoggerFactory;
  * @author Benoit Lacelle
  *
  */
+// https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_contributing_a_cleanup.htm
+// https://stackoverflow.com/questions/10120072/how-to-invoke-a-eclipse-clean-up-profile-programmatically
+// https://stackoverflow.com/questions/11166862/eclipse-create-compilationunit-from-java-file
 @Deprecated(since = "TODO")
 public class EclipseCleanupProcessor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseCleanupProcessor.class);
@@ -63,5 +68,31 @@ public class EclipseCleanupProcessor {
 
 		RefactoringStatus postStatus = cleanup.checkPostConditions(monitor);
 		LOGGER.info("post status: {}", postStatus);
+	}
+
+	public static void main(String[] args) {
+		String sourceCode = "package eu.solven.cleanthat.do_not_format_me;\n" + "\n"
+				+ "import java.time.LocalDate;\n"
+				+ "import java.time.LocalDateTime;\n"
+				+ "\n"
+				+ "public class CleanClass {\n"
+				+ "\n"
+				+ "	final LocalDate someLocalDate;\n"
+				+ "\n"
+				+ "	final LocalDateTime someLocalDateTime;\n"
+				+ "\n"
+				+ "	public CleanClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {\n"
+				+ "		super();\n"
+				+ "		this.someLocalDate = someLocalDate;\n"
+				+ "		this.someLocalDateTime = someLocalDateTime;\n"
+				+ "	}\n"
+				+ "}\n"
+				+ "";
+
+		ASTParser parser = ASTParser.newParser(AST.getJLSLatest());
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		parser.setSource(sourceCode.toCharArray());
+		parser.setResolveBindings(true);
+		CompilationUnit cUnit = (CompilationUnit) parser.createAST(null);
 	}
 }

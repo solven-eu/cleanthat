@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
@@ -45,9 +46,9 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
-	// @UnchangedMethod
-	@CompareMethods
-	public static class CaseDifferentType {
+	@UnchangedMethod
+	// @CompareMethods
+	public static class CaseDifferentType_noReAssigment {
 		public Object pre() {
 			List<?> i = new ArrayList<String>();
 			return i;
@@ -59,12 +60,25 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 		}
 	}
 
+	// If the variable type is replaced by var, it takes the initial type, which may not be compatible with further
+	// allocation
+	@UnchangedMethod
+	public static class CaseDifferentType_reAssigment {
+		public Object pre() {
+			List<?> i = new ArrayList<>();
+
+			i = ImmutableList.of();
+
+			return i;
+		}
+	}
+
 	// https://github.com/javaparser/javaparser/issues/3898
 	// @UnchangedMethod
 	@CompareMethods
 	public static class CaseAnonymous {
 		public Object pre() {
-			Map<String, Object> i = new HashMap<>() {
+			HashMap<String, Object> i = new HashMap<>() {
 				private static final long serialVersionUID = -7496095234003248150L;
 
 				{

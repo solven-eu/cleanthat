@@ -42,7 +42,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParse
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 
 /**
  * This is useful to investigate a misbehavior over current project file
@@ -56,7 +56,7 @@ public class ITGetType {
 	private static final String SOME_STATIC_CONSTANT = "magic";
 	private final String someConstant = "magic";
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ReferStaticFieldAsStatic {
 
 		public Object post(String lang) {
@@ -65,7 +65,7 @@ public class ITGetType {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ReferStaticFieldAsField {
 
 		public Object post(String lang) {
@@ -74,7 +74,7 @@ public class ITGetType {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ReferFieldAsField {
 
 		public Object post(String lang) {

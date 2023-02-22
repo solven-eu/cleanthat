@@ -15,12 +15,30 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import com.github.javaparser.ast.CompilationUnit;
+
 /**
- * Enable checking the 'post' method is not impacted by the rule.
+ * Used to check a {@link CompilationUnit} is unmodified, provided as Strings
  * 
  * @author Benoit Lacelle
  *
  */
-public @interface UnchangedMethod {
+@Target(ElementType.TYPE)
+// Runtime as this will be interpreted as Runtime to resolve `pre` and `post` (as concatenated Strings)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface UnmodifiedCompilationUnitAsString {
+	String pre();
 
+	/**
+	 * We keep a .post() to easily switch to {@link CompareCompilationUnitsAsStrings}
+	 * 
+	 * @return
+	 */
+	@Deprecated
+	String post();
 }

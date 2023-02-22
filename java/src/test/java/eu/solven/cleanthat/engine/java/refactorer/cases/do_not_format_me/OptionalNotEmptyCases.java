@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -40,21 +40,21 @@ public class OptionalNotEmptyCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseOnMap {
 		public Object pre(Map<?, ?> input) {
 			return !input.isEmpty();
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseOnHashMap {
 		public Object pre(HashMap<?, ?> input) {
 			return !input.isEmpty();
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseOnLambda {
 		public Object pre(List<Map<?, ?>> input) {
 			return input.stream().filter(m -> !m.isEmpty()).collect(Collectors.toList());

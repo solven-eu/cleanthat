@@ -32,7 +32,13 @@ Cleanthat Robot is currently compatible with the following languages:
 
 Cleanthat Refactorer is currently compatible with the following languages:
 
-- java
+- java (Cleanthat)
+- java (OpenRewrite)
+- java (Eclipse Cleanup)
+
+# Limitations
+
+- CleanThat processes files individually, which means limited `Type` resolution. This enables cleaning files on a per-impacted-file basis (e.g. in a Github Pull-Request).
 
 # Installation
 

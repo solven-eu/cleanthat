@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -15,7 +15,7 @@ public class StringToStringCases extends ARefactorerCases {
 		return new StringToString();
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseNotString {
 		public Object pre(Number o) {
 			return o.toString();
@@ -33,7 +33,7 @@ public class StringToStringCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseCharSequence {
 		public Object pre(CharSequence o) {
 			return o.toString();

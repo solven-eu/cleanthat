@@ -25,10 +25,11 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
@@ -46,14 +47,13 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
 
+	private static final ThreadLocal<TypeSolver> TL_TYPESOLVER = ThreadLocal.withInitial(() -> {
+		return JavaRefactorer.makeDefaultTypeSolver(false);
+	});
+
 	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
-		CombinedTypeSolver ts = new CombinedTypeSolver();
-
 		// We allow processing any type available to default classLoader
-		boolean jreOnly = false;
-
-		ts.add(new ReflectionTypeSolver(jreOnly));
-		return JavaParserFacade.get(ts);
+		return JavaParserFacade.get(TL_TYPESOLVER.get());
 	});
 
 	@Deprecated
@@ -74,8 +74,11 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 			try {
 				hasTransformed = processNotRecursively(node);
 			} catch (RuntimeException e) {
+				String rangeInSourceCode = "Around lines: " + node.getTokenRange().map(Object::toString).orElse("-");
 				String messageForIssueReporting = messageForIssueReporting(this, node);
-				throw new IllegalArgumentException("Issue with a cleanthat mutator. " + messageForIssueReporting, e);
+				throw new IllegalArgumentException(
+						"Issue with a cleanthat mutator. " + rangeInSourceCode + " " + messageForIssueReporting,
+						e);
 			}
 
 			if (hasTransformed) {
@@ -98,10 +101,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 			// to again 'a.equals(b)')
 			WARNS_IDEMPOTENCY_COUNT.incrementAndGet();
 			String messageForIssueReporting = messageForIssueReporting(this, node);
-			LOGGER.warn("Applying {} over {} is not idem-potent. It is a bug! {}",
-					this,
-					node,
-					messageForIssueReporting);
+			LOGGER.warn("A mutator is not idem-potent. {}", messageForIssueReporting);
 		}
 	}
 
@@ -111,7 +111,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 		String messageForIssueReporting = "Please report it to '" + "https://github.com/solven-eu/cleanthat/issues"
 				+ "' referring the faulty mutator: '"
 				+ mutator.getClass().getName()
-				+ "' with as testCase: \r\n\r\n"
+				+ " with as testCase: \r\n\r\n"
 				+ faultyCode;
 		return messageForIssueReporting;
 	}
@@ -137,13 +137,13 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 
-	protected Optional<ResolvedType> optResolvedType(Expression scope) {
-		ResolvedType calculateResolvedType;
+	// https://github.com/javaparser/javaparser/issues/1491
+	protected Optional<ResolvedType> optResolvedType(Expression expr) {
 		try {
-			calculateResolvedType = scope.calculateResolvedType();
+			return Optional.of(expr.calculateResolvedType());
 		} catch (RuntimeException e) {
 			try {
-				Optional<ResolvedType> fallbackType = Optional.of(getThreadJavaParser().getType(scope));
+				Optional<ResolvedType> fallbackType = Optional.of(getThreadJavaParser().getType(expr));
 				if (fallbackType.isPresent()) {
 					// TODO Is this related to code-modifications?
 					LOGGER.debug("1- Does this still happen? As of 2022-12: Yes!", e);
@@ -157,30 +157,44 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 			// https://github.com/javaparser/javaparser/issues/3504
 			LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
 					"https://github.com/javaparser/javaparser/issues/3504",
-					scope);
+					expr);
 			LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
 					"https://github.com/javaparser/javaparser/issues/3504",
-					scope,
+					expr,
 					e);
 
 			return Optional.empty();
 		}
-		try {
-			ResolvedType manualResolvedType = getThreadJavaParser().getType(scope);
+	}
 
-			if (!manualResolvedType.toString().equals(calculateResolvedType.toString())) {
-				throw new IllegalStateException(
-						manualResolvedType.toString() + " not equals to " + calculateResolvedType.toString());
-			}
-			// return Optional.of(calculateResolvedType);
-			return Optional.of(manualResolvedType);
+	protected Optional<ResolvedType> optResolvedType(Type type) {
+		try {
+			return Optional.of(type.resolve());
 		} catch (RuntimeException e) {
-			LOGGER.warn("2- Does this still happen? Yes!", e);
-			// This will happen often as, as of 2021-01, we solve types only given current class context,
-			// neither other classes of the project, nor its maven/gradle dependencies
-			// UnsolvedSymbolException
-			// https://github.com/javaparser/javaparser/issues/1491
-			LOGGER.debug("Issue with JavaParser: {} {}", e.getClass().getName(), e.getMessage());
+			try {
+				TypeSolver symbolSolver = TL_TYPESOLVER.get();
+				JavaSymbolSolver symbolResolver = new JavaSymbolSolver(symbolSolver);
+				Optional<ResolvedType> fallbackType =
+						Optional.of(symbolResolver.toResolvedType(type, ResolvedType.class));
+				if (fallbackType.isPresent()) {
+					// TODO Is this related to code-modifications?
+					LOGGER.debug("1- Does this still happen? As of ???: Yes!", e);
+				}
+				return fallbackType;
+			} catch (RuntimeException ee) {
+				LOGGER.info("Issue with JavaParser over {}", type, ee);
+				return Optional.empty();
+			}
+		} catch (NoClassDefFoundError e) {
+			// https://github.com/javaparser/javaparser/issues/3504
+			LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+					"https://github.com/javaparser/javaparser/issues/3504",
+					type);
+			LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+					"https://github.com/javaparser/javaparser/issues/3504",
+					type,
+					e);
+
 			return Optional.empty();
 		}
 	}

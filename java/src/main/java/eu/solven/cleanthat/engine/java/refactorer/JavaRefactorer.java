@@ -197,11 +197,17 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
-		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(new CombinedTypeSolver(reflectionTypeSolver));
+		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
+
 		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		JavaParser parser = new JavaParser(configuration);
 		return parser;
+	}
+
+	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		return reflectionTypeSolver;
 	}
 }

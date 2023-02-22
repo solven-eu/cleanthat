@@ -81,15 +81,20 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 		return singleVariableDeclaration.replace(newVariableDeclarator);
 	}
 
-	private boolean isReplaceableAssignement(Type type, Expression initializer) {
-		Optional<ResolvedType> optType = optResolvedType(initializer);
-
-		if (optType.isEmpty()) {
+	private boolean isReplaceableAssignement(Type variableType, Expression initializer) {
+		Optional<ResolvedType> optInitializerType = optResolvedType(initializer);
+		if (optInitializerType.isEmpty()) {
+			return false;
+		}
+		// TODO Would there be a way to get the mostly qualified type (i.e. based on imports, and no package if the type
+		// was actually coming from a wildcard import)
+		Optional<ResolvedType> optVariableType = optResolvedType(variableType);
+		if (optVariableType.isEmpty()) {
 			return false;
 		}
 
 		// If the variable was List but allocating an ArrayList, it means we can assign later any List
 		// `var` would forbid assigning anything but an ArrayLit
-		return optType.get().toDescriptor().equals(type.toDescriptor());
+		return optInitializerType.get().toDescriptor().equals(optVariableType.get().toDescriptor());
 	}
 }

@@ -29,14 +29,18 @@ import org.junit.runners.Parameterized;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
@@ -84,8 +88,8 @@ public abstract class AParameterizesRefactorerCases extends ATestCases {
 			doCompareTypes(transformer, testCase);
 		}
 
-		if (testCase.getAnnotationByClass(UnchangedMethod.class).isPresent()) {
-			doCheckUnchanged(transformer, testCase);
+		if (testCase.getAnnotationByClass(UnmodifiedMethod.class).isPresent()) {
+			doCheckUnmodified(transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareClasses.class).isPresent()) {
@@ -97,7 +101,47 @@ public abstract class AParameterizesRefactorerCases extends ATestCases {
 		}
 
 		if (testCase.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()) {
-			doCompareInnerClasses(javaParser, transformer, testCase);
+			doCompareInnerAnnotations(javaParser, transformer, testCase);
+		}
+
+		if (testCase.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()) {
+			doCompareMethodsAsStrings(javaParser, transformer, testCase);
+		}
+
+		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()) {
+			ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
+			// JavaParser does not print the '$' of nested qualified classname
+			// https://github.com/javaparser/javaparser/issues/1518
+			String qualifiedClassName =
+					resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
+			Class<?> realTestCase;
+			try {
+				realTestCase = Class.forName(qualifiedClassName);
+			} catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException("Issue with " + qualifiedClassName, e);
+			}
+			// This is useful to get fully resolved annotations (e.g. String concatenations)
+			CompareCompilationUnitsAsStrings realAnnotation =
+					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsStrings.class)[0];
+			doCompareCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
+		}
+
+		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
+			ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
+			// JavaParser does not print the '$' of nested qualified classname
+			// https://github.com/javaparser/javaparser/issues/1518
+			String qualifiedClassName =
+					resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
+			Class<?> realTestCase;
+			try {
+				realTestCase = Class.forName(qualifiedClassName);
+			} catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException("Issue with " + qualifiedClassName, e);
+			}
+			// This is useful to get fully resolved annotations (e.g. String concatenations)
+			UnmodifiedCompilationUnitAsString realAnnotation =
+					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
+			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
 		}
 	}
 

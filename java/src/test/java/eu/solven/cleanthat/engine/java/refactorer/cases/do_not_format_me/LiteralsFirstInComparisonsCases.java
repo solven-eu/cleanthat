@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -35,7 +35,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseConstantStringWithAnotherConstant {
 		public Object pre() {
 			return "hardcoded".equals("input");
@@ -69,7 +69,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseConstantCustom_constructor_bothsides {
 		private static final class SomeClass {
 
@@ -179,7 +179,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CasePMD_StringMethodNameButNotString {
 		private static class LikeString {
 			final String string;
@@ -232,14 +232,14 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CheckStartsWith_ConstantAfter {
 		public Object pre(String o) {
 			return o.startsWith(JsonFactory.FORMAT_NAME_JSON);
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ConstantIsIllNamedObjectField {
 		private static class LikeString {
 			public final String FORMAT_NAME_JSON = "someString";
@@ -289,7 +289,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CallsSuperEquals {
 
 		public Object pre(CallsSuperEquals o) {
@@ -306,7 +306,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class TwoUnknownVariable {
 
 		public Object pre(String o1, String o2) {
@@ -314,14 +314,14 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CompareVariableWithMethodCall {
 		public Object pre(String input, Object object) {
 			return input.equals(object.toString());
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CompareMethodCallWithVariable {
 		public Object pre(String input, Object object) {
 			return object.toString().equals(input);
@@ -330,7 +330,7 @@ public class LiteralsFirstInComparisonsCases extends ARefactorerCases {
 
 	private static final String EOL = System.lineSeparator();
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class HardcodedStringVsStatic {
 		public Object pre() {
 			return "\r\n".equals(EOL);

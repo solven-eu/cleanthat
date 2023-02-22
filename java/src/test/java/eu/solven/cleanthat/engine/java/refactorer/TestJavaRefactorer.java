@@ -33,6 +33,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
@@ -213,6 +214,20 @@ public class TestJavaRefactorer {
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded_butExplicitlyListed() {
 		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
+		customProperties.setIncluded(Arrays.asList(CustomDraftMutator.class.getName()));
+
+		List<IMutator> rules = JavaRefactorer.filterRules(engineProperties, customProperties);
+
+		Assertions.assertThat(rules)
+				.hasSize(1)
+				.map(c -> c.getClass().getName())
+				.contains(CustomDraftMutator.class.getName());
+	}
+
+	@Test
+	public void testIncludeRuleByClassName_draftRule_draftNotIncluded_butExplicitlyListedNextToComposite() {
+		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
+		customProperties.setIncludeDraft(false);
 		customProperties
 				.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName(), CustomDraftMutator.class.getName()));
 
@@ -255,6 +270,20 @@ public class TestJavaRefactorer {
 				true);
 
 		Assertions.assertThat(rules).isEmpty();
+	}
+
+	@Test
+	public void testIncludeRule_idInMultipleSingle() {
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
+				Collections.singletonList("RSPEC-2293"),
+				Collections.emptyList(),
+				true);
+
+		Assertions.assertThat(rules)
+				.hasSize(2)
+				.map(c -> c.getClass().getName())
+				.contains(UseDiamondOperator.class.getName())
+				.contains(UseDiamondOperatorJdk8.class.getName());
 	}
 
 }

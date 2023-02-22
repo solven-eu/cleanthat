@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,56 +31,37 @@ import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.NoOpJavaParserRule;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
 public class ATestCases {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
-
-	// @Deprecated
-	// protected void testCasesIn(ARefactorerCases cases) throws IOException {
-	// testCasesIn(cases.getClass(), cases.getTransformer());
-	// }
-
-	// protected void testCasesIn(Class<?> casesClass, IJavaparserMutator transformer) throws IOException {
-	// String path = LocalClassTestHelper.loadClassAsString(casesClass);
-	//
-	// JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-	// CompilationUnit compilationUnit = javaParser.parse(path).getResult().get();
-	//
-	// checkMethodCases(transformer, compilationUnit);
-	// checkMethodUnchangedCases(transformer, compilationUnit);
-	// checkTypeCases(transformer, compilationUnit);
-	// checkClasses(javaParser, transformer, compilationUnit);
-	// }
 
 	protected static List<ClassOrInterfaceDeclaration> getAllCases(CompilationUnit compilationUnit) {
 		return compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareTypes.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethods.class).isPresent()
 						|| c.getAnnotationByClass(CompareClasses.class).isPresent()
-						|| c.getAnnotationByClass(UnchangedMethod.class).isPresent()
-						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent());
-	}
-
-	private void checkMethodCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
-		List<ClassOrInterfaceDeclaration> methodCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
-				c -> c.getAnnotationByClass(CompareMethods.class).isPresent());
-		methodCases.forEach(oneCase -> {
-			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
-				return;
-			}
-			doTestMethod(transformer, oneCase);
-		});
+						|| c.getAnnotationByClass(UnmodifiedMethod.class).isPresent()
+						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent()
+						|| c.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()
+						|| c.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()
+						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
+						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent());
 	}
 
 	protected void doTestMethod(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
@@ -127,59 +107,34 @@ public class ATestCases {
 		}
 	}
 
-	private void checkMethodUnchangedCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
-		List<ClassOrInterfaceDeclaration> unchangedMethods = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
-				c -> c.getAnnotationByClass(UnchangedMethod.class).isPresent());
-		unchangedMethods.stream().forEach(oneCase -> {
-			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
-				return;
-			}
-			doCheckUnchanged(transformer, oneCase);
-		});
-	}
-
-	protected void doCheckUnchanged(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCheckUnmodified(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
 		LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration post = getMethodWithName(oneCase, "pre");
-		// Check the transformer is impact-less on already clean code
-		// This is a less relevant test: to be done later
-		{
-			LexicalPreservingPrinter.setup(post);
-
-			// https://github.com/javaparser/javaparser/issues/3322
-			// We prefer not-processing clones as it may lead to dirty issues
-			MethodDeclaration clonedPost = post.clone();
-			boolean walked = transformer.walkAstHasChanged(post);
-			if (transformer instanceof NoOpJavaParserRule) {
-				Assert.assertTrue("NoOpJavaParserRule is always walked", walked);
-			} else if (walked) {
-				post.setName("post");
-				Assert.assertFalse(
-						"Should not have mutated " + clonedPost
-								+ " but it turned into: "
-								+ post
-								+ ". The whole testcase is: "
-								+ oneCase,
-						walked);
-			}
-			Assert.assertEquals(clonedPost, post);
-			Assert.assertEquals(clonedPost.toString(), post.toString());
-
-			// https://github.com/javaparser/javaparser/issues/1913
-			Assert.assertEquals(LexicalPreservingPrinter.print(clonedPost).toString(),
-					LexicalPreservingPrinter.print(post).toString());
-		}
+		doCheckUnmodified(transformer, oneCase, post);
 	}
 
-	private void checkTypeCases(IJavaparserMutator transformer, CompilationUnit compilationUnit) {
-		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
-				c -> c.getAnnotationByClass(CompareTypes.class).isPresent());
-		typeCases.forEach(oneCase -> {
-			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
-				return;
-			}
-			doCompareTypes(transformer, oneCase);
-		});
+	protected void doCheckUnmodified(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase, Node pre) {
+		LexicalPreservingPrinter.setup(pre);
+		// https://github.com/javaparser/javaparser/issues/3322
+		// We prefer not-processing clones as it may lead to dirty issues
+		Node clonedPost = pre.clone();
+		boolean walked = transformer.walkAstHasChanged(pre);
+		if (transformer instanceof NoOpJavaParserRule) {
+			Assert.assertTrue("NoOpJavaParserRule is always walked", walked);
+		} else if (walked) {
+			Assert.assertFalse(
+					"Should not have mutated " + clonedPost
+							+ " but it turned into: "
+							+ pre
+							+ ". The whole testcase is: "
+							+ oneCase,
+					walked);
+		}
+		Assert.assertEquals(clonedPost, pre);
+		Assert.assertEquals(clonedPost.toString(), pre.toString());
+		// https://github.com/javaparser/javaparser/issues/1913
+		Assert.assertEquals(LexicalPreservingPrinter.print(clonedPost).toString(),
+				LexicalPreservingPrinter.print(pre).toString());
 	}
 
 	protected void doCompareTypes(IJavaparserMutator transformer, ClassOrInterfaceDeclaration oneCase) {
@@ -213,17 +168,6 @@ public class ATestCases {
 			transformer.walkAstHasChanged(postPost);
 			Assert.assertEquals(post, postPost);
 		}
-	}
-
-	private void checkClasses(JavaParser javaParser, IJavaparserMutator transformer, CompilationUnit compilationUnit) {
-		List<ClassOrInterfaceDeclaration> typeCases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
-				c -> c.getAnnotationByClass(CompareClasses.class).isPresent());
-		typeCases.forEach(oneCase -> {
-			if (oneCase.getAnnotationByClass(Ignore.class).isPresent()) {
-				return;
-			}
-			doCompareClasses(javaParser, transformer, oneCase);
-		});
 	}
 
 	protected void doCompareClasses(JavaParser javaParser,
@@ -287,6 +231,57 @@ public class ATestCases {
 		AnnotationDeclaration post = getAnnotationWithName(oneCase, "Post");
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
+	}
+
+	public void doCompareMethodsAsStrings(JavaParser javaParser,
+			IJavaparserMutator transformer,
+			ClassOrInterfaceDeclaration oneCase) {
+		LOGGER.info("Processing the case: {}", oneCase.getName());
+
+		NormalAnnotationExpr annotation =
+				oneCase.getAnnotationByClass(CompareMethodsAsStrings.class).get().asNormalAnnotationExpr();
+
+		StringLiteralExpr preExpr = annotation.getPairs()
+				.stream()
+				.filter(p -> p.getNameAsString().equals("pre"))
+				.findAny()
+				.get()
+				.getValue()
+				.asStringLiteralExpr();
+		MethodDeclaration pre = javaParser.parseMethodDeclaration(preExpr.getValue()).getResult().get();
+		StringLiteralExpr postExpr = annotation.getPairs()
+				.stream()
+				.filter(p -> p.getNameAsString().equals("post"))
+				.findAny()
+				.get()
+				.getValue()
+				.asStringLiteralExpr();
+		MethodDeclaration post = javaParser.parseMethodDeclaration(postExpr.getValue()).getResult().get();
+		doCompareExpectedChanges(transformer, oneCase, pre, post);
+	}
+
+	public void doCompareCompilationUnitsAsStrings(JavaParser javaParser,
+			IJavaparserMutator transformer,
+			ClassOrInterfaceDeclaration testCase,
+			CompareCompilationUnitsAsStrings annotation) {
+		LOGGER.info("Processing the case: {}", testCase.getName());
+
+		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
+		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
+		doCompareExpectedChanges(transformer,
+				testCase,
+				pre.getClassByName("SomeClass").get(),
+				post.getClassByName("SomeClass").get());
+	}
+
+	public void doCheckUnmodifiedCompilationUnitsAsStrings(JavaParser javaParser,
+			IJavaparserMutator transformer,
+			ClassOrInterfaceDeclaration testCase,
+			UnmodifiedCompilationUnitAsString annotation) {
+		LOGGER.info("Processing the case: {}", testCase.getName());
+
+		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
+		doCheckUnmodified(transformer, testCase, pre.getClassByName("SomeClass").get());
 	}
 
 	protected void doCompareClasses(IJavaparserMutator transformer, CompilationUnit pre, CompilationUnit post) {

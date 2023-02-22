@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -27,7 +27,7 @@ public class UseDiamondOperatorCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseAnonymousClass {
 
 		public Map<String, List<String>> post() {

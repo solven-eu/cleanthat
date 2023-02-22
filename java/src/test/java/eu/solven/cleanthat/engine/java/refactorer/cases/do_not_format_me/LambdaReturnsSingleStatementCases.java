@@ -8,7 +8,7 @@ import java.util.function.Function;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -63,7 +63,7 @@ public class LambdaReturnsSingleStatementCases extends ARefactorerCases {
 
 	// https://community.sonarsource.com/t/incorrect-inconsistent-sonar-squid-rule-regarding-lambdas-and-curly-braces-squid-s1602/17141/3
 	@Ignore("TODO This may require access to the classPath")
-	@UnchangedMethod
+	@UnmodifiedMethod
 	// @CompareMethods
 	public static class CaseConflictingMethods {
 		public interface SomeInterface {

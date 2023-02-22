@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LocalVariableTypeInferenceCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
-public class TestLocalVariableTypeInference extends AParameterizesRefactorerCases {
+public class TestLocalVariableTypeInferenceCases extends AParameterizesRefactorerCases {
 
 	private static ARefactorerCases getStaticRefactorerCases() {
 		return new LocalVariableTypeInferenceCases();
 	}
 
-	public TestLocalVariableTypeInference(JavaParser javaParser,
+	public TestLocalVariableTypeInferenceCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);

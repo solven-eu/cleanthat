@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -96,7 +96,7 @@ public class UnnecessaryFullyQualifiedNameCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class NotImportedType {
 		public Object pre(java.util.Map<?, ?> m) {
 			return m;

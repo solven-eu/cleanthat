@@ -63,7 +63,7 @@
 			<!-- https://github.com/spring-io/spring-javaformat -->
 			<groupId>io.spring.javaformat</groupId>
 			<artifactId>spring-javaformat-formatter</artifactId>
-			<version>0.0.35</version>
+			<version>0.0.38</version>
 		</dependency>
 
 		<dependency>

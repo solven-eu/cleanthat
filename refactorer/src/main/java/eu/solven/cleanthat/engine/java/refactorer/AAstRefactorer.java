@@ -70,6 +70,12 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		return mutators;
 	}
 
+	public static <AST, P> AST parse(AAstRefactorer<AST, P, ?, ?> refactorer, String sourceCode) {
+		P parser = refactorer.makeAstParser();
+
+		return refactorer.parseSourceCode(parser, sourceCode);
+	}
+
 	protected abstract P makeAstParser();
 
 	protected abstract AST parseSourceCode(P parser, String sourceCode);

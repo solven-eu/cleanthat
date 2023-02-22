@@ -20,10 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.javaparser.ast.CompilationUnit;
-
 /**
- * Used to check a {@link CompilationUnit} is unmodified, provided as Strings
+ * Used to compare 2 {@link CompilationUnit}, provided as Strings
  * 
  * @author Benoit Lacelle
  *
@@ -31,14 +29,8 @@ import com.github.javaparser.ast.CompilationUnit;
 @Target(ElementType.TYPE)
 // Runtime as this will be interpreted as Runtime to resolve `pre` and `post` (as concatenated Strings)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UnmodifiedCompilationUnitAsString {
+public @interface CompareCompilationUnitsAsStrings {
 	String pre();
 
-	/**
-	 * We keep a .post() to easily switch to {@link CompareCompilationUnitsAsStrings}
-	 * 
-	 * @return
-	 */
-	@Deprecated
 	String post();
 }

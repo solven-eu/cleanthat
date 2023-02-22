@@ -154,17 +154,21 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			// https://github.com/javaparser/javaparser/issues/3504
-			LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-					"https://github.com/javaparser/javaparser/issues/3504",
-					expr);
-			LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-					"https://github.com/javaparser/javaparser/issues/3504",
-					expr,
-					e);
+			logNoClassDefFoundResolvingType(expr, e);
 
 			return Optional.empty();
 		}
+	}
+
+	private void logNoClassDefFoundResolvingType(Object o, NoClassDefFoundError e) {
+		// https://github.com/javaparser/javaparser/issues/3504
+		LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+				"https://github.com/javaparser/javaparser/issues/3504",
+				o);
+		LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
+				"https://github.com/javaparser/javaparser/issues/3504",
+				o,
+				e);
 	}
 
 	protected Optional<ResolvedType> optResolvedType(Type type) {
@@ -186,14 +190,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			// https://github.com/javaparser/javaparser/issues/3504
-			LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-					"https://github.com/javaparser/javaparser/issues/3504",
-					type);
-			LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-					"https://github.com/javaparser/javaparser/issues/3504",
-					type,
-					e);
+			logNoClassDefFoundResolvingType(type, e);
 
 			return Optional.empty();
 		}

@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.test;
+package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
-import com.github.javaparser.ast.Node;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+/**
+ * Used to compare 2 {@link MethodDeclaration}, provided as Strings. Beware, the lack of `import XXX` will break most
+ * type resolutions.
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+@Target(ElementType.TYPE)
+public @interface CompareMethodsAsStrings {
+	String pre();
 
-public abstract class ARefactorerCases extends AParentRefactorerCases<Node, Node, IJavaparserMutator> {
-
+	String post();
 }

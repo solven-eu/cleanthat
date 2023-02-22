@@ -24,6 +24,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 public interface ICleanthatStepParametersProperties {
+	/**
+	 * This is the identifier of the default mutators to be safely applied to most project
+	 */
+	// BEWARE This is specific to JavaRefactorerProperties
+	String SAFE_AND_CONSENSUAL = "SafeAndConsensual";
 
 	@JsonIgnore
 	Object getCustomProperty(String key);

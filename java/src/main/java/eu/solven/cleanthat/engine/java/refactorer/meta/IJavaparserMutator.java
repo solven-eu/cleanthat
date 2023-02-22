@@ -22,12 +22,6 @@ import com.github.javaparser.ast.Node;
  *
  * @author Benoit Lacelle
  */
-public interface IJavaparserMutator extends IMutator {
-	/**
-	 * 
-	 * @param pre
-	 * @return true if the AST has been modified.
-	 */
-	boolean walkNode(Node pre);
+public interface IJavaparserMutator extends IWalkableMutator<Node, Node> {
 
 }

@@ -28,8 +28,15 @@
 
 	<dependencies>
 		<dependency>
+			<!-- Enable OpenRewrite as a ILintFixer -->
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>code-cleaners</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<!-- Enable OpenRewrite as an IMutator -->
+			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>refactorer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

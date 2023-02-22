@@ -16,15 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
@@ -39,6 +35,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -46,11 +43,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
-import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.IEngineProperties;
 
@@ -61,7 +54,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRefactorer implements ILintFixerWithId {
+public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
 	public static final String ID_REFACTORER = "refactorer";
@@ -69,154 +62,23 @@ public class JavaRefactorer implements ILintFixerWithId {
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
 
-	private final List<IJavaparserMutator> mutators;
-
 	public static final Set<String> getAllIncluded() {
 		return new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
 	}
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
-		this.engineProperties = engineProperties;
-		this.refactorerProperties = properties;
-
-		this.mutators = filterRules(engineProperties, properties).stream()
+		super(filterRules(engineProperties, properties).stream()
 				.filter(c -> IJavaparserMutator.class.isAssignableFrom(c.getClass()))
 				.map(IJavaparserMutator.class::cast)
-				.collect(Collectors.toList());
+				.collect(Collectors.toList()));
 
-		this.mutators.forEach(ct -> {
-			LOGGER.debug("Using transformer: {}", ct.getIds());
-		});
-	}
-
-	public static List<IMutator> filterRules(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
-		JavaVersion engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
-
-		List<String> includedRules = properties.getIncluded();
-		List<String> excludedRules = properties.getExcluded();
-		boolean includeDraft = properties.isIncludeDraft();
-
-		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
-		return filterRules(engineVersion, includedRules, excludedRules, includeDraft);
-	}
-
-	public static List<IMutator> filterRules(JavaVersion sourceCodeVersion,
-			List<String> includedRules,
-			List<String> excludedRules,
-			boolean includeDraft) {
-
-		List<IMutator> allSingleMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
-		List<IMutator> allCompositeMutators =
-				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
-
-		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
-			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
-				// We suppose there is no mutator from Composite which is not a single mutator
-				// Hence we return all single mutators
-				return allSingleMutators.stream();
-			} else {
-				List<IMutator> matchingMutators =
-						Stream.concat(allSingleMutators.stream(), allCompositeMutators.stream())
-								.filter(someMutator -> someMutator.getIds().contains(includedRule)
-										|| someMutator.getClass().getName().equals(includedRule))
-								.collect(Collectors.toList());
-
-				if (!matchingMutators.isEmpty()) {
-					return matchingMutators.stream();
-				}
-
-				Optional<IMutator> optFromClassName = loadMutatorFromClass(sourceCodeVersion, includedRule);
-
-				if (optFromClassName.isPresent()) {
-					return optFromClassName.stream();
-				}
-
-				LOGGER.warn("includedMutator={} did not match any mutator", includedRule);
-				return Stream.empty();
-			}
-		}).collect(Collectors.toList());
-
-		// We unroll composite to enable exclusion of included mutators
-		List<IMutator> mutatorsNotComposite = unrollCompositeMutators(mutatorsMayComposite);
-
-		// TODO '.distinct()' to handle multiple composites bringing the same mutator
-		return mutatorsNotComposite.stream().filter(mutator -> {
-			boolean isExcluded = excludedRules.contains(mutator.getClass().getName())
-					|| excludedRules.stream().anyMatch(excludedRule -> mutator.getIds().contains(excludedRule));
-
-			// debug as it seems Spotless instantiate this quite often / for each file
-			if (isExcluded) {
-				LOGGER.debug("We exclude '{}'", mutator.getIds());
-			} else {
-				LOGGER.debug("We include '{}'", mutator.getIds());
-			}
-
-			return !isExcluded;
-		}).filter(ct -> {
-			if (includeDraft) {
-				return true;
-			} else if (mutatorsMayComposite.contains(ct)) {
-				LOGGER.debug("Draft are not included by default but {} was listed explicitely", ct.getIds());
-				return true;
-			} else {
-				return !ct.isDraft();
-			}
-		}).collect(Collectors.toList());
-
-	}
-
-	private static Optional<IMutator> loadMutatorFromClass(JavaVersion sourceCodeVersion, String includedRule) {
-		try {
-			// https://www.baeldung.com/java-check-class-exists
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			Class<? extends IMutator> mutatorClass =
-					(Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
-
-			IMutator mutator;
-			if (CompositeMutator.class.isAssignableFrom(mutatorClass)) {
-				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor(JavaVersion.class);
-				mutator = ctor.newInstance(sourceCodeVersion);
-			} else {
-				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
-				mutator = ctor.newInstance();
-			}
-
-			return Optional.of(mutator);
-		} catch (ClassNotFoundException e) {
-			LOGGER.debug("includedMutator {} is not present classname", includedRule, e);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalArgumentException("Unexpected constructor for includedMutator=" + includedRule, e);
-		} catch (InstantiationException e) {
-			throw new IllegalArgumentException("Invalid class for includedMutator=" + includedRule, e);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalArgumentException("Issue instanciating includedMutator=" + includedRule, e);
-		}
-		return Optional.empty();
-	}
-
-	private static List<IMutator> unrollCompositeMutators(List<IMutator> mutatorsMayComposite) {
-		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
-
-		// Iterate until all CompositeMutators has been unrolled
-		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
-			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
-				if (m instanceof CompositeMutator) {
-					return ((CompositeMutator<?>) m).getUnderlyings().stream();
-				} else {
-					return Stream.<IMutator>of(m);
-				}
-			}).collect(Collectors.toList());
-		}
-		return mutatorsNotComposite;
+		this.engineProperties = engineProperties;
+		this.refactorerProperties = properties;
 	}
 
 	@Override
 	public String getId() {
 		return ID_REFACTORER;
-	}
-
-	public Set<String> getMutators() {
-		return mutators.stream().flatMap(m -> m.getIds().stream()).sorted().collect(Collectors.toSet());
 	}
 
 	@Override
@@ -226,52 +88,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);
 	}
 
-	private String applyTransformers(String dirtyCode) {
-		AtomicReference<String> refCleanCode = new AtomicReference<>(dirtyCode);
-
-		// Ensure we compute the compilation-unit only once per String
-		AtomicReference<CompilationUnit> optCompilationUnit = new AtomicReference<>();
-
-		JavaParser parser = makeJavaParser();
-
-		mutators.forEach(ct -> {
-			LOGGER.debug("Applying {}", ct);
-
-			// Fill cache
-			if (optCompilationUnit.get() == null) {
-				try {
-					String sourceCode = refCleanCode.get();
-					CompilationUnit compilationUnit = parseRawCode(parser, sourceCode);
-					optCompilationUnit.set(compilationUnit);
-				} catch (RuntimeException e) {
-					throw new RuntimeException("Issue parsing the code", e);
-				}
-			}
-
-			CompilationUnit compilationUnit = optCompilationUnit.get();
-			boolean walkNodeResult;
-			try {
-				walkNodeResult = ct.walkNode(compilationUnit);
-			} catch (RuntimeException e) {
-				throw new IllegalArgumentException("Issue with classTransformer: " + ct, e);
-			}
-			if (walkNodeResult) {
-				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
-				// or removing consecutive EOL
-				// We rely on javaParser source-code only if the rule has actually impacted the AST
-				LOGGER.debug("A rule based on JavaParser actually modified the code");
-
-				// One relevant change: building source-code from the AST
-				refCleanCode.set(toString(compilationUnit));
-
-				// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits
-				optCompilationUnit.set(null);
-			}
-		});
-		return refCleanCode.get();
-	}
-
-	public CompilationUnit parseRawCode(JavaParser parser, String sourceCode) {
+	@Override
+	public CompilationUnit parseSourceCode(JavaParser parser, String sourceCode) {
 		ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
 		CompilationUnit compilationUnit = parsed.getResult().get();
 
@@ -281,7 +99,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 		return compilationUnit;
 	}
 
-	public JavaParser makeJavaParser() {
+	@Override
+	protected JavaParser makeAstParser() {
 		// TODO Adjust this flag depending on filtered rules
 		boolean isJreOnly = false;
 		JavaParser parser = makeDefaultJavaParser(isJreOnly);
@@ -372,7 +191,8 @@ public class JavaRefactorer implements ILintFixerWithId {
 		}
 	}
 
-	protected String toString(CompilationUnit compilationUnit) {
+	@Override
+	protected String toString(Node compilationUnit) {
 		return LexicalPreservingPrinter.print(compilationUnit);
 	}
 

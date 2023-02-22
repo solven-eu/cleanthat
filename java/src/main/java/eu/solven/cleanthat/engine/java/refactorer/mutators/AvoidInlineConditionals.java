@@ -38,7 +38,6 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -47,7 +46,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  *
  */
-public class AvoidInlineConditionals extends AJavaParserMutator implements IMutator {
+public class AvoidInlineConditionals extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
 	// Stream exists since 8

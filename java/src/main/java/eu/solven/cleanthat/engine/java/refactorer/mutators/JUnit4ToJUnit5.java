@@ -41,7 +41,6 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -53,7 +52,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
 // https://docs.openrewrite.org/running-recipes/popular-recipe-guides/migrate-from-junit-4-to-junit-5
-public class JUnit4ToJUnit5 extends AJavaParserMutator implements IMutator {
+public class JUnit4ToJUnit5 extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
 
 	// Duplicated from com.github.javaparser.ast.CompilationUnit.JAVA_LANG
@@ -88,10 +87,10 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator implements IMutator {
 	}
 
 	@Override
-	public boolean walkNode(Node tree) {
+	public boolean walkAstHasChanged(Node tree) {
 		AtomicBoolean transformed = new AtomicBoolean(false);
 
-		if (super.walkNode(tree)) {
+		if (super.walkAstHasChanged(tree)) {
 			transformed.set(true);
 		}
 

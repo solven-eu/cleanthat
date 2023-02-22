@@ -31,15 +31,13 @@ import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * Order modifiers according the the Java specification.
  *
  * @author Benoit Lacelle
  */
-public class ModifierOrder extends AJavaParserMutator implements IMutator, IRuleExternalReferences {
+public class ModifierOrder extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",

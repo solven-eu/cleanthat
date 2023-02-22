@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.test;
+package eu.solven.cleanthat.engine.java.refactorer.meta;
+
+import java.util.Optional;
 
 /**
- * This is a marker interface for cases which must have one and only-one 'pre'. The test will verify the rule does not
- * impact the pre method.
- * 
- * @author Benoit Lacelle
+ * For classes knowing how to modify code
  *
+ * @author Benoit Lacelle
  */
-public interface IUnchangedCaseOverMethod {
+@SuppressWarnings("PMD.GenericsNaming")
+public interface IWalkableMutator<AST, R> extends IMutator {
 
+	@Deprecated(since = "Useful for simplified unitTests")
+	default boolean walkAstHasChanged(AST pre) {
+		return walkAst(pre).isPresent();
+	}
+
+	Optional<R> walkAst(AST pre);
 }

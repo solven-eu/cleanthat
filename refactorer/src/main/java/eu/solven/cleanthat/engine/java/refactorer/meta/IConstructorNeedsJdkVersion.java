@@ -13,8 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.test;
+package eu.solven.cleanthat.engine.java.refactorer.meta;
 
-public interface ICaseOverClass {
+/**
+ * For {@link IMutator} with behavior depending on source JDK version (e.g. CompositeMutator, or mutator with additional
+ * rules with later IJdkVersion like {@link UseDiamondOperator})
+ *
+ * @author Benoit Lacelle
+ */
+public interface IConstructorNeedsJdkVersion {
 
 }

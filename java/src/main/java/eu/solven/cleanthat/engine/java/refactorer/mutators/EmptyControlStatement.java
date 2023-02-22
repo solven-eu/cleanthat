@@ -26,7 +26,6 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -35,7 +34,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/blob/main/rewrite-java/src/main/java/org/openrewrite/java/cleanup/EmptyBlockVisitor.java
-public class EmptyControlStatement extends AJavaParserMutator implements IMutator {
+public class EmptyControlStatement extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmptyControlStatement.class);
 
 	@Override

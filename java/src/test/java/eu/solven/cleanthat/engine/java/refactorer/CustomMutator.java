@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.Node;
@@ -41,8 +42,8 @@ public class CustomMutator implements IJavaparserMutator {
 	}
 
 	@Override
-	public boolean walkNode(Node pre) {
-		return false;
+	public Optional<Node> walkAst(Node pre) {
+		return Optional.empty();
 	}
 
 }

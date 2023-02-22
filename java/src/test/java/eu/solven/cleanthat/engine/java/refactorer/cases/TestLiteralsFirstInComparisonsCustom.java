@@ -46,7 +46,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkNode(compilationUnit);
+		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 	}
@@ -62,7 +62,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkNode(compilationUnit);
+		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isFalse();
 	}
@@ -77,7 +77,7 @@ public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkNode(compilationUnit);
+		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isFalse();
 	}

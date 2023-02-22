@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import lombok.Data;
 
 /**
@@ -45,14 +44,9 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	public static final String WILDCARD = "*";
 
 	/**
-	 * This is the identifier of the default mutators to be safely applied to most project
-	 */
-	public static final String SAFE_AND_CONSENSUAL = "SafeAndConsensual";
-
-	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */
-	private List<String> included = List.of(SafeAndConsensualMutators.class.getName());
+	private List<String> included = List.of(SAFE_AND_CONSENSUAL);
 
 	/**
 	 * A {@link List} of excluded rules (by ID)

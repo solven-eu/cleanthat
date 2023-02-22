@@ -83,7 +83,7 @@ public class TestCreateTempFilesUsingNio extends AParameterizesRefactorerCases {
 			{
 				compilationUnit.getImports()
 						.removeIf(im -> new ImportDeclaration("java.nio.file.Files", false, false).equals(im));
-				transformer.walkNode(pre);
+				transformer.walkAstHasChanged(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");
 				Assert.assertTrue(compilationUnit.getImports()

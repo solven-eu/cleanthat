@@ -80,5 +80,4 @@ public interface IMutator extends IRuleExternalReferences {
 		// default is true so mutators are by default excluded. This is a safety mechanism.
 		return true;
 	}
-
 }

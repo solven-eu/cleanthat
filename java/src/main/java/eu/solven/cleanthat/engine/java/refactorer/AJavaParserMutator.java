@@ -67,7 +67,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 	}
 
 	@Override
-	public boolean walkNode(Node tree) {
+	public Optional<Node> walkAst(Node tree) {
 		AtomicBoolean transformed = new AtomicBoolean();
 		tree.walk(node -> {
 			boolean hasTransformed;
@@ -83,7 +83,11 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 				transformed.set(true);
 			}
 		});
-		return transformed.get();
+		if (transformed.get()) {
+			return Optional.of(tree);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	private void idempotencySanityCheck(Node node) {

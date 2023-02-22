@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
@@ -48,7 +49,7 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private static final List<String> DEFAULT_MUTATORS =
-			ImmutableList.<String>builder().add("SafeAndConsensualMutators").build();
+			ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL).build();
 
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 

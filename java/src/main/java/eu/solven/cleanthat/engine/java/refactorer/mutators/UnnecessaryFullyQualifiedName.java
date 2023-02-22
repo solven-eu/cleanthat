@@ -30,7 +30,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -38,7 +37,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryFullyQualifiedName extends AJavaParserMutator implements IMutator {
+public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
 	@Override

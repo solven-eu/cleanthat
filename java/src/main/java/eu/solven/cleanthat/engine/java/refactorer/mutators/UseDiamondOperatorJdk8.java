@@ -19,7 +19,6 @@ import java.util.Optional;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8
@@ -27,7 +26,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  */
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperatorJdk8 extends ATodoJavaParserMutator implements IMutator {
+public class UseDiamondOperatorJdk8 extends ATodoJavaParserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;

@@ -65,11 +65,11 @@ public class ITTestLocalFile {
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), new JavaRefactorerProperties());
 
 		CompilationUnit compilationUnit =
-				rulesJavaMutator.parseRawCode(rulesJavaMutator.makeJavaParser(), pathAsString);
+				rulesJavaMutator.parseSourceCode(JavaRefactorer.makeDefaultJavaParser(false), pathAsString);
 
 		// TODO Refactor to rely on RulesJavaMutator
 		IJavaparserMutator rule = new LiteralsFirstInComparisons();
-		boolean changed = rule.walkNode(compilationUnit);
+		boolean changed = rule.walkAstHasChanged(compilationUnit);
 
 		if (!changed) {
 			throw new IllegalArgumentException(rule + " did not change: " + file.getAbsolutePath());

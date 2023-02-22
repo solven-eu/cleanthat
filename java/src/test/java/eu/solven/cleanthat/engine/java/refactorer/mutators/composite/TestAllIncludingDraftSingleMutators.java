@@ -22,9 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
-public class TestAllIncludingDraftCompositeMutators {
+public class TestAllIncludingDraftSingleMutators {
 
 	@Before
 	@After
@@ -34,23 +35,17 @@ public class TestAllIncludingDraftCompositeMutators {
 
 	@Test
 	public void testScanComposite() {
-		Assertions.assertThat(AllIncludingDraftCompositeMutators.ALL_INCLUDINGDRAFT.get())
+		Assertions.assertThat(AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get())
 				.map(m -> m.getName())
-				.contains(PMDMutators.class.getName())
-				.contains(AllIncludingDraftSingleMutators.class.getName())
-				.contains(SafeAndConsensualMutators.class.getName())
-				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName());
+				.contains(LiteralsFirstInComparisons.class.getName());
 	}
 
 	@Test
 	public void testInstantiateManually() {
-		var mutator = new AllIncludingDraftCompositeMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
+		var mutator = new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
 
 		Assertions.assertThat(mutator.getUnderlyings())
 				.map(m -> m.getClass().getName())
-				.contains(PMDMutators.class.getName())
-				.contains(AllIncludingDraftSingleMutators.class.getName())
-				.contains(SafeAndConsensualMutators.class.getName())
-				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName());
+				.contains(LiteralsFirstInComparisons.class.getName());
 	}
 }

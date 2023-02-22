@@ -44,6 +44,21 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 			return i;
 		}
 	}
+	
+	@CompareMethods
+	public static class CaseLoop {
+		public void pre() {
+			for (int i = 0 ; i < 10 ; i++) {
+				System.out.println(i);
+			}
+		}
+
+		public void post() {
+			for (var i = 0 ; i < 10 ; i++) {
+				System.out.println(i);
+			}
+		}
+	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
 	@UnchangedMethod

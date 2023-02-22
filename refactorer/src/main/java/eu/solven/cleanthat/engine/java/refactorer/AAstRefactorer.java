@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkableMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
@@ -46,7 +47,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 @SuppressWarnings("PMD.GenericsNaming")
-public abstract class AAstRefactorer<AST, P, R, M extends IWalkableMutator<AST, R>> implements ILintFixerWithId {
+public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R>> implements ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
 
@@ -159,7 +160,14 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkableMutator<AST, 
 					return optFromClassName.stream();
 				}
 
-				LOGGER.warn("includedMutator={} did not match any mutator", includedRule);
+				LOGGER.warn("includedMutator={} did not match any mutator. singleIds={} compositeIds={}",
+						includedRule,
+						allSingleMutators.stream()
+								.flatMap(m -> m.getIds().stream())
+								.collect(Collectors.toCollection(TreeSet::new)),
+						allCompositeMutators.stream()
+								.flatMap(m -> m.getIds().stream())
+								.collect(Collectors.toCollection(TreeSet::new)));
 				return Stream.empty();
 			}
 		}).collect(Collectors.toList());

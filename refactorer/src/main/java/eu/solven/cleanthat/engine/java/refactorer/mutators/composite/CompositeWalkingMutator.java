@@ -15,13 +15,14 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkableMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
 /**
  * This mutator make it easy to composite multiple {@link IMutator}s in a single one.
@@ -32,17 +33,21 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkableMutator;
  *
  */
 @SuppressWarnings("PMD.GenericsNaming")
-public class CompositeWalkableMutator<AST> extends CompositeMutator<IWalkableMutator<AST, AST>>
-		implements IWalkableMutator<AST, AST> {
+public class CompositeWalkingMutator<AST> extends CompositeMutator<IWalkingMutator<AST, AST>>
+		implements IWalkingMutator<AST, AST> {
 
-	protected CompositeWalkableMutator(List<IWalkableMutator<AST, AST>> mutators) {
+	public CompositeWalkingMutator() {
+		this(Arrays.asList());
+	}
+
+	protected CompositeWalkingMutator(List<IWalkingMutator<AST, AST>> mutators) {
 		super(ImmutableList.copyOf(mutators));
 	}
 
 	@Override
 	public Optional<AST> walkAst(AST pre) {
 
-		for (IWalkableMutator<AST, AST> mutator : mutators) {
+		for (IWalkingMutator<AST, AST> mutator : mutators) {
 			pre = mutator.walkAst(pre).orElse(pre);
 		}
 

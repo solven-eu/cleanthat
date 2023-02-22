@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GenericsNaming")
-public interface IWalkableMutator<AST, R> extends IMutator {
+public interface IWalkingMutator<AST, R> extends IMutator {
 
 	@Deprecated(since = "Useful for simplified unitTests")
 	default boolean walkAstHasChanged(AST pre) {

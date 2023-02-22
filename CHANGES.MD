@@ -3,6 +3,13 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
+
+## [2.6] - 2023-02-22
+### Changes
+* Add empty constructor in `CompositeWalkableMutator`
+* `CompositeMutator.getIds()` do not return underlying identifiers anymore
+
+## [2.5] - 2023-02-22
 ### Fixed
 * Invalid reports of any IMutators as not being idempotent
 * `CreateTempFilesUsingNioCases` now handle a null directory

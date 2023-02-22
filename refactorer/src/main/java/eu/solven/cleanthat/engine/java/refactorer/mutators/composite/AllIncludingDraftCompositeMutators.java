@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -45,9 +46,6 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<IMutato
 					.stream()
 					// Exclude itself
 					.filter(m -> !m.equals(AllIncludingDraftCompositeMutators.class))
-					// CompositeMutator is not a real. Maybe it should be abstract but it could be used it is stands
-					// (e.g. in UnitTests)
-					.filter(m -> !m.equals(CompositeMutator.class))
 
 					// Sort by className, to always apply mutators in the same order
 					.sorted(Comparator.comparing(m -> m.getClass().getName()))
@@ -57,4 +55,9 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<IMutato
 		super(filterWithJdk(sourceJdkVersion, MutatorsScanner.instantiate(sourceJdkVersion, ALL_INCLUDINGDRAFT.get())));
 	}
 
+	@Override
+	public Optional<String> getCleanthatId() {
+		// BEWARE this name is quite long, as not expected to be used by Users
+		return Optional.of(this.getClass().getName());
+	}
 }

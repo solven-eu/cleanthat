@@ -63,7 +63,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	private final JavaRefactorerProperties refactorerProperties;
 
 	public static final Set<String> getAllIncluded() {
-		return new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getIds();
+		return new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyingIds();
 	}
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {

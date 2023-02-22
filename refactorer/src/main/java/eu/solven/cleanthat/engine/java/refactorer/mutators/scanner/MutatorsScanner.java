@@ -17,18 +17,21 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators.scanner;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.reflect.ClassPath;
 
 import eu.solven.cleanthat.config.GitService;
@@ -45,11 +48,23 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public class MutatorsScanner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
+	private static final AtomicInteger ERROR_COUNTS = new AtomicInteger();
+
+	/**
+	 * 
+	 * @return the number of ERRORS which has been logged without failing the process.
+	 */
+	@VisibleForTesting
+	public static int getErrorCount() {
+		return ERROR_COUNTS.get();
+	}
+
 	public List<Class<? extends IMutator>> getPackageMutatorClasses(String packageName) {
 		Set<String> classNames;
 		try {
 			classNames = getClasses(packageName);
 		} catch (ClassNotFoundException | IOException e) {
+			ERROR_COUNTS.incrementAndGet();
 			LOGGER.error("Issue loading mutators from {}", packageName, e);
 			return Collections.emptyList();
 		}
@@ -64,11 +79,13 @@ public class MutatorsScanner {
 			try {
 				return Class.forName(s);
 			} catch (ClassNotFoundException e) {
+				ERROR_COUNTS.incrementAndGet();
 				LOGGER.error("Issue with {}", s, e);
 				return null;
 			}
 		})
 				.filter(c -> IMutator.class.isAssignableFrom(c))
+				.filter(c -> !Modifier.isAbstract(c.getModifiers()))
 				.map(c -> (Class<? extends IMutator>) c.asSubclass(IMutator.class))
 				.collect(Collectors.toList());
 		return classes;
@@ -95,6 +112,7 @@ public class MutatorsScanner {
 				return mutatorClass.getConstructor().newInstance();
 			}
 		} catch (ReflectiveOperationException e) {
+			ERROR_COUNTS.incrementAndGet();
 			LOGGER.error("Issue with {}", mutatorClass, e);
 			return null;
 		}

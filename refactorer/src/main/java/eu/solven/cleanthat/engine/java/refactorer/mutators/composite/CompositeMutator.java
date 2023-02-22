@@ -15,7 +15,9 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -38,16 +40,25 @@ public class CompositeMutator<T extends IMutator> implements IMutator {
 
 	final List<T> mutators;
 
+	public CompositeMutator() {
+		this(Arrays.asList());
+	}
+
 	protected CompositeMutator(List<T> mutators) {
 		this.mutators = ImmutableList.copyOf(mutators);
+	}
+
+	@Override
+	public Optional<String> getCleanthatId() {
+		// BEWARE this name is quite long, as not expected to be used by Users
+		return Optional.of(this.getClass().getName());
 	}
 
 	public List<T> getUnderlyings() {
 		return mutators;
 	}
 
-	@Override
-	public Set<String> getIds() {
+	public Set<String> getUnderlyingIds() {
 		return mutators.stream()
 				.flatMap(ct -> ct.getIds().stream())
 				.sorted()

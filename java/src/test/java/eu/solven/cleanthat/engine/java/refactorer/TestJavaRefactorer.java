@@ -37,6 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
 public class TestJavaRefactorer {
@@ -222,6 +223,38 @@ public class TestJavaRefactorer {
 				.map(c -> c.getClass().getName())
 				.contains(CustomMutator.class.getName())
 				.contains(CustomDraftMutator.class.getName());
+	}
+
+	@Test
+	public void testIncludeRule_compositeMutator() {
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
+				Collections.singletonList(JavaRefactorerProperties.SAFE_AND_CONSENSUAL),
+				Collections.emptyList(),
+				true);
+
+		// The list will grow through time
+		Assertions.assertThat(rules).hasSizeGreaterThan(6);
+	}
+
+	@Test
+	public void testIncludeRule_ruleInSafeAndConsensual() {
+		String idInSafeAndConsensual = SafeAndConsensualMutators.SAFE_AND_CONSENSUAL.get(0).getIds().iterator().next();
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
+				Collections.singletonList(idInSafeAndConsensual),
+				Collections.emptyList(),
+				true);
+
+		Assertions.assertThat(rules).hasSize(1);
+	}
+
+	@Test
+	public void testIncludeRule_unknownRule() {
+		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
+				Collections.singletonList("UnknownId"),
+				Collections.emptyList(),
+				true);
+
+		Assertions.assertThat(rules).isEmpty();
 	}
 
 }

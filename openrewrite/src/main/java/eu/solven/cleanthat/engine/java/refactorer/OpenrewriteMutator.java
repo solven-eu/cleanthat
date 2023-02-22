@@ -28,7 +28,7 @@ import org.openrewrite.java.tree.J.CompilationUnit;
 import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkableMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
 /**
  * A {@link IMutator} configuring over an OpenRewrite {@link Recipe}
@@ -36,7 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkableMutator;
  * @author Benoit Lacelle
  *
  */
-public class OpenrewriteMutator implements IWalkableMutator<J.CompilationUnit, Result> {
+public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Result> {
 	final Recipe recipe;
 
 	public OpenrewriteMutator(Recipe recipe) {

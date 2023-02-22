@@ -34,7 +34,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/blob/main/rewrite-java/src/main/java/org/openrewrite/java/cleanup/EmptyBlockVisitor.java
-public class EmptyControlStatement extends AJavaParserMutator  {
+public class EmptyControlStatement extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmptyControlStatement.class);
 
 	@Override

@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer;
 import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
 
 /**
  * This {@link AJavaParserMutator} does not modify the AST, but always report it as changed. It can be useful to

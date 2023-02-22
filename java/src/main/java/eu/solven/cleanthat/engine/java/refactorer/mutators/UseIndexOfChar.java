@@ -35,7 +35,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIndexOfChar extends AJavaParserMutator  {
+public class UseIndexOfChar extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);
 
 	@Override

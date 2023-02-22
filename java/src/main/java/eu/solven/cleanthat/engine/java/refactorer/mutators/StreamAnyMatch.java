@@ -35,7 +35,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class StreamAnyMatch extends AJavaParserMutator  {
+public class StreamAnyMatch extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
 
 	private static final String METHOD_FILTER = "filter";

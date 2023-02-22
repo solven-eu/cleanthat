@@ -46,7 +46,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  *
  */
-public class AvoidInlineConditionals extends AJavaParserMutator  {
+public class AvoidInlineConditionals extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
 	// Stream exists since 8

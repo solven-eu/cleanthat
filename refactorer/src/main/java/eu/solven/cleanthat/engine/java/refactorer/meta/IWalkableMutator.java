@@ -22,11 +22,13 @@ import java.util.Optional;
  *
  * @author Benoit Lacelle
  */
+@SuppressWarnings("PMD.GenericsNaming")
 public interface IWalkableMutator<AST, R> extends IMutator {
 
-	default boolean walkNode(AST pre) {
-		return walkNode2(pre).isPresent();
+	@Deprecated(since = "Useful for simplified unitTests")
+	default boolean walkAstHasChanged(AST pre) {
+		return walkAst(pre).isPresent();
 	}
 
-	Optional<R> walkNode2(AST pre);
+	Optional<R> walkAst(AST pre);
 }

@@ -23,14 +23,27 @@ import java.nio.file.Path;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * Helps loading local .java file
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public class LocalClassTestHelper {
+	protected LocalClassTestHelper() {
+		// hidden
+	}
 
+	@SuppressWarnings("PMD.MagicNumber")
 	public static Path getProjectTestSourceCode() throws IOException {
 		File someResourceInSrcTestResources = new ClassPathResource("/logback-test.xml").getFile();
 		Path srcMainResource = someResourceInSrcTestResources.getParentFile().toPath();
-		Assert.assertEquals("test-classes", srcMainResource.getName(srcMainResource.getNameCount() - 1).toString());
-		Assert.assertEquals("target", srcMainResource.getName(srcMainResource.getNameCount() - 2).toString());
-		Assert.assertEquals("java", srcMainResource.getName(srcMainResource.getNameCount() - 3).toString());
+		int nameCount = srcMainResource.getNameCount();
+		Assert.assertEquals("Check 'test-classes' directory",
+				"test-classes",
+				srcMainResource.getName(nameCount - 1).toString());
+		Assert.assertEquals("Check 'target' directory", "target", srcMainResource.getName(nameCount - 2).toString());
+		Assert.assertEquals("Check 'java' directory", "java", srcMainResource.getName(nameCount - 3).toString());
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 

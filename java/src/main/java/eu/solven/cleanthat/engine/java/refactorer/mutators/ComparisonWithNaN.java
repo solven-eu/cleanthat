@@ -39,7 +39,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class ComparisonWithNaN extends AJavaParserMutator  {
+public class ComparisonWithNaN extends AJavaParserMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonWithNaN.class);
 

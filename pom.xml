@@ -20,7 +20,7 @@
 		<module>gitlab</module>
 		<module>config</module>
 		<module>code-cleaners</module>
-		
+
 		<!-- The refactoring cross-AST logic. Typically holds IMutator -->
 		<module>refactorer</module>
 
@@ -34,6 +34,7 @@
 		<module>lambda</module>
 
 		<module>test-helpers</module>
+		<module>refactorer-test-helpers</module>
 
 		<!-- Build automation tools -->
 		<module>maven</module>

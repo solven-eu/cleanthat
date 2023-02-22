@@ -25,7 +25,7 @@ import com.github.javaparser.ast.Node;
  *
  * @author Benoit Lacelle
  */
-public abstract class ATodoJavaParserMutator extends AJavaParserMutator  {
+public abstract class ATodoJavaParserMutator extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override
@@ -40,7 +40,7 @@ public abstract class ATodoJavaParserMutator extends AJavaParserMutator  {
 	}
 
 	@Override
-	public boolean walkNode(Node tree) {
+	public boolean walkAstHasChanged(Node tree) {
 		LOGGER.debug("TODO");
 		return false;
 	}

@@ -100,7 +100,7 @@ public class ATestCases {
 		// This is generally the most relevant test: to be done first
 		{
 			Node clonedPre = pre.clone();
-			boolean transformed = transformer.walkNode(pre);
+			boolean transformed = transformer.walkAstHasChanged(pre);
 			// Rename the method before checking full equality
 			// method are lowerCase while classes are camel case
 			pre.setName(post.getName());
@@ -121,7 +121,8 @@ public class ATestCases {
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			Node postBeforeWalk = post.clone();
-			Assert.assertFalse("Unexpected transformation on code just transformed", transformer.walkNode(post));
+			Assert.assertFalse("Unexpected transformation on code just transformed",
+					transformer.walkAstHasChanged(post));
 			Assert.assertEquals(postBeforeWalk, post);
 		}
 	}
@@ -148,7 +149,7 @@ public class ATestCases {
 			// https://github.com/javaparser/javaparser/issues/3322
 			// We prefer not-processing clones as it may lead to dirty issues
 			MethodDeclaration clonedPost = post.clone();
-			boolean walked = transformer.walkNode(post);
+			boolean walked = transformer.walkAstHasChanged(post);
 			if (transformer instanceof NoOpJavaParserRule) {
 				Assert.assertTrue("NoOpJavaParserRule is always walked", walked);
 			} else if (walked) {
@@ -200,7 +201,7 @@ public class ATestCases {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			transformer.walkNode(pre);
+			transformer.walkAstHasChanged(pre);
 			// Rename the method before checking full equality
 			pre.setName("Post");
 			Assert.assertEquals(post, pre);
@@ -209,7 +210,7 @@ public class ATestCases {
 		// This is a less relevant test: to be done later
 		{
 			TypeDeclaration<?> postPost = post.clone();
-			transformer.walkNode(postPost);
+			transformer.walkAstHasChanged(postPost);
 			Assert.assertEquals(post, postPost);
 		}
 	}
@@ -293,7 +294,7 @@ public class ATestCases {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			boolean transformed = transformer.walkNode(pre);
+			boolean transformed = transformer.walkAstHasChanged(pre);
 			// Rename the class before checking full equality
 			pre.getType(0).setName(post.getType(0).getNameAsString());
 			Assert.assertEquals(post, pre);
@@ -305,7 +306,7 @@ public class ATestCases {
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			CompilationUnit postBeforeWalk = post.clone();
-			Assert.assertFalse(transformer.walkNode(post));
+			Assert.assertFalse(transformer.walkAstHasChanged(post));
 			Assert.assertEquals(postBeforeWalk, post);
 		}
 	}

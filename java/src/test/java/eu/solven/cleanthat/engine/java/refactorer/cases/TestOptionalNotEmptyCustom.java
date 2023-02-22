@@ -45,7 +45,7 @@ public class TestOptionalNotEmptyCustom extends ATestCases {
 		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
 		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkNode(compilationUnit);
+		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 		Assertions.assertThat(AJavaParserMutator.getWarnCount()).isEqualTo(0);

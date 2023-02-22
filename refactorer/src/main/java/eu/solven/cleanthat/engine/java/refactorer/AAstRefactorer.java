@@ -45,6 +45,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
+@SuppressWarnings("PMD.GenericsNaming")
 public abstract class AAstRefactorer<AST, P, R, M extends IWalkableMutator<AST, R>> implements ILintFixerWithId {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
@@ -96,7 +97,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkableMutator<AST, 
 			AST compilationUnit = optCompilationUnit.get();
 			Optional<R> walkNodeResult;
 			try {
-				walkNodeResult = ct.walkNode2(compilationUnit);
+				walkNodeResult = ct.walkAst(compilationUnit);
 			} catch (RuntimeException e) {
 				throw new IllegalArgumentException("Issue with classTransformer: " + ct, e);
 			}

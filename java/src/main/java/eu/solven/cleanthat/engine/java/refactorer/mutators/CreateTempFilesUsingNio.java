@@ -45,7 +45,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Sébastien Collard
  */
-public class CreateTempFilesUsingNio extends AJavaParserMutator  {
+public class CreateTempFilesUsingNio extends AJavaParserMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 

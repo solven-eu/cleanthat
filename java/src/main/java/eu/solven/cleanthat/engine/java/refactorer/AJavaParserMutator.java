@@ -67,7 +67,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 	}
 
 	@Override
-	public Optional<Node> walkNode2(Node tree) {
+	public Optional<Node> walkAst(Node tree) {
 		AtomicBoolean transformed = new AtomicBoolean();
 		tree.walk(node -> {
 			boolean hasTransformed;

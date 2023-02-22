@@ -30,9 +30,9 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
-public class TestLiteralsFirstInComparisonsCustom extends ATestCases {
+public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 
 	// Cannot keep element because we reached the end of nodetext
 	@Test

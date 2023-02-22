@@ -32,15 +32,15 @@ import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteMutator;
 import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
-import eu.solven.cleanthat.openrewrite.cases.do_not_format_me.ReorderModifiersCases;
+import eu.solven.cleanthat.openrewrite.cases.do_not_format_me.CommonStaticAnalysisCases;
 
-public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
+public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
 
 	private static ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> getStaticRefactorerCases() {
-		return new ReorderModifiersCases();
+		return new CommonStaticAnalysisCases();
 	}
 
-	public TestReorderModifiersCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestCommonStaticAnalysisCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);
 	}
 

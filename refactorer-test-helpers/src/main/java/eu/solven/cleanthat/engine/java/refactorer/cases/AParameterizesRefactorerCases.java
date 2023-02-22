@@ -44,12 +44,24 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
-import eu.solven.cleanthat.engine.java.refactorer.test.AParentRefactorerCases;
-import eu.solven.cleanthat.engine.java.refactorer.test.AParentTestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
+/**
+ * Base class enabling each testCase to appear as an individual JUnit testCase
+ * 
+ * @author Benoit Lacelle
+ *
+ * @param <AST>
+ * @param <R>
+ */
 @RunWith(Parameterized.class)
-public abstract class AParameterizesRefactorerCases2<AST, R> extends AParentTestCases<AST, AST, R> {
+public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<AST, R> {
+
+	final JavaParser javaParser;
+
+	final ClassOrInterfaceDeclaration testCase;
 
 	// Duplicated from JavaRefactorer
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
@@ -68,7 +80,7 @@ public abstract class AParameterizesRefactorerCases2<AST, R> extends AParentTest
 		return reflectionTypeSolver;
 	}
 
-	protected static Collection<Object[]> listCases(AParentRefactorerCases<?, ?, ?> testCases) throws IOException {
+	protected static Collection<Object[]> listCases(ARefactorerCases<?, ?, ?> testCases) throws IOException {
 		String path = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
 		JavaParser javaParser = makeDefaultJavaParser(testCases.getTransformer().isJreOnly());
@@ -83,13 +95,7 @@ public abstract class AParameterizesRefactorerCases2<AST, R> extends AParentTest
 		return individualCases;
 	}
 
-	final JavaParser javaParser;
-
-	final ClassOrInterfaceDeclaration testCase;
-
-	public AParameterizesRefactorerCases2(JavaParser javaParser,
-			String testName,
-			ClassOrInterfaceDeclaration testCase) {
+	public AParameterizesRefactorerCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		this.javaParser = javaParser;
 		this.testCase = testCase;
 	}
@@ -98,7 +104,7 @@ public abstract class AParameterizesRefactorerCases2<AST, R> extends AParentTest
 	public void testCase() {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
 
-		AParentRefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
+		ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
 		IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {
@@ -166,5 +172,5 @@ public abstract class AParameterizesRefactorerCases2<AST, R> extends AParentTest
 		}
 	}
 
-	protected abstract AParentRefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> getCases();
+	protected abstract ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> getCases();
 }

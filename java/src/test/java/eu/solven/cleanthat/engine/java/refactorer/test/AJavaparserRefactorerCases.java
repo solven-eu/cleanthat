@@ -19,6 +19,12 @@ import com.github.javaparser.ast.Node;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
-public abstract class ARefactorerCases extends AParentRefactorerCases<Node, Node, IJavaparserMutator> {
+/**
+ * {@link ARefactorerCases} for {@link IJavaparserMutator}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public abstract class AJavaparserRefactorerCases extends ARefactorerCases<Node, Node, IJavaparserMutator> {
 
 }

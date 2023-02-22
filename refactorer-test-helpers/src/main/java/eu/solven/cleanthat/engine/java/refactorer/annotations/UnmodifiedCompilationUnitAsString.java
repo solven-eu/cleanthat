@@ -20,6 +20,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.javaparser.ast.CompilationUnit;
+
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+
 /**
  * Used to check a {@link CompilationUnit} is unmodified, provided as Strings
  * 
@@ -30,6 +34,10 @@ import java.lang.annotation.Target;
 // Runtime as this will be interpreted as Runtime to resolve `pre` and `post` (as concatenated Strings)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UnmodifiedCompilationUnitAsString {
+	/**
+	 * 
+	 * @return the code over which an {@link IMutator} has to be applied
+	 */
 	String pre();
 
 	/**

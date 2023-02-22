@@ -20,6 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+
 /**
  * Used to compare 2 {@link CompilationUnit}, provided as Strings
  * 
@@ -30,7 +32,15 @@ import java.lang.annotation.Target;
 // Runtime as this will be interpreted as Runtime to resolve `pre` and `post` (as concatenated Strings)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CompareCompilationUnitsAsStrings {
+	/**
+	 * 
+	 * @return the code over which a {@link IMutator} has to be applied
+	 */
 	String pre();
 
+	/**
+	 * 
+	 * @return the expected code after the {@link IMutator}
+	 */
 	String post();
 }

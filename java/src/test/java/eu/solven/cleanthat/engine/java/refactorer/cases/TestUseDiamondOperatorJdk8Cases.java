@@ -25,12 +25,12 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseDiamondOperatorJdk8Cases;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 @Ignore("TODO")
-public class TestUseDiamondOperatorJdk8Cases extends AParameterizesRefactorerCases {
+public class TestUseDiamondOperatorJdk8Cases extends AParameterizesJavaparserRefactorerCases {
 
-	private static ARefactorerCases getStaticRefactorerCases() {
+	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new UseDiamondOperatorJdk8Cases();
 	}
 
@@ -43,12 +43,12 @@ public class TestUseDiamondOperatorJdk8Cases extends AParameterizesRefactorerCas
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests
 	@Parameters(name = "{1}")
 	public static Collection<Object[]> data() throws IOException {
-		ARefactorerCases testCases = getStaticRefactorerCases();
+		AJavaparserRefactorerCases testCases = getStaticRefactorerCases();
 		return listCases(testCases);
 	}
 
 	@Override
-	protected ARefactorerCases getCases() {
+	protected AJavaparserRefactorerCases getCases() {
 		return getStaticRefactorerCases();
 	}
 

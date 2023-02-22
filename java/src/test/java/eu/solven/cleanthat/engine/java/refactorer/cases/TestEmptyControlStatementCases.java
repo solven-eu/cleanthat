@@ -24,11 +24,11 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.EmptyControlStatementCases;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestEmptyControlStatementCases extends AParameterizesRefactorerCases {
+public class TestEmptyControlStatementCases extends AParameterizesJavaparserRefactorerCases {
 
-	private static ARefactorerCases getStaticRefactorerCases() {
+	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new EmptyControlStatementCases();
 	}
 
@@ -41,12 +41,12 @@ public class TestEmptyControlStatementCases extends AParameterizesRefactorerCase
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests
 	@Parameters(name = "{1}")
 	public static Collection<Object[]> data() throws IOException {
-		ARefactorerCases testCases = getStaticRefactorerCases();
+		AJavaparserRefactorerCases testCases = getStaticRefactorerCases();
 		return listCases(testCases);
 	}
 
 	@Override
-	protected ARefactorerCases getCases() {
+	protected AJavaparserRefactorerCases getCases() {
 		return getStaticRefactorerCases();
 	}
 }

@@ -17,7 +17,16 @@ package eu.solven.cleanthat.engine.java.refactorer.test;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
-public abstract class AParentRefactorerCases<AST, R, M extends IWalkingMutator<AST, R>> {
+/**
+ * Base class for the test-cases of a {@link IWalkingMutator}
+ * 
+ * @author Benoit Lacelle
+ *
+ * @param <AST>
+ * @param <R>
+ * @param <M>
+ */
+public abstract class ARefactorerCases<AST, R, M extends IWalkingMutator<AST, R>> {
 	public String getId() {
 		return getTransformer().getClass().getName();
 	}

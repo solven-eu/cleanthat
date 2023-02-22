@@ -4,9 +4,9 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnota
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class UnnecessaryModifierCases extends ARefactorerCases {
+public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new UnnecessaryModifier();

@@ -15,6 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.annotations;
 
+/**
+ * ?
+ * 
+ * @author Benoit Lacelle
+ *
+ */
 public @interface CompareTypes {
 
 }

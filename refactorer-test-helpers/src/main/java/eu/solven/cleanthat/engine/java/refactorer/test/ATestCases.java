@@ -48,8 +48,16 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilat
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
-public abstract class AParentTestCases<N, NN extends N, R> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AParentTestCases.class);
+/**
+ * Base class for Cleanthat testing framework
+ * 
+ * @author Benoit Lacelle
+ *
+ * @param <N>
+ * @param <R>
+ */
+public abstract class ATestCases<N, R> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
 	protected static List<ClassOrInterfaceDeclaration> getAllCases(CompilationUnit compilationUnit) {
 		return compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
@@ -120,10 +128,11 @@ public abstract class AParentTestCases<N, NN extends N, R> {
 							+ oneCase,
 					walked);
 		}
-		Assert.assertEquals(clonedPost, pre);
-		Assert.assertEquals(clonedPost.toString(), pre.toString());
+		Assert.assertEquals("No modification on Node", clonedPost, pre);
+		Assert.assertEquals("No modification on Node.toString()", clonedPost.toString(), pre.toString());
 		// https://github.com/javaparser/javaparser/issues/1913
-		Assert.assertEquals(LexicalPreservingPrinter.print(clonedPost).toString(),
+		Assert.assertEquals("No modification on Node.prettyString()",
+				LexicalPreservingPrinter.print(clonedPost).toString(),
 				LexicalPreservingPrinter.print(pre).toString());
 	}
 

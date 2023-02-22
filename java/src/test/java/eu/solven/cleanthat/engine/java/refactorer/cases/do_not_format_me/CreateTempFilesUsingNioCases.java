@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 /**
  * cases inspired from https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html#code-changes
@@ -16,7 +16,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
  * @author Sébastien Collard
  */
 
-public class CreateTempFilesUsingNioCases extends ARefactorerCases {
+public class CreateTempFilesUsingNioCases extends AJavaparserRefactorerCases {
 
 	@Override
 	public IJavaparserMutator getTransformer() {

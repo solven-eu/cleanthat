@@ -2,19 +2,27 @@ package eu.solven.cleanthat.openrewrite.cases.do_not_format_me;
 
 import java.util.Collection;
 
+import org.openrewrite.Recipe;
 import org.openrewrite.Result;
-import org.openrewrite.java.cleanup.ModifierOrder;
+import org.openrewrite.config.Environment;
 import org.openrewrite.java.tree.J;
 
 import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteMutator;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
-import eu.solven.cleanthat.engine.java.refactorer.test.AParentRefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
-public class ReorderModifiersCases extends AParentRefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> {
+public class ReorderModifiersCases extends ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> {
+	// @Override
+	// public OpenrewriteMutator getTransformer() {
+	// return new OpenrewriteMutator(new ModifierOrder());
+	// }
 	@Override
 	public OpenrewriteMutator getTransformer() {
-		return new OpenrewriteMutator(new ModifierOrder());
+		Environment environment = Environment.builder().scanRuntimeClasspath().build();
+		Recipe recipe = environment.activateRecipes("org.openrewrite.java.cleanup.ModifierOrder");
+
+		return new OpenrewriteMutator(recipe);
 	}
 
 	@CompareMethods

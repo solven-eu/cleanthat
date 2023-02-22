@@ -23,16 +23,16 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.test.AParentRefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 @RunWith(Parameterized.class)
-public abstract class AParameterizesRefactorerCases extends AParameterizesRefactorerCases2<Node, Node> {
+public abstract class AParameterizesJavaparserRefactorerCases extends AParameterizesRefactorerCases<Node, Node> {
 
-	public AParameterizesRefactorerCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public AParameterizesJavaparserRefactorerCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testName, testCase);
 	}
 
-	protected abstract AParentRefactorerCases<Node, Node, IJavaparserMutator> getCases();
+	protected abstract ARefactorerCases<Node, Node, IJavaparserMutator> getCases();
 
 	@Override
 	protected Node convertToAst(Node node) {

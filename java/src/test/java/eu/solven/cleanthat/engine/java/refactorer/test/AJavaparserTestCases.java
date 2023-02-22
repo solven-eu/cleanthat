@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer;
+package eu.solven.cleanthat.engine.java.refactorer.test;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import com.github.javaparser.ast.Node;
+
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
 /**
- * Marks a {@link IMutator} an not doing anything, but behaving as always impacting the AST
+ * {@link ATestCases}for {@link IJavaparserMutator}
  * 
  * @author Benoit Lacelle
  *
  */
-public interface INoOpMutator {
+public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
+	@Override
+	protected Node convertToAst(Node ast) {
+		return ast;
+	}
 }

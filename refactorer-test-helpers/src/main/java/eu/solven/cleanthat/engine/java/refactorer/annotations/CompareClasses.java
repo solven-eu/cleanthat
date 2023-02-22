@@ -27,7 +27,15 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CompareClasses {
+	/**
+	 * 
+	 * @return a {@link Class} referring the testCase
+	 */
 	Class<?> pre();
 
+	/**
+	 * 
+	 * @return a {@link Class} referring the expected mutated sourceCode
+	 */
 	Class<?> post();
 }

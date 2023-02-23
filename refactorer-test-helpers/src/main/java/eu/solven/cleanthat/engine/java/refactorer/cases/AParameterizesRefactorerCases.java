@@ -56,6 +56,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
  * @param <AST>
  * @param <R>
  */
+@SuppressWarnings("PMD.GenericsNaming")
 @RunWith(Parameterized.class)
 public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<AST, R> {
 
@@ -95,13 +96,13 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		return individualCases;
 	}
 
-	public AParameterizesRefactorerCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public AParameterizesRefactorerCases(JavaParser javaParser, ClassOrInterfaceDeclaration testCase) {
 		this.javaParser = javaParser;
 		this.testCase = testCase;
 	}
 
 	@Test
-	public void testCase() {
+	public void oneTestCase() {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
 
 		ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
@@ -136,17 +137,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		}
 
 		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()) {
-			ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
-			// JavaParser does not print the '$' of nested qualified classname
-			// https://github.com/javaparser/javaparser/issues/1518
-			String qualifiedClassName =
-					resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
-			Class<?> realTestCase;
-			try {
-				realTestCase = Class.forName(qualifiedClassName);
-			} catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException("Issue with " + qualifiedClassName, e);
-			}
+			Class<?> realTestCase = loadTestCaseRealClass();
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			CompareCompilationUnitsAsStrings realAnnotation =
 					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsStrings.class)[0];
@@ -154,22 +145,27 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		}
 
 		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
-			ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
-			// JavaParser does not print the '$' of nested qualified classname
-			// https://github.com/javaparser/javaparser/issues/1518
-			String qualifiedClassName =
-					resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
-			Class<?> realTestCase;
-			try {
-				realTestCase = Class.forName(qualifiedClassName);
-			} catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException("Issue with " + qualifiedClassName, e);
-			}
+			Class<?> realTestCase = loadTestCaseRealClass();
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			UnmodifiedCompilationUnitAsString realAnnotation =
 					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
 			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
 		}
+	}
+
+	private Class<?> loadTestCaseRealClass() {
+		ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
+		// JavaParser does not print the '$' of nested qualified classname
+		// https://github.com/javaparser/javaparser/issues/1518
+		String qualifiedClassName =
+				resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
+		Class<?> realTestCase;
+		try {
+			realTestCase = Class.forName(qualifiedClassName);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("Issue with " + qualifiedClassName, e);
+		}
+		return realTestCase;
 	}
 
 	protected abstract ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> getCases();

@@ -41,7 +41,7 @@ public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases
 	}
 
 	public TestCommonStaticAnalysisCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
-		super(javaParser, testName, testCase);
+		super(javaParser, testCase);
 	}
 
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests

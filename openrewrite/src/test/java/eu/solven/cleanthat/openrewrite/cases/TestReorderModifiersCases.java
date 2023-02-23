@@ -40,8 +40,8 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 		return new ReorderModifiersCases();
 	}
 
-	public TestReorderModifiersCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
-		super(javaParser, testName, testCase);
+	public TestReorderModifiersCases(JavaParser javaParser, ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testCase);
 	}
 
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests

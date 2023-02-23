@@ -59,6 +59,12 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 public abstract class ATestCases<N, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
+	private static final String PRE_METHOD = "pre";
+	private static final String PRE_CLASS = "Pre";
+
+	private static final String POST_CONSTANT = "post";
+	private static final String POST_CLASS = "Post";
+
 	protected static List<ClassOrInterfaceDeclaration> getAllCases(CompilationUnit compilationUnit) {
 		return compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
 				c -> c.getAnnotationByClass(CompareTypes.class).isPresent()
@@ -106,8 +112,8 @@ public abstract class ATestCases<N, R> {
 	}
 
 	protected void doCheckUnmodified(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
-		MethodDeclaration post = getMethodWithName(oneCase, "pre");
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
+		MethodDeclaration post = getMethodWithName(oneCase, PRE_METHOD);
 		doCheckUnmodified(transformer, oneCase, post);
 	}
 
@@ -137,9 +143,9 @@ public abstract class ATestCases<N, R> {
 	}
 
 	protected void doTestMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
-		MethodDeclaration pre = getMethodWithName(oneCase, "pre");
-		MethodDeclaration post = getMethodWithName(oneCase, "post");
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
+		MethodDeclaration pre = getMethodWithName(oneCase, PRE_METHOD);
+		MethodDeclaration post = getMethodWithName(oneCase, POST_CONSTANT);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -173,26 +179,26 @@ public abstract class ATestCases<N, R> {
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			Node postBeforeWalk = post.clone();
-			Assert.assertFalse("Unexpected transformation on code just transformed",
-					transformer.walkAstHasChanged(convertToAst(post)));
-			Assert.assertEquals(postBeforeWalk, post);
+			boolean postAfterWalk = transformer.walkAstHasChanged(convertToAst(post));
+			Assert.assertFalse("Not mutating after", postAfterWalk);
+			Assert.assertEquals("After not mutated", postBeforeWalk, post);
 		}
 	}
 
 	protected void doCompareTypes(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		TypeDeclaration<?> pre = oneCase.getMembers()
 				.stream()
 				.filter(n -> n instanceof TypeDeclaration)
 				.map(n -> (TypeDeclaration<?>) n)
-				.filter(n -> "Pre".equals(n.getNameAsString()))
+				.filter(n -> PRE_CLASS.equals(n.getNameAsString()))
 				.findAny()
 				.get();
 		TypeDeclaration<?> post = oneCase.getMembers()
 				.stream()
 				.filter(n -> n instanceof TypeDeclaration)
 				.map(n -> (TypeDeclaration<?>) n)
-				.filter(n -> "Post".equals(n.getNameAsString()))
+				.filter(n -> POST_CLASS.equals(n.getNameAsString()))
 				.findAny()
 				.get();
 		// Check 'pre' is transformed into 'post'
@@ -200,22 +206,22 @@ public abstract class ATestCases<N, R> {
 		{
 			transformer.walkAstHasChanged(convertToAst(pre));
 			// Rename the method before checking full equality
-			pre.setName("Post");
-			Assert.assertEquals(post, pre);
+			pre.setName(POST_CLASS);
+			Assert.assertEquals("Check equality after mutation", post, pre);
 		}
 		// Check the transformer is impact-less on already clean code
 		// This is a less relevant test: to be done later
 		{
 			TypeDeclaration<?> postPost = post.clone();
 			transformer.walkAstHasChanged(convertToAst(postPost));
-			Assert.assertEquals(post, postPost);
+			Assert.assertEquals("Check idempotency", post, postPost);
 		}
 	}
 
 	protected void doCompareClasses(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
 
 		String qualifiedName = oneCase.getFullyQualifiedName().get();
 
@@ -258,9 +264,9 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerClasses(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
-		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, "Pre");
-		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, "Post");
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
+		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, PRE_CLASS);
+		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, POST_CLASS);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -268,9 +274,9 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerAnnotations(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
-		AnnotationDeclaration pre = getAnnotationWithName(oneCase, "Pre");
-		AnnotationDeclaration post = getAnnotationWithName(oneCase, "Post");
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
+		AnnotationDeclaration pre = getAnnotationWithName(oneCase, PRE_CLASS);
+		AnnotationDeclaration post = getAnnotationWithName(oneCase, POST_CLASS);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -278,14 +284,14 @@ public abstract class ATestCases<N, R> {
 	public void doCompareMethodsAsStrings(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		LOGGER.info("Processing the case: {}", oneCase.getName());
+		// LOGGER.info("Processing the case: {}", oneCase.getName());
 
 		NormalAnnotationExpr annotation =
 				oneCase.getAnnotationByClass(CompareMethodsAsStrings.class).get().asNormalAnnotationExpr();
 
 		StringLiteralExpr preExpr = annotation.getPairs()
 				.stream()
-				.filter(p -> "pre".equals(p.getNameAsString()))
+				.filter(p -> PRE_METHOD.equals(p.getNameAsString()))
 				.findAny()
 				.get()
 				.getValue()
@@ -293,7 +299,7 @@ public abstract class ATestCases<N, R> {
 		MethodDeclaration pre = javaParser.parseMethodDeclaration(preExpr.getValue()).getResult().get();
 		StringLiteralExpr postExpr = annotation.getPairs()
 				.stream()
-				.filter(p -> "post".equals(p.getNameAsString()))
+				.filter(p -> POST_CONSTANT.equals(p.getNameAsString()))
 				.findAny()
 				.get()
 				.getValue()
@@ -306,7 +312,7 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			CompareCompilationUnitsAsStrings annotation) {
-		LOGGER.info("Processing the case: {}", testCase.getName());
+		// LOGGER.info("Processing the case: {}", testCase.getName());
 
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
 		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
@@ -320,7 +326,7 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsString annotation) {
-		LOGGER.info("Processing the case: {}", testCase.getName());
+		// LOGGER.info("Processing the case: {}", testCase.getName());
 
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
 		doCheckUnmodified(transformer, testCase, pre.getClassByName("SomeClass").get());
@@ -334,7 +340,7 @@ public abstract class ATestCases<N, R> {
 			boolean transformed = transformer.walkAstHasChanged(convertToAst(pre));
 			// Rename the class before checking full equality
 			pre.getType(0).setName(post.getType(0).getNameAsString());
-			Assert.assertEquals(post, pre);
+			Assert.assertEquals("Check are changed", post, pre);
 			// We check this after checking comparison with 'post' for greater test result readability
 			Assert.assertTrue("We miss a transformation flag for: " + pre, transformed);
 		}
@@ -343,8 +349,8 @@ public abstract class ATestCases<N, R> {
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			CompilationUnit postBeforeWalk = post.clone();
-			Assert.assertFalse(transformer.walkAstHasChanged(convertToAst(post)));
-			Assert.assertEquals(postBeforeWalk, post);
+			Assert.assertFalse("Idempotency issue", transformer.walkAstHasChanged(convertToAst(post)));
+			Assert.assertEquals("Idempotency issue", postBeforeWalk, post);
 		}
 	}
 

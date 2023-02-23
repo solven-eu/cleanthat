@@ -26,6 +26,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  * @param <R>
  * @param <M>
  */
+@SuppressWarnings("PMD.GenericsNaming")
 public abstract class ARefactorerCases<AST, R, M extends IWalkingMutator<AST, R>> {
 	public String getId() {
 		return getTransformer().getClass().getName();

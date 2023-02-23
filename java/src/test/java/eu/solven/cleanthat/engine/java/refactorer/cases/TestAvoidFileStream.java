@@ -35,7 +35,7 @@ public class TestAvoidFileStream extends AParameterizesJavaparserRefactorerCases
 	}
 
 	public TestAvoidFileStream(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
-		super(javaParser, testName, testCase);
+		super(javaParser, testCase);
 	}
 
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests

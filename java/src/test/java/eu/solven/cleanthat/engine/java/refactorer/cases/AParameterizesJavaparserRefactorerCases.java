@@ -28,8 +28,8 @@ import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 @RunWith(Parameterized.class)
 public abstract class AParameterizesJavaparserRefactorerCases extends AParameterizesRefactorerCases<Node, Node> {
 
-	public AParameterizesJavaparserRefactorerCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
-		super(javaParser, testName, testCase);
+	public AParameterizesJavaparserRefactorerCases(JavaParser javaParser, ClassOrInterfaceDeclaration testCase) {
+		super(javaParser, testCase);
 	}
 
 	protected abstract ARefactorerCases<Node, Node, IJavaparserMutator> getCases();

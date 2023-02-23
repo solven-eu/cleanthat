@@ -436,7 +436,14 @@
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
 
-							<cleanthat />
+							<cleanthat>
+								<sourceJdk>11</sourceJdk>
+								<version>2.7-SNAPSHOT</version>
+								<mutators>
+									<mutator>SafeAndConsensual</mutator>
+									<mutator>StringToString</mutator>
+								</mutators>
+							</cleanthat>
 
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->

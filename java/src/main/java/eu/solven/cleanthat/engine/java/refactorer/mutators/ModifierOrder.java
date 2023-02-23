@@ -90,7 +90,7 @@ public class ModifierOrder extends AJavaParserMutator {
 
 				@Override
 				public int compare(Modifier o1, Modifier o2) {
-					return compare2(o1.getKeyword().asString(), o1.getKeyword().asString());
+					return compare2(o1.getKeyword().asString(), o2.getKeyword().asString());
 				}
 
 				private int compare2(String left, String right) {

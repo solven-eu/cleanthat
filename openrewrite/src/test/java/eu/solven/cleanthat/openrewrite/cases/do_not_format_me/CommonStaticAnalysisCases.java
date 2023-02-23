@@ -19,14 +19,14 @@ public class CommonStaticAnalysisCases extends ARefactorerCases<J.CompilationUni
 	}
 
 	@CompareCompilationUnitsAsStrings(
-			pre = "package eu.solven.cleanthat.do_not_format_me;" + "public class CleanClass {"
-					+ "	public CleanClass() {"
+			pre = "package eu.solven.cleanthat.do_not_format_me;" + "public class SomeClass {"
+					+ "	public SomeClass() {"
 					+ "		{}"
 					+ "		;;"
 					+ "	}"
 					+ "}",
-			post = "package eu.solven.cleanthat.do_not_format_me;" + "public class CleanClass {"
-					+ "	public CleanClass() {"
+			post = "package eu.solven.cleanthat.do_not_format_me;" + "public class SomeClass {"
+					+ "	public SomeClass() {"
 					+ "		{}"
 					+ "		;;"
 					+ "	}"

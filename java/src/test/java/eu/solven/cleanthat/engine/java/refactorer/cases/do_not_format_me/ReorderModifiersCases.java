@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import java.util.Collection;
-
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -29,7 +27,7 @@ public class ReorderModifiersCases extends AJavaparserRefactorerCases {
 		}
 
 		@SuppressWarnings("unused")
-		public Object post(Collection<?> input) {
+		public Object post() {
 			return new Object() {
 				public static final String FINAL_STATIC_PUBLIC = "";
 				public static final String STATIC_FINAL_PUBLIC = "";
@@ -56,7 +54,7 @@ public class ReorderModifiersCases extends AJavaparserRefactorerCases {
 			};
 		}
 
-		public Object post(Collection<?> input) {
+		public Object post() {
 			return new Object() {
 				@SuppressWarnings("unused")
 				protected final synchronized void staticMethod() {

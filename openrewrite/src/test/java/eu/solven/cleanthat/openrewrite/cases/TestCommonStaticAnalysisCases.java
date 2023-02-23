@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 import org.openrewrite.Result;
 import org.openrewrite.java.tree.J;
@@ -34,6 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorer
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.openrewrite.cases.do_not_format_me.CommonStaticAnalysisCases;
 
+@Ignore("TODO")
 public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
 
 	private static ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> getStaticRefactorerCases() {

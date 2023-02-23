@@ -73,29 +73,15 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 		return outputRef.get();
 	}
 
-	protected String applyProcessor(IEngineProperties languageProperties,
-			ILintFixer formatter,
+	protected String applyProcessor(IEngineProperties engineProperties,
+			ILintFixer lintFixer,
 			PathAndContent pathAndContent) throws IOException {
 		Objects.requireNonNull(pathAndContent, "pathAndContent should not be null");
 
-		LineEnding lineEnding = languageProperties.getSourceCode().getLineEndingAsEnum();
-
-		if (lineEnding == LineEnding.GIT) {
-			// see GitAttributesLineEndings_InMemory
-			LOGGER.warn("We switch lineEnding from {} to {} for '{}'",
-					lineEnding,
-					LineEnding.NATIVE,
-					pathAndContent.getPath());
-			lineEnding = LineEnding.NATIVE;
-		} else if (lineEnding == LineEnding.KEEP) {
-			String code = pathAndContent.getContent();
-			lineEnding = LineEnding.determineLineEnding(code).orElse(LineEnding.NATIVE);
-		}
-
-		if (formatter instanceof ILintFixerWithPath) {
-			return ((ILintFixerWithPath) formatter).doFormat(pathAndContent, lineEnding);
+		if (lintFixer instanceof ILintFixerWithPath) {
+			return ((ILintFixerWithPath) lintFixer).doFormat(pathAndContent);
 		} else {
-			return formatter.doFormat(pathAndContent.getContent(), lineEnding);
+			return lintFixer.doFormat(pathAndContent.getContent());
 		}
 	}
 }

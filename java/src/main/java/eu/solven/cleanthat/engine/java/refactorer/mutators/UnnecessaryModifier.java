@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.AnnotationDeclaration;
+import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -89,7 +91,8 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 
 		Node parentNode = modifier.getParentNode().get();
 		if (!(parentNode instanceof MethodDeclaration) && !(parentNode instanceof FieldDeclaration)
-				&& !(parentNode instanceof ClassOrInterfaceDeclaration)) {
+				&& !(parentNode instanceof ClassOrInterfaceDeclaration)
+				&& !(parentNode instanceof AnnotationMemberDeclaration)) {
 			return false;
 		}
 
@@ -97,22 +100,33 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 			return false;
 		}
 		Node grandParentNode = parentNode.getParentNode().get();
-		if (!(grandParentNode instanceof ClassOrInterfaceDeclaration)) {
+		if (grandParentNode instanceof ClassOrInterfaceDeclaration) {
+			ClassOrInterfaceDeclaration grandParentInterface = (ClassOrInterfaceDeclaration) grandParentNode;
+
+			if (!grandParentInterface.isInterface()) {
+				return false;
+			}
+
+			// We are considering a modifier from an interface method|field|classOrInterface
+			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
+					|| modifier.getKeyword() == Keyword.FINAL
+					|| modifier.getKeyword() == Keyword.STATIC) {
+				return modifier.remove();
+			}
+
+			return false;
+		} else if (grandParentNode instanceof AnnotationDeclaration) {
+			// We are considering a modifier from an interface method|field|classOrInterface
+			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
+					|| modifier.getKeyword() == Keyword.FINAL
+					|| modifier.getKeyword() == Keyword.STATIC) {
+				return modifier.remove();
+			}
+
+			return false;
+		} else {
 			return false;
 		}
-		ClassOrInterfaceDeclaration grandParentInterface = (ClassOrInterfaceDeclaration) grandParentNode;
 
-		if (!grandParentInterface.isInterface()) {
-			return false;
-		}
-
-		// We are considering a modifier from an interface method|field|classOrInterface
-		if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
-				|| modifier.getKeyword() == Keyword.FINAL
-				|| modifier.getKeyword() == Keyword.STATIC) {
-			return modifier.remove();
-		}
-
-		return false;
 	}
 }

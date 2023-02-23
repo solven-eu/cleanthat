@@ -24,5 +24,5 @@ import java.io.IOException;
  */
 public interface ILintFixer {
 
-	String doFormat(String content, LineEnding ending) throws IOException;
+	String doFormat(String content) throws IOException;
 }

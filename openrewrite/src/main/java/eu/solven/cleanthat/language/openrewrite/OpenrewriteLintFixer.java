@@ -32,7 +32,6 @@ import org.openrewrite.java.tree.J;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.ILintFixerWithPath;
-import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
@@ -56,7 +55,18 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 	}
 
 	@Override
-	public String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException {
+	public String doFormat(PathAndContent pathAndContent) throws IOException {
+		Input input = Input.fromString(pathAndContent.getPath(), pathAndContent.getContent());
+		return formatInput(input);
+	}
+
+	@Override
+	public String doFormat(String content) throws IOException {
+		Input input = Input.fromString(content);
+		return formatInput(input);
+	}
+
+	protected String formatInput(Input input) {
 		// paths to jars that represent the project's classpath
 		// Path projectDir = Paths.get(".");
 		List<Path> classpath = Collections.emptyList();
@@ -67,19 +77,19 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 		ExecutionContext ctx = new InMemoryExecutionContext(Throwable::printStackTrace);
 
 		// parser the source files into LSTs
-		// Beware Path implements Iterable<Path>
-		List<J.CompilationUnit> cus = javaParser.parseInputs(Collections
-				.singleton(Input.fromString(pathAndContent.getPath(), pathAndContent.getContent())), null, ctx);
+		List<J.CompilationUnit> cus = javaParser.parseInputs(Collections.singleton(input), null, ctx);
 
 		// collect results
 		List<Result> results = recipe.run(cus, ctx).getResults();
 
-		if (results.size() != 1) {
+		if (results.isEmpty()) {
+			// no change
+			return input.getSource(ctx).readFully();
+		} else if (results.size() != 1) {
 			throw new IllegalStateException("We expected a single result in return. Got: " + results.size());
 		}
 
 		return results.get(0).getAfter().printAll();
-
 	}
 
 	@Override
@@ -90,11 +100,6 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 	@Override
 	public String toString() {
 		return "Recipe: " + recipe.toString();
-	}
-
-	@Override
-	public String doFormat(String content, LineEnding ending) throws IOException {
-		return doFormat(new PathAndContent(null, content), ending);
 	}
 
 }

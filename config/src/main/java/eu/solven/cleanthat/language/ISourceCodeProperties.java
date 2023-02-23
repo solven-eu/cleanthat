@@ -32,5 +32,6 @@ public interface ISourceCodeProperties {
 
 	String getEncoding();
 
+	@Deprecated(since = "2.7", forRemoval = true)
 	LineEnding getLineEndingAsEnum();
 }

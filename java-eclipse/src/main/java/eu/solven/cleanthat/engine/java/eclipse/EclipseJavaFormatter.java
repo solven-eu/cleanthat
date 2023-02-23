@@ -64,14 +64,14 @@ public class EclipseJavaFormatter implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
+	public String doFormat(String code) throws IOException {
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 
 		long start = System.currentTimeMillis();
 		TextEdit textEdit;
 		try {
-			String eolChars = LineEnding.getOrGuess(ending, () -> code);
+			String eolChars = LineEnding.getOrGuess(LineEnding.NATIVE, () -> code);
 			textEdit = formatter.format(CodeFormatter.K_COMPILATION_UNIT
 					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, eolChars);
 			if (textEdit == null) {

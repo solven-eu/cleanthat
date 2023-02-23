@@ -39,7 +39,6 @@ import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
-import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * This is useful to investigate a misbehavior over current project file
@@ -75,13 +74,13 @@ public class ITTestRemoteFile {
 				.engineVersion(IJdkVersionConstants.LAST)
 				.build(), properties);
 
-		String cleaned = rulesJavaMutator.doFormat(pathAsString, LineEnding.KEEP);
+		String cleaned = rulesJavaMutator.doFormat(pathAsString);
 
 		if (cleaned.equals(pathAsString)) {
 			LOGGER.warn("Not a single change");
 		} else {
 			DiffMatchPatch dmp = new DiffMatchPatch();
-			String newAsString = cleaned.toString();
+			String newAsString = cleaned;
 
 			// TODO We may need to reformat to have a nice diff
 			// see eu.solven.cleanthat.java.mutators.RulesJavaMutator.fixJavaparserUnexpectedChanges(String, String)

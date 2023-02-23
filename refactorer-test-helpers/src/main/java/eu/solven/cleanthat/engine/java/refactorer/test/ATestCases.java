@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -57,8 +55,6 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  * @param <R>
  */
 public abstract class ATestCases<N, R> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
-
 	private static final String PRE_METHOD = "pre";
 	private static final String PRE_CLASS = "Pre";
 
@@ -138,8 +134,8 @@ public abstract class ATestCases<N, R> {
 		Assert.assertEquals("No modification on Node.toString()", clonedPost.toString(), pre.toString());
 		// https://github.com/javaparser/javaparser/issues/1913
 		Assert.assertEquals("No modification on Node.prettyString()",
-				LexicalPreservingPrinter.print(clonedPost).toString(),
-				LexicalPreservingPrinter.print(pre).toString());
+				LexicalPreservingPrinter.print(clonedPost),
+				LexicalPreservingPrinter.print(pre));
 	}
 
 	protected void doTestMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {

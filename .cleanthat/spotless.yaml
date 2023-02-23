@@ -10,9 +10,10 @@ formatters:
     parameters:
       source_jdk: "11.0"
       mutators:
-      - eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators
+      - SafeAndConsensual
       - LiteralsFirstInComparisons
       - ComparisonWithNaN
+      - StringToString
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:

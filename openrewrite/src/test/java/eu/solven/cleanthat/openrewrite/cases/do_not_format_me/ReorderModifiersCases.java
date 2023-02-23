@@ -13,10 +13,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 public class ReorderModifiersCases extends ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> {
-	// @Override
-	// public OpenrewriteMutator getTransformer() {
-	// return new OpenrewriteMutator(new ModifierOrder());
-	// }
+
 	@Override
 	public OpenrewriteMutator getTransformer() {
 		Environment environment = Environment.builder().scanRuntimeClasspath().build();

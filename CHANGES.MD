@@ -5,6 +5,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ## [Unreleased]
 ### Fixed
 * `LocalVariableTypeInference` handles better Unresolved types
+* `LineEnding` management is dropped from `ILintFixer` and `ILintFixerWithPath`
+* `ModifierOrder` is promoted in `SafeAndConsensual`
 
 ## [2.6] - 2023-02-22
 ### Changes
@@ -31,9 +33,9 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * Implemented generic `trimTrailingWhitespace`, `endWithNewline` and `index` from Spotless
 * Composite Mutators can now be referenced by one of their identifier
 ### Changes
-* `OptionalNotEmpty` is promoted in `SafeAndConsensualMutators`
-* `UnnecessaryModifier` is promoted in `SafeAndConsensualMutators`
-* `UnnecessaryFullyQualifiedName` is promoted in `SafeAndConsensualMutators`
+* `OptionalNotEmpty` is promoted in `SafeAndConsensual`
+* `UnnecessaryModifier` is promoted in `SafeAndConsensual`
+* `UnnecessaryFullyQualifiedName` is promoted in `SafeAndConsensual`
 * `MarkdownFormatterFactory` includes pattern is now defaulted to `*.MD` and `*.md`
 * `JsonFormatterFactory` includes pattern is now defaulted to `*.json`
 * **BREAKING CHANGE** `isProductionReady` has been removed, and replaced by a fully-functional `includeDraft`

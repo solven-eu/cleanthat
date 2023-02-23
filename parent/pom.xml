@@ -438,10 +438,12 @@
 
 							<cleanthat>
 								<sourceJdk>11</sourceJdk>
-								<version>2.7-SNAPSHOT</version>
+								<version>2.6</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
 									<mutator>StringToString</mutator>
+									<mutator>LiteralsFirstInComparisons</mutator>
+									<mutator>ComparisonWithNaN</mutator>
 								</mutators>
 							</cleanthat>
 

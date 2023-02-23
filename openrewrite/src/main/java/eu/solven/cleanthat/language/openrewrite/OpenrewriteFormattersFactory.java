@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.language.openrewrite;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +25,8 @@ import org.openrewrite.Recipe;
 import org.openrewrite.config.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -66,7 +67,7 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 			IEngineProperties engineProperties,
 			CleanthatStepProperties stepProperties) {
 
-		ILintFixerWithId processor;
+		ILintFixerWithId lintFixer;
 		String stepId = stepProperties.getId();
 		// override with explicit configuration
 		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
@@ -87,7 +88,7 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 			Environment environment = Environment.builder().scanRuntimeClasspath().build();
 			Recipe recipe = environment.activateRecipes(rawRecipes);
 
-			processor = new OpenrewriteLintFixer(recipe);
+			lintFixer = new OpenrewriteLintFixer(recipe);
 			break;
 		}
 
@@ -95,15 +96,21 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 			throw new IllegalArgumentException("Unknown step: " + stepId);
 		}
 
-		if (!processor.getId().equals(stepId)) {
-			throw new IllegalStateException("Inconsistency: " + processor.getId() + " vs " + stepId);
+		if (!lintFixer.getId().equals(stepId)) {
+			throw new IllegalStateException("Inconsistency: " + lintFixer.getId() + " vs " + stepId);
 		}
 
-		return processor;
+		return lintFixer;
 	}
 
 	private List<String> getDefaultRecipes() {
-		return Arrays.asList("org.openrewrite.java.cleanup.CommonStaticAnalysis");
+		// "org.openrewrite.java.cleanup.CommonStaticAnalysis" may not be consensual
+		return ImmutableList.<String>builder()
+				// This is consensual
+				.add("org.openrewrite.java.RemoveUnusedImports")
+				// This may not be consensual, it it provides a lot of value
+				.add("org.openrewrite.java.security.JavaSecurityBestPractices")
+				.build();
 	}
 
 	@Override

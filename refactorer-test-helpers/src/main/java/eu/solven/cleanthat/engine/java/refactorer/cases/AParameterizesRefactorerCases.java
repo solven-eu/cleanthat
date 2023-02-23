@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -108,35 +109,44 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
 		IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
+		boolean atLeastOnetest = false;
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {
+			atLeastOnetest |= true;
 			doTestMethod(transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareTypes.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCompareTypes(transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(UnmodifiedMethod.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCheckUnmodified(transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareClasses.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCompareClasses(javaParser, transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareInnerClasses.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCompareInnerClasses(javaParser, transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCompareInnerAnnotations(javaParser, transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()) {
+			atLeastOnetest |= true;
 			doCompareMethodsAsStrings(javaParser, transformer, testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()) {
+			atLeastOnetest |= true;
 			Class<?> realTestCase = loadTestCaseRealClass();
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			CompareCompilationUnitsAsStrings realAnnotation =
@@ -145,12 +155,15 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		}
 
 		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
+			atLeastOnetest |= true;
 			Class<?> realTestCase = loadTestCaseRealClass();
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			UnmodifiedCompilationUnitAsString realAnnotation =
 					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
 			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
 		}
+
+		Assertions.assertThat(atLeastOnetest).isTrue();
 	}
 
 	private Class<?> loadTestCaseRealClass() {

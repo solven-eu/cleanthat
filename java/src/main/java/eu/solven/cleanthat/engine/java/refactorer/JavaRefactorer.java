@@ -81,7 +81,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	@Override
-	public String doFormat(String dirtyCode, LineEnding ending) throws IOException {
+	public String doFormat(String dirtyCode) throws IOException {
 		LOGGER.debug("{}", this.refactorerProperties);
 		String cleanCode = applyTransformers(dirtyCode);
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);

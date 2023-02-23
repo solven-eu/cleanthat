@@ -53,7 +53,7 @@ public class TestJGitCodeProvider {
 		JGitCodeProvider codeProvider =
 				new JGitCodeProvider(Paths.get("/git_root/git_folder"), Mockito.mock(Git.class), "someSha1", true);
 
-		Assertions.assertThat(codeProvider.resolvePath(Paths.get("/root/folder/file")).toString().replace('\\', '/'))
+		Assertions.assertThat(codeProvider.resolvePath(Paths.get("root/folder/file")).toString().replace('\\', '/'))
 				.isEqualTo("/git_root/git_folder/root/folder/file");
 	}
 }

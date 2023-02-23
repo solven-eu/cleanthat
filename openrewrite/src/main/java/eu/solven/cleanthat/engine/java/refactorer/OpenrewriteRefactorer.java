@@ -32,7 +32,6 @@ import org.openrewrite.java.tree.J;
 import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * A {@link IMutator} configuring over an OpenRewrite {@link Recipe}
@@ -50,7 +49,7 @@ public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, Jav
 	}
 
 	@Override
-	public String doFormat(String content, LineEnding ending) throws IOException {
+	public String doFormat(String content) throws IOException {
 		return applyTransformers(content);
 	}
 

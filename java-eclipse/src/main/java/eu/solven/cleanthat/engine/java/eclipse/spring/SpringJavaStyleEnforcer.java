@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
-import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import io.spring.javaformat.formatter.Formatter;
 
@@ -54,7 +53,7 @@ public class SpringJavaStyleEnforcer implements ILintFixerWithId {
 	}
 
 	@Override
-	public String doFormat(String code, LineEnding ending) throws IOException {
+	public String doFormat(String code) throws IOException {
 		try {
 			Formatter formatter = new Formatter();
 

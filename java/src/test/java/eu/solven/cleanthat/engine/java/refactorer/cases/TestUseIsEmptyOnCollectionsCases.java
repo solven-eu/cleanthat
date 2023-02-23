@@ -24,29 +24,29 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseIsEmptyOnCollectionsCases;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestUseIsEmptyOnCollectionsCases extends AParameterizesRefactorerCases {
+public class TestUseIsEmptyOnCollectionsCases extends AParameterizesJavaparserRefactorerCases {
 
-	private static ARefactorerCases getStaticRefactorerCases() {
+	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new UseIsEmptyOnCollectionsCases();
 	}
 
 	public TestUseIsEmptyOnCollectionsCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
-		super(javaParser, testName, testCase);
+		super(javaParser, testCase);
 	}
 
 	// https://github.com/junit-team/junit4/wiki/parameterized-tests
 	@Parameters(name = "{1}")
 	public static Collection<Object[]> data() throws IOException {
-		ARefactorerCases testCases = getStaticRefactorerCases();
+		AJavaparserRefactorerCases testCases = getStaticRefactorerCases();
 		return listCases(testCases);
 	}
 
 	@Override
-	protected ARefactorerCases getCases() {
+	protected AJavaparserRefactorerCases getCases() {
 		return getStaticRefactorerCases();
 	}
 }

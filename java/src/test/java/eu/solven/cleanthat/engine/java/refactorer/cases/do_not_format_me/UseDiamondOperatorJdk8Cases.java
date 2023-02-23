@@ -7,10 +7,10 @@ import java.util.List;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 //TODO Have a maven module per version of Java, to ensure the post is valid
-public class UseDiamondOperatorJdk8Cases extends ARefactorerCases {
+public class UseDiamondOperatorJdk8Cases extends AJavaparserRefactorerCases {
 
 	@Override
 	public IJavaparserMutator getTransformer() {

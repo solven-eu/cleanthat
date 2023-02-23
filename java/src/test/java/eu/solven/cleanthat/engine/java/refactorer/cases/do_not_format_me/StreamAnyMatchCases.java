@@ -5,9 +5,9 @@ import java.util.List;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class StreamAnyMatchCases extends ARefactorerCases {
+public class StreamAnyMatchCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new StreamAnyMatch();

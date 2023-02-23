@@ -13,8 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.annotations;
+package eu.solven.cleanthat.engine.java.refactorer.test;
 
-public @interface CompareTypes {
+import com.github.javaparser.ast.Node;
+
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+
+/**
+ * {@link ARefactorerCases} for {@link IJavaparserMutator}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public abstract class AJavaparserRefactorerCases extends ARefactorerCases<Node, Node, IJavaparserMutator> {
 
 }

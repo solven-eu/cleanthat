@@ -24,5 +24,5 @@ import java.io.IOException;
  */
 public interface ILintFixerWithPath {
 
-	String doFormat(PathAndContent pathAndContent, LineEnding ending) throws IOException;
+	String doFormat(PathAndContent pathAndContent) throws IOException;
 }

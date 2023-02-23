@@ -32,7 +32,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import eu.solven.cleanthat.formatter.ILintFixer;
-import eu.solven.cleanthat.formatter.LineEnding;
 
 /**
  * Helps computing a difference score between code source
@@ -66,7 +65,7 @@ public class CodeDiffHelper {
 	 * @throws IOException
 	 */
 	protected long computeDiffScore(ILintFixer lintFixer, String content) throws IOException {
-		String formatted = lintFixer.doFormat(content, LineEnding.KEEP);
+		String formatted = lintFixer.doFormat(content);
 
 		if (formatted == null) {
 			// It means something failed while formatting

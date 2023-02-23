@@ -95,18 +95,22 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 		ConfigHelpers configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
 		CleanthatRepositoryProperties properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
 
-		codeProviderFormatter.formatCode(properties, codeProvider, false);
+		boolean dryRun = false;
+		codeProviderFormatter.formatCode(properties, codeProvider, dryRun);
 	}
 
 	private ICodeProviderWriter makeCodeProvider(Path root) throws IOException {
 		ICodeProviderWriter codeProvider;
 
-		// We do not rely on JGit as we do not want to add/commit/push when processing local repository
 		if (root.resolve(".git").toFile().isDirectory()) {
 			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
 			Git jgit = Git.open(root.toFile());
 
-			codeProvider = JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()), false);
+			// We can rely on JGit but we do not want to add/commit/push when processing local repository
+			// As the point is to look at the produced output
+			boolean commitPush = false;
+			codeProvider =
+					JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()), commitPush);
 		} else {
 			LOGGER.info("Processing {} with FileSystemCodeProvider (as we did not spot a '.git' directory)", root);
 			codeProvider = new FileSystemGitCodeProvider(root);

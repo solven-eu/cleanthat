@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.openrewrite.ExecutionContext;
@@ -47,8 +48,13 @@ public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Re
 	public Optional<Result> walkAst(CompilationUnit pre) {
 		ExecutionContext ctx = new InMemoryExecutionContext(Throwable::printStackTrace);
 
-		Result result = Iterables.getOnlyElement(recipe.run(Arrays.asList(pre), ctx).getResults());
-		return Optional.of(result);
+		List<Result> results = recipe.run(Arrays.asList(pre), ctx).getResults();
+		if (results.isEmpty()) {
+			return Optional.empty();
+		} else {
+			Result result = Iterables.getOnlyElement(results);
+			return Optional.of(result);
+		}
 	}
 
 }

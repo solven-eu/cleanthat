@@ -156,13 +156,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	protected Path resolvePath(Path path) {
-		if (path.isAbsolute()) {
-			// We receive absolute path, considering as root the git repository
-			// Hence we clean the leading '/' to build a path relative to the actual root
-			path = path.getRoot().relativize(path);
-		} else {
-			throw new IllegalArgumentException("We expected an absolute path");
-		}
+		CleanthatPathHelpers.checkContentPath(path);
 
 		return workingDir.resolve(path);
 	}

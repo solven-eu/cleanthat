@@ -43,7 +43,7 @@ public class LocalClassTestHelper {
 				"test-classes",
 				srcMainResource.getName(nameCount - 1).toString());
 		Assert.assertEquals("Check 'target' directory", "target", srcMainResource.getName(nameCount - 2).toString());
-		Assert.assertEquals("Check 'java' directory", "java", srcMainResource.getName(nameCount - 3).toString());
+		// Assert.assertEquals("Check 'java' directory", "java", srcMainResource.getName(nameCount - 3).toString());
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 

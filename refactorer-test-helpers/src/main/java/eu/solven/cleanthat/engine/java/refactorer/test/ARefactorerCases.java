@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.annotations;
+package eu.solven.cleanthat.engine.java.refactorer.test;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
 /**
- * This is a marker interface for cases which must have one and only-one 'pre' and a 'post' method, both returning a
- * Class<?> with a loadeable source-code (i.e. classes which are alone in their own java source file).
+ * Base class for the test-cases of a {@link IWalkingMutator}
  * 
  * @author Benoit Lacelle
  *
+ * @param <AST>
+ * @param <R>
+ * @param <M>
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface CompareClasses {
-	Class<?> pre();
+@SuppressWarnings("PMD.GenericsNaming")
+public abstract class ARefactorerCases<AST, R, M extends IWalkingMutator<AST, R>> {
+	public String getId() {
+		return getTransformer().getClass().getName();
+	}
 
-	Class<?> post();
+	public abstract IWalkingMutator<AST, R> getTransformer();
+
 }

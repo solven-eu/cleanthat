@@ -7,9 +7,9 @@ import org.junit.Ignore;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class EmptyControlStatementCases extends ARefactorerCases {
+public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new EmptyControlStatement();

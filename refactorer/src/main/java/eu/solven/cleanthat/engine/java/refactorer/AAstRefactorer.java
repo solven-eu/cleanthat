@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
@@ -69,6 +70,12 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		return mutators;
 	}
 
+	public static <AST, P> AST parse(AAstRefactorer<AST, P, ?, ?> refactorer, String sourceCode) {
+		P parser = refactorer.makeAstParser();
+
+		return refactorer.parseSourceCode(parser, sourceCode);
+	}
+
 	protected abstract P makeAstParser();
 
 	protected abstract AST parseSourceCode(P parser, String sourceCode);
@@ -100,7 +107,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			try {
 				walkNodeResult = ct.walkAst(compilationUnit);
 			} catch (RuntimeException e) {
-				throw new IllegalArgumentException("Issue with classTransformer: " + ct, e);
+				throw new IllegalArgumentException("Issue with mutator: " + ct, e);
 			}
 			if (walkNodeResult.isPresent()) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
@@ -133,19 +140,38 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			List<String> includedRules,
 			List<String> excludedRules,
 			boolean includeDraft) {
-
-		List<IMutator> allSingleMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
+		List<IMutator> allSingleMutators =
+				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
 		List<IMutator> allCompositeMutators =
+				new AllIncludingDraftCompositeMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
+
+		Set<String> allSingleIds = allSingleMutators.stream()
+				.flatMap(m -> m.getIds().stream())
+				.collect(Collectors.toCollection(TreeSet::new));
+		Set<String> allCompositeIds = allCompositeMutators.stream()
+				.flatMap(m -> m.getIds().stream())
+				.collect(Collectors.toCollection(TreeSet::new));
+
+		List<IMutator> compatibleSingleMutators =
+				new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
+		List<IMutator> compatibleCompositeMutators =
 				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
+
+		Set<String> compatibleSingleIds = compatibleSingleMutators.stream()
+				.flatMap(m -> m.getIds().stream())
+				.collect(Collectors.toCollection(TreeSet::new));
+		Set<String> compatibleCompositeIds = compatibleCompositeMutators.stream()
+				.flatMap(m -> m.getIds().stream())
+				.collect(Collectors.toCollection(TreeSet::new));
 
 		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
 			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
 				// We suppose there is no mutator from Composite which is not a single mutator
 				// Hence we return all single mutators
-				return allSingleMutators.stream();
+				return compatibleSingleMutators.stream();
 			} else {
 				List<IMutator> matchingMutators =
-						Stream.concat(allSingleMutators.stream(), allCompositeMutators.stream())
+						Stream.concat(compatibleSingleMutators.stream(), compatibleCompositeMutators.stream())
 								.filter(someMutator -> someMutator.getIds().contains(includedRule)
 										|| someMutator.getClass().getName().equals(includedRule))
 								.collect(Collectors.toList());
@@ -160,14 +186,20 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 					return optFromClassName.stream();
 				}
 
-				LOGGER.warn("includedMutator={} did not match any mutator. singleIds={} compositeIds={}",
-						includedRule,
-						allSingleMutators.stream()
-								.flatMap(m -> m.getIds().stream())
-								.collect(Collectors.toCollection(TreeSet::new)),
-						allCompositeMutators.stream()
-								.flatMap(m -> m.getIds().stream())
-								.collect(Collectors.toCollection(TreeSet::new)));
+				if (allSingleIds.contains(includedRule) || allCompositeIds.contains(includedRule)) {
+					LOGGER.warn(
+							"includedMutator={} matches some mutators, but not compatible with sourceCodeVersion={}",
+							includedRule,
+							sourceCodeVersion);
+				} else {
+					LOGGER.warn(
+							"includedMutator={} did not match any compatible mutator (sourceCodeVersion={}) singleIds={} compositeIds={}",
+							includedRule,
+							sourceCodeVersion,
+							compatibleSingleIds,
+							compatibleCompositeIds);
+				}
+
 				return Stream.empty();
 			}
 		}).collect(Collectors.toList());
@@ -182,9 +214,9 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 			// debug as it seems Spotless instantiate this quite often / for each file
 			if (isExcluded) {
-				LOGGER.debug("We exclude '{}'", mutator.getIds());
+				LOGGER.debug("We exclude {}->'{}'", mutator.getClass().getName(), mutator.getIds());
 			} else {
-				LOGGER.debug("We include '{}'", mutator.getIds());
+				LOGGER.debug("We include {}->'{}'", mutator.getClass().getName(), mutator.getIds());
 			}
 
 			return !isExcluded;

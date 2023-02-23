@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.test;
+package eu.solven.cleanthat.engine.java.refactorer;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
-public abstract class ARefactorerCases {
-	public String getId() {
-		return getTransformer().getClass().getName();
-	}
-
-	public abstract IJavaparserMutator getTransformer();
+/**
+ * Marks a {@link IMutator} an not doing anything, but behaving as always impacting the AST
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+public interface INoOpMutator {
 
 }

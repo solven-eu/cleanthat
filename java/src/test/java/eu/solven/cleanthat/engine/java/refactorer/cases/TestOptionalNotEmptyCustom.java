@@ -30,9 +30,9 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
-public class TestOptionalNotEmptyCustom extends ATestCases {
+public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
 
 	@Test
 	public void testNotIdempotent() throws IOException {

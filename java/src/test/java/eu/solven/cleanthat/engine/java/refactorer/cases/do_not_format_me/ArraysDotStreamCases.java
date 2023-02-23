@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class ArraysDotStreamCases extends ARefactorerCases {
+public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new ArraysDotStream();
@@ -49,7 +49,7 @@ public class ArraysDotStreamCases extends ARefactorerCases {
 	}
 
 	// @CompareMethods
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class EmptyArray {
 		public Object pre() {
 			return Arrays.asList().stream();
@@ -61,7 +61,7 @@ public class ArraysDotStreamCases extends ARefactorerCases {
 	}
 
 	// @CompareMethods
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ConstantArray {
 		public Object pre() {
 			return Arrays.asList("a", 1).stream();
@@ -73,7 +73,7 @@ public class ArraysDotStreamCases extends ARefactorerCases {
 	}
 
 	// @CompareMethods
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class IndividualArguments {
 		public Object pre(String a, Number b) {
 			return Arrays.asList(a, b).stream();

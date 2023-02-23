@@ -7,13 +7,16 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnchangedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class LocalVariableTypeInferenceCases extends ARefactorerCases {
+public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new LocalVariableTypeInference();
@@ -44,24 +47,24 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 			return i;
 		}
 	}
-	
+
 	@CompareMethods
 	public static class CaseLoop {
 		public void pre() {
-			for (int i = 0 ; i < 10 ; i++) {
+			for (int i = 0; i < 10; i++) {
 				System.out.println(i);
 			}
 		}
 
 		public void post() {
-			for (var i = 0 ; i < 10 ; i++) {
+			for (var i = 0; i < 10; i++) {
 				System.out.println(i);
 			}
 		}
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
-	@UnchangedMethod
+	@UnmodifiedMethod
 	// @CompareMethods
 	public static class CaseDifferentType_noReAssigment {
 		public Object pre() {
@@ -77,7 +80,7 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 
 	// If the variable type is replaced by var, it takes the initial type, which may not be compatible with further
 	// allocation
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CaseDifferentType_reAssigment {
 		public Object pre() {
 			List<?> i = new ArrayList<>();
@@ -86,6 +89,16 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 
 			return i;
 		}
+	}
+
+	@UnmodifiedCompilationUnitAsString(
+			pre = "import java.util.List;import java.util.ArrayList;import custom.CustomType; class SomeClass{"
+					+ "   void m(){ArrayList<CustomType> i = new ArrayList<>();}"
+					+ "}",
+			post = "import java.util.List;import java.util.ArrayList;import custom.CustomType; class SomeClass{"
+					+ "   void m(){var i = new ArrayList<>();}"
+					+ "}")
+	public static class CaseSameType_unresolved {
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
@@ -128,7 +141,7 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class NotLocal {
 		public Object pre(int i) {
 			return i;
@@ -136,7 +149,7 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 	}
 
 	// 'var' is not allowed by JDK in Compound declarations
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class CompoundDeclarations {
 		public Object pre() {
 			int i = 1, j = 2;
@@ -144,7 +157,7 @@ public class LocalVariableTypeInferenceCases extends ARefactorerCases {
 		}
 	}
 
-	@UnchangedMethod
+	@UnmodifiedMethod
 	public static class ClassField {
 		public Object pre() {
 			return new HashMap<>() {

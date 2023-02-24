@@ -16,14 +16,12 @@
 package eu.solven.cleanthat.spotless.language;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.markdown.FlexmarkStep;
 import com.diffplug.spotless.markdown.FreshMarkStep;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -88,20 +86,5 @@ public class MarkdownFormatterStepFactory extends AFormatterStepFactory {
 			throw new IllegalArgumentException("Unknown Java step: " + stepName);
 		}
 		}
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties flexmark = SpotlessStepProperties.builder().id("flexmark").build();
-		SpotlessStepParametersProperties flexmarkParameters = new SpotlessStepParametersProperties();
-		flexmarkParameters.putProperty("version", FlexmarkStep.defaultVersion());
-		flexmark.setParameters(flexmarkParameters);
-
-		SpotlessStepProperties freshmark = SpotlessStepProperties.builder().id("freshmark").build();
-		SpotlessStepParametersProperties freshmarkParameters = new SpotlessStepParametersProperties();
-		freshmarkParameters.putProperty("properties", Map.of("k1", "v1"));
-		freshmark.setParameters(freshmarkParameters);
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(flexmark).add(freshmark).build();
 	}
 }

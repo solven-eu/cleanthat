@@ -118,11 +118,6 @@ public class TestSpotlessFormatter_Eclipse {
 
 	CleanthatSession cleanthatSession;
 	{
-		// try {
-		// fileSystem = MemoryFileSystemBuilder.newEmpty().build();
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
 		fileSystem = Jimfs.newFileSystem();
 		cleanthatSession = new CleanthatSession(fileSystem.getPath(fileSystem.getSeparator()),
 				classpathCodeProvider,

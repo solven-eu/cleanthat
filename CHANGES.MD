@@ -7,6 +7,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `LocalVariableTypeInference` handles better Unresolved types
 * `LineEnding` management is dropped from `ILintFixer` and `ILintFixerWithPath`
 * `ModifierOrder` is promoted in `SafeAndConsensual`
+* `UnnecessaryModifier` does not strip anymore the `static` keyword of `MethodDeclaration`
 
 ## [2.6] - 2023-02-22
 ### Changes

@@ -34,11 +34,10 @@ public class TestCleanthatConfigInitializer {
 	public void testGenerate() throws IOException {
 		ICodeProvider codeProvider = FileSystemCodeProvider.forTests();
 		IEngineLintFixerFactory factory = Mockito.mock(IEngineLintFixerFactory.class);
-		CleanthatConfigInitializer initializer = new CleanthatConfigInitializer(codeProvider,
-				ConfigHelpers.makeYamlObjectMapper(),
-				Arrays.asList(factory));
+		CleanthatConfigInitializer initializer =
+				new CleanthatConfigInitializer(ConfigHelpers.makeYamlObjectMapper(), Arrays.asList(factory));
 
-		RepoInitializerResult result = initializer.prepareFile(false);
+		RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");

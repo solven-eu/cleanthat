@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -42,6 +43,7 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -63,6 +65,8 @@ import eu.solven.pepper.thread.PepperExecutorsHelper;
  * @author Benoit Lacelle
  */
 public class CodeProviderFormatter implements ICodeProviderFormatter {
+	private static final String KEY_NB_FILES_FORMATTED = "nb_files_formatted";
+
 	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final String EOL = "\r\n";
@@ -206,9 +210,42 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	// PMD.CloseResource: False positive as we did not open it ourselves
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.CloseResource" })
 	protected AtomicLongMap<String> processFiles(CleanthatSession cleanthatSession,
-			AtomicLongMap<String> languageToNbMutatedFiles,
+			AtomicLongMap<String> engineToNbMutatedFiles,
 			Map<Path, String> pathToMutatedContent,
 			IEngineProperties engineP) {
+		List<AutoCloseable> closeUs = new ArrayList<>();
+		// We rely on a ThreadLocal as Engines may not be threadSafe
+		// Hence, each new thread will compile its own engine
+		ThreadLocal<EngineAndLinters> currentThreadEngine = ThreadLocal.withInitial(() -> {
+			EngineAndLinters lintFixer = buildProcessors(engineP, cleanthatSession);
+
+			closeUs.add(lintFixer);
+
+			return lintFixer;
+		});
+
+		try {
+			AtomicLongMap<String> languageCounters =
+					processFiles(cleanthatSession, pathToMutatedContent, engineP, currentThreadEngine);
+			engineToNbMutatedFiles.addAndGet(engineP.getEngine(), languageCounters.get(KEY_NB_FILES_FORMATTED));
+
+			return languageCounters;
+		} finally {
+			closeUs.forEach(t -> {
+				try {
+					t.close();
+				} catch (Exception e) {
+					LOGGER.warn("Issue while closing {}", t, e);
+				}
+			});
+		}
+	}
+
+	@SuppressWarnings("PMD.CloseResource")
+	protected AtomicLongMap<String> processFiles(CleanthatSession cleanthatSession,
+			Map<Path, String> pathToMutatedContent,
+			IEngineProperties engineP,
+			ThreadLocal<EngineAndLinters> currentThreadEngine) {
 		ISourceCodeProperties sourceCodeProperties = engineP.getSourceCode();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
@@ -225,38 +262,17 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				PepperExecutorsHelper.newShrinkableFixedThreadPool("Cleanthat-CodeFormatter-");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
-		// We rely on a ThreadLocal as Engines may not be threadSafe
-		// Engine, each new thread will compile its own engine
-		ThreadLocal<EngineAndLinters> currentThreadEngine =
-				ThreadLocal.withInitial(() -> buildProcessors(engineP, cleanthatSession));
-
 		try {
 			cleanthatSession.getCodeProvider().listFilesForContent(file -> {
-				Path filePath = file.getPath();
+				Optional<Callable<Boolean>> optRunMe = onEachFile(cleanthatSession,
+						pathToMutatedContent,
+						currentThreadEngine,
+						languageCounters,
+						includeMatchers,
+						excludeMatchers,
+						file);
 
-				Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-				Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
-				if (matchingInclude.isPresent()) {
-					if (matchingExclude.isEmpty()) {
-						cs.submit(() -> {
-							EngineAndLinters engineSteps = currentThreadEngine.get();
-
-							try {
-								return doFormat(cleanthatSession, engineSteps, pathToMutatedContent, filePath);
-							} catch (IOException e) {
-								throw new UncheckedIOException("Issue with file: " + filePath, e);
-							} catch (RuntimeException e) {
-								throw new RuntimeException("Issue with file: " + filePath, e);
-							}
-						});
-					} else {
-						languageCounters.incrementAndGet("nb_files_both_included_excluded");
-					}
-				} else if (matchingExclude.isPresent()) {
-					languageCounters.incrementAndGet("nb_files_excluded_not_included");
-				} else {
-					languageCounters.incrementAndGet("nb_files_neither_included_nor_excluded");
-				}
+				optRunMe.ifPresent(c -> cs.submit(c));
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing files", e);
@@ -278,8 +294,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				boolean result = polled.get();
 
 				if (result) {
-					languageToNbMutatedFiles.incrementAndGet(engineP.getEngine());
-					languageCounters.incrementAndGet("nb_files_formatted");
+					languageCounters.incrementAndGet(KEY_NB_FILES_FORMATTED);
 				} else {
 					languageCounters.incrementAndGet("nb_files_already_formatted");
 				}
@@ -292,6 +307,45 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		}
 
 		return languageCounters;
+	}
+
+	private Optional<Callable<Boolean>> onEachFile(CleanthatSession cleanthatSession,
+			Map<Path, String> pathToMutatedContent,
+			ThreadLocal<EngineAndLinters> currentThreadEngine,
+			AtomicLongMap<String> languageCounters,
+			List<PathMatcher> includeMatchers,
+			List<PathMatcher> excludeMatchers,
+			ICodeProviderFile file) {
+		Path filePath = file.getPath();
+
+		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
+		if (matchingInclude.isPresent()) {
+			if (matchingExclude.isEmpty()) {
+				Callable<Boolean> runMe = () -> {
+					EngineAndLinters engineSteps = currentThreadEngine.get();
+
+					try {
+						return doFormat(cleanthatSession, engineSteps, pathToMutatedContent, filePath);
+					} catch (IOException e) {
+						throw new UncheckedIOException("Issue with file: " + filePath, e);
+					} catch (RuntimeException e) {
+						throw new RuntimeException("Issue with file: " + filePath, e);
+					}
+				};
+
+				return Optional.of(runMe);
+			} else {
+				languageCounters.incrementAndGet("nb_files_both_included_excluded");
+				return Optional.empty();
+			}
+		} else if (matchingExclude.isPresent()) {
+			languageCounters.incrementAndGet("nb_files_excluded_not_included");
+			return Optional.empty();
+		} else {
+			languageCounters.incrementAndGet("nb_files_neither_included_nor_excluded");
+			return Optional.empty();
+		}
 	}
 
 	private boolean doFormat(CleanthatSession cleanthatSession,

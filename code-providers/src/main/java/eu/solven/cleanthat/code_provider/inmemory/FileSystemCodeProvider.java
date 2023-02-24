@@ -35,7 +35,7 @@ import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.jimfs.Jimfs;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
@@ -66,7 +66,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@SuppressWarnings("PMD.CloseResource")
 	public static FileSystemCodeProvider forTests() throws IOException {
-		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+		FileSystem fs = Jimfs.newFileSystem();
 		return new FileSystemCodeProvider(CodeProviderHelpers.getRoot(fs));
 	}
 

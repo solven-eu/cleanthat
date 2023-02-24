@@ -56,8 +56,6 @@ import eu.solven.cleanthat.language.IEngineProperties;
 public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
-	public static final String ID_REFACTORER = "refactorer";
-
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
 
@@ -77,7 +75,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 
 	@Override
 	public String getId() {
-		return ID_REFACTORER;
+		return JavaRefactorerStep.ID_REFACTORER;
 	}
 
 	@Override

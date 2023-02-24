@@ -15,10 +15,12 @@
  */
 package eu.solven.cleanthat.spotless;
 
+import java.util.List;
 import java.util.Set;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Common behavior to any Spotless engine steps factory
@@ -27,11 +29,18 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
  *
  */
 // see com.diffplug.spotless.maven.FormatterFactory
-public abstract class AFormatterFactory {
+public abstract class AFormatterFactory implements IFormatterStepConstants {
 
 	public abstract Set<String> defaultIncludes();
 
 	public abstract AFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties);
+
+	/**
+	 * This is useful to demonstrate all available configuration
+	 * 
+	 * @return
+	 */
+	public abstract List<SpotlessStepProperties> exampleSteps();
 
 }

@@ -28,14 +28,14 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.jimfs.Jimfs;
 
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 public class TestFileSystemCodeProvider {
 	@Test
 	public void testInMemoryFileSystem() throws IOException {
-		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+		FileSystem fs = Jimfs.newFileSystem();
 		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
 		cp.listFilesForContent(file -> {
@@ -59,7 +59,7 @@ public class TestFileSystemCodeProvider {
 
 	@Test
 	public void testLoadFileOutOfRoot() throws IOException {
-		FileSystem fs = MemoryFileSystemBuilder.newEmpty().build();
+		FileSystem fs = Jimfs.newFileSystem();
 
 		Path secretPath = fs.getPath(fs.getSeparator(), "secretFile");
 		Files.writeString(secretPath, "secretContent");

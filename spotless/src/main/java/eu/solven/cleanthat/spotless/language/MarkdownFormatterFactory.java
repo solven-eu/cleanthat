@@ -15,13 +15,19 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.diffplug.spotless.markdown.FlexmarkStep;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Configure Spotless engine for '.MD' files
@@ -40,5 +46,20 @@ public class MarkdownFormatterFactory extends AFormatterFactory {
 	public MarkdownFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties) {
 		return new MarkdownFormatterStepFactory(this, codeProvider, formatterProperties);
+	}
+
+	@Override
+	public List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepProperties flexmark = SpotlessStepProperties.builder().id("flexmark").build();
+		SpotlessStepParametersProperties flexmarkParameters = new SpotlessStepParametersProperties();
+		flexmarkParameters.putProperty("version", FlexmarkStep.defaultVersion());
+		flexmark.setParameters(flexmarkParameters);
+
+		SpotlessStepProperties freshmark = SpotlessStepProperties.builder().id("freshmark").build();
+		SpotlessStepParametersProperties freshmarkParameters = new SpotlessStepParametersProperties();
+		freshmarkParameters.putProperty("properties", Map.of("k1", "v1"));
+		freshmark.setParameters(freshmarkParameters);
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(flexmark).add(freshmark).build();
 	}
 }

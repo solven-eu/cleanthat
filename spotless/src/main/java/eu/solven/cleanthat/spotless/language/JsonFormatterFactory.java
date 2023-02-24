@@ -15,13 +15,20 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Configure Spotless engine for '.json' files
@@ -43,5 +50,19 @@ public class JsonFormatterFactory extends AFormatterFactory {
 	public JsonFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties) {
 		return new JsonFormatterStepFactory(this, codeProvider, formatterProperties);
+	}
+
+	// This is useful to demonstrate all available configuration
+	@Override
+	public List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepProperties jackson = SpotlessStepProperties.builder().id("jackson").build();
+		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
+		jacksonParameters.putProperty("features",
+				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
+		jacksonParameters.putProperty("yaml_features",
+				ImmutableMap.builder().put(JsonGenerator.Feature.QUOTE_FIELD_NAMES.name(), false).build());
+		jackson.setParameters(jacksonParameters);
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}
 }

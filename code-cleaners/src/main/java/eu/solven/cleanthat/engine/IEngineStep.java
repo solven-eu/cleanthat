@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.mvn;
+package eu.solven.cleanthat.engine;
 
-import java.util.Collection;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.any_language.ACodeCleaner;
-import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
-import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import java.util.Set;
 
 /**
- * A default {@link ACodeCleaner} for maven
+ * Roughly describe an {@link IEngineLintFixerFactory} various steps.
  * 
  * @author Benoit Lacelle
  *
  */
-public class MavenCodeCleaner extends ACodeCleaner {
+public interface IEngineStep {
+	String getStep();
 
-	public MavenCodeCleaner(Collection<ObjectMapper> objectMappers,
-			ICleanthatConfigInitializer configInitializer,
-			ICodeProviderFormatter formatterProvider) {
-		super(objectMappers, configInitializer, formatterProvider);
-	}
-
+	Set<String> getDefaultIncludes();
 }

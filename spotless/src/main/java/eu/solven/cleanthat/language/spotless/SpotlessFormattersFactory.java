@@ -35,17 +35,23 @@ import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
+import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.EnrichedFormatter;
 import eu.solven.cleanthat.spotless.FormatterFactory;
 import eu.solven.cleanthat.spotless.SpotlessSession;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties.SpotlessEnginePropertiesBuilder;
+import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Formatter for Spotless Engine
@@ -140,19 +146,21 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public CleanthatEngineProperties makeDefaultProperties() {
-		return CleanthatEngineProperties.builder()
-				.engine(getEngine())
-				.step(CleanthatStepProperties.builder()
-						.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
-						.parameters(CleanthatSpotlessStepParametersProperties.builder().build())
-						.build())
-				.build();
+	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
+		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
+
+		engineBuilder.step(CleanthatStepProperties.builder()
+				.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
+				.parameters(CleanthatSpotlessStepParametersProperties.builder().build())
+				.build());
+
+		return engineBuilder.build();
 	}
 
 	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 	@Override
-	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties,
+			Set<String> subStepIds) {
 		Map<String, String> pathToContent = new LinkedHashMap<>();
 
 		if (!engineProperties.getSteps().isEmpty()) {
@@ -168,8 +176,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 					path = path.substring(ICleanthatConfigConstants.PATH_SEPARATOR.length());
 				}
 
-				SpotlessEngineProperties defaultSpotlessCustomConfig =
-						SpotlessEngineProperties.defaultEngineWithMarkdown();
+				SpotlessEngineProperties defaultSpotlessCustomConfig = makeDefaultConfig(subStepIds);
 				try {
 					pathToContent.put(path,
 							getConfigHelpers().getObjectMapper().writeValueAsString(defaultSpotlessCustomConfig));
@@ -180,6 +187,30 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		}
 
 		return pathToContent;
+	}
+
+	private SpotlessEngineProperties makeDefaultConfig(Set<String> formatIds) {
+		SpotlessEnginePropertiesBuilder spotlessEngine = SpotlessEngineProperties.builder();
+
+		formatIds.stream().sorted().forEach(formatId -> {
+			SpotlessFormatterProperties defaultConfig = SpotlessFormatterProperties.builder().format(formatId).build();
+			AFormatterFactory formatterFactory = FormatterFactory.makeFormatterFactory(defaultConfig);
+
+			List<SpotlessStepProperties> exampleSteps = formatterFactory.exampleSteps();
+
+			spotlessEngine
+					.formatter(SpotlessFormatterProperties.builder().format(formatId).steps(exampleSteps).build());
+		});
+
+		return spotlessEngine.build();
+	}
+
+	@Override
+	public List<IEngineStep> getMainSteps() {
+		return FormatterFactory.getFormatterIds()
+				.stream()
+				.map(formatterId -> new SpotlessEngineFormat(formatterId))
+				.collect(Collectors.toList());
 	}
 
 }

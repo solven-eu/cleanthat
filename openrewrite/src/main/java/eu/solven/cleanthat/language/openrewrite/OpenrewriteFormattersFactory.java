@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.language.openrewrite;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,10 +31,12 @@ import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepParametersProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -57,8 +60,8 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public Set<String> getDefaultIncludes() {
-		return Set.of("glob:**/*.java");
+	public List<IEngineStep> getMainSteps() {
+		return Arrays.asList(new OpenrewriteEngineStep());
 	}
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
@@ -75,7 +78,7 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 		LOGGER.debug("Processing: {}", stepId);
 
 		switch (stepId) {
-		case "openrewrite": {
+		case OpenrewriteEngineStep.ID_OPENREWRITE: {
 			// "org.openrewrite.java.cleanup.CommonStaticAnalysis"
 			Collection<String> rawRecipes = (Collection<String>) parameters.getCustomProperty("recipes");
 
@@ -114,18 +117,21 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public CleanthatEngineProperties makeDefaultProperties() {
-		CleanthatStepParametersProperties stepProperties = new CleanthatStepParametersProperties();
-		stepProperties.add("recipes", getDefaultRecipes());
+	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
+		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
 
-		return CleanthatEngineProperties.builder()
-				.engine(getEngine())
-				.step(CleanthatStepProperties.builder().id("openrewrite").parameters(stepProperties).build())
-				.build();
+		if (steps.contains(OpenrewriteEngineStep.ID_OPENREWRITE)) {
+			CleanthatStepParametersProperties stepProperties = new CleanthatStepParametersProperties();
+			stepProperties.add("recipes", getDefaultRecipes());
+			engineBuilder.step(CleanthatStepProperties.builder().id("openrewrite").parameters(stepProperties).build());
+		}
+
+		return engineBuilder.build();
 	}
 
 	@Override
-	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties,
+			Set<String> subStepIds) {
 		return Collections.emptyMap();
 	}
 

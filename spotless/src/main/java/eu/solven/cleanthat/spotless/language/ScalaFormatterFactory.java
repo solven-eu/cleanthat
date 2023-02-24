@@ -15,13 +15,18 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
 import java.util.Set;
 
+import com.diffplug.spotless.scala.ScalaFmtStep;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Configure Spotless engine for '.scala' files
@@ -47,5 +52,18 @@ public class ScalaFormatterFactory extends AFormatterFactory {
 	public ScalaFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties) {
 		return new ScalaFormatterStepFactory(this, codeProvider, formatterProperties);
+	}
+
+	@Override
+	public List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepProperties scalafmt = SpotlessStepProperties.builder().id("scalafmt").build();
+		SpotlessStepParametersProperties scalafmtParameters = new SpotlessStepParametersProperties();
+		scalafmtParameters.putProperty("version", ScalaFmtStep.defaultVersion());
+		scalafmtParameters.putProperty("scalaMajorVersion", ScalaFmtStep.defaultScalaMajorVersion());
+		// https://scalameta.org/scalafmt/docs/configuration.html
+		scalafmtParameters.putProperty(KEY_FILE, "repository:/.cleanthat/.scalafmt.conf");
+		scalafmt.setParameters(scalafmtParameters);
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(scalafmt).build();
 	}
 }

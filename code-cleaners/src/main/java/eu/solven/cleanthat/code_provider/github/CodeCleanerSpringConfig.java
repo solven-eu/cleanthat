@@ -18,6 +18,7 @@ package eu.solven.cleanthat.code_provider.github;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,9 @@ import org.springframework.context.annotation.Primary;
 
 import eu.solven.cleanthat.code_provider.github.event.CompositeCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
+import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineFormatterFactory;
@@ -60,11 +63,25 @@ public class CodeCleanerSpringConfig {
 
 		stringFormatters.forEach(sf -> {
 			String language = sf.getEngine();
-			LOGGER.info("Formatter registered for language={}: {}", language, sf);
+			LOGGER.info("Formatter registered for engine={}: {}", language, sf);
 			asMap.put(language, sf);
 		});
 
 		return new StringFormatterFactory(asMap);
+	}
+
+	@Bean
+	public ICleanthatConfigInitializer configInitializer(ConfigHelpers configHelpers,
+			List<IEngineLintFixerFactory> factories) {
+		// We exclude OpenRewrite as engine, given it is quite slow and consumes a lot of resources (including through
+		// ClassGraph?)
+		List<IEngineLintFixerFactory> cleanFactories =
+				factories.stream().filter(f -> !"openrewrite".equals(f.getEngine())).collect(Collectors.toList());
+		if (cleanFactories.size() != factories.size()) {
+			LOGGER.info("We disabled {} as engine in configInitializer", "openrewrite");
+		}
+
+		return new CleanthatConfigInitializer(configHelpers.getObjectMapper(), cleanFactories);
 	}
 
 	@Bean

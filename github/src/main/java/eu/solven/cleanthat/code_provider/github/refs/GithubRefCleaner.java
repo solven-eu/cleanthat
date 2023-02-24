@@ -66,14 +66,12 @@ import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.config.CleanthatConfigInitializer;
-import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
@@ -95,11 +93,11 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	final GithubCheckRunManager githubCheckRunManager;
 
 	public GithubRefCleaner(List<ObjectMapper> objectMappers,
-			List<IEngineLintFixerFactory> factories,
+			ICleanthatConfigInitializer configInitializer,
 			ICodeProviderFormatter formatterProvider,
 			GithubAndToken githubAndToken,
 			GithubCheckRunManager githubCheckRunManager) {
-		super(objectMappers, factories, formatterProvider);
+		super(objectMappers, configInitializer, formatterProvider);
 
 		this.githubAndToken = githubAndToken;
 
@@ -476,9 +474,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 				});
 				return false;
 			} else {
-				RepoInitializerResult result = new CleanthatConfigInitializer(codeProvider,
-						ConfigHelpers.getYaml(getObjectMappers()),
-						getFactories()).prepareFile(repo.isPrivate());
+				RepoInitializerResult result = generateDefaultConfiguration(codeProvider, repo.isPrivate());
 
 				GHCommit commit = commitConfig(defaultBranch, repo, result);
 				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());

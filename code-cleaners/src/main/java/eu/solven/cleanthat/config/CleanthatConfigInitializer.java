@@ -35,22 +35,24 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @author Benoit Lacelle
  *
  */
-public class CleanthatConfigInitializer {
+public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 	public static final String TEMPLATES_FOLDER = "/templates";
 
-	final ICodeProvider codeProvider;
+	// final ICodeProvider codeProvider;
 	final ObjectMapper objectMapper;
 	final Collection<IEngineLintFixerFactory> factories;
 
-	public CleanthatConfigInitializer(ICodeProvider codeProvider,
+	public CleanthatConfigInitializer(
+			// ICodeProvider codeProvider,
 			ObjectMapper objectMapper,
 			Collection<IEngineLintFixerFactory> factories) {
-		this.codeProvider = codeProvider;
+		// this.codeProvider = codeProvider;
 		this.objectMapper = objectMapper;
 		this.factories = factories;
 	}
 
-	public RepoInitializerResult prepareFile(boolean isPrivate) {
+	@Override
+	public RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivate) {
 		String defaultRepoPropertiesPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
 
 		// Let's follow Renovate and its configuration PR

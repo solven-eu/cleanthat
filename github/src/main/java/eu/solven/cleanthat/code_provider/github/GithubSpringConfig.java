@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.IGitService;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
@@ -55,10 +55,10 @@ public class GithubSpringConfig {
 
 	@Bean
 	public GithubCodeCleanerFactory githubCodeCleanerFactory(List<ObjectMapper> objectMappers,
-			List<IEngineLintFixerFactory> factories,
+			ICleanthatConfigInitializer configInitializer,
 			ICodeProviderFormatter formatterProvider,
 			GithubCheckRunManager githubCheckRunManager) {
-		return new GithubCodeCleanerFactory(objectMappers, factories, formatterProvider, githubCheckRunManager);
+		return new GithubCodeCleanerFactory(objectMappers, configInitializer, formatterProvider, githubCheckRunManager);
 	}
 
 }

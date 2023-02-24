@@ -20,9 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.diffplug.spotless.PaddedCell;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
@@ -80,9 +83,9 @@ public class SpotlessSession {
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
 	public String doStuff(EnrichedFormatter formatter, PathAndContent pathAndContent) {
-		CleanthatPathHelpers.checkContentPath(pathAndContent.getPath());
+		Path path = pathAndContent.getPath();
 
-		String rawPath = pathAndContent.getPath().toString();
+		String rawPath = path.toString();
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
@@ -96,14 +99,18 @@ public class SpotlessSession {
 			return rawBytes;
 		}
 
-		File absoluteFilePath = new File(rawPath);
+		File fakePathForSpotlessApi = getFakeFile(formatter.getFormatter().getRootDir(), path);
+		if (!fakePathForSpotlessApi.isAbsolute()) {
+			throw new IllegalArgumentException(
+					"Spotless expects an absolute file, while it received: " + fakePathForSpotlessApi);
+		}
 
 		try {
 			PaddedCell.DirtyState dirty = PaddedCell.calculateDirtyState(formatter.formatter,
-					absoluteFilePath,
+					fakePathForSpotlessApi,
 					rawBytes.getBytes(StandardCharsets.UTF_8));
 			if (dirty.isClean()) {
-				LOGGER.debug("This is already clean: {}", absoluteFilePath);
+				LOGGER.debug("This is already clean: {}", fakePathForSpotlessApi);
 				filesTracker.checkedButAlreadyClean();
 				return rawBytes;
 			} else if (dirty.didNotConverge()) {
@@ -120,7 +127,42 @@ public class SpotlessSession {
 				return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 			}
 		} catch (IOException e) {
-			throw new UncheckedIOException("Unable to format file " + absoluteFilePath, e);
+			throw new UncheckedIOException("Unable to format path=" + path, e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param root
+	 *            the root as provided by a {@link ICodeProvider}
+	 * @param relativeContentPath
+	 *            a relative path, as a contentPath from an {@link ICodeProvider}
+	 * @return a File for the default FileSystem (as required by Spotless)
+	 */
+	protected File getFakeFile(Path root, Path relativeContentPath) {
+		// This check is more to demonstrate the kind of expectations over given path
+		CleanthatPathHelpers.checkContentPath(relativeContentPath);
+		Path absoluteContentPath = root.resolve(relativeContentPath);
+
+		// Spotless expects absolute pathes, as they will be compared with some root
+		if (absoluteContentPath.getFileSystem().equals(FileSystems.getDefault())) {
+			return new File(absoluteContentPath.toString());
+		} else {
+			String realFsFakeRoot = FileSystems.getDefault().getSeparator();
+			// The fake root try to limit the risk of writing in improper locations
+			String someFakeRootDirectory = "cleanthat_fake_root_for_spotless";
+			String preventCollisions = UUID.randomUUID().toString();
+
+			// Spotless requires a real File (instead of a Path)
+			Path fakeRootInRealFs =
+					FileSystems.getDefault().getPath(realFsFakeRoot, someFakeRootDirectory, preventCollisions);
+
+			// This will make sure we can not traverse alternative directories
+			Path asRelativePath = absoluteContentPath.getRoot().relativize(absoluteContentPath);
+			// .toString() as FileSystem does not match
+			Path fakeContentInRealFs = CleanthatPathHelpers.resolveChild(fakeRootInRealFs, asRelativePath.toString());
+
+			return fakeContentInRealFs.toFile();
 		}
 	}
 

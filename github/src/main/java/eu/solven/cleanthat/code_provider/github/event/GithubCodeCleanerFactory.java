@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
@@ -33,16 +33,16 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
  */
 public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 	final List<ObjectMapper> objectMappers;
-	final List<IEngineLintFixerFactory> factories;
+	final ICleanthatConfigInitializer configInitializer;
 	final ICodeProviderFormatter formatterProvider;
 	final GithubCheckRunManager githubCheckRunManager;
 
 	public GithubCodeCleanerFactory(List<ObjectMapper> objectMappers,
-			List<IEngineLintFixerFactory> factories,
+			ICleanthatConfigInitializer configInitializer,
 			ICodeProviderFormatter formatterProvider,
 			GithubCheckRunManager githubCheckRunManager) {
 		this.objectMappers = objectMappers;
-		this.factories = factories;
+		this.configInitializer = configInitializer;
 		this.formatterProvider = formatterProvider;
 		this.githubCheckRunManager = githubCheckRunManager;
 	}
@@ -51,7 +51,7 @@ public class GithubCodeCleanerFactory implements ICodeCleanerFactory {
 	public Optional<IGitRefCleaner> makeCleaner(Object somethingInteresting) {
 		if (somethingInteresting instanceof GithubAndToken) {
 			GithubRefCleaner refCleaner = new GithubRefCleaner(objectMappers,
-					factories,
+					configInitializer,
 					formatterProvider,
 					(GithubAndToken) somethingInteresting,
 					githubCheckRunManager);

@@ -15,13 +15,18 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
 import java.util.Set;
 
+import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Configure Spotless engine for '.xml' files
@@ -43,5 +48,15 @@ public class XmlFormatterFactory extends AFormatterFactory {
 	public XmlFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties) {
 		return new XmlFormatterStepFactory(this, codeProvider, formatterProperties);
+	}
+
+	@Override
+	public List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepParametersProperties eclipseWtpParameters = new SpotlessStepParametersProperties();
+		eclipseWtpParameters.putProperty(XmlFormatterStepFactory.KEY_TYPE, EclipseWtpFormatterStep.XML);
+		SpotlessStepProperties eclipseWtp =
+				SpotlessStepProperties.builder().id("eclipseWtp").parameters(eclipseWtpParameters).build();
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(eclipseWtp).build();
 	}
 }

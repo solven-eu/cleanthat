@@ -29,6 +29,10 @@ public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			public static interface Baz {
 			}
+			
+			static String parse() {
+				return "parsed";
+			}
 		}
 
 		public interface Post {
@@ -44,6 +48,10 @@ public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 
 			// ditto
 			interface Baz {
+			}
+			
+			static String parse() {
+				return "parsed";
 			}
 		}
 	}

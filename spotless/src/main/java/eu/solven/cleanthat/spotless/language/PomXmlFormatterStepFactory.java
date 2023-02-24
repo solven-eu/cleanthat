@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.spotless.language;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.pom.SortPomCfg;
 import com.diffplug.spotless.pom.SortPomStep;
-import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
@@ -87,22 +85,4 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 		}
 		}
 	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties sortPom = SpotlessStepProperties.builder().id("sortPom").build();
-		SpotlessStepParametersProperties sortPomParameters = new SpotlessStepParametersProperties();
-		SortPomCfg defaultSortPomConfig = new SortPomCfg();
-		for (Field f : SortPomCfg.class.getFields()) {
-			try {
-				sortPomParameters.putProperty(f.getName(), f.get(defaultSortPomConfig));
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				LOGGER.warn("Issue fethcing default value for field={}", f, e);
-			}
-		}
-		sortPom.setParameters(sortPomParameters);
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(sortPom).build();
-	}
-
 }

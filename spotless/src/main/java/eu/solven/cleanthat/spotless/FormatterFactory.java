@@ -62,6 +62,9 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 public class FormatterFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterFactory.class);
 
+	// '-Dcleanthat.spotless.m2.repository=/Users/blacelle/.m2/repository' to reuse a local repository
+	public static final String PATH_M2_REPO = "cleanthat.spotless.m2.repository";
+
 	private static final String ID_JSON = "json";
 	private static final String ID_YAML = "yaml";
 	private static final String ID_XML = "xml";
@@ -84,8 +87,15 @@ public class FormatterFactory {
 		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
 		// JVM/Lambda instance)
 		if (REF_LOCALREPO.get() == null) {
-			REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
-			LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());
+			if (System.getProperty(PATH_M2_REPO) == null) {
+				REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
+				LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());
+			} else {
+				String rawPathM2Repository = System.getProperty(PATH_M2_REPO);
+				Path pathM2Repository = Path.of(rawPathM2Repository);
+				REF_LOCALREPO.compareAndSet(null, pathM2Repository);
+				LOGGER.info("We reuse local m2repository: {}", REF_LOCALREPO.get());
+			}
 		} else {
 			LOGGER.info("We re-use local m2repository: {}", REF_LOCALREPO.get());
 		}
@@ -108,8 +118,13 @@ public class FormatterFactory {
 				.map(s -> makeFormatterFactory(s))
 				.flatMap(f -> f.defaultIncludes().stream())
 				// Spotless patterns are always implicitly glob
-				.map(s -> "glob:" + s)
+				.map(s -> prefixWithGlob(s))
 				.collect(Collectors.toSet());
+	}
+
+	@Deprecated(since = "This is poor design")
+	public static String prefixWithGlob(String s) {
+		return "glob:" + s;
 	}
 
 	public static AFormatterFactory makeFormatterFactory(SpotlessFormatterProperties spotlessProperties) {
@@ -185,6 +200,7 @@ public class FormatterFactory {
 			Provisioner provisioner) {
 		return spotlessProperties.getSteps()
 				.stream()
+				.filter(s -> !s.isSkip())
 				.map(s -> stepFactory.makeStep(s, provisioner))
 				.collect(Collectors.toList());
 	}

@@ -182,7 +182,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	@Override
 	public String toString() {
 		try {
-			return jgit.remoteList().call().get(0).getURIs().get(0).getPath();
+			return jgit.remoteList().call().get(0).getURIs().get(0).getPath() + " in " + workingDir.toAbsolutePath();
 		} catch (GitAPIException e) {
 			throw new RuntimeException(e);
 		}

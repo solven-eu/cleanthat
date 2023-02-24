@@ -30,8 +30,9 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
+import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
@@ -47,14 +48,14 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
 
 	final Collection<ObjectMapper> objectMappers;
-	private final Collection<IEngineLintFixerFactory> factories;
+	final ICleanthatConfigInitializer configInitializer;
 	final ICodeProviderFormatter formatterProvider;
 
 	public ACodeCleaner(Collection<ObjectMapper> objectMappers,
-			Collection<IEngineLintFixerFactory> factories,
+			ICleanthatConfigInitializer configInitializer,
 			ICodeProviderFormatter formatterProvider) {
 		this.objectMappers = objectMappers;
-		this.factories = factories;
+		this.configInitializer = configInitializer;
 		this.formatterProvider = formatterProvider;
 	}
 
@@ -142,7 +143,8 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		}
 	}
 
-	public Collection<IEngineLintFixerFactory> getFactories() {
-		return factories;
+	protected RepoInitializerResult generateDefaultConfiguration(ICodeProvider codeProvider, boolean isPrivateRepo) {
+		return configInitializer.prepareFile(codeProvider, isPrivateRepo);
 	}
+
 }

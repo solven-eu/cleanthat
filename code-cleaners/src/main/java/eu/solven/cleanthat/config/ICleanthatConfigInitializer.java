@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.mvn;
+package eu.solven.cleanthat.config;
 
-import java.util.Collection;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.any_language.ACodeCleaner;
-import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
-import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 
 /**
- * A default {@link ACodeCleaner} for maven
+ * Knows how to generate a default cleanthat+engines configuration based on existing files.
  * 
  * @author Benoit Lacelle
  *
  */
-public class MavenCodeCleaner extends ACodeCleaner {
+public interface ICleanthatConfigInitializer {
 
-	public MavenCodeCleaner(Collection<ObjectMapper> objectMappers,
-			ICleanthatConfigInitializer configInitializer,
-			ICodeProviderFormatter formatterProvider) {
-		super(objectMappers, configInitializer, formatterProvider);
-	}
+	RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivateRepo);
 
 }

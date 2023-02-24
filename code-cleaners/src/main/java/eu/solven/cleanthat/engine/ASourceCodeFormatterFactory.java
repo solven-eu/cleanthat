@@ -15,6 +15,9 @@
  */
 package eu.solven.cleanthat.engine;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
@@ -41,5 +44,10 @@ public abstract class ASourceCodeFormatterFactory implements IEngineLintFixerFac
 
 	protected ICleanthatStepParametersProperties getParameters(CleanthatStepProperties rawProcessor) {
 		return rawProcessor.getParameters();
+	}
+
+	@Override
+	public Set<String> getDefaultIncludes() {
+		return getMainSteps().stream().flatMap(s -> s.getDefaultIncludes().stream()).collect(Collectors.toSet());
 	}
 }

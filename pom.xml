@@ -26,7 +26,7 @@
 
 		<!-- JVM languages -->
 		<module>java</module>
-		<module>java-eclipse</module>
+		<module>java-eclipse-cleanup</module>
 		<!-- mvn with Java and Kotlin is broken (as we are too weak in Kotlin-->
 		<!--module>kotlin</module-->
 
@@ -35,6 +35,9 @@
 
 		<module>test-helpers</module>
 		<module>refactorer-test-helpers</module>
+		
+		<!-- java-eclipse holds utilities related to Eclipse, but not a refactorer/IMutator -->
+		<module>java-eclipse</module>
 
 		<!-- Build automation tools -->
 		<module>maven</module>

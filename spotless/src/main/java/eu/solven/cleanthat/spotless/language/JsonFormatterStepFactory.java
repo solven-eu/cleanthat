@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.List;
 import java.util.Map;
 
 import com.diffplug.spotless.FormatterStep;
@@ -25,10 +24,6 @@ import com.diffplug.spotless.json.JacksonJsonStep;
 import com.diffplug.spotless.json.JsonSimpleStep;
 import com.diffplug.spotless.json.gson.GsonConfig;
 import com.diffplug.spotless.json.gson.GsonStep;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
@@ -128,7 +123,7 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 
 		@SuppressWarnings("unchecked")
 		Map<String, Boolean> jsonFeatures = parameters.getCustomProperty("json_features", Map.class);
-		if (features != null) {
+		if (jsonFeatures != null) {
 			jacksonConfig.appendJsonFeatureToToggle(jsonFeatures);
 		}
 
@@ -138,19 +133,6 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 		}
 
 		return JacksonJsonStep.create(jacksonConfig, version, provisioner);
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties jackson = SpotlessStepProperties.builder().id("jackson").build();
-		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
-		jacksonParameters.putProperty("features",
-				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
-		jacksonParameters.putProperty("yaml_features",
-				ImmutableMap.builder().put(JsonGenerator.Feature.QUOTE_FIELD_NAMES.name(), false).build());
-		jackson.setParameters(jacksonParameters);
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}
 
 }

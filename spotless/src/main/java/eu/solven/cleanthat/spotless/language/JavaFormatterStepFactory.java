@@ -33,7 +33,6 @@ import com.diffplug.spotless.java.RemoveUnusedImportsStep;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
@@ -48,7 +47,12 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
-	private static final List<String> DEFAULT_MUTATORS =
+	static final String KEY_ORDER = "order";
+	// The default eclipse configuration
+	static final String ORDER_DEFAULT_ECLIPSE =
+			Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
+
+	public static final List<String> DEFAULT_MUTATORS =
 			ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL).build();
 
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
@@ -100,7 +104,9 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private FormatterStep makeCleanthat(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		String cleanthatVersion = parameters.getCustomProperty("version", String.class);
 		if (cleanthatVersion == null) {
-			cleanthatVersion = CleanthatJavaStep.defaultVersion();
+			// TODO We should fetch latest cleanthat version available, or even current -SNAPSHOT
+			// CleanthatJavaStep.defaultVersion()
+			cleanthatVersion = "2.6";
 		}
 
 		String sourceJdk = parameters.getCustomProperty("source_jdk", String.class);
@@ -163,52 +169,11 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 		// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without
 		// blank line, and '\#` prefix for static imports.
-		String ordersString = parameters.getCustomProperty("order", String.class);
+		String ordersString = parameters.getCustomProperty(KEY_ORDER, String.class);
 		if (ordersString == null) {
-			// The default eclipse configuration
-			ordersString = Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
+			ordersString = ORDER_DEFAULT_ECLIPSE;
 		}
 		return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersString.split(","));
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties removeUnusedImports = SpotlessStepProperties.builder().id("removeUnusedImports").build();
-
-		SpotlessStepProperties importOrder = SpotlessStepProperties.builder().id("importOrder").build();
-		SpotlessStepParametersProperties importOrderParameters = new SpotlessStepParametersProperties();
-		importOrderParameters.putProperty(KEY_FILE, "repository:/.cleanthat/java-importorder.properties");
-		importOrder.setParameters(importOrderParameters);
-
-		// Cleanthat before Eclipse as CleanThat may break the style
-		SpotlessStepProperties cleanthat = SpotlessStepProperties.builder().id("cleanthat").build();
-		SpotlessStepParametersProperties cleanthatParameters = new SpotlessStepParametersProperties();
-		cleanthatParameters.putProperty("source_jdk", "11");
-		cleanthatParameters.putProperty("mutators", DEFAULT_MUTATORS);
-		cleanthat.setParameters(cleanthatParameters);
-
-		SpotlessStepProperties eclipse = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();
-		SpotlessStepParametersProperties eclipseParameters = new SpotlessStepParametersProperties();
-		eclipseParameters.putProperty("version", EclipseJdtFormatterStep.defaultVersion());
-		eclipseParameters.putProperty(KEY_FILE,
-				CleanthatUrlLoader.PREFIX_CODE + JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE);
-		eclipse.setParameters(eclipseParameters);
-
-		return ImmutableList.<SpotlessStepProperties>builder()
-				.add(removeUnusedImports)
-				.add(importOrder)
-				.add(eclipse)
-				.build();
-	}
-
-	public static SpotlessStepProperties makeDefaultEclipseStep() {
-		SpotlessStepProperties eclipse = SpotlessStepProperties.builder().id(ID_ECLIPSE).build();
-		SpotlessStepParametersProperties eclipseParameters = new SpotlessStepParametersProperties();
-		eclipseParameters.putProperty(JavaFormatterStepFactory.KEY_ECLIPSE_FILE,
-				CleanthatUrlLoader.PREFIX_CODE + JavaFormatterStepFactory.DEFAULT_ECLIPSE_FILE);
-		eclipse.setParameters(eclipseParameters);
-
-		return eclipse;
 	}
 
 }

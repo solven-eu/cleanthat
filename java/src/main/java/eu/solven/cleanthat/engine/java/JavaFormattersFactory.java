@@ -15,6 +15,8 @@
  */
 package eu.solven.cleanthat.engine.java;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,11 +25,14 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
+import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
+import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -62,7 +67,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 		LOGGER.debug("Processing: {}", stepId);
 
 		switch (stepId) {
-		case JavaRefactorer.ID_REFACTORER: {
+		case JavaRefactorerStep.ID_REFACTORER: {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
 			JavaRefactorer javaRefactorer = new JavaRefactorer(engineProperties, processorConfig);
 
@@ -83,24 +88,28 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 	}
 
 	@Override
-	public CleanthatEngineProperties makeDefaultProperties() {
-		return CleanthatEngineProperties.builder()
-				.engine(getEngine())
-				.step(CleanthatStepProperties.builder()
-						.id(JavaRefactorer.ID_REFACTORER)
-						.parameters(JavaRefactorerProperties.defaults())
-						.build())
-				.build();
+	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
+		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
+
+		if (steps.contains(JavaRefactorerStep.ID_REFACTORER)) {
+			engineBuilder.step(CleanthatStepProperties.builder()
+					.id(JavaRefactorerStep.ID_REFACTORER)
+					.parameters(JavaRefactorerProperties.defaults())
+					.build());
+		}
+
+		return engineBuilder.build();
 	}
 
 	@Override
-	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+	public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties,
+			Set<String> subStepIds) {
 		return Map.of();
 	}
 
 	@Override
-	public Set<String> getDefaultIncludes() {
-		return Set.of("glob:**/src/**/*.java");
+	public List<IEngineStep> getMainSteps() {
+		return Arrays.asList(new JavaRefactorerStep());
 	}
 
 }

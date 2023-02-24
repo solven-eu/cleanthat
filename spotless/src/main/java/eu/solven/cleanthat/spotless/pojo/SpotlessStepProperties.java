@@ -42,6 +42,9 @@ public class SpotlessStepProperties {
 	@lombok.NonNull
 	private final String id;
 
+	@Builder.Default
+	private final boolean skip = false;
+
 	// the step parameters
 	@Builder.Default
 	private SpotlessStepParametersProperties parameters = new SpotlessStepParametersProperties();

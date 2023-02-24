@@ -28,7 +28,7 @@ import org.kohsuke.github.GitHubBuilder;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.marschall.memoryfilesystem.MemoryFileSystemBuilder;
+import com.google.common.jimfs.Jimfs;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -122,7 +122,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			@Override
 			public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
 					IWebhookEvent input) {
-				try (FileSystem fs = MemoryFileSystemBuilder.newEmpty().build()) {
+				try (FileSystem fs = Jimfs.newFileSystem()) {
 					return githubWebhookHandler.filterWebhookEventTargetRelevantBranch(fs.getPath(fs.getSeparator()),
 							codeCleanerFactory,
 							input);
@@ -134,7 +134,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			@Override
 			public void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input) {
 				// We make a FileSystem per ICodeProvider
-				try (FileSystem fs = MemoryFileSystemBuilder.newEmpty().build()) {
+				try (FileSystem fs = Jimfs.newFileSystem()) {
 					githubWebhookHandler.doExecuteClean(fs.getPath(fs.getSeparator()), codeCleanerFactory, input);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);

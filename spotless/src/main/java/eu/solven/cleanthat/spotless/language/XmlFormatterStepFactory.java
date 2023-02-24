@@ -15,17 +15,12 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.List;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
-import com.diffplug.spotless.extra.wtp.EclipseWtpFormatterStep;
-import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
-import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
@@ -51,16 +46,6 @@ public class XmlFormatterStepFactory extends AFormatterStepFactory {
 	public FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner) {
 		String stepName = s.getId();
 		throw new IllegalArgumentException("Unknown step: " + stepName);
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepParametersProperties eclipseWtpParameters = new SpotlessStepParametersProperties();
-		eclipseWtpParameters.putProperty(KEY_TYPE, EclipseWtpFormatterStep.XML);
-		SpotlessStepProperties eclipseWtp =
-				SpotlessStepProperties.builder().id("eclipseWtp").parameters(eclipseWtpParameters).build();
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(eclipseWtp).build();
 	}
 
 }

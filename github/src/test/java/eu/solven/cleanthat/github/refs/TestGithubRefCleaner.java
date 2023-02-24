@@ -35,6 +35,7 @@ import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubRefCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
+import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
@@ -54,7 +55,7 @@ public class TestGithubRefCleaner {
 
 		GithubCheckRunManager checkRunManager = new GithubCheckRunManager(Mockito.mock(IGitService.class));
 		GithubRefCleaner cleaner = new GithubRefCleaner(Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
-				Arrays.asList(),
+				new CleanthatConfigInitializer(ConfigHelpers.makeJsonObjectMapper(), Arrays.asList()),
 				Mockito.any(ICodeProviderFormatter.class),
 				new GithubAndToken(gitHub, "someToken", Map.of()),
 				checkRunManager);

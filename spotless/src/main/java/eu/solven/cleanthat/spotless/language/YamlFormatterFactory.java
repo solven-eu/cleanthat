@@ -15,13 +15,20 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
+import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Configure Spotless engine for YAML format
@@ -44,5 +51,22 @@ public class YamlFormatterFactory extends AFormatterFactory {
 	public YamlFormatterStepFactory makeStepFactory(ICodeProvider codeProvider,
 			SpotlessFormatterProperties formatterProperties) {
 		return new YamlFormatterStepFactory(this, codeProvider, formatterProperties);
+	}
+
+	@Override
+	public List<SpotlessStepProperties> exampleSteps() {
+		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
+		jacksonParameters.putProperty("features",
+				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
+		jacksonParameters.putProperty("yaml_features",
+				ImmutableMap.builder().put(YAMLGenerator.Feature.MINIMIZE_QUOTES.name(), true).build());
+		SpotlessStepProperties jackson = SpotlessStepProperties.builder()
+				.id("jackson")
+				// skipped as jackson has many limitations (strip comments away, strip anchors away, etc)
+				.skip(true)
+				.parameters(jacksonParameters)
+				.build();
+
+		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}
 }

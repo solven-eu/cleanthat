@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,9 +40,22 @@ public interface IEngineLintFixerFactory {
 			IEngineProperties engineProperties,
 			CleanthatStepProperties stepProperties);
 
-	CleanthatEngineProperties makeDefaultProperties();
+	/**
+	 * 
+	 * @param steps
+	 *            with the id as defined in {@link IEngineStep}
+	 * @return
+	 */
+	CleanthatEngineProperties makeDefaultProperties(Set<String> steps);
 
-	Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties);
+	/**
+	 * 
+	 * @param engineProperties
+	 * @param subStepIds
+	 *            ids as provided initially by {@link #getMainSteps()}
+	 * @return
+	 */
+	Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties, Set<String> subStepIds);
 
 	/**
 	 * The typical file concerned by this {@link ILintFixer}
@@ -49,4 +63,13 @@ public interface IEngineLintFixerFactory {
 	 * @return the {@link Set} of relevant include patterns.
 	 */
 	Set<String> getDefaultIncludes();
+
+	/**
+	 * 
+	 * @return the main steps of given engine. This is descriptive only. It may represents steps in
+	 *         {@link IEngineLintFixerFactory}, or steps in the inner engine, not appearing in CleanThat own step
+	 *         hierarchy.
+	 */
+	List<IEngineStep> getMainSteps();
+
 }

@@ -110,13 +110,13 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 			// We are considering a modifier from an interface method|field|classOrInterface
 			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
 					|| modifier.getKeyword() == Keyword.FINAL
-					|| modifier.getKeyword() == Keyword.STATIC) {
+					|| modifier.getKeyword() == Keyword.STATIC && !(parentNode instanceof MethodDeclaration)) {
 				return modifier.remove();
 			}
 
 			return false;
 		} else if (grandParentNode instanceof AnnotationDeclaration) {
-			// We are considering a modifier from an interface method|field|classOrInterface
+			// We are considering a modifier from an annotation method|field|classOrInterface
 			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
 					|| modifier.getKeyword() == Keyword.FINAL
 					|| modifier.getKeyword() == Keyword.STATIC) {

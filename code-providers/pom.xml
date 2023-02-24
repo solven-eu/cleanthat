@@ -34,15 +34,8 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- https://github.com/marschall/memoryfilesystem -->
-		<dependency>
-			<!-- This enables manipulating Path not dependent on a local FileSystem -->
-			<groupId>com.github.marschall</groupId>
-			<artifactId>memoryfilesystem</artifactId>
-			<version>2.5.0</version>
-		</dependency>
-
 		<!-- https://github.com/google/jimfs -->
+		<!-- https://github.com/marschall/memoryfilesystem is an alternative, but we have issues with .toUri().getPath() -->
 		<dependency>
 			<groupId>com.google.jimfs</groupId>
 			<artifactId>jimfs</artifactId>

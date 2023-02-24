@@ -38,11 +38,10 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
@@ -81,10 +80,8 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 		Optional<File> optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 		if (optConfig.isEmpty()) {
 			LOGGER.info("Generate an initial configuration");
-			CleanthatConfigInitializer initializer = new CleanthatConfigInitializer(codeProvider,
-					appContext.getBean(ConfigHelpers.class).getObjectMapper(),
-					appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
-			RepoInitializerResult result = initializer.prepareFile(false);
+			ICleanthatConfigInitializer initializer = appContext.getBean(ICleanthatConfigInitializer.class);
+			RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
 
 			codeProvider.persistChanges(result.getPathToContents(), Arrays.asList(), Arrays.asList());
 
@@ -103,7 +100,7 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 		ICodeProviderWriter codeProvider;
 
 		if (root.resolve(".git").toFile().isDirectory()) {
-			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)");
+			LOGGER.info("Processing {} with JGitCodeProvider (as we spot a '.git' directory)", root);
 			Git jgit = Git.open(root.toFile());
 
 			// We can rely on JGit but we do not want to add/commit/push when processing local repository

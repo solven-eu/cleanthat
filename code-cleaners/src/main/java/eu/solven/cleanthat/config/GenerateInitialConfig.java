@@ -31,12 +31,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.google.common.util.concurrent.AtomicLongMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineStep;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}
@@ -67,7 +69,10 @@ public class GenerateInitialConfig {
 		List<CleanthatEngineProperties> mutableEngines = new ArrayList<>(properties.getEngines());
 		properties.setEngines(mutableEngines);
 
-		AtomicLongMap<String> factoryToFileCount = scanFileExtentions(codeProvider, factories);
+		AtomicLongMap<String> factoryToFileCount = scanFileExtentions(codeProvider,
+				factories,
+				IEngineLintFixerFactory::getEngine,
+				IEngineLintFixerFactory::getDefaultIncludes);
 
 		factoryToFileCount.asMap().forEach((engine, count) -> {
 			if (count == 0) {
@@ -78,10 +83,17 @@ public class GenerateInitialConfig {
 				IEngineLintFixerFactory factory =
 						factories.stream().filter(f -> engine.equals(f.getEngine())).findAny().get();
 
-				CleanthatEngineProperties engineProperties = factory.makeDefaultProperties();
+				AtomicLongMap<String> stepToFileCount = scanFileExtentions(codeProvider,
+						factory.getMainSteps(),
+						IEngineStep::getStep,
+						IEngineStep::getDefaultIncludes);
+
+				Set<String> subStepIds = stepToFileCount.asMap().keySet();
+				LOGGER.info("We accept subStepIds={} for {}", subStepIds, engine);
+				CleanthatEngineProperties engineProperties = factory.makeDefaultProperties(subStepIds);
 				mutableEngines.add(engineProperties);
 
-				pathToContent.putAll(factory.makeCustomDefaultFiles(engineProperties));
+				pathToContent.putAll(factory.makeCustomDefaultFiles(engineProperties, subStepIds));
 			}
 		});
 
@@ -90,8 +102,10 @@ public class GenerateInitialConfig {
 
 	// PMD.CloseResource: False positive as we did not open it ourselves
 	@SuppressWarnings("PMD.CloseResource")
-	public AtomicLongMap<String> scanFileExtentions(ICodeProvider codeProvider,
-			Collection<IEngineLintFixerFactory> factories) {
+	public <T> AtomicLongMap<String> scanFileExtentions(ICodeProvider codeProvider,
+			Collection<T> factories,
+			Function<T, String> getId,
+			Function<T, Set<String>> getDefaultIncludes) {
 		AtomicLongMap<String> factoryToFileCount = AtomicLongMap.create();
 
 		Path repoRoot = codeProvider.getRepositoryRoot();
@@ -102,13 +116,13 @@ public class GenerateInitialConfig {
 
 			Set<String> allIncludes = new HashSet<>();
 
-			factories.forEach(f -> allIncludes.addAll(f.getDefaultIncludes()));
+			factories.forEach(f -> allIncludes.addAll(getDefaultIncludes.apply(f)));
 
 			codeProvider.listFilesForFilenames(allIncludes, file -> {
 				Path filePath = file.getPath();
 
 				factories.forEach(factory -> {
-					Set<String> includes = factory.getDefaultIncludes();
+					Set<String> includes = getDefaultIncludes.apply(factory);
 
 					List<PathMatcher> includeMatchers =
 							IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
@@ -116,7 +130,7 @@ public class GenerateInitialConfig {
 							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 
 					if (matchingInclude.isPresent()) {
-						factoryToFileCount.getAndIncrement(factory.getEngine());
+						factoryToFileCount.getAndIncrement(getId.apply(factory));
 					}
 				});
 			});

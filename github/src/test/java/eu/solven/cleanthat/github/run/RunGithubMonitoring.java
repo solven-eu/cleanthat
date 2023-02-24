@@ -16,6 +16,8 @@
 package eu.solven.cleanthat.github.run;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +52,7 @@ import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
@@ -86,13 +89,19 @@ public class RunGithubMonitoring {
 			}
 
 			@Override
-			public CleanthatEngineProperties makeDefaultProperties() {
+			public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties) {
+			public Map<String, String> makeCustomDefaultFiles(CleanthatEngineProperties engineProperties,
+					Set<String> subStepIds) {
 				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public List<IEngineStep> getMainSteps() {
+				return Collections.emptyList();
 			}
 
 		};

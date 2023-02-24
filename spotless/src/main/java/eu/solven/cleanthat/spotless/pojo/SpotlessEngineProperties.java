@@ -68,6 +68,7 @@ public class SpotlessEngineProperties {
 	 * @return a minimal engine properties with rationale default. It supposed it will process a Git hub repository,
 	 *         which is most of the time accompanied by a README.MD at the root
 	 */
+	@Deprecated(since = "This has a very strict applicability: we suppose there is only a main README.MD")
 	public static SpotlessEngineProperties defaultEngineWithMarkdown() {
 		SpotlessStepProperties flexmark = SpotlessStepProperties.builder().id("flexmark").build();
 

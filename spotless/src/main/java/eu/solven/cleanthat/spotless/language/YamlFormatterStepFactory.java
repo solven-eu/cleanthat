@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.spotless.language;
 
-import java.util.List;
 import java.util.Map;
 
 import com.diffplug.spotless.FormatterStep;
@@ -23,10 +22,6 @@ import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.json.JacksonJsonStep;
 import com.diffplug.spotless.yaml.JacksonYamlConfig;
 import com.diffplug.spotless.yaml.JacksonYamlStep;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
@@ -87,19 +82,6 @@ public class YamlFormatterStepFactory extends AFormatterStepFactory {
 		}
 
 		return JacksonYamlStep.create(jacksonConfig, version, provisioner);
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepParametersProperties jacksonParameters = new SpotlessStepParametersProperties();
-		jacksonParameters.putProperty("features",
-				ImmutableMap.builder().put(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS.name(), true).build());
-		jacksonParameters.putProperty("yaml_features",
-				ImmutableMap.builder().put(YAMLGenerator.Feature.MINIMIZE_QUOTES.name(), true).build());
-		SpotlessStepProperties jackson =
-				SpotlessStepProperties.builder().id("jackson").parameters(jacksonParameters).build();
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(jackson).build();
 	}
 
 }

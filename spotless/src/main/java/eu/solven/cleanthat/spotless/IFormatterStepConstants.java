@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.mvn;
-
-import java.util.Collection;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.solven.cleanthat.any_language.ACodeCleaner;
-import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
-import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+package eu.solven.cleanthat.spotless;
 
 /**
- * A default {@link ACodeCleaner} for maven
+ * COmmon behavior to any Spotless engine steps factory
  * 
  * @author Benoit Lacelle
  *
  */
-public class MavenCodeCleaner extends ACodeCleaner {
-
-	public MavenCodeCleaner(Collection<ObjectMapper> objectMappers,
-			ICleanthatConfigInitializer configInitializer,
-			ICodeProviderFormatter formatterProvider) {
-		super(objectMappers, configInitializer, formatterProvider);
-	}
+public interface IFormatterStepConstants {
+	String KEY_FILE = "file";
+	String KEY_TYPE = "type";
 
 }

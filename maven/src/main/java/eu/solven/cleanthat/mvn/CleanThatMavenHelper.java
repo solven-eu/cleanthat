@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
@@ -40,10 +40,9 @@ public class CleanThatMavenHelper {
 
 	public static MavenCodeCleaner makeCodeCleaner(ApplicationContext appContext) {
 		Collection<ObjectMapper> objectMappers = appContext.getBeansOfType(ObjectMapper.class).values();
-		Collection<IEngineLintFixerFactory> factories =
-				appContext.getBeansOfType(IEngineLintFixerFactory.class).values();
+		ICleanthatConfigInitializer configInitializer = appContext.getBean(ICleanthatConfigInitializer.class);
 		ICodeProviderFormatter codeProviderFormatter = appContext.getBean(ICodeProviderFormatter.class);
-		return new MavenCodeCleaner(objectMappers, factories, codeProviderFormatter);
+		return new MavenCodeCleaner(objectMappers, configInitializer, codeProviderFormatter);
 	}
 
 	// Process the root of current module

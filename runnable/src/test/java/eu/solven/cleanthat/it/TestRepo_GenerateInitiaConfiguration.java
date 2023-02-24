@@ -53,10 +53,9 @@ public class TestRepo_GenerateInitiaConfiguration {
 				new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)),
 						SpotlessFormattersFactory.makeProvisioner());
 
-		CleanthatConfigInitializer initializer =
-				new CleanthatConfigInitializer(codeProvider, objectMapper, Arrays.asList(factory));
+		CleanthatConfigInitializer initializer = new CleanthatConfigInitializer(objectMapper, Arrays.asList(factory));
 
-		RepoInitializerResult result = initializer.prepareFile(false);
+		RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");

@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
@@ -86,27 +87,26 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 						objectMapper,
 						url);
 
-		// TODO We should add spotlessSteps dynamically
-		Assert.assertEquals(1, spotlessConfigResource.getFormatters().size());
+		Assert.assertEquals(2, spotlessConfigResource.getFormatters().size());
 		{
 
 			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(0);
 			Assert.assertEquals("markdown", formatter.getFormat());
 
+			Assert.assertEquals(2, formatter.getSteps().size());
+
+			Assert.assertEquals("flexmark", Iterables.getFirst(formatter.getSteps(), null).getId());
+			Assert.assertEquals("freshmark", Iterables.getLast(formatter.getSteps()).getId());
+		}
+		{
+			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(1);
+			Assert.assertEquals("pom", formatter.getFormat());
+
 			Assert.assertEquals(1, formatter.getSteps().size());
 
 			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
-			Assert.assertEquals("flexmark", firstStep.getId());
+			Assert.assertEquals("sortPom", firstStep.getId());
 		}
-		// {
-		// SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(1);
-		// Assert.assertEquals("pomXml", formatter.getFormat());
-		//
-		// Assert.assertEquals(1, formatter.getSteps().size());
-		//
-		// SpotlessStepProperties firstStep = formatter.getSteps().get(0);
-		// Assert.assertEquals("sortPom", firstStep.getId());
-		// }
 	}
 
 	@Test
@@ -147,29 +147,45 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 						url);
 
 		// TODO We should add spotlessSteps dynamically
-		Assert.assertEquals(1, spotlessConfigResource.getFormatters().size());
+		Assert.assertEquals(4, spotlessConfigResource.getFormatters().size());
 		{
 
 			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(0);
-			Assert.assertEquals("markdown", formatter.getFormat());
+			Assert.assertEquals("java", formatter.getFormat());
+
+			Assert.assertEquals(4, formatter.getSteps().size());
+
+			Assert.assertEquals("cleanthat", Iterables.getFirst(formatter.getSteps(), null).getId());
+			Assert.assertEquals("eclipse", Iterables.getLast(formatter.getSteps()).getId());
+		}
+		{
+
+			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(1);
+			Assert.assertEquals("json", formatter.getFormat());
 
 			Assert.assertEquals(1, formatter.getSteps().size());
 
 			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
-			Assert.assertEquals("flexmark", firstStep.getId());
+			Assert.assertEquals("jackson", firstStep.getId());
 		}
+		{
+			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(2);
+			Assert.assertEquals("pom", formatter.getFormat());
 
-		// {
-		// SpotlessStepProperties step = firstFormatter.getSteps().get(0);
-		// Assert.assertEquals("java", step.getId());
-		// }
-		// {
-		// SpotlessStepProperties step = firstFormatter.getSteps().get(1);
-		// Assert.assertEquals("json", step.getId());
-		// }
-		// {
-		// SpotlessStepProperties step = firstFormatter.getSteps().get(2);
-		// Assert.assertEquals("xml", step.getId());
-		// }
+			Assert.assertEquals(1, formatter.getSteps().size());
+
+			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
+			Assert.assertEquals("sortPom", firstStep.getId());
+		}
+		{
+
+			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(3);
+			Assert.assertEquals("yaml", formatter.getFormat());
+
+			Assert.assertEquals(1, formatter.getSteps().size());
+
+			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
+			Assert.assertEquals("jackson", firstStep.getId());
+		}
 	}
 }

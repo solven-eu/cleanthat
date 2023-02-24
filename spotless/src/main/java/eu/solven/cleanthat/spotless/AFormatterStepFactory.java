@@ -63,9 +63,7 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  *
  */
 // see com.diffplug.spotless.maven.FormatterFactory
-public abstract class AFormatterStepFactory {
-	public static final String KEY_FILE = "file";
-	public static final String KEY_TYPE = "type";
+public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 
 	private static final Cache<String, File> CONTENT_TO_FILE =
 			CacheBuilder.newBuilder().maximumSize(IPepperMemoryConstants.KB).build();
@@ -163,8 +161,8 @@ public abstract class AFormatterStepFactory {
 		case "licenseHeader": {
 			return Optional.of(makeLicenseHeader(parameters));
 		}
-		case "wtpEclipse": {
-			return Optional.of(makeWtpEclipse(parameters, provisioner));
+		case "eclipseWtp": {
+			return Optional.of(makeEclipseWtp(parameters, provisioner));
 		}
 
 		default: {
@@ -235,7 +233,7 @@ public abstract class AFormatterStepFactory {
 				.filterByFile(LicenseHeaderStep.unsupportedJvmFilesFilter());
 	}
 
-	protected FormatterStep makeWtpEclipse(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
+	protected FormatterStep makeEclipseWtp(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		EclipseWtpFormatterStep type =
 				EclipseWtpFormatterStep.valueOf(parameters.getCustomProperty(KEY_TYPE, String.class));
 

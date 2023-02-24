@@ -78,6 +78,7 @@ import eu.solven.cleanthat.git.GitIgnoreParser;
 import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 import eu.solven.cleanthat.spotless.FormatterFactory;
+import eu.solven.cleanthat.spotless.language.JavaFormatterFactory;
 import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
@@ -220,7 +221,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		CleanthatEngineProperties spotlessEngine;
 		if (optSpotlessProperties.isEmpty()) {
-			spotlessEngine = appContext.getBean(SpotlessFormattersFactory.class).makeDefaultProperties();
+			spotlessEngine = appContext.getBean(SpotlessFormattersFactory.class)
+					.makeDefaultProperties(Set.of(FormatterFactory.ID_JAVA));
 
 			repositoryProperties.setEngines(ImmutableList.<CleanthatEngineProperties>builder()
 					.addAll(repositoryProperties.getEngines())
@@ -269,7 +271,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 				.filter(f -> JavaFormatterStepFactory.ID_ECLIPSE.equalsIgnoreCase(f.getId()))
 				.findFirst();
 		if (optEclipseStep.isEmpty()) {
-			eclipseStep = JavaFormatterStepFactory.makeDefaultEclipseStep();
+			eclipseStep = JavaFormatterFactory.makeDefaultEclipseStep();
 
 			javaFormatter.setSteps(ImmutableList.<SpotlessStepProperties>builder()
 					.addAll(javaFormatter.getSteps())
@@ -284,7 +286,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		SpotlessStepParametersProperties eclipseParameters = eclipseStep.getParameters();
 		if (eclipseParameters == null) {
-			eclipseParameters = JavaFormatterStepFactory.makeDefaultEclipseStep().getParameters();
+			eclipseParameters = JavaFormatterFactory.makeDefaultEclipseStep().getParameters();
 			needToSaveSpotless = true;
 		}
 

@@ -140,11 +140,11 @@ public class CleanthatPathHelpers {
 		Path otherDummyNormalized = dummy.resolve(child).normalize();
 		// Check if `normalize()` removed any elements
 		if (otherDummyNormalized.getNameCount() != 1 + child.getNameCount()) {
-			throw new IllegalArgumentException("Invalid child path");
+			throw new IllegalArgumentException("Invalid child path: " + child);
 		}
 		// Verify that normalization did not change any name elements
 		if (!otherDummyNormalized.startsWith(dummy) || !otherDummyNormalized.endsWith(child)) {
-			throw new IllegalArgumentException("Invalid child path");
+			throw new IllegalArgumentException("Invalid child path: " + child);
 		}
 
 		Path result = parent.resolve(child);
@@ -156,7 +156,7 @@ public class CleanthatPathHelpers {
 			minDiff = 0;
 			// Detect case "".resolve("")
 			if (isEmptyPath(resultNormalized)) {
-				throw new IllegalArgumentException("Invalid child path");
+				throw new IllegalArgumentException("Invalid child path: " + child);
 			}
 		} else {
 			// Only perform further checks when `this` is not empty path "" because for "".resolve(other)
@@ -164,13 +164,13 @@ public class CleanthatPathHelpers {
 			minDiff = 1;
 			// Sanity check; probably already covered by normalization checks above
 			if (!resultNormalized.startsWith(thisNormalized)) {
-				throw new IllegalArgumentException("Invalid child path");
+				throw new IllegalArgumentException("Invalid child path: " + child);
 			}
 		}
 
 		// Verify that result is actually a 'true' child
 		if (resultNormalized.getNameCount() - thisNormalized.getNameCount() < minDiff) {
-			throw new IllegalArgumentException("Invalid child path");
+			throw new IllegalArgumentException("Invalid child path: " + child);
 		}
 
 		return result;

@@ -41,9 +41,9 @@ import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
+import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 @RunWith(SpringRunner.class)
@@ -58,7 +58,7 @@ public class ITGithubPullRequestCleaner {
 	@Autowired
 	List<ObjectMapper> objectMappers;
 	@Autowired
-	List<IEngineLintFixerFactory> factories;
+	ICleanthatConfigInitializer configInitializer;
 	@Autowired
 	ICodeProviderFormatter codeProviderFormatter;
 
@@ -73,7 +73,7 @@ public class ITGithubPullRequestCleaner {
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		cleaner = new GithubRefCleaner(objectMappers,
-				factories,
+				configInitializer,
 				codeProviderFormatter,
 				githubForRepo,
 				new GithubCheckRunManager(Mockito.mock(IGitService.class)));

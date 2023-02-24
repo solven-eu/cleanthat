@@ -18,12 +18,10 @@ package eu.solven.cleanthat.spotless.language;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.scala.ScalaFmtStep;
-import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.AFormatterStepFactory;
@@ -84,19 +82,6 @@ public class ScalaFormatterStepFactory extends AFormatterStepFactory {
 			throw new IllegalArgumentException("Unknown step: " + stepId);
 		}
 		}
-	}
-
-	// This is useful to demonstrate all available configuration
-	public static List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties scalafmt = SpotlessStepProperties.builder().id("scalafmt").build();
-		SpotlessStepParametersProperties scalafmtParameters = new SpotlessStepParametersProperties();
-		scalafmtParameters.putProperty("version", ScalaFmtStep.defaultVersion());
-		scalafmtParameters.putProperty("scalaMajorVersion", ScalaFmtStep.defaultScalaMajorVersion());
-		// https://scalameta.org/scalafmt/docs/configuration.html
-		scalafmtParameters.putProperty(KEY_FILE, "repository:/.cleanthat/.scalafmt.conf");
-		scalafmt.setParameters(scalafmtParameters);
-
-		return ImmutableList.<SpotlessStepProperties>builder().add(scalafmt).build();
 	}
 
 }

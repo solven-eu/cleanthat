@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.Singular;
 import lombok.extern.jackson.Jacksonized;
 
@@ -43,6 +44,7 @@ public class SpotlessFormatterProperties {
 	private String encoding;
 
 	// java, json, etc (or a generic 'format')
+	@NonNull
 	private String format;
 	// Any String. Useful when multiple formatters rely on the same format
 	private String alias;

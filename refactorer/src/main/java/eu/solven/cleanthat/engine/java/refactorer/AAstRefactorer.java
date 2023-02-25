@@ -142,7 +142,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			boolean includeDraft) {
 		List<IMutator> allSingleMutators =
 				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
-		List<IMutator> allCompositeMutators =
+		List<? extends IMutator> allCompositeMutators =
 				new AllIncludingDraftCompositeMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
 
 		Set<String> allSingleIds = allSingleMutators.stream()
@@ -154,7 +154,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 		List<IMutator> compatibleSingleMutators =
 				new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
-		List<IMutator> compatibleCompositeMutators =
+		List<? extends IMutator> compatibleCompositeMutators =
 				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
 
 		Set<String> compatibleSingleIds = compatibleSingleMutators.stream()

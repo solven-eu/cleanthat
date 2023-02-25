@@ -98,7 +98,8 @@ public class MutatorsScanner {
 	 *            The IMutator classes to instantiate
 	 * @return a {@link List} of {@link IMutator} detected in given package.
 	 */
-	public static List<IMutator> instantiate(JavaVersion sourceJdkVersion, List<Class<? extends IMutator>> classes) {
+	public static <T extends IMutator> List<T> instantiate(JavaVersion sourceJdkVersion,
+			List<Class<? extends T>> classes) {
 		return classes.stream().filter(c -> c != null).filter(c -> IMutator.class.isAssignableFrom(c)).map(c -> {
 			return instantiate(sourceJdkVersion, c);
 		}).filter(Objects::nonNull).collect(Collectors.toList());

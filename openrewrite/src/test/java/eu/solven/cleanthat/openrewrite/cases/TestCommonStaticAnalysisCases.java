@@ -38,6 +38,8 @@ import eu.solven.cleanthat.openrewrite.cases.do_not_format_me.CommonStaticAnalys
 @Ignore("TODO")
 public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
 
+	final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
+
 	private static ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> getStaticRefactorerCases() {
 		return new CommonStaticAnalysisCases();
 	}
@@ -61,8 +63,6 @@ public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases
 	@Override
 	protected J.CompilationUnit convertToAst(Node pre) {
 		String asString = pre.toString();
-
-		OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 
 		return AAstRefactorer.parse(refactorer, asString);
 	}

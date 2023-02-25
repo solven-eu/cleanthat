@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
@@ -25,6 +26,8 @@ import org.openrewrite.Recipe;
 import org.openrewrite.Result;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.J.CompilationUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 
@@ -38,6 +41,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  *
  */
 public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Result> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteMutator.class);
+
 	final Recipe recipe;
 
 	public OpenrewriteMutator(Recipe recipe) {
@@ -46,10 +51,21 @@ public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Re
 
 	@Override
 	public Optional<Result> walkAst(CompilationUnit pre) {
-		ExecutionContext ctx = new InMemoryExecutionContext(Throwable::printStackTrace);
+		AtomicReference<Throwable> refFirstError = new AtomicReference<>();
+
+		ExecutionContext ctx = new InMemoryExecutionContext(t -> {
+			if (refFirstError.compareAndSet(null, t)) {
+				LOGGER.debug("We register the first exception", t);
+			} else {
+				LOGGER.warn("Multiple exception are being thrown. This one is being discarded", t);
+			}
+		});
 
 		List<Result> results = recipe.run(Arrays.asList(pre), ctx).getResults();
 		if (results.isEmpty()) {
+			return Optional.empty();
+		} else if (refFirstError.get() != null) {
+			LOGGER.warn("OpenRewrite encountered an error with given AST", refFirstError.get());
 			return Optional.empty();
 		} else {
 			Result result = Iterables.getOnlyElement(results);

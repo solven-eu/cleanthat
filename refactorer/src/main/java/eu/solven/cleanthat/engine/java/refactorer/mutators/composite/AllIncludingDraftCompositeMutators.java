@@ -35,22 +35,29 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  * @author Benoit Lacelle
  *
  */
-public class AllIncludingDraftCompositeMutators extends CompositeMutator<IMutator>
+public class AllIncludingDraftCompositeMutators extends CompositeMutator<CompositeMutator<?>>
 		implements IConstructorNeedsJdkVersion {
 	// This packageName is not part of the public API
 	@Deprecated
 	static final String PACKAGE_COMPOSITE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators.composite";
 
-	static final Supplier<List<Class<? extends IMutator>>> ALL_INCLUDINGDRAFT =
+	static final Supplier<List<Class<? extends CompositeMutator<?>>>> ALL_INCLUDINGDRAFT =
 			Suppliers.memoize(() -> MutatorsScanner.scanPackageMutators(PACKAGE_COMPOSITE_MUTATORS)
 					.stream()
 					// Exclude itself
 					.filter(m -> !m.equals(AllIncludingDraftCompositeMutators.class))
+					.filter(m -> CompositeMutator.class.isAssignableFrom(m))
+					.map(m -> (Class<? extends CompositeMutator<?>>) m)
 
 					// Sort by className, to always apply mutators in the same order
 					.sorted(Comparator.comparing(m -> m.getClass().getName()))
 					.collect(Collectors.toList()));
 
+	/**
+	 * 
+	 * @param sourceJdkVersion
+	 *            used to filter relevant mutators. A recent sourceJdkVersion is compatible with old {@link IMutator}
+	 */
 	public AllIncludingDraftCompositeMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, MutatorsScanner.instantiate(sourceJdkVersion, ALL_INCLUDINGDRAFT.get())));
 	}

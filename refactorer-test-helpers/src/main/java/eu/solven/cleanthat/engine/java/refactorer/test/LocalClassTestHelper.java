@@ -35,7 +35,7 @@ public class LocalClassTestHelper {
 	}
 
 	@SuppressWarnings("PMD.MagicNumber")
-	public static Path getProjectTestSourceCode() throws IOException {
+	public static Path getSrcMainResourceFolder() throws IOException {
 		File someResourceInSrcTestResources = new ClassPathResource("/logback-test.xml").getFile();
 		Path srcMainResource = someResourceInSrcTestResources.getParentFile().toPath();
 		int nameCount = srcMainResource.getNameCount();
@@ -44,6 +44,11 @@ public class LocalClassTestHelper {
 				srcMainResource.getName(nameCount - 1).toString());
 		Assert.assertEquals("Check 'target' directory", "target", srcMainResource.getName(nameCount - 2).toString());
 		// Assert.assertEquals("Check 'java' directory", "java", srcMainResource.getName(nameCount - 3).toString());
+		return srcMainResource;
+	}
+
+	public static Path getProjectTestSourceCode() throws IOException {
+		Path srcMainResource = getSrcMainResourceFolder();
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 

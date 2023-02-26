@@ -38,6 +38,8 @@ import eu.solven.cleanthat.openrewrite.cases.do_not_format_me.ReorderModifiersCa
 @Ignore("TODO")
 public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
 
+	final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
+
 	private static ARefactorerCases<J.CompilationUnit, Result, OpenrewriteMutator> getStaticRefactorerCases() {
 		return new ReorderModifiersCases();
 	}
@@ -62,8 +64,16 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	protected J.CompilationUnit convertToAst(Node pre) {
 		String asString = pre.toString();
 
-		OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
-
 		return AAstRefactorer.parse(refactorer, asString);
+	}
+
+	@Override
+	protected <T extends Node> String toString(T post) {
+		return post.toString();
+	}
+
+	@Override
+	protected String toString(Result post) {
+		return post.getAfter().printAll();
 	}
 }

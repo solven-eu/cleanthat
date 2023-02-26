@@ -31,4 +31,13 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 	protected Node convertToAst(Node ast) {
 		return ast;
 	}
+
+	// protected <T extends Node> String toString(T post) {
+	// return post.toString();
+	// }
+
+	@Override
+	protected String toString(Node post) {
+		return post.toString();
+	}
 }

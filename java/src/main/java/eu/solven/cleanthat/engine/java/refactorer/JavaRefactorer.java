@@ -193,6 +193,11 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 		return LexicalPreservingPrinter.print(compilationUnit);
 	}
 
+	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		return reflectionTypeSolver;
+	}
+
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
 		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
@@ -201,10 +206,5 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		JavaParser parser = new JavaParser(configuration);
 		return parser;
-	}
-
-	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
-		return reflectionTypeSolver;
 	}
 }

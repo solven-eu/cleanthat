@@ -36,6 +36,7 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
@@ -158,6 +159,24 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 			CompareCompilationUnitsAsStrings realAnnotation =
 					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsStrings.class)[0];
 			doCompareCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
+		}
+
+		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
+			atLeastOnetest |= true;
+			Class<?> realTestCase = loadTestCaseRealClass();
+			// This is useful to get fully resolved annotations (e.g. String concatenations)
+			UnmodifiedCompilationUnitAsString realAnnotation =
+					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
+			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, transformer, testCase, realAnnotation);
+		}
+
+		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsResources.class).isPresent()) {
+			atLeastOnetest |= true;
+			Class<?> realTestCase = loadTestCaseRealClass();
+			// This is useful to get fully resolved annotations (e.g. String concatenations)
+			CompareCompilationUnitsAsResources realAnnotation =
+					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsResources.class)[0];
+			doCompareCompilationUnitsAsResources(javaParser, transformer, testCase, realAnnotation);
 		}
 
 		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {

@@ -18,9 +18,12 @@ package eu.solven.cleanthat.engine.java.refactorer.test;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -36,6 +39,7 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 
 import eu.solven.cleanthat.engine.java.refactorer.INoOpMutator;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
@@ -43,9 +47,11 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitsAsResources;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
+import eu.solven.pepper.resource.PepperResourceHelper;
 
 /**
  * Base class for Cleanthat testing framework
@@ -56,6 +62,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  * @param <R>
  */
 public abstract class ATestCases<N, R> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
+
 	private static final String PRE_METHOD = "pre";
 	private static final String PRE_CLASS = "Pre";
 
@@ -69,11 +77,13 @@ public abstract class ATestCases<N, R> {
 						|| c.getAnnotationByClass(CompareClasses.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedMethod.class).isPresent()
 						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent()
+						|| c.getAnnotationByClass(UnmodifiedInnerClasses.class).isPresent()
 						|| c.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()
-						|| c.getAnnotationByClass(UnmodifiedInnerClasses.class).isPresent());
+						|| c.getAnnotationByClass(CompareCompilationUnitsAsResources.class).isPresent()
+						|| c.getAnnotationByClass(UnmodifiedCompilationUnitsAsResources.class).isPresent());
 	}
 
 	public static MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
@@ -120,7 +130,9 @@ public abstract class ATestCases<N, R> {
 		doCheckUnmodifiedNode(transformer, oneCase, post);
 	}
 
-	protected void doCheckUnmodifiedNode(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase, Node pre) {
+	protected void doCheckUnmodifiedNode(IWalkingMutator<N, R> transformer,
+			ClassOrInterfaceDeclaration oneCase,
+			Node pre) {
 		LexicalPreservingPrinter.setup(pre);
 		// https://github.com/javaparser/javaparser/issues/3322
 		// We prefer not-processing clones as it may lead to dirty issues
@@ -160,21 +172,37 @@ public abstract class ATestCases<N, R> {
 		// This is generally the most relevant test: to be done first
 		{
 			Node clonedPre = pre.clone();
-			boolean transformed = transformer.walkAstHasChanged(convertToAst(pre));
+			String preAsString = toString(clonedPre);
+
+			Optional<R> optResult = transformer.walkAst(convertToAst(pre));
+
+			Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
+
 			// Rename the method before checking full equality
 			// method are lowerCase while classes are camel case
 			pre.setName(post.getName());
 
 			// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
-			Assert.assertEquals("Should have mutated " + clonedPre
+
+			String expectedPost = toString(post);
+			String msg = "Should have mutated " + preAsString
 					+ " into "
-					+ post
+					+ expectedPost
 					+ " but it turned into: "
 					+ pre
 					+ ". The whole testcase is: "
-					+ oneCase, post, pre);
-			// We check this after checking comparison with 'post' for greater test result readability
-			Assert.assertTrue("We miss a transformation flag for: " + pre, transformed);
+					+ oneCase;
+			String actualPost = toString(optResult.get());
+			Assert.assertEquals(msg, expectedPost, actualPost);
+
+			if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
+				// https://github.com/javaparser/javaparser/pull/2320
+				// 2 TextBlocks can have the same .toString representation but different underlying value as long as the
+				// underlying value are not both stripped
+				LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
+			} else {
+				Assert.assertEquals(msg, post, pre);
+			}
 		}
 		// Check the transformer is impact-less on already clean code
 		// This is a less relevant test: to be done later
@@ -186,6 +214,10 @@ public abstract class ATestCases<N, R> {
 			Assert.assertEquals("After not mutated", postBeforeWalk, post);
 		}
 	}
+
+	protected abstract <T extends Node> String toString(T post);
+
+	protected abstract String toString(R post);
 
 	protected void doCompareTypes(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
@@ -323,6 +355,30 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsString annotation) {
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
+		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
+	}
+
+	public void doCompareCompilationUnitsAsResources(JavaParser javaParser,
+			IWalkingMutator<N, R> transformer,
+			ClassOrInterfaceDeclaration testCase,
+			CompareCompilationUnitsAsResources annotation) {
+		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
+		CompilationUnit pre = javaParser.parse(preAsString).getResult().get();
+		String postAsString = PepperResourceHelper.loadAsString(annotation.post());
+		CompilationUnit post = javaParser.parse(postAsString).getResult().get();
+
+		doCompareExpectedChanges(transformer,
+				testCase,
+				pre.getClassByName("SomeClass").get(),
+				post.getClassByName("SomeClass").get());
+	}
+
+	public void doCheckUnmodifiedCompilationUnitsAsResources(JavaParser javaParser,
+			IWalkingMutator<N, R> transformer,
+			ClassOrInterfaceDeclaration testCase,
+			UnmodifiedCompilationUnitsAsResources annotation) {
+		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
+		CompilationUnit pre = javaParser.parse(preAsString).getResult().get();
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
 	}
 

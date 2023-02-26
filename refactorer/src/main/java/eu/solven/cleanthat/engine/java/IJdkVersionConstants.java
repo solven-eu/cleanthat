@@ -50,6 +50,11 @@ public interface IJdkVersionConstants {
 	 */
 	String JDK_11 = "11";
 
+	/**
+	 * Introduced TextBlocks
+	 */
+	String JDK_15 = "15";
+
 	String JDK_17 = "17";
 
 	/**

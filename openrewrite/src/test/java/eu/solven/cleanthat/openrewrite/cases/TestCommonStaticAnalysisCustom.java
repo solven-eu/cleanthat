@@ -85,4 +85,14 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 
 		return AAstRefactorer.parse(refactorer, asString);
 	}
+
+	@Override
+	protected <T extends Node> String toString(T post) {
+		return post.toString();
+	}
+
+	@Override
+	protected String toString(Result post) {
+		return post.getAfter().printAll();
+	}
 }

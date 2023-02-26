@@ -15,54 +15,62 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.it;
 
+import org.assertj.core.api.Assertions;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.type.VarType;
+import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 public class ReportLocalVariableTypeInference {
 	static final String testCase = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
-			+ "import java.util.HashMap;\n"
-			+ "import java.util.Map;\n"
-			+ "public class LocalVariableTypeInferenceCases {\n"
-			+ "	public Object pre() {\n"
-			+ "			Map<String, ?> i = new HashMap<>();\n"
-			+ "			return i;"
-			+ "	}\n"
-			+ "}\n"
-			+ "";
+			+ "import java.util.Optional;\n"
+			+ "\n"
+			+ "public class SomeClass {\n"
+			+ "\n"
+			+ "	String html = \"\"\"\n"
+			+ "			<html>\n"
+			+ "				<head>\n"
+			+ "					<meta charset=\"utf-8\">\n"
+			+ "				</head>\n"
+			+ "				<body class=\"default-view\" style=\"word-wrap: break-word;\">\n"
+			+ "					<p>Hello, world</p>\n"
+			+ "				</body>\n"
+			+ "			</html>\n"
+			+ "			\"\"\";\n"
+			+ "}";
 
-	static boolean processNotRecursively(Node node) {
-		if (!(node instanceof VariableDeclarationExpr)) {
-			return false;
-		}
-		VariableDeclarationExpr variableDeclarationExpr = (VariableDeclarationExpr) node;
+	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		return reflectionTypeSolver;
+	}
 
-		if (variableDeclarationExpr.getVariables().size() >= 2) {
-			return false;
-		}
+	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
+		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
-		VariableDeclarator singleVariableDeclaration = variableDeclarationExpr.getVariable(0);
+		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		if (singleVariableDeclaration.getType().isVarType()) {
-			return false;
-		}
-
-		singleVariableDeclaration.setType(new VarType());
-
-		return true;
+		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		JavaParser parser = new JavaParser(configuration);
+		return parser;
 	}
 
 	public static void main(String[] args) {
-		CompilationUnit node = StaticJavaParser.parse(testCase);
+		CompilationUnit node = makeDefaultJavaParser(true).parse(testCase).getResult().get();
 
 		node = LexicalPreservingPrinter.setup(node);
 
-		node.walk(innerNode -> {
-			processNotRecursively(innerNode);
-		});
+		TextBlockLiteralExpr textBlock = node.findAll(TextBlockLiteralExpr.class).get(0);
+
+		Assertions.assertThat(textBlock.getValue()).startsWith("\t\t\t<html>");
+
+		TextBlockLiteralExpr newExprFromStrippedString = new TextBlockLiteralExpr(textBlock.stripIndent());
+
+		Assertions.assertThat(textBlock.toString()).isEqualTo(newExprFromStrippedString.toString());
+		Assertions.assertThat(textBlock).isEqualTo(newExprFromStrippedString);
 	}
 }

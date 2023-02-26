@@ -38,4 +38,9 @@ public abstract class AParameterizesJavaparserRefactorerCases extends AParameter
 	protected Node convertToAst(Node node) {
 		return node;
 	}
+
+	@Override
+	protected String toString(Node node) {
+		return node.toString();
+	}
 }

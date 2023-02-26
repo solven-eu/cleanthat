@@ -144,13 +144,15 @@ public class UnnecessaryImport extends AJavaParserMutator {
 	 */
 	// https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java#L278
 	private static Set<String> tokensInUse(CompilationUnit unit) {
-		// Extract tokens from the java code:
-		Stream<Node> packageDecl =
-				unit.getPackageDeclaration().isPresent()
-						? Stream.of(unit.getPackageDeclaration().get())
-								.map(PackageDeclaration::getAnnotations)
-								.flatMap(NodeList::stream)
-						: Stream.empty();
+		Stream<Node> packageDecl;
+
+		if (unit.getPackageDeclaration().isPresent()) {
+			packageDecl = Stream.of(unit.getPackageDeclaration().get())
+					.map(PackageDeclaration::getAnnotations)
+					.flatMap(NodeList::stream);
+		} else {
+			packageDecl = Stream.empty();
+		}
 		Stream<String> typesInCode = Stream.concat(packageDecl, unit.getTypes().stream())
 				.map(Node::getTokenRange)
 				.filter(Optional::isPresent)
@@ -226,9 +228,12 @@ public class UnnecessaryImport extends AJavaParserMutator {
 			// only @throws and @exception have names who are importable; @param and others don't
 			EnumSet<JavadocBlockTag.Type> blockTagTypesWithImportableNames =
 					EnumSet.of(JavadocBlockTag.Type.THROWS, JavadocBlockTag.Type.EXCEPTION);
-			Stream<String> importableTagNames = blockTagTypesWithImportableNames.contains(tag.getType())
-					? Stream.of(tag.getName()).filter(Optional::isPresent).map(Optional::get)
-					: Stream.empty();
+			Stream<String> importableTagNames;
+			if (blockTagTypesWithImportableNames.contains(tag.getType())) {
+				importableTagNames = Stream.of(tag.getName()).filter(Optional::isPresent).map(Optional::get);
+			} else {
+				importableTagNames = Stream.empty();
+			}
 			Stream<String> tagDescriptions =
 					Stream.of(tag.getContent()).flatMap(UnnecessaryImport::parseJavadocDescription);
 			return Stream.concat(importableTagNames, tagDescriptions);

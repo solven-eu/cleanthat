@@ -159,7 +159,11 @@ public final class GitAttributesLineEndings_InMemory {
 			String absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
 			String subpath = FileSignature.subpath(rootDir, absPath);
 			String ending = hasNonDefaultEnding.getValueForExactKey(subpath);
-			return ending == null ? defaultEnding : ending;
+			if (ending == null) {
+				return defaultEnding;
+			} else {
+				return ending;
+			}
 		}
 	}
 

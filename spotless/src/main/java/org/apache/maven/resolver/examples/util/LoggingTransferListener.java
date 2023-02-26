@@ -46,7 +46,12 @@ public class LoggingTransferListener extends AbstractTransferListener {
 	@Override
 	public void transferInitiated(TransferEvent event) {
 		requireNonNull(event, "event cannot be null");
-		String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
+		String message;
+		if (event.getRequestType() == TransferEvent.RequestType.PUT) {
+			message = "Uploading";
+		} else {
+			message = "Downloading";
+		}
 
 		LOGGER.info(message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
 	}
@@ -104,7 +109,12 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		long contentLength = event.getTransferredBytes();
 		if (contentLength >= 0) {
 			String type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
-			String len = contentLength >= 1024 ? toKB(contentLength) + " KB" : contentLength + " B";
+			String len;
+			if (contentLength >= 1024) {
+				len = toKB(contentLength) + " KB";
+			} else {
+				len = contentLength + " B";
+			}
 
 			String throughput = "";
 			long duration = System.currentTimeMillis() - resource.getTransferStartTime();

@@ -127,7 +127,7 @@ public class SpotlessSession {
 				return new String(baos.toByteArray(), StandardCharsets.UTF_8);
 			}
 		} catch (IOException e) {
-			throw new UncheckedIOException("Unable to format path=" + path, e);
+			throw new UncheckedIOException("Unable to format path=" + path + " with " + formatter, e);
 		}
 	}
 

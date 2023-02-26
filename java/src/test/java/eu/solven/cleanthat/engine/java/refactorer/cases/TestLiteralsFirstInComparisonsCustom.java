@@ -81,4 +81,20 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 
 		Assertions.assertThat(transformed).isFalse();
 	}
+
+	@Test
+	public void testIssueWithUnresolvedSymbols() throws IOException {
+		Resource testRoaringBitmapSource =
+				new ClassPathResource("/source/do_not_format_me/ShaftEngine/RecordManager.java");
+		String asString =
+				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+
+		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
+		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
+		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+
+		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+
+		Assertions.assertThat(transformed).isTrue();
+	}
 }

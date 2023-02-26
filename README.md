@@ -15,6 +15,7 @@ Related projects:
 - https://www.moderne.io/ (paid)
 - https://eslint.org/docs/latest/extend/custom-formatters (free)
 - https://errorprone.info/docs/refaster (free)
+- https://github.com/XenoAmess/remove-unused-imports-maven-plugin (free, focused on imports)
 
 # Changes
 
@@ -67,7 +68,7 @@ Features :
 
 One liner (even without a `pom.xml`):
 
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
+        mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
 
 ## Gradle (Free)
 

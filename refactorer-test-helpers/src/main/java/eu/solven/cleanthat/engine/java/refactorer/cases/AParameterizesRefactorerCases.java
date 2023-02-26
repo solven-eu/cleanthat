@@ -104,6 +104,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		this.testCase = testCase;
 	}
 
+	@SuppressWarnings("PMD.NPathComplexity")
 	@Test
 	public void oneTestCase() {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());

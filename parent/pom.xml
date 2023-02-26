@@ -444,6 +444,7 @@
 									<mutator>StringToString</mutator>
 									<mutator>LiteralsFirstInComparisons</mutator>
 									<mutator>ComparisonWithNaN</mutator>
+									<mutator>AvoidInlineConditionals</mutator>
 								</mutators>
 							</cleanthat>
 

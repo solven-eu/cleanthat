@@ -33,6 +33,7 @@ import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.resolution.Resolvable;
+import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -153,19 +154,6 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 			// Or switching a nullable with another nullable
 			return false;
 		}
-
-		// if (isStaticField(scope) && !isStaticField(singleArgument)) {
-		// // Scope is a static field: keep it as scope
-		// return false;
-		// } else if (isField(scope) && !isField(singleArgument)) {
-		// // Scope is a field: keep it as scope
-		// return false;
-		// } else if (!isField(scope) && scope.isNameExpr() && !isField(singleArgument) && singleArgument.isNameExpr())
-		// {
-		// // Comparing 2 anonymous variables
-		// return false;
-		// }
-
 	}
 
 	private boolean mayBeNull(Expression expr) {
@@ -184,9 +172,17 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 			try {
 				resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
 			} catch (UnsolvedSymbolException e) {
-				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)");
+				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
 
 				return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
+			} catch (IllegalStateException e) {
+				if (e.getMessage().contains(SymbolResolver.class.getSimpleName())) {
+					// com.github.javaparser.ast.Node.getSymbolResolver()
+					LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
+					return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
+				} else {
+					throw new IllegalStateException(e);
+				}
 			}
 
 			if (resolved.isField() && resolved.asField().isStatic()) {

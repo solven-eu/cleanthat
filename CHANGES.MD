@@ -12,6 +12,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `IMutator` is generated into [MUTATORS.generated.MD](MUTATORS.generated.MD) by `RunGenerateDocumentation`
 * `UseUnderscoresInNumericLiterals` is an additional PMD mutator
 * `UseTextBlocks` is an additional mutator
+* `UnnecessaryImport` is an additional mutator
 
 ## [2.6] - 2023-02-22
 ### Changes

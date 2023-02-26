@@ -43,6 +43,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // https://www.baeldung.com/java-text-blocks
+// https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 public class UseTextBlocks extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseTextBlocks.class);
 

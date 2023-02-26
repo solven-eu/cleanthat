@@ -35,7 +35,7 @@ public class EnrichedFormatter {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this).add("id", getId()).toString();
+		return MoreObjects.toStringHelper(this).add("id", getId()).add("name", getFormatter().getName()).toString();
 	}
 
 	public String getId() {

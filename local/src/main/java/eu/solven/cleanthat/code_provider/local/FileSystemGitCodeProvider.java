@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.inmemory.FileSystemCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
@@ -47,7 +48,7 @@ public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
 	}
 
 	protected Predicate<Path> makeGitIgnorePredicate() throws IOException {
-		Path gitIgnore = resolvePath(getRepositoryRoot().resolve(".gitignore"));
+		Path gitIgnore = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), ".gitignore");
 
 		// TODO Beware there could be .gitignore in subfolders
 		// TODO Spotless implements this logic

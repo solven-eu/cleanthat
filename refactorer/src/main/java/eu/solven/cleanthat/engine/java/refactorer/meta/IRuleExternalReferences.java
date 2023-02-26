@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Helps understand why a rule is relevant, given other systems implementing the rule
@@ -33,7 +34,13 @@ public interface IRuleExternalReferences {
 	}
 
 	default Optional<String> getPmdId() {
+		// return getPmdIds().stream().findFirst();
 		return Optional.empty();
+	}
+
+	default Set<String> getPmdIds() {
+		// return getPmdId().stream().collect(Collectors.toSet());
+		return Set.of();
 	}
 
 	default String pmdUrl() {

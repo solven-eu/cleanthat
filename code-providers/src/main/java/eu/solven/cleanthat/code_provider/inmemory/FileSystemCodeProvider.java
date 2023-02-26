@@ -138,14 +138,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	protected Path resolvePath(Path inMemoryPath) {
-		if (!inMemoryPath.isAbsolute()) {
-			throw new IllegalArgumentException(
-					"We expect only absolute path, consider the root of the git repository as the root (path="
-							+ inMemoryPath
-							+ ")");
-		}
-
-		return root.resolve("." + inMemoryPath);
+		return CleanthatPathHelpers.resolveChild(root, inMemoryPath);
 	}
 
 	@Override
@@ -155,7 +148,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			Path resolved = resolvePath(inMemoryPath);
 			try {
-				Files.createDirectories(inMemoryPath.getParent());
+				Files.createDirectories(resolved.getParent());
 
 				LOGGER.info("Write file: {}", resolved);
 				Files.write(resolved, content.getBytes(StandardCharsets.UTF_8));

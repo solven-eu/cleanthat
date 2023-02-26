@@ -164,7 +164,7 @@ public abstract class ATestCases<N, R> {
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
 
-	private <T extends Node & NodeWithSimpleName<?>> void doCompareExpectedChanges(IWalkingMutator<N, R> transformer,
+	private <T extends Node> void doCompareExpectedChanges(IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase,
 			T pre,
 			T post) {
@@ -176,32 +176,36 @@ public abstract class ATestCases<N, R> {
 
 			Optional<R> optResult = transformer.walkAst(convertToAst(pre));
 
-			Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
-
-			// Rename the method before checking full equality
-			// method are lowerCase while classes are camel case
-			pre.setName(post.getName());
-
-			// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
-
-			String expectedPost = toString(post);
-			String msg = "Should have mutated " + preAsString
-					+ " into "
-					+ expectedPost
-					+ " but it turned into: "
-					+ pre
-					+ ". The whole testcase is: "
-					+ oneCase;
-			String actualPost = toString(optResult.get());
-			Assert.assertEquals(msg, expectedPost, actualPost);
-
-			if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
-				// https://github.com/javaparser/javaparser/pull/2320
-				// 2 TextBlocks can have the same .toString representation but different underlying value as long as the
-				// underlying value are not both stripped
-				LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
+			if (optResult.isEmpty()) {
+				Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
 			} else {
-				Assert.assertEquals(msg, post, pre);
+				// Rename the method before checking full equality
+				// method are lowerCase while classes are camel case
+				if (pre instanceof NodeWithSimpleName<?> && post instanceof NodeWithSimpleName<?>) {
+					((NodeWithSimpleName<?>) pre).setName(((NodeWithSimpleName<?>) post).getName());
+				}
+
+				// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
+
+				String expectedPost = toString(post);
+				String msg = "Should have mutated " + preAsString
+						+ " into "
+						+ expectedPost
+						+ " but it turned into: "
+						+ pre
+						+ ". The whole testcase is: "
+						+ oneCase;
+				String actualPost = toString(optResult.get());
+				Assert.assertEquals(msg, expectedPost, actualPost);
+
+				if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
+					// https://github.com/javaparser/javaparser/pull/2320
+					// 2 TextBlocks can have the same .toString representation but different underlying value as long as
+					// the underlying value are not both stripped
+					LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
+				} else {
+					Assert.assertEquals(msg, post, pre);
+				}
 			}
 		}
 		// Check the transformer is impact-less on already clean code
@@ -344,10 +348,8 @@ public abstract class ATestCases<N, R> {
 			CompareCompilationUnitsAsStrings annotation) {
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
 		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
-		doCompareExpectedChanges(transformer,
-				testCase,
-				pre.getClassByName("SomeClass").get(),
-				post.getClassByName("SomeClass").get());
+
+		doCompareExpectedChanges(transformer, testCase, pre, post);
 	}
 
 	public void doCheckUnmodifiedCompilationUnitsAsStrings(JavaParser javaParser,
@@ -355,7 +357,7 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsString annotation) {
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
-		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
+		doCheckUnmodifiedNode(transformer, testCase, pre);
 	}
 
 	public void doCompareCompilationUnitsAsResources(JavaParser javaParser,
@@ -364,13 +366,13 @@ public abstract class ATestCases<N, R> {
 			CompareCompilationUnitsAsResources annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
 		CompilationUnit pre = javaParser.parse(preAsString).getResult().get();
+		Assertions.assertThat(pre.getTypes()).hasSize(1);
+
 		String postAsString = PepperResourceHelper.loadAsString(annotation.post());
 		CompilationUnit post = javaParser.parse(postAsString).getResult().get();
+		Assertions.assertThat(post.getTypes()).hasSize(1);
 
-		doCompareExpectedChanges(transformer,
-				testCase,
-				pre.getClassByName("SomeClass").get(),
-				post.getClassByName("SomeClass").get());
+		doCompareExpectedChanges(transformer, testCase, pre, post);
 	}
 
 	public void doCheckUnmodifiedCompilationUnitsAsResources(JavaParser javaParser,

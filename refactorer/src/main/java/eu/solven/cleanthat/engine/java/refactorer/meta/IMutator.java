@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -41,8 +42,14 @@ public interface IMutator extends IRuleExternalReferences {
 	}
 
 	default Set<String> getIds() {
-		Set<String> ids = Stream.of(Optional.of(getId()), getCheckstyleId(), getPmdId(), getSonarId(), getCleanthatId())
-				.flatMap(Optional::stream)
+		Set<String> ids = Stream
+				.of(Optional.of(getId()).stream(),
+						getPmdId().stream(),
+						getPmdIds().stream(),
+						getCheckstyleId().stream(),
+						getSonarId().stream(),
+						getCleanthatId().stream())
+				.flatMap(Functions.identity())
 				.filter(s -> !"TODO".equals(s))
 				// Not sorted to privilege PMD over SONAR
 				// .sorted()

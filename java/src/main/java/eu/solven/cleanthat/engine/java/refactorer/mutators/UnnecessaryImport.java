@@ -213,7 +213,7 @@ public class UnnecessaryImport extends AJavaParserMutator {
 			if (packageName.isEmpty()) {
 				return !imp.contains(".");
 			}
-			return imp.startsWith(packageName) && imp.lastIndexOf(".") <= packageName.length();
+			return imp.startsWith(packageName) && imp.lastIndexOf('.') <= packageName.length();
 		}).collect(Collectors.toList());
 	}
 

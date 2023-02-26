@@ -44,6 +44,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  */
 // https://www.baeldung.com/java-text-blocks
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
+// TODO Handle intermediate parenthesis
 public class UseTextBlocks extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseTextBlocks.class);
 
@@ -106,12 +107,11 @@ public class UseTextBlocks extends AJavaParserMutator {
 		}
 
 		BinaryExpr binaryExpr = expr.asBinaryExpr();
-
-		List<StringLiteralExpr> underlyingStrings = new ArrayList<>();
-
 		if (binaryExpr.getOperator() != Operator.PLUS) {
 			return Optional.empty();
 		}
+
+		List<StringLiteralExpr> underlyingStrings = new ArrayList<>();
 
 		Expression left = binaryExpr.getLeft();
 		Optional<List<StringLiteralExpr>> leftAsList = optAsList(left);

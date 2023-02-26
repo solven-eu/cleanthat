@@ -48,6 +48,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
+@SuppressWarnings("PMD.GodClass")
 public class LiteralsFirstInComparisons extends AJavaParserMutator implements IMutatorDescriber {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 

@@ -127,6 +127,12 @@ isDraft
 
 Require sourceJdk: 1
 
+### [UnnecessaryImport](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryImport.java)
+
+CheckStyle: UnusedImports
+
+Require sourceJdk: 1
+
 ### [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 
 PMD: UnnecessaryModifier
@@ -166,6 +172,21 @@ Sonar: RSPEC-1155
 isDraft
 
 Require sourceJdk: 1.6
+
+### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
+
+
+isDraft
+
+Require sourceJdk: 15
+
+### [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
+
+PMD: UseUnderscoresInNumericLiterals
+
+isDraft
+
+Require sourceJdk: 1.7
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)

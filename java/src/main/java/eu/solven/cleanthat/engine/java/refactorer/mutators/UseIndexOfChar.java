@@ -34,6 +34,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
+// TODO Implements lastIndexOf
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
 public class UseIndexOfChar extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);

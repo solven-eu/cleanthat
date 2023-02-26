@@ -81,7 +81,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 
 			if (noUnderscore.matches("\\d+")) {
 				int nbDigits = noUnderscore.length();
-				StringBuilder sb = new StringBuilder(nbDigits + nbDigits / 3);
+				StringBuilder sb = new StringBuilder(nbDigits + nbDigits / BLOCK_SIZE);
 
 				appendWithUnderscores(noUnderscore, sb);
 
@@ -113,12 +113,12 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 				int indexOfDot = noUnderscore.indexOf('.');
 				if (indexOfDot <= 0) {
 					int nbDigits = noUnderscore.length();
-					sb = new StringBuilder(nbDigits + nbDigits / 3);
+					sb = new StringBuilder(nbDigits + nbDigits / BLOCK_SIZE);
 
 					appendWithUnderscores(noUnderscore.substring(0, lastIndex), sb);
 				} else {
 					int totalNbDigits = noUnderscore.length() - 1;
-					sb = new StringBuilder(totalNbDigits + 1 + totalNbDigits / 3);
+					sb = new StringBuilder(totalNbDigits + 1 + totalNbDigits / BLOCK_SIZE);
 
 					{
 						String beforeDot = noUnderscore.substring(0, indexOfDot);

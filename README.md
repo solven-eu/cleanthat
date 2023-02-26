@@ -20,6 +20,12 @@ Related projects:
 
 See [CHANGES.MD](CHANGES.MD)
 
+- 2023-02-22: 2.6 Latest release
+- ...
+- 2023-02-06: 2.0 Major Release leveraging from/to [Spotless](https://github.com/diffplug/spotless)
+- ...
+- 2021-08-12: 1.0 Initial Release
+
 # Compatibility
 
 Cleanthat Robot is currently compatible with the following languages:
@@ -44,15 +50,32 @@ Cleanthat Refactorer is currently compatible with the following languages:
 
 ## Maven (Free)
 
+### Spotless `mvn` plugin (for pure `mvn` users)
+
+`mvn` integration is available through Spotless: https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat
+
+One can then clean its codebase with `mvn spotless:apply`
+
+### Cleanthat `mvn` plugin (for GitHub App users)
+
 See README: https://github.com/solven-eu/cleanthat/tree/master/maven
+
+Features :
+
+- Apply full refactoring as it would be executed by the Github App, based on `.cleanthat` configuration
+- Generate automatically an optimal Eclipse stylesheet based on your code-case
+
+One liner (even without a `pom.xml`):
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
 
 ## Gradle (Free)
 
-Pending for Spotless integration: https://github.com/diffplug/spotless/tree/main/plugin-gradle
+`gradle` integration is available through Spotless: https://github.com/diffplug/spotless/tree/main/plugin-gradle#cleanthat
 
 ## Github (Free+Paid)
 
-If your repository is hosted on Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/)
+If your repository is hosted by Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/)
 
 It can configured through a `/.cleanthat/cleanthat.yaml` file at the root of the repository (e.g. [https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml](https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml)).
 
@@ -63,7 +86,8 @@ It differs from mvn/gradle integration by fetching only relevant (e.g. modified)
 
 ### Key Features
 
-- Clean branches which are not protected, but which are head of a a PullRequest
+- Automatic generation of the initial configuration
+- Clean branches which are not protected and head of a PullRequest
 
 ### Example configurations of happy Users:
 
@@ -78,6 +102,16 @@ As of 2022-12, this projects focuses on typical Java projects. Hence, it enables
 - Advanced Formatting of .java files (to be dropped, to rely on Spotless)
 - Advanced Formatting of pom.xml files (to be dropped, to rely on Spotless)
 - Basic Formatting of .json, .xml, etc files (to be dropped, to rely on Spotless)
+
+## Refactoring on a `per-single-source file` basis
+
+One major goal of this project is to enable incremental refactoring on a per Pull-Request basis. Hence, the availability of the whole code-base and related binaries (e.g. `mvn` dependencies) is limited. Cleanthat focuses on cleaning individual source files.
+
+Limitations :
+
+- Can not refactor based on multiple source files information (e.g. type definition in a different file)
+- Can not refactor based on binaries information (e.g. type definition from dependencies)
+- Can refactor based on standard JRE classpath
 
 ## Github App does not rely on Maven and Gradle
 

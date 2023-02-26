@@ -23,16 +23,18 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseIndexOfCharCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseUnderscoresInNumericLiteralsCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestUseIndexOfChar extends AParameterizesJavaparserRefactorerCases {
+public class TestUseUnderscoresInNumericLiteralsCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new UseIndexOfCharCases();
+		return new UseUnderscoresInNumericLiteralsCases();
 	}
 
-	public TestUseIndexOfChar(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestUseUnderscoresInNumericLiteralsCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

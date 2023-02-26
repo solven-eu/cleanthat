@@ -43,6 +43,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 
@@ -71,7 +72,8 @@ public abstract class ATestCases<N, R> {
 						|| c.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
-						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent());
+						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()
+						|| c.getAnnotationByClass(UnmodifiedInnerClasses.class).isPresent());
 	}
 
 	public static MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
@@ -107,13 +109,18 @@ public abstract class ATestCases<N, R> {
 		return matching.get(0);
 	}
 
-	protected void doCheckUnmodified(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
+	protected void doCheckUnmodifiedMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration post = getMethodWithName(oneCase, PRE_METHOD);
-		doCheckUnmodified(transformer, oneCase, post);
+		doCheckUnmodifiedNode(transformer, oneCase, post);
 	}
 
-	protected void doCheckUnmodified(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase, Node pre) {
+	protected void doCheckUnmodifiedClass(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
+		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, PRE_CLASS);
+		doCheckUnmodifiedNode(transformer, oneCase, post);
+	}
+
+	protected void doCheckUnmodifiedNode(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase, Node pre) {
 		LexicalPreservingPrinter.setup(pre);
 		// https://github.com/javaparser/javaparser/issues/3322
 		// We prefer not-processing clones as it may lead to dirty issues
@@ -139,7 +146,6 @@ public abstract class ATestCases<N, R> {
 	}
 
 	protected void doTestMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		MethodDeclaration pre = getMethodWithName(oneCase, PRE_METHOD);
 		MethodDeclaration post = getMethodWithName(oneCase, POST_CONSTANT);
 
@@ -260,7 +266,6 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerClasses(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, PRE_CLASS);
 		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, POST_CLASS);
 
@@ -270,7 +275,6 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerAnnotations(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		AnnotationDeclaration pre = getAnnotationWithName(oneCase, PRE_CLASS);
 		AnnotationDeclaration post = getAnnotationWithName(oneCase, POST_CLASS);
 
@@ -280,8 +284,6 @@ public abstract class ATestCases<N, R> {
 	public void doCompareMethodsAsStrings(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		// LOGGER.info("Processing the case: {}", oneCase.getName());
-
 		NormalAnnotationExpr annotation =
 				oneCase.getAnnotationByClass(CompareMethodsAsStrings.class).get().asNormalAnnotationExpr();
 
@@ -308,8 +310,6 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			CompareCompilationUnitsAsStrings annotation) {
-		// LOGGER.info("Processing the case: {}", testCase.getName());
-
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
 		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
 		doCompareExpectedChanges(transformer,
@@ -322,14 +322,11 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsString annotation) {
-		// LOGGER.info("Processing the case: {}", testCase.getName());
-
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
-		doCheckUnmodified(transformer, testCase, pre.getClassByName("SomeClass").get());
+		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
 	}
 
 	protected void doCompareClasses(IWalkingMutator<N, R> transformer, CompilationUnit pre, CompilationUnit post) {
-
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{

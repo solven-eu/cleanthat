@@ -21,13 +21,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This marker interface should be applied to a class holding two sub-type (named 'Pre' and 'Post') expected not to be
- * modified
+ * This marker interface should be applied to a class holding a sub-type (named 'Pre') expected not to be modified
  * 
  * @author Benoit Lacelle
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CompareInnerClasses {
+public @interface UnmodifiedInnerClasses {
 }

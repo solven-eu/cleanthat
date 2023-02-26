@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.diffplug.spotless.Provisioner;
 
+import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import io.sentry.IHub;
@@ -92,6 +93,10 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 			// Ensure events are sent to Sentry
 			IHub sentryHub = appContext.getBean(IHub.class);
 			sentryHub.captureMessage("Maven is OK");
+
+			LOGGER.info("sha1: {}{}",
+					"https://github.com/solven-eu/cleanthat/commit/",
+					appContext.getBean(IGitService.class).getSha1());
 
 			CURRENT_MOJO.get().doClean(appContext);
 			sentryHub.flush(TimeUnit.SECONDS.toMillis(1));

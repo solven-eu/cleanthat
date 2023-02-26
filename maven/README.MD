@@ -72,7 +72,7 @@ reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.
 
 ### cleanthat:init
 
-This will initialize cleanthat configuration with a standard configuration. It essentially generates a /cleanthat.yaml file at the root of the repository.
+This will initialize cleanthat configuration with a standard configuration. It essentially generates a `.cleanthat/cleanthat.yaml` file at the root of the repository.
 
     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
 

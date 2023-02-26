@@ -57,8 +57,8 @@ public class StreamAnyMatch extends AJavaParserMutator {
 	}
 
 	@Override
-	public String getId() {
-		return "StreamAnyMatch";
+	public Optional<String> getCleanthatId() {
+		return Optional.of("StreamAnyMatch");
 	}
 
 	// TODO Lack of checking for Stream type

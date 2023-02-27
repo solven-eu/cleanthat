@@ -57,7 +57,6 @@ import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.common.io.ByteStreams;
@@ -143,11 +142,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	@Override
 	public void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
-		String rawRepositoryConfigPath = getRepositoryConfigPath();
-		if (Strings.isNullOrEmpty(rawRepositoryConfigPath)) {
-			LOGGER.warn("configPath is empty (-Dcleanthat.configPath=xxx)");
-			return;
-		}
+		Path cleanthatConfigPath = getRepositoryConfigPath();
 
 		IEclipseStylesheetGenerator generator = appContext.getBean(IEclipseStylesheetGenerator.class);
 
@@ -163,10 +158,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		Map<String, String> settings = generator.generateSettings(timeLimit, pathToContent);
 		Path eclipseConfigPath = writeSettings(settings);
 
-		Path cleanthatConfigPath = Paths.get(rawRepositoryConfigPath);
-
 		// TODO In fact, we go through Spotless to do so
-		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, rawRepositoryConfigPath);
+		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, cleanthatConfigPath);
 
 		// We expect configPath to be like '.../.cleanthat/cleanthat.yaml'
 		Path dotCleanthatFolder = cleanthatConfigPath.getParent();

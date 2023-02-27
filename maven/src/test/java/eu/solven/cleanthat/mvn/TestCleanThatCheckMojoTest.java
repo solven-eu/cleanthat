@@ -16,17 +16,23 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 
 import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
 
+import com.google.common.jimfs.Jimfs;
+
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.pepper.unittest.ILogDisabler;
 import eu.solven.pepper.unittest.PepperTestHelper;
 
 public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
+	final FileSystem fs = Jimfs.newFileSystem();
+
 	@Test
 	public void testCleanthat_noConfig() throws Exception {
 		String relativePathToParent = "/unit/project-to-test";
@@ -40,6 +46,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
 
 		CleanThatCleanThatMojo myMojo = lookupConfiguredFixMojo(project);
+		myMojo.setFileSystem(fs);
 
 		try (ILogDisabler logCLoser = PepperTestHelper.disableLog(SpringApplication.class)) {
 			Assertions.assertThatThrownBy(() -> myMojo.execute()).isInstanceOf(IllegalStateException.class);
@@ -60,9 +67,16 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 
 		// 'init' will create a cleanthat.yaml
 		CleanThatInitMojo initMojo = lookupConfiguredInitMojo(project);
+
+		String executionRootDirectory = initMojo.getSession().getExecutionRootDirectory();
+
+		initMojo.setFileSystem(fs);
+		Files.createDirectories(fs.getPath(executionRootDirectory));
+
 		initMojo.execute();
 
 		CleanThatCheckMojo checkMojo = lookupConfiguredCheckMojo(project);
+		checkMojo.setFileSystem(fs);
 		checkMojo.execute();
 	}
 
@@ -80,12 +94,17 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 
 		// 'init' will create a cleanthat.yaml
 		CleanThatInitMojo initMojo = lookupConfiguredInitMojo(project);
+		String executionRootDirectory = initMojo.getSession().getExecutionRootDirectory();
+		Files.createDirectories(fs.getPath(executionRootDirectory));
+		initMojo.setFileSystem(fs);
 		initMojo.execute();
 
 		CleanThatCleanThatMojo cleanthatMojo = lookupConfiguredFixMojo(project);
+		cleanthatMojo.setFileSystem(fs);
 		cleanthatMojo.execute();
 
 		CleanThatCheckMojo checkMojo = lookupConfiguredCheckMojo(project);
+		checkMojo.setFileSystem(fs);
 		checkMojo.execute();
 	}
 }

@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
@@ -47,6 +49,8 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 	public static final String MOJO_CHECK = "check";
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCheckMojo.class);
+
 	@Override
 	protected List<Class<?>> springClasses() {
 		List<Class<?>> classes = new ArrayList<>();
@@ -64,13 +68,16 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 		checkParameters();
 
 		getLog().info("Path: " + getRepositoryConfigPath());
-		getLog().info("URL: " + getConfigUrl());
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
 		CodeFormatResult result = codeCleaner.formatCodeGivenConfig("CleanThatCheckMojo", codeProvider, true);
 
-		if (!result.isEmpty()) {
+		if (result.isEmpty()) {
+			result.getDetails().forEach((k, v) -> LOGGER.info("Some path needs cleaning: {} - {}", k, v));
+		} else {
+			result.getDetails().forEach((k, v) -> LOGGER.warn("Some path needs cleaning: {} - {}", k, v));
+
 			throw new MojoFailureException("ARG",
 					"CleanThat would have impacted the code",
 					"CleanThat would have impacted the code");

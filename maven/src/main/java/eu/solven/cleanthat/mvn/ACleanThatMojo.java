@@ -16,6 +16,10 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -27,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+
 /**
  * The mojo of the mvn plugin
  * 
@@ -37,12 +43,19 @@ import com.google.common.base.Strings;
 public abstract class ACleanThatMojo extends AbstractMojo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
 
+	// To be synced with CodeProviderHelpers.PATHES_CLEANTHAT.get(0)
+	public static final String MARKER_ANY_PARENT_DOTCLEANTHAT =
+			"glob:**/" + ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
+
 	// http://maven.apache.org/ref/3.1.1/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)
 	private MavenProject project;
 
 	@Parameter(defaultValue = "${session}", required = true, readonly = true)
 	private MavenSession session;
+
+	// @Parameter(defaultValue = "${session.executionRootDirectory}", required = true, readonly = true)
+	// private String executionRootDirectory;
 
 	// https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project
 	// It seems not possible to rely on 'maven.XXX' (hence not '${maven.multiModuleProjectDirectory}') in plugin
@@ -51,14 +64,9 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	// @Parameter(property = "cleanthat.configPath", defaultValue = "${project.basedir}/cleanthat.yaml")
 	// The following is not compatible with goals executable without a pom.xml
 	// @Parameter(property = "cleanthat.configPath", defaultValue = "${session.topLevelProject.basedir}/cleanthat.yaml")
-	// The following is not compatible with UnitTests
-	// To be synced with CodeProviderHelpers.PATHES_CLEANTHAT.get(0)
-	@Parameter(property = "cleanthat.configPath",
-			defaultValue = "${session.executionRootDirectory}/.cleanthat/cleanthat.yaml")
+	// A typical value is '-Dcleanthat.configPath=${session.executionRootDirectory}/.cleanthat/cleanthat.yaml'
+	@Parameter(property = "cleanthat.configPath", defaultValue = MARKER_ANY_PARENT_DOTCLEANTHAT)
 	private String cleanthatRepositoryConfigPath;
-
-	@Parameter(property = "cleanthat.configUrl")
-	private String configUrl;
 
 	// Useful to check what are the expected impacts without actually changing project files
 	@Parameter(property = "cleanthat.dryRun", defaultValue = "false")
@@ -79,11 +87,21 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 * Runs the plugin only if the current project is the execution root.
 	 *
 	 * This is helpful, if the plugin is defined in a profile and should only run once to download a shared file.
+	 * 
+	 * Cleanthat will process current directory: it does not need to iterate over modules which are children in the
+	 * {@link FileSystem}
 	 */
 	// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L335
 	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
 	private boolean runOnlyAtRoot;
+
+	FileSystem fs = FileSystems.getDefault();
+
+	@Deprecated(since = "Only for testing")
+	public void setFileSystem(FileSystem fs) {
+		this.fs = fs;
+	}
 
 	@VisibleForTesting
 	protected void setProject(MavenProject project) {
@@ -103,16 +121,16 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		return session;
 	}
 
-	protected void checkParameters() {
-		String configPath = getRepositoryConfigPath();
-		String configUrl = getConfigUrl();
+	@VisibleForTesting
+	public void setCleanthatRepositoryConfigPath(String cleanthatRepositoryConfigPath) {
+		this.cleanthatRepositoryConfigPath = cleanthatRepositoryConfigPath;
+	}
 
-		if (Strings.isNullOrEmpty(configPath) && Strings.isNullOrEmpty(configUrl)) {
-			throw new IllegalStateException("configPath and configUrl are both empty");
-		} else if (!Strings.isNullOrEmpty(configPath) && !Strings.isNullOrEmpty(configUrl)
-				&& !configPath.equals(configUrl)) {
-			throw new IllegalStateException(
-					"configPath and configUrl are both non-empty: " + configPath + " vs " + configUrl);
+	protected void checkParameters() {
+		Path configPath = getRepositoryConfigPath();
+
+		if (!Files.exists(configPath)) {
+			throw new IllegalArgumentException("There is no configuration at: " + configPath);
 		}
 	}
 
@@ -132,28 +150,79 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		return baseDir;
 	}
 
-	public String getRepositoryConfigPath() {
-		if (cleanthatRepositoryConfigPath != null && cleanthatRepositoryConfigPath.contains("${")) {
-			// session.get
-			// project.getBasedir();
-			// session.getExecutionRootDirectory();
-			// session.getBas
-			throw new IllegalStateException("Issue with configPath: '" + cleanthatRepositoryConfigPath + "'");
-		}
+	public Path getRepositoryConfigPath() {
+		if (Strings.isNullOrEmpty(cleanthatRepositoryConfigPath)) {
+			throw new IllegalArgumentException("'cleanthatRepositoryConfigPath' must not be null");
+		} else if (MARKER_ANY_PARENT_DOTCLEANTHAT.equals(cleanthatRepositoryConfigPath)) {
+			// We apply the default strategy: iterate through parentFolder for '.cleanthat/cleanthat.yaml'
+			String rawExecutionRootDirectory = session.getExecutionRootDirectory();
+			Path executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
 
-		return cleanthatRepositoryConfigPath;
+			if (!Files.isDirectory(executionRootDirectory)) {
+				throw new IllegalStateException("Not a directory: " + executionRootDirectory);
+			}
+
+			Path rootOrAncestor = executionRootDirectory;
+			do {
+				Path configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
+				if (Files.isRegularFile(configPath)) {
+					LOGGER.debug("Main configurationFile: {}", configPath);
+					return configPath;
+				} else {
+					LOGGER.debug("{} does not exist", configPath);
+					rootOrAncestor = rootOrAncestor.getParent();
+				}
+			} while (rootOrAncestor.getParent() != null);
+
+			throw new IllegalArgumentException(
+					"We do not find a relative " + ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT
+							+ " from current of ancestors directories");
+		} else {
+			if (cleanthatRepositoryConfigPath.contains("${")) {
+				throw new IllegalStateException(
+						"Some placeholders are left in cleanthatRepositoryConfigPath: '" + cleanthatRepositoryConfigPath
+								+ "'");
+			}
+
+			// We have been requested for a specific configuration path
+			Path manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
+
+			if (!Files.exists(manuaPathToConfig)) {
+				throw new IllegalArgumentException("There is no configuration at: " + manuaPathToConfig);
+			}
+
+			return manuaPathToConfig;
+		}
 	}
 
-	@VisibleForTesting
-	public void setConfigUrl(String configUrl) {
-		this.configUrl = configUrl;
-	}
+	public Path getMayNotExistRepositoryConfigPath() {
+		if (Strings.isNullOrEmpty(cleanthatRepositoryConfigPath)) {
+			throw new IllegalArgumentException("'cleanthatRepositoryConfigPath' must not be null");
+		} else if (MARKER_ANY_PARENT_DOTCLEANTHAT.equals(cleanthatRepositoryConfigPath)) {
+			// We apply the default strategy: iterate through parentFolder for '.cleanthat/cleanthat.yaml'
+			String rawExecutionRootDirectory = session.getExecutionRootDirectory();
+			Path executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
 
-	public String getConfigUrl() {
-		if (configUrl != null && configUrl.contains("${")) {
-			throw new IllegalStateException("Issue with configUrl: '" + configUrl + "'");
+			if (!Files.isDirectory(executionRootDirectory)) {
+				throw new IllegalStateException("Not a directory: " + executionRootDirectory);
+			}
+
+			Path rootOrAncestor = executionRootDirectory;
+			Path configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
+			LOGGER.debug("Main configurationFile: {}", configPath);
+			return configPath;
+		} else {
+			if (cleanthatRepositoryConfigPath.contains("${")) {
+				throw new IllegalStateException(
+						"Some placeholders are left in cleanthatRepositoryConfigPath: '" + cleanthatRepositoryConfigPath
+								+ "'");
+			}
+
+			// We have been requested for a specific configuration path
+			Path manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
+
+			return manuaPathToConfig;
 		}
-		return configUrl;
 	}
 
 	public boolean isDryRun() {
@@ -175,23 +244,32 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 */
 	// https://blog.sonatype.com/2009/05/how-to-make-a-plugin-run-once-during-a-build/
 	protected boolean isThisTheExecutionRoot() {
-		LOGGER.debug("Root Folder: {}", session.getExecutionRootDirectory());
+		String executionRootDirectory = session.getExecutionRootDirectory();
+		LOGGER.debug("getExecutionRootDirectory(): {}", executionRootDirectory);
 
-		File baseDir = getProject().getBasedir();
-		LOGGER.debug("Current Folder: {}", baseDir);
-		boolean result = session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
+		File baseDir = getProject().getBasedir().getAbsoluteFile();
+		LOGGER.debug("getProject().getBasedir().getAbsoluteFile(): {}", baseDir);
+		boolean result = executionRootDirectory.equalsIgnoreCase(baseDir.toString());
+		File projectFile = getProject().getBasedir();
+		sanityChecks(baseDir, result, projectFile);
+		return result;
+	}
+
+	@SuppressWarnings("PMD.InvalidLogMessageFormat")
+	private void sanityChecks(File baseDir, boolean result, File projectFile) {
+		String template =
+				": Unclear what is the executionRoot: getExecutionRootDirectory()={} vs getProject().getBasedir()={}";
 		if (result) {
 			LOGGER.debug("This is the execution root.");
 			if (!getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
+				LOGGER.warn("`getProject().isExecutionRoot()==false`" + template, baseDir, projectFile);
 			}
 		} else {
 			LOGGER.debug("This is NOT the execution root.");
 			if (getProject().isExecutionRoot()) {
-				LOGGER.warn("Unclear if this is the executionRoot: {} vs {}", baseDir, getProject());
+				LOGGER.warn("`getProject().isExecutionRoot()==true`" + template, baseDir, projectFile);
 			}
 		}
-		return result;
 	}
 
 }

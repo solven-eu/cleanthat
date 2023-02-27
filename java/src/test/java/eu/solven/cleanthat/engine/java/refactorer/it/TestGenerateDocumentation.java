@@ -71,7 +71,7 @@ public class TestGenerateDocumentation {
 		CompositeMutator<IMutator> allSingles =
 				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
 
-		sb.append(EOL).append("## Single Mutators").append(isDraft ? " (DRAFTs)" : "PRD-READY");
+		sb.append(EOL).append("## Single Mutators").append(isDraft ? " (DRAFTs)" : " PRD-READY");
 
 		for (IMutator mutator : allSingles.getUnderlyings()
 				.stream()

@@ -15,15 +15,16 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -36,15 +37,14 @@ import org.springframework.context.ApplicationContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
 
+import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
-import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.EngineInitializerResult;
 import eu.solven.cleanthat.config.GenerateInitialConfig;
-import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
@@ -70,6 +70,15 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	public static final String MOJO_INIT = "init";
 
 	@Override
+	protected void checkParameters() {
+		Path configPath = getMayNotExistRepositoryConfigPath();
+
+		if (Files.exists(configPath)) {
+			throw new IllegalArgumentException("There is already a configuration at: " + configPath);
+		}
+	}
+
+	@Override
 	protected List<Class<?>> springClasses() {
 		List<Class<?>> classes = new ArrayList<>();
 
@@ -83,7 +92,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	}
 
 	@Override
-	public void doClean(ApplicationContext appContext) throws MojoFailureException {
+	public void doClean(ApplicationContext appContext) throws MojoFailureException, IOException {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
 		if (isRunOnlyAtRoot()) {
 			if (getProject().isExecutionRoot()) {
@@ -98,14 +107,8 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 			getLog().debug("Not required to be executed at root");
 		}
 
-		String configPath = getRepositoryConfigPath();
-		if (Strings.isNullOrEmpty(configPath)) {
-			throw new IllegalArgumentException("We need a not-empty configPath to run the 'init' mojo");
-		}
-
-		getLog().info("Path: " + configPath);
-
-		Path configPathFile = Paths.get(configPath);
+		Path configPathFile = getMayNotExistRepositoryConfigPath();
+		getLog().info("Configuration path: " + configPathFile);
 
 		if (!checkIfValidToInit(configPathFile)) {
 			throw new MojoFailureException(configPathFile,
@@ -113,7 +116,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 					"Something prevents the generation of a configuration");
 		}
 
-		ICodeProvider codeProvider = new FileSystemGitCodeProvider(getBaseDir().toPath());
+		ICodeProviderWriter codeProvider = new FileSystemGitCodeProvider(getBaseDir().toPath());
 
 		GenerateInitialConfig generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
@@ -123,12 +126,18 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue preparing initial config given codeProvider=" + codeProvider, e);
 		}
+
+		// 'configPathFile' may be not a children of codeProvider.getRepositoryRoot()
+		// for users wiching to write the configuration in a separate location
 		writeConfiguration(configPathFile, properties.getRepoProperties());
 
-		// Prefix with '.' to convert from absolute path (in the Git repository) to relative path (in the FileSystem
-		// root directory)
+		Map<Path, String> pathToContent = new LinkedHashMap<>();
+
+		Path root = codeProvider.getRepositoryRoot();
 		properties.getPathToContents()
-				.forEach((path, content) -> writeFile(getBaseDir().toPath().resolve(path), content));
+				.forEach((k, v) -> pathToContent.put(CleanthatPathHelpers.makeContentPath(root, k), v));
+
+		codeProvider.persistChanges(pathToContent, Collections.emptyList(), Collections.emptyList());
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {
@@ -140,24 +149,20 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 			// Useful to projects not integrating maven, but wishing to be initialized through the mvn plugin
 			LOGGER.info("You are initializing cleanthat without a pom.xml to contextualize it");
 		} else {
-			File baseFir = project.getBasedir();
+			Path baseFir = fs.getPath(project.getBasedir().getAbsolutePath());
 
-			Path relativized = baseFir.toPath().relativize(configPathFile);
-
-			String expectedConfigPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
-
-			if (!relativized.toString().equals(expectedConfigPath)) {
-				LOGGER.info("We'll init only in a module containing the configuration in relative path {}",
-						baseFir.toPath().resolve(ICleanthatConfigConstants.PATHES_CLEANTHAT.get(0)));
-				isValid = false;
+			if (!baseFir.startsWith(configPathFile)) {
+				LOGGER.warn("The configuration is being written out of the project baseDir: '{}' vs '{}'",
+						configPathFile,
+						baseFir);
 			}
 		}
 
-		if (configPathFile.toFile().isDirectory()) {
+		if (Files.isDirectory(configPathFile)) {
 			LOGGER.error("The path of the configuration is a folder: '{}'", configPathFile);
 			isValid = false;
-		} else if (configPathFile.toFile().exists()) {
-			if (configPathFile.toFile().isFile()) {
+		} else if (Files.exists(configPathFile)) {
+			if (Files.isRegularFile(configPathFile)) {
 				LOGGER.error("There is already a configuration: '{}'", configPathFile);
 			} else {
 				LOGGER.error("There is something but not a file at configuration: '{}'", configPathFile);
@@ -169,7 +174,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		return isValid;
 	}
 
-	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) {
+	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) throws IOException {
 		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 		String asYaml;
 		try {
@@ -181,8 +186,9 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		writeFile(configPathFile, asYaml);
 	}
 
-	private void writeFile(Path configPathFile, String content) {
-		if (configPathFile.toFile().getParentFile().mkdirs()) {
+	private void writeFile(Path configPathFile, String content) throws IOException {
+		if (!Files.exists(configPathFile.getParent())) {
+			Files.createDirectories(configPathFile.getParent());
 			LOGGER.info("We created parent folder(s) for {}", configPathFile);
 		}
 

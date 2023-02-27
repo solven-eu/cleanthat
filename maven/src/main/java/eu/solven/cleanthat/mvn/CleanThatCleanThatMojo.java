@@ -15,17 +15,12 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
@@ -49,8 +44,6 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 		// One may rely on the mvn plugin to clean a folder, even if no pom.xml is available
 		requiresProject = false)
 public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
-
 	public static final String MOJO_FIX = "cleanthat";
 
 	@Override
@@ -72,27 +65,6 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
 			return;
 		}
-
-		String configPath = getRepositoryConfigPath();
-		getLog().info("Path: " + configPath);
-		getLog().info("URL: " + getConfigUrl());
-
-		File baseDir = getBaseDir();
-
-		Path configPathFile = Paths.get(configPath);
-
-		Path dotCleanthatPath = configPathFile.getParent();
-		getLog().info("dotCleanthatPath: " + dotCleanthatPath);
-
-		Path supposedlyRootPath = dotCleanthatPath.getParent();
-		getLog().info("supposedlyRootPath: " + supposedlyRootPath);
-
-		if (!supposedlyRootPath.equals(baseDir.toPath())) {
-			LOGGER.info("We'll clean only in a module containing the configuration: {}", dotCleanthatPath);
-			return;
-		}
-
-		getLog().info("project.baseDir: " + baseDir);
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);

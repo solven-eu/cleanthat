@@ -18,6 +18,8 @@ package eu.solven.cleanthat.mvn;
 import java.io.File;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +36,8 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
  *
  */
 public class CleanThatMavenHelper {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatMavenHelper.class);
+
 	protected CleanThatMavenHelper() {
 		// hidden
 	}
@@ -47,7 +51,8 @@ public class CleanThatMavenHelper {
 
 	// Process the root of current module
 	public static ICodeProviderWriter makeCodeProviderWriter(ACleanThatMojo cleanThatCleanThatMojo) {
-		File baseDir = cleanThatCleanThatMojo.getBaseDir();
-		return new FileSystemGitCodeProvider(baseDir.toPath());
+		File baseDir = cleanThatCleanThatMojo.getBaseDir().getAbsoluteFile();
+		LOGGER.info("Building a {} over {}", FileSystemGitCodeProvider.class, baseDir);
+		return new FileSystemGitCodeProvider(cleanThatCleanThatMojo.fs.getPath(baseDir.getAbsolutePath()));
 	}
 }

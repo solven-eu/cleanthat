@@ -1,8 +1,11 @@
+# Spotless-maven-plugin
+
+For per-module configuration, one should integrate [spotless-maven-plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat).
+
 # Cleanthat-maven-plugin
 
 ## Purpose and limitation
 
-For per-module configuration, one should integration spotless-maven-plugin.
 This maven plugin enables reproducing the Github App behavior (which process a repository from its root, not per-module).
 
 It also enable additional features like:
@@ -30,7 +33,54 @@ One can shorten its cleanthat commands by adding in ${user.home}/.m2/settings.xm
 
 reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
 
-### Configure within a pom.xml
+## Goals
+
+### cleanthat:init
+
+This will initialize cleanthat configuration with a standard configuration. It essentially generates a `.cleanthat/cleanthat.yaml` file at the root of the repository.
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
+
+### cleanthat:cleanthat
+
+This will apply cleanthat linting logic over the whole directory.
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
+    
+### cleanthat:eclipse_formatter-stylesheet
+
+CleanThat for Java holds a module to apply an Eclipse Stylesheet. However, generating this stylesheet may be complex if the team not already on it (e.g. IntelliJ users).
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
+
+#### Timeout
+
+As this process can be very slow, we default a timeout at 1 minute. It can be overriden through:
+
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet -Dduration.limit=PT1H
+
+Details about the syntax: https://en.wikipedia.org/wiki/ISO_8601#Durations
+
+## Developers
+
+Install the plugin in local mvn repository (if only the plugin has been updated):
+
+    mvn install -pl :cleanthat-maven-plugin
+    
+With dependencies (if cleanthat core has been updated):
+
+    mvn install -pl :cleanthat-maven-plugin -am -PskipStyle -DskipITs -DskipTests
+
+Call the installed plugin with current SNAPSHOT:
+    
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.7-SNAPSHOT:init
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.7-SNAPSHOT:eclipse_formatter-stylesheet
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.7-SNAPSHOT:cleanthat
+    
+### DEPRECATED Configure within a pom.xml
+
+** This is not relevant anymore as cleanthat-maven-plugin is now a pom-less plugin**
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -66,48 +116,3 @@ reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.
 			</plugin>
 		</plugins>
 	</build>
-
-
-## Goals
-
-### cleanthat:init
-
-This will initialize cleanthat configuration with a standard configuration. It essentially generates a `.cleanthat/cleanthat.yaml` file at the root of the repository.
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
-
-### cleanthat:cleanthat
-
-This will apply cleanthat linting logic.
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
-    
-### cleanthat:eclipse_formatter-stylesheet
-
-CleanThat for Java holds a module to apply an Eclipse Stylesheet. However, generating this stylesheet may be complex if the team not already on it (e.g. IntelliJ users).
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet
-
-#### Timeout
-
-As this process can be very slow, we default a timeout at 1 minute. It can be overriden through:
-
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:eclipse_formatter-stylesheet -Dduration.limit=PT1H
-
-Details about the syntax: https://en.wikipedia.org/wiki/ISO_8601#Durations
-
-## Developers
-
-Install the plugin in local mvn repository (if only the plugin has been updated):
-
-    mvn install -pl :cleanthat-maven-plugin
-    
-With dependencies (if cleanthat core has been updated):
-
-    mvn install -pl :cleanthat-maven-plugin -am -PskipStyle -DskipITs -DskipTests
-
-Call the installed plugin with current SNAPSHOT:
-    
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.0-SNAPSHOT:init
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.0-SNAPSHOT:eclipse_formatter-stylesheet
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:2.0-SNAPSHOT:cleanthat

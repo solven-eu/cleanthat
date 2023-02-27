@@ -1,6 +1,58 @@
 # Mutators
 ## Single MutatorsPRD-READY
 
+### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
+
+
+Require sourceJdk: 1.8
+
+### [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
+
+
+CheckStyle: AvoidInlineConditionals
+
+Require sourceJdk: 1
+
+### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
+
+
+PMD: ComparisonWithNaN
+
+Require sourceJdk: 11
+
+### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
+
+
+PMD: LiteralsFirstInComparisons
+
+Require sourceJdk: 1
+
+### [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
+
+
+CheckStyle: ModifierOrder
+
+Sonar: RSPEC-1124
+
+Require sourceJdk: 1
+
+### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
+
+
+Require sourceJdk: 11
+
+### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
+
+
+Require sourceJdk: 1.8
+
+### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
+
+
+PMD: StringToString
+
+Require sourceJdk: 1
+
 ### [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 
 
@@ -11,14 +63,34 @@ CheckStyle: RedundantModifier
 Sonar: RSPEC-2333
 
 Require sourceJdk: 1
+
+### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
+
+
+PMD: UseIndexOfChar
+
+Sonar: RSPEC-1155
+
+Require sourceJdk: 1
+
+### [UseIsEmptyOnCollections](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIsEmptyOnCollections.java)
+
+
+PMD: UseCollectionIsEmpty
+
+Sonar: RSPEC-1155
+
+Require sourceJdk: 1.6
+
+### [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
+
+
+PMD: UseUnderscoresInNumericLiterals
+
+Sonar: RSPEC-2148
+
+Require sourceJdk: 1.7
 ## Single Mutators (DRAFTs)
-
-### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
-
-
-isDraft
-
-Require sourceJdk: 1.8
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 
@@ -29,30 +101,12 @@ isDraft
 
 Require sourceJdk: 1.7
 
-### [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
-
-
-CheckStyle: AvoidInlineConditionals
-
-isDraft
-
-Require sourceJdk: 1.8
-
 ### [BoxedPrimitiveConstructor](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/BoxedPrimitiveConstructor.java)
 
 
 isDraft
 
 Require sourceJdk: 1.5
-
-### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
-
-
-PMD: ComparisonWithNaN
-
-isDraft
-
-Require sourceJdk: 11
 
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 
@@ -106,15 +160,6 @@ isDraft
 
 Require sourceJdk: 1.8
 
-### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
-
-
-PMD: LiteralsFirstInComparisons
-
-isDraft
-
-Require sourceJdk: 1
-
 ### [LocalVariableTypeInference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LocalVariableTypeInference.java)
 
 
@@ -123,40 +168,6 @@ Sonar: RSPEC-6212
 isDraft
 
 Require sourceJdk: 10
-
-### [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
-
-
-CheckStyle: ModifierOrder
-
-Sonar: RSPEC-1124
-
-isDraft
-
-Require sourceJdk: 1
-
-### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
-
-
-isDraft
-
-Require sourceJdk: 11
-
-### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
-
-
-isDraft
-
-Require sourceJdk: 1.8
-
-### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
-
-
-PMD: StringToString
-
-isDraft
-
-Require sourceJdk: 1
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 
@@ -218,45 +229,12 @@ isDraft
 
 Require sourceJdk: 1.8
 
-### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
-
-
-PMD: UseIndexOfChar
-
-Sonar: RSPEC-1155
-
-isDraft
-
-Require sourceJdk: 1
-
-### [UseIsEmptyOnCollections](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIsEmptyOnCollections.java)
-
-
-PMD: UseCollectionIsEmpty
-
-Sonar: RSPEC-1155
-
-isDraft
-
-Require sourceJdk: 1.6
-
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
 
 isDraft
 
 Require sourceJdk: 15
-
-### [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
-
-
-PMD: UseUnderscoresInNumericLiterals
-
-Sonar: RSPEC-2148
-
-isDraft
-
-Require sourceJdk: 1.7
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)

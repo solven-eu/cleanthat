@@ -18,7 +18,7 @@ package eu.solven.cleanthat.formatter;
 import java.util.Map;
 
 /**
- * Holds a resumee of a codeFormat
+ * Holds a synthesis of a codeFormat
  * 
  * @author Benoit Lacelle
  *
@@ -34,5 +34,9 @@ public class CodeFormatResult {
 
 	public boolean isEmpty() {
 		return empty;
+	}
+
+	public Map<String, ?> getDetails() {
+		return details;
 	}
 }

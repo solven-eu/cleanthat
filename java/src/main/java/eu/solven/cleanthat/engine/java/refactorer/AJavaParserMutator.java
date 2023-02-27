@@ -128,7 +128,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExt
 	}
 
 	public boolean tryReplace(Node node, Node replacement) {
-		LOGGER.info("Turning {} into {}", node, replacement);
+		LOGGER.info("Turning `{}` into `{}`", node, replacement);
 
 		return node.replace(replacement);
 	}

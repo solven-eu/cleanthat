@@ -50,10 +50,10 @@ import eu.solven.pepper.logging.PepperLogHelper;
 /**
  * Remove imports from a Java source file by analyzing {@link ImportDeclaration}.
  * <p>
- * More precisely, it will analyze each Tokens beinh used in the code-base, and remove imports not matching given
+ * More precisely, it will analyze each Tokens being used in the code-base, and remove imports not matching given
  * import.
  * <p>
- * One limitation is it will not strip away wildcard imports.
+ * One limitation is it will not strip away wildcard imports. (https://sonarsource.atlassian.net/browse/RSPEC-2208)
  *
  * @author Benoit Lacelle
  */

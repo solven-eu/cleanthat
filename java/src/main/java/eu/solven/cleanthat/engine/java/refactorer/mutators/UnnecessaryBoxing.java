@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -35,14 +36,12 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
- * Clean the way of converting primitives into {@link String}.
+ * Turns `Integer integer = Integer.valueOf(2)` into `Integer integer = 2`
  *
  * @author Benoit Lacelle
  */
-// https://jsparrow.github.io/rules/primitive-boxed-for-string.html
-// https://rules.sonarsource.com/java/RSPEC-1158
-public class PrimitiveBoxedForString extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveBoxedForString.class);
+public class UnnecessaryBoxing extends AJavaParserMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryBoxing.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -51,18 +50,23 @@ public class PrimitiveBoxedForString extends AJavaParserMutator {
 
 	@Override
 	public String jsparrowUrl() {
-		return "https://jsparrow.github.io/rules/reorder-modifiers.html";
+		return "https://jsparrow.github.io/rules/primitive-boxed-for-string.html";
 	}
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
+		// "https://pmd.github.io/latest/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
+		return "https://docs.pmd-code.org/pmd-doc-7.0.0-SNAPSHOT/pmd_rules_java_codestyle.html#unnecessaryboxing";
 	}
 
 	@Override
-	public Optional<String> getPmdId() {
-		// This matches multiple CleanThat rules
-		return Optional.of("UnnecessaryWrapperObjectCreation");
+	public Set<String> getPmdIds() {
+		return Set.of("UnnecessaryBoxing", "UnnecessaryWrapperObjectCreation");
+	}
+
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-1158");
 	}
 
 	@Override
@@ -85,6 +89,7 @@ public class PrimitiveBoxedForString extends AJavaParserMutator {
 			return false;
 		}
 		LOGGER.debug("{} is referenceType", type);
+
 		String primitiveQualifiedName = type.asReferenceType().getQualifiedName();
 		if (Boolean.class.getName().equals(primitiveQualifiedName)
 				|| Byte.class.getName().equals(primitiveQualifiedName)

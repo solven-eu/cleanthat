@@ -5,7 +5,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class UnecessaryImportsCases extends AJavaparserRefactorerCases {
+public class UnnecessaryImportsCases extends AJavaparserRefactorerCases {
 	static final String PREFIX = "source/do_not_format_me/UnnecessaryImport/";
 
 	@Override

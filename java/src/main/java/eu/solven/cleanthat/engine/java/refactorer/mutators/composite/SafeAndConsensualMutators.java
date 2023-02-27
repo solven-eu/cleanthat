@@ -28,7 +28,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveBoxedForString;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
@@ -55,7 +55,7 @@ public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implem
 					new OptionalNotEmpty(),
 					new StreamAnyMatch(),
 					new StringToString(),
-					new PrimitiveBoxedForString(),
+					new UnnecessaryBoxing(),
 					new UnnecessaryModifier(),
 					new UnnecessaryFullyQualifiedName())
 			.build();

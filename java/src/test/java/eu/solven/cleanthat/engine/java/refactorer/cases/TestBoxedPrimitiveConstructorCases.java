@@ -23,18 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.PrimitiveBoxedForStringCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.BoxedPrimitiveConstructorCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestPrimitiveBoxedForStringCases extends AParameterizesJavaparserRefactorerCases {
+public class TestBoxedPrimitiveConstructorCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new PrimitiveBoxedForStringCases();
+		return new BoxedPrimitiveConstructorCases();
 	}
 
-	public TestPrimitiveBoxedForStringCases(JavaParser javaParser,
-			String testName,
-			ClassOrInterfaceDeclaration testCase) {
+	public TestBoxedPrimitiveConstructorCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

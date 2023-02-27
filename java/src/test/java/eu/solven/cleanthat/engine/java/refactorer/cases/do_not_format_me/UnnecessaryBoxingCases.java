@@ -2,13 +2,13 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveBoxedForString;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class PrimitiveBoxedForStringCases extends AJavaparserRefactorerCases {
+public class UnnecessaryBoxingCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new PrimitiveBoxedForString();
+		return new UnnecessaryBoxing();
 	}
 
 	@CompareMethods
@@ -96,6 +96,23 @@ public class PrimitiveBoxedForStringCases extends AJavaparserRefactorerCases {
 
 		public Object post(double someByte) {
 			return Double.toString(someByte);
+		}
+	}
+
+	@CompareMethods
+	public static class CaseIntegerToPrimitive {
+		public Object pre(int i) {
+			int i1 = Integer.valueOf(i).intValue();
+			int i2 = Integer.valueOf(i);
+
+			return i1 + i2;
+		}
+
+		public Object post(int i) {
+			int i1 = i;
+			int i2 = i;
+
+			return i1 + i2;
 		}
 	}
 }

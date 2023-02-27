@@ -13,6 +13,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `UseUnderscoresInNumericLiterals` is an additional PMD mutator
 * `UseTextBlocks` is an additional mutator
 * `UnnecessaryImport` is an additional mutator
+* `BoxedPrimitiveConstructor` is an additional mutator
+* `PrimitiveBoxedForString` is renamed into `UnnecessaryBoxing`
 
 ## [2.6] - 2023-02-22
 ### Changes

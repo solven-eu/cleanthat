@@ -203,7 +203,13 @@ public abstract class ATestCases<N, R> {
 					// 2 TextBlocks can have the same .toString representation but different underlying value as long as
 					// the underlying value are not both stripped
 					LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
+				} else if (preAsString.contains("::") || expectedPost.contains("::")) {
+					// https://github.com/javaparser/javaparser/pull/2320
+					// It can be difficult to provide a TypeExpr given a MethodCallExpr
+					LOGGER.warn("We skip javaParser Node equality due to `::` anf TypeExpr given a MethodCallExpr");
 				} else {
+					// Some cases leads to failure here: nodes are different while they have the same .toString
+					// A Visitor similar to EqualsVisiyot, but returning the first different node would be helpful
 					Assert.assertEquals(msg, post, pre);
 				}
 			}

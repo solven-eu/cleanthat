@@ -23,7 +23,7 @@ import java.util.Set;
  *
  * @author Benoit Lacelle
  */
-public interface IRuleExternalReferences {
+public interface IMutatorExternalReferences {
 
 	/**
 	 * 
@@ -48,10 +48,13 @@ public interface IRuleExternalReferences {
 	}
 
 	default Optional<String> getSonarId() {
+		// RSPEC-XXX
 		return Optional.empty();
 	}
 
 	default String sonarUrl() {
+		// https://sonarsource.atlassian.net/browse/RSPEC-XXX
+		// https://sonarcloud.io/organizations/default/rules?languages=java&open=java%3ASXXX&q=SXXX
 		return getSonarId().map(id -> "https://rules.sonarsource.com/java/" + id).orElse("");
 	}
 
@@ -65,5 +68,9 @@ public interface IRuleExternalReferences {
 
 	default String jsparrowUrl() {
 		return "";
+	}
+
+	default Set<String> getSeeUrls() {
+		return Set.of();
 	}
 }

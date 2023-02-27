@@ -73,11 +73,6 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 		return Optional.of("RSPEC-1155");
 	}
 
-	@Override
-	public String sonarUrl() {
-		return "https://rules.sonarsource.com/java/RSPEC-1155";
-	}
-
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {

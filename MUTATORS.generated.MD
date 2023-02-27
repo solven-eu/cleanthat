@@ -1,40 +1,9 @@
 # Mutators
-## Single Mutators
-
-### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
-
-
-isDraft
-
-Require sourceJdk: 1.8
+## Single MutatorsPRD-READY
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 
 PMD: AvoidFileStream
-
-Require sourceJdk: 1.7
-
-### [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
-
-CheckStyle: AvoidInlineConditionals
-
-isDraft
-
-Require sourceJdk: 1.8
-
-### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
-
-PMD: ComparisonWithNaN
-
-isDraft
-
-Require sourceJdk: 11
-
-### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
-
-Sonar: RSPEC-2976
-
-isDraft
 
 Require sourceJdk: 1.7
 
@@ -46,86 +15,17 @@ Sonar: RSPEC-1116
 
 Require sourceJdk: 1
 
-### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
-
-
-isDraft
-
-Require sourceJdk: 1.5
-
-### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
-
-
-isDraft
-
-Require sourceJdk: 1.8
-
 ### [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 
 Sonar: S1602
 
 Require sourceJdk: 1.8
 
-### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
-
-PMD: LiteralsFirstInComparisons
-
-isDraft
-
-Require sourceJdk: 1
-
 ### [LocalVariableTypeInference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LocalVariableTypeInference.java)
 
 Sonar: RSPEC-6212
 
 Require sourceJdk: 10
-
-### [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
-
-CheckStyle: ModifierOrder
-Sonar: RSPEC-1124
-
-isDraft
-
-Require sourceJdk: 1
-
-### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
-
-
-isDraft
-
-Require sourceJdk: 11
-
-### [PrimitiveBoxedForString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveBoxedForString.java)
-
-PMD: UnnecessaryWrapperObjectCreation
-
-isDraft
-
-Require sourceJdk: 1.1
-
-### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
-
-
-isDraft
-
-Require sourceJdk: 1.8
-
-### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
-
-PMD: StringToString
-
-isDraft
-
-Require sourceJdk: 1
-
-### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
-
-PMD: UnnecessaryFullyQualifiedName
-
-isDraft
-
-Require sourceJdk: 1
 
 ### [UnnecessaryImport](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryImport.java)
 
@@ -154,6 +54,131 @@ PMD: UseDiamondOperator
 Sonar: RSPEC-2293
 
 Require sourceJdk: 1.8
+## Single Mutators (DRAFTs)
+
+### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
+### [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
+
+CheckStyle: AvoidInlineConditionals
+
+isDraft
+
+Require sourceJdk: 1.8
+
+### [BoxedPrimitiveConstructor](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/BoxedPrimitiveConstructor.java)
+
+
+isDraft
+
+Require sourceJdk: 1.5
+
+### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
+
+PMD: ComparisonWithNaN
+
+isDraft
+
+Require sourceJdk: 11
+
+### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
+
+Sonar: RSPEC-2976
+
+isDraft
+
+Require sourceJdk: 1.7
+
+### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
+
+
+isDraft
+
+Require sourceJdk: 1.5
+
+### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
+### [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
+
+Sonar: S1612
+
+isDraft
+
+Require sourceJdk: 1.8
+
+### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
+
+PMD: LiteralsFirstInComparisons
+
+isDraft
+
+Require sourceJdk: 1
+
+### [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
+
+CheckStyle: ModifierOrder
+Sonar: RSPEC-1124
+
+isDraft
+
+Require sourceJdk: 1
+
+### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
+
+
+isDraft
+
+Require sourceJdk: 11
+
+### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
+### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
+
+PMD: StringToString
+
+isDraft
+
+Require sourceJdk: 1
+
+### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
+
+Sonar: RSPEC-1158
+
+isDraft
+
+Require sourceJdk: 1.1
+
+### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
+
+PMD: UnnecessaryFullyQualifiedName
+
+isDraft
+
+Require sourceJdk: 1
+
+### [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
+
+PMD: UnnecessarySemicolon
+Sonar: RSPEC-2959
+
+isDraft
+
+Require sourceJdk: 1
 
 ### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
 

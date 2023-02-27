@@ -19,17 +19,18 @@ import java.util.Optional;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.stmt.Statement;
 
 /**
- * Most {@link AJavaParserMutator} will trigger over an {@link Expression}
+ * Most {@link AJavaParserMutator} will trigger over an {@link Statement}
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserExprMutator extends AJavaParserMutator {
+public abstract class AJavaParserStmtMutator extends AJavaParserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		if (node instanceof Expression) {
-			Expression expr = (Expression) node;
+		if (node instanceof Statement) {
+			Statement expr = (Statement) node;
 
 			return processNotRecursively(expr);
 		} else {
@@ -38,18 +39,18 @@ public abstract class AJavaParserExprMutator extends AJavaParserMutator {
 
 	}
 
-	protected boolean processNotRecursively(Expression expr) {
-		Optional<Expression> optReplacement = replaceExpression(expr);
+	protected boolean processNotRecursively(Statement stmt) {
+		Optional<Expression> optReplacement = replaceStatement(stmt);
 
 		if (optReplacement.isPresent()) {
 			Expression replacement = optReplacement.get();
-			return tryReplace(expr, replacement);
+			return tryReplace(stmt, replacement);
 		} else {
 			return false;
 		}
 	}
 
-	protected Optional<Expression> replaceExpression(Expression expr) {
+	protected Optional<Expression> replaceStatement(Statement stmt) {
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 }

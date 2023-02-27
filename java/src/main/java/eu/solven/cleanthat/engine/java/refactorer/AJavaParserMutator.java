@@ -35,14 +35,14 @@ import com.google.common.annotations.VisibleForTesting;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IRuleExternalReferences;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorExternalReferences;
 
 /**
  * Enables common behavior to JavaParser-based rules
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserMutator implements IJavaparserMutator, IRuleExternalReferences {
+public abstract class AJavaParserMutator implements IJavaparserMutator, IMutatorExternalReferences {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();

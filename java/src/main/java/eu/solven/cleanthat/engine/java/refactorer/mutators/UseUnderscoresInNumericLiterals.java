@@ -61,6 +61,11 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 	public Optional<String> getPmdId() {
 		return Optional.of("UseUnderscoresInNumericLiterals");
 	}
+	
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-2148");
+	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override

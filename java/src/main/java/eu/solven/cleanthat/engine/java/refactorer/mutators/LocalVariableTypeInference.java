@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -48,6 +49,11 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-6212");
+	}
+
+	@Override
+	public Set<String> getSeeUrls() {
+		return Set.of("https://openjdk.org/jeps/286");
 	}
 
 	@Override

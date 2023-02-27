@@ -30,7 +30,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
  *
  * @author Benoit Lacelle
  */
-public interface IMutator extends IRuleExternalReferences {
+public interface IMutator extends IMutatorExternalReferences {
 
 	@Deprecated(since = "This is for tests purposes")
 	String ID_NOOP = "NoOp";

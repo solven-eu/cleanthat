@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.CharLiteralExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 
@@ -81,11 +83,6 @@ public class UseIndexOfChar extends AJavaParserMutator {
 			return false;
 		}
 		StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) node;
-		String stringLiteralExprValue = stringLiteralExpr.getValue();
-		if (stringLiteralExprValue.length() != 1) {
-			// We consider only String with length == to .indexOf over the single char
-			return false;
-		}
 
 		if (!stringLiteralExpr.getParentNode().isPresent()) {
 			return false;
@@ -96,12 +93,21 @@ public class UseIndexOfChar extends AJavaParserMutator {
 			return false;
 		}
 		MethodCallExpr parentMethodCall = (MethodCallExpr) parentNode;
-		if (!"indexOf".equals(parentMethodCall.getNameAsString())) {
+		String parentMethodAsString = parentMethodCall.getNameAsString();
+		if (!"indexOf".equals(parentMethodAsString) && !"lastIndexOf".equals(parentMethodAsString)) {
 			// We search a call for .indexOf
 			return false;
 		}
 
 		if (!scopeHasRequiredType(parentMethodCall.getScope(), String.class)) {
+			return false;
+		}
+
+		String stringLiteralExprValue = stringLiteralExpr.getValue();
+		if (stringLiteralExprValue.isEmpty()) {
+			return parentNode.replace(new IntegerLiteralExpr("0"));
+		} else if (stringLiteralExprValue.length() != 1) {
+			// We consider only String with `.length()==1` to `.indexOf` over the single char
 			return false;
 		}
 

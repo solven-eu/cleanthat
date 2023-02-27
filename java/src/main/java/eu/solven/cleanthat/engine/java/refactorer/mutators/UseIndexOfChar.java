@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.CharLiteralExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
@@ -94,18 +95,27 @@ public class UseIndexOfChar extends AJavaParserMutator {
 		}
 		MethodCallExpr parentMethodCall = (MethodCallExpr) parentNode;
 		String parentMethodAsString = parentMethodCall.getNameAsString();
-		if (!"indexOf".equals(parentMethodAsString) && !"lastIndexOf".equals(parentMethodAsString)) {
+		boolean isIndexOf = "indexOf".equals(parentMethodAsString);
+		boolean isLastIndexOf = "lastIndexOf".equals(parentMethodAsString);
+		if (!isIndexOf && !isLastIndexOf) {
 			// We search a call for .indexOf
 			return false;
 		}
 
-		if (!scopeHasRequiredType(parentMethodCall.getScope(), String.class)) {
+		Optional<Expression> optScope = parentMethodCall.getScope();
+		if (!scopeHasRequiredType(optScope, String.class)) {
 			return false;
 		}
 
 		String stringLiteralExprValue = stringLiteralExpr.getValue();
 		if (stringLiteralExprValue.isEmpty()) {
-			return parentNode.replace(new IntegerLiteralExpr("0"));
+			if (isIndexOf) {
+				return parentNode.replace(new IntegerLiteralExpr("0"));
+			} else {
+				assert isLastIndexOf;
+				MethodCallExpr lengthMethodCall = new MethodCallExpr(optScope.get(), "length");
+				return parentNode.replace(lengthMethodCall);
+			}
 		} else if (stringLiteralExprValue.length() != 1) {
 			// We consider only String with `.length()==1` to `.indexOf` over the single char
 			return false;

@@ -42,13 +42,24 @@ public class UseIndexOfCharCases extends AJavaparserRefactorerCases {
 	}
 
 	@CompareMethods
-	public static class EmptyString {
+	public static class indexOf_EmptyString {
 		public Object pre(String s) {
 			return s.indexOf("");
 		}
 
 		public Object post(String s) {
 			return 0;
+		}
+	}
+
+	@CompareMethods
+	public static class lastIndexOf_EmptyString {
+		public Object pre(String s) {
+			return s.lastIndexOf("");
+		}
+
+		public Object post(String s) {
+			return s.length();
 		}
 	}
 

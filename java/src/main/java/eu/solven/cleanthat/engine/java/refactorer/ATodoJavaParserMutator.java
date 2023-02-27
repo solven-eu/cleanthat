@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+
 /**
  * Helps preparing rules
  *
@@ -30,13 +32,12 @@ public abstract class ATodoJavaParserMutator extends AJavaParserMutator {
 
 	@Override
 	public boolean isDraft() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String minimalJavaVersion() {
-		// A fake Java version which will never be reached
-		return "99.9";
+		return IJdkVersionConstants.LAST;
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 
 	@Override
 	public boolean isDraft() {
-		return true;
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

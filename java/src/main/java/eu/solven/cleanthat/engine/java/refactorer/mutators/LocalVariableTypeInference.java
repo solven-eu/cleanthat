@@ -36,10 +36,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  */
 // https://github.com/openrewrite/rewrite/issues/1656
 public class LocalVariableTypeInference extends AJavaParserMutator {
-	@Override
-	public boolean isDraft() {
-		return false;
-	}
 
 	@Override
 	public String minimalJavaVersion() {

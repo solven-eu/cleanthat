@@ -44,7 +44,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 
 	@Override
 	public boolean isDraft() {
-		return true;
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 	public Optional<String> getPmdId() {
 		return Optional.of("UseUnderscoresInNumericLiterals");
 	}
-	
+
 	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-2148");

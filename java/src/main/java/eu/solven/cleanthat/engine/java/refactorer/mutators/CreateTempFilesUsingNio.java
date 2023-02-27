@@ -56,11 +56,6 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator {
 	}
 
 	@Override
-	public boolean isDraft() {
-		return true;
-	}
-
-	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-2976");
 	}

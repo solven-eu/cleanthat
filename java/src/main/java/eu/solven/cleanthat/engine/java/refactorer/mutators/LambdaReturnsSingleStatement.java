@@ -43,7 +43,7 @@ public class LambdaReturnsSingleStatement extends AJavaParserMutator {
 	@Override
 	public boolean isDraft() {
 		// TODO CaseConflictingMethods
-		return false;
+		return true;
 	}
 
 	@Override

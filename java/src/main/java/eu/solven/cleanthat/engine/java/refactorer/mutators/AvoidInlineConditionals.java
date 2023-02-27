@@ -49,10 +49,9 @@ import eu.solven.pepper.logging.PepperLogHelper;
 public class AvoidInlineConditionals extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
-	// Stream exists since 8
 	@Override
-	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_8;
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

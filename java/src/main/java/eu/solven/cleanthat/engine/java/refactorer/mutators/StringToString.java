@@ -44,6 +44,11 @@ public class StringToString extends AJavaParserMutator {
 	}
 
 	@Override
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
+	}
+
+	@Override
 	public Optional<String> getPmdId() {
 		return Optional.of("StringToString");
 	}

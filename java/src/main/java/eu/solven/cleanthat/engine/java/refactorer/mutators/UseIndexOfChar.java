@@ -35,7 +35,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // TODO Implements lastIndexOf
-// https://jsparrow.github.io/rules/use-is-empty-on-collections.html
 public class UseIndexOfChar extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);
 
@@ -46,7 +45,7 @@ public class UseIndexOfChar extends AJavaParserMutator {
 
 	@Override
 	public boolean isDraft() {
-		return true;
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override
@@ -67,6 +66,11 @@ public class UseIndexOfChar extends AJavaParserMutator {
 	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-1155");
+	}
+
+	@Override
+	public String jsparrowUrl() {
+		return "https://jsparrow.github.io/rules/use-is-empty-on-collections.html";
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")

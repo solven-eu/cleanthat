@@ -39,11 +39,6 @@ public class UseDiamondOperator extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override
-	public boolean isDraft() {
-		return false;
-	}
-
-	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
 	}

@@ -48,7 +48,7 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 
 	@Override
 	public boolean isDraft() {
-		return false;
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

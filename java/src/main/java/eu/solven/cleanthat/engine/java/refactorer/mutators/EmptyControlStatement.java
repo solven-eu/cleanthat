@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,8 @@ public class EmptyControlStatement extends AJavaParserMutator {
 	}
 
 	@Override
-	public boolean isDraft() {
-		return false;
-	}
-
-	@Override
-	public Optional<String> getPmdId() {
-		// Used to be 'EmptyStatementBlock'
-		return Optional.of("EmptyControlStatement");
+	public Set<String> getPmdIds() {
+		return Set.of("EmptyControlStatement", "EmptyStatementBlock");
 	}
 
 	@Override

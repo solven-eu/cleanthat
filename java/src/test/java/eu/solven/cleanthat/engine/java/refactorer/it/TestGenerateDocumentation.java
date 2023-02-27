@@ -115,10 +115,11 @@ public class TestGenerateDocumentation {
 				url = ((IMutatorExternalReferences) mutator).pmdUrl();
 			}
 
+			sb.append(EOL).append(EOL);
 			if (Strings.isNullOrEmpty(url)) {
-				sb.append(EOL).append("PMD: [").append(ruleId).append("](").append(url).append(')');
+				sb.append("PMD: [").append(ruleId).append("](").append(url).append(')');
 			} else {
-				sb.append(EOL).append("PMD: ").append(ruleId);
+				sb.append("PMD: ").append(ruleId);
 			}
 		});
 		mutator.getCheckstyleId().ifPresent(ruleId -> {
@@ -128,10 +129,11 @@ public class TestGenerateDocumentation {
 				url = ((IMutatorExternalReferences) mutator).checkstyleUrl();
 			}
 
+			sb.append(EOL).append(EOL);
 			if (Strings.isNullOrEmpty(url)) {
-				sb.append(EOL).append("CheckStyle: [").append(ruleId).append("](").append(url).append(')');
+				sb.append("CheckStyle: [").append(ruleId).append("](").append(url).append(')');
 			} else {
-				sb.append(EOL).append("CheckStyle: ").append(ruleId);
+				sb.append("CheckStyle: ").append(ruleId);
 			}
 		});
 		mutator.getSonarId().ifPresent(ruleId -> {
@@ -141,10 +143,11 @@ public class TestGenerateDocumentation {
 				url = ((IMutatorExternalReferences) mutator).sonarUrl();
 			}
 
+			sb.append(EOL).append(EOL);
 			if (Strings.isNullOrEmpty(url)) {
-				sb.append(EOL).append("Sonar: [").append(ruleId).append("](").append(url).append(')');
+				sb.append("Sonar: [").append(ruleId).append("](").append(url).append(')');
 			} else {
-				sb.append(EOL).append("Sonar: ").append(ruleId);
+				sb.append("Sonar: ").append(ruleId);
 			}
 		});
 	}

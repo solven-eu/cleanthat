@@ -68,11 +68,6 @@ public class UnnecessaryImport extends AJavaParserMutator {
 	}
 
 	@Override
-	public boolean isDraft() {
-		return false;
-	}
-
-	@Override
 	public Set<String> getPmdIds() {
 		return ImmutableSet.of("UnnecessaryImport", "UnusedImports");
 	}

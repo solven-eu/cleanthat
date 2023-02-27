@@ -54,6 +54,11 @@ public class ModifierOrder extends AJavaParserMutator {
 			"strictfp");
 
 	@Override
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
+	}
+
+	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
 	}

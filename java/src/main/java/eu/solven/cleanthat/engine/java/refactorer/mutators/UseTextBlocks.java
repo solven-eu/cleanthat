@@ -49,11 +49,6 @@ public class UseTextBlocks extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseTextBlocks.class);
 
 	@Override
-	public boolean isDraft() {
-		return true;
-	}
-
-	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_15;
 	}

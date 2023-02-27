@@ -31,6 +31,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
  * @author Benoit Lacelle
  */
 public interface IMutator extends IMutatorExternalReferences {
+	boolean IS_PRODUCTION_READY = false;
 
 	@Deprecated(since = "This is for tests purposes")
 	String ID_NOOP = "NoOp";

@@ -109,10 +109,10 @@ public final class GitAttributesLineEndings_InMemory {
 		@SuppressWarnings("PMD.NullAssignment")
 		@Override
 		protected CachedEndings_InMemory calculateState() throws Exception {
-			Runtime_InMemory runtime = new RuntimeInit_InMemory(codeProvider, git, projectDir).atRuntime();
+			var runtime = new RuntimeInit_InMemory(codeProvider, git, projectDir).atRuntime();
 			// LazyForwardingEquality guarantees that this will only be called once, and keeping toFormat
 			// causes a memory leak, see https://github.com/diffplug/spotless/issues/1194
-			CachedEndings_InMemory state = new CachedEndings_InMemory(projectDir, runtime, toFormat.get());
+			var state = new CachedEndings_InMemory(projectDir, runtime, toFormat.get());
 			projectDir = null;
 			toFormat = null;
 			return state;
@@ -140,15 +140,15 @@ public final class GitAttributesLineEndings_InMemory {
 				new ConcurrentRadixTree<>(new DefaultCharSequenceNodeFactory());
 
 		CachedEndings_InMemory(Path projectDir, Runtime_InMemory runtime, Iterable<Path> toFormat) {
-			String rootPath = FileSignature.pathNativeToUnix(projectDir.toAbsolutePath().toString());
+			var rootPath = FileSignature.pathNativeToUnix(projectDir.toAbsolutePath().toString());
 			// is this a bug in original implementation? (.equals instead of .endsWith)
 			rootDir = "/".equals(rootPath) ? rootPath : rootPath + "/";
 			defaultEnding = runtime.defaultEnding;
 			for (Path file : toFormat) {
-				String ending = runtime.getEndingFor(file);
+				var ending = runtime.getEndingFor(file);
 				if (!ending.equals(defaultEnding)) {
-					String absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
-					String subPath = FileSignature.subpath(rootDir, absPath);
+					var absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
+					var subPath = FileSignature.subpath(rootDir, absPath);
 					hasNonDefaultEnding.put(subPath, ending);
 				}
 			}
@@ -156,8 +156,8 @@ public final class GitAttributesLineEndings_InMemory {
 
 		/** Returns the line ending appropriate for the given file. */
 		public String endingFor(Path file) {
-			String absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
-			String subpath = FileSignature.subpath(rootDir, absPath);
+			var absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
+			var subpath = FileSignature.subpath(rootDir, absPath);
 			String ending = hasNonDefaultEnding.getValueForExactKey(subpath);
 			if (ending == null) {
 				return defaultEnding;
@@ -230,7 +230,7 @@ public final class GitAttributesLineEndings_InMemory {
 
 		public String getEndingFor(Path file) {
 			// handle the local .gitattributes (if any)
-			String localResult = cache.valueFor(file, KEY_EOL);
+			var localResult = cache.valueFor(file, KEY_EOL);
 			if (localResult != null) {
 				return convertEolToLineEnding(localResult, file);
 			}
@@ -309,15 +309,15 @@ public final class GitAttributesLineEndings_InMemory {
 
 		/** Returns a value if there is one, or unspecified if there isn't. */
 		public @Nullable String valueFor(Path file, String key) {
-			StringBuilder pathBuilder = new StringBuilder(file.toAbsolutePath().toString().length());
+			var pathBuilder = new StringBuilder(file.toAbsolutePath().toString().length());
 
 			// We assume the input path if always a file, hence not a directory
-			boolean isDirectory = false;
-			Path parent = file.getParent();
+			var isDirectory = false;
+			var parent = file.getParent();
 
 			pathBuilder.append(file.getFileName());
 			while (parent != null) {
-				String path = pathBuilder.toString();
+				var path = pathBuilder.toString();
 
 				String value = findAttributeInRules(path, isDirectory, key, getRulesForFolder(parent));
 				if (value != null) {

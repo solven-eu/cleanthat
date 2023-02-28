@@ -31,10 +31,8 @@ import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepParametersProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
@@ -71,9 +69,9 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 			CleanthatStepProperties stepProperties) {
 
 		ILintFixerWithId lintFixer;
-		String stepId = stepProperties.getId();
+		var stepId = stepProperties.getId();
 		// override with explicit configuration
-		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
+		var parameters = getParameters(stepProperties);
 
 		LOGGER.debug("Processing: {}", stepId);
 
@@ -118,10 +116,10 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
-		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
+		var engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
 
 		if (steps.contains(OpenrewriteEngineStep.ID_OPENREWRITE)) {
-			CleanthatStepParametersProperties stepProperties = new CleanthatStepParametersProperties();
+			var stepProperties = new CleanthatStepParametersProperties();
 			stepProperties.add("recipes", getDefaultRecipes());
 			engineBuilder.step(CleanthatStepProperties.builder().id("openrewrite").parameters(stepProperties).build());
 		}

@@ -68,10 +68,10 @@ public class EclipseJavaFormatter implements ILintFixerWithId {
 		// Make a new formatter to enable thread-safety
 		CodeFormatter formatter = makeFormatter();
 
-		long start = System.currentTimeMillis();
+		var start = System.currentTimeMillis();
 		TextEdit textEdit;
 		try {
-			String eolChars = LineEnding.getOrGuess(LineEnding.NATIVE, () -> code);
+			var eolChars = LineEnding.getOrGuess(LineEnding.NATIVE, () -> code);
 			textEdit = formatter.format(CodeFormatter.K_COMPILATION_UNIT
 					| CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, eolChars);
 			if (textEdit == null) {
@@ -86,9 +86,9 @@ public class EclipseJavaFormatter implements ILintFixerWithId {
 			LOGGER.warn("Bug in Eclipse Formatter?", e);
 			return null;
 		} finally {
-			long time = System.currentTimeMillis() - start;
-			long totalDuration = TIME_FORMATTING.addAndGet(time);
-			int totalFormats = NB_FORMATTED.incrementAndGet();
+			var time = System.currentTimeMillis() - start;
+			var totalDuration = TIME_FORMATTING.addAndGet(time);
+			var totalFormats = NB_FORMATTED.incrementAndGet();
 			if (Integer.bitCount(totalFormats) == 1) {
 				LOGGER.info("Total Eclipse Formats: {}. MeanTime: {}",
 						PepperLogHelper.humanBytes(totalFormats),

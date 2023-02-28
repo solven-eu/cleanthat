@@ -70,14 +70,14 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 	}
 
 	public ResultOrError<CleanthatRepositoryProperties, String> loadAndCheckConfiguration(ICodeProvider codeProvider) {
-		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
+		var optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isEmpty()) {
 			LOGGER.info("There is no configuration ({}) on {}",
 					ICleanthatConfigConstants.PATHES_CLEANTHAT,
 					codeProvider);
 			return ResultOrError.error("No configuration");
 		}
-		Optional<String> version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
+		var version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
 		if (version.isEmpty()) {
 			LOGGER.warn("No version on configuration applying to PR {}", codeProvider);
 			return ResultOrError.error("No syntax_version in configuration");
@@ -87,7 +87,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 					+ "')", version.get(), codeProvider);
 			return ResultOrError.error("Invalid syntax_version in configuration");
 		}
-		Map<String, ?> prConfig = optPrConfig.get();
+		var prConfig = optPrConfig.get();
 		CleanthatRepositoryProperties properties;
 		try {
 			properties = prepareConfiguration(prConfig);
@@ -100,13 +100,13 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 	@Override
 	public CodeFormatResult formatCodeGivenConfig(String eventKey, ICodeProviderWriter codeProvider, boolean dryRun) {
-		ResultOrError<CleanthatRepositoryProperties, String> optResult = loadAndCheckConfiguration(codeProvider);
+		var optResult = loadAndCheckConfiguration(codeProvider);
 
 		if (optResult.getOptError().isPresent()) {
 			throw new IllegalStateException("Issue with configuration: " + optResult.getOptError().get());
 		}
 
-		CleanthatRepositoryProperties properties = optResult.getOptResult().get();
+		var properties = optResult.getOptResult().get();
 
 		if (codeProvider instanceof IListOnlyModifiedFiles || codeProvider instanceof CodeProviderDecoratingWriter
 				&& ((CodeProviderDecoratingWriter) codeProvider).getDecorated() instanceof IListOnlyModifiedFiles) {
@@ -129,7 +129,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 	protected CleanthatRepositoryProperties prepareConfiguration(Map<String, ?> prConfig) {
 		// Whatever objectMapper is OK as we do not transcode into json/yaml
-		ObjectMapper objectMapper = objectMappers.iterator().next();
+		var objectMapper = objectMappers.iterator().next();
 
 		return CleanthatConfigHelper.parseConfig(objectMapper, prConfig);
 	}

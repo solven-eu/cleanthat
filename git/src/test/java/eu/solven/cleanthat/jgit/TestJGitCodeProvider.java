@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.jgit;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
@@ -33,11 +32,9 @@ public class TestJGitCodeProvider {
 
 	@Test
 	public void testAcceptPath() {
-		FileSystem fs = Jimfs.newFileSystem();
-
+		var fs = Jimfs.newFileSystem();
 		JGitCodeProvider codeProvider =
 				new JGitCodeProvider(fs.getPath("/any"), Mockito.mock(Git.class), "someSha1", true);
-
 		Consumer<ICodeProviderFile> consumer = file -> {
 			Assertions.assertThat(file.getPath().toString())
 					.doesNotStartWith(fs.getSeparator())
@@ -52,7 +49,6 @@ public class TestJGitCodeProvider {
 	public void testResolvePath() {
 		JGitCodeProvider codeProvider =
 				new JGitCodeProvider(Paths.get("/git_root/git_folder"), Mockito.mock(Git.class), "someSha1", true);
-
 		Assertions.assertThat(codeProvider.resolvePath(Paths.get("root/folder/file")).toString().replace('\\', '/'))
 				.isEqualTo("/git_root/git_folder/root/folder/file");
 	}

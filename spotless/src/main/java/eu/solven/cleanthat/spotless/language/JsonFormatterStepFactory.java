@@ -108,7 +108,7 @@ public class JsonFormatterStepFactory extends AFormatterStepFactory {
 	}
 
 	private FormatterStep makeJackson(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
-		JacksonJsonConfig jacksonConfig = new JacksonJsonConfig();
+		var jacksonConfig = new JacksonJsonConfig();
 
 		Boolean spaceBeforeSeparator = parameters.getCustomProperty("space_before_separator", Boolean.class);
 		if (spaceBeforeSeparator != null) {

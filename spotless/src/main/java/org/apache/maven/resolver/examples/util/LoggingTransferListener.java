@@ -62,7 +62,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		TransferResource resource = event.getResource();
 		downloads.put(resource, event.getTransferredBytes());
 
-		StringBuilder buffer = new StringBuilder(64);
+		var buffer = new StringBuilder(64);
 
 		for (Map.Entry<TransferResource, Long> entry : downloads.entrySet()) {
 			long total = entry.getKey().getContentLength();
@@ -71,7 +71,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 			buffer.append(getStatus(complete, total)).append("  ");
 		}
 
-		int pad = lastLength - buffer.length();
+		var pad = lastLength - buffer.length();
 		lastLength = buffer.length();
 		pad(buffer, pad);
 		buffer.append('\r');
@@ -80,11 +80,11 @@ public class LoggingTransferListener extends AbstractTransferListener {
 	}
 
 	private String getStatus(long complete, long total) {
-		if (total >= 1024) {
+		if (total >= 1_024) {
 			return toKB(complete) + "/" + toKB(total) + " KB ";
 		} else if (total >= 0) {
 			return complete + "/" + total + " B ";
-		} else if (complete >= 1024) {
+		} else if (complete >= 1_024) {
 			return toKB(complete) + " KB ";
 		} else {
 			return complete + " B ";
@@ -94,7 +94,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 	private void pad(StringBuilder buffer, int spaces) {
 		String block = "                                        ";
 		while (spaces > 0) {
-			int n = Math.min(spaces, block.length());
+			var n = Math.min(spaces, block.length());
 			buffer.append(block, 0, n);
 			spaces -= n;
 		}
@@ -110,7 +110,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		if (contentLength >= 0) {
 			String type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
 			String len;
-			if (contentLength >= 1024) {
+			if (contentLength >= 1_024) {
 				len = toKB(contentLength) + " KB";
 			} else {
 				len = contentLength + " B";
@@ -120,8 +120,8 @@ public class LoggingTransferListener extends AbstractTransferListener {
 			long duration = System.currentTimeMillis() - resource.getTransferStartTime();
 			if (duration > 0) {
 				long bytes = contentLength - resource.getResumeOffset();
-				DecimalFormat format = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ENGLISH));
-				double kbPerSec = (bytes / 1024.0) / (duration / 1000.0);
+				var format = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ENGLISH));
+				var kbPerSec = (bytes / 1_024.0) / (duration / 1_000.0);
 				throughput = " at " + format.format(kbPerSec) + " KB/sec";
 			}
 
@@ -149,7 +149,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		requireNonNull(event, "event cannot be null");
 		downloads.remove(event.getResource());
 
-		StringBuilder buffer = new StringBuilder(64);
+		var buffer = new StringBuilder(64);
 		pad(buffer, lastLength);
 		buffer.append('\r');
 		LOGGER.info("{}", buffer);
@@ -162,7 +162,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 
 	@SuppressWarnings("checkstyle:magicnumber")
 	protected long toKB(long bytes) {
-		return (bytes + 1023) / 1024;
+		return (bytes + 1_023) / 1_024;
 	}
 
 }

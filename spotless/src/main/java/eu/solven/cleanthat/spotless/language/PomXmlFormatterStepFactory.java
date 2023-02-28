@@ -59,7 +59,7 @@ public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
 
 		switch (stepName) {
 		case "sortPom": {
-			SortPomCfg config = new SortPomCfg();
+			var config = new SortPomCfg();
 
 			parameters.getCustomProperties().forEach((customKey, customValue) -> {
 				Field field;

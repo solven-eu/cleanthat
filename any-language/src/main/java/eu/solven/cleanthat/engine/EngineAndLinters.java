@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.MoreObjects.ToStringHelper;
 
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
@@ -53,9 +52,9 @@ public class EngineAndLinters implements AutoCloseable {
 
 	@Override
 	public String toString() {
-		ToStringHelper builder = MoreObjects.toStringHelper(this).add("engine", engineProperties.getEngine());
+		var builder = MoreObjects.toStringHelper(this).add("engine", engineProperties.getEngine());
 
-		for (int i = 0; i < linters.size(); i++) {
+		for (var i = 0; i < linters.size(); i++) {
 			builder.add("step_" + i, linters.get(i));
 		}
 

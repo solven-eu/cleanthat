@@ -66,7 +66,7 @@ public class GithubCheckRunManager {
 			// https://docs.github.com/en/rest/reference/permissions-required-for-github-apps#permission-on-checks
 
 			// Limitted to 20 characters
-			String identifier = Ascii.truncate(gitService.getSha1(), LIMIT_IDENTIFIER, "");
+			var identifier = Ascii.truncate(gitService.getSha1(), LIMIT_IDENTIFIER, "");
 			// Limitted to 40 characters
 			String description = "Cleanthat cleaning/refactoring";
 
@@ -109,10 +109,10 @@ public class GithubCheckRunManager {
 
 	public void reportFailure(GHCheckRun checkRun, RuntimeException e) {
 		try {
-			String stackTrace = Throwables.getStackTraceAsString(e);
+			var stackTrace = Throwables.getStackTraceAsString(e);
 
 			// Summary is limited to 65535 chars
-			String summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
+			var summary = Ascii.truncate(stackTrace, LIMIT_SUMMARY, "...");
 
 			checkRun.update()
 					.withConclusion(Conclusion.FAILURE)

@@ -65,7 +65,7 @@ public class CodeDiffHelper {
 	 * @throws IOException
 	 */
 	protected long computeDiffScore(ILintFixer lintFixer, String content) throws IOException {
-		String formatted = lintFixer.doFormat(content);
+		var formatted = lintFixer.doFormat(content);
 
 		if (formatted == null) {
 			// It means something failed while formatting
@@ -94,7 +94,7 @@ public class CodeDiffHelper {
 		if (!formattedRows.equals(patchApplied)) {
 			throw new IllegalArgumentException("Issue computing the diff?");
 		}
-		long deltaDiff = diff.getDeltas().stream().mapToLong(d -> {
+		var deltaDiff = diff.getDeltas().stream().mapToLong(d -> {
 			if (d.getType() == DeltaType.EQUAL) {
 				return 0L;
 			}
@@ -103,16 +103,16 @@ public class CodeDiffHelper {
 			List<String> targetLines = d.getTarget().getLines();
 
 			if (sourceLines.size() == 1 && targetLines.size() == 1) {
-				String sourceLine = sourceLines.get(0);
-				String targetLine = targetLines.get(0);
+				var sourceLine = sourceLines.get(0);
+				var targetLine = targetLines.get(0);
 				// int common = new LongestCommonSubsequence().apply(sourceLine, targetLine);
 				// The diff is the longest difference between the 2 lines
 				// return Math.max(sourceLine.length(), targetLine.length()) - common;
 
 				return LevenshteinDistance.getDefaultInstance().apply(sourceLine, targetLine);
 			} else {
-				long sourceSize = sourceLines.stream().mapToLong(String::length).sum();
-				long targetSize = targetLines.stream().mapToLong(String::length).sum();
+				var sourceSize = sourceLines.stream().mapToLong(String::length).sum();
+				var targetSize = targetLines.stream().mapToLong(String::length).sum();
 				// Given a diff, we consider the biggest square between the source and the
 				// target
 				return Math.max(sourceSize, targetSize);

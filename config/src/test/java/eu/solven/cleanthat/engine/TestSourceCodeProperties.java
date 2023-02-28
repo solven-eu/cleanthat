@@ -30,7 +30,7 @@ public class TestSourceCodeProperties {
 
 	@Test
 	public void testDefaultConstructor() {
-		SourceCodeProperties properties = SourceCodeProperties.builder().build();
+		var properties = SourceCodeProperties.builder().build();
 
 		// We rely on null so that any other parameter takes precedence
 		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
@@ -38,28 +38,28 @@ public class TestSourceCodeProperties {
 
 	@Test
 	public void testDefaultMethod() throws JsonMappingException, JsonProcessingException {
-		SourceCodeProperties properties = SourceCodeProperties.defaultRoot();
+		var properties = SourceCodeProperties.defaultRoot();
 
 		// By default, neither LR or CRLF as we should not privilege a platform
 		Assertions.assertThat(properties.getLineEndingAsEnum()).isEqualTo(LineEnding.GIT);
 
-		String asString = objectMapper.writeValueAsString(properties);
+		var asString = objectMapper.writeValueAsString(properties);
 		Assertions.assertThat(asString).contains("line_ending", "GIT");
 
-		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
+		var asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
 
 		Assertions.assertThat(asObject).isEqualTo(properties);
 	}
 
 	@Test
 	public void testDefaultChild() throws JsonMappingException, JsonProcessingException {
-		SourceCodeProperties properties = SourceCodeProperties.defaultChild();
+		var properties = SourceCodeProperties.defaultChild();
 
 		Assertions.assertThat(properties.getLineEndingAsEnum()).isNull();
 
-		String asString = objectMapper.writeValueAsString(properties);
+		var asString = objectMapper.writeValueAsString(properties);
 
-		SourceCodeProperties asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
+		var asObject = objectMapper.readValue(asString, SourceCodeProperties.class);
 
 		Assertions.assertThat(asObject).isEqualTo(properties);
 	}

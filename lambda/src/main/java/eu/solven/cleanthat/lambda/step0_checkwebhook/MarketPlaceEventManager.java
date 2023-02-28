@@ -58,7 +58,7 @@ public class MarketPlaceEventManager {
 
 		// https://api.slack.com/apps/A04AW22QQ9X/incoming-webhooks
 		String whKey = "slack.webhook.marketplace";
-		String marketplaceWebhook = env.getProperty(whKey);
+		var marketplaceWebhook = env.getProperty(whKey);
 		if (Strings.isNullOrEmpty(marketplaceWebhook)) {
 			LOGGER.error("We lack a '{}'", whKey);
 			return;
@@ -78,8 +78,8 @@ public class MarketPlaceEventManager {
 			blocks.add(section);
 		}
 
-		String action = PepperMapHelper.getRequiredString(marketplaceEvent, "action");
-		String effectiveDate = PepperMapHelper.getRequiredString(marketplaceEvent, "effective_date");
+		var action = PepperMapHelper.getRequiredString(marketplaceEvent, "action");
+		var effectiveDate = PepperMapHelper.getRequiredString(marketplaceEvent, "effective_date");
 		// Map<String, ?> marketplacePurchase = PepperMapHelper.getRequiredAs(marketplaceEvent, "marketplace_purchase");
 		// String accountLogin = PepperMapHelper.getRequiredString(marketplacePurchase, "account", "login");
 

@@ -61,7 +61,7 @@ public class OverlayCodeProviderWrite implements ICodeProviderWriter {
 	public Optional<String> loadContentForPath(Path path) throws IOException {
 		CleanthatPathHelpers.checkContentPath(path);
 
-		String overlayedContent = pathToOverlay.get(path);
+		var overlayedContent = pathToOverlay.get(path);
 		if (overlayedContent != null) {
 			return Optional.of(overlayedContent);
 		}

@@ -53,7 +53,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 	public void testRoaringBitmap() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
 		Map<Path, String> pathToFile = Map.of(Paths.get("/RoaringBitmap.java"), asString);
@@ -65,7 +65,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 			Assertions.assertThat(defaultConfigs.entrySet()
 					.stream()
 					.filter(e -> e.getValue().equals(defaultConf.getOption()))
-					.map(e -> e.getKey())
+					.map(java.util.Map.Entry::getKey)
 					.findAny()
 					.get()).isEqualTo("google");
 		}
@@ -102,7 +102,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 	public void testTestRoaringBitmap() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/TestRoaringBitmap.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
 		Map<Path, String> pathToFile = Map.of(Paths.get("/TestRoaringBitmap.java"), asString);
@@ -114,7 +114,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 			Assertions.assertThat(defaultConfigs.entrySet()
 					.stream()
 					.filter(e -> e.getValue().equals(defaultConf.getOption()))
-					.map(e -> e.getKey())
+					.map(java.util.Map.Entry::getKey)
 					.findAny()
 					.get()).isEqualTo("default");
 		}

@@ -22,20 +22,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns '"a\r\n" + "b\r\n"’ into ’"""aEOLbEOL"""'
@@ -46,8 +40,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 // TODO Handle intermediate parenthesis
 public class UseTextBlocks extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseTextBlocks.class);
-
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_15;
@@ -61,12 +53,11 @@ public class UseTextBlocks extends AJavaParserMutator {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof Expression)) {
 			return false;
 		}
 
-		Expression rootExp = (Expression) node;
+		var rootExp = (Expression) node;
 
 		Optional<List<StringLiteralExpr>> optAsList = optAsList(rootExp);
 
@@ -76,7 +67,7 @@ public class UseTextBlocks extends AJavaParserMutator {
 
 		List<StringLiteralExpr> listStringExpr = optAsList.get();
 
-		String concat = listStringExpr.stream().map(s -> s.asString()).collect(Collectors.joining());
+		var concat = listStringExpr.stream().map(StringLiteralExpr::asString).collect(Collectors.joining());
 
 		// TextBlocks are '\n'-based
 		List<String> rows = Arrays.asList(concat.split("\n"));
@@ -94,21 +85,21 @@ public class UseTextBlocks extends AJavaParserMutator {
 		if (expr.isStringLiteralExpr()) {
 			return Optional.of(Collections.singletonList(expr.asStringLiteralExpr()));
 		} else if (expr.isIntegerLiteralExpr()) {
-			IntegerLiteralExpr asIntExpr = expr.asIntegerLiteralExpr();
-			String intAsString = Integer.toString(asIntExpr.asNumber().intValue());
+			var asIntExpr = expr.asIntegerLiteralExpr();
+			var intAsString = Integer.toString(asIntExpr.asNumber().intValue());
 			return Optional.of(Collections.singletonList(new StringLiteralExpr(intAsString)));
 		} else if (!expr.isBinaryExpr()) {
 			return Optional.empty();
 		}
 
-		BinaryExpr binaryExpr = expr.asBinaryExpr();
+		var binaryExpr = expr.asBinaryExpr();
 		if (binaryExpr.getOperator() != Operator.PLUS) {
 			return Optional.empty();
 		}
 
 		List<StringLiteralExpr> underlyingStrings = new ArrayList<>();
 
-		Expression left = binaryExpr.getLeft();
+		var left = binaryExpr.getLeft();
 		Optional<List<StringLiteralExpr>> leftAsList = optAsList(left);
 		if (leftAsList.isEmpty()) {
 			return Optional.empty();
@@ -116,7 +107,7 @@ public class UseTextBlocks extends AJavaParserMutator {
 			underlyingStrings.addAll(leftAsList.get());
 		}
 
-		Expression right = binaryExpr.getRight();
+		var right = binaryExpr.getRight();
 		Optional<List<StringLiteralExpr>> rightAsList = optAsList(right);
 		if (rightAsList.isEmpty()) {
 			return Optional.empty();

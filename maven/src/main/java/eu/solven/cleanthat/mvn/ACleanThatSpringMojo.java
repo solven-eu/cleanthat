@@ -80,7 +80,7 @@ public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
 
 		@Bean
 		public Provisioner mvnCliProvisionner() {
-			ACleanThatSpringMojo mojo = CURRENT_MOJO.get();
+			var mojo = CURRENT_MOJO.get();
 			ArtifactResolver resolver =
 					new ArtifactResolver(mojo.repositorySystem, mojo.repositorySystemSession, mojo.repositories);
 			return MavenProvisioner.create(resolver);

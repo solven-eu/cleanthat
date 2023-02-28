@@ -64,7 +64,7 @@ public class GithubRepositoryFacade {
 
 	public Optional<?> openPrIfNoneExists(GitRepoBranchSha1 base, GitRepoBranchSha1 head, String title, String body)
 			throws IOException {
-		String repoName = getRepoFullName();
+		var repoName = getRepoFullName();
 		if (!base.getRepoFullName().equals(repoName)) {
 			throw new IllegalArgumentException(
 					"The base (" + base + ") is not a ref of current repo (" + repoName + ")");
@@ -75,11 +75,11 @@ public class GithubRepositoryFacade {
 					"The head (" + head + ") has a different repository than current repo (" + repoName + ")");
 		}
 
-		String baseFullRef = base.getRef();
+		var baseFullRef = base.getRef();
 		if (!baseFullRef.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
 			throw new IllegalArgumentException("The base has to be a branch. ref=" + baseFullRef);
 		}
-		String headRef = head.getRef();
+		var headRef = head.getRef();
 
 		Optional<GHPullRequest> existingPr = repository.getPullRequests(GHIssueState.ALL).stream().filter(pr -> {
 			return baseFullRef.equals(GithubFacade.toFullGitRef(pr.getBase()))
@@ -90,10 +90,10 @@ public class GithubRepositoryFacade {
 			// TODO We should allow ourselves to write into a previous RR open by CleanThat (else we would open an
 			// infinite amount of cleaning PR, all with the same content)
 
-			String baseBranchName = baseFullRef.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
+			var baseBranchName = baseFullRef.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
 
 			// We create only Draft PR for now
-			boolean isDraft = true;
+			var isDraft = true;
 			// Maintainers are of-course allowed to modify CleanThat PR
 			GHPullRequest pr = repository.createPullRequest(title, headRef, baseBranchName, body, true, isDraft);
 
@@ -109,7 +109,7 @@ public class GithubRepositoryFacade {
 	}
 
 	public void removeRef(GitRepoBranchSha1 ref) throws IOException {
-		String repoName = getRepoFullName();
+		var repoName = getRepoFullName();
 		if (!repoName.equals(ref.getRepoFullName())) {
 			throw new IllegalArgumentException("Inconsistent repo: " + repoName + "and " + ref.getRepoFullName());
 		}
@@ -118,7 +118,7 @@ public class GithubRepositoryFacade {
 
 		URL remoteRefUrl = remoteRef.getUrl();
 		String currentSha = remoteRef.getObject().getSha();
-		String initialSha = ref.getSha();
+		var initialSha = ref.getSha();
 		if (currentSha.equals(initialSha)) {
 			LOGGER.info("About to delete {}", remoteRefUrl);
 			remoteRef.delete();
@@ -144,7 +144,7 @@ public class GithubRepositoryFacade {
 		}
 
 		// GHRepository.getRef expects a ref name without the leading 'refs/'
-		String githubRefName = refName.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
+		var githubRefName = refName.substring(CleanthatRefFilterProperties.REFS_PREFIX.length());
 
 		return repository.getRef(githubRefName);
 	}
@@ -164,7 +164,7 @@ public class GithubRepositoryFacade {
 	}
 
 	public Optional<GHRef> optRef(GitRepoBranchSha1 ref) {
-		String repoName = getRepoFullName();
+		var repoName = getRepoFullName();
 		if (!repoName.equals(ref.getRepoFullName())) {
 			throw new IllegalArgumentException("Inconsistent repo: " + repoName + "and " + ref.getRepoFullName());
 		}

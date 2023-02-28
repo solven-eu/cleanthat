@@ -30,7 +30,7 @@ public abstract class AJavaParserStmtMutator extends AJavaParserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (node instanceof Statement) {
-			Statement expr = (Statement) node;
+			var expr = (Statement) node;
 
 			return processNotRecursively(expr);
 		} else {
@@ -43,7 +43,7 @@ public abstract class AJavaParserStmtMutator extends AJavaParserMutator {
 		Optional<Expression> optReplacement = replaceStatement(stmt);
 
 		if (optReplacement.isPresent()) {
-			Expression replacement = optReplacement.get();
+			var replacement = optReplacement.get();
 			return tryReplace(stmt, replacement);
 		} else {
 			return false;

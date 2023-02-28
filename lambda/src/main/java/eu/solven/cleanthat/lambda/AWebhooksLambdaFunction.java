@@ -69,7 +69,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	public Function<Map<String, ?>, Map<String, ?>> ingressRawWebhook() {
 		ObjectMapper objectMapper = appContext.getBean(ObjectMapper.class);
 
-		ObjectMapper dynamoDbObjectMapper = configureForDynamoDb(objectMapper);
+		var dynamoDbObjectMapper = configureForDynamoDb(objectMapper);
 
 		// https://aws.amazon.com/fr/premiumsupport/knowledge-center/custom-headers-api-gateway-lambda/
 		// We would benefit from seeing the headers from Github:
@@ -105,7 +105,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				}).filter(m -> !m.isEmpty()).map(r -> {
 					logEvent(objectMapper, r);
 
-					IWebhookEvent event = wrapAsEvent(r);
+					var event = wrapAsEvent(r);
 					try {
 						return processOneEvent(event);
 					} catch (RuntimeException e) {
@@ -120,7 +120,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 				// It may also happens in localhost invocation (e.g. ITProcessLocallyDynamoDbEvent_ExecuteClean)
 				logEvent(objectMapper, input);
 
-				IWebhookEvent event = wrapAsEvent(input);
+				var event = wrapAsEvent(input);
 				functionOutput = processOneEvent(event);
 			}
 			LOGGER.info("Output: {}", functionOutput);
@@ -139,7 +139,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 	public static ObjectMapper configureForDynamoDb(ObjectMapper objectMapper) {
 		// DynamoDB prints json as 'S' for AttributeValue.getS(), while default jackson would name this field 's'
-		ObjectMapper dynamoDbObjectMapper = objectMapper.copy();
+		var dynamoDbObjectMapper = objectMapper.copy();
 
 		// DynamoDB exclude null from AttributeValue fields
 		dynamoDbObjectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -191,7 +191,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		// see StreamRecord
 		LOGGER.debug("TODO Learn how to process me: {}", r);
 
-		String eventName = PepperMapHelper.getRequiredString(r, "eventName");
+		var eventName = PepperMapHelper.getRequiredString(r, "eventName");
 
 		if (
 		// INSERT event: this is something new process
@@ -226,7 +226,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	public Map<String, ?> parseSqsEvent(ObjectMapper objectMapper, Map<String, ?> r) {
 		Map<String, ?> asMap;
 		// SQS
-		String body = PepperMapHelper.getRequiredString(r, KEY_BODY);
+		var body = PepperMapHelper.getRequiredString(r, KEY_BODY);
 		Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
 		if (messageAttributes.isPresent()) {
 			LOGGER.info("Attributes: {}", messageAttributes);

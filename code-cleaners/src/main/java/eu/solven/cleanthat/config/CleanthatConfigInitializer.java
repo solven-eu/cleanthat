@@ -17,7 +17,6 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.RepoInitializerResult.RepoInitializerResultBuilder;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.pepper.resource.PepperResourceHelper;
 
@@ -53,11 +51,11 @@ public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 
 	@Override
 	public RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivate) {
-		String defaultRepoPropertiesPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
+		var defaultRepoPropertiesPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
 
 		// Let's follow Renovate and its configuration PR
 		// https://github.com/solven-eu/agilea/pull/1
-		String body = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/onboarding-body.md");
+		var body = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/onboarding-body.md");
 		// body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 		body = body.replaceAll(Pattern.quote("${DEFAULT_PATH}"), defaultRepoPropertiesPath);
 
@@ -65,17 +63,16 @@ public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 			body += "\r\n" + "---" + "\r\n" + "@blacelle please look at me";
 		}
 
-		String commitMessage = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt");
-		RepoInitializerResultBuilder resultBuilder =
-				RepoInitializerResult.builder().prBody(body).commitMessage(commitMessage);
+		var commitMessage = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt");
+		var resultBuilder = RepoInitializerResult.builder().prBody(body).commitMessage(commitMessage);
 
-		GenerateInitialConfig generateInitialConfig = new GenerateInitialConfig(factories);
+		var generateInitialConfig = new GenerateInitialConfig(factories);
 		try {
-			EngineInitializerResult engineConfig = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
+			var engineConfig = generateInitialConfig.prepareDefaultConfiguration(codeProvider);
 
 			// Write the main config files (cleanthat.yaml)
-			String repoPropertiesYaml = objectMapper.writeValueAsString(engineConfig.getRepoProperties());
-			Path repositoryRoot = codeProvider.getRepositoryRoot();
+			var repoPropertiesYaml = objectMapper.writeValueAsString(engineConfig.getRepoProperties());
+			var repositoryRoot = codeProvider.getRepositoryRoot();
 			resultBuilder.pathToContent(CleanthatPathHelpers.makeContentPath(repositoryRoot, defaultRepoPropertiesPath),
 					repoPropertiesYaml);
 

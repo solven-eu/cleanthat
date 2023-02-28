@@ -27,7 +27,6 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'Arrays.asList("1", 2).stream()' into 'Arrays.stream("1", 2)'
@@ -67,12 +66,11 @@ public class ArraysDotStream extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
-		String methodCallIdentifier = methodCall.getNameAsString();
+		var methodCall = (MethodCallExpr) node;
+		var methodCallIdentifier = methodCall.getNameAsString();
 		if (!METHOD_STREAM.equals(methodCallIdentifier)) {
 			return false;
 		}
@@ -81,11 +79,11 @@ public class ArraysDotStream extends AJavaParserMutator {
 		if (optScope.isEmpty()) {
 			return false;
 		}
-		Expression scope = optScope.get();
+		var scope = optScope.get();
 		if (!(scope instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr scopeAsMethodCallExpr = (MethodCallExpr) scope;
+		var scopeAsMethodCallExpr = (MethodCallExpr) scope;
 		if (!METHOD_ASLIST.equals(scopeAsMethodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
@@ -94,7 +92,7 @@ public class ArraysDotStream extends AJavaParserMutator {
 		if (optParentScope.isEmpty()) {
 			return false;
 		}
-		Expression parentScope = optParentScope.get();
+		var parentScope = optParentScope.get();
 		if (!parentScope.isNameExpr()) {
 			return false;
 		}
@@ -103,9 +101,9 @@ public class ArraysDotStream extends AJavaParserMutator {
 			// TODO Handle this case with Stream.of(...)
 			return false;
 		}
-		Expression filterPredicate = scopeAsMethodCallExpr.getArgument(0);
+		var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
 
-		boolean localTransformed = false;
+		var localTransformed = false;
 		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
 		Expression replacement = new MethodCallExpr(parentScope, METHOD_STREAM, replaceArguments);
 

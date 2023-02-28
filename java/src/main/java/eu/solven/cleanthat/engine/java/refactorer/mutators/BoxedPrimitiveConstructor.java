@@ -20,7 +20,6 @@ import java.util.Optional;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -50,9 +49,9 @@ public class BoxedPrimitiveConstructor extends AJavaParserExprMutator {
 			return false;
 		}
 
-		ObjectCreationExpr objectCreationExpr = expr.asObjectCreationExpr();
+		var objectCreationExpr = expr.asObjectCreationExpr();
 
-		ClassOrInterfaceType type = objectCreationExpr.getType();
+		var type = objectCreationExpr.getType();
 
 		if (!isBoxedPrimitive(type)) {
 			return false;

@@ -86,8 +86,8 @@ public class TestSpotlessFormatter_Eclipse {
 	private IEngineProperties getEngineProperties() throws IOException, JsonParseException, JsonMappingException {
 		List<CleanthatEngineProperties> engines = repositoryProperties.getEngines();
 		Assert.assertEquals(1, engines.size());
-		IEngineProperties engineP = new ConfigHelpers(Arrays.asList(objectMapper))
-				.mergeEngineProperties(repositoryProperties, engines.get(0));
+		var engineP = new ConfigHelpers(Arrays.asList(objectMapper)).mergeEngineProperties(repositoryProperties,
+				engines.get(0));
 		return engineP;
 	}
 
@@ -136,7 +136,7 @@ public class TestSpotlessFormatter_Eclipse {
 
 	@Test
 	public void testFormat_WrongIndentation() throws IOException {
-		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+		var sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"",
 				"import java.time.LocalDate;",
 				"import java.time.LocalDateTime;",
@@ -161,7 +161,7 @@ public class TestSpotlessFormatter_Eclipse {
 				"",
 				"").collect(Collectors.joining(System.lineSeparator()));
 
-		String expectedCleaned = Stream.of("/* (C)2023 */",
+		var expectedCleaned = Stream.of("/* (C)2023 */",
 				"package eu.solven.cleanthat.do_not_format_me;",
 				"",
 				"import java.time.LocalDate;",
@@ -181,12 +181,12 @@ public class TestSpotlessFormatter_Eclipse {
 				"}",
 				"").collect(Collectors.joining(System.lineSeparator()));
 
-		IEngineProperties languageP = getEngineProperties();
+		var languageP = getEngineProperties();
 
 		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+		var contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
 				"someModule/src/main/java/some_package/someFilePath.java");
-		String cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
+		var cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
 	}
 
@@ -194,7 +194,7 @@ public class TestSpotlessFormatter_Eclipse {
 	@Test
 	public void testCompileManyTimes() throws JsonParseException, JsonMappingException, IOException {
 
-		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+		var sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"",
 				"import java.time.LocalDate;",
 				"import java.time.LocalDateTime;",
@@ -218,8 +218,8 @@ public class TestSpotlessFormatter_Eclipse {
 				"}",
 				"",
 				"").collect(Collectors.joining(System.lineSeparator()));
-		IEngineProperties languageP = getEngineProperties();
-		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+		var languageP = getEngineProperties();
+		var contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
 				"someModule/src/main/java/some_package/someFilePath.java");
 
 		while (true) {

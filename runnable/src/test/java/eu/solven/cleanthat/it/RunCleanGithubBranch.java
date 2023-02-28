@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
@@ -78,7 +77,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
-		ApplicationContext appContext = event.getApplicationContext();
+		var appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		GithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
@@ -107,7 +106,7 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			}
 		}).orElseGet(() -> GithubHelper.getDefaultBranch(repo));
 
-		Path root = Files.createTempDirectory("cleanthat");
+		var root = Files.createTempDirectory("cleanthat");
 		ICodeProvider codeProvider =
 				new GithubBranchCodeProvider(root.getRoot(), githubAndToken.getToken(), repo, branch);
 

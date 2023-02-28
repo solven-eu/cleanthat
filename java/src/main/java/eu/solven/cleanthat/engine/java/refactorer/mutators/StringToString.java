@@ -26,7 +26,6 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns '"someString".toString()' into '"someString"'
@@ -61,12 +60,11 @@ public class StringToString extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
-		String methodCallIdentifier = methodCall.getName().getIdentifier();
+		var methodCall = (MethodCallExpr) node;
+		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_TO_STRING.equals(methodCallIdentifier)) {
 			return false;
 		}
@@ -80,9 +78,9 @@ public class StringToString extends AJavaParserMutator {
 			return false;
 		}
 
-		Expression scope = optScope.get();
-		boolean localTransformed = false;
-		MethodCallExpr replacement = new MethodCallExpr(scope, METHOD_TO_STRING);
+		var scope = optScope.get();
+		var localTransformed = false;
+		var replacement = new MethodCallExpr(scope, METHOD_TO_STRING);
 		LOGGER.info("Turning {} into {}", node, replacement);
 		if (node.replace(scope)) {
 			localTransformed = true;

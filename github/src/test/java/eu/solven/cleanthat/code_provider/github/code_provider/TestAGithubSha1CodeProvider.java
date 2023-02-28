@@ -19,10 +19,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,7 +43,7 @@ public class TestAGithubSha1CodeProvider {
 	public void testRepoSha1AsZip() throws IOException {
 		GHRepository ghRepo = Mockito.mock(GHRepository.class);
 
-		Path tmpZipFile = Files.createTempFile("cleanthat", "TestAGithubSha1CodeProvider.zip");
+		var tmpZipFile = Files.createTempFile("cleanthat", "TestAGithubSha1CodeProvider.zip");
 		tmpZipFile.toFile().delete();
 
 		AGithubSha1CodeProvider codeProvider =
@@ -72,21 +70,21 @@ public class TestAGithubSha1CodeProvider {
 			env.put("create", "true");
 
 			// The 'jar:' prefix is necessary to enable the use of FileSystems.newFileSystem over a .zip
-			URI uri = URI.create("jar:" + tmpZipFile.toUri());
+			var uri = URI.create("jar:" + tmpZipFile.toUri());
 
-			try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+			try (var zipfs = FileSystems.newFileSystem(uri, env)) {
 
 				Files.createDirectory(zipfs.getPath("/repository_branch_random"));
 
 				// Path externalTxtFile = Paths.get("/codeSamples/zipfs/SomeTextFile.txt");
 				{
-					Path pathInZipfile = zipfs.getPath("/repository_branch_random/root.txt");
+					var pathInZipfile = zipfs.getPath("/repository_branch_random/root.txt");
 
 					Files.copy(new ByteArrayInputStream("someTiti".getBytes(StandardCharsets.UTF_8)), pathInZipfile);
 				}
 
 				{
-					Path pathInZipfile = zipfs.getPath("/repository_branch_random/dir/toto.txt");
+					var pathInZipfile = zipfs.getPath("/repository_branch_random/dir/toto.txt");
 
 					Files.createDirectories(pathInZipfile.getParent());
 
@@ -101,7 +99,7 @@ public class TestAGithubSha1CodeProvider {
 			return isf.apply(new FileSystemResource(tmpZipFile).getInputStream());
 		});
 
-		Path tmpDir = Files.createTempDirectory("cleanthat-TestAGithubSha1CodeProvider");
+		var tmpDir = Files.createTempDirectory("cleanthat-TestAGithubSha1CodeProvider");
 		ICodeProvider localCodeProvider = codeProvider.getHelper().downloadGitRefLocally(tmpDir);
 
 		Set<String> paths = new HashSet<>();

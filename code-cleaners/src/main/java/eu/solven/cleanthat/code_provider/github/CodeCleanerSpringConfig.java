@@ -62,7 +62,7 @@ public class CodeCleanerSpringConfig {
 		Map<String, IEngineLintFixerFactory> asMap = new LinkedHashMap<>();
 
 		stringFormatters.forEach(sf -> {
-			String language = sf.getEngine();
+			var language = sf.getEngine();
 			LOGGER.info("Formatter registered for engine={}: {}", language, sf);
 			asMap.put(language, sf);
 		});
@@ -75,7 +75,7 @@ public class CodeCleanerSpringConfig {
 			List<IEngineLintFixerFactory> factories) {
 		// We exclude OpenRewrite as engine, given it is quite slow and consumes a lot of resources (including through
 		// ClassGraph?)
-		List<IEngineLintFixerFactory> cleanFactories =
+		var cleanFactories =
 				factories.stream().filter(f -> !"openrewrite".equals(f.getEngine())).collect(Collectors.toList());
 		if (cleanFactories.size() != factories.size()) {
 			LOGGER.info("We disabled {} as engine in configInitializer", "openrewrite");

@@ -17,7 +17,6 @@ package eu.solven.cleanthat.formatter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
@@ -25,12 +24,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -39,7 +36,6 @@ import org.slf4j.Logger;
 
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
@@ -56,9 +52,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.EngineAndLinters;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineFormatterFactory;
-import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
-import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.pepper.thread.PepperExecutorsHelper;
 
 /**
@@ -100,7 +94,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		// TODO or an indirect change leading to a full re-compute (e.g. a implicit
 		// version upgrade led to a change of some engine, which should trigger a full re-compute)
-		AtomicBoolean configIsChanged = new AtomicBoolean();
+		var configIsChanged = new AtomicBoolean();
 
 		List<String> prComments = new ArrayList<>();
 
@@ -127,18 +121,17 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
-		CleanthatSession cleanthatSession =
-				new CleanthatSession(codeWriter.getRepositoryRoot(), codeWriter, repoProperties);
+		var cleanthatSession = new CleanthatSession(codeWriter.getRepositoryRoot(), codeWriter, repoProperties);
 
 		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
-			IEngineProperties languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
+			var languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
 
 			// TODO Process all languages in a single pass
 			// Beware about concurrency as multiple processors/languages may impact the same file
-			AtomicLongMap<String> languageCounters =
+			var languageCounters =
 					processFiles(cleanthatSession, languageToNbAddedFiles, pathToMutatedContent, languageP);
 
-			String details = languageCounters.asMap()
+			var details = languageCounters.asMap()
 					.entrySet()
 					.stream()
 					.map(e -> e.getKey() + ": " + e.getValue())
@@ -188,15 +181,15 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private IEngineProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,
 			CleanthatEngineProperties dirtyEngine) {
 
-		IEngineProperties cleanEngine = configHelpers.mergeEngineProperties(repoProperties, dirtyEngine);
+		var cleanEngine = configHelpers.mergeEngineProperties(repoProperties, dirtyEngine);
 
-		String language = cleanEngine.getEngine();
+		var language = cleanEngine.getEngine();
 		LOGGER.info("About to prepare files for language: {}", language);
 
-		ISourceCodeProperties sourceCodeProperties = cleanEngine.getSourceCode();
-		List<String> includes = cleanEngine.getSourceCode().getIncludes();
+		var sourceCodeProperties = cleanEngine.getSourceCode();
+		var includes = cleanEngine.getSourceCode().getIncludes();
 		if (includes.isEmpty()) {
-			Set<String> defaultIncludes = formatterFactory.getDefaultIncludes(cleanEngine.getEngine());
+			var defaultIncludes = formatterFactory.getDefaultIncludes(cleanEngine.getEngine());
 
 			LOGGER.info("Default includes to: {}", defaultIncludes);
 			// https://github.com/spring-io/spring-javaformat/blob/master/spring-javaformat-maven/spring-javaformat-maven-plugin/...
@@ -221,7 +214,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		// We rely on a ThreadLocal as Engines may not be threadSafe
 		// Hence, each new thread will compile its own engine
 		ThreadLocal<EngineAndLinters> currentThreadEngine = ThreadLocal.withInitial(() -> {
-			EngineAndLinters lintFixer = buildProcessors(engineP, cleanthatSession);
+			var lintFixer = buildProcessors(engineP, cleanthatSession);
 
 			closeUs.add(lintFixer);
 
@@ -229,8 +222,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		});
 
 		try {
-			AtomicLongMap<String> languageCounters =
-					processFiles(cleanthatSession, pathToMutatedContent, engineP, currentThreadEngine);
+			var languageCounters = processFiles(cleanthatSession, pathToMutatedContent, engineP, currentThreadEngine);
 			engineToNbMutatedFiles.addAndGet(engineP.getEngine(), languageCounters.get(KEY_NB_FILES_FORMATTED));
 
 			return languageCounters;
@@ -250,25 +242,22 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			Map<Path, String> pathToMutatedContent,
 			IEngineProperties engineP,
 			ThreadLocal<EngineAndLinters> currentThreadEngine) {
-		ISourceCodeProperties sourceCodeProperties = engineP.getSourceCode();
+		var sourceCodeProperties = engineP.getSourceCode();
 
 		AtomicLongMap<String> languageCounters = AtomicLongMap.create();
 
-		FileSystem fs = cleanthatSession.getRepositoryRoot().getFileSystem();
-		List<PathMatcher> includeMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
-		List<PathMatcher> excludeMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getExcludes());
+		var fs = cleanthatSession.getRepositoryRoot().getFileSystem();
+		var includeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getIncludes());
+		var excludeMatchers = IncludeExcludeHelpers.prepareMatcher(fs, sourceCodeProperties.getExcludes());
 
 		// https://github.com/diffplug/spotless/issues/1555
 		// If too many threads, we would load too many Spotless engines
-		ListeningExecutorService executor =
-				PepperExecutorsHelper.newShrinkableFixedThreadPool("Cleanthat-CodeFormatter-");
+		var executor = PepperExecutorsHelper.newShrinkableFixedThreadPool("Cleanthat-CodeFormatter-");
 		CompletionService<Boolean> cs = new ExecutorCompletionService<>(executor);
 
 		try {
 			cleanthatSession.getCodeProvider().listFilesForContent(file -> {
-				Optional<Callable<Boolean>> optRunMe = onEachFile(cleanthatSession,
+				var optRunMe = onEachFile(cleanthatSession,
 						pathToMutatedContent,
 						currentThreadEngine,
 						languageCounters,
@@ -276,7 +265,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 						excludeMatchers,
 						file);
 
-				optRunMe.ifPresent(c -> cs.submit(c));
+				optRunMe.ifPresent(cs::submit);
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue listing files", e);
@@ -290,7 +279,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		// Once here, we are guaranteed all tasks has been pushed: we can poll until null.
 		while (true) {
 			try {
-				Future<Boolean> polled = cs.poll();
+				var polled = cs.poll();
 
 				if (polled == null) {
 					break;
@@ -320,14 +309,14 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			List<PathMatcher> includeMatchers,
 			List<PathMatcher> excludeMatchers,
 			ICodeProviderFile file) {
-		Path filePath = file.getPath();
+		var filePath = file.getPath();
 
-		Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
-		Optional<PathMatcher> matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
+		var matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+		var matchingExclude = IncludeExcludeHelpers.findMatching(excludeMatchers, filePath);
 		if (matchingInclude.isPresent()) {
 			if (matchingExclude.isEmpty()) {
 				Callable<Boolean> runMe = () -> {
-					EngineAndLinters engineSteps = currentThreadEngine.get();
+					var engineSteps = currentThreadEngine.get();
 
 					try {
 						return doFormat(cleanthatSession, engineSteps, pathToMutatedContent, filePath);
@@ -357,17 +346,16 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			Map<Path, String> pathToMutatedContent,
 			Path filePath) throws IOException {
 		// Rely on the latest code (possibly formatted by a previous processor)
-		Optional<String> optCode =
-				loadCodeOptMutated(cleanthatSession.getCodeProvider(), pathToMutatedContent, filePath);
+		var optCode = loadCodeOptMutated(cleanthatSession.getCodeProvider(), pathToMutatedContent, filePath);
 
 		if (optCode.isEmpty()) {
 			LOGGER.warn("Skip processing {} as its content is not available", filePath);
 			return false;
 		}
-		String code = optCode.get();
+		var code = optCode.get();
 
 		LOGGER.debug("Processing path={}", filePath);
-		String output = doFormat(engineAndLinters, new PathAndContent(filePath, code));
+		var output = doFormat(engineAndLinters, new PathAndContent(filePath, code));
 		if (!Strings.isNullOrEmpty(output) && !code.equals(output)) {
 			LOGGER.info("Path={} successfully cleaned by {}", filePath, engineAndLinters);
 			pathToMutatedContent.put(filePath, output);
@@ -394,7 +382,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	public Optional<String> loadCodeOptMutated(ICodeProvider codeProvider,
 			Map<Path, String> pathToMutatedContent,
 			Path filePath) {
-		Optional<String> optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
+		var optAlreadyMutated = Optional.ofNullable(pathToMutatedContent.get(filePath));
 
 		if (optAlreadyMutated.isPresent()) {
 			return optAlreadyMutated;
@@ -408,7 +396,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 	}
 
 	private EngineAndLinters buildProcessors(IEngineProperties properties, CleanthatSession cleanthatSession) {
-		IEngineLintFixerFactory formattersFactory = formatterFactory.makeLanguageFormatter(properties);
+		var formattersFactory = formatterFactory.makeLanguageFormatter(properties);
 
 		return sourceCodeFormatterHelper.compile(properties, cleanthatSession, formattersFactory);
 	}

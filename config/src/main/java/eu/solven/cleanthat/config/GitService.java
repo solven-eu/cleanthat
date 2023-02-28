@@ -54,7 +54,7 @@ public class GitService implements IGitService, InitializingBean {
 
 	@Override
 	public Map<String, ?> getProperties() throws IOException {
-		ClassPathResource resource = new ClassPathResource("/git.json");
+		var resource = new ClassPathResource("/git.json");
 		if (!resource.exists()) {
 			// https://github.com/solven-eu/mitrust-datasharing/issues/8871
 			LOGGER.warn("We failed finding the resource: {}", resource.getPath());
@@ -76,7 +76,7 @@ public class GitService implements IGitService, InitializingBean {
 	}
 
 	public static String safeGetSha1() {
-		GitService gitService = new GitService();
+		var gitService = new GitService();
 		try {
 			gitService.afterPropertiesSet();
 		} catch (IOException e) {

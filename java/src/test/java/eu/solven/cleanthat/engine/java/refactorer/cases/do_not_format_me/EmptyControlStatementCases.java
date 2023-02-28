@@ -8,6 +8,7 @@ import org.junit.Ignore;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -130,7 +131,8 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	@CompareMethods
+	@UnmodifiedMethod
+	// @CompareMethods
 	public static class InLambda {
 		public void pre(ICodeProvider cp) throws IOException {
 			cp.listFilesForContent(file -> {

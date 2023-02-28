@@ -30,14 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
-import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedInterfaceDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -105,12 +102,12 @@ public class ITAnonymousClass {
 
 	@Test
 	public void testResolveType() throws IOException {
-		File file = new File("src/test/java/" + ITAnonymousClass.class.getName().replace(".", "/") + ".java");
+		var file = new File("src/test/java/" + ITAnonymousClass.class.getName().replace(".", "/") + ".java");
 		if (!file.isFile()) {
 			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
 		}
-		String pathAsString = Files.readString(file.toPath());
-		CompilationUnit tree = parser.parse(pathAsString).getResult().get();
+		var pathAsString = Files.readString(file.toPath());
+		var tree = parser.parse(pathAsString).getResult().get();
 
 		tree.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
 			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
@@ -121,7 +118,7 @@ public class ITAnonymousClass {
 						Optional<Node> optParentNode = node.getParentNode();
 
 						if (optParentNode.isPresent() && optParentNode.get() instanceof ObjectCreationExpr) {
-							ObjectCreationExpr objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
+							var objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
 							Optional<ResolvedReferenceTypeDeclaration> optTypeDeclaration =
 									objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
 							if (optTypeDeclaration.isEmpty()) {
@@ -133,18 +130,18 @@ public class ITAnonymousClass {
 								LOGGER.info("Anonymous Class");
 							}
 
-							ResolvedReferenceTypeDeclaration typeDecl = optTypeDeclaration.get();
+							var typeDecl = optTypeDeclaration.get();
 							if (typeDecl.isAnonymousClass()) {
-								ResolvedClassDeclaration asClass = typeDecl.asClass();
+								var asClass = typeDecl.asClass();
 								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
 							} else if (typeDecl.isClass()) {
-								ResolvedClassDeclaration asClass = typeDecl.asClass();
+								var asClass = typeDecl.asClass();
 								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
 							} else if (typeDecl.isFunctionalInterface()) {
-								ResolvedInterfaceDeclaration asClass = typeDecl.asInterface();
+								var asClass = typeDecl.asInterface();
 								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
 							} else if (typeDecl.isInterface()) {
-								ResolvedInterfaceDeclaration asClass = typeDecl.asInterface();
+								var asClass = typeDecl.asInterface();
 								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
 							} else {
 								System.out.println("?");

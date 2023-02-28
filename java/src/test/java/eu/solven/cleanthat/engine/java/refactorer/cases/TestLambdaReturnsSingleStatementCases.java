@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LambdaReturnsSingleStatementCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestLambdaReturnsSingleStatement extends AParameterizesJavaparserRefactorerCases {
+public class TestLambdaReturnsSingleStatementCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new LambdaReturnsSingleStatementCases();
 	}
 
-	public TestLambdaReturnsSingleStatement(JavaParser javaParser,
+	public TestLambdaReturnsSingleStatementCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

@@ -69,7 +69,7 @@ public class GithubNoApiWebhookHandler {
 	public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
-		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
+		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		Optional<Object> organizationUrl = PepperMapHelper.getOptionalAs(input, "organization", "url");
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
@@ -86,7 +86,7 @@ public class GithubNoApiWebhookHandler {
 		// Push on PR: there is no action. There may be multiple commits being pushed
 		// Present for PR, PR_review and PR_review_comment
 		Optional<Map<String, ?>> optPullRequest = PepperMapHelper.getOptionalAs(input, "pull_request");
-		Optional<String> optAction = PepperMapHelper.getOptionalString(input, "action");
+		var optAction = PepperMapHelper.getOptionalString(input, "action");
 		// We are notified a PR has been open: its branch may be keep_cleaned or not
 		boolean prOpen;
 		Optional<GitPrHeadRef> optOpenPr;
@@ -106,9 +106,9 @@ public class GithubNoApiWebhookHandler {
 			if (optAction.isEmpty()) {
 				throw new IllegalStateException("We miss an action for a webhook holding a pull_request");
 			}
-			String githubAction = optAction.get();
+			var githubAction = optAction.get();
 			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
-				String shortHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
+				var shortHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
 				String headRef = GithubFacade.branchToRef(shortHeadRef);
 
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
@@ -122,19 +122,17 @@ public class GithubNoApiWebhookHandler {
 				}
 				// Some dirty commits may have been pushed while the PR was closed
 				prOpen = true;
-				String baseRepoName =
-						PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
-				String shortBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
+				var baseRepoName = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
+				var shortBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
 				String baseRef = GithubFacade.branchToRef(shortBaseRef);
 
-				long prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
-				String headRepoName =
-						PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
-				String baseSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "sha");
-				GitRepoBranchSha1 base = new GitRepoBranchSha1(baseRepoName, baseRef, baseSha);
+				var prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
+				var headRepoName = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
+				var baseSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "sha");
+				var base = new GitRepoBranchSha1(baseRepoName, baseRef, baseSha);
 				optBaseRef = Optional.of(base);
-				String headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
-				GitRepoBranchSha1 head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
+				var headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
+				var head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
 				optHeadRef = Optional.of(head);
 				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prNumber, base.getRef(), head.getRef()));
 
@@ -168,11 +166,11 @@ public class GithubNoApiWebhookHandler {
 				// to a branch, not a commit.
 				// In fact, keeping only a sha1 is not relevant, as we need a ref/branch to record our cleaning anyway.
 				// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-				Optional<String> optBeforeSha = PepperMapHelper.getOptionalString(input, "before");
-				Optional<String> optAfterSha = PepperMapHelper.getOptionalString(input, "after");
-				Optional<String> optFullRefName = PepperMapHelper.getOptionalString(input, "ref");
+				var optBeforeSha = PepperMapHelper.getOptionalString(input, "before");
+				var optAfterSha = PepperMapHelper.getOptionalString(input, "after");
+				var optFullRefName = PepperMapHelper.getOptionalString(input, "ref");
 				if (optAfterSha.isPresent() && optFullRefName.isPresent()) {
-					String afterSha = optAfterSha.get();
+					var afterSha = optAfterSha.get();
 					if (afterSha.matches("0+")) {
 						LOGGER.info("We discard as deleted refs (after={})", afterSha);
 						return new GitWebhookRelevancyResult(false,
@@ -181,7 +179,7 @@ public class GithubNoApiWebhookHandler {
 								Optional.empty(),
 								Optional.empty());
 					}
-					String pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
+					var pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
 					// TODO 'cleanthat' username should not be hardcoded
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
@@ -192,16 +190,16 @@ public class GithubNoApiWebhookHandler {
 								Optional.empty());
 					}
 					pushBranch = true;
-					String ref = optFullRefName.get();
+					var ref = optFullRefName.get();
 					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
 					LOGGER.info("Event for repository={}", repoName);
 					LOGGER.info("Event for pushing into {}", ref);
-					GitRepoBranchSha1 after = new GitRepoBranchSha1(repoName, ref, afterSha);
+					var after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
-					String beforeSha = optBeforeSha.get();
+					var beforeSha = optBeforeSha.get();
 
-					boolean created = PepperMapHelper.getRequiredBoolean(input, "created");
-					boolean forced = PepperMapHelper.getRequiredBoolean(input, "forced");
+					var created = PepperMapHelper.getRequiredBoolean(input, "created");
+					var forced = PepperMapHelper.getRequiredBoolean(input, "forced");
 
 					if (created) {
 						LOGGER.info(

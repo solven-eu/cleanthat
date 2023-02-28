@@ -17,9 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -29,16 +26,13 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 's.indexOf("s")’ into ’s.indexOf('s')'.
  *
  * @author Benoit Lacelle
  */
-// TODO Implements lastIndexOf
 public class UseIndexOfChar extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseIndexOfChar.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -78,24 +72,23 @@ public class UseIndexOfChar extends AJavaParserMutator {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof StringLiteralExpr)) {
 			return false;
 		}
-		StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) node;
+		var stringLiteralExpr = (StringLiteralExpr) node;
 
 		if (stringLiteralExpr.getParentNode().isEmpty()) {
 			return false;
 		}
-		Node parentNode = stringLiteralExpr.getParentNode().get();
+		var parentNode = stringLiteralExpr.getParentNode().get();
 		if (!(parentNode instanceof MethodCallExpr)) {
 			// We search a call for .indexOf
 			return false;
 		}
-		MethodCallExpr parentMethodCall = (MethodCallExpr) parentNode;
-		String parentMethodAsString = parentMethodCall.getNameAsString();
-		boolean isIndexOf = "indexOf".equals(parentMethodAsString);
-		boolean isLastIndexOf = "lastIndexOf".equals(parentMethodAsString);
+		var parentMethodCall = (MethodCallExpr) parentNode;
+		var parentMethodAsString = parentMethodCall.getNameAsString();
+		var isIndexOf = "indexOf".equals(parentMethodAsString);
+		var isLastIndexOf = "lastIndexOf".equals(parentMethodAsString);
 		if (!isIndexOf && !isLastIndexOf) {
 			// We search a call for .indexOf
 			return false;
@@ -106,13 +99,13 @@ public class UseIndexOfChar extends AJavaParserMutator {
 			return false;
 		}
 
-		String stringLiteralExprValue = stringLiteralExpr.getValue();
+		var stringLiteralExprValue = stringLiteralExpr.getValue();
 		if (stringLiteralExprValue.isEmpty()) {
 			if (isIndexOf) {
 				return parentNode.replace(new IntegerLiteralExpr("0"));
 			} else {
 				assert isLastIndexOf;
-				MethodCallExpr lengthMethodCall = new MethodCallExpr(optScope.get(), "length");
+				var lengthMethodCall = new MethodCallExpr(optScope.get(), "length");
 				return parentNode.replace(lengthMethodCall);
 			}
 		} else if (stringLiteralExprValue.length() != 1) {

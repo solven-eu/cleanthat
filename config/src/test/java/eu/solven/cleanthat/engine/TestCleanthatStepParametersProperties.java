@@ -37,14 +37,13 @@ public class TestCleanthatStepParametersProperties {
 
 	@Test
 	public void testDefaultConstructor() throws JsonProcessingException {
-		CleanthatStepParametersProperties p = new CleanthatStepParametersProperties();
+		var p = new CleanthatStepParametersProperties();
 
 		p.add("k1", "v1");
 
-		String json = objectMapper.writeValueAsString(p);
+		var json = objectMapper.writeValueAsString(p);
 
-		CleanthatStepParametersProperties backToObject =
-				objectMapper.readValue(json, CleanthatStepParametersProperties.class);
+		var backToObject = objectMapper.readValue(json, CleanthatStepParametersProperties.class);
 
 		Assert.assertEquals(p, backToObject);
 		Assertions.assertThat(backToObject.getCustomProperty("k1")).isEqualTo("v1");
@@ -58,10 +57,9 @@ public class TestCleanthatStepParametersProperties {
 		CleanthatStepParametersProperties genericConfig =
 				objectMapper.convertValue(p, CleanthatStepParametersProperties.class);
 
-		String json = objectMapper.writeValueAsString(genericConfig);
+		var json = objectMapper.writeValueAsString(genericConfig);
 
-		CleanthatStepParametersProperties backToGeneric =
-				objectMapper.readValue(json, CleanthatStepParametersProperties.class);
+		var backToGeneric = objectMapper.readValue(json, CleanthatStepParametersProperties.class);
 
 		CleanthatCustomStepParametersProperties backToCustomThroughGeneric =
 				objectMapper.convertValue(backToGeneric, CleanthatCustomStepParametersProperties.class);

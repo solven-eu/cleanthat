@@ -46,8 +46,7 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 	public static final String MOJO_FIX = "cleanthat";
 
-	@Override
-	protected List<Class<?>> springClasses() {
+	static List<Class<?>> cleanThatSpringClasses() {
 		List<Class<?>> classes = new ArrayList<>();
 
 		classes.add(GithubSpringConfig.class);
@@ -58,11 +57,16 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 	}
 
 	@Override
+	protected List<Class<?>> springClasses() {
+		return cleanThatSpringClasses();
+	}
+
+	@Override
 	public void doClean(ApplicationContext appContext) {
 		if (isRunOnlyAtRoot() && !isThisTheExecutionRoot()) {
 			// This will check it is called only if the command is run from the project root.
 			// However, it will not prevent the plugin to be called on each module
-			getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
+			getLog().info("maven-cleanthat-plugin:" + MOJO_FIX + " skipped (not execution root)");
 			return;
 		}
 

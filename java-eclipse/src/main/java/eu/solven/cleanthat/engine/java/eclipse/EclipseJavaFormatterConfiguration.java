@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.eclipse;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,7 +68,7 @@ public class EclipseJavaFormatterConfiguration {
 			LOGGER.info("There is no {}. Switching to default formatting", KEY_URL);
 			// https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/FormatterMojo.java#L689
 			// { "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "9", "10", "11" }
-			String jdkVersion = Optional.ofNullable(languageProperties.getEngineVersion()).orElse("1.8");
+			var jdkVersion = Optional.ofNullable(languageProperties.getEngineVersion()).orElse("1.8");
 			// if (optJdkVersion.isEmpty()) {
 			// LOGGER.warn("No value for {}. Defaulted to: {}", KEY_JDK_VERSION, DEFAULT_JDK_VERSION);
 			// }
@@ -83,7 +82,7 @@ public class EclipseJavaFormatterConfiguration {
 		} else {
 			LOGGER.info("Loading Eclipse java formatting configuration from {}", javaConfigFile);
 
-			Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, javaConfigFile);
+			var resource = CleanthatUrlLoader.loadUrl(codeProvider, javaConfigFile);
 
 			try {
 				return loadResource(resource);
@@ -94,7 +93,7 @@ public class EclipseJavaFormatterConfiguration {
 	}
 
 	public static EclipseJavaFormatterConfiguration loadResource(Resource resource) {
-		try (InputStream is = resource.getInputStream()) {
+		try (var is = resource.getInputStream()) {
 			try {
 				Map<String, String> settings = new ConfigReader().read(is);
 				return new EclipseJavaFormatterConfiguration(settings);

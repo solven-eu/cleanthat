@@ -27,7 +27,6 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.TypeSolver;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -37,6 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorExternalReferences;
+import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Enables common behavior to JavaParser-based rules
@@ -69,20 +69,24 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 
 	@Override
 	public Optional<Node> walkAst(Node tree) {
-		AtomicBoolean transformed = new AtomicBoolean();
+		var transformed = new AtomicBoolean();
 		tree.walk(node -> {
 			boolean hasTransformed;
 			try {
+				LOGGER.debug("{} is going over {}",
+						this.getClass().getSimpleName(),
+						PepperLogHelper.getObjectAndClass(node));
 				hasTransformed = processNotRecursively(node);
 			} catch (RuntimeException e) {
 				String rangeInSourceCode = "Around lines: " + node.getTokenRange().map(Object::toString).orElse("-");
-				String messageForIssueReporting = messageForIssueReporting(this, node);
+				var messageForIssueReporting = messageForIssueReporting(this, node);
 				throw new IllegalArgumentException(
 						"Issue with a cleanthat mutator. " + rangeInSourceCode + " " + messageForIssueReporting,
 						e);
 			}
 
 			if (hasTransformed) {
+				LOGGER.debug("{} transformed something into `{}`", this, node);
 				idempotencySanityCheck(node);
 				transformed.set(true);
 			}
@@ -95,19 +99,19 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 	}
 
 	private void idempotencySanityCheck(Node node) {
-		boolean transformAgain = processNotRecursively(node);
+		var transformAgain = processNotRecursively(node);
 		// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
 		if (!this.getIds().contains(IMutator.ID_NOOP) && transformAgain) {
 			// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
 			// to again 'a.equals(b)')
 			WARNS_IDEMPOTENCY_COUNT.incrementAndGet();
-			String messageForIssueReporting = messageForIssueReporting(this, node);
+			var messageForIssueReporting = messageForIssueReporting(this, node);
 			LOGGER.warn("A mutator is not idem-potent. {}", messageForIssueReporting);
 		}
 	}
 
 	public static String messageForIssueReporting(IMutator mutator, Node node) {
-		String faultyCode = node.toString();
+		var faultyCode = node.toString();
 
 		String messageForIssueReporting =
 				"\r\n\r\nPlease report it to '" + "https://github.com/solven-eu/cleanthat/issues"
@@ -122,7 +126,7 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 		Optional<Node> optReplacement = replaceNode(node);
 
 		if (optReplacement.isPresent()) {
-			Node replacement = optReplacement.get();
+			var replacement = optReplacement.get();
 			return tryReplace(node, replacement);
 		} else {
 			return false;
@@ -178,8 +182,8 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 			return Optional.of(type.resolve());
 		} catch (RuntimeException e) {
 			try {
-				TypeSolver symbolSolver = TL_TYPESOLVER.get();
-				JavaSymbolSolver symbolResolver = new JavaSymbolSolver(symbolSolver);
+				var symbolSolver = TL_TYPESOLVER.get();
+				var symbolResolver = new JavaSymbolSolver(symbolSolver);
 				Optional<ResolvedType> fallbackType =
 						Optional.of(symbolResolver.toResolvedType(type, ResolvedType.class));
 				if (fallbackType.isPresent()) {
@@ -187,11 +191,14 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 					LOGGER.debug("1- Does this still happen? As of ???: Yes!", e);
 				}
 				return fallbackType;
-			} catch (UnsolvedSymbolException ee) {
+			} catch (RuntimeException ee) {
+				// UnsolvedSymbolException | UnsupportedOperationException
+				// Caused by: java.lang.UnsupportedOperationException: CorrespondingDeclaration not available for
+				// unsolved symbol.
+				// at com.github.javaparser.resolution.model.SymbolReference.getCorrespondingDeclaration
+				// (SymbolReference.java:116)
 				LOGGER.debug("Issue with JavaParser over {}", type, ee);
 				return Optional.empty();
-			} catch (RuntimeException ee) {
-				throw new IllegalArgumentException(ee);
 			}
 		} catch (NoClassDefFoundError e) {
 			logNoClassDefFoundResolvingType(type, e);
@@ -202,13 +209,13 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 
 	protected void onMethodName(Node node, String methodName, OnMethodName consumer) {
 		if (node instanceof MethodCallExpr && methodName.equals(((MethodCallExpr) node).getName().getIdentifier())) {
-			MethodCallExpr methodCall = (MethodCallExpr) node;
+			var methodCall = (MethodCallExpr) node;
 			Optional<Expression> optScope = methodCall.getScope();
 			if (optScope.isEmpty()) {
 				// TODO Document when this would happen
 				return;
 			}
-			Expression scope = optScope.get();
+			var scope = optScope.get();
 			Optional<ResolvedType> type = optResolvedType(scope);
 			if (type.isPresent()) {
 				consumer.onMethodName(methodCall, scope, type.get());
@@ -225,8 +232,8 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 		if (optType.isEmpty()) {
 			return false;
 		}
-		ResolvedType type = optType.get();
-		boolean isCorrectClass = false;
+		var type = optType.get();
+		var isCorrectClass = false;
 		if (type.isConstraint()) {
 			// Happens on Lambda
 			type = type.asConstraintType().getBound();

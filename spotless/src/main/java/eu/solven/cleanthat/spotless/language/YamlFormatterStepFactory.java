@@ -62,7 +62,7 @@ public class YamlFormatterStepFactory extends AFormatterStepFactory {
 	}
 
 	private FormatterStep makeJackson(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
-		JacksonYamlConfig jacksonConfig = new JacksonYamlConfig();
+		var jacksonConfig = new JacksonYamlConfig();
 
 		@SuppressWarnings("unchecked")
 		Map<String, Boolean> features = parameters.getCustomProperty("features", Map.class);

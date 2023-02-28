@@ -50,7 +50,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 	public void testWeirdCharacters() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/shaft_engine/PropertyFileManager.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
 		Environment environment = Environment.builder().scanRuntimeClasspath().build();
@@ -60,7 +60,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 
 		// LiteralsFirstInComparisons transformer = new LiteralsFirstInComparisons();
 		JavaParser javaParser = AParameterizesRefactorerCases.makeDefaultJavaParser(true);
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
 		org.openrewrite.java.tree.J.CompilationUnit openrewriteCompilationUnit = convertToAst(compilationUnit);
 
@@ -81,7 +81,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 
 	@Override
 	protected J.CompilationUnit convertToAst(Node pre) {
-		String asString = pre.toString();
+		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString);
 	}

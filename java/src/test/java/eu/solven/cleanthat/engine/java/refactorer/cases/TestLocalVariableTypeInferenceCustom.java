@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.io.ByteStreams;
 
@@ -34,20 +32,19 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInfe
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestLocalVariableTypeInferenceCustom extends AJavaparserTestCases {
+	final IJavaparserMutator mutator = new LocalVariableTypeInference();
 
 	@Test
 	public void testIssueWithFile() throws IOException {
-		Resource testRoaringBitmapSource =
+		Resource resource =
 				new ClassPathResource("/source/do_not_format_me/LocalVariableTypeInference/CodeProviderHelpers.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		IJavaparserMutator transformer = new LocalVariableTypeInference();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 		LexicalPreservingPrinter.setup(compilationUnit);
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 	}

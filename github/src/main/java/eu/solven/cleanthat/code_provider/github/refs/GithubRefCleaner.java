@@ -115,7 +115,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			GitRepoBranchSha1 head,
 			// There can be multiple eventBaseBranches in case of push events
 			Set<String> eventBaseRefs) {
-		ICodeProvider codeProvider = getCodeProviderForRef(root, head);
+		var codeProvider = getCodeProviderForRef(root, head);
 		ResultOrError<CleanthatRepositoryProperties, String> optConfig;
 		try {
 			optConfig = loadAndCheckConfiguration(codeProvider);
@@ -131,14 +131,14 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			return Optional.empty();
 		}
 
-		CleanthatRepositoryProperties properties = optConfig.getOptResult().get();
+		var properties = optConfig.getOptResult().get();
 
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		List<String> protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
+		var protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
 
-		String headRef = head.getRef();
+		var headRef = head.getRef();
 		if (canCleanInPlace(eventBaseRefs, protectedPatterns, headRef)) {
 			logWhyCanCleanInPlace(eventBaseRefs, protectedPatterns, result, headRef);
 
@@ -164,7 +164,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 
 	private void updateCheckRunFailureWithConfig(String eventKey, GitRepoBranchSha1 head) {
 		GHRepository repository;
-		String repoName = head.getRepoFullName();
+		var repoName = head.getRepoFullName();
 		try {
 			repository = githubAndToken.getGithub().getRepository(repoName);
 		} catch (IOException e) {
@@ -178,7 +178,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 								+ "/blob/master/runnable/src/test/resources/config/default-safe.yaml")
 						.build();
 
-				String summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
+				var summary = summuaryRows.stream().collect(Collectors.joining("\r\n"));
 				cr.update()
 						.withConclusion(Conclusion.ACTION_REQUIRED)
 						.withStatus(Status.COMPLETED)
@@ -196,7 +196,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			String headRef) {
 		// We'll have to open a dedicated ReviewRequest if necessary
 		// As we prefer not to pollute a random existing PR
-		String newBranchRef = prepareRefNameForHead(headRef);
+		var newBranchRef = prepareRefNameForHead(headRef);
 		// We may open a branch later if it appears this branch is relevant
 		// BEWARE we do not open the branch right now: we wait to detect at least one fail is relevant to be clean
 		// In case of concurrent events, we may end opening multiple PR to clean the same branch
@@ -207,29 +207,29 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 				cleanableRefsRegexes);
 
 		// See GithubEventHelper.doOpenPr(WebhookRelevancyResult, GithubRepositoryFacade, GitRepoBranchSha1)
-		Optional<GitRepoBranchSha1> optBaseRef = result.optBaseRef();
+		var optBaseRef = result.optBaseRef();
 		if (optBaseRef.isEmpty()) {
 			// This may happen on the event of branch creation, when the branch is cleanable
 			throw new IllegalStateException("No baseRef? headRef=" + headRef);
 		}
 
-		GitRepoBranchSha1 base = optBaseRef.get();
+		var base = optBaseRef.get();
 		// We keep the base sha1, as it will be used for diff computations (i.e. listing the concerned files)
 		// We use as refName the pushedRef/rrHead as it is to this ref that a RR has to be open
-		GitRepoBranchSha1 actualBase = new GitRepoBranchSha1(base.getRepoFullName(), head.getRef(), base.getSha());
+		var actualBase = new GitRepoBranchSha1(base.getRepoFullName(), head.getRef(), base.getSha());
 
-		GitRepoBranchSha1 actualHead = new GitRepoBranchSha1(head.getRepoFullName(), newBranchRef, head.getSha());
+		var actualHead = new GitRepoBranchSha1(head.getRepoFullName(), newBranchRef, head.getSha());
 		return Optional.of(new HeadAndOptionalBase(actualHead, Optional.of(actualBase)));
 	}
 
 	private boolean canCleanInNewRR(List<String> cleanableRefsRegexes, String headRef) {
-		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(cleanableRefsRegexes, headRef);
+		var optHeadMatchingRule = selectPatternOfSensibleHead(cleanableRefsRegexes, headRef);
 
 		return optHeadMatchingRule.isPresent();
 	}
 
 	private boolean canCleanInPlace(Set<String> eventBaseRefs, List<String> protectedPatterns, String headRef) {
-		Optional<String> optHeadMatchingRule = selectPatternOfSensibleHead(protectedPatterns, headRef);
+		var optHeadMatchingRule = selectPatternOfSensibleHead(protectedPatterns, headRef);
 		if (optHeadMatchingRule.isPresent()) {
 			// We never clean in place the cleanable branches, as they are considered sensible
 			LOGGER.info("Not cleaning in-place as head={} is a sensible/cleanable ref (rule={})",
@@ -238,7 +238,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			return false;
 		}
 
-		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, protectedPatterns);
+		var optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, protectedPatterns);
 
 		return optBaseMatchingRule.isPresent();
 	}
@@ -249,7 +249,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			List<String> refToCleanRegexes,
 			IExternalWebhookRelevancyResult result,
 			String headRef) {
-		Optional<String> optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+		var optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
 
 		if (optBaseMatchingRule.isEmpty()) {
 			throw new IllegalStateException("Should be called only if .canCleanInPlace() returns true");
@@ -257,7 +257,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 
 		// TODO We should ensure the HEAD does not match any regex (i.e. not clean in-place a sensible branch, even
 		// if it is the head of a RR)
-		String baseMatchingRule = optBaseMatchingRule.get();
+		var baseMatchingRule = optBaseMatchingRule.get();
 
 		String prefix = "Cleaning {} in-place as ";
 		String suffix = " a sensible/cleanable base (rule={})";
@@ -287,7 +287,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			optBaseMatchingRule = Optional.empty();
 		} else {
 			optBaseMatchingRule = regexes.stream().filter(regex -> {
-				Optional<String> matchingBase = refs.stream().filter(base -> {
+				var matchingBase = refs.stream().filter(base -> {
 					return Pattern.matches(regex, base);
 				}).findAny();
 
@@ -307,15 +307,15 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	private Optional<HeadAndOptionalBase> cleanHeadInPlace(IExternalWebhookRelevancyResult result,
 			GitRepoBranchSha1 head) {
 		// The base is cleanable: we are allowed to clean its head in-place
-		Optional<GitRepoBranchSha1> optBase = result.optBaseRef();
+		var optBase = result.optBaseRef();
 		if (optBase.isPresent()) {
-			GitRepoBranchSha1 base = optBase.get();
+			var base = optBase.get();
 
 			if (IGitRefsConstants.SHA1_CLEANTHAT_UP_TO_REF_ROOT.equals(base.getSha())) {
 				// Typically a refs has been created, or forced-push
 				// Its base would be the ancestor commit which is in the default branch
 				try {
-					String baseRepoFullName = base.getRepoFullName();
+					var baseRepoFullName = base.getRepoFullName();
 					GHRepository repo = githubAndToken.getGithub().getRepository(baseRepoFullName);
 
 					// BEWARE What-if head is a commit of the defaultBranch?
@@ -325,8 +325,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 					GHCompare compare = repo.getCompare(defaultBranch.getSHA1(), head.getSha());
 					Commit mergeBaseCommit = compare.getMergeBaseCommit();
 
-					GitRepoBranchSha1 newBase =
-							new GitRepoBranchSha1(baseRepoFullName, base.getRef(), mergeBaseCommit.getSHA1());
+					var newBase = new GitRepoBranchSha1(baseRepoFullName, base.getRef(), mergeBaseCommit.getSHA1());
 					LOGGER.info("We will use as base={} to clean head={}", newBase, head);
 					optBase = Optional.of(newBase);
 				} catch (IOException e) {
@@ -347,7 +346,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		// We now suggest opening a RR at most once per day. We may not open it if there is a previous day RR still open
 		String nowSuffix = "-" + LocalDate.now();
 
-		String ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + nowSuffix;
+		var ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + nowSuffix;
 		LOGGER.info("We provisioned a (temporary, not-materialized yet) head branch={} to clean base branch={}",
 				ref,
 				baseToClean);
@@ -355,10 +354,10 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	}
 
 	public ICodeProvider getCodeProviderForRef(Path root, GitRepoBranchSha1 theRef) {
-		String ref = theRef.getRef();
+		var ref = theRef.getRef();
 
 		try {
-			String repoName = theRef.getRepoFullName();
+			var repoName = theRef.getRepoFullName();
 			GithubFacade facade = new GithubFacade(githubAndToken.getGithub(), repoName);
 			GHRef refObject = facade.getRef(ref);
 			return new GithubRefCodeProvider(root, githubAndToken.getToken(), facade.getRepository(), refObject);
@@ -374,7 +373,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		ICodeProviderWriter codeProviderWriter = new CodeProviderDecoratingWriter(codeProvider, () -> {
 			// Get the head lazily, to prevent creating empty branches
 			GHRef headWhereToWrite = headSupplier.getSupplier().get().getDecorated();
-			Path repositoryRoot = codeProvider.getRepositoryRoot();
+			var repositoryRoot = codeProvider.getRepositoryRoot();
 			return new GithubRefCodeReadWriter(repositoryRoot,
 					githubAndToken.getToken(),
 					eventKey,
@@ -411,7 +410,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			IGitRepository repo,
 			IGitCommit base,
 			ILazyGitReference headSupplier) {
-		String refOrSha1 = headSupplier.getFullRefOrSha1();
+		var refOrSha1 = headSupplier.getFullRefOrSha1();
 		GHCommit ghBase = base.getDecorated();
 
 		LOGGER.info("Base: {} Head: {}", ghBase.getSHA1(), refOrSha1);
@@ -443,8 +442,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		GHRepository repo = defaultBranch.getOwner();
 
 		String branchName = defaultBranch.getName();
-		String baseRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName;
-		ICodeProvider codeProvider = getCodeProviderForRef(root,
+		var baseRef = CleanthatRefFilterProperties.BRANCHES_PREFIX + branchName;
+		var codeProvider = getCodeProviderForRef(root,
 				new GitRepoBranchSha1(repo.getFullName(), baseRef, defaultBranch.getSHA1()));
 		Optional<Map<String, ?>> optPrConfig = safeConfig(codeProvider);
 		if (optPrConfig.isPresent()) {
@@ -460,7 +459,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			LOGGER.warn("New feature is failing", e);
 		}
 
-		String headRef = REF_NAME_CONFIGURE;
+		var headRef = REF_NAME_CONFIGURE;
 		Optional<GHRef> optRefToPR = optRef(repo, headRef);
 		try {
 			if (optRefToPR.isPresent()) {
@@ -478,7 +477,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 
 				GHCommit commit = commitConfig(defaultBranch, repo, result);
 				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());
-				boolean force = false;
+				var force = false;
 				refToPr.updateTo(commit.getSHA1(), force);
 
 				// Issue using '/' in the base, while renovate succeed naming branches: 'renovate/configure'
@@ -517,7 +516,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	}
 
 	private void closeOldConfigurePr(GHRepository repo) {
-		String headRef = REF_NAME_CONFIGURE_V1;
+		var headRef = REF_NAME_CONFIGURE_V1;
 		Optional<GHRef> optRefToPR = optRef(repo, headRef);
 		if (optRefToPR.isPresent()) {
 			GHRef refToPr = optRefToPR.get();

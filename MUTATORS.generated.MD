@@ -1,5 +1,5 @@
 # Mutators
-## Single MutatorsPRD-READY
+## Single Mutators PRD-READY
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 
@@ -100,6 +100,15 @@ PMD: AvoidFileStream
 isDraft
 
 Require sourceJdk: 1.7
+
+### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
+
+
+PMD: AvoidUncheckedExceptionsInSignatures
+
+isDraft
+
+Require sourceJdk: 1
 
 ### [BoxedPrimitiveConstructor](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/BoxedPrimitiveConstructor.java)
 
@@ -277,6 +286,13 @@ isDraft
 Require sourceJdk: 1
 
 ### [SafeAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeAndConsensualMutators.java)
+
+
+isDraft
+
+Require sourceJdk: 1
+
+### [SafeButNotAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotAndConsensualMutators.java)
 
 
 isDraft

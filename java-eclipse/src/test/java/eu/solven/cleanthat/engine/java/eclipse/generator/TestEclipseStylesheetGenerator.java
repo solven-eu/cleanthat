@@ -48,7 +48,7 @@ public class TestEclipseStylesheetGenerator {
 	public void testInterruptEarly() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
 		Map<Path, String> pathToFile = Map.of(Paths.get("/RoaringBitmap.java"), asString);
@@ -63,7 +63,7 @@ public class TestEclipseStylesheetGenerator {
 	public void testFromEmptyConfiguration() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/RoaringBitmap/RoaringBitmap.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
 		Map<Path, String> pathToFile = Map.of(Paths.get("/RoaringBitmap.java"), asString);

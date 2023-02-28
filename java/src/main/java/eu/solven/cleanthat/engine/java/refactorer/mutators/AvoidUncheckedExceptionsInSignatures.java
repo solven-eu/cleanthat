@@ -20,7 +20,6 @@ import java.util.Optional;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
@@ -66,7 +65,7 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaParserMutator {
 				return false;
 			}
 
-			ResolvedReferenceType referenceType = optResolved.get().asReferenceType();
+			var referenceType = optResolved.get().asReferenceType();
 
 			List<ResolvedReferenceType> ancestors = referenceType.getAllClassesAncestors();
 

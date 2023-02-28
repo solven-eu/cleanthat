@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
@@ -38,14 +36,14 @@ public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
 	public void testNotIdempotent() throws IOException {
 		Resource testRoaringBitmapSource =
 				new ClassPathResource("/source/do_not_format_me/Spotless/testCaseOptionalNotEmpty.java");
-		String asString =
+		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		LiteralsFirstInComparisons transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var transformer = new LiteralsFirstInComparisons();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 		Assertions.assertThat(AJavaParserMutator.getWarnCount()).isEqualTo(0);

@@ -59,12 +59,12 @@ public class GithubEventHelper {
 			ILazyGitReference headSupplier) {
 		CodeFormatResult result;
 		if (relevancyResult.optBaseForHead().isPresent()) {
-			GitRepoBranchSha1 baseAsObject = relevancyResult.optBaseForHead().get();
+			var baseAsObject = relevancyResult.optBaseForHead().get();
 
 			// We use as base a commit, and not a ref
 			// Else, a compare within a single ref would lead to weird result (as the ref would take by default the most
 			// recent commit, not the commit before the push, which may be even more recent than the head)
-			String sha1 = baseAsObject.getSha();
+			var sha1 = baseAsObject.getSha();
 
 			GHCommit base = facade.getCommit(sha1);
 
@@ -82,7 +82,7 @@ public class GithubEventHelper {
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated,
 			CodeFormatResult result) {
 		if (refLazyRefCreated.get() != null) {
-			GitRepoBranchSha1 lazyRefCreated = refLazyRefCreated.get();
+			var lazyRefCreated = refLazyRefCreated.get();
 			if (relevancyResult.optBaseForHead().isEmpty()) {
 				// TODO Document when this would happen
 				LOGGER.warn("We created a tmpRef but there is no base");
@@ -108,7 +108,7 @@ public class GithubEventHelper {
 
 		String refSha = ref.getObject().getSha();
 
-		String expectedHeadSha1 = lazyRefCreated.getSha();
+		var expectedHeadSha1 = lazyRefCreated.getSha();
 		if (expectedHeadSha1.equals(refSha)) {
 			// TODO We should remove a ref only if CleanThat is the only writer, else it means a human
 			// has made some work on it
@@ -141,10 +141,10 @@ public class GithubEventHelper {
 		// TODO We may want to open a PR in a different repository, in case the original repository does not
 		// accept new branches
 		Optional<?> optOpenPr;
-		GitRepoBranchSha1 base = relevancyResult.optBaseForHead().get();
+		var base = relevancyResult.optBaseForHead().get();
 		try {
 			// TODO Add details about the event triggering this
-			String body = PepperResourceHelper
+			var body = PepperResourceHelper
 					.loadAsString(CleanthatConfigInitializer.TEMPLATES_FOLDER + "/cleaning-body.md");
 
 			if (!facade.getRepository().isPrivate()) {

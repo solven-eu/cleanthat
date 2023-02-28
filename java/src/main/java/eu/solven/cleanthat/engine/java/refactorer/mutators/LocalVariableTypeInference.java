@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,7 +25,9 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VarType;
+import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.utils.Pair;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
@@ -57,37 +60,46 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 		if (!(node instanceof VariableDeclarationExpr)) {
 			return false;
 		}
-		VariableDeclarationExpr variableDeclarationExpr = (VariableDeclarationExpr) node;
+		var variableDeclarationExpr = (VariableDeclarationExpr) node;
 
 		if (variableDeclarationExpr.getVariables().size() >= 2) {
 			return false;
 		}
 
-		VariableDeclarator singleVariableDeclaration = variableDeclarationExpr.getVariable(0);
+		var singleVariableDeclaration = variableDeclarationExpr.getVariable(0);
 
-		Type type = singleVariableDeclaration.getType();
+		var type = singleVariableDeclaration.getType();
 		if (type.isVarType()) {
 			return false;
 		}
 
 		// https://github.com/javaparser/javaparser/issues/3898
 		// We can not change the Type, as it would fail in the case of Type with Diamond
-		Expression initializer = singleVariableDeclaration.getInitializer().orElse(null);
+		var initializer = singleVariableDeclaration.getInitializer().orElse(null);
 
 		if (!isReplaceableAssignement(type, initializer)) {
 			return false;
 		}
 
-		VariableDeclarator newVariableDeclarator =
+		var newVariableDeclarator =
 				new VariableDeclarator(new VarType(), singleVariableDeclaration.getName(), initializer);
 		// We can not change the VariableDeclarator, as it would fail in the case of Type with Diamond
 		// return singleVariableDeclaration.replace(newVariableDeclarator);
 
-		VariableDeclarationExpr newVariableDeclarationExpr = new VariableDeclarationExpr(newVariableDeclarator);
+		var newVariableDeclarationExpr = new VariableDeclarationExpr(newVariableDeclarator);
+		newVariableDeclarationExpr.setModifiers(variableDeclarationExpr.getModifiers());
+
 		return variableDeclarationExpr.replace(newVariableDeclarationExpr);
 	}
 
 	private boolean isReplaceableAssignement(Type variableType, Expression initializer) {
+		if (initializer == null) {
+			return false;
+		} else if (initializer.isLambdaExpr()) {
+			// LambdaExpr can not be in a `var`
+			return false;
+		}
+
 		Optional<ResolvedType> optInitializerType = optResolvedType(initializer);
 		if (optInitializerType.isEmpty()) {
 			return false;
@@ -100,7 +112,27 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 		}
 
 		// If the variable was List but allocating an ArrayList, it means we can assign later any List
-		// `var` would forbid assigning anything but an ArrayLit
-		return optInitializerType.get().toDescriptor().equals(optVariableType.get().toDescriptor());
+		// `var` would forbid assigning anything but an ArrayList
+		var initializerType = optInitializerType.get();
+		var resolvedVariableType = optVariableType.get();
+		if (!initializerType.toDescriptor().equals(resolvedVariableType.toDescriptor())) {
+			return false;
+		}
+
+		if (initializerType.isReferenceType() && resolvedVariableType.isReferenceType()) {
+			// We require generics to be the same in both sides
+			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> initializerTypeParametersMap =
+					initializerType.asReferenceType().getTypeParametersMap();
+			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> variableTypeParametersMap =
+					resolvedVariableType.asReferenceType().getTypeParametersMap();
+
+			// In fact, it is not enough. See
+			// eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LocalVariableTypeInferenceCases.Case_UnclearGenericBounds
+			// return initializerTypeParametersMap.equals(variableTypeParametersMap);
+
+			return initializerTypeParametersMap.isEmpty() && variableTypeParametersMap.isEmpty();
+		}
+
+		return true;
 	}
 }

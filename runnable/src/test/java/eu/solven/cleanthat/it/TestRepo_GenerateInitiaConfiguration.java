@@ -17,7 +17,6 @@ package eu.solven.cleanthat.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.assertj.core.api.Assertions;
@@ -26,14 +25,11 @@ import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.RepoInitializerResult;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 public class TestRepo_GenerateInitiaConfiguration {
@@ -41,25 +37,25 @@ public class TestRepo_GenerateInitiaConfiguration {
 	public void testGenerateConfiguration() throws IOException {
 		Resource srcMainResourcesResource = new ClassPathResource("/application.yml");
 
-		File repositoryRoot = srcMainResourcesResource.getFile();
+		var repositoryRoot = srcMainResourcesResource.getFile();
 		while (!new File(repositoryRoot, ".git").isDirectory()) {
 			repositoryRoot = repositoryRoot.getParentFile();
 		}
 
 		ICodeProvider codeProvider = new FileSystemGitCodeProvider(repositoryRoot.toPath());
 
-		ObjectMapper objectMapper = ConfigHelpers.makeYamlObjectMapper();
+		var objectMapper = ConfigHelpers.makeYamlObjectMapper();
 		SpotlessFormattersFactory factory =
 				new SpotlessFormattersFactory(new ConfigHelpers(Arrays.asList(objectMapper)),
 						SpotlessFormattersFactory.makeProvisioner());
 
-		CleanthatConfigInitializer initializer = new CleanthatConfigInitializer(objectMapper, Arrays.asList(factory));
+		var initializer = new CleanthatConfigInitializer(objectMapper, Arrays.asList(factory));
 
-		RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
+		var result = initializer.prepareFile(codeProvider, false);
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
-		Path root = codeProvider.getRepositoryRoot();
+		var root = codeProvider.getRepositoryRoot();
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(2)
 				.containsKey(CleanthatPathHelpers.makeContentPath(root, ".cleanthat/cleanthat.yaml"))

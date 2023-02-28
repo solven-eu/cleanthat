@@ -43,18 +43,18 @@ public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
 	@Override
 	public void listFilesForContent(Set<String> includePatterns, Consumer<ICodeProviderFile> consumer)
 			throws IOException {
-		Predicate<Path> gitIgnorePredicate = makeGitIgnorePredicate();
+		var gitIgnorePredicate = makeGitIgnorePredicate();
 		listFilesForContent(gitIgnorePredicate, consumer);
 	}
 
 	protected Predicate<Path> makeGitIgnorePredicate() throws IOException {
-		Path gitIgnore = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), ".gitignore");
+		var gitIgnore = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), ".gitignore");
 
 		// TODO Beware there could be .gitignore in subfolders
 		// TODO Spotless implements this logic
 		Predicate<Path> gitIgnorePredicate;
 		if (Files.exists(gitIgnore)) {
-			String gitIgnoreContent = Files.readString(gitIgnore, StandardCharsets.UTF_8);
+			var gitIgnoreContent = Files.readString(gitIgnore, StandardCharsets.UTF_8);
 
 			Set<String> patterns = GitIgnoreParser.parsePatterns(gitIgnoreContent);
 

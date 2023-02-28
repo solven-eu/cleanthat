@@ -41,7 +41,6 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Switch o.equals("someString") to "someString".equals(o)
@@ -85,19 +84,15 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		if (node.toString().contains("EOL")) {
-			LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-		}
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
+		var methodCall = (MethodCallExpr) node;
 		if (methodCall.getArguments().size() != 1) {
 			return false;
 		}
-		Expression singleArgument = methodCall.getArgument(0);
-		String methodCallName = methodCall.getName().getIdentifier();
+		var singleArgument = methodCall.getArgument(0);
+		var methodCallName = methodCall.getName().getIdentifier();
 		boolean stringScopeOnly;
 		if (singleArgument instanceof ObjectCreationExpr && METHOD_EQUALS.equals(methodCallName)) {
 			LOGGER.debug("This is a !String method which can be swapped");
@@ -126,7 +121,7 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 		}
 
 		// recover argument of equals
-		Expression argument = singleArgument;
+		var argument = singleArgument;
 		// hardcoded string seems to be instance of StringLiteralExpr
 		LOGGER.debug("Find a hardcoded string : {}", argument);
 
@@ -136,7 +131,7 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 			// equals must be called by something
 			return false;
 		}
-		Expression scope = optScope.get();
+		var scope = optScope.get();
 
 		if (stringScopeOnly && !isStringScope(scope)) {
 			return false;
@@ -148,7 +143,7 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 		} else if (!mayBeNull(argument)
 				// Static fields are considered notNull when compared with a notStatic thing
 				|| isStaticField(argument) && !isStaticField(scope)) {
-			MethodCallExpr replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
+			var replacement = new MethodCallExpr(argument, methodCallName, new NodeList<>(scope));
 			return tryReplace(node, replacement);
 		} else {
 			// There is no point in switching a constant with another constant
@@ -206,7 +201,7 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 		if (optType.isEmpty()) {
 			return false;
 		}
-		ResolvedType type = optType.get();
+		var type = optType.get();
 		if (type.isConstraint()) {
 			// This happens on lambda expression: the type we're looking for is the Lambda bound-type
 			type = type.asConstraintType().getBound();

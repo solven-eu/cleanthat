@@ -17,20 +17,15 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.Statement;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns '.stream(s -> {return s.subString(0, 2)})' into '.stream(s -> s.subString(0, 2))'
@@ -38,7 +33,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class LambdaReturnsSingleStatement extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LambdaReturnsSingleStatement.class);
 
 	@Override
 	public boolean isDraft() {
@@ -69,25 +63,23 @@ public class LambdaReturnsSingleStatement extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 		if (!(node instanceof LambdaExpr)) {
 			return false;
 		}
 
-		LambdaExpr lambdaExpr = (LambdaExpr) node;
+		var lambdaExpr = (LambdaExpr) node;
 
-		Statement body = lambdaExpr.getBody();
+		var body = lambdaExpr.getBody();
 
 		if (!(body instanceof BlockStmt)) {
 			return false;
 		}
 
-		BlockStmt lambdaBLockStmt = (BlockStmt) body;
+		var lambdaBLockStmt = (BlockStmt) body;
 
 		if (lambdaBLockStmt.getStatements().size() == 1) {
 			if (lambdaBLockStmt.getStatement(0) instanceof ReturnStmt) {
-				ReturnStmt returnStmt = (ReturnStmt) lambdaBLockStmt.getStatement(0);
+				var returnStmt = (ReturnStmt) lambdaBLockStmt.getStatement(0);
 
 				Optional<Expression> returnedExpr = returnStmt.getExpression();
 
@@ -99,7 +91,7 @@ public class LambdaReturnsSingleStatement extends AJavaParserMutator {
 
 				return true;
 			} else if (lambdaBLockStmt.getStatement(0) instanceof ExpressionStmt) {
-				ExpressionStmt exprStmt = (ExpressionStmt) lambdaBLockStmt.getStatement(0);
+				var exprStmt = (ExpressionStmt) lambdaBLockStmt.getStatement(0);
 
 				lambdaExpr.setBody(new ExpressionStmt(exprStmt.getExpression()));
 

@@ -42,7 +42,7 @@ public class TestSpotlessDefaultIncludes {
 		Set<String> includes = new PomXmlFormatterFactory().defaultIncludes();
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pom.xml");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "pom.xml");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -51,7 +51,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "directory/pom.xml");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "directory/pom.xml");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -60,7 +60,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "pre_pom.xml");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "pre_pom.xml");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -74,7 +74,7 @@ public class TestSpotlessDefaultIncludes {
 		Set<String> includes = new MarkdownFormatterFactory().defaultIncludes();
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "README.MD");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "README.MD");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -83,7 +83,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "readme.md");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "readme.md");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -92,7 +92,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "directory/deep/README.md");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "directory/deep/README.md");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -101,7 +101,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "CHANGES.md");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "CHANGES.md");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -110,7 +110,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "CHANGES.narkdown");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "CHANGES.narkdown");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -124,7 +124,7 @@ public class TestSpotlessDefaultIncludes {
 		Set<String> includes = new JsonFormatterFactory().defaultIncludes();
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "renovate.json");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "renovate.json");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -133,7 +133,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "project/src/main/resources/config.json");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "project/src/main/resources/config.json");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
@@ -142,7 +142,7 @@ public class TestSpotlessDefaultIncludes {
 		}
 
 		{
-			Path filePath = CleanthatPathHelpers.makeContentPath(root, "main.js");
+			var filePath = CleanthatPathHelpers.makeContentPath(root, "main.js");
 
 			List<PathMatcher> includeMatchers = IncludeExcludeHelpers.prepareMatcher(root.getFileSystem(), includes);
 			Optional<PathMatcher> matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);

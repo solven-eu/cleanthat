@@ -31,29 +31,29 @@ public class TestCleanthatRefFilterProperties {
 
 	@Test
 	public void testDefaultConstructor() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
-		String json = objectMapper.writeValueAsString(p);
+		var json = objectMapper.writeValueAsString(p);
 
-		CleanthatRefFilterProperties backToObject = objectMapper.readValue(json, CleanthatRefFilterProperties.class);
+		var backToObject = objectMapper.readValue(json, CleanthatRefFilterProperties.class);
 
 		Assert.assertEquals(p, backToObject);
 	}
 
 	@Test
 	public void testEmptyJson() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		String json = "{}";
 
-		CleanthatRefFilterProperties backToObject = objectMapper.readValue(json, CleanthatRefFilterProperties.class);
+		var backToObject = objectMapper.readValue(json, CleanthatRefFilterProperties.class);
 
 		Assert.assertEquals(p, backToObject);
 	}
 
 	@Test
 	public void testSimpleBranchName() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		p.setProtectedPatterns(Arrays.asList("branchName"));
 
@@ -62,7 +62,7 @@ public class TestCleanthatRefFilterProperties {
 
 	@Test
 	public void testSimpleBranchPattern() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		p.setProtectedPatterns(Arrays.asList("branchName"));
 
@@ -71,7 +71,7 @@ public class TestCleanthatRefFilterProperties {
 
 	@Test
 	public void testSimpleBranchName_andQualifiedExplicitly() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		p.setProtectedPatterns(Arrays.asList("branchName", "refs/heads/branchName"));
 
@@ -80,7 +80,7 @@ public class TestCleanthatRefFilterProperties {
 
 	@Test
 	public void testSimpleBranchName_tag() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		p.setProtectedPatterns(Arrays.asList("refs/tags/v1.0"));
 
@@ -89,7 +89,7 @@ public class TestCleanthatRefFilterProperties {
 
 	@Test
 	public void testSimpleBranchName_withDomain() throws JsonProcessingException {
-		CleanthatRefFilterProperties p = new CleanthatRefFilterProperties();
+		var p = new CleanthatRefFilterProperties();
 
 		p.setProtectedPatterns(Arrays.asList("domain1/branchName1", "domain2/sub/branchName2"));
 

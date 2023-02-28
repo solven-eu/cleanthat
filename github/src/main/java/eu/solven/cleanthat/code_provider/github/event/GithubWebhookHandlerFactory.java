@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.github.event;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.FileSystem;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -111,7 +110,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 	public IGitWebhookHandler makeWithFreshAuth() throws IOException {
 		GithubWebhookHandler githubWebhookHandler = makeGithubWebhookHandler();
 
-		IGitWebhookHandler noAuth = makeNoAuth();
+		var noAuth = makeNoAuth();
 
 		return new IGitWebhookHandler() {
 			@Override
@@ -122,7 +121,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			@Override
 			public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(ICodeCleanerFactory codeCleanerFactory,
 					IWebhookEvent input) {
-				try (FileSystem fs = Jimfs.newFileSystem()) {
+				try (var fs = Jimfs.newFileSystem()) {
 					return githubWebhookHandler.filterWebhookEventTargetRelevantBranch(fs.getPath(fs.getSeparator()),
 							codeCleanerFactory,
 							input);
@@ -134,7 +133,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 			@Override
 			public void doExecuteClean(ICodeCleanerFactory codeCleanerFactory, IWebhookEvent input) {
 				// We make a FileSystem per ICodeProvider
-				try (FileSystem fs = Jimfs.newFileSystem()) {
+				try (var fs = Jimfs.newFileSystem()) {
 					githubWebhookHandler.doExecuteClean(fs.getPath(fs.getSeparator()), codeCleanerFactory, input);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
@@ -163,7 +162,7 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
 	public String makeJWT() throws JOSEException {
-		String rawJwk = env.getRequiredProperty(ENV_GITHUB_APP_PRIVATE_JWK);
+		var rawJwk = env.getRequiredProperty(ENV_GITHUB_APP_PRIVATE_JWK);
 
 		// if (rawJwk.equals(GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS)
 		// && GCInspector.inUnitTest()) {
@@ -180,12 +179,12 @@ public class GithubWebhookHandlerFactory implements IGitWebhookHandlerFactory {
 		// Create RSA-signer with the private key
 		JWSSigner signer = new RSASSASigner(rsaJWK);
 		// Prepare JWT with claims set
-		Date now = new Date();
+		var now = new Date();
 
 		// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
-		Date expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES)
+		var expiresAt = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(GITHUB_TIMEOUT_JWK_MINUTES)
 				- TimeUnit.SECONDS.toMillis(GITHUB_TIMEOUT_SAFETY_SECONDS));
-		String githubAppId = env.getProperty("github.app.app-id", GITHUB_DEFAULT_APP_ID);
+		var githubAppId = env.getProperty("github.app.app-id", GITHUB_DEFAULT_APP_ID);
 		JWTClaimsSet claimsSet =
 				new JWTClaimsSet.Builder().issuer(githubAppId).issueTime(now).expirationTime(expiresAt).build();
 		SignedJWT signedJWT =

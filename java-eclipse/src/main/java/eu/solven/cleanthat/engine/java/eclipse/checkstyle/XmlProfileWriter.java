@@ -22,11 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -34,8 +32,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -83,16 +79,16 @@ public final class XmlProfileWriter {
 			String profileVersion,
 			String profileKind,
 			Map<String, String> settings) throws TransformerException, ParserConfigurationException {
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder builder = factory.newDocumentBuilder();
-		final Document document = builder.newDocument();
+		final var factory = DocumentBuilderFactory.newInstance();
+		final var builder = factory.newDocumentBuilder();
+		final var document = builder.newDocument();
 
-		final Element rootElement = document.createElement(XML_NODE_ROOT);
+		final var rootElement = document.createElement(XML_NODE_ROOT);
 		rootElement.setAttribute(XML_ATTRIBUTE_VERSION, profileVersion);
 
 		document.appendChild(rootElement);
 
-		final Element profileElement = document.createElement(XML_NODE_PROFILE);
+		final var profileElement = document.createElement(XML_NODE_PROFILE);
 		profileElement.setAttribute(XML_ATTRIBUTE_NAME, name);
 		profileElement.setAttribute(XML_ATTRIBUTE_VERSION, profileVersion);
 		profileElement.setAttribute(XML_ATTRIBUTE_PROFILE_KIND, profileKind);
@@ -100,10 +96,10 @@ public final class XmlProfileWriter {
 		final Iterator<String> keyIter = settings.keySet().iterator();
 
 		while (keyIter.hasNext()) {
-			final String key = keyIter.next();
-			final String value = settings.get(key);
+			final var key = keyIter.next();
+			final var value = settings.get(key);
 			if (value != null) {
-				final Element setting = document.createElement(XML_NODE_SETTING);
+				final var setting = document.createElement(XML_NODE_SETTING);
 				setting.setAttribute(XML_ATTRIBUTE_ID, key);
 				setting.setAttribute(XML_ATTRIBUTE_VALUE, value);
 				profileElement.appendChild(setting);
@@ -113,11 +109,11 @@ public final class XmlProfileWriter {
 		}
 		rootElement.appendChild(profileElement);
 
-		final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		final var transformer = TransformerFactory.newInstance().newTransformer();
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 		transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		final StringWriter writer = new StringWriter();
+		final var writer = new StringWriter();
 		transformer.transform(new DOMSource(document), new StreamResult(writer));
 		return new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
 	}

@@ -15,10 +15,8 @@
  */
 package eu.solven.cleanthat.mvn;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,7 +67,6 @@ import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
 import eu.solven.cleanthat.engine.java.eclipse.generator.EclipseStylesheetGenerator;
 import eu.solven.cleanthat.engine.java.eclipse.generator.IEclipseStylesheetGenerator;
@@ -149,28 +145,28 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
 
-		Duration durationLimit = Duration.parse(rawDurationLimit);
-		OffsetDateTime timeLimit = OffsetDateTime.now().plus(durationLimit);
+		var durationLimit = Duration.parse(rawDurationLimit);
+		var timeLimit = OffsetDateTime.now().plus(durationLimit);
 		LOGGER.info(
 				"Job is limitted to duration={} (can be adjusted with '-Dduration.limit=PT1M') It will end at most at: {}",
 				rawDurationLimit,
 				timeLimit);
 
 		Map<String, String> settings = generator.generateSettings(timeLimit, pathToContent);
-		Path eclipseConfigPath = writeSettings(settings);
+		var eclipseConfigPath = writeSettings(settings);
 
 		// TODO In fact, we go through Spotless to do so
 		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, cleanthatConfigPath);
 
 		// We expect configPath to be like '.../.cleanthat/cleanthat.yaml'
-		Path dotCleanthatFolder = cleanthatConfigPath.getParent();
+		var dotCleanthatFolder = cleanthatConfigPath.getParent();
 		if (dotCleanthatFolder == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
 		} else if (!".cleanthat".equals(dotCleanthatFolder.getFileName().toString())) {
 			throw new IllegalArgumentException(
 					"Issue with configPath: " + cleanthatConfigPath + " (not in .cleanthat)");
 		}
-		Path repositoryRoot = dotCleanthatFolder.getParent();
+		var repositoryRoot = dotCleanthatFolder.getParent();
 		if (repositoryRoot == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
 		}
@@ -200,11 +196,11 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 				codeCleaner.loadAndCheckConfiguration(codeProvider);
 
 		if (optResult.getOptError().isPresent()) {
-			String error = optResult.getOptError().get();
+			var error = optResult.getOptError().get();
 			throw new MojoFailureException("ARG", error, error);
 		}
 
-		CleanthatRepositoryProperties repositoryProperties = optResult.getOptResult().get();
+		var repositoryProperties = optResult.getOptResult().get();
 
 		Optional<CleanthatEngineProperties> optSpotlessProperties = repositoryProperties.getEngines()
 				.stream()
@@ -231,10 +227,10 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		}
 
 		ConfigHelpers configHelpers = appContext.getBean(ConfigHelpers.class);
-		ObjectMapper objectMapper = configHelpers.getObjectMapper();
+		var objectMapper = configHelpers.getObjectMapper();
 
-		ICleanthatStepParametersProperties spotlessParameters = spotlessEngine.getSteps().get(0).getParameters();
-		String rawPathToSpotlessConfig =
+		var spotlessParameters = spotlessEngine.getSteps().get(0).getParameters();
+		var rawPathToSpotlessConfig =
 				objectMapper.convertValue(spotlessParameters, CleanthatSpotlessStepParametersProperties.class)
 						.getConfiguration();
 
@@ -248,7 +244,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 		SpotlessFormatterProperties javaFormatter;
 
-		boolean needToSaveSpotless = false;
+		var needToSaveSpotless = false;
 		if (optJavaFormatter.isEmpty()) {
 			javaFormatter = SpotlessFormatterProperties.builder().format(FormatterFactory.ID_JAVA).build();
 			spotlessEngineProperties.getFormatters().add(javaFormatter);
@@ -294,12 +290,12 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		}
 
 		if (needToSaveCleanthat) {
-			String rawCleanthatConfigPath = CleanthatPathHelpers.makeContentRawPath(repoRoot, cleanthatConfigPath);
-			Path cleanthatConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawCleanthatConfigPath);
+			var rawCleanthatConfigPath = CleanthatPathHelpers.makeContentRawPath(repoRoot, cleanthatConfigPath);
+			var cleanthatConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawCleanthatConfigPath);
 			persistConfigurationFiles(appContext, codeProvider, cleanthatConfigContentPath, repositoryProperties);
 		}
 		if (needToSaveSpotless) {
-			Path spotlessConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawPathToSpotlessConfig);
+			var spotlessConfigContentPath = CleanthatPathHelpers.makeContentPath(repoRoot, rawPathToSpotlessConfig);
 			persistConfigurationFiles(appContext, codeProvider, spotlessConfigContentPath, spotlessEngineProperties);
 		}
 	}
@@ -313,9 +309,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 	public static SpotlessEngineProperties loadSpotlessEngineProperties(ICodeProvider codeProvider,
 			ObjectMapper objectMapper,
 			String pathToSpotlessConfig) throws IOException {
-		Resource spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
+		var spotlessConfigAsResource = CleanthatUrlLoader.loadUrl(codeProvider, pathToSpotlessConfig);
 
-		try (InputStream inputStream = spotlessConfigAsResource.getInputStream()) {
+		try (var inputStream = spotlessConfigAsResource.getInputStream()) {
 			return objectMapper.readValue(inputStream, SpotlessEngineProperties.class);
 		}
 	}
@@ -326,7 +322,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			Object properties) {
 		List<ObjectMapper> objectMappers =
 				appContext.getBeansOfType(ObjectMapper.class).values().stream().collect(Collectors.toList());
-		ObjectMapper yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
+		var yamlObjectMapper = ConfigHelpers.getYaml(objectMappers);
 
 		// Prepare the configuration as yaml
 		String asYaml;
@@ -375,8 +371,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 				// We make path relative to the baseDir, even through it seems mvn provides absolute paths is default
 				// case
-				return Stream.concat(sourceRoots.stream(), testRoots.stream())
-						.map(sourceFolder -> projectBaseDir.resolve(sourceFolder));
+				return Stream.concat(sourceRoots.stream(), testRoots.stream()).map(projectBaseDir::resolve);
 			}).collect(Collectors.toSet());
 		}
 
@@ -385,8 +380,8 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	protected Set<String> loadGitIgnorePatterns(Path executionRoot) {
 		// TODO This assumes the command is run from the repository root
-		Path gitIgnore = executionRoot.resolve(".gitignore");
-		File gitIgnoreFile = gitIgnore.toFile();
+		var gitIgnore = executionRoot.resolve(".gitignore");
+		var gitIgnoreFile = gitIgnore.toFile();
 
 		Set<String> gitIgnorePatterns;
 		if (gitIgnoreFile.isFile()) {
@@ -412,7 +407,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			Set<Path> roots) {
 		Map<Path, String> pathToContent = new LinkedHashMap<>();
 
-		AtomicInteger nbFilteredByGitignore = new AtomicInteger();
+		var nbFilteredByGitignore = new AtomicInteger();
 
 		roots.forEach(rootAsPath -> {
 			try {
@@ -421,7 +416,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 					return;
 				}
 
-				Pattern compiledRegex = Pattern.compile(javaRegex);
+				var compiledRegex = Pattern.compile(javaRegex);
 				Map<Path, String> fileToContent = generator.loadFilesContent(rootAsPath, compiledRegex);
 
 				if (!gitIgnorePatterns.isEmpty()) {
@@ -452,9 +447,9 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		if (eclipseConfigPath.startsWith("${")) {
 			throw new IllegalArgumentException("Issue with mvn placeholders: " + eclipseConfigPath);
 		}
-		Path whereToWrite = Paths.get(eclipseConfigPath);
+		var whereToWrite = Paths.get(eclipseConfigPath);
 
-		File whereToWriteAsFile = whereToWrite.toFile().getAbsoluteFile();
+		var whereToWriteAsFile = whereToWrite.toFile().getAbsoluteFile();
 		if (whereToWriteAsFile.exists()) {
 			if (whereToWriteAsFile.isFile()) {
 				LOGGER.warn("We are going to write over '{}'", whereToWrite);
@@ -469,7 +464,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		}
 
 		try (InputStream is = XmlProfileWriter.writeFormatterProfileToStream("cleanthat", settings);
-				OutputStream outputStream = Files.newOutputStream(whereToWrite, StandardOpenOption.CREATE)) {
+				var outputStream = Files.newOutputStream(whereToWrite, StandardOpenOption.CREATE)) {
 			ByteStreams.copy(is, outputStream);
 		} catch (TransformerException | ParserConfigurationException e) {
 			throw new IllegalArgumentException(e);

@@ -46,7 +46,7 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<Composi
 					.stream()
 					// Exclude itself
 					.filter(m -> !m.equals(AllIncludingDraftCompositeMutators.class))
-					.filter(m -> CompositeMutator.class.isAssignableFrom(m))
+					.filter(CompositeMutator.class::isAssignableFrom)
 					.map(m -> (Class<? extends CompositeMutator<?>>) m)
 
 					// Sort by className, to always apply mutators in the same order

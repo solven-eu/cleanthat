@@ -33,7 +33,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
-import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
@@ -91,7 +90,7 @@ public abstract class ATestCases<N, R> {
 		if (preMethods.size() != 1) {
 			throw new IllegalStateException("Expected one and only one '" + name + "' method in " + oneCase);
 		}
-		MethodDeclaration pre = preMethods.get(0);
+		var pre = preMethods.get(0);
 		return pre;
 	}
 
@@ -121,12 +120,12 @@ public abstract class ATestCases<N, R> {
 
 	protected void doCheckUnmodifiedMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
-		MethodDeclaration post = getMethodWithName(oneCase, PRE_METHOD);
+		var post = getMethodWithName(oneCase, PRE_METHOD);
 		doCheckUnmodifiedNode(transformer, oneCase, post);
 	}
 
 	protected void doCheckUnmodifiedClass(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, PRE_CLASS);
+		var post = getClassWithName(oneCase, PRE_CLASS);
 		doCheckUnmodifiedNode(transformer, oneCase, post);
 	}
 
@@ -134,16 +133,16 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration oneCase,
 			Node pre) {
 		LexicalPreservingPrinter.setup(pre);
-		String preAsString = toString(pre);
+		var preAsString = toString(pre);
 
 		// https://github.com/javaparser/javaparser/issues/3322
 		// We prefer not-processing clones as it may lead to dirty issues
-		Node clonedPre = pre.clone();
+		var clonedPre = pre.clone();
 
 		Optional<R> optWalked = transformer.walkAst(convertToAst(pre));
-		boolean walked = optWalked.isPresent();
+		var walked = optWalked.isPresent();
 
-		String modifiedPreAsString = toString(pre);
+		var modifiedPreAsString = toString(pre);
 
 		if (transformer instanceof INoOpMutator) {
 			Assert.assertTrue("INoOpMutator is always walked", walked);
@@ -172,8 +171,8 @@ public abstract class ATestCases<N, R> {
 	}
 
 	protected void doTestMethod(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
-		MethodDeclaration pre = getMethodWithName(oneCase, PRE_METHOD);
-		MethodDeclaration post = getMethodWithName(oneCase, POST_CONSTANT);
+		var pre = getMethodWithName(oneCase, PRE_METHOD);
+		var post = getMethodWithName(oneCase, POST_CONSTANT);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -185,8 +184,8 @@ public abstract class ATestCases<N, R> {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			Node clonedPre = pre.clone();
-			String preAsString = toString(clonedPre);
+			var clonedPre = pre.clone();
+			var preAsString = toString(clonedPre);
 
 			Optional<R> optResult = transformer.walkAst(convertToAst(pre));
 
@@ -201,7 +200,7 @@ public abstract class ATestCases<N, R> {
 
 				// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
 
-				String expectedPost = toString(post);
+				var expectedPost = toString(post);
 				String msg = "Should have mutated " + preAsString
 						+ " into "
 						+ expectedPost
@@ -209,7 +208,7 @@ public abstract class ATestCases<N, R> {
 						+ pre
 						+ ". The whole testcase is: "
 						+ oneCase;
-				String actualPost = toString(optResult.get());
+				var actualPost = toString(optResult.get());
 				Assert.assertEquals(msg, expectedPost, actualPost);
 
 				if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
@@ -232,8 +231,8 @@ public abstract class ATestCases<N, R> {
 		// This is a less relevant test: to be done later
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
-			Node postBeforeWalk = post.clone();
-			boolean postAfterWalk = transformer.walkAstHasChanged(convertToAst(post));
+			var postBeforeWalk = post.clone();
+			var postAfterWalk = transformer.walkAstHasChanged(convertToAst(post));
 			Assert.assertFalse("Not mutating after", postAfterWalk);
 			Assert.assertEquals("After not mutated", postBeforeWalk, post);
 		}
@@ -247,14 +246,14 @@ public abstract class ATestCases<N, R> {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
 		TypeDeclaration<?> pre = oneCase.getMembers()
 				.stream()
-				.filter(n -> n instanceof TypeDeclaration)
+				.filter(TypeDeclaration.class::isInstance)
 				.map(n -> (TypeDeclaration<?>) n)
 				.filter(n -> PRE_CLASS.equals(n.getNameAsString()))
 				.findAny()
 				.get();
 		TypeDeclaration<?> post = oneCase.getMembers()
 				.stream()
-				.filter(n -> n instanceof TypeDeclaration)
+				.filter(TypeDeclaration.class::isInstance)
 				.map(n -> (TypeDeclaration<?>) n)
 				.filter(n -> POST_CLASS.equals(n.getNameAsString()))
 				.findAny()
@@ -281,12 +280,12 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration oneCase) {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
 
-		String qualifiedName = oneCase.getFullyQualifiedName().get();
+		var qualifiedName = oneCase.getFullyQualifiedName().get();
 
 		// We receive a nested class: we have to manually replace the last '.' into '$' in order to get a
 		// nestedClassName compatible with Class.forName
 		// https://stackoverflow.com/questions/7007831/instantiate-nested-static-class-using-class-forname
-		int lastDot = qualifiedName.lastIndexOf('.');
+		var lastDot = qualifiedName.lastIndexOf('.');
 		qualifiedName = qualifiedName.substring(0, lastDot) + "$" + qualifiedName.substring(lastDot + 1);
 
 		Class<?> clazz;
@@ -322,8 +321,8 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerClasses(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		ClassOrInterfaceDeclaration pre = getClassWithName(oneCase, PRE_CLASS);
-		ClassOrInterfaceDeclaration post = getClassWithName(oneCase, POST_CLASS);
+		var pre = getClassWithName(oneCase, PRE_CLASS);
+		var post = getClassWithName(oneCase, POST_CLASS);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -331,8 +330,8 @@ public abstract class ATestCases<N, R> {
 	protected void doCompareInnerAnnotations(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase) {
-		AnnotationDeclaration pre = getAnnotationWithName(oneCase, PRE_CLASS);
-		AnnotationDeclaration post = getAnnotationWithName(oneCase, POST_CLASS);
+		var pre = getAnnotationWithName(oneCase, PRE_CLASS);
+		var post = getAnnotationWithName(oneCase, POST_CLASS);
 
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
@@ -343,22 +342,22 @@ public abstract class ATestCases<N, R> {
 		NormalAnnotationExpr annotation =
 				oneCase.getAnnotationByClass(CompareMethodsAsStrings.class).get().asNormalAnnotationExpr();
 
-		StringLiteralExpr preExpr = annotation.getPairs()
+		var preExpr = annotation.getPairs()
 				.stream()
 				.filter(p -> PRE_METHOD.equals(p.getNameAsString()))
 				.findAny()
 				.get()
 				.getValue()
 				.asStringLiteralExpr();
-		MethodDeclaration pre = javaParser.parseMethodDeclaration(preExpr.getValue()).getResult().get();
-		StringLiteralExpr postExpr = annotation.getPairs()
+		var pre = javaParser.parseMethodDeclaration(preExpr.getValue()).getResult().get();
+		var postExpr = annotation.getPairs()
 				.stream()
 				.filter(p -> POST_CONSTANT.equals(p.getNameAsString()))
 				.findAny()
 				.get()
 				.getValue()
 				.asStringLiteralExpr();
-		MethodDeclaration post = javaParser.parseMethodDeclaration(postExpr.getValue()).getResult().get();
+		var post = javaParser.parseMethodDeclaration(postExpr.getValue()).getResult().get();
 		doCompareExpectedChanges(transformer, oneCase, pre, post);
 	}
 
@@ -385,11 +384,11 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			CompareCompilationUnitsAsResources annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
-		CompilationUnit pre = javaParser.parse(preAsString).getResult().get();
+		var pre = javaParser.parse(preAsString).getResult().get();
 		Assertions.assertThat(pre.getTypes()).hasSize(1);
 
 		String postAsString = PepperResourceHelper.loadAsString(annotation.post());
-		CompilationUnit post = javaParser.parse(postAsString).getResult().get();
+		var post = javaParser.parse(postAsString).getResult().get();
 		Assertions.assertThat(post.getTypes()).hasSize(1);
 
 		doCompareExpectedChanges(transformer, testCase, pre, post);
@@ -400,7 +399,7 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitsAsResources annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
-		CompilationUnit pre = javaParser.parse(preAsString).getResult().get();
+		var pre = javaParser.parse(preAsString).getResult().get();
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
 	}
 
@@ -408,7 +407,7 @@ public abstract class ATestCases<N, R> {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			boolean transformed = transformer.walkAstHasChanged(convertToAst(pre));
+			var transformed = transformer.walkAstHasChanged(convertToAst(pre));
 			// Rename the class before checking full equality
 			pre.getType(0).setName(post.getType(0).getNameAsString());
 			Assert.assertEquals("Check are changed", post, pre);
@@ -419,7 +418,7 @@ public abstract class ATestCases<N, R> {
 		// This is a less relevant test: to be done later
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
-			CompilationUnit postBeforeWalk = post.clone();
+			var postBeforeWalk = post.clone();
 			Assert.assertFalse("Idempotency issue", transformer.walkAstHasChanged(convertToAst(post)));
 			Assert.assertEquals("Idempotency issue", postBeforeWalk, post);
 		}

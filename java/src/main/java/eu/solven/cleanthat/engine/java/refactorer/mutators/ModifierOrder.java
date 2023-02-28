@@ -103,7 +103,7 @@ public class ModifierOrder extends AJavaParserMutator {
 				}
 			});
 
-			boolean changed = areSameReferences(modifiers, mutableModifiers);
+			var changed = areSameReferences(modifiers, mutableModifiers);
 
 			if (changed) {
 				LOGGER.debug("We fixed the ordering of modifiers");
@@ -117,8 +117,8 @@ public class ModifierOrder extends AJavaParserMutator {
 
 	@SuppressWarnings("PMD.CompareObjectsWithEquals")
 	private boolean areSameReferences(NodeList<Modifier> modifiers, NodeList<Modifier> mutableModifiers) {
-		boolean changed = false;
-		for (int i = 0; i < modifiers.size(); i++) {
+		var changed = false;
+		for (var i = 0; i < modifiers.size(); i++) {
 			// Check by reference
 			if (modifiers.get(i) != mutableModifiers.get(i)) {
 				changed = true;

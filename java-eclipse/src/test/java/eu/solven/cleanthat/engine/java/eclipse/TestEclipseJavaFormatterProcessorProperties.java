@@ -51,8 +51,8 @@ public class TestEclipseJavaFormatterProcessorProperties {
 					Assertions.assertThat(defaultIsReadable.isReadable()).isTrue();
 
 					try {
-						byte[] byteArray = ByteStreams.toByteArray(defaultIsReadable.getInputStream());
-						String asString = new String(byteArray, StandardCharsets.UTF_8);
+						var byteArray = ByteStreams.toByteArray(defaultIsReadable.getInputStream());
+						var asString = new String(byteArray, StandardCharsets.UTF_8);
 						Assertions.assertThat(asString).isNotBlank();
 					} catch (IOException e) {
 						throw new UncheckedIOException(e);

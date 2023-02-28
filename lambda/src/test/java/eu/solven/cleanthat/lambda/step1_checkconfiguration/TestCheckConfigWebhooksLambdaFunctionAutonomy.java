@@ -80,8 +80,7 @@ public class TestCheckConfigWebhooksLambdaFunctionAutonomy {
 		{
 			IGitWebhookHandler gitWebhookHandler = appContext.getBean(IGitWebhookHandler.class);
 
-			WebhookRelevancyResult value =
-					new WebhookRelevancyResult(Optional.empty(), Optional.of("someUnitTestReason"));
+			var value = new WebhookRelevancyResult(Optional.empty(), Optional.of("someUnitTestReason"));
 			Mockito.when(
 					gitWebhookHandler.filterWebhookEventTargetRelevantBranch(Mockito.any(ICodeCleanerFactory.class),
 							Mockito.any(IWebhookEvent.class)))

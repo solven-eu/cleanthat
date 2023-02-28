@@ -23,13 +23,10 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Prevent relying .equals on {@link Enum} types
@@ -61,17 +58,15 @@ public class EnumsWithoutEquals extends AJavaParserMutator {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
-		AtomicBoolean mutated = new AtomicBoolean(false);
+		var mutated = new AtomicBoolean(false);
 		onMethodName(node, "equals", (methodCall, scope, type) -> {
 			if (type.isReferenceType()) {
-				boolean isEnum = false;
-				ResolvedReferenceType referenceType = type.asReferenceType();
+				var isEnum = false;
+				var referenceType = type.asReferenceType();
 
 				referenceType.isJavaLangEnum();
 
-				String className = referenceType.getQualifiedName();
+				var className = referenceType.getQualifiedName();
 
 				try {
 					Class<?> clazz = Class.forName(className, false, Thread.currentThread().getContextClassLoader());
@@ -82,13 +77,13 @@ public class EnumsWithoutEquals extends AJavaParserMutator {
 				}
 
 				if (isEnum && methodCall.getArguments().size() == 1) {
-					Expression singleArgument = methodCall.getArgument(0);
+					var singleArgument = methodCall.getArgument(0);
 
 					Optional<Node> optParentNode = methodCall.getParentNode();
 
 					boolean isNegated;
 					if (optParentNode.isPresent()) {
-						Node parent = optParentNode.get();
+						var parent = optParentNode.get();
 
 						if (parent instanceof UnaryExpr
 								&& ((UnaryExpr) parent).getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
@@ -101,13 +96,13 @@ public class EnumsWithoutEquals extends AJavaParserMutator {
 					}
 
 					if (isNegated) {
-						BinaryExpr replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.NOT_EQUALS);
+						var replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.NOT_EQUALS);
 
 						if (tryReplace(optParentNode.get(), replacement)) {
 							mutated.set(true);
 						}
 					} else {
-						BinaryExpr replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.EQUALS);
+						var replacement = new BinaryExpr(scope, singleArgument, BinaryExpr.Operator.EQUALS);
 
 						if (tryReplace(node, replacement)) {
 							mutated.set(true);

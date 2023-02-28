@@ -217,7 +217,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				.sorted((l, r) -> Integer.compare(l.getValue().size(), r.getValue().size()))
 				// Filter parameters which are not identical through all standard configurations
 				.filter(e -> e.getValue().size() >= 2)
-				.map(e -> e.getKey())
+				.map(Entry::getKey)
 				.collect(Collectors.toSet());
 		return commonlyChangedSettings;
 	}
@@ -385,7 +385,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				.stream()
 				.filter(e -> DefaultCodeFormatterConstants.MIXED.equals(e.getValue().get(SETTING_TABULATION_CHAR)))
 				.forEach(e -> {
-					String configName = e.getKey();
+					var configName = e.getKey();
 					LOGGER.info("Config {} has {}='{}'. We force it to '{}'",
 							configName,
 							SETTING_TABULATION_CHAR,
@@ -399,7 +399,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	public void logBestDefaultConfig(Map<String, Map<String, String>> keyToConfig,
 			ScoredOption<Map<String, String>> bestDefaultConfig) {
 		Map<String, String> selectedOption = bestDefaultConfig.getOption();
-		String bestOptionName = getDefaultOptionName(keyToConfig, selectedOption);
+		var bestOptionName = getDefaultOptionName(keyToConfig, selectedOption);
 		LOGGER.info("Best standard configuration: {} (score={})", bestOptionName, bestDefaultConfig.getScore());
 	}
 
@@ -460,7 +460,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		LOGGER.debug("Considering parameter: {} ({} candidates)", parameterToSwitch, possibleOptions.size());
 		Optional<ScoredOption<Map<String, String>>> optMin = possibleOptions.parallelStream().map(possibleValue -> {
 			Map<String, String> tweakedConfiguration = new TreeMap<>(initialOptions.getOption());
-			String currentBestOption = tweakedConfiguration.put(parameterToSwitch, possibleValue);
+			var currentBestOption = tweakedConfiguration.put(parameterToSwitch, possibleValue);
 			if (currentBestOption == null) {
 				LOGGER.debug("This happens when we consider a parameter not explicit in the current settings");
 			} else if (currentBestOption.equals(possibleValue)) {
@@ -511,7 +511,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		Files.walk(rootForFiles).forEach(path -> {
 			if (path.toFile().isFile() && fileMatcher.matcher(path.toString()).matches()) {
 				try {
-					String content = Files.readString(path);
+					var content = Files.readString(path);
 
 					pathToFile.put(path, content);
 				} catch (IOException e) {
@@ -552,8 +552,8 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 							DefaultCodeFormatterConstants.WRAP_NEXT_PER_LINE)))
 					.stream()
 					.map(list -> {
-						boolean forceSplit = (boolean) list.get(0);
-						int wrapStyle = (int) list.get(1);
+						var forceSplit = (boolean) list.get(0);
+						var wrapStyle = (int) list.get(1);
 						return DefaultCodeFormatterConstants.createAlignmentValue(forceSplit, wrapStyle);
 					})
 					.collect(Collectors.toSet());
@@ -641,7 +641,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 			if (parameterToSwitch.startsWith("org.eclipse.jdt.core.formatter.")) {
 				// Replace '.' by '_' to handle
 				// 'org.eclipse.jdt.core.formatter.comment.align_tags_descriptions_grouped'
-				String parameterName =
+				var parameterName =
 						parameterToSwitch.substring("org.eclipse.jdt.core.formatter.".length()).replace('.', '_');
 
 				String logPrefix = "Introspection strategy failed for ";

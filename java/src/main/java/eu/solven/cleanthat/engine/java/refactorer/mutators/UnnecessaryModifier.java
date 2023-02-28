@@ -17,9 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
@@ -31,7 +28,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'public static final someMethod();' into 'someMethod();' in interfaces
@@ -39,7 +35,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class UnnecessaryModifier extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryModifier.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -79,17 +74,16 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof Modifier)) {
 			return false;
 		}
-		Modifier modifier = (Modifier) node;
+		var modifier = (Modifier) node;
 
 		if (modifier.getParentNode().isEmpty()) {
 			return false;
 		}
 
-		Node parentNode = modifier.getParentNode().get();
+		var parentNode = modifier.getParentNode().get();
 		if (!(parentNode instanceof MethodDeclaration) && !(parentNode instanceof FieldDeclaration)
 				&& !(parentNode instanceof ClassOrInterfaceDeclaration)
 				&& !(parentNode instanceof AnnotationMemberDeclaration)) {
@@ -99,9 +93,9 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 		if (parentNode.getParentNode().isEmpty()) {
 			return false;
 		}
-		Node grandParentNode = parentNode.getParentNode().get();
+		var grandParentNode = parentNode.getParentNode().get();
 		if (grandParentNode instanceof ClassOrInterfaceDeclaration) {
-			ClassOrInterfaceDeclaration grandParentInterface = (ClassOrInterfaceDeclaration) grandParentNode;
+			var grandParentInterface = (ClassOrInterfaceDeclaration) grandParentNode;
 
 			if (!grandParentInterface.isInterface()) {
 				return false;

@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.DoubleLiteralExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
@@ -29,7 +26,6 @@ import com.github.javaparser.ast.expr.LongLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'int i = 1234567’ into ’int i = 1_234_567'
@@ -37,8 +33,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseUnderscoresInNumericLiterals.class);
-
 	// We groups digits per block of thousands
 	private static final int BLOCK_SIZE = 3;
 
@@ -70,23 +64,22 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof LiteralStringValueExpr)) {
 			return false;
 		}
 
-		LiteralStringValueExpr literalStringExpr = (LiteralStringValueExpr) node;
+		var literalStringExpr = (LiteralStringValueExpr) node;
 
-		String asString = literalStringExpr.getValue();
+		var asString = literalStringExpr.getValue();
 		Optional<String> optNewValue;
 
 		if (node instanceof IntegerLiteralExpr || node instanceof LongLiteralExpr) {
 
-			String noUnderscore = asString.replaceAll("_", "");
+			var noUnderscore = asString.replaceAll("_", "");
 
 			if (noUnderscore.matches("\\d+")) {
-				int nbDigits = noUnderscore.length();
-				StringBuilder sb = new StringBuilder(nbDigits + nbDigits / BLOCK_SIZE);
+				var nbDigits = noUnderscore.length();
+				var sb = new StringBuilder(nbDigits + nbDigits / BLOCK_SIZE);
 
 				appendWithUnderscores(noUnderscore, sb);
 
@@ -95,7 +88,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 				optNewValue = Optional.empty();
 			}
 		} else if (node instanceof DoubleLiteralExpr) {
-			String noUnderscore = asString.replaceAll("_", "");
+			var noUnderscore = asString.replaceAll("_", "");
 
 			if (noUnderscore.matches("\\d+(\\.\\d+)?([dDfF])?")) {
 				OptionalInt optTrailingChar;
@@ -115,23 +108,23 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 
 				StringBuilder sb;
 
-				int indexOfDot = noUnderscore.indexOf('.');
+				var indexOfDot = noUnderscore.indexOf('.');
 				if (indexOfDot <= 0) {
-					int nbDigits = noUnderscore.length();
+					var nbDigits = noUnderscore.length();
 					sb = new StringBuilder(nbDigits + nbDigits / BLOCK_SIZE);
 
 					appendWithUnderscores(noUnderscore.substring(0, lastIndex), sb);
 				} else {
-					int totalNbDigits = noUnderscore.length() - 1;
+					var totalNbDigits = noUnderscore.length() - 1;
 					sb = new StringBuilder(totalNbDigits + 1 + totalNbDigits / BLOCK_SIZE);
 
 					{
-						String beforeDot = noUnderscore.substring(0, indexOfDot);
+						var beforeDot = noUnderscore.substring(0, indexOfDot);
 						appendWithUnderscores(beforeDot, sb);
 					}
 					sb.append('.');
 					{
-						String afterDot = noUnderscore.substring(indexOfDot + 1, lastIndex);
+						var afterDot = noUnderscore.substring(indexOfDot + 1, lastIndex);
 						appendWithUnderscores(afterDot, sb, true);
 					}
 				}
@@ -151,7 +144,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 		}
 
 		if (optNewValue.isPresent()) {
-			String newValue = optNewValue.get();
+			var newValue = optNewValue.get();
 
 			if (newValue.equals(asString)) {
 				return false;
@@ -171,10 +164,10 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 	private void appendWithUnderscores(String noUnderscore, StringBuilder sb, boolean reverseForDecimals) {
 		assert noUnderscore.matches("\\d+");
 
-		int nbDigits = noUnderscore.length();
+		var nbDigits = noUnderscore.length();
 
-		int position = 0;
-		int nbDigitsLeft = nbDigits;
+		var position = 0;
+		var nbDigitsLeft = nbDigits;
 		while (nbDigitsLeft > 0) {
 			if (position != 0) {
 				sb.append('_');
@@ -186,8 +179,8 @@ public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
 			} else {
 				nextBlockSize = (nbDigitsLeft - 1) % BLOCK_SIZE + 1;
 			}
-			int nextPosition = position + nextBlockSize;
-			String subString = noUnderscore.substring(position, nextPosition);
+			var nextPosition = position + nextBlockSize;
+			var subString = noUnderscore.substring(position, nextPosition);
 			sb.append(subString);
 			nbDigitsLeft -= nextBlockSize;
 			position = nextPosition;

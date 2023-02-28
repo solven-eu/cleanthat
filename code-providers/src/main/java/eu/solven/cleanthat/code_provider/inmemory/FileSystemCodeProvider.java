@@ -65,7 +65,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@SuppressWarnings("PMD.CloseResource")
 	public static FileSystemCodeProvider forTests() throws IOException {
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 		return new FileSystemCodeProvider(CodeProviderHelpers.getRoot(fs));
 	}
 
@@ -106,10 +106,10 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
 
-				Path relativized2 = root.relativize(file);
+				var relativized2 = root.relativize(file);
 
-				String rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, relativized2);
-				Path relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
+				var rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, relativized2);
+				var relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
 
 				// String unixLikePath = toUnixPath(relativized);
 
@@ -143,7 +143,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	@Override
 	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
-			Path resolved = resolvePath(inMemoryPath);
+			var resolved = resolvePath(inMemoryPath);
 			try {
 				Files.createDirectories(resolved.getParent());
 
@@ -159,7 +159,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	public Optional<String> loadContentForPath(Path path) throws IOException {
 		CleanthatPathHelpers.checkContentPath(path);
 
-		Path pathForRootFS = CleanthatPathHelpers.resolveChild(getRepositoryRoot(), path);
+		var pathForRootFS = CleanthatPathHelpers.resolveChild(getRepositoryRoot(), path);
 
 		if (Files.exists(pathForRootFS)) {
 			return Optional.of(Files.readString(pathForRootFS));

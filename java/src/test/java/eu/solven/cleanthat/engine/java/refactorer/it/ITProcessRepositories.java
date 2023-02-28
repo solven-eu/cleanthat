@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 public class ITProcessRepositories {
 
-	final static String CHECKOUT = "/Users/blacelle/workspace3/cleanthat_checkouts";
+	static final String CHECKOUT = "/Users/blacelle/workspace3/cleanthat_checkouts";
 
 	public static void main(String[] args) {
 		Stream.of("https://github.com/spring-projects/spring-boot", "https://github.com/openjdk/jdk")

@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.eclipse.generator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,9 +56,9 @@ public class RunGenerateEclipseStylesheet {
 	public static void main(String[] args)
 			throws TransformerException, ParserConfigurationException, IOException, PatchFailedException {
 		// Path writtenPath = stylesheetGenerator.writeInTmp();
-		Path rootForFiles = Paths.get("/Users/blacelle/workspace2/RoaringBitmap");
+		var rootForFiles = Paths.get("/Users/blacelle/workspace2/RoaringBitmap");
 		// TODO We should exclude files matching .gitignore (e.g. everything in target folders)
-		Pattern fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
+		var fileMatcher = Pattern.compile(".*/src/main/java/.*\\.java");
 
 		EclipseStylesheetGenerator stylesheetGenerator = new EclipseStylesheetGenerator();
 		Map<Path, String> pathToFile = stylesheetGenerator.loadFilesContent(rootForFiles, fileMatcher);
@@ -102,17 +101,17 @@ public class RunGenerateEclipseStylesheet {
 
 		Map<String, String> defaultSettingsAsMap = defaultSettings.getMap();
 
-		Path tmpFile = writeConfigurationToTmpPath(defaultSettingsAsMap);
+		var tmpFile = writeConfigurationToTmpPath(defaultSettingsAsMap);
 
 		return tmpFile;
 	}
 
 	public static Path writeConfigurationToTmpPath(Map<String, String> settings) throws IOException {
-		Path tmpFile = Files.createTempFile("cleanthat-eclipse-formatter-", ".xml");
+		var tmpFile = Files.createTempFile("cleanthat-eclipse-formatter-", ".xml");
 		LOGGER.info("About to write Eclipse formatter configuration in {}", tmpFile);
 
 		try (InputStream is = XmlProfileWriter.writeFormatterProfileToStream("cleanthat", settings);
-				OutputStream outputStream = Files.newOutputStream(tmpFile)) {
+				var outputStream = Files.newOutputStream(tmpFile)) {
 			ByteStreams.copy(is, outputStream);
 		} catch (TransformerException | ParserConfigurationException e) {
 			throw new IllegalArgumentException(e);

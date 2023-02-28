@@ -39,9 +39,9 @@ public class SourceCodeFormatterHelper {
 	public EngineAndLinters compile(IEngineProperties engineProperties,
 			CleanthatSession cleanthatSession,
 			IEngineLintFixerFactory lintFixerFactory) {
-		List<ILintFixer> linters = prepareLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
+		var linters = prepareLintFixers(engineProperties, cleanthatSession, lintFixerFactory);
 
-		String engine = engineProperties.getEngine();
+		var engine = engineProperties.getEngine();
 		LOGGER.info("engine={} has prepared {} lintFixers", engine, linters.size());
 		linters.forEach(lf -> LOGGER.info("engine={} relies on {}", engine, lf.getClass().getName()));
 

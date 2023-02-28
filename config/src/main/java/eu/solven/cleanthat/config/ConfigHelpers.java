@@ -85,10 +85,10 @@ public class ConfigHelpers {
 	}
 
 	public static ObjectMapper makeYamlObjectMapper() {
-		YAMLFactory yamlFactory = new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER)
+		var yamlFactory = new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER)
 				// This is disabled by default
 				.enable(Feature.USE_PLATFORM_LINE_BREAKS);
-		ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
+		var objectMapper = new ObjectMapper(yamlFactory);
 
 		// Used not to print null options in configurations
 		// https://www.baeldung.com/jackson-ignore-null-fields
@@ -103,7 +103,7 @@ public class ConfigHelpers {
 
 	public CleanthatRepositoryProperties loadResource(Resource resource, Class<CleanthatRepositoryProperties> clazz) {
 		ObjectMapper objectMapper;
-		String filenameLowerCase = resource.getFilename().toLowerCase(Locale.US);
+		var filenameLowerCase = resource.getFilename().toLowerCase(Locale.US);
 		if (filenameLowerCase.endsWith(".json")) {
 			objectMapper = ConfigHelpers.getJson(objectMappers);
 		} else if (filenameLowerCase.endsWith(".yml") || filenameLowerCase.endsWith(".yaml")) {
@@ -121,8 +121,8 @@ public class ConfigHelpers {
 	}
 
 	public IEngineProperties mergeEngineProperties(IHasSourceCodeProperties properties, IEngineProperties dirtyEngine) {
-		Map<String, ?> dirtyLanguageAsMap = makeDeepCopy(dirtyEngine);
-		ISourceCodeProperties sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
+		var dirtyLanguageAsMap = makeDeepCopy(dirtyEngine);
+		var sourceConfig = mergeSourceConfig(properties, dirtyLanguageAsMap);
 		Map<String, Object> languageConfig = new LinkedHashMap<>();
 		languageConfig.putAll(dirtyLanguageAsMap);
 		languageConfig.put(KEY_SOURCE_CODE, sourceConfig);
@@ -132,12 +132,11 @@ public class ConfigHelpers {
 
 	protected ISourceCodeProperties mergeSourceConfig(IHasSourceCodeProperties properties,
 			Map<String, ?> dirtyLanguageConfig) {
-		Map<String, ?> rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
-		Map<String, ?> explicitSourceCodeProperties =
+		var rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
+		var explicitSourceCodeProperties =
 				PepperMapHelper.<Map<String, ?>>getOptionalAs(dirtyLanguageConfig, KEY_SOURCE_CODE).orElse(Map.of());
 
-		Map<String, Object> sourceConfig =
-				mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);
+		var sourceConfig = mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);
 
 		return objectMapper.convertValue(sourceConfig, SourceCodeProperties.class);
 	}
@@ -166,15 +165,15 @@ public class ConfigHelpers {
 			}
 
 			{
-				List<?> outerIncludes = getAsNonNullList(outer, KEY_INCLUDES);
-				List<?> innerIncludes = getAsNonNullList(inner, KEY_INCLUDES);
+				var outerIncludes = getAsNonNullList(outer, KEY_INCLUDES);
+				var innerIncludes = getAsNonNullList(inner, KEY_INCLUDES);
 
-				List<?> outerExcludes = getAsNonNullList(outer, KEY_EXCLUDES);
-				List<?> innerExcludes = getAsNonNullList(inner, KEY_EXCLUDES);
+				var outerExcludes = getAsNonNullList(outer, KEY_EXCLUDES);
+				var innerExcludes = getAsNonNullList(inner, KEY_EXCLUDES);
 
 				if (innerIncludes.isEmpty()) {
 					// An inner excludes cancels outer includes
-					Stream<?> outerIncludesWithoutInnerExclude =
+					var outerIncludesWithoutInnerExclude =
 							outerIncludes.stream().filter(includes -> !innerExcludes.contains(includes));
 
 					List<Object> mergedIncludes =
@@ -189,7 +188,7 @@ public class ConfigHelpers {
 				}
 
 				// An inner includes cancels outer excludes
-				Stream<?> outerExcludesWithoutInnerInclude =
+				var outerExcludesWithoutInnerInclude =
 						outerExcludes.stream().filter(exclude -> !innerIncludes.contains(exclude));
 				List<Object> mergedExcludes = Stream.concat(outerExcludesWithoutInnerInclude, innerExcludes.stream())
 						.distinct()
@@ -203,7 +202,7 @@ public class ConfigHelpers {
 	}
 
 	private List<?> getAsNonNullList(Map<String, ?> outer, String k) {
-		List<?> outerIncludes = (List<?>) outer.get(k);
+		var outerIncludes = (List<?>) outer.get(k);
 		if (outerIncludes == null) {
 			outerIncludes = Collections.emptyList();
 		}
@@ -213,8 +212,8 @@ public class ConfigHelpers {
 	public <T> Map<String, Object> makeDeepCopy(T object) {
 		try {
 			// We make a deep-copy before mutation
-			byte[] serialized = objectMapper.writeValueAsBytes(object);
-			Map<String, ?> fromJackson = objectMapper.readValue(serialized, Map.class);
+			var serialized = objectMapper.writeValueAsBytes(object);
+			var fromJackson = objectMapper.readValue(serialized, Map.class);
 
 			return new LinkedHashMap<>(fromJackson);
 		} catch (JsonProcessingException e) {
@@ -225,8 +224,8 @@ public class ConfigHelpers {
 	}
 
 	public IEngineProperties forceIncludes(IEngineProperties engine, Collection<String> includes) {
-		Map<String, Object> engineAsMap = objectMapper.convertValue(engine, Map.class);
-		Map<String, Object> sourceCodeAsMap = objectMapper.convertValue(engine.getSourceCode(), Map.class);
+		var engineAsMap = objectMapper.convertValue(engine, Map.class);
+		var sourceCodeAsMap = objectMapper.convertValue(engine.getSourceCode(), Map.class);
 		sourceCodeAsMap.put(KEY_INCLUDES, includes);
 		engineAsMap.put(KEY_SOURCE_CODE, sourceCodeAsMap);
 		return objectMapper.convertValue(engineAsMap, CleanthatEngineProperties.class);

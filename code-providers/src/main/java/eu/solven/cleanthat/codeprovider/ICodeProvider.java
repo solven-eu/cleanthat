@@ -68,7 +68,7 @@ public interface ICodeProvider {
 	 * @throws IOException
 	 */
 	default Optional<String> loadContentForPath(String rawPath) throws IOException {
-		Path path = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), rawPath);
+		var path = CleanthatPathHelpers.makeContentPath(getRepositoryRoot(), rawPath);
 
 		return loadContentForPath(path);
 	}

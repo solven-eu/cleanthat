@@ -96,7 +96,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 					"Invalid current sha1: " + head + " (expected: " + expectedHeadName + ")");
 		}
 
-		JGitCodeProvider wrapped = new JGitCodeProvider(workingDir, jgit, expectedHeadName, commitPush);
+		var wrapped = new JGitCodeProvider(workingDir, jgit, expectedHeadName, commitPush);
 
 		return wrapped;
 	}
@@ -191,7 +191,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	@Override
 	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
 		pathToMutatedContent.forEach((k, v) -> {
-			Path resolvedPath = resolvePath(k);
+			var resolvedPath = resolvePath(k);
 
 			if (resolvedPath.getFileSystem().isReadOnly()) {
 				throw new IllegalArgumentException("The fileSystem is readOnly: " + resolvedPath.getFileSystem());
@@ -242,7 +242,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public Optional<String> loadContentForPath(Path path) throws IOException {
-		Path resolvedPath = resolvePath(path);
+		var resolvedPath = resolvePath(path);
 
 		if (resolvedPath.toFile().isFile()) {
 			return Optional.of(new String(Files.readAllBytes(resolvedPath), StandardCharsets.UTF_8));
@@ -285,9 +285,9 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 				.setCloneSubmodules(false)
 				.setProgressMonitor(new TextProgressMonitor());
 
-		String userInfo = URI.create(authTransportUrl).getUserInfo();
+		var userInfo = URI.create(authTransportUrl).getUserInfo();
 		if (!Strings.isNullOrEmpty(userInfo) && userInfo.indexOf(':') >= 0) {
-			int indexofSemiColumn = userInfo.indexOf(':');
+			var indexofSemiColumn = userInfo.indexOf(':');
 			// Unclear why, sometimes, JGit fails with BASIC in provided URL: we help it through an explicit
 			// CredentialProvider
 			builder.setCredentialsProvider(

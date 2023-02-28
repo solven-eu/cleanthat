@@ -136,8 +136,8 @@ public class CleanthatPathHelpers {
 		// name element of `child.normalize()` (if child has no name
 		// elements it is not allowed either because it is not a true
 		// child)
-		Path dummy = parent.getFileSystem().getPath("dummy");
-		Path otherDummyNormalized = dummy.resolve(child).normalize();
+		var dummy = parent.getFileSystem().getPath("dummy");
+		var otherDummyNormalized = dummy.resolve(child).normalize();
 		// Check if `normalize()` removed any elements
 		if (otherDummyNormalized.getNameCount() != 1 + child.getNameCount()) {
 			throw new IllegalArgumentException("Invalid child path: " + child);
@@ -147,10 +147,10 @@ public class CleanthatPathHelpers {
 			throw new IllegalArgumentException("Invalid child path: " + child);
 		}
 
-		Path result = parent.resolve(child);
+		var result = parent.resolve(child);
 
-		Path resultNormalized = result.normalize();
-		Path thisNormalized = parent.normalize();
+		var resultNormalized = result.normalize();
+		var thisNormalized = parent.normalize();
 		int minDiff;
 		if (isEmptyPath(thisNormalized)) {
 			minDiff = 0;
@@ -185,9 +185,9 @@ public class CleanthatPathHelpers {
 
 	public static Path makeContentPath(Path repositoryRoot, String pathString) {
 		// Safe resolution of the content path
-		Path absoluteContentPath = resolveChild(repositoryRoot, pathString);
+		var absoluteContentPath = resolveChild(repositoryRoot, pathString);
 
-		Path relativeContentPath = repositoryRoot.relativize(absoluteContentPath);
+		var relativeContentPath = repositoryRoot.relativize(absoluteContentPath);
 
 		// Check the contentPath is really safe
 		checkContentPath(relativeContentPath);
@@ -196,7 +196,7 @@ public class CleanthatPathHelpers {
 	}
 
 	public static String makeContentRawPath(Path repositoryRoot, Path contentPath) {
-		Path childrenAbsolutePath = resolveChild(repositoryRoot, contentPath);
+		var childrenAbsolutePath = resolveChild(repositoryRoot, contentPath);
 
 		return repositoryRoot.relativize(childrenAbsolutePath).toString();
 	}

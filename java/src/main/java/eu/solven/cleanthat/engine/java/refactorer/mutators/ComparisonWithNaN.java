@@ -17,22 +17,17 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'd == Double.NaN' into 'Double.isNaN(d)'
@@ -40,8 +35,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class ComparisonWithNaN extends AJavaParserMutator {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonWithNaN.class);
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11
@@ -68,18 +61,17 @@ public class ComparisonWithNaN extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof BinaryExpr)) {
 			return false;
 		}
-		BinaryExpr binaryExpr = (BinaryExpr) node;
+		var binaryExpr = (BinaryExpr) node;
 
 		if (binaryExpr.getOperator() != BinaryExpr.Operator.EQUALS) {
 			return false;
 		}
 
-		Expression left = binaryExpr.getLeft();
-		Expression right = binaryExpr.getRight();
+		var left = binaryExpr.getLeft();
+		var right = binaryExpr.getRight();
 
 		Expression mayNotBeNaN;
 
@@ -108,12 +100,12 @@ public class ComparisonWithNaN extends AJavaParserMutator {
 		} else {
 			return false;
 		}
-		NameExpr nameExpr = new NameExpr(methodHolderClass.getSimpleName());
-		MethodCallExpr properNaNCall = new MethodCallExpr(nameExpr, "isNaN", new NodeList<>(mayNotBeNaN));
+		var nameExpr = new NameExpr(methodHolderClass.getSimpleName());
+		var properNaNCall = new MethodCallExpr(nameExpr, "isNaN", new NodeList<>(mayNotBeNaN));
 
 		Node replacement;
 		if (prefixNullCheck) {
-			BinaryExpr notNull = new BinaryExpr(mayNotBeNaN, new NullLiteralExpr(), Operator.NOT_EQUALS);
+			var notNull = new BinaryExpr(mayNotBeNaN, new NullLiteralExpr(), Operator.NOT_EQUALS);
 			replacement = new BinaryExpr(notNull, properNaNCall, Operator.AND);
 		} else {
 			replacement = properNaNCall;
@@ -128,7 +120,7 @@ public class ComparisonWithNaN extends AJavaParserMutator {
 			return false;
 		}
 
-		FieldAccessExpr fieldAccessExpr = left.asFieldAccessExpr();
+		var fieldAccessExpr = left.asFieldAccessExpr();
 
 		if (!("NaN".equals(fieldAccessExpr.getNameAsString()))) {
 			return false;

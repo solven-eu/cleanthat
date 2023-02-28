@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -109,7 +108,7 @@ public class RunGithubMonitoring {
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
-		ApplicationContext appContext = event.getApplicationContext();
+		var appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 

@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
-import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
@@ -34,6 +33,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  *
  * @author Benoit Lacelle
  */
+// see org.openrewrite.java.cleanup.UseDiamondOperator
 @Deprecated(since = "Not-ready")
 public class UseDiamondOperator extends AJavaParserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
@@ -75,14 +75,24 @@ public class UseDiamondOperator extends AJavaParserMutator {
 
 		if (optParentNode.isPresent() && optParentNode.get() instanceof ObjectCreationExpr
 				&& !withTypeArgument.isUsingDiamondOperator()) {
-			ObjectCreationExpr objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
-			Optional<ResolvedReferenceTypeDeclaration> optTypeDeclaration =
-					objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
+			var objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
+			Optional<ResolvedType> optTypeDeclaration = optResolvedType(objectCreationExpr.getType());
+			// objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
 			if (optTypeDeclaration.isEmpty()) {
 				return false;
 			}
 
-			ResolvedClassDeclaration asClass = optTypeDeclaration.get().asClass();
+			if (!optTypeDeclaration.get().isReferenceType()) {
+				return false;
+			}
+
+			var asReferenceType = optTypeDeclaration.get().asReferenceType();
+
+			if (asReferenceType.getTypeDeclaration().isEmpty()) {
+				return false;
+			}
+
+			var asClass = asReferenceType.getTypeDeclaration().get().asClass();
 			if (asClass.isAnonymousClass()) {
 				// We need the explicit type in the generic type for anonymous class
 				return false;

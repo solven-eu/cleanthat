@@ -74,7 +74,7 @@ public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	public void setProtectedPatterns(List<String> protectedPatterns) {
 		protectedPatterns = protectedPatterns.stream().map(branch -> {
 			if (!branch.startsWith(REFS_PREFIX)) {
-				String qualifiedRef = BRANCHES_PREFIX + branch;
+				var qualifiedRef = BRANCHES_PREFIX + branch;
 				LOGGER.debug("We qualify {} into {} (i.e. we supposed it is a branch name)", branch, qualifiedRef);
 				return qualifiedRef;
 			} else {

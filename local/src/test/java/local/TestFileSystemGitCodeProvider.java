@@ -18,7 +18,6 @@ package local;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -31,7 +30,7 @@ public class TestFileSystemGitCodeProvider {
 
 	@Test
 	public void testRelative() throws IOException {
-		Path tmpFolderAsPath = tmpFolder.toPath();
+		var tmpFolderAsPath = tmpFolder.toPath();
 		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
@@ -44,7 +43,7 @@ public class TestFileSystemGitCodeProvider {
 
 	@Test
 	public void testNotSimpleRelative() throws IOException {
-		Path tmpFolderAsPath = tmpFolder.toPath();
+		var tmpFolderAsPath = tmpFolder.toPath();
 		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder
@@ -59,7 +58,7 @@ public class TestFileSystemGitCodeProvider {
 
 	@Test
 	public void testLoadNotExistingFile() throws IOException {
-		Path tmpFolderAsPath = tmpFolder.toPath();
+		var tmpFolderAsPath = tmpFolder.toPath();
 		FileSystemGitCodeProvider codeProvider = new FileSystemGitCodeProvider(tmpFolderAsPath);
 
 		// Consider a file at the root of given folder

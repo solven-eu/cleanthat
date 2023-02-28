@@ -41,10 +41,10 @@ public class LazyGitReference implements ILazyGitReference {
 	@Override
 	public Supplier<IGitReference> getSupplier() {
 		return () -> {
-			IGitReference reference = supplier.get();
+			var reference = supplier.get();
 
-			String initialRef = getFullRefOrSha1();
-			String lazyRef = reference.getFullRefOrSha1();
+			var initialRef = getFullRefOrSha1();
+			var lazyRef = reference.getFullRefOrSha1();
 			if (!initialRef.equals(lazyRef)) {
 				throw new IllegalStateException("Inconsistency: " + initialRef + " vs " + lazyRef);
 			}

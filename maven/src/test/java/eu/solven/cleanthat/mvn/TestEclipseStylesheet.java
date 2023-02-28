@@ -59,7 +59,7 @@ public class TestEclipseStylesheet {
 
 	@Test
 	public void testWriteSettings_exist() throws IOException {
-		Path tmpPath = Files.createTempFile("cleanthat-TestEclipseStylesheet", ".xml");
+		var tmpPath = Files.createTempFile("cleanthat-TestEclipseStylesheet", ".xml");
 
 		mojo.setConfigPath(tmpPath.toString());
 		mojo.writeSettings(Map.of());
@@ -67,9 +67,9 @@ public class TestEclipseStylesheet {
 
 	@Test
 	public void testWriteSettings_doesNotExist_inSubFolder() throws IOException {
-		Path tmpPath = Files.createTempDirectory("cleanthat-TestEclipseStylesheet");
+		var tmpPath = Files.createTempDirectory("cleanthat-TestEclipseStylesheet");
 
-		boolean deleted = tmpPath.toFile().delete();
+		var deleted = tmpPath.toFile().delete();
 		Assert.assertTrue(deleted);
 
 		mojo.setConfigPath(tmpPath.resolve("eclipse-stylesheet.xml").toString());

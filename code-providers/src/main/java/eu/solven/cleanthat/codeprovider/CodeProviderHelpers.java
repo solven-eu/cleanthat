@@ -56,7 +56,7 @@ public class CodeProviderHelpers {
 		Optional<Map.Entry<String, String>> optPathAndContent;
 		optPathAndContent = ICleanthatConfigConstants.PATHES_CLEANTHAT.stream().map(p -> {
 			try {
-				Path resolvedPath = CleanthatPathHelpers.makeContentPath(codeProvider.getRepositoryRoot(), p);
+				var resolvedPath = CleanthatPathHelpers.makeContentPath(codeProvider.getRepositoryRoot(), p);
 				return codeProvider.loadContentForPath(resolvedPath).map(content -> Maps.immutableEntry(p, content));
 			} catch (IOException e) {
 				throw new IllegalArgumentException(e);
@@ -68,7 +68,7 @@ public class CodeProviderHelpers {
 		}
 
 		ObjectMapper objectMapper;
-		Map.Entry<String, String> pathAndContent = optPathAndContent.get();
+		var pathAndContent = optPathAndContent.get();
 
 		String sha1ForLog;
 		if (codeProvider instanceof IGitSha1CodeProvider) {
@@ -96,7 +96,7 @@ public class CodeProviderHelpers {
 
 	public static Optional<File> pathToConfig(Path localFolder) {
 		return ICleanthatConfigConstants.PATHES_CLEANTHAT.stream().map(s -> {
-			File file = CleanthatPathHelpers.resolveChild(localFolder, s).toFile();
+			var file = CleanthatPathHelpers.resolveChild(localFolder, s).toFile();
 			return file;
 		}).filter(File::exists).findAny();
 	}

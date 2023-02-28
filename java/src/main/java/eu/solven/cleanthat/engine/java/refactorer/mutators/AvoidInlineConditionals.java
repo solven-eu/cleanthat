@@ -37,7 +37,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'boolean b = (x > 1 ) ? true : callback.doIt() || true' into 'if (x > 1) { ... } else { ...}'
@@ -67,18 +66,17 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof ConditionalExpr)) {
 			return false;
 		}
-		ConditionalExpr ternary = (ConditionalExpr) node;
+		var ternary = (ConditionalExpr) node;
 
 		if (ternary.getParentNode().isEmpty()) {
 			return false;
 		}
-		Node parent = ternary.getParentNode().get();
+		var parent = ternary.getParentNode().get();
 
-		Expression condition = ternary.getCondition();
+		var condition = ternary.getCondition();
 
 		// Try discard a redundant blockStatement as 'if (...)' always implies it
 		while (condition instanceof EnclosedExpr) {
@@ -89,7 +87,7 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 			if (parent.getParentNode().isEmpty()) {
 				return false;
 			}
-			Node grandParent = parent.getParentNode().get();
+			var grandParent = parent.getParentNode().get();
 			if (!(grandParent instanceof VariableDeclarationExpr)) {
 				return false;
 			}
@@ -97,7 +95,7 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 			if (grandParent.getParentNode().isEmpty()) {
 				return false;
 			}
-			Node grandGrandParent = grandParent.getParentNode().get();
+			var grandGrandParent = grandParent.getParentNode().get();
 			if (!(grandGrandParent instanceof ExpressionStmt)) {
 				return false;
 			}
@@ -105,43 +103,42 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 			if (grandGrandParent.getParentNode().isEmpty()) {
 				return false;
 			}
-			Node grandGrandGrandParent = grandGrandParent.getParentNode().get();
+			var grandGrandGrandParent = grandGrandParent.getParentNode().get();
 			if (!(grandGrandGrandParent instanceof BlockStmt)) {
 				return false;
 			}
 
-			VariableDeclarationExpr variableDeclExpr = (VariableDeclarationExpr) grandParent;
+			var variableDeclExpr = (VariableDeclarationExpr) grandParent;
 			if (variableDeclExpr.getVariables().size() != 1) {
 				return false;
 			}
-			VariableDeclarator variableDeclarator = variableDeclExpr.getVariables().get(0);
+			var variableDeclarator = variableDeclExpr.getVariables().get(0);
 
-			SimpleName variableName = variableDeclarator.getName();
-			BlockStmt grandGrandGrandParentBlockStmt = (BlockStmt) grandGrandGrandParent;
+			var variableName = variableDeclarator.getName();
+			var grandGrandGrandParentBlockStmt = (BlockStmt) grandGrandGrandParent;
 
 			// We declare the variable before the 'if (...)' statement
 			{
-				int indexOfVariableInParent = grandGrandGrandParentBlockStmt.getStatements().indexOf(grandGrandParent);
+				var indexOfVariableInParent = grandGrandGrandParentBlockStmt.getStatements().indexOf(grandGrandParent);
 				if (indexOfVariableInParent < 0) {
 					LOGGER.error("Issue searching for {} inside {}", grandGrandParent, grandGrandGrandParentBlockStmt);
 					return false;
 				}
 
-				VariableDeclarator newVariableDeclarator =
-						new VariableDeclarator(variableDeclarator.getType(), variableName);
+				var newVariableDeclarator = new VariableDeclarator(variableDeclarator.getType(), variableName);
 				grandGrandGrandParentBlockStmt.addStatement(indexOfVariableInParent,
 						new VariableDeclarationExpr(newVariableDeclarator));
 			}
 
-			Expression thenExpr = ternary.getThenExpr();
-			Expression elseExpr = ternary.getElseExpr();
+			var thenExpr = ternary.getThenExpr();
+			var elseExpr = ternary.getElseExpr();
 			Node newNode =
 					new IfStmt(condition, wrapThenElse(thenExpr, variableName), wrapThenElse(elseExpr, variableName));
 
 			return grandGrandParent.replace(newNode);
 		} else if (parent instanceof ReturnStmt) {
-			Expression thenExpr = ternary.getThenExpr();
-			Expression elseExpr = ternary.getElseExpr();
+			var thenExpr = ternary.getThenExpr();
+			var elseExpr = ternary.getElseExpr();
 
 			// https://github.com/javaparser/javaparser/issues/3850
 			Node newNode = new IfStmt(condition,

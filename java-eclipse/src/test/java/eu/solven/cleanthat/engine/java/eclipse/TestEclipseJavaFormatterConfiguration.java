@@ -65,8 +65,7 @@ public class TestEclipseJavaFormatterConfiguration {
 
 		processorConfig.setUrl("code:" + path);
 
-		String content =
-				new String(new ClassPathResource(path).getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+		var content = new String(new ClassPathResource(path).getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
 		Mockito.when(codeProvider.loadContentForPath(path)).thenReturn(Optional.of(content));
 

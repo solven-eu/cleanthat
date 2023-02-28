@@ -19,7 +19,6 @@ import org.assertj.core.api.Assertions;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
@@ -44,30 +43,30 @@ public class ReportTextBlockStripIndent {
 			+ "}";
 
 	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
 		return reflectionTypeSolver;
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
+		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
-		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
+		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
-		JavaParser parser = new JavaParser(configuration);
+		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		var parser = new JavaParser(configuration);
 		return parser;
 	}
 
 	public static void main(String[] args) {
-		CompilationUnit node = makeDefaultJavaParser(true).parse(testCase).getResult().get();
+		var node = makeDefaultJavaParser(true).parse(testCase).getResult().get();
 
 		node = LexicalPreservingPrinter.setup(node);
 
-		TextBlockLiteralExpr textBlock = node.findAll(TextBlockLiteralExpr.class).get(0);
+		var textBlock = node.findAll(TextBlockLiteralExpr.class).get(0);
 
 		Assertions.assertThat(textBlock.getValue()).startsWith("\t\t\t<html>");
 
-		TextBlockLiteralExpr newExprFromStrippedString = new TextBlockLiteralExpr(textBlock.stripIndent());
+		var newExprFromStrippedString = new TextBlockLiteralExpr(textBlock.stripIndent());
 
 		Assertions.assertThat(textBlock.toString()).isEqualTo(newExprFromStrippedString.toString());
 		Assertions.assertThat(textBlock).isEqualTo(newExprFromStrippedString);

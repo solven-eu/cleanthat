@@ -95,7 +95,7 @@ public class GithubHelper {
 	}
 
 	public static GHRef openEmptyRef(GHRepository repo, GHBranch base) {
-		String cleanThatPrId = UUID.randomUUID().toString();
+		var cleanThatPrId = UUID.randomUUID().toString();
 		String refName = ICleanthatGitRefsConstants.PREFIX_REF_CLEANTHAT_MANUAL
 				+ base.getName().replace('/', '_').replace('-', '_')
 				+ "---"

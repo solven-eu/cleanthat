@@ -439,9 +439,15 @@
 									<mutator>SafeButNotConsensual</mutator>
 								</mutators>
 								<includeDraft>true</includeDraft>
+								<excludedMutators>
+									<!-- https://github.com/javaparser/javaparser/issues/3930 -->
+									<excludedMutator>LambdaReturnsSingleStatement</excludedMutator>
+									<!-- Too much instable -->
+									<excludedMutator>UseDiamondOperator</excludedMutator>
+								</excludedMutators>
 							</cleanthat>
 
-<!--							<removeUnusedImports />-->
+							<!--							<removeUnusedImports />-->
 							<importOrder>
 								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->

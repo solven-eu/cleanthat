@@ -18,7 +18,6 @@ package eu.solven.cleanthat.github.refs;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -60,7 +59,7 @@ public class TestGithubRefCleaner {
 				new GithubAndToken(gitHub, "someToken", Map.of()),
 				checkRunManager);
 
-		Path root = Files.createTempDirectory("cleanthat-TestGithubRefCleaner-");
+		var root = Files.createTempDirectory("cleanthat-TestGithubRefCleaner-");
 		ICodeProvider codeProvider = cleaner.getCodeProviderForRef(root,
 				new GitRepoBranchSha1("someUser/someRepoName", "refs/heads/someRef", "someSha1"));
 

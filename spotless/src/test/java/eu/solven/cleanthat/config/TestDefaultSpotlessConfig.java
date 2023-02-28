@@ -41,7 +41,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
@@ -58,7 +57,7 @@ public class TestDefaultSpotlessConfig {
 
 	@Test
 	public void testDefaultSpotless() throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+		var yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 
 		SpotlessEngineProperties safeRebuiltFromEmpty = SpotlessEngineProperties.defaultEngineWithMarkdown();
 

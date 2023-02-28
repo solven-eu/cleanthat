@@ -103,7 +103,7 @@ public class GithubSha1CodeProviderHelper {
 
 			ICodeProvider localCodeProvider;
 			if (ZIP_ELSE_CLONE) {
-				ICodeProvider zippedLocalRef = downloadGitRefLocally(workingDir);
+				var zippedLocalRef = downloadGitRefLocally(workingDir);
 				// localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, () -> sha1CodeProvider);
 				localCodeProvider = zippedLocalRef;
 			} else {
@@ -131,7 +131,7 @@ public class GithubSha1CodeProviderHelper {
 		String ref = sha1CodeProvider.getSha1();
 
 		// We save the repository zip in this hardcoded file
-		Path zipPath = tmpDir.resolve("repository.zip");
+		var zipPath = tmpDir.resolve("repository.zip");
 
 		GHRepository repo = sha1CodeProvider.getRepo();
 		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
@@ -148,11 +148,11 @@ public class GithubSha1CodeProviderHelper {
 			throw new UncheckedIOException("Issue downloading a ZIP for " + ref, e);
 		}
 
-		Path repoPath = tmpDir.resolve("repository");
+		var repoPath = tmpDir.resolve("repository");
 
 		// TODO We may want not to unzip the file, but it would probably lead to terrible performance
 		LOGGER.info("Unzipping the repo={} ref={} into {}", repo.getFullName(), ref, repoPath);
-		try (InputStream fis = Files.newInputStream(zipPath)) {
+		try (var fis = Files.newInputStream(zipPath)) {
 			unzip(fis, repoPath);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Issue with " + tmpDir, e);
@@ -179,9 +179,9 @@ public class GithubSha1CodeProviderHelper {
 	@SuppressWarnings("PMD.AssignmentInOperand")
 	private static void unzip(InputStream is, Path targetDir) throws IOException {
 		targetDir = targetDir.toAbsolutePath();
-		try (ZipInputStream zipIn = new ZipInputStream(is)) {
+		try (var zipIn = new ZipInputStream(is)) {
 			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
-				Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
+				var resolvedPath = targetDir.resolve(ze.getName()).normalize();
 				if (!resolvedPath.startsWith(targetDir)) {
 					// see: https://snyk.io/research/zip-slip-vulnerability
 					throw new RuntimeException("Entry with an illegal path: " + ze.getName());
@@ -197,7 +197,7 @@ public class GithubSha1CodeProviderHelper {
 	}
 
 	public void cleanTmpFiles() {
-		Path workingDir = localTmpFolder.get();
+		var workingDir = localTmpFolder.get();
 		if (workingDir != null) {
 			LOGGER.info("Removing recursively the folder: {}", workingDir);
 

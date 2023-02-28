@@ -121,7 +121,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		}
 
 		List<String> excludedMutators = parameters.getCustomProperty("excluded_mutators", List.class);
-		String defaultGroupArtifact = CleanthatJavaStep.defaultGroupArtifact();
+		var defaultGroupArtifact = CleanthatJavaStep.defaultGroupArtifact();
 		return CleanthatJavaStep
 				.create(defaultGroupArtifact, cleanthatVersion, sourceJdk, mutators, excludedMutators, provisioner);
 	}

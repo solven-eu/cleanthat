@@ -29,7 +29,7 @@ public abstract class AJavaParserExprMutator extends AJavaParserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (node instanceof Expression) {
-			Expression expr = (Expression) node;
+			var expr = (Expression) node;
 
 			return processNotRecursively(expr);
 		} else {
@@ -42,7 +42,7 @@ public abstract class AJavaParserExprMutator extends AJavaParserMutator {
 		Optional<Expression> optReplacement = replaceExpression(expr);
 
 		if (optReplacement.isPresent()) {
-			Expression replacement = optReplacement.get();
+			var replacement = optReplacement.get();
 			return tryReplace(expr, replacement);
 		} else {
 			return false;

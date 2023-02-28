@@ -17,10 +17,7 @@ package eu.solven.cleanthat.config;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.PathMatcher;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -37,13 +34,12 @@ public class TestIncludeExcludeHelpers {
 
 	@Test
 	public void testAmbiguousDirectorySeparator() {
-		List<PathMatcher> pathMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, Arrays.asList("regex:.*/do_not_format_me/.*"));
+		var pathMatchers = IncludeExcludeHelpers.prepareMatcher(fs, Arrays.asList("regex:.*/do_not_format_me/.*"));
 
 		// Under Windows: we would have a Windows PathMatcher, while we ensure the returned path holds '/' as directory
 		// separator (e.g.
 		// eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider.listFilesForContent(Consumer<ICodeProviderFile>))
-		Optional<PathMatcher> optMatcher = IncludeExcludeHelpers.findMatching(pathMatchers,
+		var optMatcher = IncludeExcludeHelpers.findMatching(pathMatchers,
 				fs.getPath("/bash/src/main/resources/do_not_format_me/basic_raw.sh"));
 
 		Assertions.assertThat(optMatcher).isPresent();
@@ -51,13 +47,12 @@ public class TestIncludeExcludeHelpers {
 
 	@Test
 	public void testImplyGlob() {
-		List<PathMatcher> pathMatchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, Arrays.asList("**/do_not_format_me/**"));
+		var pathMatchers = IncludeExcludeHelpers.prepareMatcher(fs, Arrays.asList("**/do_not_format_me/**"));
 
 		// Under Windows: we would have a Windows PathMatcher, while we ensure the returned path holds '/' as directory
 		// separator (e.g.
 		// eu.solven.cleanthat.code_provider.local.FileSystemCodeProvider.listFilesForContent(Consumer<ICodeProviderFile>))
-		Optional<PathMatcher> optMatcher = IncludeExcludeHelpers.findMatching(pathMatchers,
+		var optMatcher = IncludeExcludeHelpers.findMatching(pathMatchers,
 				fs.getPath("/bash/src/main/resources/do_not_format_me/basic_raw.sh"));
 
 		Assertions.assertThat(optMatcher).isPresent();

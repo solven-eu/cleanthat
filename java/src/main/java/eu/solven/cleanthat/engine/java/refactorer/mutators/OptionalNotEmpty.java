@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns '!o.isEmpty()' into 'o.isPresent()'
@@ -65,12 +64,11 @@ public class OptionalNotEmpty extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
-		String methodCallIdentifier = methodCall.getName().getIdentifier();
+		var methodCall = (MethodCallExpr) node;
+		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_IS_EMPTY.equals(methodCallIdentifier) && !METHOD_IS_PRESENT.equals(methodCallIdentifier)) {
 			return false;
 		}
@@ -79,7 +77,7 @@ public class OptionalNotEmpty extends AJavaParserMutator {
 		if (methodCall.getScope().isEmpty() || optParent.isEmpty() || !(optParent.get() instanceof UnaryExpr)) {
 			return false;
 		}
-		UnaryExpr unaryExpr = (UnaryExpr) optParent.get();
+		var unaryExpr = (UnaryExpr) optParent.get();
 		if (!"LOGICAL_COMPLEMENT".equals(unaryExpr.getOperator().name())) {
 			return false;
 		}
@@ -89,7 +87,7 @@ public class OptionalNotEmpty extends AJavaParserMutator {
 			return false;
 		}
 
-		Expression scope = optScope.get();
+		var scope = optScope.get();
 		String newMethod;
 
 		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
@@ -98,8 +96,8 @@ public class OptionalNotEmpty extends AJavaParserMutator {
 			newMethod = METHOD_IS_EMPTY;
 		}
 
-		boolean localTransformed = false;
-		MethodCallExpr replacement = new MethodCallExpr(scope, newMethod);
+		var localTransformed = false;
+		var replacement = new MethodCallExpr(scope, newMethod);
 		LOGGER.info("Turning {} into {}", unaryExpr, replacement);
 		if (unaryExpr.replace(replacement)) {
 			localTransformed = true;

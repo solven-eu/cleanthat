@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.report_javaparser;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 public class LexicalPreservingAnnotatedPackage {
@@ -41,7 +40,7 @@ public class LexicalPreservingAnnotatedPackage {
 			+ "";
 
 	public static void main(String[] args) {
-		CompilationUnit node = StaticJavaParser.parse(testCase);
+		var node = StaticJavaParser.parse(testCase);
 
 		node = LexicalPreservingPrinter.setup(node);
 

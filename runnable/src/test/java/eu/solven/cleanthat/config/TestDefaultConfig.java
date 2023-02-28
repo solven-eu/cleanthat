@@ -28,7 +28,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
@@ -48,9 +47,9 @@ public class TestDefaultConfig {
 
 	@Test
 	public void testDefaultCleanthat() throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+		var yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 
-		CleanthatRepositoryProperties safeRebuiltFromEmpty = CleanthatRepositoryProperties.defaultRepository();
+		var safeRebuiltFromEmpty = CleanthatRepositoryProperties.defaultRepository();
 
 		// By in safe-default, we exclude anything in an 'exclude' directory
 		{
@@ -67,13 +66,13 @@ public class TestDefaultConfig {
 			// eu.solven.cleanthat.config.GenerateInitialConfig.prepareDefaultConfiguration(ICodeProvider)
 			{
 
-				SourceCodeProperties javaSourceCodeProperties = SourceCodeProperties.builder()
+				var javaSourceCodeProperties = SourceCodeProperties.builder()
 						.include("regex:.*\\.java")
 						.include("regex:.*\\.json")
 						.include("glob:**/pom.xml")
 						.build();
 
-				CleanthatEngineProperties engineProperties = CleanthatEngineProperties.builder()
+				var engineProperties = CleanthatEngineProperties.builder()
 						.engine(CleanthatSpotlessStepParametersProperties.ENGINE_ID)
 						.sourceCode(javaSourceCodeProperties)
 						.step(CleanthatStepProperties.builder()
@@ -90,14 +89,12 @@ public class TestDefaultConfig {
 
 		// This is useful to convert the Java class of processors into Map (like it will happen when loading from the
 		// yaml)
-		String defaultConfigAsYaml = yamlObjectMapper.writeValueAsString(safeRebuiltFromEmpty);
+		var defaultConfigAsYaml = yamlObjectMapper.writeValueAsString(safeRebuiltFromEmpty);
 		LOGGER.info("Default config as YAML: {}{}", System.lineSeparator(), defaultConfigAsYaml);
-		CleanthatRepositoryProperties configFromEmptyAsMap =
-				yamlObjectMapper.readValue(defaultConfigAsYaml, CleanthatRepositoryProperties.class);
+		var configFromEmptyAsMap = yamlObjectMapper.readValue(defaultConfigAsYaml, CleanthatRepositoryProperties.class);
 
-		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(yamlObjectMapper));
-		CleanthatRepositoryProperties configDefaultSafe =
-				configHelpers.loadRepoConfig(new ClassPathResource("/config/default-safe.yaml"));
+		var configHelpers = new ConfigHelpers(Arrays.asList(yamlObjectMapper));
+		var configDefaultSafe = configHelpers.loadRepoConfig(new ClassPathResource("/config/default-safe.yaml"));
 
 		Assert.assertEquals(yamlObjectMapper.writeValueAsString(configDefaultSafe),
 				yamlObjectMapper.writeValueAsString(configFromEmptyAsMap));

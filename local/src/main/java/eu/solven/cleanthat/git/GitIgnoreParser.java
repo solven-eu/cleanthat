@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.git;
 
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -47,24 +46,24 @@ public class GitIgnoreParser {
 		return Stream.of(gitIgnore.split("[\r\n]+"))
 				// A blank line matches no files, so it can serve as a separator for readability.
 				.filter(s -> !s.isBlank())
-				.map(s -> s.trim())
+				.map(String::trim)
 				// A line starting with # serves as a comment.
 				.filter(s -> !s.startsWith("#"))
 				.collect(Collectors.toSet());
 	}
 
 	public static boolean match(Set<String> patterns, Path path) {
-		Set<String> ignoredPatterns = patterns.stream().filter(s -> !s.startsWith("!")).collect(Collectors.toSet());
-		boolean doMatch = doMatch(ignoredPatterns, path);
+		var ignoredPatterns = patterns.stream().filter(s -> !s.startsWith("!")).collect(Collectors.toSet());
+		var doMatch = doMatch(ignoredPatterns, path);
 
 		if (doMatch) {
-			Set<String> unignoredPatterns = patterns.stream()
+			var unignoredPatterns = patterns.stream()
 					// Filter unignored patterns
 					.filter(s -> s.startsWith("!"))
 					// Remove the leading '!'
 					.map(s -> s.substring(1, s.length()))
 					.collect(Collectors.toSet());
-			boolean doMatchUnignored = doMatch(unignoredPatterns, path);
+			var doMatchUnignored = doMatch(unignoredPatterns, path);
 
 			if (doMatchUnignored) {
 				// Matches unignored: it is accepted
@@ -109,7 +108,7 @@ public class GitIgnoreParser {
 					// We add the directory as its own file: it will reject file named like directory (which is bad but
 					// rate)
 					// But it will enable rejecting a directory as soon as we encounter it
-					String directoryAsFile = s.substring(0, s.length() - 1);
+					var directoryAsFile = s.substring(0, s.length() - 1);
 					return Stream.of(directoryAsFile);
 				} else {
 					s = s + "**";
@@ -121,7 +120,7 @@ public class GitIgnoreParser {
 			}
 		}).anyMatch(s -> {
 			Path pToTEst;
-			FileSystem fs = p.getFileSystem();
+			var fs = p.getFileSystem();
 			if (s.startsWith("/") && !p.isAbsolute()) {
 				pToTEst = fs.getPath(fs.getSeparator()).resolve(p);
 			} else {
@@ -129,7 +128,7 @@ public class GitIgnoreParser {
 			}
 
 			// https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns
-			boolean matches = fs.getPathMatcher("glob:" + s).matches(pToTEst);
+			var matches = fs.getPathMatcher("glob:" + s).matches(pToTEst);
 			if (matches) {
 				LOGGER.trace("{} accepted {}", s, p);
 			}

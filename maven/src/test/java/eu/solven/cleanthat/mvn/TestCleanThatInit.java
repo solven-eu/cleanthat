@@ -59,7 +59,7 @@ public class TestCleanThatInit {
 		String prefixFromMvnTests = "/work/";
 
 		mojo.setCleanthatRepositoryConfigPath("someDir/some.yaml");
-		Path configPath = fs.getPath(prefixFromMvnTests, "someDir/some.yaml");
+		var configPath = fs.getPath(prefixFromMvnTests, "someDir/some.yaml");
 		Files.createDirectories(configPath.getParent());
 		Files.writeString(configPath, "someContent");
 

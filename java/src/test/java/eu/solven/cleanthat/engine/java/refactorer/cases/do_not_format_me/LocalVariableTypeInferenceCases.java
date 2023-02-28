@@ -1,18 +1,23 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -102,9 +107,35 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3898
-	// @UnchangedMethod
 	@CompareMethods
-	public static class CaseAnonymous {
+	public static class CaseAnonymous_noGenerics {
+		public Object pre() {
+			Exception i = new Exception() {
+				private static final long serialVersionUID = -7496095234003248150L;
+
+				{
+					setStackTrace(new StackTraceElement[] {});
+				}
+			};
+			return i;
+		}
+
+		public Object post() {
+			var i = new Exception() {
+				private static final long serialVersionUID = -7496095234003248150L;
+
+				{
+					setStackTrace(new StackTraceElement[] {});
+				}
+			};
+			return i;
+		}
+	}
+
+	// TODO
+	@UnmodifiedMethod
+	// @CompareMethods
+	public static class CaseAnonymous_withGenerics {
 		public Object pre() {
 			HashMap<String, Object> i = new HashMap<>() {
 				private static final long serialVersionUID = -7496095234003248150L;
@@ -173,8 +204,32 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 	}
 
 	@UnmodifiedMethod
-	public static class CaseCouic {
-		public Optional<Object> pre() {
+	public static class Case_Lambda_unknownType {
+		public Consumer<ICodeProviderFile> pre() {
+			Consumer<ICodeProviderFile> consumer = file -> {
+				System.out.println();
+			};
+
+			return consumer;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class Case_Lambda_knownType {
+		public Consumer<String> pre() {
+			Consumer<String> consumer = file -> {
+				System.out.println();
+			};
+
+			return consumer;
+		}
+	}
+
+	// Code preventing var in Case_UnclearGenericBounds breaks var in this one
+	// @CompareMethods
+	@UnmodifiedMethod
+	public static class CaseGenericInType_NotInInitializer {
+		public Optional<Map.Entry<String, String>> pre() {
 			Optional<Map.Entry<String, String>> optPathAndContent = Optional.empty();
 
 			if (optPathAndContent.isEmpty()) {
@@ -184,5 +239,31 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 			Map.Entry<String, String> pathAndContent = optPathAndContent.get();
 			return Optional.of(pathAndContent);
 		}
+
+		public Optional<Map.Entry<String, String>> post() {
+			Optional<Map.Entry<String, String>> optPathAndContent = Optional.empty();
+
+			if (optPathAndContent.isEmpty()) {
+				return Optional.empty();
+			}
+
+			var pathAndContent = optPathAndContent.get();
+			return Optional.of(pathAndContent);
+		}
 	}
+
+	@UnmodifiedMethod
+	public static class Case_UnclearGenericBounds {
+		public List<Class<? extends IMutator>> pre(List<String> classNames) {
+			List<Class<? extends IMutator>> classes = classNames.stream().map(s -> {
+				try {
+					return Class.forName(s);
+				} catch (ClassNotFoundException e) {
+					return null;
+				}
+			}).map(c -> (Class<? extends IMutator>) c.asSubclass(IMutator.class)).collect(Collectors.toList());
+			return classes;
+		}
+	}
+
 }

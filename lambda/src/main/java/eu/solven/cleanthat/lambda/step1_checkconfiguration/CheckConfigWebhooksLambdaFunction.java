@@ -32,8 +32,6 @@ import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
-import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
@@ -57,15 +55,14 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 
 		ICodeCleanerFactory cleanerFactory = getAppContext().getBean(CompositeCodeCleanerFactory.class);
 
-		WebhookRelevancyResult processAnswer =
-				makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
+		var processAnswer = makeWithFreshJwt.filterWebhookEventTargetRelevantBranch(cleanerFactory, input);
 
 		if (processAnswer.optHeadToClean().isPresent()) {
 			AmazonDynamoDB client = makeDynamoDbClient();
 
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>(input.getBody());
 
-			GitRepoBranchSha1 headToClean = processAnswer.optHeadToClean().get();
+			var headToClean = processAnswer.optHeadToClean().get();
 
 			ObjectMapper objectMapper = getAppContext().getBean(ObjectMapper.class);
 			acceptedEvent.put("refToClean", objectMapper.convertValue(headToClean, Map.class));

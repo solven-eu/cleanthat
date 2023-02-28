@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
@@ -54,7 +53,7 @@ public class TestCheckConfigWebhooksLambdaFunction {
 	ApplicationContext appContext;
 
 	@Before
-	public void prepareMocks() throws BeansException, IOException {
+	public void prepareMocks() throws IOException {
 		Mockito.when(appContext.getBean(IGitWebhookHandlerFactory.class).makeWithFreshAuth())
 				.thenReturn(webhookHandler);
 
@@ -76,8 +75,7 @@ public class TestCheckConfigWebhooksLambdaFunction {
 
 		IWebhookEvent input = Mockito.mock(IWebhookEvent.class);
 
-		GitRepoBranchSha1 head =
-				new GitRepoBranchSha1("someUser/someRepoName", "refs/heads/someBranchName", "someSha1");
+		var head = new GitRepoBranchSha1("someUser/someRepoName", "refs/heads/someBranchName", "someSha1");
 		Mockito.when(webhookHandler
 				.filterWebhookEventTargetRelevantBranch(appContext.getBean(ICodeCleanerFactory.class), input))
 				.thenReturn(WebhookRelevancyResult.relevant(new HeadAndOptionalBase(head, Optional.empty())));

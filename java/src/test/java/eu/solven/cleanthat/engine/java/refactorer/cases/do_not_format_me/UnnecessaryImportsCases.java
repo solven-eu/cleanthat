@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import org.junit.Ignore;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
@@ -37,6 +39,7 @@ public class UnnecessaryImportsCases extends AJavaparserRefactorerCases {
 	public static class caseJdk17TextBlock {
 	}
 
+	@Ignore("https://github.com/javaparser/javaparser/issues/3924")
 	@CompareCompilationUnitsAsResources(pre = PREFIX + "Revelc_Pre.java", post = PREFIX + "Revelc_Post.java")
 	public static class caseRevelc {
 	}

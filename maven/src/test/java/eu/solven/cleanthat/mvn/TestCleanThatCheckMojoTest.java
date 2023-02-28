@@ -39,8 +39,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml =
-				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
+		var cleanthatYaml = readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -59,8 +58,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml =
-				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
+		var cleanthatYaml = readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -86,8 +84,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
-		File cleanthatYaml =
-				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
+		var cleanthatYaml = readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);

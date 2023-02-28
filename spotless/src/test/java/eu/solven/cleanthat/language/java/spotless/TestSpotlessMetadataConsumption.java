@@ -22,6 +22,6 @@ import com.diffplug.spotless.pom.SortPomCfg;
 public class TestSpotlessMetadataConsumption {
 	@Test
 	public void testLoadingManyTimes() {
-		SortPomCfg config = new SortPomCfg();
+		var config = new SortPomCfg();
 	}
 }

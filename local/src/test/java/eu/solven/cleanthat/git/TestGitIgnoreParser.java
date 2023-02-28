@@ -18,7 +18,6 @@ package eu.solven.cleanthat.git;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
@@ -35,7 +34,7 @@ public class TestGitIgnoreParser {
 
 	@Test
 	public void testCodeMix() throws IOException {
-		String gitIgnoreContent = new String(ByteStreams
+		var gitIgnoreContent = new String(ByteStreams
 				.toByteArray(new ClassPathResource("/git/codemixGitIgnoreTestCase.gitignore").getInputStream()));
 
 		Set<String> patterns = GitIgnoreParser.parsePatterns(gitIgnoreContent);
@@ -64,7 +63,7 @@ public class TestGitIgnoreParser {
 
 	@Test
 	public void testGitDocumentation_hello() throws IOException {
-		Set<String> helloStar = Set.of("hello.*");
+		var helloStar = Set.of("hello.*");
 		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("hello."))).isTrue();
 		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("hello.alice"))).isTrue();
 		Assertions.assertThat(GitIgnoreParser.match(helloStar, fs.getPath("alice/hello.bob"))).isTrue();
@@ -75,9 +74,9 @@ public class TestGitIgnoreParser {
 
 	@Test
 	public void testGitDocumentation_foo() throws IOException {
-		Set<String> helloStar = Set.of("foo/");
+		var helloStar = Set.of("foo/");
 
-		Path pathToFoo = fs.getPath("foo");
+		var pathToFoo = fs.getPath("foo");
 
 		Assertions.assertThat(GitIgnoreParser.match(helloStar, pathToFoo.resolve("bar"))).isTrue();
 

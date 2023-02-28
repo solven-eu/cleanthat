@@ -18,7 +18,6 @@ package eu.solven.cleanthat.code_provider.inmemory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -34,7 +33,7 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 public class TestFileSystemCodeProvider {
 	@Test
 	public void testInMemoryFileSystem() throws IOException {
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
 		cp.listFilesForContent(file -> {
@@ -47,7 +46,7 @@ public class TestFileSystemCodeProvider {
 		cp.listFilesForContent(file -> {
 			Assertions.assertThat(file.getPath().toString()).isEqualTo("root/directory/file.txt");
 
-			Path raw = (Path) file.getRaw();
+			var raw = (Path) file.getRaw();
 			try {
 				Assertions.assertThat(Files.readString(raw, StandardCharsets.UTF_8)).isEqualTo("newContent");
 			} catch (IOException e) {
@@ -58,12 +57,12 @@ public class TestFileSystemCodeProvider {
 
 	@Test
 	public void testLoadFileOutOfRoot() throws IOException {
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 
-		Path secretPath = fs.getPath(fs.getSeparator(), "secretFile");
+		var secretPath = fs.getPath(fs.getSeparator(), "secretFile");
 		Files.writeString(secretPath, "secretContent");
 
-		Path notSecretPath = fs.getPath(fs.getSeparator(), "project", "notSecretFile");
+		var notSecretPath = fs.getPath(fs.getSeparator(), "project", "notSecretFile");
 		Files.createDirectories(notSecretPath.getParent());
 		Files.writeString(notSecretPath, "notSecretContent");
 
@@ -79,7 +78,7 @@ public class TestFileSystemCodeProvider {
 
 		Assertions.assertThat(cp.loadContentForPath(cp.getRepositoryRoot().relativize(notSecretPath)))
 				.contains("notSecretContent");
-		Path illegalLookingValid = fs.getPath(fs.getSeparator(), "project", "..", "project", "notSecretFile");
+		var illegalLookingValid = fs.getPath(fs.getSeparator(), "project", "..", "project", "notSecretFile");
 		Assertions.assertThat(illegalLookingValid.normalize()).isEqualTo(notSecretPath);
 		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(illegalLookingValid))
 				.isInstanceOf(IllegalArgumentException.class);

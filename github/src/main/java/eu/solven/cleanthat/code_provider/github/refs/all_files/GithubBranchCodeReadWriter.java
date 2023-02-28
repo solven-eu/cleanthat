@@ -62,7 +62,7 @@ public class GithubBranchCodeReadWriter extends AGithubSha1CodeProviderWriter {
 
 	@Override
 	protected GHRef getAsGHRef() {
-		String refName = getRef();
+		var refName = getRef();
 		try {
 			return new GithubRepositoryFacade(getRepo()).getRef(refName);
 		} catch (IOException e) {

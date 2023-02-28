@@ -45,8 +45,8 @@ public class TestSafeAndConsensualMutators {
 
 	@Test
 	public void testIds() {
-		SafeAndConsensualMutators safeAndConsensual = new SafeAndConsensualMutators(last);
-		SafeButNotAndConsensualMutators safeButNotConsensual = new SafeButNotAndConsensualMutators(last);
+		var safeAndConsensual = new SafeAndConsensualMutators(last);
+		var safeButNotConsensual = new SafeButNotAndConsensualMutators(last);
 
 		Assertions.assertThat(safeAndConsensual.getIds()).doesNotContainAnyElementsOf(safeButNotConsensual.getIds());
 		Assertions.assertThat(safeButNotConsensual.getIds()).doesNotContainAnyElementsOf(safeAndConsensual.getIds());

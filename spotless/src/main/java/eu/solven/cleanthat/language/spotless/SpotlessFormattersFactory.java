@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 
 import com.diffplug.spotless.Provisioner;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,9 +34,7 @@ import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.formatter.CleanthatSession;
@@ -88,9 +85,9 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		SpotlessSession spotlessSession = new SpotlessSession();
 
 		ILintFixerWithId processor;
-		String stepId = stepProperties.getId();
+		var stepId = stepProperties.getId();
 		// override with explicit configuration
-		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
+		var parameters = getParameters(stepProperties);
 
 		LOGGER.debug("Processing: {}", stepId);
 
@@ -99,12 +96,12 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 			CleanthatSpotlessStepParametersProperties processorConfig =
 					convertValue(parameters, CleanthatSpotlessStepParametersProperties.class);
 
-			String spotlessConfig = processorConfig.getConfiguration();
+			var spotlessConfig = processorConfig.getConfiguration();
 			if (Strings.isNullOrEmpty(spotlessConfig)) {
 				throw new IllegalArgumentException("'configuration' is mandatory");
 			}
 
-			Resource spotlessPropertiesResource =
+			var spotlessPropertiesResource =
 					CleanthatUrlLoader.loadUrl(cleanthatSession.getCodeProvider(), spotlessConfig);
 
 			SpotlessEngineProperties spotlessEngine;
@@ -147,7 +144,7 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
-		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
+		var engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
 
 		engineBuilder.step(CleanthatStepProperties.builder()
 				.id(CleanthatSpotlessStepParametersProperties.STEP_ID)
@@ -164,13 +161,13 @@ public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
 		Map<String, String> pathToContent = new LinkedHashMap<>();
 
 		if (!engineProperties.getSteps().isEmpty()) {
-			CleanthatStepProperties singleSpotlessStep = engineProperties.getSteps().get(0);
+			var singleSpotlessStep = engineProperties.getSteps().get(0);
 
-			String configuration = (String) singleSpotlessStep.getParameters()
+			var configuration = (String) singleSpotlessStep.getParameters()
 					.getCustomProperty(CleanthatSpotlessStepParametersProperties.KEY_CONFIGURATION);
 
 			if (configuration != null && configuration.startsWith(CleanthatUrlLoader.PREFIX_CODE)) {
-				String path = configuration.substring(CleanthatUrlLoader.PREFIX_CODE.length());
+				var path = configuration.substring(CleanthatUrlLoader.PREFIX_CODE.length());
 
 				if (path.startsWith(ICleanthatConfigConstants.PATH_SEPARATOR)) {
 					path = path.substring(ICleanthatConfigConstants.PATH_SEPARATOR.length());

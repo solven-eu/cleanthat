@@ -28,7 +28,6 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -71,7 +70,7 @@ public class UnnecessaryBoxing extends AJavaParserMutator {
 
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		AtomicBoolean transformed = new AtomicBoolean();
+		var transformed = new AtomicBoolean();
 
 		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		onMethodName(node, "toString", (methodNode, scope, type) -> {
@@ -90,7 +89,7 @@ public class UnnecessaryBoxing extends AJavaParserMutator {
 		}
 		LOGGER.debug("{} is referenceType", type);
 
-		String primitiveQualifiedName = type.asReferenceType().getQualifiedName();
+		var primitiveQualifiedName = type.asReferenceType().getQualifiedName();
 		if (Boolean.class.getName().equals(primitiveQualifiedName)
 				|| Byte.class.getName().equals(primitiveQualifiedName)
 				|| Short.class.getName().equals(primitiveQualifiedName)
@@ -101,31 +100,30 @@ public class UnnecessaryBoxing extends AJavaParserMutator {
 			LOGGER.debug("{} is AutoBoxed", type);
 			if (scope instanceof ObjectCreationExpr) {
 				// new Boolean(b).toString()
-				ObjectCreationExpr creation = (ObjectCreationExpr) scope;
+				var creation = (ObjectCreationExpr) scope;
 				NodeList<Expression> inputs = creation.getArguments();
-				MethodCallExpr replacement =
-						new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
+				var replacement = new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
 				LOGGER.info("Turning {} into {}", node, replacement);
 				return node.replace(replacement);
 			} else if (scope instanceof MethodCallExpr) {
 				// Boolean.valueOf(b).toString()
-				MethodCallExpr call = (MethodCallExpr) scope;
+				var call = (MethodCallExpr) scope;
 
 				if (!"valueOf".equals(call.getNameAsString()) || call.getScope().isEmpty()) {
 					return false;
 				}
 
-				Expression calledScope = call.getScope().get();
+				var calledScope = call.getScope().get();
 				Optional<ResolvedType> calledType = optResolvedType(calledScope);
 
 				if (calledType.isEmpty() || !calledType.get().isReferenceType()) {
 					return false;
 				}
 
-				ResolvedReferenceType referenceType = calledType.get().asReferenceType();
+				var referenceType = calledType.get().asReferenceType();
 
 				if (referenceType.hasName() && primitiveQualifiedName.equals(referenceType.getQualifiedName())) {
-					MethodCallExpr replacement = new MethodCallExpr(calledScope, "toString", call.getArguments());
+					var replacement = new MethodCallExpr(calledScope, "toString", call.getArguments());
 
 					return node.replace(replacement);
 				}

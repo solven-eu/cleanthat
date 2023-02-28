@@ -62,25 +62,25 @@ public class ITTestRemoteFile {
 	private void processOneUrl(String path) throws IOException, MalformedURLException, URISyntaxException {
 		LOGGER.info("Process: {}", path);
 
-		String pathAsString =
+		var pathAsString =
 				new String(ByteStreams.toByteArray(new URI(path).toURL().openStream()), StandardCharsets.UTF_8);
 
-		JavaRefactorerProperties properties = new JavaRefactorerProperties();
+		var properties = new JavaRefactorerProperties();
 		properties.setIncluded(
 				Arrays.asList(SafeAndConsensualMutators.class.getName(), LiteralsFirstInComparisons.class.getName()));
 
-		JavaRefactorer rulesJavaMutator = new JavaRefactorer(CleanthatEngineProperties.builder()
+		var rulesJavaMutator = new JavaRefactorer(CleanthatEngineProperties.builder()
 				.sourceCode(SourceCodeProperties.defaultRoot())
 				.engineVersion(IJdkVersionConstants.LAST)
 				.build(), properties);
 
-		String cleaned = rulesJavaMutator.doFormat(pathAsString);
+		var cleaned = rulesJavaMutator.doFormat(pathAsString);
 
 		if (cleaned.equals(pathAsString)) {
 			LOGGER.warn("Not a single change");
 		} else {
 			DiffMatchPatch dmp = new DiffMatchPatch();
-			String newAsString = cleaned;
+			var newAsString = cleaned;
 
 			// TODO We may need to reformat to have a nice diff
 			// see eu.solven.cleanthat.java.mutators.RulesJavaMutator.fixJavaparserUnexpectedChanges(String, String)

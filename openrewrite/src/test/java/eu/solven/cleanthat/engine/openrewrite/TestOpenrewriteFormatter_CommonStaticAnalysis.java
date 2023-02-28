@@ -85,8 +85,8 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 	private IEngineProperties getEngineProperties() throws IOException, JsonParseException, JsonMappingException {
 		List<CleanthatEngineProperties> engines = repositoryProperties.getEngines();
 		Assert.assertEquals(1, engines.size());
-		IEngineProperties engineP = new ConfigHelpers(Arrays.asList(objectMapper))
-				.mergeEngineProperties(repositoryProperties, engines.get(0));
+		var engineP = new ConfigHelpers(Arrays.asList(objectMapper)).mergeEngineProperties(repositoryProperties,
+				engines.get(0));
 		return engineP;
 	}
 
@@ -142,7 +142,7 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 	// https://docs.openrewrite.org/reference/recipes/java/cleanup/emptyblock
 	@Test
 	public void testFormat_EmptyBlock() throws IOException {
-		String sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+		var sourceCode = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"public class CleanClass {",
 				"	public CleanClass() {",
 				"		{}",
@@ -150,19 +150,19 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 				"	}",
 				"}").collect(Collectors.joining(System.lineSeparator()));
 
-		String expectedCleaned = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
+		var expectedCleaned = Stream.of("package eu.solven.cleanthat.do_not_format_me;",
 				"public class CleanClass {",
 				"	public CleanClass() {",
 				"	}",
 				"}").collect(Collectors.joining(System.lineSeparator()));
 
-		IEngineProperties languageP = getEngineProperties();
+		var languageP = getEngineProperties();
 
 		EngineAndLinters compile = helper.compile(languageP, cleanthatSession, formatter);
-		Path contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
+		var contentPath = CleanthatPathHelpers.makeContentPath(cleanthatSession.getRepositoryRoot(),
 				"someModule/src/main/java/some_package/someFilePath.java");
 
-		String cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
+		var cleaned = applier.applyProcessors(compile, new PathAndContent(contentPath, sourceCode));
 		Assert.assertEquals(expectedCleaned, cleaned);
 	}
 }

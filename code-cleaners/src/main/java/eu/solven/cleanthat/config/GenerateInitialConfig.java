@@ -17,15 +17,12 @@ package eu.solven.cleanthat.config;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -64,12 +61,12 @@ public class GenerateInitialConfig {
 	public EngineInitializerResult prepareDefaultConfiguration(ICodeProvider codeProvider) throws IOException {
 		Map<String, String> pathToContent = new LinkedHashMap<>();
 
-		CleanthatRepositoryProperties properties = CleanthatRepositoryProperties.defaultRepository();
+		var properties = CleanthatRepositoryProperties.defaultRepository();
 
 		List<CleanthatEngineProperties> mutableEngines = new ArrayList<>(properties.getEngines());
 		properties.setEngines(mutableEngines);
 
-		AtomicLongMap<String> factoryToFileCount = scanFileExtentions(codeProvider,
+		var factoryToFileCount = scanFileExtentions(codeProvider,
 				factories,
 				IEngineLintFixerFactory::getEngine,
 				IEngineLintFixerFactory::getDefaultIncludes);
@@ -80,17 +77,16 @@ public class GenerateInitialConfig {
 			} else {
 				LOGGER.info("Some files ({}) matched {}", count, engine);
 
-				IEngineLintFixerFactory factory =
-						factories.stream().filter(f -> engine.equals(f.getEngine())).findAny().get();
+				var factory = factories.stream().filter(f -> engine.equals(f.getEngine())).findAny().get();
 
-				AtomicLongMap<String> stepToFileCount = scanFileExtentions(codeProvider,
+				var stepToFileCount = scanFileExtentions(codeProvider,
 						factory.getMainSteps(),
 						IEngineStep::getStep,
 						IEngineStep::getDefaultIncludes);
 
-				Set<String> subStepIds = stepToFileCount.asMap().keySet();
+				var subStepIds = stepToFileCount.asMap().keySet();
 				LOGGER.info("We accept subStepIds={} for {}", subStepIds, engine);
-				CleanthatEngineProperties engineProperties = factory.makeDefaultProperties(subStepIds);
+				var engineProperties = factory.makeDefaultProperties(subStepIds);
 				mutableEngines.add(engineProperties);
 
 				pathToContent.putAll(factory.makeCustomDefaultFiles(engineProperties, subStepIds));
@@ -108,7 +104,7 @@ public class GenerateInitialConfig {
 			Function<T, Set<String>> getDefaultIncludes) {
 		AtomicLongMap<String> factoryToFileCount = AtomicLongMap.create();
 
-		Path repoRoot = codeProvider.getRepositoryRoot();
+		var repoRoot = codeProvider.getRepositoryRoot();
 
 		try {
 			// Listing files may be slow if there is many files (e.g. download of repo as zip)
@@ -119,15 +115,13 @@ public class GenerateInitialConfig {
 			factories.forEach(f -> allIncludes.addAll(getDefaultIncludes.apply(f)));
 
 			codeProvider.listFilesForFilenames(allIncludes, file -> {
-				Path filePath = file.getPath();
+				var filePath = file.getPath();
 
 				factories.forEach(factory -> {
 					Set<String> includes = getDefaultIncludes.apply(factory);
 
-					List<PathMatcher> includeMatchers =
-							IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
-					Optional<PathMatcher> matchingInclude =
-							IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
+					var includeMatchers = IncludeExcludeHelpers.prepareMatcher(repoRoot.getFileSystem(), includes);
+					var matchingInclude = IncludeExcludeHelpers.findMatching(includeMatchers, filePath);
 
 					if (matchingInclude.isPresent()) {
 						factoryToFileCount.getAndIncrement(getId.apply(factory));

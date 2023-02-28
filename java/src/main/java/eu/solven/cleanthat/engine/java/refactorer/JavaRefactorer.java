@@ -86,14 +86,14 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	@Override
 	public String doFormat(String dirtyCode) throws IOException {
 		LOGGER.debug("{}", this.refactorerProperties);
-		String cleanCode = applyTransformers(dirtyCode);
+		var cleanCode = applyTransformers(dirtyCode);
 		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);
 	}
 
 	@Override
 	public CompilationUnit parseSourceCode(JavaParser parser, String sourceCode) {
 		ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
-		CompilationUnit compilationUnit = parsed.getResult().get();
+		var compilationUnit = parsed.getResult().get();
 
 		// https://github.com/javaparser/javaparser/issues/3490
 		// We register given node for later prettyPrinting
@@ -104,8 +104,8 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	@Override
 	protected JavaParser makeAstParser() {
 		// TODO Adjust this flag depending on filtered rules
-		boolean isJreOnly = false;
-		JavaParser parser = makeDefaultJavaParser(isJreOnly);
+		var isJreOnly = false;
+		var parser = makeDefaultJavaParser(isJreOnly);
 		return parser;
 	}
 
@@ -115,7 +115,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 			return dirtyCode;
 		}
 
-		String lineEndingChars =
+		var lineEndingChars =
 				LineEnding.getOrGuess(engineProperties.getSourceCode().getLineEndingAsEnum(), () -> cleanCode);
 		Optional<LineEnding> optLineEnding = LineEnding.determineLineEnding(lineEndingChars);
 
@@ -159,7 +159,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 				List<String> sourceLines = p.getSource().getLines();
 				Set<String> unique = sourceLines.stream().distinct().collect(Collectors.toSet());
 				if (unique.size() == 1) {
-					String uniqueTrimmer = unique.iterator().next().trim();
+					var uniqueTrimmer = unique.iterator().next().trim();
 					// if empty: it corresponds to consecutive EOL
 					// if '*': it corresponds to empty rows in a Javadoc
 					if (uniqueTrimmer.isEmpty() || "*".equals(uniqueTrimmer)) {
@@ -199,17 +199,17 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
 		return reflectionTypeSolver;
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
+		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
-		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
+		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
-		JavaParser parser = new JavaParser(configuration);
+		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		var parser = new JavaParser(configuration);
 		return parser;
 	}
 }

@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.language.spotless;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,7 +48,7 @@ public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath, 
 
 		formatters.stream().forEach(f -> {
 
-			Path path = pathAndContent.getPath();
+			var path = pathAndContent.getPath();
 			if (spotlessSession.acceptPath(f, path)) {
 				String spotlessContent;
 				try {

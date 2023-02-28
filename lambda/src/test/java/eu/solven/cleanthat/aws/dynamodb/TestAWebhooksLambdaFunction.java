@@ -66,7 +66,7 @@ public class TestAWebhooksLambdaFunction {
 		Assertions.assertThat(events).hasSize(1);
 
 		Map<String, ?> firstEvent = (Map<String, ?>) events.get(0);
-		IWebhookEvent inputEvent = (IWebhookEvent) firstEvent.get("input");
+		var inputEvent = (IWebhookEvent) firstEvent.get("input");
 		Assertions.assertThat(inputEvent).isInstanceOf(GithubWebhookEvent.class);
 	}
 
@@ -82,7 +82,7 @@ public class TestAWebhooksLambdaFunction {
 		Assertions.assertThat(events).hasSize(1);
 
 		Map<String, ?> firstEvent = (Map<String, ?>) events.get(0);
-		IWebhookEvent inputEvent = (IWebhookEvent) firstEvent.get("input");
+		var inputEvent = (IWebhookEvent) firstEvent.get("input");
 		Assertions.assertThat(inputEvent).isInstanceOf(CleanThatWebhookEvent.class);
 	}
 }

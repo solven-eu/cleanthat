@@ -100,7 +100,7 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 	@Override
 	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		GHRepository repo = pr.getRepository();
-		String fullRefName = getRef();
+		var fullRefName = getRef();
 
 		GHRef ref;
 		try {
@@ -115,7 +115,7 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 	@Override
 	public Optional<String> loadContentForPath(Path path) throws IOException {
 		try {
-			String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), path);
+			var rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), path);
 			return Optional.of(loadContent(pr.getRepository(), rawPath, pr.getHead().getSha()));
 		} catch (GHFileNotFoundException e) {
 			LOGGER.trace("We miss: {}", path, e);

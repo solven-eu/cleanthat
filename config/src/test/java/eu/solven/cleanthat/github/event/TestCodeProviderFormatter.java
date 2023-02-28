@@ -17,9 +17,6 @@ package eu.solven.cleanthat.github.event;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.PathMatcher;
-import java.util.List;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,10 +29,9 @@ public class TestCodeProviderFormatter {
 
 	@Test
 	public void testMatchFile_root_absolute() {
-		List<PathMatcher> matchers =
-				IncludeExcludeHelpers.prepareMatcher(fs, IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA);
+		var matchers = IncludeExcludeHelpers.prepareMatcher(fs, IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA);
 
-		Optional<PathMatcher> matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("/SomeClass.java"));
+		var matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("/SomeClass.java"));
 
 		Assert.assertTrue(matching.isPresent());
 	}
@@ -43,21 +39,20 @@ public class TestCodeProviderFormatter {
 	// In this case, we suppose the issue would be to return a relative path
 	@Test
 	public void testMatchFile_root_relative() {
-		List<PathMatcher> matchers = IncludeExcludeHelpers.prepareMatcher(FileSystems.getDefault(),
+		var matchers = IncludeExcludeHelpers.prepareMatcher(FileSystems.getDefault(),
 				IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA);
 
-		Optional<PathMatcher> matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("SomeClass.java"));
+		var matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("SomeClass.java"));
 
 		Assert.assertTrue(matching.isPresent());
 	}
 
 	@Test
 	public void testMatchFile_subFolder() {
-		List<PathMatcher> matchers = IncludeExcludeHelpers.prepareMatcher(FileSystems.getDefault(),
+		var matchers = IncludeExcludeHelpers.prepareMatcher(FileSystems.getDefault(),
 				IncludeExcludeHelpers.DEFAULT_INCLUDES_JAVA);
 
-		Optional<PathMatcher> matching =
-				IncludeExcludeHelpers.findMatching(matchers, fs.getPath("src/main/java/SomeClass.java"));
+		var matching = IncludeExcludeHelpers.findMatching(matchers, fs.getPath("src/main/java/SomeClass.java"));
 
 		Assert.assertTrue(matching.isPresent());
 	}

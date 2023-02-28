@@ -36,8 +36,8 @@ public class StringFormatterFactory implements IEngineFormatterFactory {
 
 	@Override
 	public IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties) {
-		String language = languageProperties.getEngine();
-		IEngineLintFixerFactory formatter = engineToFormatter.get(language);
+		var language = languageProperties.getEngine();
+		var formatter = engineToFormatter.get(language);
 
 		if (formatter == null) {
 			throw new IllegalArgumentException(

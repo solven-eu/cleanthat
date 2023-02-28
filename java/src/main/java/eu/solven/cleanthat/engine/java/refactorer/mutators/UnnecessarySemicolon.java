@@ -17,19 +17,13 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserStmtMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns `int i = 0;;` into `int i = 0;`
@@ -37,7 +31,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 public class UnnecessarySemicolon extends AJavaParserStmtMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessarySemicolon.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -62,20 +55,19 @@ public class UnnecessarySemicolon extends AJavaParserStmtMutator {
 	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 	@Override
 	protected boolean processNotRecursively(Statement stmt) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(stmt));
 		if (!stmt.isEmptyStmt()) {
 			return false;
 		}
 
-		EmptyStmt emptyStmt = stmt.asEmptyStmt();
+		var emptyStmt = stmt.asEmptyStmt();
 
 		Optional<Node> parentNode = emptyStmt.getParentNode();
 		if (parentNode.isPresent() && parentNode.get() instanceof IfStmt) {
-			IfStmt ifStmt = (IfStmt) parentNode.get();
+			var ifStmt = (IfStmt) parentNode.get();
 
 			if (ifStmt.getThenStmt().equals(emptyStmt) && ifStmt.getElseStmt().isEmpty()) {
 				// Turns `if (l.remove(""));` into `l.remove("");`
-				Expression condition = ifStmt.getCondition();
+				var condition = ifStmt.getCondition();
 
 				// TODO What is the exact rules allowing to convert an expression to a statement?
 				if (condition.isMethodCallExpr()) {

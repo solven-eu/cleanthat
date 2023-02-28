@@ -37,11 +37,11 @@ public class TestCleanthatMetaProperties {
 
 	@Test
 	public void testDefaultConstructor() throws JsonProcessingException {
-		CleanthatMetaProperties p = new CleanthatMetaProperties();
+		var p = new CleanthatMetaProperties();
 
-		String json = objectMapper.writeValueAsString(p);
+		var json = objectMapper.writeValueAsString(p);
 
-		CleanthatMetaProperties backToObject = objectMapper.readValue(json, CleanthatMetaProperties.class);
+		var backToObject = objectMapper.readValue(json, CleanthatMetaProperties.class);
 
 		Assert.assertEquals(p, backToObject);
 		Assertions.assertThat(backToObject.getLabels()).containsExactly("cleanthat");

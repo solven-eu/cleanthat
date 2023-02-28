@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.JavaToken;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
@@ -45,7 +42,6 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Remove imports from a Java source file by analyzing {@link ImportDeclaration}.
@@ -60,7 +56,6 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://github.com/javaparser/javaparser/issues/1590
 // https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java
 public class UnnecessaryImport extends AJavaParserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryImport.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -96,12 +91,11 @@ public class UnnecessaryImport extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof CompilationUnit)) {
 			return false;
 		}
 
-		CompilationUnit compilationUnit = (CompilationUnit) node;
+		var compilationUnit = (CompilationUnit) node;
 
 		NodeList<ImportDeclaration> importDeclarations = compilationUnit.getImports();
 		if (importDeclarations.isEmpty()) {
@@ -162,7 +156,7 @@ public class UnnecessaryImport extends AJavaParserMutator {
 		// Extract referenced class names from parsed javadoc comments:
 		Stream<String> typesInJavadocs = unit.getAllComments()
 				.stream()
-				.filter(c -> c instanceof JavadocComment)
+				.filter(JavadocComment.class::isInstance)
 				.map(JavadocComment.class::cast)
 				.map(JavadocComment::parse)
 				.flatMap(UnnecessaryImport::parseJavadoc);
@@ -188,11 +182,11 @@ public class UnnecessaryImport extends AJavaParserMutator {
 				return false;
 			}
 
-			String[] segments = i.getNameAsString().split("[.]");
+			var segments = i.getNameAsString().split("[.]");
 			if (segments.length == 0) {
 				throw new AssertionError("Parse tree includes invalid import statements");
 			}
-			String lastSegment = segments[segments.length - 1];
+			var lastSegment = segments[segments.length - 1];
 
 			return !tokensInUse.contains(lastSegment);
 		}).collect(Collectors.toList());
@@ -201,10 +195,10 @@ public class UnnecessaryImport extends AJavaParserMutator {
 	// https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java#L366
 	static List<ImportDeclaration> removeSamePackageImports(Collection<ImportDeclaration> imports,
 			Optional<PackageDeclaration> packageDeclaration) {
-		String packageName = packageDeclaration.map(p -> p.getName().toString()).orElse("");
+		var packageName = packageDeclaration.map(p -> p.getName().toString()).orElse("");
 
 		return imports.stream().filter(i -> {
-			String imp = i.getNameAsString();
+			var imp = i.getNameAsString();
 			if (packageName.isEmpty()) {
 				return !imp.contains(".");
 			}

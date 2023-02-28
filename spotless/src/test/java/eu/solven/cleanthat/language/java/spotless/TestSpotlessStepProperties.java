@@ -29,7 +29,7 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 public class TestSpotlessStepProperties {
 	@Test
 	public void testJackson() throws JsonProcessingException {
-		ObjectMapper om = new ObjectMapper();
+		var om = new ObjectMapper();
 
 		SpotlessStepProperties step = SpotlessStepProperties.builder().id("someStepName").build();
 		SpotlessStepParametersProperties parameters = new SpotlessStepParametersProperties();
@@ -46,7 +46,7 @@ public class TestSpotlessStepProperties {
 
 	@Test
 	public void testJackson_lackId() throws JsonProcessingException {
-		ObjectMapper om = new ObjectMapper();
+		var om = new ObjectMapper();
 
 		SpotlessStepProperties step = SpotlessStepProperties.builder().id("someStepName").build();
 		SpotlessStepParametersProperties parameters = new SpotlessStepParametersProperties();

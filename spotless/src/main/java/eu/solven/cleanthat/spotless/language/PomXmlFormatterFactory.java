@@ -59,7 +59,7 @@ public class PomXmlFormatterFactory extends AFormatterFactory {
 	public List<SpotlessStepProperties> exampleSteps() {
 		SpotlessStepProperties sortPom = SpotlessStepProperties.builder().id("sortPom").build();
 		SpotlessStepParametersProperties sortPomParameters = new SpotlessStepParametersProperties();
-		SortPomCfg defaultSortPomConfig = new SortPomCfg();
+		var defaultSortPomConfig = new SortPomCfg();
 		for (Field f : SortPomCfg.class.getFields()) {
 			try {
 				sortPomParameters.putProperty(f.getName(), f.get(defaultSortPomConfig));

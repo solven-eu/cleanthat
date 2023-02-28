@@ -25,9 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties.CleanthatEnginePropertiesBuilder;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
-import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.ASourceCodeFormatterFactory;
 import eu.solven.cleanthat.engine.IEngineStep;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
@@ -52,7 +50,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public String getEngine() {
-		return "java";
+		return "javaparser";
 	}
 
 	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
@@ -61,15 +59,15 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			IEngineProperties engineProperties,
 			CleanthatStepProperties stepProperties) {
 		ILintFixerWithId processor;
-		String stepId = stepProperties.getId();
-		ICleanthatStepParametersProperties parameters = getParameters(stepProperties);
+		var stepId = stepProperties.getId();
+		var parameters = getParameters(stepProperties);
 
 		LOGGER.debug("Processing: {}", stepId);
 
 		switch (stepId) {
 		case JavaRefactorerStep.ID_REFACTORER: {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
-			JavaRefactorer javaRefactorer = new JavaRefactorer(engineProperties, processorConfig);
+			var javaRefactorer = new JavaRefactorer(engineProperties, processorConfig);
 
 			LOGGER.info("Mutators: {}", javaRefactorer.getMutators());
 			processor = javaRefactorer;
@@ -89,7 +87,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 
 	@Override
 	public CleanthatEngineProperties makeDefaultProperties(Set<String> steps) {
-		CleanthatEnginePropertiesBuilder engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
+		var engineBuilder = CleanthatEngineProperties.builder().engine(getEngine());
 
 		if (steps.contains(JavaRefactorerStep.ID_REFACTORER)) {
 			engineBuilder.step(CleanthatStepProperties.builder()

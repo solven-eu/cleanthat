@@ -107,8 +107,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, headSha1);
 		}
 
-		Map<Path, String> pathToCommitableContent =
-				filterOutPathsHavingDiverged(pathToMutatedContent, refName, refTargetSha);
+		var pathToCommitableContent = filterOutPathsHavingDiverged(pathToMutatedContent, refName, refTargetSha);
 
 		if (pathToCommitableContent.isEmpty()) {
 			LOGGER.warn("Due to ref update, there is not a single file to commit");
@@ -134,7 +133,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		allCommitRows.addAll(prComments);
 		allCommitRows.add("eventKey: " + eventKey);
 
-		String commitMessage = allCommitRows.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
+		var commitMessage = allCommitRows.stream().collect(Collectors.joining(CodeProviderFormatter.EOL));
 		GHCommitBuilder preparedCommit =
 				prepareCommit(repo).message(commitMessage).parent(refTargetSha).tree(createdTree.getSha());
 
@@ -165,7 +164,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			return pathToMutatedContent;
 		}
 
-		Path root = pathToMutatedContent.keySet().iterator().next();
+		var root = pathToMutatedContent.keySet().iterator().next();
 
 		Map<Path, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
 		{

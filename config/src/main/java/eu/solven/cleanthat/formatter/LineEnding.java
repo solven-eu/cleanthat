@@ -61,11 +61,11 @@ public enum LineEnding {
 	 */
 	@SuppressWarnings({ "PMD.AvoidReassigningLoopVariables", "PMD.CognitiveComplexity" })
 	public static Optional<LineEnding> determineLineEnding(String fileDataString) {
-		int lfCount = 0;
-		int crCount = 0;
-		int crlfCount = 0;
-		for (int i = 0; i < fileDataString.length(); i++) {
-			char c = fileDataString.charAt(i);
+		var lfCount = 0;
+		var crCount = 0;
+		var crlfCount = 0;
+		for (var i = 0; i < fileDataString.length(); i++) {
+			var c = fileDataString.charAt(i);
 			if (c == '\r') {
 				if ((i + 1) < fileDataString.length() && fileDataString.charAt(i + 1) == '\n') {
 					crlfCount++;

@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +70,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	}
 
 	public static <AST, P> AST parse(AAstRefactorer<AST, P, ?, ?> refactorer, String sourceCode) {
-		P parser = refactorer.makeAstParser();
+		var parser = refactorer.makeAstParser();
 
 		return refactorer.parseSourceCode(parser, sourceCode);
 	}
@@ -86,7 +85,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		// Ensure we compute the compilation-unit only once per String
 		AtomicReference<AST> optCompilationUnit = new AtomicReference<>();
 
-		P parser = makeAstParser();
+		var parser = makeAstParser();
 
 		getRawMutators().forEach(ct -> {
 			LOGGER.debug("Applying {}", ct);
@@ -94,25 +93,26 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			// Fill cache
 			if (optCompilationUnit.get() == null) {
 				try {
-					String sourceCode = refCleanCode.get();
-					AST compilationUnit = parseSourceCode(parser, sourceCode);
+					var sourceCode = refCleanCode.get();
+					var compilationUnit = parseSourceCode(parser, sourceCode);
 					optCompilationUnit.set(compilationUnit);
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
 				}
 			}
 
-			AST compilationUnit = optCompilationUnit.get();
+			var compilationUnit = optCompilationUnit.get();
 			Optional<R> walkNodeResult;
 			try {
 				walkNodeResult = ct.walkAst(compilationUnit);
-			} catch (RuntimeException e) {
+			} catch (RuntimeException | StackOverflowError e) {
+				// StackOverflowError may come from Javaparser
 				throw new IllegalArgumentException("Issue with mutator: " + ct, e);
 			}
 			if (walkNodeResult.isPresent()) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
-				LOGGER.debug("IMutator {} linted (with impact) {}", ct.getClass().getSimpleName());
+				LOGGER.debug("IMutator {} linted (with impact)", ct.getClass().getSimpleName());
 
 				// One relevant change: building source-code from the AST
 				refCleanCode.set(toString(walkNodeResult.get()));
@@ -125,11 +125,11 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	}
 
 	public static List<IMutator> filterRules(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
-		JavaVersion engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
+		var engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
 
-		List<String> includedRules = properties.getIncluded();
-		List<String> excludedRules = properties.getExcluded();
-		boolean includeDraft = properties.isIncludeDraft();
+		var includedRules = properties.getIncluded();
+		var excludedRules = properties.getExcluded();
+		var includeDraft = properties.isIncludeDraft();
 
 		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)
 		return filterRules(engineVersion, includedRules, excludedRules, includeDraft);
@@ -139,7 +139,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			List<String> includedRules,
 			List<String> excludedRules,
 			boolean includeDraft) {
-		List<IMutator> allSingleMutators =
+		var allSingleMutators =
 				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
 		List<? extends IMutator> allCompositeMutators =
 				new AllIncludingDraftCompositeMutators(JavaVersion.parse(IJdkVersionConstants.LAST)).getUnderlyings();
@@ -151,8 +151,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 				.flatMap(m -> m.getIds().stream())
 				.collect(Collectors.toCollection(TreeSet::new));
 
-		List<IMutator> compatibleSingleMutators =
-				new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
+		var compatibleSingleMutators = new AllIncludingDraftSingleMutators(sourceCodeVersion).getUnderlyings();
 		List<? extends IMutator> compatibleCompositeMutators =
 				new AllIncludingDraftCompositeMutators(sourceCodeVersion).getUnderlyings();
 
@@ -163,7 +162,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 				.flatMap(m -> m.getIds().stream())
 				.collect(Collectors.toCollection(TreeSet::new));
 
-		List<IMutator> mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
+		var mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
 			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
 				// We suppose there is no mutator from Composite which is not a single mutator
 				// Hence we return all single mutators
@@ -179,7 +178,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 					return matchingMutators.stream();
 				}
 
-				Optional<IMutator> optFromClassName = loadMutatorFromClass(sourceCodeVersion, includedRule);
+				var optFromClassName = loadMutatorFromClass(sourceCodeVersion, includedRule);
 
 				if (optFromClassName.isPresent()) {
 					return optFromClassName.stream();
@@ -204,12 +203,12 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		}).collect(Collectors.toList());
 
 		// We unroll composite to enable exclusion of included mutators
-		List<IMutator> mutatorsNotComposite = unrollCompositeMutators(mutatorsMayComposite);
+		var mutatorsNotComposite = unrollCompositeMutators(mutatorsMayComposite);
 
 		// TODO '.distinct()' to handle multiple composites bringing the same mutator
 		return mutatorsNotComposite.stream().filter(mutator -> {
-			boolean isExcluded = excludedRules.contains(mutator.getClass().getName())
-					|| excludedRules.stream().anyMatch(excludedRule -> mutator.getIds().contains(excludedRule));
+			var isExcluded = excludedRules.contains(mutator.getClass().getName())
+					|| excludedRules.stream().anyMatch(mutator.getIds()::contains);
 
 			// debug as it seems Spotless instantiate this quite often / for each file
 			if (isExcluded) {
@@ -235,16 +234,15 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	private static Optional<IMutator> loadMutatorFromClass(JavaVersion sourceCodeVersion, String includedRule) {
 		try {
 			// https://www.baeldung.com/java-check-class-exists
-			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-			Class<? extends IMutator> mutatorClass =
-					(Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
+			var classLoader = Thread.currentThread().getContextClassLoader();
+			var mutatorClass = (Class<? extends IMutator>) Class.forName(includedRule, false, classLoader);
 
 			IMutator mutator;
 			if (CompositeMutator.class.isAssignableFrom(mutatorClass)) {
-				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor(JavaVersion.class);
+				var ctor = mutatorClass.getConstructor(JavaVersion.class);
 				mutator = ctor.newInstance(sourceCodeVersion);
 			} else {
-				Constructor<? extends IMutator> ctor = mutatorClass.getConstructor();
+				var ctor = mutatorClass.getConstructor();
 				mutator = ctor.newInstance();
 			}
 
@@ -262,10 +260,10 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	}
 
 	private static List<IMutator> unrollCompositeMutators(List<IMutator> mutatorsMayComposite) {
-		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
+		var mutatorsNotComposite = mutatorsMayComposite;
 
 		// Iterate until all CompositeMutators has been unrolled
-		while (mutatorsNotComposite.stream().anyMatch(m -> m instanceof CompositeMutator)) {
+		while (mutatorsNotComposite.stream().anyMatch(CompositeMutator.class::isInstance)) {
 			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
 				if (m instanceof CompositeMutator) {
 					return ((CompositeMutator<?>) m).getUnderlyings().stream();

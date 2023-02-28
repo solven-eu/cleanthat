@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -170,5 +171,74 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		public void post(List<Runnable> runnables) {
 			runnables.forEach(Runnable::run);
 		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseCastToGeneric {
+		public List<Class<? extends CharSequence>> pre(Stream<? extends Class<?>> s) {
+			return s.map(m -> (Class<? extends CharSequence>) m).collect(Collectors.toList());
+		}
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer;\n" + "\n"
+					+ "import java.util.Map;\n"
+					+ "\n"
+					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
+					+ "\n"
+					+ "	public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "		return map.entrySet().stream().map(e -> e.getKey()).findAny().get();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "",
+			post = "package eu.solven.cleanthat.engine.java.refactorer;\n"
+					+ "\n"
+					+ "import java.util.Map;\n"
+					+ "\n"
+					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
+					+ "\n"
+					+ "    public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "        return map.entrySet().stream().map(java.util.Map.Entry::getKey).findAny().get();\n"
+					+ "    }\n"
+					+ "}\n"
+					+ "")
+	public static class CaseNeedImport {
+	}
+
+	// One may prefer `Map.Entry::getKey` than `Entry::getKey`
+	@CompareCompilationUnitsAsStrings(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer;\n"
+					+ "\n"
+					+ "import java.util.Map;\n"
+					+ "import java.util.Map.Entry;\n"
+					+ "\n"
+					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
+					+ "\n"
+					+ "	public String testRoaringBitmap(Entry<String, ?> e) {\n"
+					+ "		return e.getKey();\n"
+					+ "	}\n"
+					+ "\n"
+					+ "	public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "		return map.entrySet().stream().map(e -> e.getKey()).findAny().get();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "",
+			post = "package eu.solven.cleanthat.engine.java.refactorer;\n"
+					+ "\n"
+					+ "import java.util.Map;\n"
+					+ "import java.util.Map.Entry;\n"
+					+ "\n"
+					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
+					+ "\n"
+					+ "    public String testRoaringBitmap(Entry<String, ?> e) {\n"
+					+ "        return e.getKey();\n"
+					+ "    }\n"
+					+ "\n"
+					+ "    public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "        return map.entrySet().stream().map(Entry::getKey).findAny().get();\n"
+					+ "    }\n"
+					+ "}\n"
+					+ "")
+	public static class CaseAlreadyImported {
 	}
 }

@@ -84,7 +84,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	 * @return a {@link JavaRefactorerProperties} based on {@link AllIncludingDraftSingleMutators}
 	 */
 	public static JavaRefactorerProperties allProductionReady() {
-		JavaRefactorerProperties properties = new JavaRefactorerProperties();
+		var properties = new JavaRefactorerProperties();
 
 		properties.setIncludeDraft(false);
 		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
@@ -98,7 +98,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	 */
 	@Deprecated
 	public static JavaRefactorerProperties allEvenNotProductionReady() {
-		JavaRefactorerProperties properties = new JavaRefactorerProperties();
+		var properties = new JavaRefactorerProperties();
 
 		properties.setIncludeDraft(true);
 		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));

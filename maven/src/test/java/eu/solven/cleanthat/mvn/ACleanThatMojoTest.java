@@ -55,7 +55,7 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 		FileUtils.copyDirectory(readOnlyFolder, readWriteFolder);
 
 		// We need a pom to execute the Mojo (i.e. it is difficult to test the markdown-only case)
-		File pom = new File(readWriteFolder, "pom.xml");
+		var pom = new File(readWriteFolder, "pom.xml");
 		assertNotNull(pom);
 		assertTrue(pom.exists());
 
@@ -63,7 +63,7 @@ public abstract class ACleanThatMojoTest extends AbstractMojoTestCase {
 		MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
 
 		{
-			Properties userProperties = new Properties();
+			var userProperties = new Properties();
 			// Unclear why this is not setup by default test-harness
 			userProperties.setProperty("maven.multiModuleProjectDirectory", readWriteFolder.getAbsolutePath());
 			executionRequest.setUserProperties(userProperties);

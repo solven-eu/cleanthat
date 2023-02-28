@@ -55,7 +55,7 @@ public class SpringJavaStyleEnforcer implements ILintFixerWithId {
 	@Override
 	public String doFormat(String code) throws IOException {
 		try {
-			Formatter formatter = new Formatter();
+			var formatter = new Formatter();
 
 			TextEdit edit = formatter.format(code);
 

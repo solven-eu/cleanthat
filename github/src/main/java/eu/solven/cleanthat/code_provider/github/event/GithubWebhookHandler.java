@@ -67,7 +67,6 @@ import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitPrHeadRef;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
-import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
 import eu.solven.cleanthat.codeprovider.git.IExternalWebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
@@ -234,7 +233,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
-		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
+		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 
 		ResultOrError<GithubAndToken, WebhookRelevancyResult> optToken = makeInstallationGithub(installationId);
 		if (optToken.getOptError().isPresent()) {
@@ -250,7 +249,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		GHRepository baseRepo = baseRepoOrError.getOptResult().get();
 
-		GitRepoBranchSha1 pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
+		var pushedRefOrRrHead = offlineResult.optPushedRefOrRrHead().get();
 
 		String eventKey = githubEvent.getxGithubDelivery();
 		Optional<GHCheckRun> optCheckRun =
@@ -273,7 +272,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					eventKey);
 
 			optCheckRun.ifPresent(checkRun -> {
-				Optional<String> optRejectedReason = result.optRejectedReason();
+				var optRejectedReason = result.optRejectedReason();
 
 				try {
 					if (optRejectedReason.isPresent()) {
@@ -313,15 +312,15 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHRepository baseRepo,
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			String eventKey) {
-		Optional<GitPrHeadRef> optOpenPr = offlineResult.optOpenPr();
+		var optOpenPr = offlineResult.optOpenPr();
 
 		ResultOrError<GitRepoBranchSha1, WebhookRelevancyResult> optHead =
 				checkRefCleanabilityAsHead(baseRepo, pushedRefOrRrHead, optOpenPr);
 		if (optHead.getOptError().isPresent()) {
 			return optHead.getOptError().get();
 		}
-		GitRepoBranchSha1 dirtyHeadRef = optHead.getOptResult().get();
-		Optional<String> optHeadSha1 = Optional.of(dirtyHeadRef.getSha());
+		var dirtyHeadRef = optHead.getOptResult().get();
+		var optHeadSha1 = Optional.of(dirtyHeadRef.getSha());
 		if (optHeadSha1.isEmpty()) {
 			throw new IllegalStateException("Should not happen");
 		}
@@ -338,7 +337,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				return WebhookRelevancyResult.dismissed("Issue guessing the default branch");
 			}
 
-			String pushedRef = offlineResult.optBaseRef().get().getRef();
+			var pushedRef = offlineResult.optBaseRef().get().getRef();
 			if (pushedRef.equals(CleanthatRefFilterProperties.BRANCHES_PREFIX + defaultBranch.getName())) {
 				LOGGER.debug("About to consider creating a default configuration for {} (as default branch)",
 						pushedRef);
@@ -360,8 +359,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		// BEWARE this branch may not exist: either it is a cleanthat branch yet to create. Or it may be deleted in
 		// the meantime (e.g. merged+deleted before cleanthat doing its work)
-		Optional<HeadAndOptionalBase> refToClean =
-				cleaner.prepareRefToClean(root, eventKey, offlineResult, dirtyHeadRef, relevantBaseBranches);
+		var refToClean = cleaner.prepareRefToClean(root, eventKey, offlineResult, dirtyHeadRef, relevantBaseBranches);
 		if (refToClean.isEmpty()) {
 			return WebhookRelevancyResult.dismissed(
 					"After looking deeper, this event seems not relevant (e.g. no configuration, or forked|readonly head)");
@@ -392,7 +390,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			// e.g. a given RR may want to remain neat, and not impacted by a change of configuration in the head
 			// WRONG: Here, we are looking for PR merging the pushed branch into some cleanable branch
 			// i.e. this is a push to a PR head, we are looking for the PR reference.
-			String ref = pushedRefOrRrHead.getRef();
+			var ref = pushedRefOrRrHead.getRef();
 
 			LOGGER.info("Search for a PR with head the commited branch (head={})", ref);
 			try {
@@ -441,7 +439,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 		}
 		// We suppose this is always the same as the base repository id
-		long baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
+		var baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
 		GHRepository baseRepo;
 		try {
 			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
@@ -456,10 +454,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GitRepoBranchSha1 pushedRefOrRrHead,
 			Optional<GitPrHeadRef> optOpenPr) {
 		if (optOpenPr.isPresent()) {
-			String rawPrNumber = String.valueOf(optOpenPr.get().getId());
+			var rawPrNumber = String.valueOf(optOpenPr.get().getId());
 			GHPullRequest optPr;
 			try {
-				int prNumberAsInteger = Integer.parseInt(rawPrNumber);
+				var prNumberAsInteger = Integer.parseInt(rawPrNumber);
 				optPr = eventRepo.getPullRequest(prNumberAsInteger);
 			} catch (GHFileNotFoundException e) {
 				LOGGER.debug("PR does not exists. Closed?", e);
@@ -484,7 +482,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 								+ headRepoFullname));
 			}
 		}
-		String refToClean = pushedRefOrRrHead.getRef();
+		var refToClean = pushedRefOrRrHead.getRef();
 		try {
 			new GithubRepositoryFacade(eventRepo).getRef(refToClean);
 		} catch (GHFileNotFoundException e) {
@@ -510,7 +508,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
 			throw new IllegalArgumentException("We should have rejected this earlier");
 		}
-		WebhookRelevancyResult relevancyResult =
+		var relevancyResult =
 				filterWebhookEventTargetRelevantBranch(root, cleanerFactory, githubAndBranchAcceptedEvent);
 		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
@@ -518,16 +516,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = externalCodeEvent.getBody();
-		long installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
+		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId).getOptResult().get();
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
 		String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();
 
 		Optional<GHCheckRun> optCheckRun;
-		Optional<GitRepoBranchSha1> optHead = offlineResult.optPushedRefOrRrHead();
+		var optHead = offlineResult.optPushedRefOrRrHead();
 		if (optHead.isPresent()) {
-			String sha1 = optHead.get().getSha();
+			var sha1 = optHead.get().getSha();
 			optCheckRun = githubCheckRunManager.createCheckRun(githubAuthAsInst, repo, sha1, eventKey);
 		} else {
 			optCheckRun = Optional.empty();
@@ -577,8 +575,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			GHRepository repo,
 			GithubRepositoryFacade facade,
 			AtomicReference<GitRepoBranchSha1> refLazyRefCreated) {
-		GitRepoBranchSha1 refToProcess = relevancyResult.optHeadToClean().get();
-		String refName = refToProcess.getRef();
+		var refToProcess = relevancyResult.optHeadToClean().get();
+		var refName = refToProcess.getRef();
 
 		checkBranchProtection(repo, refName);
 
@@ -657,7 +655,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// TODO Should we refuse, under any circumstances, to write to a baseBranch?
 		// Or to any protected branch?
 		if (refName.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
-			String branchName = refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
+			var branchName = refName.substring(CleanthatRefFilterProperties.BRANCHES_PREFIX.length());
 
 			if (branchName.startsWith(ICleanthatGitRefsConstants.REF_DOMAIN_CLEANTHAT_WITH_TRAILING_SLASH)) {
 				LOGGER.info(

@@ -91,8 +91,8 @@ public class FormatterFactory {
 				REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
 				LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());
 			} else {
-				String rawPathM2Repository = System.getProperty(PATH_M2_REPO);
-				Path pathM2Repository = Path.of(rawPathM2Repository);
+				var rawPathM2Repository = System.getProperty(PATH_M2_REPO);
+				var pathM2Repository = Path.of(rawPathM2Repository);
 				REF_LOCALREPO.compareAndSet(null, pathM2Repository);
 				LOGGER.info("We reuse local m2repository: {}", REF_LOCALREPO.get());
 			}

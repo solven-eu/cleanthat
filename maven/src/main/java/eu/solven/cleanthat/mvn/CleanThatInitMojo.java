@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
@@ -85,7 +84,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		classes.add(ConfigSpringConfig.class);
 		classes.add(CodeProviderHelpers.class);
 
-		// Needed to generate default configuration given all knowns languages
+		// Needed to generate default configuration given all known languages
 		classes.add(AllEnginesSpringConfig.class);
 
 		return classes;
@@ -94,17 +93,11 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	@Override
 	public void doClean(ApplicationContext appContext) throws MojoFailureException, IOException {
 		// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java#L324
-		if (isRunOnlyAtRoot()) {
-			if (getProject().isExecutionRoot()) {
-				getLog().debug("We are, as expected, at executionRoot");
-			} else {
-				// This will check it is called only if the command is run from the project root.
-				// However, it will not prevent the plugin to be called on each module
-				getLog().info("maven-cleanthat-plugin:cleanthat skipped (not project root)");
-				return;
-			}
-		} else {
-			getLog().debug("Not required to be executed at root");
+		if (isRunOnlyAtRoot() && !isThisTheExecutionRoot()) {
+			// This will check it is called only if the command is run from the project root.
+			// However, it will not prevent the plugin to be called on each module
+			getLog().info("maven-cleanthat-plugin:" + MOJO_INIT + " skipped (not project root)");
+			return;
 		}
 
 		Path configPathFile = getMayNotExistRepositoryConfigPath();
@@ -118,7 +111,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = new FileSystemGitCodeProvider(getBaseDir().toPath());
 
-		GenerateInitialConfig generateInitialConfig =
+		var generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());
 		EngineInitializerResult properties;
 		try {
@@ -133,7 +126,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 
 		Map<Path, String> pathToContent = new LinkedHashMap<>();
 
-		Path root = codeProvider.getRepositoryRoot();
+		var root = codeProvider.getRepositoryRoot();
 		properties.getPathToContents()
 				.forEach((k, v) -> pathToContent.put(CleanthatPathHelpers.makeContentPath(root, k), v));
 
@@ -141,7 +134,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {
-		boolean isValid = true;
+		var isValid = true;
 
 		MavenProject project = getProject();
 		if (project == null || project.getBasedir() == null) {
@@ -175,7 +168,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 	}
 
 	public void writeConfiguration(Path configPathFile, CleanthatRepositoryProperties properties) throws IOException {
-		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+		var yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
 		String asYaml;
 		try {
 			asYaml = yamlObjectMapper.writeValueAsString(properties);

@@ -17,7 +17,6 @@ package eu.solven.cleanthat.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -70,9 +69,9 @@ public class ITGithub {
 	private static final String SOLVEN_EU_SPRING_BOOT = "solven-eu/spring-boot";
 
 	static PrivateKey get(String filename) throws Exception {
-		byte[] keyBytes = Files.toByteArray(new File(filename));
-		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-		KeyFactory kf = KeyFactory.getInstance("RSA");
+		var keyBytes = Files.toByteArray(new File(filename));
+		var spec = new PKCS8EncodedKeySpec(keyBytes);
+		var kf = KeyFactory.getInstance("RSA");
 		return kf.generatePrivate(spec);
 	}
 
@@ -101,7 +100,7 @@ public class ITGithub {
 			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());
 		});
 
-		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9086720).getOptResult().get();
+		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9_086_720).getOptResult().get();
 
 		// Own repo
 		GithubFacade ownRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT);
@@ -136,7 +135,7 @@ public class ITGithub {
 					itsRepo.getRef(IGitRefsConstants.BRANCHES_PREFIX + "master"),
 					"ITGithub");
 
-			FileSystem fs = Jimfs.newFileSystem();
+			var fs = Jimfs.newFileSystem();
 			GithubBranchCodeProvider codeProvider = new GithubBranchCodeProvider(fs.getPath(fs.getSeparator()),
 					gitHubInstallation.getToken(),
 					itsRepo.getRepository(),

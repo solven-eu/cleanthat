@@ -64,13 +64,13 @@ public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
 	}
 
 	public String flushLogs() {
-		StringBuilder sb = new StringBuilder();
+		var sb = new StringBuilder();
 
 		TL_LOGS.get().forEach(bytes -> sb.append(new String(bytes, StandardCharsets.UTF_8)));
 
 		TL_LOGS.get().clear();
 
-		String asString = sb.toString();
+		var asString = sb.toString();
 		LOGGER.debug("We cleared the log buffer after a flush ({} chars)", asString.length());
 		return asString;
 	}

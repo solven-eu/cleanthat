@@ -27,7 +27,6 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns '{}' into ''
@@ -71,13 +70,12 @@ public class EmptyControlStatement extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof BlockStmt)) {
 			return false;
 		}
-		BlockStmt blockStmt = (BlockStmt) node;
+		var blockStmt = (BlockStmt) node;
 
-		boolean removed = false;
+		var removed = false;
 
 		// We loop as an empty statement may be wrapped in a (yet-to-come) empty statement
 		while (true) {
@@ -107,8 +105,7 @@ public class EmptyControlStatement extends AJavaParserMutator {
 			LOGGER.debug("Encountered an empty initializer in an anonymous class?");
 
 			if (blockStmt.getParentNode().get() instanceof InitializerDeclaration) {
-				InitializerDeclaration parentInitializerDeclaration =
-						(InitializerDeclaration) blockStmt.getParentNode().get();
+				var parentInitializerDeclaration = (InitializerDeclaration) blockStmt.getParentNode().get();
 
 				removed |= parentInitializerDeclaration.remove();
 			}

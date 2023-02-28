@@ -35,16 +35,16 @@ import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
- * Migrate from JUnit4 to JUnit5/Jupiter
+ * Migrate from JUnit4 to JUnit5/Jupiter.
+ * 
+ * We may better invest on OpenRewrite for a full-fledged JUnit4->JUnit5 migration
  *
  * @author Benoit Lacelle
  */
@@ -88,7 +88,7 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 
 	@Override
 	public boolean walkAstHasChanged(Node tree) {
-		AtomicBoolean transformed = new AtomicBoolean(false);
+		var transformed = new AtomicBoolean(false);
 
 		if (super.walkAstHasChanged(tree)) {
 			transformed.set(true);
@@ -96,11 +96,11 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 
 		// Remove JUnit4 imports only after having processed the annotations, else they can not be resolved
 		if (tree instanceof CompilationUnit) {
-			CompilationUnit compilationUnit = (CompilationUnit) tree;
+			var compilationUnit = (CompilationUnit) tree;
 
 			// https://medium.com/@GalletVictor/migration-from-junit-4-to-junit-5-d8fe38644abe
 			compilationUnit.getImports().forEach(importNode -> {
-				String importName = importNode.getName().asString();
+				var importName = importNode.getName().asString();
 				Optional<String> optMigratedName = computeNewName(importName);
 
 				if (optMigratedName.isPresent()) {
@@ -116,9 +116,7 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
-		boolean localTransformed = false;
+		var localTransformed = false;
 
 		if (node instanceof AnnotationExpr) {
 			localTransformed = processAnnotation((AnnotationExpr) node);
@@ -158,21 +156,21 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 			LOGGER.debug("We were not able to resolve annotation: {}", annotation);
 			return false;
 		}
-		String qualifiedName = resolvedAnnotation.getQualifiedName();
+		var qualifiedName = resolvedAnnotation.getQualifiedName();
 
 		Optional<String> optMigratedName = computeNewName(qualifiedName);
 
-		boolean localTransformed = false;
+		var localTransformed = false;
 		if (optMigratedName.isPresent()) {
 			localTransformed = true;
 
-			String migratedName = optMigratedName.get();
+			var migratedName = optMigratedName.get();
 			if (annotation.getName().asString().indexOf('.') >= 0) {
 				// The existing name is fully qualified
 				annotation.setName(migratedName);
 			} else {
 				// The existing name is the simple className
-				int lastDot = migratedName.lastIndexOf('.');
+				var lastDot = migratedName.lastIndexOf('.');
 				if (lastDot < 0) {
 					// No dot: the class is in the root package
 					annotation.setName(migratedName);
@@ -190,31 +188,30 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 			// TODO Document when this would happen
 			return false;
 		}
-		Expression scope = optScope.get();
+		var scope = optScope.get();
 		Optional<ResolvedType> type = optResolvedType(scope);
 
 		if (type.isPresent() && type.get().isReferenceType()) {
-			ResolvedReferenceType referenceType = type.get().asReferenceType();
+			var referenceType = type.get().asReferenceType();
 
-			String oldQualifiedName = referenceType.getQualifiedName();
+			var oldQualifiedName = referenceType.getQualifiedName();
 			Optional<String> optNewName = computeNewName(oldQualifiedName);
 			if (optNewName.isPresent()) {
-				String newQualifiedName = optNewName.get();
+				var newQualifiedName = optNewName.get();
 
 				// JUnit5 imports are not added yet: check import status based on JUnit4 imports
 				// see com.github.javaparser.ast.CompilationUnit.addImport(ImportDeclaration)
-				CompilationUnit compilationUnit = methodCall.findAncestor(CompilationUnit.class).get();
-				boolean imported = isImported(compilationUnit, new ImportDeclaration(newQualifiedName, false, false));
+				var compilationUnit = methodCall.findAncestor(CompilationUnit.class).get();
+				var imported = isImported(compilationUnit, new ImportDeclaration(newQualifiedName, false, false));
 
 				NameExpr newScope;
 				if (imported) {
-					String newSimpleName = newQualifiedName.substring(newQualifiedName.lastIndexOf('.') + 1);
+					var newSimpleName = newQualifiedName.substring(newQualifiedName.lastIndexOf('.') + 1);
 					newScope = new NameExpr(newSimpleName);
 				} else {
 					newScope = new NameExpr(newQualifiedName);
 				}
-				MethodCallExpr replacement =
-						new MethodCallExpr(newScope, methodCall.getNameAsString(), methodCall.getArguments());
+				var replacement = new MethodCallExpr(newScope, methodCall.getNameAsString(), methodCall.getArguments());
 				return methodCall.replace(replacement);
 			}
 		}
@@ -243,7 +240,7 @@ public class JUnit4ToJUnit5 extends AJavaParserMutator {
 			}
 			if (compilationUnit.getPackageDeclaration().isPresent()) {
 				// the import is within the same package
-				Name currentPackageName = compilationUnit.getPackageDeclaration().get().getName();
+				var currentPackageName = compilationUnit.getPackageDeclaration().get().getName();
 				return currentPackageName.equals(importPackageName.get());
 			}
 			return false;

@@ -72,7 +72,7 @@ public final class CleanthatMetaProperties {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		CleanthatMetaProperties other = (CleanthatMetaProperties) obj;
+		var other = (CleanthatMetaProperties) obj;
 		return Objects.equals(labels, other.labels) && Objects.equals(refs, other.refs);
 	}
 

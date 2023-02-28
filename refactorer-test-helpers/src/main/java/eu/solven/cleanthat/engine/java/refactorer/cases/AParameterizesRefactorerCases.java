@@ -29,9 +29,7 @@ import org.junit.runners.Parameterized;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
@@ -69,18 +67,18 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 
 	// Duplicated from JavaRefactorer
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
+		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
-		JavaSymbolSolver symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
+		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		ParserConfiguration configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
-		JavaParser parser = new JavaParser(configuration);
+		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		var parser = new JavaParser(configuration);
 		return parser;
 	}
 
 	// Duplicated from JavaRefactorer
 	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
-		ReflectionTypeSolver reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
+		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
 		return reflectionTypeSolver;
 	}
 
@@ -88,12 +86,12 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		String path = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
 		JavaParser javaParser = makeDefaultJavaParser(testCases.getTransformer().isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(path).getResult().get();
+		var compilationUnit = javaParser.parse(path).getResult().get();
 
 		List<Object[]> individualCases = new ArrayList<>();
 
 		getAllCases(compilationUnit).stream()
-				.map(t -> new Object[] { javaParser, t.getName().toString(), t })
+				.map(t -> new Object[] { javaParser, t.getNameAsString().toString(), t })
 				.forEach(individualCases::add);
 
 		return individualCases;
@@ -112,7 +110,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
 		IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
-		boolean atLeastOnetest = false;
+		var atLeastOnetest = false;
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {
 			atLeastOnetest |= true;
 			doTestMethod(transformer, testCase);
@@ -193,11 +191,10 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 	}
 
 	private Class<?> loadTestCaseRealClass() {
-		ResolvedReferenceTypeDeclaration resolved = testCase.resolve();
+		var resolved = testCase.resolve();
 		// JavaParser does not print the '$' of nested qualified classname
 		// https://github.com/javaparser/javaparser/issues/1518
-		String qualifiedClassName =
-				resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
+		var qualifiedClassName = resolved.getPackageName() + "." + resolved.getClassName().replaceFirst("\\.", "\\$");
 		Class<?> realTestCase;
 		try {
 			realTestCase = Class.forName(qualifiedClassName);

@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,7 +60,7 @@ public class ITGithubBranchCodeProvider {
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = cleanthatRepo.getBranch("master");
 
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 		GithubSha1CodeProviderHelper codeProvider =
 				new GithubBranchCodeProvider(fs.getPath("/"), githubForRepo.getToken(), cleanthatRepo, masterBranch)
 						.getHelper();

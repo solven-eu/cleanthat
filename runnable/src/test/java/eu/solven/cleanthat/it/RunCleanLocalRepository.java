@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.it;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.FileSystemResource;
@@ -36,7 +34,6 @@ import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
 
@@ -63,18 +60,18 @@ public class RunCleanLocalRepository extends ACleanThatXxxApplication {
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		// One can adjust this to any local folder
-		Path repoFolder = Paths.get(System.getProperty("user.home"), "workspace3", "spring-boot");
+		var repoFolder = Paths.get(System.getProperty("user.home"), "workspace3", "spring-boot");
 
 		LOGGER.info("About to process {}", repoFolder);
 
-		ICodeProviderWriter codeProvider = makeCodeProvider(repoFolder);
+		var codeProvider = makeCodeProvider(repoFolder);
 
-		ApplicationContext appContext = event.getApplicationContext();
+		var appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
-		File pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder).get();
+		var pathToConfig = CodeProviderHelpers.pathToConfig(repoFolder).get();
 
-		ConfigHelpers configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
-		CleanthatRepositoryProperties properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
+		var configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
+		var properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
 
 		codeProviderFormatter.formatCode(properties, codeProvider, false);
 	}

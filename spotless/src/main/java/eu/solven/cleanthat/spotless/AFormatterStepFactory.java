@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Collection;
@@ -30,8 +29,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import org.springframework.core.io.Resource;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
@@ -174,22 +171,22 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 	public abstract FormatterStep makeSpecializedStep(SpotlessStepProperties s, Provisioner provisioner);
 
 	protected File locateFile(String stylesheetFile) throws IOException {
-		Resource resource = CleanthatUrlLoader.loadUrl(codeProvider, stylesheetFile);
+		var resource = CleanthatUrlLoader.loadUrl(codeProvider, stylesheetFile);
 
 		if (resource.isFile()) {
 			return resource.getFile();
 		}
 
-		byte[] content = ByteStreams.toByteArray(resource.getInputStream());
+		var content = ByteStreams.toByteArray(resource.getInputStream());
 
 		File locatedFile;
 		try {
 			locatedFile = CONTENT_TO_FILE.get(Base64.getEncoder().encodeToString(content), () -> {
-				String fileExt = com.google.common.io.Files.getFileExtension(stylesheetFile);
-				Path tmpFileAsPath = Files.createTempFile("cleanthat-spotless-", "." + fileExt);
+				var fileExt = com.google.common.io.Files.getFileExtension(stylesheetFile);
+				var tmpFileAsPath = Files.createTempFile("cleanthat-spotless-", "." + fileExt);
 
 				Files.copy(resource.getInputStream(), tmpFileAsPath, StandardCopyOption.REPLACE_EXISTING);
-				File tmpFile = tmpFileAsPath.toFile();
+				var tmpFile = tmpFileAsPath.toFile();
 				tmpFile.deleteOnExit();
 
 				return tmpFile;
@@ -217,7 +214,7 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 				throw new IllegalArgumentException("Can not set both 'file' and 'content'");
 			}
 
-			byte[] fileBytes = PepperResourceHelper.loadAsBinary(CleanthatUrlLoader.loadUrl(codeProvider, file));
+			var fileBytes = PepperResourceHelper.loadAsBinary(CleanthatUrlLoader.loadUrl(codeProvider, file));
 			content = new String(fileBytes, StandardCharsets.UTF_8);
 		} else {
 			content = parameters.getCustomProperty("content", String.class);
@@ -225,7 +222,7 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 		// Enable with next Spotless version
 		// String skipLinesMatching = s.getCustomProperty("skipLinesMatching", String.class);
 
-		YearMode yearMode = YearMode.PRESERVE;
+		var yearMode = YearMode.PRESERVE;
 		return LicenseHeaderStep.headerDelimiter(() -> content, delimiter)
 				.withYearMode(yearMode)
 				// .withSkipLinesMatching(skipLinesMatching)

@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.it;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
@@ -77,7 +74,7 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
-		ApplicationContext appContext = event.getApplicationContext();
+		var appContext = event.getApplicationContext();
 		GithubWebhookHandlerFactory factory = appContext.getBean(GithubWebhookHandlerFactory.class);
 		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
 
@@ -101,9 +98,9 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 		GHBranch defaultBranch = GithubHelper.getDefaultBranch(repo);
 		GHBranch consideredBranch = defaultBranch;
 
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 
-		Path repositoryRoot = fs.getPath(fs.getSeparator());
+		var repositoryRoot = fs.getPath(fs.getSeparator());
 		ICodeProvider codeProvider =
 				new GithubBranchCodeProvider(repositoryRoot, githubAndToken.getToken(), repo, defaultBranch);
 

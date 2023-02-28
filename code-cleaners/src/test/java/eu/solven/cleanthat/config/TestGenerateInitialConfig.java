@@ -25,17 +25,16 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 
 public class TestGenerateInitialConfig {
 	@Test
 	public void testGenerateDefaultConfig_empty() throws IOException {
 		IEngineLintFixerFactory factory = Mockito.mock(IEngineLintFixerFactory.class);
-		GenerateInitialConfig generator = new GenerateInitialConfig(Arrays.asList(factory));
+		var generator = new GenerateInitialConfig(Arrays.asList(factory));
 
 		ICodeProvider codeProvider = Mockito.mock(ICodeProvider.class);
-		CleanthatRepositoryProperties config = generator.prepareDefaultConfiguration(codeProvider).getRepoProperties();
+		var config = generator.prepareDefaultConfiguration(codeProvider).getRepoProperties();
 
 		Assertions.assertThat(config.getSourceCode().getIncludes()).isEmpty();
 		Assertions.assertThat(config.getSourceCode().getExcludes()).isEmpty();
@@ -44,13 +43,13 @@ public class TestGenerateInitialConfig {
 	@Test
 	public void testGenerateDefaultConfig_mvnWrapper() throws IOException {
 		IEngineLintFixerFactory factory = Mockito.mock(IEngineLintFixerFactory.class);
-		GenerateInitialConfig generator = new GenerateInitialConfig(Arrays.asList(factory));
+		var generator = new GenerateInitialConfig(Arrays.asList(factory));
 
 		ICodeProvider codeProvider = Mockito.mock(ICodeProvider.class);
 		Mockito.when(codeProvider.loadContentForPath(Paths.get("/.mvn/wrapper/maven-wrapper.properties")))
 				.thenReturn(Optional.of("somePropertiesFileContent"));
 
-		CleanthatRepositoryProperties config = generator.prepareDefaultConfiguration(codeProvider).getRepoProperties();
+		var config = generator.prepareDefaultConfiguration(codeProvider).getRepoProperties();
 
 		Assertions.assertThat(config.getSourceCode().getIncludes()).isEmpty();
 		Assertions.assertThat(config.getSourceCode().getExcludes()).isEmpty();

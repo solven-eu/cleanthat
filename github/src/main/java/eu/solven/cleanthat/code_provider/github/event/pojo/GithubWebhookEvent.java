@@ -104,9 +104,9 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 		}
 
 		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, KEY_GITHUB, "headers");
-		String xGithubEvent = PepperMapHelper.getOptionalString(headers, "X-GitHub-Event").orElse("");
-		String xGithubDelivery = PepperMapHelper.getOptionalString(headers, X_GIT_HUB_DELIVERY).orElse("");
-		String xGithubSignature256 = PepperMapHelper.getOptionalString(headers, "X-GitHub-Signature-256").orElse("");
+		var xGithubEvent = PepperMapHelper.getOptionalString(headers, "X-GitHub-Event").orElse("");
+		var xGithubDelivery = PepperMapHelper.getOptionalString(headers, X_GIT_HUB_DELIVERY).orElse("");
+		var xGithubSignature256 = PepperMapHelper.getOptionalString(headers, "X-GitHub-Signature-256").orElse("");
 
 		return new GithubWebhookEvent(xGithubEvent,
 				xGithubDelivery,

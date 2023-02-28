@@ -30,7 +30,6 @@ import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
-import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 
 /**
@@ -71,7 +70,7 @@ public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-		CodeFormatResult result = codeCleaner.formatCodeGivenConfig("CleanThatCheckMojo", codeProvider, true);
+		var result = codeCleaner.formatCodeGivenConfig("CleanThatCheckMojo", codeProvider, true);
 
 		if (result.isEmpty()) {
 			result.getDetails().forEach((k, v) -> LOGGER.info("Some path needs cleaning: {} - {}", k, v));

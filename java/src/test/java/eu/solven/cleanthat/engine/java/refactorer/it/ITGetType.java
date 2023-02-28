@@ -27,16 +27,11 @@ import org.junit.Test;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
@@ -60,7 +55,7 @@ public class ITGetType {
 	public static class ReferStaticFieldAsStatic {
 
 		public Object post(String lang) {
-			String constant = ITGetType.SOME_STATIC_CONSTANT;
+			var constant = ITGetType.SOME_STATIC_CONSTANT;
 			return lang.equals(constant);
 		}
 	}
@@ -69,7 +64,7 @@ public class ITGetType {
 	public static class ReferStaticFieldAsField {
 
 		public Object post(String lang) {
-			String constant = new ITGetType().SOME_STATIC_CONSTANT;
+			var constant = new ITGetType().SOME_STATIC_CONSTANT;
 			return lang.equals(constant);
 		}
 	}
@@ -78,7 +73,7 @@ public class ITGetType {
 	public static class ReferFieldAsField {
 
 		public Object post(String lang) {
-			String constant = new ITGetType().someConstant;
+			var constant = new ITGetType().someConstant;
 			return lang.equals(constant);
 		}
 	}
@@ -93,12 +88,12 @@ public class ITGetType {
 	// https://github.com/javaparser/javaparser/issues/1506
 	@Test
 	public void testResolveType() throws IOException {
-		File file = new File("src/test/java/" + ITGetType.class.getName().replace(".", "/") + ".java");
+		var file = new File("src/test/java/" + ITGetType.class.getName().replace(".", "/") + ".java");
 		if (!file.isFile()) {
 			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
 		}
-		String pathAsString = Files.readString(file.toPath());
-		CompilationUnit tree = parser.parse(pathAsString).getResult().get();
+		var pathAsString = Files.readString(file.toPath());
+		var tree = parser.parse(pathAsString).getResult().get();
 
 		tree.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
 			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
@@ -112,20 +107,19 @@ public class ITGetType {
 					if (!(node instanceof MethodCallExpr)) {
 						return;
 					}
-					MethodCallExpr methodCall = (MethodCallExpr) node;
+					var methodCall = (MethodCallExpr) node;
 					if (!methodCall.toString().contains("equals")) {
 						return;
 					}
 
-					Expression arg0 = methodCall.getArgument(0);
+					var arg0 = methodCall.getArgument(0);
 					if (arg0.isNameExpr()) {
-						NameExpr nameExpr = arg0.asNameExpr();
-						ResolvedValueDeclaration resolved = nameExpr.resolve();
+						var nameExpr = arg0.asNameExpr();
+						var resolved = nameExpr.resolve();
 						System.out.println(resolved);
 
 						if (resolved instanceof JavaParserVariableDeclaration) {
-							VariableDeclarator declarator =
-									((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
+							var declarator = ((JavaParserVariableDeclaration) resolved).getVariableDeclarator();
 
 							// 'constant = ITGetType.SOME_CONSTANT'
 							System.out.println(declarator);
@@ -133,9 +127,9 @@ public class ITGetType {
 								// 'ITGetType.SOME_CONSTANT'
 								System.out.println(expr);
 
-								FieldAccessExpr fae = (FieldAccessExpr) expr;
+								var fae = (FieldAccessExpr) expr;
 
-								ResolvedValueDeclaration rvd = fae.resolve();
+								var rvd = fae.resolve();
 
 								System.out.println(rvd.asField().isStatic());
 
@@ -151,35 +145,35 @@ public class ITGetType {
 	@Test
 	public void testResolveType_LeanerStyle() {
 		// Source code
-		String sourceCode = Stream.of("public class A {                                                     ",
+		var sourceCode = Stream.of("public class A {                                                     ",
 				"            public Object post(String lang) {",
 				"                return o.startsWith(Locale.FRANCE.getCountry());",
 				"        }",
 				"    }").collect(Collectors.joining(System.lineSeparator()));
 
-		CompilationUnit cu = parser.parse(sourceCode).getResult().get();
+		var cu = parser.parse(sourceCode).getResult().get();
 
 		cu.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
 			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
 			if (preMethods.size() != 1) {
 				return;
 			}
-			MethodDeclaration md = preMethods.get(0);
+			var md = preMethods.get(0);
 
 			md.walk(node -> {
 				if (!(node instanceof MethodCallExpr)) {
 					return;
 				}
-				MethodCallExpr methodCall = (MethodCallExpr) node;
+				var methodCall = (MethodCallExpr) node;
 				if (!methodCall.getOrphanComments().toString().contains("Locale.FRANCE")) {
 					return;
 				}
 
 				Optional<Expression> optScope = methodCall.getScope();
 
-				Expression scope = optScope.get();
+				var scope = optScope.get();
 
-				ResolvedType type = scope.calculateResolvedType(); // 2 - this is how to solve the type
+				var type = scope.calculateResolvedType(); // 2 - this is how to solve the type
 
 				System.out.println(type.describe());
 			});

@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
@@ -33,67 +31,57 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInCompar
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
+	final IJavaparserMutator mutator = new LiteralsFirstInComparisons();
 
 	// Cannot keep element because we reached the end of nodetext
 	@Test
 	public void testIssueWithFile() throws IOException {
-		Resource testRoaringBitmapSource =
-				new ClassPathResource("/source/do_not_format_me/MiTrust/TestNodeResourceImpl.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+		Resource resource = new ClassPathResource("/source/do_not_format_me/MiTrust/TestNodeResourceImpl.java");
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 	}
 
 	@Test
 	public void testIssueWithFile2() throws IOException {
-		Resource testRoaringBitmapSource =
-				new ClassPathResource("/source/do_not_format_me/Generic/ConstantWithDigitInName.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+		Resource resource = new ClassPathResource("/source/do_not_format_me/Generic/ConstantWithDigitInName.java");
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isFalse();
 	}
 
 	@Test
 	public void testIssueWithFile3() throws IOException {
-		Resource testRoaringBitmapSource = new ClassPathResource("/source/do_not_format_me/MiTrust/LocaleHelper.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+		Resource resource = new ClassPathResource("/source/do_not_format_me/MiTrust/LocaleHelper.java");
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isFalse();
 	}
 
 	@Test
 	public void testIssueWithUnresolvedSymbols() throws IOException {
-		Resource testRoaringBitmapSource =
-				new ClassPathResource("/source/do_not_format_me/ShaftEngine/RecordManager.java");
-		String asString =
-				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
+		Resource resource = new ClassPathResource("/source/do_not_format_me/ShaftEngine/RecordManager.java");
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		IJavaparserMutator transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		CompilationUnit compilationUnit = javaParser.parse(asString).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		boolean transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 	}

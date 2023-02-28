@@ -70,7 +70,7 @@ public class MutatorsScanner {
 		}
 
 		if (classNames.isEmpty()) {
-			String cleanThatSha1 = GitService.safeGetSha1();
+			var cleanThatSha1 = GitService.safeGetSha1();
 
 			LOGGER.warn("CleanThat failed detecting a single mutator in {} sha1={}", packageName, cleanThatSha1);
 		}
@@ -84,7 +84,7 @@ public class MutatorsScanner {
 				return null;
 			}
 		})
-				.filter(c -> IMutator.class.isAssignableFrom(c))
+				.filter(IMutator.class::isAssignableFrom)
 				.filter(c -> !Modifier.isAbstract(c.getModifiers()))
 				.map(c -> (Class<? extends IMutator>) c.asSubclass(IMutator.class))
 				.collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class MutatorsScanner {
 	 */
 	public static <T extends IMutator> List<T> instantiate(JavaVersion sourceJdkVersion,
 			List<Class<? extends T>> classes) {
-		return classes.stream().filter(c -> c != null).filter(c -> IMutator.class.isAssignableFrom(c)).map(c -> {
+		return classes.stream().filter(Objects::nonNull).filter(IMutator.class::isAssignableFrom).map(c -> {
 			return instantiate(sourceJdkVersion, c);
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
@@ -130,12 +130,12 @@ public class MutatorsScanner {
 	 */
 	// https://stackoverflow.com/questions/28327389/how-can-i-do-to-get-all-class-of-a-given-package-with-guava
 	private static Set<String> getClasses(String packageName) throws ClassNotFoundException, IOException {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final var loader = Thread.currentThread().getContextClassLoader();
 
 		Set<String> classNames = new TreeSet<>();
 		try {
 
-			ClassPath classpath = ClassPath.from(loader);
+			var classpath = ClassPath.from(loader);
 			for (ClassPath.ClassInfo classInfo : classpath.getTopLevelClasses(packageName)) {
 				classNames.add(classInfo.getName());
 			}

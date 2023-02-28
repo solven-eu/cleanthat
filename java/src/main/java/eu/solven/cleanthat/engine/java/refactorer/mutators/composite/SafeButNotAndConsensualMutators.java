@@ -39,7 +39,6 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInCompar
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 
@@ -70,7 +69,8 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					new LocalVariableTypeInference(),
 					new UnnecessaryImport(),
 					new UnnecessarySemicolon(),
-					new UseDiamondOperator(),
+					// UseDiamondOperator is too much unstable
+					// new UseDiamondOperator(),
 					// new UseDiamondOperatorJdk8(),
 					new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals())

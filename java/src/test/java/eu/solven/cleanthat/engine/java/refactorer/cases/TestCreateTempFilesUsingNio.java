@@ -82,7 +82,7 @@ public class TestCreateTempFilesUsingNio extends AParameterizesJavaparserRefacto
 			// TODO not yet testing import of Paths
 			{
 				compilationUnit.getImports()
-						.removeIf(im -> new ImportDeclaration("java.nio.file.Files", false, false).equals(im));
+						.removeIf(new ImportDeclaration("java.nio.file.Files", false, false)::equals);
 				transformer.walkAstHasChanged(pre);
 				// Rename the method before checking full equality
 				pre.setName("post");

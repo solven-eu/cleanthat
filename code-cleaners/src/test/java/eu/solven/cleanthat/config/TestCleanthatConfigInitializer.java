@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.config;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.assertj.core.api.Assertions;
@@ -34,14 +33,13 @@ public class TestCleanthatConfigInitializer {
 	public void testGenerate() throws IOException {
 		ICodeProvider codeProvider = FileSystemCodeProvider.forTests();
 		IEngineLintFixerFactory factory = Mockito.mock(IEngineLintFixerFactory.class);
-		CleanthatConfigInitializer initializer =
-				new CleanthatConfigInitializer(ConfigHelpers.makeYamlObjectMapper(), Arrays.asList(factory));
+		var initializer = new CleanthatConfigInitializer(ConfigHelpers.makeYamlObjectMapper(), Arrays.asList(factory));
 
-		RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
+		var result = initializer.prepareFile(codeProvider, false);
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");
-		Path root = codeProvider.getRepositoryRoot();
+		var root = codeProvider.getRepositoryRoot();
 		Assertions.assertThat(result.getPathToContents())
 				.hasSize(1)
 				.containsKey(CleanthatPathHelpers.makeContentPath(root, ".cleanthat/cleanthat.yaml"))

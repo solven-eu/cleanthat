@@ -16,9 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.report_javaparser;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
@@ -39,13 +37,13 @@ public class ReportLocalVariableTypeInference {
 		if (!(node instanceof VariableDeclarationExpr)) {
 			return false;
 		}
-		VariableDeclarationExpr variableDeclarationExpr = (VariableDeclarationExpr) node;
+		var variableDeclarationExpr = (VariableDeclarationExpr) node;
 
 		if (variableDeclarationExpr.getVariables().size() >= 2) {
 			return false;
 		}
 
-		VariableDeclarator singleVariableDeclaration = variableDeclarationExpr.getVariable(0);
+		var singleVariableDeclaration = variableDeclarationExpr.getVariable(0);
 
 		if (singleVariableDeclaration.getType().isVarType()) {
 			return false;
@@ -57,7 +55,7 @@ public class ReportLocalVariableTypeInference {
 	}
 
 	public static void main(String[] args) {
-		CompilationUnit node = StaticJavaParser.parse(testCase);
+		var node = StaticJavaParser.parse(testCase);
 
 		node = LexicalPreservingPrinter.setup(node);
 

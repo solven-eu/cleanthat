@@ -55,7 +55,7 @@ public abstract class AGithubCodeProvider implements ICodeProvider {
 		}
 
 		String asString;
-		try (InputStreamReader reader = new InputStreamReader(content.read(), Charsets.UTF_8)) {
+		try (var reader = new InputStreamReader(content.read(), Charsets.UTF_8)) {
 			asString = CharStreams.toString(reader);
 		}
 		return asString;

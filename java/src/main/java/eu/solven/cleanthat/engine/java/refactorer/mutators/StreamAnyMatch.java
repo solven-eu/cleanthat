@@ -28,7 +28,6 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 's.filter(p).findAny().isPresent()' into 's.anyMatch(predicate)'
@@ -65,12 +64,11 @@ public class StreamAnyMatch extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCall = (MethodCallExpr) node;
-		String methodCallIdentifier = methodCall.getName().getIdentifier();
+		var methodCall = (MethodCallExpr) node;
+		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_IS_PRESENT.equals(methodCallIdentifier) && !METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
 			return false;
 		}
@@ -79,11 +77,11 @@ public class StreamAnyMatch extends AJavaParserMutator {
 		if (optScope.isEmpty()) {
 			return false;
 		}
-		Expression scope = optScope.get();
+		var scope = optScope.get();
 		if (!(scope instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr scopeAsMethodCallExpr = (MethodCallExpr) scope;
+		var scopeAsMethodCallExpr = (MethodCallExpr) scope;
 		if (!METHOD_FIND_ANY.equals(scopeAsMethodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
@@ -92,11 +90,11 @@ public class StreamAnyMatch extends AJavaParserMutator {
 		if (optParentScope.isEmpty()) {
 			return false;
 		}
-		Expression parentScope = optParentScope.get();
+		var parentScope = optParentScope.get();
 		if (!parentScope.isMethodCallExpr()) {
 			return false;
 		}
-		MethodCallExpr parentScopeAsMethodCallExpr = (MethodCallExpr) parentScope;
+		var parentScopeAsMethodCallExpr = (MethodCallExpr) parentScope;
 		if (!METHOD_FILTER.equals(parentScopeAsMethodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
@@ -105,11 +103,11 @@ public class StreamAnyMatch extends AJavaParserMutator {
 		if (optGrandParentScope.isEmpty()) {
 			return false;
 		}
-		Expression grandParentScope = optGrandParentScope.get();
+		var grandParentScope = optGrandParentScope.get();
 
-		Expression filterPredicate = parentScopeAsMethodCallExpr.getArgument(0);
+		var filterPredicate = parentScopeAsMethodCallExpr.getArgument(0);
 
-		boolean localTransformed = false;
+		var localTransformed = false;
 		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
 		Expression replacement = new MethodCallExpr(grandParentScope, METHOD_ANY_MATCH, replaceArguments);
 

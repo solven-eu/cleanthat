@@ -25,8 +25,6 @@ import org.assertj.core.api.Assertions;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.junit.Test;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
@@ -61,9 +59,9 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testFilterOnVersion_UseDiamondOperatorJdk8() {
-		UseDiamondOperatorJdk8 rule = new UseDiamondOperatorJdk8();
+		var rule = new UseDiamondOperatorJdk8();
 		// UseDiamondOperatorJdk8 is not productionReady
-		JavaRefactorerProperties mutatorsProperties = draftMutatorsProperties;
+		var mutatorsProperties = draftMutatorsProperties;
 
 		{
 			engineProperties.setEngineVersion(IJdkVersionConstants.JDK_5);
@@ -92,9 +90,9 @@ public class TestJavaRefactorer {
 		engineProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
 
 		// UseIsEmptyOnCollections is not productionReady
-		JavaRefactorerProperties mutatorsProperties = draftMutatorsProperties;
+		var mutatorsProperties = draftMutatorsProperties;
 
-		UseIsEmptyOnCollections oneRule = new UseIsEmptyOnCollections();
+		var oneRule = new UseIsEmptyOnCollections();
 		Set<String> oneRuleIds = oneRule.getIds();
 
 		Assertions.assertThat(oneRuleIds.size()).isGreaterThan(1);
@@ -117,18 +115,18 @@ public class TestJavaRefactorer {
 		Class<JavaparserDirtyMe> classToLoad = JavaparserDirtyMe.class;
 		String dirtyCode = LocalClassTestHelper.loadClassAsString(classToLoad);
 
-		JavaRefactorer rulesJavaMutator = new JavaRefactorer(engineProperties, prdMutatorsProperties);
+		var rulesJavaMutator = new JavaRefactorer(engineProperties, prdMutatorsProperties);
 
-		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(true);
-		CompilationUnit compilationUnit = javaParser.parse(dirtyCode).getResult().get();
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(true);
+		var compilationUnit = javaParser.parse(dirtyCode).getResult().get();
 		LexicalPreservingPrinter.setup(compilationUnit);
-		String rawJavaparserCode = rulesJavaMutator.toString(compilationUnit);
+		var rawJavaparserCode = rulesJavaMutator.toString(compilationUnit);
 
 		// Check this is a piece of code which is dirtied by JavaParser
 		// 2022-01: We rely on LexicalPreservingPrinter for prettyPrinting
 		Assertions.assertThat(rawJavaparserCode).isEqualTo(dirtyCode);
 
-		String cleanJavaparserCode = rulesJavaMutator.fixJavaparserUnexpectedChanges(dirtyCode, rawJavaparserCode);
+		var cleanJavaparserCode = rulesJavaMutator.fixJavaparserUnexpectedChanges(dirtyCode, rawJavaparserCode);
 		Assertions.assertThat(cleanJavaparserCode).isEqualTo(dirtyCode);
 	}
 
@@ -183,7 +181,7 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded() {
-		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
+		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
 		customProperties.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName()));
 
@@ -197,7 +195,7 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testIncludeRuleByClassName_draftRule_draftIncluded() {
-		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
+		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(true);
 		customProperties.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName()));
 
@@ -212,7 +210,7 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded_butExplicitlyListed() {
-		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
+		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
 		customProperties.setIncluded(Arrays.asList(CustomDraftMutator.class.getName()));
 
@@ -226,7 +224,7 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded_butExplicitlyListedNextToComposite() {
-		final JavaRefactorerProperties customProperties = new JavaRefactorerProperties();
+		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
 		customProperties
 				.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName(), CustomDraftMutator.class.getName()));
@@ -253,7 +251,7 @@ public class TestJavaRefactorer {
 
 	@Test
 	public void testIncludeRule_ruleInSafeAndConsensual() {
-		String idInSafeAndConsensual = SafeAndConsensualMutators.SAFE_AND_CONSENSUAL.get(0).getIds().iterator().next();
+		var idInSafeAndConsensual = SafeAndConsensualMutators.SAFE_AND_CONSENSUAL.get(0).getIds().iterator().next();
 		List<IMutator> rules = JavaRefactorer.filterRules(JavaVersion.parse("11"),
 				Collections.singletonList(idInSafeAndConsensual),
 				Collections.emptyList(),

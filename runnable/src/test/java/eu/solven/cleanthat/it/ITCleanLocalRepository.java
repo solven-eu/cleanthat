@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.FileSystemResource;
@@ -40,8 +39,6 @@ import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
-import eu.solven.cleanthat.config.RepoInitializerResult;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
@@ -69,30 +66,30 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 	@EventListener(ContextRefreshedEvent.class)
 	public void doSomethingAfterStartup(ContextRefreshedEvent event) throws IOException, JOSEException {
 		// One can adjust this to any local folder
-		Path repoFolder = Paths.get(System.getProperty("user.home"), "cleanthat-ITs", "spring-boot");
+		var repoFolder = Paths.get(System.getProperty("user.home"), "cleanthat-ITs", "spring-boot");
 
 		LOGGER.info("About to process {}", repoFolder);
 
-		ICodeProviderWriter codeProvider = makeCodeProvider(repoFolder);
+		var codeProvider = makeCodeProvider(repoFolder);
 
-		ApplicationContext appContext = event.getApplicationContext();
+		var appContext = event.getApplicationContext();
 		CodeProviderFormatter codeProviderFormatter = appContext.getBean(CodeProviderFormatter.class);
 		Optional<File> optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 		if (optConfig.isEmpty()) {
 			LOGGER.info("Generate an initial configuration");
 			ICleanthatConfigInitializer initializer = appContext.getBean(ICleanthatConfigInitializer.class);
-			RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
+			var result = initializer.prepareFile(codeProvider, false);
 
 			codeProvider.persistChanges(result.getPathToContents(), CodeWritingMetadata.empty());
 
 			optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 		}
-		File pathToConfig = optConfig.get();
+		var pathToConfig = optConfig.get();
 
-		ConfigHelpers configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
-		CleanthatRepositoryProperties properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
+		var configHelper = new ConfigHelpers(appContext.getBeansOfType(ObjectMapper.class).values());
+		var properties = configHelper.loadRepoConfig(new FileSystemResource(pathToConfig));
 
-		boolean dryRun = false;
+		var dryRun = false;
 		codeProviderFormatter.formatCode(properties, codeProvider, dryRun);
 	}
 
@@ -105,7 +102,7 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 
 			// We can rely on JGit but we do not want to add/commit/push when processing local repository
 			// As the point is to look at the produced output
-			boolean commitPush = false;
+			var commitPush = false;
 			codeProvider =
 					JGitCodeProvider.wrap(root, jgit, JGitCodeProvider.getHeadName(jgit.getRepository()), commitPush);
 		} else {

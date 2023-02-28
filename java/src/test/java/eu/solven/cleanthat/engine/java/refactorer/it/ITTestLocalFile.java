@@ -25,8 +25,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.CompilationUnit;
-
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
@@ -49,7 +47,7 @@ public class ITTestLocalFile {
 
 	@Test
 	public void testCleanLocalFile() throws IOException {
-		File file = new File(
+		var file = new File(
 				// "../" +
 				path);
 
@@ -59,24 +57,24 @@ public class ITTestLocalFile {
 			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
 		}
 
-		String pathAsString = Files.readString(file.toPath());
+		var pathAsString = Files.readString(file.toPath());
 
-		JavaRefactorer rulesJavaMutator =
+		var rulesJavaMutator =
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), new JavaRefactorerProperties());
 
-		CompilationUnit compilationUnit =
+		var compilationUnit =
 				rulesJavaMutator.parseSourceCode(JavaRefactorer.makeDefaultJavaParser(false), pathAsString);
 
 		// TODO Refactor to rely on RulesJavaMutator
 		IJavaparserMutator rule = new LiteralsFirstInComparisons();
-		boolean changed = rule.walkAstHasChanged(compilationUnit);
+		var changed = rule.walkAstHasChanged(compilationUnit);
 
 		if (!changed) {
 			throw new IllegalArgumentException(rule + " did not change: " + file.getAbsolutePath());
 		}
 
 		DiffMatchPatch dmp = new DiffMatchPatch();
-		String newAsString = compilationUnit.toString();
+		var newAsString = compilationUnit.toString();
 
 		// TODO We may need to reformat to have a nice diff
 		// see eu.solven.cleanthat.java.mutators.RulesJavaMutator.fixJavaparserUnexpectedChanges(String, String)

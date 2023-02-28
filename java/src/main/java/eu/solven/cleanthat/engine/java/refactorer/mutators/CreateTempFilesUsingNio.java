@@ -38,7 +38,6 @@ import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * cases inspired from #description
@@ -72,12 +71,11 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator {
 
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		// ResolvedMethodDeclaration test;
 		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
-		MethodCallExpr methodCallExpr = (MethodCallExpr) node;
+		var methodCallExpr = (MethodCallExpr) node;
 		if (!"createTempFile".equals(methodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
@@ -114,21 +112,21 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator {
 	private boolean process(MethodCallExpr methodExp) {
 		List<Expression> arguments = methodExp.getArguments();
 		Optional<Expression> optToPath;
-		NameExpr newStaticClass = new NameExpr("Files");
+		var newStaticClass = new NameExpr("Files");
 		String newStaticMethod = "createTempFile";
-		int minArgSize = 2;
+		var minArgSize = 2;
 		if (arguments.size() == minArgSize) {
 			// Create in default tmp directory
 			LOGGER.debug("Add java.nio.file.Files to import");
 			methodExp.tryAddImportToParentCompilationUnit(Files.class);
 			optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, methodExp.getArguments()));
 		} else if (arguments.size() == minArgSize + 1) {
-			Expression arg0 = methodExp.getArgument(0);
-			Expression arg1 = methodExp.getArgument(1);
-			Expression arg3 = methodExp.getArgument(2);
+			var arg0 = methodExp.getArgument(0);
+			var arg1 = methodExp.getArgument(1);
+			var arg3 = methodExp.getArgument(2);
 			if (arg3.isObjectCreationExpr()) {
 				methodExp.tryAddImportToParentCompilationUnit(Paths.class);
-				ObjectCreationExpr objectCreation = (ObjectCreationExpr) methodExp.getArgument(minArgSize);
+				var objectCreation = (ObjectCreationExpr) methodExp.getArgument(minArgSize);
 				NodeList<Expression> objectCreationArguments = objectCreation.getArguments();
 				NodeList<Expression> replaceArguments =
 						new NodeList<>(new MethodCallExpr(new NameExpr("Paths"), "get", objectCreationArguments),
@@ -137,15 +135,14 @@ public class CreateTempFilesUsingNio extends AJavaParserMutator {
 				optToPath = Optional.of(new MethodCallExpr(newStaticClass, newStaticMethod, replaceArguments));
 			} else if (arg3.isNameExpr()) {
 				// The directory may be null, in which case case, we'll rely on the default tmp directory
-				BinaryExpr fileIsNull = new BinaryExpr(arg3, new NullLiteralExpr(), Operator.EQUALS);
+				var fileIsNull = new BinaryExpr(arg3, new NullLiteralExpr(), Operator.EQUALS);
 
 				NodeList<Expression> replaceArgumentsIfNull = new NodeList<>(arg0, arg1);
-				MethodCallExpr callIfNull = new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsIfNull);
+				var callIfNull = new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsIfNull);
 
 				NodeList<Expression> replaceArgumentsNotNull =
 						new NodeList<>(new MethodCallExpr(arg3, "toPath"), arg0, arg1);
-				MethodCallExpr callNotNull =
-						new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsNotNull);
+				var callNotNull = new MethodCallExpr(newStaticClass, newStaticMethod, replaceArgumentsNotNull);
 
 				// We need to enclose the ternary between '(...)' as we will call .toFile() right-away
 				Expression enclosedTernary = new EnclosedExpr(new ConditionalExpr(fileIsNull, callIfNull, callNotNull));

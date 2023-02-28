@@ -30,7 +30,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns 'java.lang.String' into 'String'
@@ -80,8 +79,6 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-
 		if (!(node instanceof NodeWithType)) {
 			return false;
 
@@ -125,7 +122,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
 			return false;
 		}
 
-		int nodeTypeLastDot = nodeType.asString().lastIndexOf('.');
+		var nodeTypeLastDot = nodeType.asString().lastIndexOf('.');
 		if (nodeTypeLastDot < 0) {
 			LOGGER.debug("Import without a '.' ?");
 			return false;
@@ -138,12 +135,12 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
 	}
 
 	private List<ImportDeclaration> getImports(Node node) {
-		Node root = node;
+		var root = node;
 		while (root.getParentNode().isPresent()) {
 			root = root.getParentNode().get();
 		}
 
-		ImportVisitorAdapter visitor = new ImportVisitorAdapter();
+		var visitor = new ImportVisitorAdapter();
 		root.accept(visitor, null);
 
 		List<ImportDeclaration> imports = visitor.getImports();
@@ -152,8 +149,8 @@ public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
 
 	private Optional<ImportDeclaration> searchMatchingImport(List<ImportDeclaration> imports, Type type) {
 		return imports.stream().filter(i -> {
-			String importedTypeOrPackage = i.getNameAsString();
-			String nodeTypeMayDiamond = type.asString();
+			var importedTypeOrPackage = i.getNameAsString();
+			var nodeTypeMayDiamond = type.asString();
 
 			if (nodeTypeMayDiamond.indexOf('<') >= 0) {
 				nodeTypeMayDiamond = nodeTypeMayDiamond.substring(0, nodeTypeMayDiamond.indexOf('<'));

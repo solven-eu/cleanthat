@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class TestGithubPRCodeProvider {
 		Mockito.when(repository.getFileContent("someFileName", "headSha")).thenReturn(ghContent);
 		Mockito.when(ghContent.read())
 				.thenReturn(new ByteArrayInputStream("someContent".getBytes(StandardCharsets.UTF_8)));
-		Path tmpDir = Files.createTempDirectory("TestGithubPRCodeProvider");
+		var tmpDir = Files.createTempDirectory("TestGithubPRCodeProvider");
 		String content =
 				new GithubPRCodeProvider(tmpDir, "someToken", "someEventKey", pr).loadContentForPath(file.getFilename())
 						.get();

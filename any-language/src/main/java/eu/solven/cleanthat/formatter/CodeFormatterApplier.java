@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.formatter;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -41,14 +40,14 @@ public class CodeFormatterApplier implements ICodeFormatterApplier {
 
 	@Override
 	public String applyProcessors(EngineAndLinters engineAndSteps, PathAndContent pathAndContent) throws IOException {
-		String code = pathAndContent.getContent();
-		Path filepath = pathAndContent.getPath();
-		AtomicReference<String> outputRef = new AtomicReference<>(code);
+		var code = pathAndContent.getContent();
+		var filepath = pathAndContent.getPath();
+		var outputRef = new AtomicReference<>(code);
 
-		IEngineProperties engineProperties = engineAndSteps.getEngineProperties();
+		var engineProperties = engineAndSteps.getEngineProperties();
 		engineAndSteps.getLinters().forEach(linter -> {
 			try {
-				String output = applyProcessor(engineProperties, linter, pathAndContent);
+				var output = applyProcessor(engineProperties, linter, pathAndContent);
 				if (output == null) {
 					throw new IllegalStateException("Null code.");
 				}

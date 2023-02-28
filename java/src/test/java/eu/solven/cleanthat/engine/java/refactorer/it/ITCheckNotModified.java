@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.google.common.collect.ImmutableMap;
 
 // TODO Move this to somewhere not specific to lambda?
@@ -48,15 +47,15 @@ public class ITCheckNotModified {
 		// JavaParser.setDoNotAssignCommentsPreceedingEmptyLines(true);
 		LOGGER.info("Process: {}");
 
-		File file = new File("src/test/java/" + ITCheckNotModified.class.getName().replace('.', '/') + ".java");
+		var file = new File("src/test/java/" + ITCheckNotModified.class.getName().replace('.', '/') + ".java");
 
 		if (!file.isFile()) {
 			throw new IllegalArgumentException("Can not read: " + file.getAbsolutePath());
 		}
 
-		String pathAsString = Files.readString(file.toPath());
+		var pathAsString = Files.readString(file.toPath());
 
-		CompilationUnit node = StaticJavaParser.parse(pathAsString);
+		var node = StaticJavaParser.parse(pathAsString);
 
 		// IClassTransformer rule = new VariableEqualsConstant();
 		// boolean changed = rule.walkNode(node);
@@ -66,7 +65,7 @@ public class ITCheckNotModified {
 		// }
 
 		DiffMatchPatch dmp = new DiffMatchPatch();
-		String newAsString = node.toString();
+		var newAsString = node.toString();
 
 		LOGGER.info("new:");
 		LOGGER.info("----NEW--------START-------------");

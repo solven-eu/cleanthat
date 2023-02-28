@@ -30,8 +30,6 @@ import com.google.common.collect.Iterables;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
 import eu.solven.cleanthat.language.spotless.CleanthatSpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
@@ -61,26 +59,25 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, CleanThatInitMojo.MOJO_INIT);
 		assertNotNull(myMojo);
 
-		File cleanthatYaml =
-				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
+		var cleanthatYaml = readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();
 
 		Assertions.assertThat(cleanthatYaml).isFile();
-		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(objectMapper));
-		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
+		var configHelpers = new ConfigHelpers(Arrays.asList(objectMapper));
+		var config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2023-01-09", config.getSyntaxVersion());
 		Assert.assertEquals(1, config.getEngines().size());
 		Assert.assertEquals("spotless", config.getEngines().get(0).getEngine());
 
 		Assertions.assertThat(config.getEngines().get(0).getSteps()).hasSize(1);
-		CleanthatStepProperties singleStep = config.getEngines().get(0).getSteps().get(0);
+		var singleStep = config.getEngines().get(0).getSteps().get(0);
 
-		CleanthatSpotlessStepParametersProperties stepParameters =
+		var stepParameters =
 				objectMapper.convertValue(singleStep.getParameters(), CleanthatSpotlessStepParametersProperties.class);
-		String url = stepParameters.getConfiguration();
+		var url = stepParameters.getConfiguration();
 
 		SpotlessEngineProperties spotlessConfigResource = CleanThatGenerateEclipseStylesheetMojo
 				.loadSpotlessEngineProperties(new FileSystemGitCodeProvider(readWriteFolder.toPath()),
@@ -119,15 +116,14 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, CleanThatInitMojo.MOJO_INIT);
 		assertNotNull(myMojo);
 
-		File cleanthatYaml =
-				readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
+		var cleanthatYaml = readWriteFolder.toPath().resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT).toFile();
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();
 
 		Assertions.assertThat(cleanthatYaml).isFile();
-		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(objectMapper));
-		CleanthatRepositoryProperties config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
+		var configHelpers = new ConfigHelpers(Arrays.asList(objectMapper));
+		var config = configHelpers.loadRepoConfig(new FileSystemResource(cleanthatYaml));
 
 		Assert.assertEquals("2023-01-09", config.getSyntaxVersion());
 		Assert.assertEquals(2, config.getEngines().size());
@@ -135,11 +131,11 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 		Assert.assertEquals("openrewrite", config.getEngines().get(1).getEngine());
 
 		Assertions.assertThat(config.getEngines().get(0).getSteps()).hasSize(1);
-		CleanthatStepProperties singleStep = config.getEngines().get(0).getSteps().get(0);
+		var singleStep = config.getEngines().get(0).getSteps().get(0);
 
-		CleanthatSpotlessStepParametersProperties stepParameters =
+		var stepParameters =
 				objectMapper.convertValue(singleStep.getParameters(), CleanthatSpotlessStepParametersProperties.class);
-		String url = stepParameters.getConfiguration();
+		var url = stepParameters.getConfiguration();
 
 		SpotlessEngineProperties spotlessConfigResource = CleanThatGenerateEclipseStylesheetMojo
 				.loadSpotlessEngineProperties(new FileSystemGitCodeProvider(readWriteFolder.toPath()),

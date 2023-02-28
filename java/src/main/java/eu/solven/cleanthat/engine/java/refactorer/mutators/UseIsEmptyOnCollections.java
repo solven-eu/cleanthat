@@ -27,12 +27,10 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
@@ -76,11 +74,10 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 		if (!(node instanceof BinaryExpr)) {
 			return false;
 		}
-		BinaryExpr binaryExpr = (BinaryExpr) node;
+		var binaryExpr = (BinaryExpr) node;
 		if (!BinaryExpr.Operator.EQUALS.equals(binaryExpr.getOperator())) {
 			// We search for 'x == 0' or '0 == x'
 			return false;
@@ -105,18 +102,18 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 		}
 
 		// Check the called method is .size() or .length()
-		String calledMethodName = checkmeForIsEmpty.get().getNameAsString();
+		var calledMethodName = checkmeForIsEmpty.get().getNameAsString();
 		if (!"size".equals(calledMethodName)// For Collection.size()
 				&& !"length".equals(calledMethodName) // For String.length()
 		) {
 			LOGGER.debug("Not calling .size() nor .length()");
 			return false;
 		}
-		Expression lengthScope = optLengthScope.get();
+		var lengthScope = optLengthScope.get();
 		Optional<ResolvedType> type = optResolvedType(lengthScope);
 
 		if (type.isPresent()) {
-			boolean localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
+			var localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
 			if (localTransformed) {
 				return true;
 			}
@@ -130,8 +127,8 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 		boolean transformed;
 		if (type.isReferenceType()) {
 			LOGGER.info("scope={} type={}", lengthScope, type);
-			boolean doIt = false;
-			ResolvedReferenceType referenceType = type.asReferenceType();
+			var doIt = false;
+			var referenceType = type.asReferenceType();
 			if (referenceType.getQualifiedName().equals(Collection.class.getName())
 					|| referenceType.getQualifiedName().equals(Map.class.getName())
 					|| referenceType.getQualifiedName().equals(String.class.getName())) {

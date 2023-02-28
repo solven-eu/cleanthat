@@ -55,7 +55,7 @@ public class SpotlessSession {
 	}
 
 	public boolean acceptPath(EnrichedFormatter formatter, Path path) {
-		String rawPath = path.toString();
+		var rawPath = path.toString();
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
@@ -83,16 +83,16 @@ public class SpotlessSession {
 	// com.diffplug.gradle.spotless.IdeHook#performHook
 	// com.diffplug.spotless.maven.SpotlessApplyMojo#process
 	public String doStuff(EnrichedFormatter formatter, PathAndContent pathAndContent) {
-		Path path = pathAndContent.getPath();
+		var path = pathAndContent.getPath();
 
-		String rawPath = path.toString();
+		var rawPath = path.toString();
 
 		MatchPatterns includePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getIncludes(formatter.formatterStepFactory)));
 		MatchPatterns excludePatterns =
 				MatchPatterns.from(withNormalizedFileSeparators(getExcludes(formatter.formatterStepFactory)));
 
-		String rawBytes = pathAndContent.getContent();
+		var rawBytes = pathAndContent.getContent();
 		if (!includePatterns.matches(rawPath, true)) {
 			return rawBytes;
 		} else if (excludePatterns.matches(rawPath, true)) {
@@ -119,7 +119,7 @@ public class SpotlessSession {
 				filesTracker.checkedButAlreadyClean();
 				return rawBytes;
 			} else {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				var baos = new ByteArrayOutputStream();
 
 				dirty.writeCanonicalTo(baos);
 
@@ -142,25 +142,25 @@ public class SpotlessSession {
 	protected File getFakeFile(Path root, Path relativeContentPath) {
 		// This check is more to demonstrate the kind of expectations over given path
 		CleanthatPathHelpers.checkContentPath(relativeContentPath);
-		Path absoluteContentPath = root.resolve(relativeContentPath);
+		var absoluteContentPath = root.resolve(relativeContentPath);
 
 		// Spotless expects absolute pathes, as they will be compared with some root
 		if (absoluteContentPath.getFileSystem().equals(FileSystems.getDefault())) {
 			return new File(absoluteContentPath.toString());
 		} else {
-			String realFsFakeRoot = FileSystems.getDefault().getSeparator();
+			var realFsFakeRoot = FileSystems.getDefault().getSeparator();
 			// The fake root try to limit the risk of writing in improper locations
 			String someFakeRootDirectory = "cleanthat_fake_root_for_spotless";
-			String preventCollisions = UUID.randomUUID().toString();
+			var preventCollisions = UUID.randomUUID().toString();
 
 			// Spotless requires a real File (instead of a Path)
-			Path fakeRootInRealFs =
+			var fakeRootInRealFs =
 					FileSystems.getDefault().getPath(realFsFakeRoot, someFakeRootDirectory, preventCollisions);
 
 			// This will make sure we can not traverse alternative directories
-			Path asRelativePath = absoluteContentPath.getRoot().relativize(absoluteContentPath);
+			var asRelativePath = absoluteContentPath.getRoot().relativize(absoluteContentPath);
 			// .toString() as FileSystem does not match
-			Path fakeContentInRealFs = CleanthatPathHelpers.resolveChild(fakeRootInRealFs, asRelativePath.toString());
+			var fakeContentInRealFs = CleanthatPathHelpers.resolveChild(fakeRootInRealFs, asRelativePath.toString());
 
 			return fakeContentInRealFs.toFile();
 		}

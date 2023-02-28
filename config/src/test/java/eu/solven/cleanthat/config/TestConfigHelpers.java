@@ -34,9 +34,7 @@ import org.springframework.util.StreamUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
 
@@ -48,8 +46,8 @@ public class TestConfigHelpers {
 
 	@Test
 	public void testYaml() throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
-		String asString = yamlObjectMapper.writeValueAsString(Map.of("k1", Map.of("k2", "v")));
+		var yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+		var asString = yamlObjectMapper.writeValueAsString(Map.of("k1", Map.of("k2", "v")));
 		// This may demonstrate unexpected behavior with EOL on different systems
 		Assertions.assertThat(asString).contains("k", "  k2: \"v\"");
 		Assertions.assertThat(asString.split(EOL)).hasSize(2);
@@ -58,17 +56,16 @@ public class TestConfigHelpers {
 	@Ignore("We do not manipulate .json configuration anymore")
 	@Test
 	public void testFromJsonToYaml() throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper jsonObjectMapper = ConfigHelpers.makeJsonObjectMapper();
-		ConfigHelpers configHelpers = new ConfigHelpers(Arrays.asList(jsonObjectMapper));
+		var jsonObjectMapper = ConfigHelpers.makeJsonObjectMapper();
+		var configHelpers = new ConfigHelpers(Arrays.asList(jsonObjectMapper));
 		// 'default_as_json' case is not satisfying as we have null in its yaml version
 		Stream.of("simple_as_json", "default_as_json").forEach(name -> {
 			try {
-				CleanthatRepositoryProperties config =
-						configHelpers.loadRepoConfig(new ClassPathResource("/config/" + name + ".json"));
-				ObjectMapper yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
-				String asYaml = yamlObjectMapper.writeValueAsString(config);
+				var config = configHelpers.loadRepoConfig(new ClassPathResource("/config/" + name + ".json"));
+				var yamlObjectMapper = ConfigHelpers.makeYamlObjectMapper();
+				var asYaml = yamlObjectMapper.writeValueAsString(config);
 				LOGGER.debug("Config as yaml: {}{}{}{}{}{}", EOL, "------", EOL, asYaml, EOL, "------");
-				String expectedYaml = StreamUtils.copyToString(
+				var expectedYaml = StreamUtils.copyToString(
 						new ClassPathResource("/config/" + name + ".to_yaml.yaml").getInputStream(),
 						StandardCharsets.UTF_8);
 				if ("\r\n".equals(EOL)) {
@@ -89,12 +86,12 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCodeEol() {
-		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
-		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+		var om = ConfigHelpers.makeYamlObjectMapper();
+		var helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = SourceCodeProperties.defaultRoot();
+		var defaultP = SourceCodeProperties.defaultRoot();
 		defaultP.setEncoding(StandardCharsets.ISO_8859_1.name());
-		SourceCodeProperties windowsP = SourceCodeProperties.builder().lineEnding(LineEnding.CRLF).build();
+		var windowsP = SourceCodeProperties.builder().lineEnding(LineEnding.CRLF).build();
 		windowsP.setEncoding(StandardCharsets.US_ASCII.name());
 
 		Assert.assertEquals(LineEnding.GIT, defaultP.getLineEndingAsEnum());
@@ -105,9 +102,9 @@ public class TestConfigHelpers {
 
 		// windows as inner
 		{
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(windowsP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(LineEnding.CRLF, merged.getLineEndingAsEnum());
 			Assert.assertEquals("US-ASCII", merged.getEncoding());
@@ -115,9 +112,9 @@ public class TestConfigHelpers {
 
 		// windows as outer
 		{
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(windowsP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(windowsP, Map.class),
 					om.convertValue(defaultP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
@@ -125,9 +122,9 @@ public class TestConfigHelpers {
 
 		// default and default
 		{
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(defaultP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(LineEnding.GIT, merged.getLineEndingAsEnum());
 			Assert.assertEquals("ISO-8859-1", merged.getEncoding());
@@ -137,41 +134,41 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCode_parentHasExcluded() {
-		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
-		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+		var om = ConfigHelpers.makeYamlObjectMapper();
+		var helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = SourceCodeProperties.builder().exclude(".*/generated/.*").build();
+		var defaultP = SourceCodeProperties.builder().exclude(".*/generated/.*").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
+			var childrenP = SourceCodeProperties.builder().build();
 
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(Arrays.asList(".*/generated/.*"), merged.getExcludes());
 		}
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").build();
+			var childrenP = SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").build();
 
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(Arrays.asList(".*/generated/.*", ".*/do_not_clean_me/.*"), merged.getExcludes());
 		}
 
 		{
 			// NotEmptyChildren and cancel parent exclusion
-			SourceCodeProperties childrenP =
+			var childrenP =
 					SourceCodeProperties.builder().exclude(".*/do_not_clean_me/.*").include(".*/generated/.*").build();
 
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(Arrays.asList(".*/do_not_clean_me/.*"), merged.getExcludes());
 			Assert.assertEquals(Arrays.asList(".*/generated/.*"), merged.getIncludes());
@@ -181,29 +178,29 @@ public class TestConfigHelpers {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMergeSourceCode_parentHasIncluded() {
-		ObjectMapper om = ConfigHelpers.makeYamlObjectMapper();
-		ConfigHelpers helper = new ConfigHelpers(Collections.singleton(om));
+		var om = ConfigHelpers.makeYamlObjectMapper();
+		var helper = new ConfigHelpers(Collections.singleton(om));
 
-		SourceCodeProperties defaultP = SourceCodeProperties.builder().include(".*\\.xml").build();
+		var defaultP = SourceCodeProperties.builder().include(".*\\.xml").build();
 
 		{
 			// EmptyChildren
-			SourceCodeProperties childrenP = SourceCodeProperties.builder().build();
+			var childrenP = SourceCodeProperties.builder().build();
 
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(Arrays.asList(".*\\.xml"), merged.getIncludes());
 		}
 
 		{
 			// NotEmptyChildren
-			SourceCodeProperties childrenP = SourceCodeProperties.builder().include("pom.xml").build();
+			var childrenP = SourceCodeProperties.builder().include("pom.xml").build();
 
-			Map<String, ?> mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
+			var mergedAsMap = helper.mergeSourceCodeProperties(om.convertValue(defaultP, Map.class),
 					om.convertValue(childrenP, Map.class));
-			SourceCodeProperties merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
+			var merged = om.convertValue(mergedAsMap, SourceCodeProperties.class);
 
 			Assert.assertEquals(Arrays.asList("pom.xml"), merged.getIncludes());
 		}

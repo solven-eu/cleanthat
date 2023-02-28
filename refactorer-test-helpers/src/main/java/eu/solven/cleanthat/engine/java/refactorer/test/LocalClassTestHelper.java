@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,9 +35,9 @@ public class LocalClassTestHelper {
 
 	@SuppressWarnings("PMD.MagicNumber")
 	public static Path getSrcMainResourceFolder() throws IOException {
-		File someResourceInSrcTestResources = new ClassPathResource("/logback-test.xml").getFile();
-		Path srcMainResource = someResourceInSrcTestResources.getParentFile().toPath();
-		int nameCount = srcMainResource.getNameCount();
+		var someResourceInSrcTestResources = new ClassPathResource("/logback-test.xml").getFile();
+		var srcMainResource = someResourceInSrcTestResources.getParentFile().toPath();
+		var nameCount = srcMainResource.getNameCount();
 		Assert.assertEquals("Check 'test-classes' directory",
 				"test-classes",
 				srcMainResource.getName(nameCount - 1).toString());
@@ -48,23 +47,23 @@ public class LocalClassTestHelper {
 	}
 
 	public static Path getProjectTestSourceCode() throws IOException {
-		Path srcMainResource = getSrcMainResourceFolder();
+		var srcMainResource = getSrcMainResourceFolder();
 		return srcMainResource.resolve("./../../src/test/java").toAbsolutePath();
 	}
 
 	public static Path localClassAsPath(Class<?> classToLoad) throws IOException {
-		Path srcMainJava = getProjectTestSourceCode();
+		var srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
-		String path = classToLoad.getName().replaceAll("\\.", "/") + ".java";
+		var path = classToLoad.getName().replaceAll("\\.", "/") + ".java";
 
-		Path pathToDirty = srcMainJava.resolve(path);
+		var pathToDirty = srcMainJava.resolve(path);
 		return pathToDirty;
 	}
 
 	public static String loadClassAsString(Class<?> classToLoad) throws IOException {
-		Path pathToDirty = localClassAsPath(classToLoad);
+		var pathToDirty = localClassAsPath(classToLoad);
 
-		String dirtyCode = Files.readString(pathToDirty);
+		var dirtyCode = Files.readString(pathToDirty);
 		return dirtyCode;
 	}
 

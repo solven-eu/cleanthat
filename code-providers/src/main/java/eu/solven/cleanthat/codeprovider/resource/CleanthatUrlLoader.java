@@ -52,12 +52,12 @@ public class CleanthatUrlLoader {
 		if (configFile.startsWith(PREFIX_CODE)) {
 			// This is inspired by Spring 'classpath:'
 			// Here, it is used to load files from current repository
-			String path = configFile.substring(PREFIX_CODE.length());
+			var path = configFile.substring(PREFIX_CODE.length());
 			resource = loadFromRepository(codeProvider, path);
 		} else if (configFile.startsWith(PREFIX_CODE_LEGACY)) {
 			// This is inspired by Spring 'classpath:'
 			// Here, it is used to load files from current repository
-			String path = configFile.substring(PREFIX_CODE_LEGACY.length());
+			var path = configFile.substring(PREFIX_CODE_LEGACY.length());
 			resource = loadFromRepository(codeProvider, path);
 		} else if (configFile.startsWith(PREFIX_CLASSPATH_ECLIPSE)) {
 			resource = new DefaultResourceLoader().getResource(configFile);

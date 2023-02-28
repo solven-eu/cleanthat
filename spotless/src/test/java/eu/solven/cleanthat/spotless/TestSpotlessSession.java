@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.spotless;
 
 import java.io.File;
-import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 
 import org.assertj.core.api.Assertions;
@@ -44,7 +43,7 @@ public class TestSpotlessSession {
 
 	@Test
 	public void testPrepareFile_memoryFs() {
-		FileSystem fs = Jimfs.newFileSystem();
+		var fs = Jimfs.newFileSystem();
 
 		File someFile = ss.getFakeFile(fs.getPath("/root"), fs.getPath("some/file"));
 		Assertions.assertThat(someFile).doesNotExist().isAbsolute();

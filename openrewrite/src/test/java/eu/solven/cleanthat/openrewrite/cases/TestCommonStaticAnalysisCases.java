@@ -62,7 +62,7 @@ public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases
 
 	@Override
 	protected J.CompilationUnit convertToAst(Node pre) {
-		String asString = pre.toString();
+		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString);
 	}

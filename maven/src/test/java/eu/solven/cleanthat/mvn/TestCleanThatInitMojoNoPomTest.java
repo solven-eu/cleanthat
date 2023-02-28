@@ -38,7 +38,7 @@ public class TestCleanThatInitMojoNoPomTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookupConfiguredMojo(project, "init");
 		assertNotNull(myMojo);
 
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		var cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();
@@ -59,7 +59,7 @@ public class TestCleanThatInitMojoNoPomTest extends ACleanThatMojoTest {
 		CleanThatInitMojo myMojo = (CleanThatInitMojo) lookup(mojoDescriptor.getRole(), mojoDescriptor.getRoleHint());
 		assertNotNull(myMojo);
 
-		File cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
+		var cleanthatYaml = new File(readWriteFolder, "cleanthat.yaml");
 		Assertions.assertThat(cleanthatYaml).doesNotExist();
 
 		myMojo.execute();

@@ -127,7 +127,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	}
 
 	protected void checkParameters() {
-		Path configPath = getRepositoryConfigPath();
+		var configPath = getRepositoryConfigPath();
 
 		if (!Files.exists(configPath)) {
 			throw new IllegalArgumentException("There is no configuration at: " + configPath);
@@ -156,15 +156,15 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		} else if (MARKER_ANY_PARENT_DOTCLEANTHAT.equals(cleanthatRepositoryConfigPath)) {
 			// We apply the default strategy: iterate through parentFolder for '.cleanthat/cleanthat.yaml'
 			String rawExecutionRootDirectory = session.getExecutionRootDirectory();
-			Path executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
+			var executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
 
 			if (!Files.isDirectory(executionRootDirectory)) {
 				throw new IllegalStateException("Not a directory: " + executionRootDirectory);
 			}
 
-			Path rootOrAncestor = executionRootDirectory;
+			var rootOrAncestor = executionRootDirectory;
 			do {
-				Path configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
+				var configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
 				if (Files.isRegularFile(configPath)) {
 					LOGGER.debug("Main configurationFile: {}", configPath);
 					return configPath;
@@ -185,7 +185,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 			}
 
 			// We have been requested for a specific configuration path
-			Path manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
+			var manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
 
 			if (!Files.exists(manuaPathToConfig)) {
 				throw new IllegalArgumentException("There is no configuration at: " + manuaPathToConfig);
@@ -201,14 +201,14 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		} else if (MARKER_ANY_PARENT_DOTCLEANTHAT.equals(cleanthatRepositoryConfigPath)) {
 			// We apply the default strategy: iterate through parentFolder for '.cleanthat/cleanthat.yaml'
 			String rawExecutionRootDirectory = session.getExecutionRootDirectory();
-			Path executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
+			var executionRootDirectory = fs.getPath(rawExecutionRootDirectory);
 
 			if (!Files.isDirectory(executionRootDirectory)) {
 				throw new IllegalStateException("Not a directory: " + executionRootDirectory);
 			}
 
-			Path rootOrAncestor = executionRootDirectory;
-			Path configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
+			var rootOrAncestor = executionRootDirectory;
+			var configPath = rootOrAncestor.resolve(ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT);
 			LOGGER.debug("Main configurationFile: {}", configPath);
 			return configPath;
 		} else {
@@ -219,7 +219,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 			}
 
 			// We have been requested for a specific configuration path
-			Path manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
+			var manuaPathToConfig = fs.getPath(cleanthatRepositoryConfigPath).toAbsolutePath();
 
 			return manuaPathToConfig;
 		}
@@ -249,7 +249,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 		File baseDir = getProject().getBasedir().getAbsoluteFile();
 		LOGGER.debug("getProject().getBasedir().getAbsoluteFile(): {}", baseDir);
-		boolean result = executionRootDirectory.equalsIgnoreCase(baseDir.toString());
+		var result = executionRootDirectory.equalsIgnoreCase(baseDir.toString());
 
 		File projectFile = getProject().getBasedir();
 		sanityChecks(baseDir, result, projectFile);

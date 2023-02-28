@@ -30,6 +30,9 @@ public interface ICleanthatStepParametersProperties {
 	// BEWARE This is specific to JavaRefactorerProperties
 	String SAFE_AND_CONSENSUAL = "SafeAndConsensual";
 
+	// BEWARE This is specific to JavaRefactorerProperties
+	String SAFE_BUT_NOT_CONSENSUAL = "SafeButNotConsensual";
+
 	@JsonIgnore
 	Object getCustomProperty(String key);
 }

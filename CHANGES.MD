@@ -4,11 +4,13 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 ### Fixed
-* `LocalVariableTypeInference` handles better Unresolved types
+* `LocalVariableTypeInference` improved handling of unresolved types
+### Changes
 * `LineEnding` management is dropped from `ILintFixer` and `ILintFixerWithPath`
 * `ModifierOrder` is promoted in `SafeAndConsensual`
 * `StringToString` is promoted in `SafeAndConsensual`
 * `UnnecessaryModifier` does not strip anymore the `static` keyword of `MethodDeclaration`
+### Added
 * `IMutator` is generated into [MUTATORS.generated.MD](MUTATORS.generated.MD) by `RunGenerateDocumentation`
 * `UseUnderscoresInNumericLiterals` is an additional PMD mutator
 * `UseTextBlocks` is an additional mutator
@@ -17,6 +19,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `LambdaIsMethodReference` is an additional mutator
 * `AvoidUncheckedExceptionsInSignatures` is an additional mutator
 * `PrimitiveBoxedForString` is renamed into `UnnecessaryBoxing`
+* `SafeButNotAndConsensual` is an additional composite mutator
 
 ## [2.6] - 2023-02-22
 ### Changes

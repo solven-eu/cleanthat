@@ -27,6 +27,12 @@ See [CHANGES.MD](CHANGES.MD)
 - ...
 - 2021-08-12: 1.0 Initial Release
 
+# List of mutators
+
+[![javadoc](https://javadoc.io/badge2/io.github.solven-eu.cleanthat/java/javadoc.svg)](https://javadoc.io/doc/io.github.solven-eu.cleanthat/java)
+
+[MUTATORS.generated.MD](MUTATORS.generated.MD)
+
 # Compatibility
 
 Cleanthat Robot is currently compatible with the following languages:
@@ -62,6 +68,8 @@ One can then clean its codebase with `mvn spotless:apply`
 
 See README: https://github.com/solven-eu/cleanthat/tree/master/maven
 
+![Maven Central](https://img.shields.io/maven-central/v/io.github.solven-eu.cleanthat/java)
+
 Features :
 
 - Apply full refactoring as it would be executed by the Github App, based on `.cleanthat` configuration
@@ -76,6 +84,8 @@ or simply `mvn cleanthat:apply`
 ## Gradle (Free)
 
 `gradle` integration is available through Spotless: https://github.com/diffplug/spotless/tree/main/plugin-gradle#cleanthat
+
+[![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.spotless-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.spotless)
 
 ## Github (Free+Paid)
 

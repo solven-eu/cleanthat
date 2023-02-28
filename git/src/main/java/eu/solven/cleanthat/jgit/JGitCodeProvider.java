@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +55,7 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -189,9 +189,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
 		pathToMutatedContent.forEach((k, v) -> {
 			Path resolvedPath = resolvePath(k);
 
@@ -214,7 +212,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		});
 
 		if (commitPush) {
-			addCommitPush(prComments);
+			addCommitPush(metadata.getComments());
 		}
 	}
 

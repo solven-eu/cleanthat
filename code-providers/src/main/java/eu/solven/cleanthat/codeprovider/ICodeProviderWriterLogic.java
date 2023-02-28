@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.codeprovider;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +25,6 @@ import java.util.Map;
  */
 public interface ICodeProviderWriterLogic {
 
-	void persistChanges(Map<Path, String> pathToMutatedContent, List<String> prComments, Collection<String> prLabels);
+	void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata);
 
 }

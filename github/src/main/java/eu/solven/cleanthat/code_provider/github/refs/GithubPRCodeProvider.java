@@ -38,6 +38,7 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
@@ -99,9 +100,7 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		GHRepository repo = pr.getRepository();
 		String fullRefName = getRef();
 
@@ -111,8 +110,8 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue fetching refName=" + fullRefName, e);
 		}
-		new GithubRefWriterLogic(eventKey, repo, ref, getSha1())
-				.persistChanges(pathToMutatedContent, prComments, prLabels);
+		GithubRefWriterLogic refWriterLogic = new GithubRefWriterLogic(eventKey, repo, ref, getSha1());
+		refWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
 	}
 
 	@Override

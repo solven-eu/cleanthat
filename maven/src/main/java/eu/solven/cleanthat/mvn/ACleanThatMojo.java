@@ -93,7 +93,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 */
 	// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L335
-	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
+	@Parameter(property = "runOnlyAtRoot", defaultValue = "true")
 	private boolean runOnlyAtRoot;
 
 	FileSystem fs = FileSystems.getDefault();
@@ -250,8 +250,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 		File baseDir = getProject().getBasedir().getAbsoluteFile();
 		LOGGER.debug("getProject().getBasedir().getAbsoluteFile(): {}", baseDir);
 		boolean result = executionRootDirectory.equalsIgnoreCase(baseDir.toString());
+
 		File projectFile = getProject().getBasedir();
 		sanityChecks(baseDir, result, projectFile);
+
 		return result;
 	}
 

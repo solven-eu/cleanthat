@@ -24,8 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -43,6 +41,7 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}
@@ -142,9 +141,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			Path resolved = resolvePath(inMemoryPath);
 			try {

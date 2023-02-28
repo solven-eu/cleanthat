@@ -50,6 +50,8 @@ import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
@@ -149,7 +151,9 @@ public class ITGithub {
 				}
 			});
 
-			writer.persistChanges(changes, Arrays.asList("someComment"), Arrays.asList("someLabel"));
+			ICodeWritingMetadata codeWritingMetadata =
+					new CodeWritingMetadata(Arrays.asList("someComment"), Arrays.asList("someLabel"));
+			writer.persistChanges(changes, codeWritingMetadata);
 		}
 	}
 }

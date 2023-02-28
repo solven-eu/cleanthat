@@ -16,8 +16,6 @@
 package eu.solven.cleanthat.code_provider.github.code_provider;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.kohsuke.github.GHRef;
@@ -26,6 +24,7 @@ import org.kohsuke.github.GHRepository;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefWriterLogic;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
@@ -45,11 +44,9 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 	protected abstract GHRef getAsGHRef();
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef(), getSha1());
-		githubRefWriterLogic.persistChanges(pathToMutatedContent, prComments, prLabels);
+		githubRefWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
 	}
 
 	@Override

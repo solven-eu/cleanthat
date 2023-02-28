@@ -27,24 +27,25 @@ import eu.solven.cleanthat.any_language.ICodeCleaner;
 import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 
 /**
- * The mojo doing actual cleaning
+ * This {@link org.apache.maven.plugin.Mojo} enables running a single {@link IMutator} over current directory.
  * 
  * @author Benoit Lacelle
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-@Mojo(name = CleanThatCleanThatMojo.MOJO_FIX,
+@Mojo(name = CleanThatSingleMojo.MOJO_SINGLE,
 		defaultPhase = LifecyclePhase.PROCESS_SOURCES,
 		threadSafe = true,
 		// Used to enable symbolSolving based on project dependencies
 		requiresDependencyResolution = ResolutionScope.RUNTIME,
 		// One may rely on the mvn plugin to clean a folder, even if no pom.xml is available
 		requiresProject = false)
-public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
-	public static final String MOJO_FIX = "cleanthat";
+public class CleanThatSingleMojo extends ACleanThatSpringMojo {
+	public static final String MOJO_SINGLE = "single";
 
 	@Override
 	protected List<Class<?>> springClasses() {
@@ -68,6 +69,6 @@ public class CleanThatCleanThatMojo extends ACleanThatSpringMojo {
 
 		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 		ICodeCleaner codeCleaner = CleanThatMavenHelper.makeCodeCleaner(appContext);
-		codeCleaner.formatCodeGivenConfig(CleanThatCleanThatMojo.class.getSimpleName(), codeProvider, isDryRun());
+		codeCleaner.formatCodeGivenConfig(CleanThatSingleMojo.class.getSimpleName(), codeProvider, isDryRun());
 	}
 }

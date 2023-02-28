@@ -17,8 +17,6 @@ package eu.solven.cleanthat.codeprovider;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -78,12 +76,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
-		// if (codeProvider instanceof GithubComm)
-
-		writerLogicSupplier.get().persistChanges(pathToMutatedContent, prComments, prLabels);
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
+		writerLogicSupplier.get().persistChanges(pathToMutatedContent, metadata);
 	}
 
 	@Override

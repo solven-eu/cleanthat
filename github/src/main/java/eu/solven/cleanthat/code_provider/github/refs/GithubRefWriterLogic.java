@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriterLogic;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 
 /**
@@ -75,10 +75,8 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent,
-			List<String> prComments,
-			Collection<String> prLabels) {
-		commitIntoRef(pathToMutatedContent, prComments);
+	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+		commitIntoRef(pathToMutatedContent, codeWritingMetadata.getComments());
 	}
 
 	protected void commitIntoRef(Map<Path, String> pathToMutatedContent, List<String> prComments) {

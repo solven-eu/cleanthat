@@ -46,6 +46,7 @@ Cleanthat Refactorer is currently compatible with the following languages:
 # Limitations
 
 - CleanThat processes files individually, which means limited `Type` resolution. This enables cleaning files on a per-impacted-file basis (e.g. in a Github Pull-Request).
+- The type resolution may be lifted through `cleanthat-maven-plugin`
 
 # Installation
 

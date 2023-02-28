@@ -63,6 +63,7 @@ import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.CodeCleanerSpringConfig;
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
@@ -335,7 +336,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 			throw new RuntimeException("Issue converting " + properties + " to YAML", e);
 		}
 
-		codeWriter.persistChanges(Map.of(configPath, asYaml), Collections.emptyList(), Collections.emptyList());
+		codeWriter.persistChanges(Map.of(configPath, asYaml), CodeWritingMetadata.empty());
 	}
 
 	/**

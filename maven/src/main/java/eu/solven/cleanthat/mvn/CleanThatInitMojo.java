@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,7 @@ import com.google.common.base.Charsets;
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.EngineInitializerResult;
@@ -137,7 +137,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 		properties.getPathToContents()
 				.forEach((k, v) -> pathToContent.put(CleanthatPathHelpers.makeContentPath(root, k), v));
 
-		codeProvider.persistChanges(pathToContent, Collections.emptyList(), Collections.emptyList());
+		codeProvider.persistChanges(pathToContent, CodeWritingMetadata.empty());
 	}
 
 	public boolean checkIfValidToInit(Path configPathFile) {

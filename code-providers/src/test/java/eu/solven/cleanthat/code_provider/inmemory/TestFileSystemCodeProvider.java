@@ -21,8 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
@@ -30,6 +28,7 @@ import org.junit.Test;
 
 import com.google.common.jimfs.Jimfs;
 
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 
 public class TestFileSystemCodeProvider {
@@ -43,8 +42,7 @@ public class TestFileSystemCodeProvider {
 		});
 
 		cp.persistChanges(Map.of(fs.getPath("root", "directory", "file.txt"), "newContent"),
-				Arrays.asList(),
-				Collections.emptyList());
+				CodeWritingMetadata.empty());
 
 		cp.listFilesForContent(file -> {
 			Assertions.assertThat(file.getPath().toString()).isEqualTo("root/directory/file.txt");

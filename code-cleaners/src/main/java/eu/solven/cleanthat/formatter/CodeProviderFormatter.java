@@ -42,9 +42,11 @@ import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
@@ -171,7 +173,9 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 				LOGGER.info("Skip persisting changes as dryRun=true");
 				isEmpty = true;
 			} else {
-				codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
+				ICodeWritingMetadata metadata =
+						new CodeWritingMetadata(prComments, repoProperties.getMeta().getLabels());
+				codeWriter.persistChanges(pathToMutatedContent, metadata);
 				isEmpty = false;
 			}
 		}

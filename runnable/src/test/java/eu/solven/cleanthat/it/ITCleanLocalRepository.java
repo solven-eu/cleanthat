@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.eclipse.jgit.api.Git;
@@ -37,6 +36,7 @@ import com.nimbusds.jose.JOSEException;
 
 import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
+import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
@@ -83,7 +83,7 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 			ICleanthatConfigInitializer initializer = appContext.getBean(ICleanthatConfigInitializer.class);
 			RepoInitializerResult result = initializer.prepareFile(codeProvider, false);
 
-			codeProvider.persistChanges(result.getPathToContents(), Arrays.asList(), Arrays.asList());
+			codeProvider.persistChanges(result.getPathToContents(), CodeWritingMetadata.empty());
 
 			optConfig = CodeProviderHelpers.pathToConfig(repoFolder);
 		}

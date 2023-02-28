@@ -69,7 +69,7 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaParserMutator {
 
 			List<ResolvedReferenceType> ancestors = referenceType.getAllClassesAncestors();
 
-			// isAssignableBy(null)
+			optResolved.get().isAssignableBy(null);
 
 			if (referenceType.getQualifiedName().equals(RuntimeException.class.getName())) {
 				return true;

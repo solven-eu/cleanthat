@@ -37,6 +37,7 @@ import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.resolution.types.ResolvedLambdaConstraintType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -88,50 +89,103 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 
 		LambdaExpr lambdaExpr = (LambdaExpr) node;
 
-		Statement body = lambdaExpr.getBody();
-
+		// if (lambdaExpr.getParameters().isEmpty()) {
+		// return hasZeroVariable(lambdaExpr);
+		// } else
 		if (lambdaExpr.getParameters().size() == 1) {
 			Parameter singleParameter = lambdaExpr.getParameters().get(0);
 
-			if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isInstanceOfExpr()) {
+			return hasOneVariable(lambdaExpr, singleParameter);
+		} else {
+			return false;
+		}
 
-				InstanceOfExpr instanceOfExpr = body.asExpressionStmt().getExpression().asInstanceOfExpr();
+	}
 
-				if (!instanceOfExpr.getExpression().isNameExpr()
-						|| !instanceOfExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
-					return false;
-				}
+	// private boolean hasZeroVariable(LambdaExpr lambdaExpr) {
+	// Statement body = lambdaExpr.getBody();
+	//
+	// if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isMethodCallExpr()) {
+	// MethodCallExpr methodCallExpr = body.asExpressionStmt().getExpression().asMethodCallExpr();
+	//
+	// Optional<Expression> optScope = methodCallExpr.getScope();
+	// if (optScope.isEmpty()) {
+	// return false;
+	// }
+	//
+	// if (optScope.get().isNameExpr()
+	// || !optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
+	// return false;
+	// }
+	//
+	// Expression scope = optScope.get();
+	//
+	// Optional<ResolvedType> scopeType = optResolvedType(scope);
+	//
+	// if (scopeType.isEmpty()) {
+	// return false;
+	// } else if (!scopeType.get().isReferenceType()) {
+	// return false;
+	// }
+	//
+	// // ClassOrInterfaceType type =
+	// // new ClassOrInterfaceType(scopeType.get().asReferenceType().getQualifiedName());
+	//
+	// // `b -> b.<String>getObject()` -> `B::<String>getObject`
+	// // MethodReferenceExpr methodReference = new MethodReferenceExpr(new ClassExpr(type),
+	// // new NodeList<>(),
+	// // methodCallExpr.getNameAsString());
+	// // return lambdaExpr.replace(methodReference);
+	//
+	// // `b -> System.out.println(b)` into `System.out::println`
+	// MethodReferenceExpr methodReference =
+	// new MethodReferenceExpr(scope, new NodeList<>(), methodCallExpr.getNameAsString());
+	// return lambdaExpr.replace(methodReference);
+	//
+	// }
+	// return false;
+	// }
 
-				// `a -> a instanceof B` -> `B.class::isInstance`
-				ClassExpr newScope = new ClassExpr(instanceOfExpr.getType());
-				MethodReferenceExpr methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "isInstance");
-				return lambdaExpr.replace(methodReference);
-			} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isCastExpr()) {
-				CastExpr castExpr = body.asExpressionStmt().getExpression().asCastExpr();
+	private boolean hasOneVariable(LambdaExpr lambdaExpr, Parameter singleParameter) {
+		Statement body = lambdaExpr.getBody();
 
-				// `a -> (B) a` -> `B.class::cast`
-				ClassExpr newScope = new ClassExpr(castExpr.getType());
-				MethodReferenceExpr methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "cast");
-				return lambdaExpr.replace(methodReference);
+		if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isInstanceOfExpr()) {
 
-			} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isMethodCallExpr()) {
-				MethodCallExpr methodCallExpr = body.asExpressionStmt().getExpression().asMethodCallExpr();
+			InstanceOfExpr instanceOfExpr = body.asExpressionStmt().getExpression().asInstanceOfExpr();
 
-				Optional<Expression> optScope = methodCallExpr.getScope();
-				if (optScope.isEmpty()) {
-					return false;
-				}
+			if (!instanceOfExpr.getExpression().isNameExpr()
+					|| !instanceOfExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
+				return false;
+			}
 
-				if (methodCallExpr.getArguments().size() != 1 || !methodCallExpr.getArguments().get(0).isNameExpr()
-						|| !methodCallExpr.getArguments()
-								.get(0)
-								.asNameExpr()
-								.getName()
-								.equals(singleParameter.getName())) {
-					return false;
-				}
+			// `a -> a instanceof B` -> `B.class::isInstance`
+			ClassExpr newScope = new ClassExpr(instanceOfExpr.getType());
+			MethodReferenceExpr methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "isInstance");
+			return lambdaExpr.replace(methodReference);
+		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isCastExpr()) {
+			CastExpr castExpr = body.asExpressionStmt().getExpression().asCastExpr();
 
-				Expression scope = optScope.get();
+			if (!castExpr.getExpression().isNameExpr()
+					|| !castExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
+				return false;
+			}
+
+			// `a -> (B) a` -> `B.class::cast`
+			ClassExpr newScope = new ClassExpr(castExpr.getType());
+			MethodReferenceExpr methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "cast");
+			return lambdaExpr.replace(methodReference);
+
+		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isMethodCallExpr()) {
+			MethodCallExpr methodCallExpr = body.asExpressionStmt().getExpression().asMethodCallExpr();
+
+			Optional<Expression> optScope = methodCallExpr.getScope();
+			if (optScope.isEmpty()) {
+				return false;
+			}
+			Expression scope = optScope.get();
+
+			if (methodCallExpr.getArguments().size() == 1 && methodCallExpr.getArguments().get(0).isNameExpr()
+					&& methodCallExpr.getArguments().get(0).asNameExpr().getName().equals(singleParameter.getName())) {
 
 				Optional<ResolvedType> scopeType = optResolvedType(scope);
 
@@ -154,52 +208,78 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 				MethodReferenceExpr methodReference =
 						new MethodReferenceExpr(scope, new NodeList<>(), methodCallExpr.getNameAsString());
 				return lambdaExpr.replace(methodReference);
+			} else if (methodCallExpr.getArguments().isEmpty() && optScope.get().isNameExpr()
+					&& optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
 
-			} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isBinaryExpr()) {
-				BinaryExpr binaryExpr = body.asExpressionStmt().getExpression().asBinaryExpr();
-				Operator operator = binaryExpr.getOperator();
-				Expression left = binaryExpr.getLeft();
-				Expression right = binaryExpr.getRight();
-				if ((operator == Operator.EQUALS || operator == Operator.NOT_EQUALS)
-						&& (left.isNullLiteralExpr() || right.isNullLiteralExpr())) {
+				Optional<ResolvedType> scopeType = optResolvedType(scope);
 
-					Expression notNunull;
-					if (left.isNullLiteralExpr()) {
-						if (right.isNullLiteralExpr()) {
-							// comparing null with null
-							return binaryExpr.replace(new BooleanLiteralExpr(true));
-						} else {
-							notNunull = right;
-						}
-					} else {
-						notNunull = left;
-					}
-
-					if (!notNunull.isNameExpr()
-							|| !notNunull.asNameExpr().getName().equals(singleParameter.getName())) {
-						return false;
-					}
-
-					// `a -> a == null` -> `Objects::isNull`
-					String methodIdentifier;
-					if (operator == Operator.EQUALS) {
-						methodIdentifier = "isNull";
-					} else {
-						assert operator == Operator.NOT_EQUALS;
-						methodIdentifier = "nonNull";
-					}
-
-					// TODO This lack the additional Import?
-					// What if there is already an import to guava Objects?
-					MethodReferenceExpr methodReference = new MethodReferenceExpr(
-							new TypeExpr(new ClassOrInterfaceType(null, Objects.class.getSimpleName())),
-							new NodeList<>(),
-							methodIdentifier);
-					return lambdaExpr.replace(methodReference);
+				if (scopeType.isEmpty()) {
+					return false;
+				} else if (!scopeType.get().isConstraint()) {
+					return false;
 				}
+
+				ResolvedLambdaConstraintType constraint = scopeType.get().asConstraintType();
+
+				ResolvedType resolvedBound = constraint.getBound();
+
+				if (!resolvedBound.isReferenceType()) {
+					return false;
+				}
+
+				// https://github.com/javaparser/javaparser/issues/3929
+				return false;
+
+				// `r -> r.run()` into `Runnable::run`
+				// MethodReferenceExpr methodReference =
+				// new MethodReferenceExpr(new TypeExpr(null), new NodeList<>(), methodCallExpr.getNameAsString());
+				// return lambdaExpr.replace(methodReference);
+			} else {
+				return false;
+			}
+
+		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isBinaryExpr()) {
+			BinaryExpr binaryExpr = body.asExpressionStmt().getExpression().asBinaryExpr();
+			Operator operator = binaryExpr.getOperator();
+			Expression left = binaryExpr.getLeft();
+			Expression right = binaryExpr.getRight();
+			if ((operator == Operator.EQUALS || operator == Operator.NOT_EQUALS)
+					&& (left.isNullLiteralExpr() || right.isNullLiteralExpr())) {
+
+				Expression notNunull;
+				if (left.isNullLiteralExpr()) {
+					if (right.isNullLiteralExpr()) {
+						// comparing null with null
+						return binaryExpr.replace(new BooleanLiteralExpr(true));
+					} else {
+						notNunull = right;
+					}
+				} else {
+					notNunull = left;
+				}
+
+				if (!notNunull.isNameExpr() || !notNunull.asNameExpr().getName().equals(singleParameter.getName())) {
+					return false;
+				}
+
+				// `a -> a == null` -> `Objects::isNull`
+				String methodIdentifier;
+				if (operator == Operator.EQUALS) {
+					methodIdentifier = "isNull";
+				} else {
+					assert operator == Operator.NOT_EQUALS;
+					methodIdentifier = "nonNull";
+				}
+
+				// TODO This lack the additional Import?
+				// What if there is already an import to guava Objects?
+				MethodReferenceExpr methodReference = new MethodReferenceExpr(
+						new TypeExpr(new ClassOrInterfaceType(null, Objects.class.getSimpleName())),
+						new NodeList<>(),
+						methodIdentifier);
+				return lambdaExpr.replace(methodReference);
 			}
 		}
-
 		return false;
 	}
 }

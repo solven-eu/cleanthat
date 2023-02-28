@@ -1,7 +1,10 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.time.chrono.ChronoPeriod;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -116,7 +119,7 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 	}
 
 	@UnmodifiedMethod
-	public static class CaseEqualsComplex {
+	public static class CasemethodCall_notOverLambda {
 		public ObjectMapper pre(List<ObjectMapper> objectMappers) {
 			return objectMappers.stream()
 					.filter(om -> JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
@@ -125,19 +128,48 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	// Example from https://rules.sonarsource.com/java/RSPEC-1602
+	@UnmodifiedMethod
+	public static class CaseInstanceOf_notOverLambda {
+		public ObjectMapper pre(List<ObjectMapper> objectMappers) {
+			return objectMappers.stream().filter(om -> objectMappers instanceof List).findAny().get();
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseCastOf_notOverLambda {
+		public String pre(List<ChronoPeriod> chronoPeriods) {
+			Object something = "";
+
+			return chronoPeriods.stream().map(cp -> (String) something).findAny().get();
+		}
+	}
+
 	// @CompareMethods
-	// public static class CaseBiFunction {
-	// public BiFunction<String, String, Integer> pre() {
-	// return (a,b) ->
-	// return a.substring(b.length);
-	// };
-	// }
-	//
-	// public Function<String, Integer> post() {
-	// return s -> {
-	// return s.length();
-	// };
-	// }
-	// }
+	// Stuck on https://github.com/javaparser/javaparser/issues/3929
+	@UnmodifiedMethod
+	public static class CaseBiFunction {
+		public void pre(Map<String, String> map) {
+			Map<String, String> linkedHashMap = new LinkedHashMap<>();
+			map.forEach((a, b) -> linkedHashMap.put(a, b));
+		}
+
+		public void post(Map<String, String> map) {
+			Map<String, String> linkedHashMap = new LinkedHashMap<>();
+			map.forEach(linkedHashMap::put);
+		}
+	}
+
+	// Example from https://rules.sonarsource.com/java/RSPEC-1602
+	// Stuck on https://github.com/javaparser/javaparser/issues/3929
+	// @CompareMethods
+	@UnmodifiedMethod
+	public static class CaseRunnable {
+		public void pre(List<Runnable> runnables) {
+			runnables.forEach(r -> r.run());
+		}
+
+		public void post(List<Runnable> runnables) {
+			runnables.forEach(Runnable::run);
+		}
+	}
 }

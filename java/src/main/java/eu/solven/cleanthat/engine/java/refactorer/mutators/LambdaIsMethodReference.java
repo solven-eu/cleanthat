@@ -80,7 +80,7 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
-		LOGGER.info("{}", PepperLogHelper.getObjectAndClass(node));
+		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
 
 		if (!(node instanceof LambdaExpr)) {
 			return false;
@@ -119,6 +119,15 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 
 				Optional<Expression> optScope = methodCallExpr.getScope();
 				if (optScope.isEmpty()) {
+					return false;
+				}
+
+				if (methodCallExpr.getArguments().size() != 1 || !methodCallExpr.getArguments().get(0).isNameExpr()
+						|| !methodCallExpr.getArguments()
+								.get(0)
+								.asNameExpr()
+								.getName()
+								.equals(singleParameter.getName())) {
 					return false;
 				}
 

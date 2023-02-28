@@ -78,6 +78,11 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 		return JavaRefactorerStep.ID_REFACTORER;
 	}
 
+	@Deprecated(since = "Not used anymore. Kept for retrocompatiblity of users (e.g. Spotless)", forRemoval = true)
+	public String doFormat(String dirtyCode, LineEnding eol) throws IOException {
+		return doFormat(dirtyCode);
+	}
+
 	@Override
 	public String doFormat(String dirtyCode) throws IOException {
 		LOGGER.debug("{}", this.refactorerProperties);

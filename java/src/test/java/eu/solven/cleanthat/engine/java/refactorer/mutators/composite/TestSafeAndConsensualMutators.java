@@ -35,6 +35,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
 public class TestSafeAndConsensualMutators {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestSafeAndConsensualMutators.class);
 
+	final JavaVersion last = JavaVersion.parse(IJdkVersionConstants.LAST);
+
 	@Before
 	@After
 	public void checkErrorCount() {
@@ -42,8 +44,16 @@ public class TestSafeAndConsensualMutators {
 	}
 
 	@Test
+	public void testIds() {
+		SafeAndConsensualMutators safeAndConsensual = new SafeAndConsensualMutators(last);
+		SafeButNotAndConsensualMutators safeButNotConsensual = new SafeButNotAndConsensualMutators(last);
+
+		Assertions.assertThat(safeAndConsensual.getIds()).doesNotContainAnyElementsOf(safeButNotConsensual.getIds());
+		Assertions.assertThat(safeButNotConsensual.getIds()).doesNotContainAnyElementsOf(safeAndConsensual.getIds());
+	}
+
+	@Test
 	public void testScanComposite() {
-		JavaVersion last = JavaVersion.parse(IJdkVersionConstants.LAST);
 		Set<String> safeAndConsensual = new SafeAndConsensualMutators(last).getUnderlyingIds();
 		Set<String> safeButNotConsensual = new SafeButNotAndConsensualMutators(last).getUnderlyingIds();
 

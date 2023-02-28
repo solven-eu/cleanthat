@@ -433,13 +433,10 @@
 
 							<cleanthat>
 								<sourceJdk>${maven.compiler.source}</sourceJdk>
-								<version>2.6</version>
+								<version>2.7-SNAPSHOT</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
-									<mutator>StringToString</mutator>
-									<mutator>LiteralsFirstInComparisons</mutator>
-									<mutator>ComparisonWithNaN</mutator>
-									<mutator>AvoidInlineConditionals</mutator>
+									<mutator>SafeButNotConsensual</mutator>
 								</mutators>
 								<includeDraft>true</includeDraft>
 							</cleanthat>

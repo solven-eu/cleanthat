@@ -7,12 +7,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
+// https://www.baeldung.com/java-8-lambda-expressions-tips
 public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 	@Override
@@ -108,6 +112,16 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 		public Object post(Stream<?> s) {
 			return s.filter(Objects::isNull).filter(Objects::nonNull).filter(o -> true).count();
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseEqualsComplex {
+		public ObjectMapper pre(List<ObjectMapper> objectMappers) {
+			return objectMappers.stream()
+					.filter(om -> JsonFactory.FORMAT_NAME_JSON.equals(om.getFactory().getFormatName()))
+					.findAny()
+					.get();
 		}
 	}
 

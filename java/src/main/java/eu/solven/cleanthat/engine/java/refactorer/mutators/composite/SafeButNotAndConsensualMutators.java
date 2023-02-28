@@ -26,7 +26,6 @@ import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidFileStream;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidUncheckedExceptionsInSignatures;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.BoxedPrimitiveConstructor;
@@ -41,7 +40,6 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInfe
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 
@@ -58,7 +56,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumer
 public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	public static final List<IMutator> SAFE_BUT_NOT_CONSENSUAL = ImmutableList.<IMutator>builder()
 			.add(new ArraysDotStream(),
-					new AvoidFileStream(),
+					// new AvoidFileStream(),
 					new AvoidInlineConditionals(),
 					new AvoidUncheckedExceptionsInSignatures(),
 					new BoxedPrimitiveConstructor(),
@@ -73,7 +71,7 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					new UnnecessaryImport(),
 					new UnnecessarySemicolon(),
 					new UseDiamondOperator(),
-					new UseDiamondOperatorJdk8(),
+					// new UseDiamondOperatorJdk8(),
 					new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals())
 			.build();
@@ -84,6 +82,6 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 
 	@Override
 	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.SAFE_AND_CONSENSUAL);
+		return Optional.of(JavaRefactorerProperties.SAFE_BUT_NOT_CONSENSUAL);
 	}
 }

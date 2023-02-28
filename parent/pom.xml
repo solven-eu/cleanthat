@@ -51,7 +51,7 @@
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.4</pepper.version>
 		<error-prone.version>2.18.0</error-prone.version>
-		<spotless.version>2.33.0</spotless.version>
+		<spotless.version>2.34.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 		<spotbugs.version>4.7.3.2</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
@@ -120,7 +120,7 @@
 										<version>3.0</version>
 									</requireMavenVersion>
 									<requireJavaVersion>
-										<version>11</version>
+										<version>${maven.compiler.source}</version>
 									</requireJavaVersion>
 									<!-- We leave some plugin versions to SpringBoot -->
 									<!-- <requirePluginVersions /> -->
@@ -430,14 +430,9 @@
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
-							<removeUnusedImports />
-							<importOrder>
-								<file>eclipse/eclipse.importorder</file>
-								<!--order>java,javax,org,com</order-->
-							</importOrder>
-
+							
 							<cleanthat>
-								<sourceJdk>11</sourceJdk>
+								<sourceJdk>${maven.compiler.source}</sourceJdk>
 								<version>2.6</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
@@ -446,7 +441,14 @@
 									<mutator>ComparisonWithNaN</mutator>
 									<mutator>AvoidInlineConditionals</mutator>
 								</mutators>
+								<includeDraft>true</includeDraft>
 							</cleanthat>
+							
+							<removeUnusedImports />
+							<importOrder>
+								<file>eclipse/eclipse.importorder</file>
+								<!--order>java,javax,org,com</order-->
+							</importOrder>
 
 							<eclipse>
 								<!-- https://github.com/diffplug/spotless/tree/main/lib-extra/src/main/resources/com/diffplug/spotless/extra/eclipse_jdt_formatter -->

@@ -70,7 +70,7 @@ public class UseTextBlocks extends AJavaParserMutator {
 
 		Optional<List<StringLiteralExpr>> optAsList = optAsList(rootExp);
 
-		if (!optAsList.isPresent()) {
+		if (optAsList.isEmpty()) {
 			return false;
 		}
 

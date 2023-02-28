@@ -84,7 +84,7 @@ public class UseIndexOfChar extends AJavaParserMutator {
 		}
 		StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) node;
 
-		if (!stringLiteralExpr.getParentNode().isPresent()) {
+		if (stringLiteralExpr.getParentNode().isEmpty()) {
 			return false;
 		}
 		Node parentNode = stringLiteralExpr.getParentNode().get();

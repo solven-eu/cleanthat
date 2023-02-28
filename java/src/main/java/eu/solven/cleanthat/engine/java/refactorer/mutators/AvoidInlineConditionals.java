@@ -73,7 +73,7 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 		}
 		ConditionalExpr ternary = (ConditionalExpr) node;
 
-		if (!ternary.getParentNode().isPresent()) {
+		if (ternary.getParentNode().isEmpty()) {
 			return false;
 		}
 		Node parent = ternary.getParentNode().get();
@@ -86,7 +86,7 @@ public class AvoidInlineConditionals extends AJavaParserMutator {
 		}
 
 		if (parent instanceof VariableDeclarator) {
-			if (!parent.getParentNode().isPresent()) {
+			if (parent.getParentNode().isEmpty()) {
 				return false;
 			}
 			Node grandParent = parent.getParentNode().get();

@@ -266,7 +266,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		List<IMutator> mutatorsNotComposite = mutatorsMayComposite;
 
 		// Iterate until all CompositeMutators has been unrolled
-		while (mutatorsNotComposite.stream().filter(m -> m instanceof CompositeMutator).findAny().isPresent()) {
+		while (mutatorsNotComposite.stream().anyMatch(m -> m instanceof CompositeMutator)) {
 			mutatorsNotComposite = mutatorsNotComposite.stream().flatMap(m -> {
 				if (m instanceof CompositeMutator) {
 					return ((CompositeMutator<?>) m).getUnderlyings().stream();

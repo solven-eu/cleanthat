@@ -85,7 +85,7 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 		}
 		Modifier modifier = (Modifier) node;
 
-		if (!modifier.getParentNode().isPresent()) {
+		if (modifier.getParentNode().isEmpty()) {
 			return false;
 		}
 
@@ -96,7 +96,7 @@ public class UnnecessaryModifier extends AJavaParserMutator {
 			return false;
 		}
 
-		if (!parentNode.getParentNode().isPresent()) {
+		if (parentNode.getParentNode().isEmpty()) {
 			return false;
 		}
 		Node grandParentNode = parentNode.getParentNode().get();

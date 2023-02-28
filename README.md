@@ -69,7 +69,9 @@ Features :
 
 One liner (even without a `pom.xml`):
 
-        mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
+    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:cleanthat
+        
+or simply `mvn cleanthat:apply`
 
 ## Gradle (Free)
 

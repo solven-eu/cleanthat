@@ -430,7 +430,7 @@
 								<!-- TestCases needs to remains not formatted/cleaned -->
 								<exclude>**/do_not_format_me/**</exclude>
 							</excludes>
-							
+
 							<cleanthat>
 								<sourceJdk>${maven.compiler.source}</sourceJdk>
 								<version>2.6</version>
@@ -443,7 +443,7 @@
 								</mutators>
 								<includeDraft>true</includeDraft>
 							</cleanthat>
-							
+
 							<removeUnusedImports />
 							<importOrder>
 								<file>eclipse/eclipse.importorder</file>

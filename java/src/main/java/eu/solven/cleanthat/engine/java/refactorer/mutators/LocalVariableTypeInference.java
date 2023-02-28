@@ -80,7 +80,11 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 
 		VariableDeclarator newVariableDeclarator =
 				new VariableDeclarator(new VarType(), singleVariableDeclaration.getName(), initializer);
-		return singleVariableDeclaration.replace(newVariableDeclarator);
+		// We can not change the VariableDeclarator, as it would fail in the case of Type with Diamond
+		// return singleVariableDeclaration.replace(newVariableDeclarator);
+
+		VariableDeclarationExpr newVariableDeclarationExpr = new VariableDeclarationExpr(newVariableDeclarator);
+		return variableDeclarationExpr.replace(newVariableDeclarationExpr);
 	}
 
 	private boolean isReplaceableAssignement(Type variableType, Expression initializer) {

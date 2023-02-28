@@ -134,26 +134,40 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration oneCase,
 			Node pre) {
 		LexicalPreservingPrinter.setup(pre);
+		String preAsString = toString(pre);
+
 		// https://github.com/javaparser/javaparser/issues/3322
 		// We prefer not-processing clones as it may lead to dirty issues
-		Node clonedPost = pre.clone();
-		boolean walked = transformer.walkAstHasChanged(convertToAst(pre));
+		Node clonedPre = pre.clone();
+
+		Optional<R> optWalked = transformer.walkAst(convertToAst(pre));
+		boolean walked = optWalked.isPresent();
+
+		String modifiedPreAsString = toString(pre);
+
 		if (transformer instanceof INoOpMutator) {
 			Assert.assertTrue("INoOpMutator is always walked", walked);
 		} else if (walked) {
+			Assert.assertEquals("Should not have mutated " + preAsString
+					+ " but it turned into: "
+					+ preAsString
+					+ ". The whole testcase is: "
+					+ oneCase, preAsString, modifiedPreAsString);
+
 			Assert.assertFalse(
-					"Should not have mutated " + clonedPost
+					"Should not have mutated " + clonedPre
 							+ " but it turned into: "
 							+ pre
 							+ ". The whole testcase is: "
 							+ oneCase,
 					walked);
 		}
-		Assert.assertEquals("No modification on Node", clonedPost, pre);
-		Assert.assertEquals("No modification on Node.toString()", clonedPost.toString(), pre.toString());
+		Assert.assertEquals("No modification on Node.toString()", preAsString, modifiedPreAsString);
+		Assert.assertEquals("No modification on Node", clonedPre, pre);
+
 		// https://github.com/javaparser/javaparser/issues/1913
 		Assert.assertEquals("No modification on Node.prettyString()",
-				LexicalPreservingPrinter.print(clonedPost),
+				LexicalPreservingPrinter.print(clonedPre),
 				LexicalPreservingPrinter.print(pre));
 	}
 

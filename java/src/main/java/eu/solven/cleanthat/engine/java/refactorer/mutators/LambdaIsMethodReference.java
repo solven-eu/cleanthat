@@ -21,6 +21,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
@@ -34,10 +36,12 @@ import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.types.ResolvedLambdaConstraintType;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -110,11 +114,6 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 	//
 	// Optional<Expression> optScope = methodCallExpr.getScope();
 	// if (optScope.isEmpty()) {
-	// return false;
-	// }
-	//
-	// if (optScope.get().isNameExpr()
-	// || !optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
 	// return false;
 	// }
 	//
@@ -227,13 +226,23 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 					return false;
 				}
 
+				ResolvedReferenceType refType = resolvedBound.asReferenceType();
+
 				// https://github.com/javaparser/javaparser/issues/3929
-				return false;
+				// return false;
 
 				// `r -> r.run()` into `Runnable::run`
-				// MethodReferenceExpr methodReference =
-				// new MethodReferenceExpr(new TypeExpr(null), new NodeList<>(), methodCallExpr.getNameAsString());
-				// return lambdaExpr.replace(methodReference);
+				String className = refType.getQualifiedName();
+
+				Optional<CompilationUnit> compilationUnit = lambdaExpr.findAncestor(CompilationUnit.class);
+				if (compilationUnit.isPresent() && isImported(compilationUnit.get().getImports(), className)) {
+					className = toSimpleName(className);
+				}
+
+				MethodReferenceExpr methodReference = new MethodReferenceExpr(new NameExpr(className),
+						methodCallExpr.getTypeArguments().orElseGet(() -> new NodeList<>()),
+						methodCallExpr.getNameAsString());
+				return lambdaExpr.replace(methodReference);
 			} else {
 				return false;
 			}
@@ -281,5 +290,21 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 			}
 		}
 		return false;
+	}
+
+	protected String toSimpleName(String qualifiedClassname) {
+		int indexOf = qualifiedClassname.lastIndexOf('.');
+		if (indexOf < 0) {
+			// already qualified: it may be a class in the root package
+			return qualifiedClassname;
+		} else {
+			return qualifiedClassname.substring(indexOf + 1);
+		}
+	}
+
+	@Deprecated
+	private boolean isImported(NodeList<ImportDeclaration> imports, String className) {
+		// TODO
+		return true;
 	}
 }

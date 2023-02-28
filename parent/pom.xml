@@ -441,7 +441,7 @@
 								<includeDraft>true</includeDraft>
 							</cleanthat>
 
-							<removeUnusedImports />
+<!--							<removeUnusedImports />-->
 							<importOrder>
 								<file>eclipse/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->

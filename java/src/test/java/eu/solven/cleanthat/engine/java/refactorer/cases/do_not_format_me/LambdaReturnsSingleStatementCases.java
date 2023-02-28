@@ -1,12 +1,15 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -87,6 +90,19 @@ public class LambdaReturnsSingleStatementCases extends AJavaparserRefactorerCase
 			// input.asTransaction(session -> session.toLowerCase());
 
 			// input.asTransaction(session -> session.toLowerCase());
+		}
+	}
+
+	@CompareMethods
+	public static class InLambda {
+		public void pre(ICodeProvider cp) throws IOException {
+			cp.listFilesForContent(file -> {
+				Assertions.fail("The FS is empty");
+			});
+		}
+
+		public void post(ICodeProvider cp) throws IOException {
+			cp.listFilesForContent(file -> Assertions.fail("The FS is empty"));
 		}
 	}
 }

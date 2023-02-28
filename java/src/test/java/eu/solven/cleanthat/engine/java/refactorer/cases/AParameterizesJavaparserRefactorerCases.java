@@ -21,6 +21,7 @@ import org.junit.runners.Parameterized;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -36,6 +37,11 @@ public abstract class AParameterizesJavaparserRefactorerCases extends AParameter
 
 	@Override
 	protected Node convertToAst(Node node) {
+		// Many issues are specific to LexicalPreservingPrinter.setup
+		// https://github.com/javaparser/javaparser/issues/3898
+		// https://github.com/javaparser/javaparser/issues/3924
+		LexicalPreservingPrinter.setup(node);
+
 		return node;
 	}
 

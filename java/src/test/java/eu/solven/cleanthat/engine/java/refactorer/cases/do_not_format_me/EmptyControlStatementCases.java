@@ -1,9 +1,12 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.io.IOException;
 import java.util.HashMap;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
@@ -124,6 +127,21 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 				}
 
 			};
+		}
+	}
+
+	@CompareMethods
+	public static class InLambda {
+		public void pre(ICodeProvider cp) throws IOException {
+			cp.listFilesForContent(file -> {
+				Assertions.fail("The FS is empty");
+			});
+		}
+
+		public void post(ICodeProvider cp) throws IOException {
+			cp.listFilesForContent(file -> {
+				Assertions.fail("The FS is empty");
+			});
 		}
 	}
 }

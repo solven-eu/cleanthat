@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
 
-import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -169,6 +169,20 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 					put("k", i);
 				}
 			};
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseCouic {
+		public Optional<Object> pre() {
+			Optional<Map.Entry<String, String>> optPathAndContent = Optional.empty();
+
+			if (optPathAndContent.isEmpty()) {
+				return Optional.empty();
+			}
+
+			Map.Entry<String, String> pathAndContent = optPathAndContent.get();
+			return Optional.of(pathAndContent);
 		}
 	}
 }

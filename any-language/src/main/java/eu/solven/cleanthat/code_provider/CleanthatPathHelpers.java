@@ -69,7 +69,7 @@ public class CleanthatPathHelpers {
 	 * @see {@link #resolveDirectChild(String)}
 	 */
 	// https://bugs.openjdk.org/browse/JDK-8262822
-	public static Path resolveChild(Path parent, String child) throws InvalidPathException, IllegalArgumentException {
+	public static Path resolveChild(Path parent, String child) {
 		return resolveChild(parent, parent.getFileSystem().getPath(child));
 	}
 
@@ -106,7 +106,7 @@ public class CleanthatPathHelpers {
 	 */
 	// https://bugs.openjdk.org/browse/JDK-8262822
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	public static Path resolveChild(Path parent, Path child) throws IllegalArgumentException {
+	public static Path resolveChild(Path parent, Path child) {
 		/*
 		 * Don't permit any root: - If different root, result would not be child of this -> have to throw exception - If
 		 * same root, would allow an adversary to know that their provided root was guessed 'correctly' because no

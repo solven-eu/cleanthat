@@ -27,6 +27,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -108,11 +109,12 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 	public static String messageForIssueReporting(IMutator mutator, Node node) {
 		String faultyCode = node.toString();
 
-		String messageForIssueReporting = "Please report it to '" + "https://github.com/solven-eu/cleanthat/issues"
-				+ "' referring the faulty mutator: '"
-				+ mutator.getClass().getName()
-				+ " with as testCase: \r\n\r\n"
-				+ faultyCode;
+		String messageForIssueReporting =
+				"\r\n\r\nPlease report it to '" + "https://github.com/solven-eu/cleanthat/issues"
+						+ "' referring the faulty mutator: '"
+						+ mutator.getClass().getName()
+						+ " with as testCase: \r\n\r\n"
+						+ faultyCode;
 		return messageForIssueReporting;
 	}
 
@@ -185,9 +187,11 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 					LOGGER.debug("1- Does this still happen? As of ???: Yes!", e);
 				}
 				return fallbackType;
-			} catch (RuntimeException ee) {
-				LOGGER.info("Issue with JavaParser over {}", type, ee);
+			} catch (UnsolvedSymbolException ee) {
+				LOGGER.debug("Issue with JavaParser over {}", type, ee);
 				return Optional.empty();
+			} catch (RuntimeException ee) {
+				throw new IllegalArgumentException(ee);
 			}
 		} catch (NoClassDefFoundError e) {
 			logNoClassDefFoundResolvingType(type, e);

@@ -112,8 +112,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			if (walkNodeResult.isPresent()) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
-				// We rely on javaParser source-code only if the rule has actually impacted the AST
-				LOGGER.debug("A rule based on JavaParser actually modified the code");
+				LOGGER.debug("IMutator {} linted (with impact) {}", ct.getClass().getSimpleName());
 
 				// One relevant change: building source-code from the AST
 				refCleanCode.set(toString(walkNodeResult.get()));

@@ -27,26 +27,6 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		return new LambdaIsMethodReference();
 	}
 
-	@UnmodifiedMethod
-	public static class helpBuilding {
-
-		class B extends CaseSonar {
-			<T> T getObject() {
-				return null;
-			}
-		}
-
-		void pre(List<CaseSonar> list) {
-			list.stream().filter(Objects::isNull).filter(Objects::nonNull).count();
-
-			list.stream()
-					.filter(B.class::isInstance)
-					.map(B.class::cast)
-					.map(B::<String>getObject)
-					.forEach(System.out::println);
-		}
-	}
-
 	// https://sonarsource.atlassian.net/browse/RSPEC-1612
 
 	// .map(B::<String>getObject)
@@ -76,9 +56,8 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	// TODO
-	@UnmodifiedMethod
-	public static class CaseSonar_todo {
+	@CompareMethods
+	public static class Case_methodCall {
 
 		class B extends CaseSonar {
 			<T> T getObject() {
@@ -92,6 +71,26 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 		Stream<?> post(List<B> list) {
 			return list.stream().map(B::<String>getObject);
+		}
+	}
+
+	// TODO
+	@UnmodifiedMethod
+	// @CompareMethods
+	public static class Case_methodCall_afterSimpleMap {
+
+		class B extends CaseSonar {
+			<T> T getObject() {
+				return null;
+			}
+		}
+
+		Stream<?> pre(List<B> list) {
+			return list.stream().map(b -> b).map(b -> b.<String>getObject());
+		}
+
+		Stream<?> post(List<B> list) {
+			return list.stream().map(b -> b).map(B::<String>getObject);
 		}
 	}
 
@@ -161,8 +160,8 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 	// Example from https://rules.sonarsource.com/java/RSPEC-1602
 	// Stuck on https://github.com/javaparser/javaparser/issues/3929
-	// @CompareMethods
-	@UnmodifiedMethod
+	@CompareMethods
+	// @UnmodifiedMethod
 	public static class CaseRunnable {
 		public void pre(List<Runnable> runnables) {
 			runnables.forEach(r -> r.run());

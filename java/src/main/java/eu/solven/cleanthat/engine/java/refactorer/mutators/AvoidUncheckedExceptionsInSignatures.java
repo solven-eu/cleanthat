@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
@@ -69,7 +70,10 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaParserMutator {
 
 			List<ResolvedReferenceType> ancestors = referenceType.getAllClassesAncestors();
 
-			optResolved.get().isAssignableBy(null);
+			// https://github.com/javaparser/javaparser/issues/3929#issuecomment-1447720743
+			// optResolved.get().isAssignableBy(ReferenceTypeImpl.);
+
+			// new ReferenceTypeImpl(null)
 
 			if (referenceType.getQualifiedName().equals(RuntimeException.class.getName())) {
 				return true;

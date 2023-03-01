@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -48,39 +49,52 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	// @CompareMethods
-	@UnmodifiedMethod
+	@CompareMethods
+	// @UnmodifiedMethod
 	public static class EmptyArray {
 		public Object pre() {
 			return Arrays.asList().stream();
 		}
 
-		public Object post(String[] objects) {
-			return Stream.of();
+		public Object post() {
+			return java.util.stream.Stream.of();
 		}
 	}
 
-	// @CompareMethods
-	@UnmodifiedMethod
+	@CompareMethods
+	// @UnmodifiedMethod
 	public static class ConstantArray {
 		public Object pre() {
 			return Arrays.asList("a", 1).stream();
 		}
 
 		public Object post() {
-			return Stream.of("a", 1);
+			return java.util.stream.Stream.of("a", 1);
 		}
 	}
 
-	// @CompareMethods
-	@UnmodifiedMethod
+	@CompareMethods
+	// @UnmodifiedMethod
 	public static class IndividualArguments {
 		public Object pre(String a, Number b) {
 			return Arrays.asList(a, b).stream();
 		}
 
 		public Object post(String a, Number b) {
-			return Stream.of(a, b);
+			return java.util.stream.Stream.of(a, b);
 		}
 	}
+
+	// @CompareMethods
+	@UnmodifiedMethod
+	public static class ArraysAsListString {
+		public Object pre() {
+			return Arrays.asList(" total 65512K").stream().collect(Collectors.joining("\n"));
+		}
+
+		public Object post() {
+			return Stream.of(" total 65512K").collect(Collectors.joining("\n"));
+		}
+	}
+
 }

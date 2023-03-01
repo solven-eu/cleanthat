@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.ArraysDotStreamCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestArraysDotStream extends AParameterizesJavaparserRefactorerCases {
+public class TestArraysDotStreamCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new ArraysDotStreamCases();
 	}
 
-	public TestArraysDotStream(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestArraysDotStreamCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

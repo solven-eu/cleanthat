@@ -21,7 +21,7 @@ Related projects:
 
 See [CHANGES.MD](CHANGES.MD)
 
-- 2023-02-22: 2.6 Latest release
+- 2023-03-01: 2.7 Latest release
 - ...
 - 2023-02-06: 2.0 Major Release leveraging from/to [Spotless](https://github.com/diffplug/spotless)
 - ...
@@ -62,13 +62,15 @@ Cleanthat Refactorer is currently compatible with the following languages:
 
 `mvn` integration is available through Spotless: https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat
 
+[![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug.spotless%3Aspotless--maven--plugin-blue.svg)](https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin)
+
 One can then clean its codebase with `mvn spotless:apply`
 
 ### Cleanthat `mvn` plugin (for GitHub App users)
 
 See README: https://github.com/solven-eu/cleanthat/tree/master/maven
 
-![Maven Central](https://img.shields.io/maven-central/v/io.github.solven-eu.cleanthat/java)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.solven-eu.cleanthat/java)(https://mvnrepository.com/artifact/io.github.solven-eu.cleanthat/cleanthat-maven-plugin)
 
 Features :
 

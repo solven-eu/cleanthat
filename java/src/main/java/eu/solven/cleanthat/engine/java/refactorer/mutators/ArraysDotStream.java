@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
@@ -97,11 +100,22 @@ public class ArraysDotStream extends AJavaParserMutator {
 			return false;
 		}
 
-		if (scopeAsMethodCallExpr.getArguments().size() != 1) {
-			// TODO Handle this case with Stream.of(...)
-			return false;
+		// TODO Manage imports
+		if (scopeAsMethodCallExpr.getArguments().isEmpty()) {
+			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
+			return node.replace(new MethodCallExpr(new NameExpr(Stream.class.getName()), "of"));
+		} else if (scopeAsMethodCallExpr.getArguments().size() != 1) {
+			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
+			return node.replace(new MethodCallExpr(new NameExpr(Stream.class.getName()),
+					"of",
+					scopeAsMethodCallExpr.getArguments()));
 		}
 		var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
+
+		Optional<ResolvedType> optType = optResolvedType(filterPredicate);
+		if (!optType.get().isArray()) {
+			return false;
+		}
 
 		var localTransformed = false;
 		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);

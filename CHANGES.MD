@@ -4,6 +4,10 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 ### Fixed
+* `ArraysDotStream` requires the argument to be an Array to convert use `Arrays.steam()`
+
+## [2.7] - 2023-01-01
+### Fixed
 * `LocalVariableTypeInference` improved handling of unresolved types
 ### Changes
 * `LineEnding` management is dropped from `ILintFixer` and `ILintFixerWithPath`

@@ -220,6 +220,10 @@ public abstract class ATestCases<N, R> {
 					// https://github.com/javaparser/javaparser/pull/2320
 					// It can be difficult to provide a TypeExpr given a MethodCallExpr
 					LOGGER.warn("We skip javaParser Node equality due to `::` and TypeExpr given a MethodCallExpr");
+				} else if (expectedPost.contains("java.util.stream.Stream")) {
+					// see ArraysDotStream
+					// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
+					LOGGER.warn("We skip javaParser Node equality due to `packagedname` (NameExpr vs FieldAccessExp)");
 				} else {
 					// Some cases leads to failure here: nodes are different while they have the same .toString
 					// A Visitor similar to EqualsVisiyot, but returning the first different node would be helpful

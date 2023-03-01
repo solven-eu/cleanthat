@@ -433,7 +433,7 @@
 
 							<cleanthat>
 								<sourceJdk>${maven.compiler.source}</sourceJdk>
-								<version>2.7-SNAPSHOT</version>
+								<version>2.7</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
 									<mutator>SafeButNotConsensual</mutator>

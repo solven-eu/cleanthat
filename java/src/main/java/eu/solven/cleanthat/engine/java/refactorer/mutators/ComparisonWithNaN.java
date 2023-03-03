@@ -66,7 +66,7 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 		}
 		var binaryExpr = (BinaryExpr) node;
 
-		if (binaryExpr.getOperator() != BinaryExpr.Operator.EQUALS) {
+		if (isEquals(binaryExpr)) {
 			return false;
 		}
 
@@ -113,6 +113,12 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 
 		return node.replace(replacement);
 
+	}
+
+	// https://github.com/pmd/pmd/issues/2716
+	@SuppressWarnings("PMD.CompareObjectsWithEquals")
+	private boolean isEquals(BinaryExpr binaryExpr) {
+		return binaryExpr.getOperator() != BinaryExpr.Operator.EQUALS;
 	}
 
 	private boolean isNaNReference(Expression left) {

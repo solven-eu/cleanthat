@@ -47,7 +47,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitsAsResource;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsResource;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
@@ -83,7 +83,7 @@ public abstract class ATestCases<N, R> {
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsResources.class).isPresent()
-						|| c.getAnnotationByClass(UnmodifiedCompilationUnitsAsResource.class).isPresent());
+						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsResource.class).isPresent());
 	}
 
 	public static MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
@@ -415,7 +415,7 @@ public abstract class ATestCases<N, R> {
 	public void doCheckUnmodifiedCompilationUnitsAsResources(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
-			UnmodifiedCompilationUnitsAsResource annotation) {
+			UnmodifiedCompilationUnitAsResource annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
 		var pre = javaParser.parse(preAsString).getResult().get();
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());

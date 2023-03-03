@@ -15,13 +15,15 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -34,7 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 
 	// Object -> Throwable -> Exception -> RuntimeException
-	private static final int INDEXOF_RUNTIMEEXCEPTION = 4;
+	// private static final int INDEXOF_RUNTIMEEXCEPTION = 4;
 
 	@Override
 	public String minimalJavaVersion() {
@@ -61,35 +63,22 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 		return nodeWithThrown.getThrownExceptions().removeIf(t -> {
 			Optional<ResolvedType> optResolved = optResolvedType(t);
 
-			if (optResolved.isEmpty() || !optResolved.get().isReferenceType()) {
+			if (optResolved.isEmpty()) {
 				return false;
 			}
 
-			var referenceType = optResolved.get().asReferenceType();
+			ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
+			SymbolReference<ResolvedReferenceTypeDeclaration> optType =
+					typeSolver.tryToSolveType(RuntimeException.class.getName());
 
-			List<ResolvedReferenceType> ancestors = referenceType.getAllClassesAncestors();
+			// https://github.com/javaparser/javaparser/issues/3929
+			ReferenceTypeImpl referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
 
-			// https://github.com/javaparser/javaparser/issues/3929#issuecomment-1447720743
-			// optResolved.get().isAssignableBy(ReferenceTypeImpl.);
-
-			// new ReferenceTypeImpl(null)
-
-			if (referenceType.getQualifiedName().equals(RuntimeException.class.getName())) {
-				return true;
-			} else if (ancestors.size() >= INDEXOF_RUNTIMEEXCEPTION
-					&& ancestors.get(ancestors.size() - INDEXOF_RUNTIMEEXCEPTION)
-							.getQualifiedName()
-							.equals(RuntimeException.class.getName())) {
+			if (referenceTypeImpl.isAssignableBy(optResolved.get())) {
 				return true;
 			} else {
 				return false;
 			}
-
-			// ObjectCreationExpr expression = new ObjectCreationExpr(null,
-			// new ClassOrInterfaceType(RuntimeException.class.getSimpleName()),
-			// new NodeList<>());
-			// node.getSymbolResolver().calculateType(expression);
-
 		});
 	}
 

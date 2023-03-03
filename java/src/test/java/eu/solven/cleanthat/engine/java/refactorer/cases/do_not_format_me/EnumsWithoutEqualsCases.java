@@ -3,6 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.math.RoundingMode;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -45,5 +46,18 @@ public class EnumsWithoutEqualsCases extends AJavaparserRefactorerCases {
 		public boolean post(RoundingMode roundingMode) {
 			return RoundingMode.UP != roundingMode;
 		}
+	}
+
+	@UnmodifiedCompilationUnitAsString(pre = "package custom.project;\n"
+			+ "\n"
+			+ "import custom.library.RoundingMode;\n"
+			+ "\n"
+			+ "public class CheckEnum {\n"
+			+ "	public boolean pre(RoundingMode roundingMode) {\n"
+			+ "		return roundingMode.equals(RoundingMode.UP);\n"
+			+ "	}\n"
+			+ "}\n"
+			+ "")
+	public static class UnknownType {
 	}
 }

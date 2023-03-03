@@ -23,14 +23,14 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 
 /**
  * Turns `new Double(d)` into `Double.valueOf(d)`
  *
  * @author Benoit Lacelle
  */
-public class BoxedPrimitiveConstructor extends AJavaParserExprMutator {
+public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
 		// java.lang.Boolean.valueOf(boolean): 1.4
@@ -41,6 +41,16 @@ public class BoxedPrimitiveConstructor extends AJavaParserExprMutator {
 	@Override
 	public Optional<String> getCleanthatId() {
 		return Optional.of("BoxedPrimitiveConstructor");
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("PrimitiveWrapperInstantiation");
+	}
+
+	@Override
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation";
 	}
 
 	@Override

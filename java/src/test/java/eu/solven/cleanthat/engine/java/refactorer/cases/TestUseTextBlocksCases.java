@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.javaparser.JavaParser;
@@ -26,6 +27,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseTextBlocksCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
+@Ignore
 public class TestUseTextBlocksCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {

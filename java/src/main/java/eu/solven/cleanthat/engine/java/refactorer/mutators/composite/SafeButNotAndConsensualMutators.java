@@ -28,18 +28,16 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidUncheckedExceptionsInSignatures;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.BoxedPrimitiveConstructor;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ComparisonWithNaN;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 
 /**
@@ -58,13 +56,14 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					// new AvoidFileStream(),
 					new AvoidInlineConditionals(),
 					new AvoidUncheckedExceptionsInSignatures(),
-					new BoxedPrimitiveConstructor(),
+					new PrimitiveWrapperInstantiation(),
 					new ComparisonWithNaN(),
 					new CreateTempFilesUsingNio(),
 					new EmptyControlStatement(),
 					new EnumsWithoutEquals(),
 					new LambdaIsMethodReference(),
-					new LambdaReturnsSingleStatement(),
+					// https://github.com/javaparser/javaparser/pull/3938
+					// new LambdaReturnsSingleStatement(),
 					new LiteralsFirstInComparisons(),
 					new LocalVariableTypeInference(),
 					new UnnecessaryImport(),
@@ -72,7 +71,8 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					// UseDiamondOperator is too much unstable
 					// new UseDiamondOperator(),
 					// new UseDiamondOperatorJdk8(),
-					new UseTextBlocks(),
+					// https://github.com/javaparser/javaparser/issues/3936
+					// new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals())
 			.build();
 

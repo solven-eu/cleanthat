@@ -27,14 +27,14 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 's.filter(p).findAny().isPresent()' into 's.anyMatch(predicate)'
  *
  * @author Benoit Lacelle
  */
-public class StreamAnyMatch extends AJavaParserMutator {
+public class StreamAnyMatch extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
 
 	private static final String METHOD_FILTER = "filter";

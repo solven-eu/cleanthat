@@ -11,7 +11,10 @@ import org.springframework.core.io.InputStreamResource;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
@@ -336,4 +339,35 @@ public class LiteralsFirstInComparisonsCases extends AJavaparserRefactorerCases 
 			return "\r\n".equals(EOL);
 		}
 	}
+
+	// @CompareCompilationUnitsAsResources(pre =
+	// "/source/do_not_format_me/LiteralsFirstInComparisons/TestApexCubeSnapshooterOnUpdatedCountries.java",
+	// post = "/source/do_not_format_me/LiteralsFirstInComparisons/TestApexCubeSnapshooterOnUpdatedCountries.java")
+	// public static class Issue_resolvingType {
+	// }
+
+	@UnmodifiedCompilationUnitAsString(pre = "package blasd.apex.server.cube.snapshot;\n" + "\n"
+			+ "import com.quartetfs.biz.pivot.cube.hierarchy.ILevelInfo;\n"
+			+ "\n"
+			+ "public class TestApexCubeSnapshooterOnUpdatedCountries {\n"
+			+ "\n"
+			+ "	public void testQueryOnUpdatePartitions(ILevelInfo countryLevel) {\n"
+			+ "		return new AApexCubeSnapshooter() {\n"
+			+ "\n"
+			+ "				@Override\n"
+			+ "				protected String getTargetColumnName(ILevelInfo levelInfo) {\n"
+			+ "					if (levelInfo.equals(countryLevel)) {\n"
+			+ "						return COUNTRY;\n"
+			+ "					} else {\n"
+			+ "						return super.getTargetColumnName(levelInfo);\n"
+			+ "					}\n"
+			+ "				}\n"
+			+ "\n"
+			+ "			};\n"
+			+ "	}\n"
+			+ "}\n"
+			+ "")
+	public static class Issue_unknownType {
+	}
+
 }

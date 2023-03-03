@@ -32,14 +32,11 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
-import com.github.javaparser.resolution.Resolvable;
-import com.github.javaparser.resolution.SymbolResolver;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
@@ -48,7 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class LiteralsFirstInComparisons extends AJavaParserMutator implements IMutatorDescriber {
+public class LiteralsFirstInComparisons extends AJavaparserMutator implements IMutatorDescriber {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 
 	private static final String METHOD_EQUALS = "equals";
@@ -164,27 +161,18 @@ public class LiteralsFirstInComparisons extends AJavaParserMutator implements IM
 	private boolean isStaticField(Expression singleArgument) {
 		boolean argumentIsField;
 		if (singleArgument instanceof NameExpr || singleArgument instanceof FieldAccessExpr) {
-			ResolvedValueDeclaration resolved;
-			try {
-				resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
-			} catch (UnsolvedSymbolException e) {
-				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
+			Optional<ResolvedDeclaration> optResolved = optResolved(singleArgument);
 
+			if (optResolved.isEmpty()) {
 				return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
-			} catch (IllegalStateException e) {
-				if (e.getMessage().contains(SymbolResolver.class.getSimpleName())) {
-					// com.github.javaparser.ast.Node.getSymbolResolver()
-					LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
-					return looksLikeAConstant(((NodeWithSimpleName<?>) singleArgument).getName());
-				} else {
-					throw new IllegalStateException(e);
-				}
-			}
-
-			if (resolved.isField() && resolved.asField().isStatic()) {
-				argumentIsField = true;
 			} else {
-				argumentIsField = false;
+				var resolved = optResolved.get();
+
+				if (resolved.isField() && resolved.asField().isStatic()) {
+					argumentIsField = true;
+				} else {
+					argumentIsField = false;
+				}
 			}
 		} else {
 			argumentIsField = false;

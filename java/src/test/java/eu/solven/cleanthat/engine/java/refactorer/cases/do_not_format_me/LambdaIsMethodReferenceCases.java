@@ -95,6 +95,7 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// TODO
 	@UnmodifiedMethod
 	public static class CaseConstructor {
 
@@ -104,6 +105,14 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 		Set<?> post(Stream<?> s) {
 			return s.collect(Collectors.toCollection(HashSet::new));
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseCast_Generic {
+
+		<T> Set<T> pre(Stream<?> s) {
+			return s.map(o -> (T) o).collect(Collectors.toSet());
 		}
 	}
 
@@ -191,15 +200,14 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 					+ "	}\n"
 					+ "}\n"
 					+ "",
-			post = "package eu.solven.cleanthat.engine.java.refactorer;\n"
-					+ "\n"
+			post = "package eu.solven.cleanthat.engine.java.refactorer;\n" + "\n"
 					+ "import java.util.Map;\n"
 					+ "\n"
 					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
 					+ "\n"
-					+ "    public String testRoaringBitmap(Map<String, ?> map) {\n"
-					+ "        return map.entrySet().stream().map(java.util.Map.Entry::getKey).findAny().get();\n"
-					+ "    }\n"
+					+ "	public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "		return map.entrySet().stream().map(java.util.Map.Entry::getKey).findAny().get();\n"
+					+ "	}\n"
 					+ "}\n"
 					+ "")
 	public static class CaseNeedImport {
@@ -207,8 +215,7 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 	// One may prefer `Map.Entry::getKey` than `Entry::getKey`
 	@CompareCompilationUnitsAsStrings(
-			pre = "package eu.solven.cleanthat.engine.java.refactorer;\n"
-					+ "\n"
+			pre = "package eu.solven.cleanthat.engine.java.refactorer;\n" + "\n"
 					+ "import java.util.Map;\n"
 					+ "import java.util.Map.Entry;\n"
 					+ "\n"
@@ -223,20 +230,19 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 					+ "	}\n"
 					+ "}\n"
 					+ "",
-			post = "package eu.solven.cleanthat.engine.java.refactorer;\n"
-					+ "\n"
+			post = "package eu.solven.cleanthat.engine.java.refactorer;\n" + "\n"
 					+ "import java.util.Map;\n"
 					+ "import java.util.Map.Entry;\n"
 					+ "\n"
 					+ "public class TestEclipseStylesheetGenerator_OverBigFiles {\n"
 					+ "\n"
-					+ "    public String testRoaringBitmap(Entry<String, ?> e) {\n"
-					+ "        return e.getKey();\n"
-					+ "    }\n"
+					+ "	public String testRoaringBitmap(Entry<String, ?> e) {\n"
+					+ "		return e.getKey();\n"
+					+ "	}\n"
 					+ "\n"
-					+ "    public String testRoaringBitmap(Map<String, ?> map) {\n"
-					+ "        return map.entrySet().stream().map(Entry::getKey).findAny().get();\n"
-					+ "    }\n"
+					+ "	public String testRoaringBitmap(Map<String, ?> map) {\n"
+					+ "		return map.entrySet().stream().map(Entry::getKey).findAny().get();\n"
+					+ "	}\n"
 					+ "}\n"
 					+ "")
 	public static class CaseAlreadyImported {

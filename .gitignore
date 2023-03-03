@@ -25,6 +25,7 @@ buildNumber.properties
 .project
 .settings
 bin
+.factorypath
 
 # JavaMissionControl
 *.jfr

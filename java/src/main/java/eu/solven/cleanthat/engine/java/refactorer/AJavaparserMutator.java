@@ -22,11 +22,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.Resolvable;
+import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -43,8 +51,9 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserMutator implements IJavaparserMutator, IMutatorExternalReferences {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaParserMutator.class);
+@SuppressWarnings("PMD.GodClass")
+public abstract class AJavaparserMutator implements IJavaparserMutator, IMutatorExternalReferences {
+	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaparserMutator.class);
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
 
@@ -207,6 +216,36 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 		}
 	}
 
+	protected Optional<ResolvedDeclaration> optResolved(Expression singleArgument) {
+		if (!(singleArgument instanceof Resolvable<?>)) {
+			return Optional.empty();
+		}
+
+		try {
+			Object resolved = ((Resolvable<?>) singleArgument).resolve();
+			return Optional.of((ResolvedDeclaration) resolved);
+			// resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
+		} catch (UnsolvedSymbolException e) {
+			LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
+			return Optional.empty();
+		} catch (IllegalStateException | UnsupportedOperationException e) {
+			if (e.getMessage().contains(SymbolResolver.class.getSimpleName())) {
+				// com.github.javaparser.ast.Node.getSymbolResolver()
+				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
+				return Optional.empty();
+			} else if (e.getMessage().contains("unsolved symbol")) {
+				// Caused by: java.lang.UnsupportedOperationException: CorrespondingDeclaration not available for
+				// unsolved symbol.
+				// at
+				// com.github.javaparser.resolution.model.SymbolReference.getCorrespondingDeclaration(SymbolReference.java:116)
+				LOGGER.debug("Typically a 3rd-party symbol (e.g. in some library not loaded by CleanThat)", e);
+				return Optional.empty();
+			} else {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
+
 	protected void onMethodName(Node node, String methodName, OnMethodName consumer) {
 		if (node instanceof MethodCallExpr && methodName.equals(((MethodCallExpr) node).getName().getIdentifier())) {
 			var methodCall = (MethodCallExpr) node;
@@ -250,5 +289,65 @@ public abstract class AJavaParserMutator implements IJavaparserMutator, IMutator
 		}
 
 		return true;
+	}
+
+	/**
+	 * 
+	 * @param compilationUnit
+	 * @param methodRefPackage
+	 * @param qualifiedName
+	 * @return true if the given qualifiedName (which may be a nested Class) in given package is already imported in
+	 *         given CompilationUnit
+	 */
+	protected boolean isImported(CompilationUnit compilationUnit, String methodRefPackage, String qualifiedName) {
+		Optional<PackageDeclaration> optPackageDeclaration = compilationUnit.getPackageDeclaration();
+		if (optPackageDeclaration.isPresent()) {
+			var packageDecl = optPackageDeclaration.get().getNameAsString();
+
+			// see UnnecessaryImport.removeSamePackageImports(Collection<ImportDeclaration>,
+			// Optional<PackageDeclaration>)
+			if (methodRefPackage.equals(packageDecl)) {
+				return true;
+			}
+		}
+
+		NodeList<ImportDeclaration> imports = compilationUnit.getImports();
+
+		if (imports.isEmpty() && methodRefPackage.indexOf('.') >= 0) {
+			return false;
+		}
+
+		if ("java.lang".equals(methodRefPackage)) {
+			return true;
+		}
+		// TODO manage wildcards/asterisks
+		return imports.stream().anyMatch(id -> id.getNameAsString().equals(qualifiedName));
+	}
+
+	/**
+	 * 
+	 * @param compilationUnit
+	 * @param qualifiedName
+	 * @return true if the given qualifiedName (which may be a nested Class) in given package can be imported in given
+	 *         CompilationUnit without conflicting existing imports
+	 */
+	protected boolean isImportable(CompilationUnit compilationUnit, String qualifiedName) {
+		NodeList<ImportDeclaration> imports = compilationUnit.getImports();
+
+		var tokenName = getSimpleName(qualifiedName);
+
+		// There is already a wildcard import: it may hold the token name
+		return imports.stream()
+				.noneMatch(id -> id.isAsterisk() || getSimpleName(id.getNameAsString()).equals(tokenName));
+	}
+
+	protected String getSimpleName(String qualifiedName) {
+		var indexOfDot = qualifiedName.lastIndexOf('.');
+
+		if (indexOfDot < 0) {
+			return qualifiedName;
+		} else {
+			return qualifiedName.substring(indexOfDot + 1);
+		}
 	}
 }

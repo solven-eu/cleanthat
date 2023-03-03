@@ -25,14 +25,14 @@ import com.github.javaparser.ast.expr.LiteralStringValueExpr;
 import com.github.javaparser.ast.expr.LongLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'int i = 1234567’ into ’int i = 1_234_567'
  *
  * @author Benoit Lacelle
  */
-public class UseUnderscoresInNumericLiterals extends AJavaParserMutator {
+public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
 	// We groups digits per block of thousands
 	private static final int BLOCK_SIZE = 3;
 

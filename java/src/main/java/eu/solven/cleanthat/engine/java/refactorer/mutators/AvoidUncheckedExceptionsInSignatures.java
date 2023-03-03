@@ -24,14 +24,14 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns `throws RuntimeException` into ``
  *
  * @author Benoit Lacelle
  */
-public class AvoidUncheckedExceptionsInSignatures extends AJavaParserMutator {
+public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 
 	// Object -> Throwable -> Exception -> RuntimeException
 	private static final int INDEXOF_RUNTIMEEXCEPTION = 4;

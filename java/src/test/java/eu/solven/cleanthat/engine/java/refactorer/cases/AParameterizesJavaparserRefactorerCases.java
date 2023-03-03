@@ -46,7 +46,14 @@ public abstract class AParameterizesJavaparserRefactorerCases extends AParameter
 	}
 
 	@Override
-	protected String toString(Node node) {
-		return node.toString();
+	protected String astToString(Node node) {
+		return LexicalPreservingPrinter.print(node);
+		// return node.toString();
+	}
+
+	@Override
+	protected String resultToString(Node node) {
+		return LexicalPreservingPrinter.print(node);
+		// return node.toString();
 	}
 }

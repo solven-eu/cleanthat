@@ -30,7 +30,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
@@ -38,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIsEmptyOnCollections extends AJavaParserMutator {
+public class UseIsEmptyOnCollections extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
@@ -122,11 +122,10 @@ public class UseIsEmptyOnCollections extends AJavaParserMutator {
 		return false;
 	}
 
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	private boolean checkTypeAndProcess(Node node, Expression lengthScope, ResolvedType type) {
 		boolean transformed;
 		if (type.isReferenceType()) {
-			LOGGER.info("scope={} type={}", lengthScope, type);
+			LOGGER.debug("scope={} type={}", lengthScope, type);
 			var doIt = false;
 			var referenceType = type.asReferenceType();
 			if (referenceType.getQualifiedName().equals(Collection.class.getName())

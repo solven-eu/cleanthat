@@ -211,8 +211,9 @@
 					<configuration>
 						<!-- Skipped as we need a Pepper release for the default exclusions -->
 						<skip>false</skip>
-						<!-- Need Pepper release 4.3? -->
 						<excludeFilterFile>style/pepper.spotbugs.xml</excludeFilterFile>
+						<!-- Try not forking else it is slow even if skipped -->
+						<fork>false</fork>
 					</configuration>
 					<dependencies>
 						<dependency>

@@ -49,6 +49,11 @@
 			<artifactId>rewrite-java-11</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openrewrite.recipe</groupId>
+			<artifactId>rewrite-logging-frameworks</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<dependency>
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->

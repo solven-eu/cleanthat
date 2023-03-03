@@ -37,14 +37,14 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * cases inspired from #description
  *
  * @author Sébastien Collard
  */
-public class CreateTempFilesUsingNio extends AJavaParserMutator {
+public class CreateTempFilesUsingNio extends AJavaparserMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
 

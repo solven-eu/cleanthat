@@ -4,7 +4,15 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 ### Fixed
-* `ArraysDotStream` requires the argument to be an Array to convert use `Arrays.steam()`
+* `ArraysDotStream` requires the argument to be an Array to convert use `Arrays.steam()`. It may also rely on `Stream.of` for other cases
+* `ArraysDotStream` will apply only if the scope is `Arrays`
+* `EmptyControlStatement` will not break empty method definitions.
+* `LiteralsFirstInComparisons` better handles unresolved symbols.
+* `LambdaIsMethodReference` will not rely on `T.class::cast` if T is a Type bound (e.g. in `<T> void method(...)`).
+### Changes
+* `UseTextBlocks` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/issues/3936).
+* `LambdaReturnsSingleStatement` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/pull/3938).
+* `BoxedPrimitiveConstructor` is renamed `PrimitiveWrapperInstantiation`, as it is the relevant PMD rule.
 
 ## [2.7] - 2023-01-01
 ### Fixed

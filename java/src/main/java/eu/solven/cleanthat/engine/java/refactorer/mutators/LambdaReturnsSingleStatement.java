@@ -25,14 +25,14 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns '.stream(s -> {return s.subString(0, 2)})' into '.stream(s -> s.subString(0, 2))'
  *
  * @author Benoit Lacelle
  */
-public class LambdaReturnsSingleStatement extends AJavaParserMutator {
+public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 
 	@Override
 	public boolean isDraft() {

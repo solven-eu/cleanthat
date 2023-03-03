@@ -27,7 +27,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
  *
  * @author Benoit Lacelle
  */
-public abstract class ATodoJavaParserMutator extends AJavaParserMutator {
+public abstract class ATodoJavaParserMutator extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override

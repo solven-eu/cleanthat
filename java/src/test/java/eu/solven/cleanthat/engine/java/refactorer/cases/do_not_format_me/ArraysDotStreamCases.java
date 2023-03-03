@@ -4,7 +4,11 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Lists;
+
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream;
@@ -57,7 +61,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post() {
-			return java.util.stream.Stream.of();
+			return Stream.of();
 		}
 	}
 
@@ -69,7 +73,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post() {
-			return java.util.stream.Stream.of("a", 1);
+			return Stream.of("a", 1);
 		}
 	}
 
@@ -81,12 +85,12 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post(String a, Number b) {
-			return java.util.stream.Stream.of(a, b);
+			return Stream.of(a, b);
 		}
 	}
 
-	// @CompareMethods
-	@UnmodifiedMethod
+	@CompareMethods
+	// @UnmodifiedMethod
 	public static class ArraysAsListString {
 		public Object pre() {
 			return Arrays.asList(" total 65512K").stream().collect(Collectors.joining("\n"));
@@ -95,6 +99,139 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 		public Object post() {
 			return Stream.of(" total 65512K").collect(Collectors.joining("\n"));
 		}
+	}
+
+	@UnmodifiedMethod
+	public static class GuavaListsAsList {
+		public Object pre(Runnable first, Runnable... more) {
+			return Lists.asList(first, more).stream();
+		}
+	}
+	
+	@CompareCompilationUnitsAsStrings(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return Arrays.asList(\"a\", \"b\").stream().collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "",
+			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "import java.util.stream.Stream;\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return Stream.of(\"a\", \"b\").collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "")
+	public static class AddImports_noStreamYet {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
+					+ "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "import java.util.stream.Stream;\n"
+					+ "\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return Arrays.asList(\"a\", \"b\").stream().collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "	\n"
+					+ "	public static long mongoSteam(Stream<?> javaUtilStream) {\n"
+					+ "		return javaUtilStream.count();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "",
+			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
+					+ "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "import java.util.stream.Stream;\n"
+					+ "\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return Stream.of(\"a\", \"b\").collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "	\n"
+					+ "	public static long mongoSteam(Stream<?> javaUtilStream) {\n"
+					+ "		return javaUtilStream.count();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "")
+	public static class AddImports_alreadyStream {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
+					+ "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "\n"
+					+ "import com.mongodb.connection.Stream;\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return Arrays.asList(\"a\", \"b\").stream().collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "	\n"
+					+ "	public static String mongoSteam(Stream mongoStream) {\n"
+					+ "		return mongoStream.toString();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "",
+			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
+					+ "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "\n"
+					+ "import com.mongodb.connection.Stream;\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream() {\n"
+					+ "		return java.util.stream.Stream.of(\"a\", \"b\").collect(Collectors.toList());\n"
+					+ "	}\n"
+					+ "	\n"
+					+ "	public static String mongoSteam(Stream mongoStream) {\n"
+					+ "		return mongoStream.toString();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "")
+	public static class AddImports_hasOtherStreamAlready {
+	}
+
+	// TODO
+//	@CompareCompilationUnitsAsStrings
+	@UnmodifiedCompilationUnitAsString(
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
+					+ "\n"
+					+ "import java.util.Arrays;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.stream.Collectors;\n"
+					+ "import com.fancy_editor.ILocation;\n"
+					+ "\n"
+					+ "public class SimpleArraysAsList {\n"
+					+ "	public static List<String> toStream(ILocation location) {\n"
+					+ "		return Arrays.asList(location).stream();\n"
+					+ "	}\n"
+					+ "}\n"
+					+ "")
+	public static class OverUnknownType {
 	}
 
 }

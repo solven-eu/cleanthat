@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 @Target(ElementType.TYPE)
 // Runtime as this will be interpreted as Runtime to resolve `pre` and `post` (as concatenated Strings)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UnmodifiedCompilationUnitsAsResources {
+public @interface UnmodifiedCompilationUnitsAsResource {
 	/**
 	 * 
 	 * @return the path of the resource over which a {@link IMutator} has to be applied
@@ -46,5 +46,5 @@ public @interface UnmodifiedCompilationUnitsAsResources {
 	 * 
 	 * @return the path of the resource expected code after the {@link IMutator}
 	 */
-	String post();
+	String post() default "";
 }

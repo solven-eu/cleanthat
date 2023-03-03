@@ -30,7 +30,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.Pair;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'int i = 10;' into 'var i = 10'
@@ -38,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/issues/1656
-public class LocalVariableTypeInference extends AJavaParserMutator {
+public class LocalVariableTypeInference extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -87,7 +87,9 @@ public class LocalVariableTypeInference extends AJavaParserMutator {
 		// return singleVariableDeclaration.replace(newVariableDeclarator);
 
 		var newVariableDeclarationExpr = new VariableDeclarationExpr(newVariableDeclarator);
+
 		newVariableDeclarationExpr.setModifiers(variableDeclarationExpr.getModifiers());
+		newVariableDeclarationExpr.setAnnotations(variableDeclarationExpr.getAnnotations());
 
 		return variableDeclarationExpr.replace(newVariableDeclarationExpr);
 	}

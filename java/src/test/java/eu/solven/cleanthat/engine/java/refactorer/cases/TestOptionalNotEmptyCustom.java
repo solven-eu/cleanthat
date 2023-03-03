@@ -25,7 +25,7 @@ import org.springframework.core.io.Resource;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
@@ -46,6 +46,6 @@ public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
 		var transformed = transformer.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
-		Assertions.assertThat(AJavaParserMutator.getWarnCount()).isEqualTo(0);
+		Assertions.assertThat(AJavaparserMutator.getWarnCount()).isEqualTo(0);
 	}
 }

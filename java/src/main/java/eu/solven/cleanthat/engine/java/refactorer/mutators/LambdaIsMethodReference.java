@@ -19,10 +19,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
@@ -33,12 +31,13 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.TypeExpr;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns `.stream(s -> s.size())` into `.stream(String::size)`
@@ -46,7 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class LambdaIsMethodReference extends AJavaParserMutator {
+public class LambdaIsMethodReference extends AJavaparserMutator {
 	@Override
 	public boolean isDraft() {
 		// Beware of Objects import management
@@ -82,9 +81,6 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 
 		var lambdaExpr = (LambdaExpr) node;
 
-		// if (lambdaExpr.getParameters().isEmpty()) {
-		// return hasZeroVariable(lambdaExpr);
-		// } else
 		if (lambdaExpr.getParameters().size() == 1) {
 			var singleParameter = lambdaExpr.getParameters().get(0);
 
@@ -95,89 +91,22 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 
 	}
 
-	// private boolean hasZeroVariable(LambdaExpr lambdaExpr) {
-	// Statement body = lambdaExpr.getBody();
-	//
-	// if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isMethodCallExpr()) {
-	// MethodCallExpr methodCallExpr = body.asExpressionStmt().getExpression().asMethodCallExpr();
-	//
-	// Optional<Expression> optScope = methodCallExpr.getScope();
-	// if (optScope.isEmpty()) {
-	// return false;
-	// }
-	//
-	// Expression scope = optScope.get();
-	//
-	// Optional<ResolvedType> scopeType = optResolvedType(scope);
-	//
-	// if (scopeType.isEmpty()) {
-	// return false;
-	// } else if (!scopeType.get().isReferenceType()) {
-	// return false;
-	// }
-	//
-	// // ClassOrInterfaceType type =
-	// // new ClassOrInterfaceType(scopeType.get().asReferenceType().getQualifiedName());
-	//
-	// // `b -> b.<String>getObject()` -> `B::<String>getObject`
-	// // MethodReferenceExpr methodReference = new MethodReferenceExpr(new ClassExpr(type),
-	// // new NodeList<>(),
-	// // methodCallExpr.getNameAsString());
-	// // return lambdaExpr.replace(methodReference);
-	//
-	// // `b -> System.out.println(b)` into `System.out::println`
-	// MethodReferenceExpr methodReference =
-	// new MethodReferenceExpr(scope, new NodeList<>(), methodCallExpr.getNameAsString());
-	// return lambdaExpr.replace(methodReference);
-	//
-	// }
-	// return false;
-	// }
-
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	private boolean hasOneVariable(LambdaExpr lambdaExpr, Parameter singleParameter) {
 		var body = lambdaExpr.getBody();
 
-		if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isInstanceOfExpr()) {
+		if (!body.isExpressionStmt()) {
+			return false;
+		}
 
-			var instanceOfExpr = body.asExpressionStmt().getExpression().asInstanceOfExpr();
-
-			if (!instanceOfExpr.getExpression().isNameExpr()
-					|| !instanceOfExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
-				return false;
-			}
-
-			// `a -> a instanceof B` -> `B.class::isInstance`
-			var newScope = new ClassExpr(instanceOfExpr.getType());
-			var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "isInstance");
-			return lambdaExpr.replace(methodReference);
-		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isCastExpr()) {
-			var castExpr = body.asExpressionStmt().getExpression().asCastExpr();
-
-			if (!castExpr.getType().isClassOrInterfaceType()) {
-				return false;
-			} else if (castExpr.getType().asClassOrInterfaceType().getTypeArguments().isPresent()) {
-				// We can not have expression like `Class<? extends XXX>.class`
-				return false;
-			}
-
-			if (!castExpr.getExpression().isNameExpr()
-					|| !castExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
-				return false;
-			}
-
-			// `a -> (B) a` -> `B.class::cast`
-			var newScope = new ClassExpr(castExpr.getType());
-			var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "cast");
-			return lambdaExpr.replace(methodReference);
-
-		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isMethodCallExpr()) {
-			var methodCallExpr = body.asExpressionStmt().getExpression().asMethodCallExpr();
-
-			return onMethodCall(lambdaExpr, singleParameter, methodCallExpr);
-
-		} else if (body.isExpressionStmt() && body.asExpressionStmt().getExpression().isBinaryExpr()) {
-			var binaryExpr = body.asExpressionStmt().getExpression().asBinaryExpr();
+		ExpressionStmt asExpressionStmt = body.asExpressionStmt();
+		Expression expression = asExpressionStmt.getExpression();
+		if (expression.isInstanceOfExpr()) {
+			return onInstanceOf(lambdaExpr, singleParameter, expression);
+		} else if (expression.isCastExpr()) {
+			return onCast(lambdaExpr, singleParameter, expression);
+		} else if (expression.isBinaryExpr()) {
+			var binaryExpr = expression.asBinaryExpr();
 			var operator = binaryExpr.getOperator();
 			var left = binaryExpr.getLeft();
 			var right = binaryExpr.getRight();
@@ -217,8 +146,60 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 						methodIdentifier);
 				return lambdaExpr.replace(methodReference);
 			}
+		} else if (expression.isMethodCallExpr()) {
+			var methodCallExpr = expression.asMethodCallExpr();
+
+			return onMethodCall(lambdaExpr, singleParameter, methodCallExpr);
+
 		}
 		return false;
+	}
+
+	private boolean onCast(LambdaExpr lambdaExpr, Parameter singleParameter, Expression expression) {
+		var castExpr = expression.asCastExpr();
+
+		if (!castExpr.getType().isClassOrInterfaceType()) {
+			return false;
+		}
+
+		var asClassOrInterfaceType = castExpr.getType().asClassOrInterfaceType();
+		if (asClassOrInterfaceType.getTypeArguments().isPresent()) {
+			// We can not have expression like `Class<? extends XXX>.class`
+			return false;
+		}
+
+		Optional<ResolvedType> optResolvedType = optResolvedType(asClassOrInterfaceType);
+		if (optResolvedType.isEmpty()) {
+			return false;
+		} else if (optResolvedType.get().isTypeVariable()) {
+			// The type is a generic boung
+			// e.g. `<T> void method() {...}`
+			return false;
+		}
+
+		if (!castExpr.getExpression().isNameExpr()
+				|| !castExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
+			return false;
+		}
+
+		// `a -> (SomeClass) a` -> `SomeClass.class::cast`
+		var newScope = new ClassExpr(castExpr.getType());
+		var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "cast");
+		return lambdaExpr.replace(methodReference);
+	}
+
+	private boolean onInstanceOf(LambdaExpr lambdaExpr, Parameter singleParameter, Expression expression) {
+		var instanceOfExpr = expression.asInstanceOfExpr();
+
+		if (!instanceOfExpr.getExpression().isNameExpr()
+				|| !instanceOfExpr.getExpression().asNameExpr().getName().equals(singleParameter.getName())) {
+			return false;
+		}
+
+		// `a -> a instanceof B` -> `B.class::isInstance`
+		var newScope = new ClassExpr(instanceOfExpr.getType());
+		var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "isInstance");
+		return lambdaExpr.replace(methodReference);
 	}
 
 	private boolean onMethodCall(LambdaExpr lambdaExpr, Parameter singleParameter, MethodCallExpr methodCallExpr) {
@@ -239,15 +220,6 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 				return false;
 			}
 
-			// ClassOrInterfaceType type =
-			// new ClassOrInterfaceType(scopeType.get().asReferenceType().getQualifiedName());
-
-			// `b -> b.<String>getObject()` -> `B::<String>getObject`
-			// MethodReferenceExpr methodReference = new MethodReferenceExpr(new ClassExpr(type),
-			// new NodeList<>(),
-			// methodCallExpr.getNameAsString());
-			// return lambdaExpr.replace(methodReference);
-
 			// `b -> System.out.println(b)` into `System.out::println`
 			var methodReference = new MethodReferenceExpr(scope, new NodeList<>(), methodCallExpr.getNameAsString());
 			return lambdaExpr.replace(methodReference);
@@ -263,17 +235,12 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 			}
 
 			var constraint = scopeType.get().asConstraintType();
-
 			var resolvedBound = constraint.getBound();
-
 			if (!resolvedBound.isReferenceType()) {
 				return false;
 			}
 
 			var refType = resolvedBound.asReferenceType();
-
-			// https://github.com/javaparser/javaparser/issues/3929
-			// return false;
 
 			Optional<ResolvedReferenceTypeDeclaration> optTypeDeclaration = refType.getTypeDeclaration();
 			if (optTypeDeclaration.isEmpty()) {
@@ -301,32 +268,5 @@ public class LambdaIsMethodReference extends AJavaParserMutator {
 		} else {
 			return false;
 		}
-	}
-
-	@Deprecated
-	private boolean isImported(CompilationUnit compilationUnit, String methodRefPackage, String qualifiedName) {
-		Optional<PackageDeclaration> optPackageDeclaration = compilationUnit.getPackageDeclaration();
-		if (optPackageDeclaration.isPresent()) {
-			var packageDecl = optPackageDeclaration.get().getNameAsString();
-
-			// see
-			// eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport.removeSamePackageImports(Collection<ImportDeclaration>,
-			// Optional<PackageDeclaration>)
-			if (methodRefPackage.equals(packageDecl)) {
-				return true;
-			}
-		}
-
-		NodeList<ImportDeclaration> imports = compilationUnit.getImports();
-
-		if (imports.isEmpty() && methodRefPackage.indexOf('.') >= 0) {
-			return false;
-		}
-
-		if ("java.lang".equals(methodRefPackage)) {
-			return true;
-		}
-		// TODO manage wildcards/asterisks
-		return imports.stream().anyMatch(id -> id.getNameAsString().equals(qualifiedName));
 	}
 }

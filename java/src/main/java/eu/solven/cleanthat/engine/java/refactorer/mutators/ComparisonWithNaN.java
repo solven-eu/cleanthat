@@ -27,14 +27,14 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'd == Double.NaN' into 'Double.isNaN(d)'
  *
  * @author Benoit Lacelle
  */
-public class ComparisonWithNaN extends AJavaParserMutator {
+public class ComparisonWithNaN extends AJavaparserMutator {
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11

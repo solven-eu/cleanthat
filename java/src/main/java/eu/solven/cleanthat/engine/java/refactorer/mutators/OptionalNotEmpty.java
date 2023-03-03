@@ -28,14 +28,14 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns '!o.isEmpty()' into 'o.isPresent()'
  *
  * @author Benoit Lacelle
  */
-public class OptionalNotEmpty extends AJavaParserMutator {
+public class OptionalNotEmpty extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
 
 	private static final String ID_NOTEMPTY = "OptionalNotEmpty";

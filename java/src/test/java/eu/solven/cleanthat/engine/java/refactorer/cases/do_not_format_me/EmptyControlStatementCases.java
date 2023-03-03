@@ -7,7 +7,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
@@ -54,6 +57,7 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 			if (true) {
 			}
 
+
 		}
 	}
 
@@ -91,7 +95,6 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 
 		public Object post() {
 			return new HashMap<>() {
-
 				@Override
 				public Object get(Object key) {
 					return super.get(key);
@@ -121,7 +124,6 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 
 		public Object post() {
 			return new HashMap<>() {
-
 				@Override
 				public Object get(Object key) {
 					return super.get(key);
@@ -144,6 +146,22 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 			cp.listFilesForContent(file -> {
 				Assertions.fail("The FS is empty");
 			});
+		}
+	}
+
+	@UnmodifiedInnerClass
+	public static class EmptyMethod {
+
+		public static class Pre {
+			public void testArrayInt() {
+
+			}
+		}
+
+		public static class Post {
+			public void testArrayInt() {
+
+			}
 		}
 	}
 }

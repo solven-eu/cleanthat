@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.ReorderModifiersCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.ModifierOrderCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestReorderModifiersCases extends AParameterizesJavaparserRefactorerCases {
+public class TestModifierOrderCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new ReorderModifiersCases();
+		return new ModifierOrderCases();
 	}
 
-	public TestReorderModifiersCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestModifierOrderCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

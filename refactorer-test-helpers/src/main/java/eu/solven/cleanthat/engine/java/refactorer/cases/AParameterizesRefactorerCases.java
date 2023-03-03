@@ -42,7 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
@@ -141,7 +141,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 			doCompareInnerAnnotations(javaParser, transformer, testCase);
 		}
 
-		if (testCase.getAnnotationByClass(UnmodifiedInnerClasses.class).isPresent()) {
+		if (testCase.getAnnotationByClass(UnmodifiedInnerClass.class).isPresent()) {
 			atLeastOnetest |= true;
 			doCheckUnmodifiedClass(transformer, testCase);
 		}

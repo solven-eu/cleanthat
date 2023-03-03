@@ -30,14 +30,14 @@ import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Order modifiers according the the Java specification.
  *
  * @author Benoit Lacelle
  */
-public class ModifierOrder extends AJavaParserMutator {
+public class ModifierOrder extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",
@@ -106,6 +106,9 @@ public class ModifierOrder extends AJavaParserMutator {
 			var changed = areSameReferences(modifiers, mutableModifiers);
 
 			if (changed) {
+				// https://github.com/javaparser/javaparser/issues/3935
+				nodeWithModifiers.setModifiers();
+
 				LOGGER.debug("We fixed the ordering of modifiers");
 				nodeWithModifiers.setModifiers(mutableModifiers);
 				return true;

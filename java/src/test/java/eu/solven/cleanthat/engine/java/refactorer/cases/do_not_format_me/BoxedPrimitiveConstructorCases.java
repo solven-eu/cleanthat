@@ -17,13 +17,13 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.BoxedPrimitiveConstructor;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 public class BoxedPrimitiveConstructorCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new BoxedPrimitiveConstructor();
+		return new PrimitiveWrapperInstantiation();
 	}
 
 	@CompareMethods

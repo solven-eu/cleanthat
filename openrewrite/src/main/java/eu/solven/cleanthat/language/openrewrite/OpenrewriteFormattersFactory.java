@@ -109,7 +109,7 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 		return ImmutableList.<String>builder()
 				// This is consensual
 				.add("org.openrewrite.java.RemoveUnusedImports")
-				// This may not be consensual, it it provides a lot of value
+				// This may not be consensual, it provides a lot of value
 				.add("org.openrewrite.java.security.JavaSecurityBestPractices")
 				.build();
 	}

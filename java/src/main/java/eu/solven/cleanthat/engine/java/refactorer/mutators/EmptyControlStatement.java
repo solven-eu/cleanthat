@@ -26,7 +26,7 @@ import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns '{}' into ''
@@ -34,7 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/blob/main/rewrite-java/src/main/java/org/openrewrite/java/cleanup/EmptyBlockVisitor.java
-public class EmptyControlStatement extends AJavaParserMutator {
+public class EmptyControlStatement extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmptyControlStatement.class);
 
 	@Override
@@ -82,6 +82,16 @@ public class EmptyControlStatement extends AJavaParserMutator {
 			// Get parent before removing the children
 			Optional<Node> optParentNode = blockStmt.getParentNode();
 
+			if (optParentNode.isEmpty()) {
+				break;
+			}
+
+			var parentNode = optParentNode.get();
+			if (!(parentNode instanceof BlockStmt)) {
+				break;
+			}
+			var parentNodeAsBlockStmt = (BlockStmt) parentNode;
+
 			if (!blockStmt.getChildNodes().isEmpty()) {
 				break;
 			}
@@ -93,11 +103,7 @@ public class EmptyControlStatement extends AJavaParserMutator {
 				break;
 			}
 
-			if (optParentNode.isPresent() && optParentNode.get() instanceof BlockStmt) {
-				blockStmt = (BlockStmt) optParentNode.get();
-			} else {
-				break;
-			}
+			blockStmt = parentNodeAsBlockStmt;
 		}
 
 		if (blockStmt.getChildNodes().isEmpty() && blockStmt.getParentNode().isPresent()) {

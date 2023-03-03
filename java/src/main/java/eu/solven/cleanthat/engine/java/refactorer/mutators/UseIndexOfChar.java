@@ -25,14 +25,14 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 's.indexOf("s")’ into ’s.indexOf('s')'.
  *
  * @author Benoit Lacelle
  */
-public class UseIndexOfChar extends AJavaParserMutator {
+public class UseIndexOfChar extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {

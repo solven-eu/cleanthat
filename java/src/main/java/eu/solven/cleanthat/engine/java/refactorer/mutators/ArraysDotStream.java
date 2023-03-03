@@ -15,12 +15,14 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
@@ -29,7 +31,7 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'Arrays.asList("1", 2).stream()' into 'Arrays.stream("1", 2)'
@@ -37,7 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  *
  */
-public class ArraysDotStream extends AJavaParserMutator {
+public class ArraysDotStream extends AJavaparserMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
 
@@ -98,38 +100,68 @@ public class ArraysDotStream extends AJavaParserMutator {
 		var parentScope = optParentScope.get();
 		if (!parentScope.isNameExpr()) {
 			return false;
-		}
-
-		// TODO Manage imports
-		if (scopeAsMethodCallExpr.getArguments().isEmpty()) {
-			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
-			return node.replace(new MethodCallExpr(new NameExpr(Stream.class.getName()), "of"));
-		} else if (scopeAsMethodCallExpr.getArguments().size() != 1) {
-			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
-			return node.replace(new MethodCallExpr(new NameExpr(Stream.class.getName()),
-					"of",
-					scopeAsMethodCallExpr.getArguments()));
-		}
-		var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
-
-		Optional<ResolvedType> optType = optResolvedType(filterPredicate);
-		if (!optType.get().isArray()) {
+		} else if (!parentScope.asNameExpr().getNameAsString().equals(Arrays.class.getSimpleName())) {
 			return false;
 		}
 
-		var localTransformed = false;
-		NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
-		Expression replacement = new MethodCallExpr(parentScope, METHOD_STREAM, replaceArguments);
+		boolean useStreamOf;
 
-		LOGGER.info("Turning {} into {}", methodCall, replacement);
-		if (methodCall.replace(replacement)) {
-			localTransformed = true;
-		}
-
-		if (localTransformed) {
-			return true;
+		if (scopeAsMethodCallExpr.getArguments().size() != 1) {
+			useStreamOf = true;
 		} else {
-			return false;
+			var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
+
+			Optional<ResolvedType> optType = optResolvedType(filterPredicate);
+
+			if (optType.isEmpty()) {
+				// TODO Ask JavaParser how can one get a qualifiedname, especially given imports
+				// https://github.com/javaparser/javaparser/issues/2575
+				return false;
+			}
+
+			// If the input is an array (either a primitive Array, or a T[]), we rely on Arrays.stream
+			useStreamOf = !optType.get().isArray();
 		}
+
+		if (useStreamOf) {
+			Optional<CompilationUnit> compilationUnit = node.findAncestor(CompilationUnit.class);
+			var methodRefClassName = getStaticMethodClassRefMayAddImport(compilationUnit, Stream.class);
+			var nameExpr = new NameExpr(methodRefClassName);
+
+			// This will catch 0_argument and 2+_arguments
+			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
+			return node.replace(new MethodCallExpr(nameExpr, "of", scopeAsMethodCallExpr.getArguments()));
+		} else {
+			var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
+
+			NodeList<Expression> replaceArguments = new NodeList<>(filterPredicate);
+			Expression replacement = new MethodCallExpr(parentScope, METHOD_STREAM, replaceArguments);
+
+			LOGGER.info("Turning {} into {}", methodCall, replacement);
+			return methodCall.replace(replacement);
+		}
+	}
+
+	// https://stackoverflow.com/questions/147454/why-is-using-a-wild-card-with-a-java-import-statement-bad
+	private String getStaticMethodClassRefMayAddImport(Optional<CompilationUnit> optCompilationUnit, Class<?> clazz) {
+		var qualifiedName = clazz.getName();
+		if (optCompilationUnit.isEmpty()) {
+			return qualifiedName;
+		}
+
+		var classSimpleName = clazz.getSimpleName();
+
+		String methodRefClassName;
+		var compilationUnit = optCompilationUnit.get();
+		if (isImported(compilationUnit, clazz.getPackageName(), qualifiedName)) {
+			methodRefClassName = classSimpleName;
+		} else if (isImportable(compilationUnit, qualifiedName)) {
+			compilationUnit.addImport(qualifiedName, false, false);
+			methodRefClassName = classSimpleName;
+		} else {
+			methodRefClassName = qualifiedName;
+
+		}
+		return methodRefClassName;
 	}
 }

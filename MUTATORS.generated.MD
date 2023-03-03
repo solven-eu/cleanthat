@@ -110,13 +110,6 @@ isDraft
 
 Require sourceJdk: 1
 
-### [BoxedPrimitiveConstructor](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/BoxedPrimitiveConstructor.java)
-
-
-isDraft
-
-Require sourceJdk: 1.5
-
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 
 
@@ -177,6 +170,15 @@ Sonar: RSPEC-6212
 isDraft
 
 Require sourceJdk: 10
+
+### [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
+
+
+PMD: PrimitiveWrapperInstantiation
+
+isDraft
+
+Require sourceJdk: 1.5
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 

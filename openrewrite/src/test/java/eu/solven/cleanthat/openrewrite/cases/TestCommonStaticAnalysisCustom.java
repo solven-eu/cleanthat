@@ -26,11 +26,11 @@ import org.openrewrite.Recipe;
 import org.openrewrite.Result;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.tree.J;
+import org.openrewrite.java.tree.J.CompilationUnit;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.google.common.io.ByteStreams;
 
@@ -62,7 +62,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 		JavaParser javaParser = AParameterizesRefactorerCases.makeDefaultJavaParser(true);
 		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		org.openrewrite.java.tree.J.CompilationUnit openrewriteCompilationUnit = convertToAst(compilationUnit);
+		CompilationUnit openrewriteCompilationUnit = convertToAst(compilationUnit);
 
 		Optional<Result> transformed;
 		try (ILogDisabler logDisabler = PepperTestHelper.disableLog(OpenrewriteMutator.class)) {
@@ -87,12 +87,12 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 	}
 
 	@Override
-	protected <T extends Node> String toString(T post) {
-		return post.toString();
+	protected String resultToString(Result post) {
+		return post.getAfter().printAll();
 	}
 
 	@Override
-	protected String toString(Result post) {
-		return post.getAfter().printAll();
+	protected String astToString(CompilationUnit asAst) {
+		return asAst.toString();
 	}
 }

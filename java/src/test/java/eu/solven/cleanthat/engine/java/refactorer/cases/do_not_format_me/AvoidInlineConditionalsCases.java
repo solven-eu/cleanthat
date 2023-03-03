@@ -53,6 +53,7 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// LexicalPreservingPriner prints weird indentation
 	@CompareMethods
 	public static class Checkstyle_booleanExpression_variable {
 		public Object pre(String text) {
@@ -61,12 +62,12 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post(String text) {
-			String output;
-			if (text == null) {
-				output = "";
-			} else {
-				output = text;
-			}
+				 String output;
+				 if (text == null) {
+					 output = "";
+				 } else {
+					 output = text;
+				 }
 			return output;
 		}
 	}
@@ -116,6 +117,7 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// LexicalPreservingPriner prints weird indentation
 	@CompareMethods
 	public static class Checkstyle_complexExpression_variable {
 		public Object pre(String a) {
@@ -124,12 +126,12 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post(String a) {
-			Object output;
-			if (a != null && a.length() >= 1) {
-				output = a.substring(1);
-			} else {
-				output = null;
-			}
+				 Object output;
+				 if (a != null && a.length() >= 1) {
+					 output = a.substring(1);
+				 } else {
+					 output = null;
+				 }
 			return output;
 		}
 	}

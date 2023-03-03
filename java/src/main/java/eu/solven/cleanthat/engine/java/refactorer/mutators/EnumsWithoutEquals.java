@@ -26,7 +26,7 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Prevent relying .equals on {@link Enum} types
@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 // https://stackoverflow.com/questions/1750435/comparing-java-enum-members-or-equals
-public class EnumsWithoutEquals extends AJavaParserMutator {
+public class EnumsWithoutEquals extends AJavaparserMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 

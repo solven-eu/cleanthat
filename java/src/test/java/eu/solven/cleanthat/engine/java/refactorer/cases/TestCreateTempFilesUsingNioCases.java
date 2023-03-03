@@ -38,14 +38,16 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingN
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
-public class TestCreateTempFilesUsingNio extends AParameterizesJavaparserRefactorerCases {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNio.class);
+public class TestCreateTempFilesUsingNioCases extends AParameterizesJavaparserRefactorerCases {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestCreateTempFilesUsingNioCases.class);
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new CreateTempFilesUsingNioCases();
 	}
 
-	public TestCreateTempFilesUsingNio(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestCreateTempFilesUsingNioCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

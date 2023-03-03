@@ -1,12 +1,13 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class ReorderModifiersCases extends AJavaparserRefactorerCases {
+public class ModifierOrderCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new ModifierOrder();
@@ -39,6 +40,7 @@ public class ReorderModifiersCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// The weird indentation in `post` relates with 'https://github.com/javaparser/javaparser/issues/3935'
 	@CompareMethods
 	public static class CaseMethods {
 		public String getTitle() {
@@ -57,7 +59,7 @@ public class ReorderModifiersCases extends AJavaparserRefactorerCases {
 		public Object post() {
 			return new Object() {
 				@SuppressWarnings("unused")
-				protected final synchronized void staticMethod() {
+	   protected final synchronized void staticMethod() {
 					// Empty
 				}
 			};
@@ -73,5 +75,31 @@ public class ReorderModifiersCases extends AJavaparserRefactorerCases {
 		public static class Post {
 			// empty
 		}
+	}
+
+	// https://github.com/javaparser/javaparser/issues/3935
+	@CompareCompilationUnitsAsStrings(pre = "package org.eclipse.mat.snapshot.model;\n"
+			+ "\n"
+			+ "import java.io.Serializable;\n"
+			+ "\n"
+			+ "import org.eclipse.mat.internal.Messages;\n"
+			+ "\n"
+			+ "abstract public class GCRootInfo implements Serializable {\n"
+			+ "	private static final long serialVersionUID = 2L;\n"
+			+ "\n"
+			+ "}\n"
+			+ "",
+			post = "package org.eclipse.mat.snapshot.model;\n"
+					+ "\n"
+					+ "import java.io.Serializable;\n"
+					+ "\n"
+					+ "import org.eclipse.mat.internal.Messages;\n"
+					+ "\n"
+					+ "public abstract class GCRootInfo implements Serializable {\n"
+					+ "	private static final long serialVersionUID = 2L;\n"
+					+ "\n"
+					+ "}\n"
+					+ "")
+	public static class Issue_MissingWhitespaceAfterLastModifier {
 	}
 }

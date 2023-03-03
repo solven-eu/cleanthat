@@ -1,6 +1,5 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -185,6 +184,20 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 		public Object pre() {
 			int i = 1, j = 2;
 			return i + j;
+		}
+	}
+
+	@CompareMethods
+	public static class WithAnnotation {
+		public Object pre() {
+			@edu.umd.cs.findbugs.annotations.SuppressWarnings
+			int i = 10;
+			return i;
+		}
+
+		public Object post() {
+			@edu.umd.cs.findbugs.annotations.SuppressWarnings var i = 10;
+			return i;
 		}
 	}
 

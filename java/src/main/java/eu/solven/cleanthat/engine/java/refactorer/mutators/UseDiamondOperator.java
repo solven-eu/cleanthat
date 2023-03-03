@@ -26,7 +26,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Use the diamond operation {@code <>} whenever possible.
@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  */
 // see org.openrewrite.java.cleanup.UseDiamondOperator
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperator extends AJavaParserMutator {
+public class UseDiamondOperator extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override

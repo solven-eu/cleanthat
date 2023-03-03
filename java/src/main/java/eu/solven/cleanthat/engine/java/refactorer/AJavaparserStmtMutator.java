@@ -22,11 +22,11 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.stmt.Statement;
 
 /**
- * Most {@link AJavaParserMutator} will trigger over an {@link Statement}
+ * Most {@link AJavaparserMutator} will trigger over an {@link Statement}
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserStmtMutator extends AJavaParserMutator {
+public abstract class AJavaparserStmtMutator extends AJavaparserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (node instanceof Statement) {

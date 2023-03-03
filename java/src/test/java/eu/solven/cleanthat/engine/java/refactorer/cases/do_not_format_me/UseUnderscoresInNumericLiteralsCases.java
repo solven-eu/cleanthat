@@ -2,7 +2,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -53,7 +53,7 @@ public class UseUnderscoresInNumericLiteralsCases extends AJavaparserRefactorerC
 		}
 	}
 
-	@UnmodifiedInnerClasses
+	@UnmodifiedInnerClass
 	public static class SomeInterface_complexRepresentation {
 
 		public interface Pre {

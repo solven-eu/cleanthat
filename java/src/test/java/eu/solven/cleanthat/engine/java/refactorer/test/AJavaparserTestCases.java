@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
@@ -29,6 +30,8 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
 	@Override
 	protected Node convertToAst(Node ast) {
+		LexicalPreservingPrinter.setup(ast);
+
 		return ast;
 	}
 
@@ -37,7 +40,14 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 	// }
 
 	@Override
-	protected String toString(Node post) {
-		return post.toString();
+	protected String astToString(Node node) {
+		return LexicalPreservingPrinter.print(node);
+		// return post.toString();
+	}
+
+	@Override
+	protected String resultToString(Node node) {
+		return LexicalPreservingPrinter.print(node);
+		// return post.toString();
 	}
 }

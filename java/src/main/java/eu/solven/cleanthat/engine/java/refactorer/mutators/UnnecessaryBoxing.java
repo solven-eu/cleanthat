@@ -31,7 +31,7 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -39,7 +39,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryBoxing extends AJavaParserMutator {
+public class UnnecessaryBoxing extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryBoxing.class);
 
 	@Override

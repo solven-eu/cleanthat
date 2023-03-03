@@ -39,7 +39,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Migrate from JUnit4 to JUnit5/Jupiter.
@@ -52,7 +52,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
 // https://docs.openrewrite.org/running-recipes/popular-recipe-guides/migrate-from-junit-4-to-junit-5
-public class JUnit4ToJUnit5 extends AJavaParserMutator {
+public class JUnit4ToJUnit5 extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
 
 	// Duplicated from com.github.javaparser.ast.CompilationUnit.JAVA_LANG

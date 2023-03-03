@@ -35,6 +35,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.engine.java.refactorer.INoOpMutator;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
@@ -46,8 +47,8 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitsAsResources;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitsAsResource;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.pepper.resource.PepperResourceHelper;
@@ -76,13 +77,13 @@ public abstract class ATestCases<N, R> {
 						|| c.getAnnotationByClass(CompareClasses.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedMethod.class).isPresent()
 						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent()
-						|| c.getAnnotationByClass(UnmodifiedInnerClasses.class).isPresent()
+						|| c.getAnnotationByClass(UnmodifiedInnerClass.class).isPresent()
 						|| c.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsResources.class).isPresent()
-						|| c.getAnnotationByClass(UnmodifiedCompilationUnitsAsResources.class).isPresent());
+						|| c.getAnnotationByClass(UnmodifiedCompilationUnitsAsResource.class).isPresent());
 	}
 
 	public static MethodDeclaration getMethodWithName(ClassOrInterfaceDeclaration oneCase, String name) {
@@ -132,21 +133,22 @@ public abstract class ATestCases<N, R> {
 	protected void doCheckUnmodifiedNode(IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase,
 			Node pre) {
-		LexicalPreservingPrinter.setup(pre);
-		var preAsString = toString(pre);
+		// LexicalPreservingPrinter.setup(pre);
+		var preAsAst = convertToAst(pre);
+		var preAsString = astToString(preAsAst);
 
 		// https://github.com/javaparser/javaparser/issues/3322
 		// We prefer not-processing clones as it may lead to dirty issues
 		var clonedPre = pre.clone();
 
-		Optional<R> optWalked = transformer.walkAst(convertToAst(pre));
+		Optional<R> optWalked = transformer.walkAst(preAsAst);
 		var walked = optWalked.isPresent();
-
-		var modifiedPreAsString = toString(pre);
 
 		if (transformer instanceof INoOpMutator) {
 			Assert.assertTrue("INoOpMutator is always walked", walked);
 		} else if (walked) {
+			var modifiedPreAsString = resultToString(optWalked.get());
+
 			Assert.assertEquals("Should not have mutated " + preAsString
 					+ " but it turned into: "
 					+ preAsString
@@ -161,7 +163,7 @@ public abstract class ATestCases<N, R> {
 							+ oneCase,
 					walked);
 		}
-		Assert.assertEquals("No modification on Node.toString()", preAsString, modifiedPreAsString);
+		// Assert.assertEquals("No modification on Node.toString()", preAsString, modifiedPreAsString);
 		Assert.assertEquals("No modification on Node", clonedPre, pre);
 
 		// https://github.com/javaparser/javaparser/issues/1913
@@ -184,10 +186,12 @@ public abstract class ATestCases<N, R> {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		{
-			var clonedPre = pre.clone();
-			var preAsString = toString(clonedPre);
+			// This is done before .toString typically to register LexicalPreservingPrinter
+			var asAst = convertToAst(pre);
 
-			Optional<R> optResult = transformer.walkAst(convertToAst(pre));
+			var preAsString = astToString(asAst);
+
+			Optional<R> optResult = transformer.walkAst(asAst);
 
 			if (optResult.isEmpty()) {
 				Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
@@ -200,7 +204,7 @@ public abstract class ATestCases<N, R> {
 
 				// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
 
-				var expectedPost = toString(post);
+				var expectedPost = astToString(convertToAst(post));
 				String msg = "Should have mutated " + preAsString
 						+ " into "
 						+ expectedPost
@@ -208,8 +212,9 @@ public abstract class ATestCases<N, R> {
 						+ pre
 						+ ". The whole testcase is: "
 						+ oneCase;
-				var actualPost = toString(optResult.get());
-				Assert.assertEquals(msg, expectedPost, actualPost);
+				var actualPost = resultToString(optResult.get());
+				// LexicalPreservingPrinter may indent with 4 whitespaces
+				Assert.assertEquals(msg, sanitizeTestedSource(expectedPost), sanitizeTestedSource(actualPost));
 
 				if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
 					// https://github.com/javaparser/javaparser/pull/2320
@@ -242,9 +247,16 @@ public abstract class ATestCases<N, R> {
 		}
 	}
 
-	protected abstract <T extends Node> String toString(T post);
+	@SuppressWarnings("checkstyle:MagicNumber")
+	private String sanitizeTestedSource(String expectedPost) {
+		return expectedPost.replace(Strings.repeat(" ", 4), "\t");
+	}
 
-	protected abstract String toString(R post);
+	// protected abstract <T extends Node> String toString(T post);
+
+	protected abstract String astToString(N asAst);
+
+	protected abstract String resultToString(R post);
 
 	protected void doCompareTypes(IWalkingMutator<N, R> transformer, ClassOrInterfaceDeclaration oneCase) {
 		// LOGGER.info("Processing the case: {}", oneCase.getName());
@@ -372,6 +384,8 @@ public abstract class ATestCases<N, R> {
 		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
 		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
 
+		LexicalPreservingPrinter.setup(pre);
+
 		doCompareExpectedChanges(transformer, testCase, pre, post);
 	}
 
@@ -401,7 +415,7 @@ public abstract class ATestCases<N, R> {
 	public void doCheckUnmodifiedCompilationUnitsAsResources(JavaParser javaParser,
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
-			UnmodifiedCompilationUnitsAsResources annotation) {
+			UnmodifiedCompilationUnitsAsResource annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
 		var pre = javaParser.parse(preAsString).getResult().get();
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());

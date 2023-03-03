@@ -39,7 +39,7 @@ public class UnnecessaryImportsCases extends AJavaparserRefactorerCases {
 	public static class caseJdk17TextBlock {
 	}
 
-	@Ignore("https://github.com/javaparser/javaparser/issues/3924")
+	// @Ignore("https://github.com/javaparser/javaparser/issues/3924")
 	@CompareCompilationUnitsAsResources(pre = PREFIX + "Revelc_Pre.java", post = PREFIX + "Revelc_Post.java")
 	public static class caseRevelc {
 	}

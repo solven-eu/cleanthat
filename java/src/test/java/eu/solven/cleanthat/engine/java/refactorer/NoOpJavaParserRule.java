@@ -20,12 +20,12 @@ import com.github.javaparser.ast.Node;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * This {@link AJavaParserMutator} does not modify the AST, but always report it as changed. It can be useful to
+ * This {@link AJavaparserMutator} does not modify the AST, but always report it as changed. It can be useful to
  * checkthe default behavior of JavaParser.
  *
  * @author Benoit Lacelle
  */
-public class NoOpJavaParserRule extends AJavaParserMutator implements INoOpMutator {
+public class NoOpJavaParserRule extends AJavaparserMutator implements INoOpMutator {
 	@Override
 	public String getId() {
 		return IMutator.ID_NOOP;

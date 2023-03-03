@@ -45,7 +45,7 @@ public class CreateTempFilesUsingNioCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	// TODO Add test case where directory is explicitely null
+	// TODO Add test case where directory is explicitly null
 	@CompareMethods
 	public static class CaseWithDirectory {
 		public Object pre(File directory) throws IOException {
@@ -53,7 +53,7 @@ public class CreateTempFilesUsingNioCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post(File directory) throws IOException {
-			return (directory == null ? Files.createTempFile( "myFile", ".tmp") : Files.createTempFile(directory.toPath(), "myFile", ".tmp")).toFile();
+			return (directory == null ? Files.createTempFile("myFile", ".tmp") : Files.createTempFile(directory.toPath(), "myFile", ".tmp")).toFile();
 		}
 	}
 

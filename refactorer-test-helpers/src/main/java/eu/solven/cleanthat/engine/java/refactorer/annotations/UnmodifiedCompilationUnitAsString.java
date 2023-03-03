@@ -46,5 +46,5 @@ public @interface UnmodifiedCompilationUnitAsString {
 	 * @return
 	 */
 	@Deprecated
-	String post();
+	String post() default "";
 }

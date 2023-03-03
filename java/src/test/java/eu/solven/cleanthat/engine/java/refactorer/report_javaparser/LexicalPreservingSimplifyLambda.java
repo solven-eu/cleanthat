@@ -25,9 +25,8 @@ public class LexicalPreservingSimplifyLambda {
 	static final String testCase = "package eu.solven.cleanthat.code_provider.inmemory;\n" + "\n"
 			+ "import java.util.stream.Stream;\n"
 			+ "\n"
-			+ "public class TestFileSystemCodeProvider {\n"
-			+ "	@Test\n"
-			+ "	public void testInMemoryFileSystem() throws IOException {\n"
+			+ "class TestFileSystemCodeProvider {\n"
+			+ "	void testInMemoryFileSystem() {\n"
 			+ "\n"
 			+ "		Stream.of(\"\").listFilesForContent(file -> {\n"
 			+ "			System.out.println(s);\n"
@@ -61,10 +60,12 @@ public class LexicalPreservingSimplifyLambda {
 			}
 		});
 
-		System.out.println("OK");
-		System.out.println(unit.toString());
-
 		System.out.println("KO");
 		System.out.println(LexicalPreservingPrinter.print(unit));
+
+		System.out.println();
+
+		// System.out.println("OK");
+		// System.out.println(unit.toString());
 	}
 }

@@ -64,7 +64,9 @@ public interface IMutator extends IMutatorExternalReferences {
 
 	/**
 	 * @return true if this rule process only jre standard classes
+	 * @deprecated Usage is unclear
 	 */
+	@Deprecated(since = "It is unclear how this is useful")
 	default boolean isJreOnly() {
 		return true;
 	}

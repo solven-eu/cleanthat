@@ -29,14 +29,14 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'java.lang.String' into 'String'
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryFullyQualifiedName extends AJavaParserMutator {
+public class UnnecessaryFullyQualifiedName extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
 	@Override

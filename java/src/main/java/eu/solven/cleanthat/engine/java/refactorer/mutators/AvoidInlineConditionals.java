@@ -36,7 +36,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'boolean b = (x > 1 ) ? true : callback.doIt() || true' into 'if (x > 1) { ... } else { ...}'
@@ -44,7 +44,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  * @author Benoit Lacelle
  *
  */
-public class AvoidInlineConditionals extends AJavaParserMutator {
+public class AvoidInlineConditionals extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
 	@Override

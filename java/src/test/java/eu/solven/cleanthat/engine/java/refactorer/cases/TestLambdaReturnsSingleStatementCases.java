@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.javaparser.JavaParser;
@@ -26,6 +27,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LambdaReturnsSingleStatementCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
+@Ignore("https://github.com/javaparser/javaparser/pull/3938")
 public class TestLambdaReturnsSingleStatementCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {

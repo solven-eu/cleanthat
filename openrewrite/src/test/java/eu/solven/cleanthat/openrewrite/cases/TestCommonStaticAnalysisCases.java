@@ -23,6 +23,7 @@ import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 import org.openrewrite.Result;
 import org.openrewrite.java.tree.J;
+import org.openrewrite.java.tree.J.CompilationUnit;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.Node;
@@ -68,12 +69,12 @@ public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases
 	}
 
 	@Override
-	protected <T extends Node> String toString(T post) {
-		return post.toString();
+	protected String resultToString(Result post) {
+		return post.getAfter().printAll();
 	}
 
 	@Override
-	protected String toString(Result post) {
-		return post.getAfter().printAll();
+	protected String astToString(CompilationUnit asAst) {
+		return asAst.toString();
 	}
 }

@@ -27,14 +27,14 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns 'public static final someMethod();' into 'someMethod();' in interfaces
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryModifier extends AJavaParserMutator {
+public class UnnecessaryModifier extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {

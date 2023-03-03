@@ -23,14 +23,14 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 
 /**
  * Turns `int i = 0;;` into `int i = 0;`
  *
  * @author Benoit Lacelle
  */
-public class UnnecessarySemicolon extends AJavaParserStmtMutator {
+public class UnnecessarySemicolon extends AJavaparserStmtMutator {
 
 	@Override
 	public String minimalJavaVersion() {

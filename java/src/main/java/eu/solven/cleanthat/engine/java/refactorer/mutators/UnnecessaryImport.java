@@ -41,7 +41,7 @@ import com.github.javaparser.javadoc.description.JavadocSnippet;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Remove imports from a Java source file by analyzing {@link ImportDeclaration}.
@@ -55,7 +55,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
  */
 // https://github.com/javaparser/javaparser/issues/1590
 // https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java
-public class UnnecessaryImport extends AJavaParserMutator {
+public class UnnecessaryImport extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {

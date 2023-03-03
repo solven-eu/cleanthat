@@ -29,7 +29,7 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns '"a\r\n" + "b\r\n"’ into ’"""aEOLbEOL"""'
@@ -39,7 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
 // https://www.baeldung.com/java-text-blocks
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 // TODO Handle intermediate parenthesis
-public class UseTextBlocks extends AJavaParserMutator {
+public class UseTextBlocks extends AJavaparserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_15;

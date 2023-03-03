@@ -25,14 +25,14 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns '"someString".toString()' into '"someString"'
  *
  * @author Benoit Lacelle
  */
-public class StringToString extends AJavaParserMutator {
+public class StringToString extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StringToString.class);
 
 	private static final String METHOD_TO_STRING = "toString";

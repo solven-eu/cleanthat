@@ -21,11 +21,11 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 
 /**
- * Most {@link AJavaParserMutator} will trigger over an {@link Expression}
+ * Most {@link AJavaparserMutator} will trigger over an {@link Expression}
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaParserExprMutator extends AJavaParserMutator {
+public abstract class AJavaparserExprMutator extends AJavaparserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (node instanceof Expression) {

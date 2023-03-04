@@ -1,6 +1,10 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import static org.assertj.core.api.Assertions.entry;
+
 import java.time.LocalDate;
+import java.util.Locale;
+import java.util.Map;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
@@ -160,4 +164,18 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 			}
 		}
 	}
+	
+	// TODO
+	// @CompareMethods
+	@UnmodifiedMethod
+	public static class TernaryInExpr {
+		public Object pre(boolean caseSensitive, Map.Entry<String, String> entry) {
+			return "env." + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));
+		}
+
+		public Object post(boolean caseSensitive, Map.Entry<String, String> entry) {
+			return "env." + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));
+		}
+	}
+
 }

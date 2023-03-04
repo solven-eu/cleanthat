@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.AvoidInlineConditionalsCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestAvoidInlineConditionals extends AParameterizesJavaparserRefactorerCases {
+public class TestAvoidInlineConditionalsCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new AvoidInlineConditionalsCases();
 	}
 
-	public TestAvoidInlineConditionals(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestAvoidInlineConditionalsCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

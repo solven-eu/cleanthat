@@ -32,7 +32,9 @@ public class TestAvoidInlineConditionalsCases extends AParameterizesJavaparserRe
 		return new AvoidInlineConditionalsCases();
 	}
 
-	public TestAvoidInlineConditionalsCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestAvoidInlineConditionalsCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

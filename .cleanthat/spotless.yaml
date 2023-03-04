@@ -9,11 +9,10 @@ formatters:
   - id: "cleanthat"
     parameters:
       source_jdk: "11.0"
+      include_draft: true
       mutators:
       - SafeAndConsensual
-      - LiteralsFirstInComparisons
-      - ComparisonWithNaN
-      - StringToString
+      - SafeButNotConsensual
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:

@@ -34,6 +34,10 @@ public class EnvironmentUtils {
 
 	private static Properties envVars;
 
+	protected EnvironmentUtils() {
+		// hidden
+	}
+
 	/**
 	 * Adds the environment variables in the form of properties whose keys are prefixed with {@code env.}, e.g. {@code
 	 * env.PATH}. Unlike native environment variables, properties are always case-sensitive. For the sake of

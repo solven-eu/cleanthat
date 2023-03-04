@@ -24,6 +24,11 @@ import com.google.common.base.Strings;
  */
 // https://github.com/apache/maven/blob/master/maven-core/src/main/java/org/apache/maven/properties/internal/SystemProperties.java
 public class SystemProperties {
+
+	protected SystemProperties() {
+		// hidden
+	}
+
 	/**
 	 * Thread-safe System.properties copy implementation.
 	 */

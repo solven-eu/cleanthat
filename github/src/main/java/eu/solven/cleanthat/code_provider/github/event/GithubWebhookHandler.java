@@ -582,31 +582,32 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 		String sha;
 
-		boolean headIsMaterialized;
+		boolean headIsYetToBeMaterialized;
 		if (refName.startsWith(ICleanthatGitRefsConstants.PREFIX_REF_CLEANTHAT_TMPHEAD)) {
-			Optional<GHRef> optAlreadyExisting = optRef(repo, refName);
+			Optional<GHRef> optAlreadyExisting = optRef(facade, refName);
 
 			if (optAlreadyExisting.isPresent()) {
 				sha = optAlreadyExisting.get().getObject().getSha();
 				LOGGER.info("The ref {} already exists, with sha1={}", refName, sha);
-				headIsMaterialized = false;
+				headIsYetToBeMaterialized = false;
 			} else {
 				sha = refToProcess.getSha();
-				headIsMaterialized = true;
+				headIsYetToBeMaterialized = true;
 			}
 		} else {
 			sha = refToProcess.getSha();
-			headIsMaterialized = true;
+			headIsYetToBeMaterialized = false;
 		}
 
 		Supplier<IGitReference> headSupplier = () -> {
-			String repoName = facade.getRepoFullName();
-			if (!headIsMaterialized) {
-				Optional<GHRef> optAlreadyExisting = optRef(repo, refName);
-
-				if (!optAlreadyExisting.isPresent()) {
+			Optional<GHRef> optAlreadyExisting = optRef(facade, refName);
+			if (headIsYetToBeMaterialized) {
+				if (optAlreadyExisting.isPresent()) {
+					LOGGER.info("A ref yet to be materialized is already existing: is this a re-run?");
+				} else {
 					try {
-						repo.createRef(refName, sha);
+						GHRef ref = repo.createRef(refName, sha);
+						optAlreadyExisting = Optional.of(ref);
 						LOGGER.info("We materialized ref={} onto sha1={}", refName, sha);
 					} catch (IOException e) {
 						// TODO If already exists, should we stop the process, or continue?
@@ -614,14 +615,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 						throw new UncheckedIOException("Issue materializing ref=" + refName, e);
 					}
 				}
+				String repoName = facade.getRepoFullName();
 				refLazyRefCreated.set(new GitRepoBranchSha1(repoName, refName, sha));
+			} else if (optAlreadyExisting.isEmpty()) {
+				throw new IllegalStateException("The ref has been removed in the meantime: ref=" + refName);
 			}
 
-			try {
-				return GithubDecoratorHelper.decorate(facade.getRef(refName));
-			} catch (IOException e) {
-				throw new UncheckedIOException("Issue fetching ref=" + refName, e);
-			}
+			return GithubDecoratorHelper.decorate(optAlreadyExisting.get());
 		};
 
 		return new ILazyGitReference() {
@@ -639,14 +639,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		};
 	}
 
-	private Optional<GHRef> optRef(GHRepository repo, String refName) {
+	private Optional<GHRef> optRef(GithubRepositoryFacade repo, String refName) {
 		Optional<GHRef> optAlreadyExisting;
 		try {
 			GHRef ref = repo.getRef(refName);
 			optAlreadyExisting = Optional.of(ref);
-		} catch (IOException e) {
+		} catch (GHFileNotFoundException e) {
 			LOGGER.info("The ref={} does not exists yet", refName);
 			optAlreadyExisting = Optional.empty();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 		return optAlreadyExisting;
 	}

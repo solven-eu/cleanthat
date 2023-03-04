@@ -47,7 +47,7 @@ public class ITProcessLocallyDynamoDbEvent_ExecuteClean {
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
 		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
 		// You can search logs for this key, in order to process given event locally
-		String key = "random-ffd75e10-e9c5-42f6-9319-37885f5889f1";
+		String key = "random-ba42c40c-0475-4a40-b5d2-c96e1016cb19";
 
 		Map<String, ?> dynamoDbPureJson = EventFromDynamoDbITHelper.loadEvent("cleanthat_accepted_events", key);
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

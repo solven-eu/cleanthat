@@ -58,7 +58,7 @@
 
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-		<sentry-spring.version>6.14.0</sentry-spring.version>
+		<sentry-spring.version>6.15.0</sentry-spring.version>
 		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2021.0.6</spring-cloud.version>
 

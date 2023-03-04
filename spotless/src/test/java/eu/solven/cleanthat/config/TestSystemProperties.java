@@ -13,21 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.kotlin;
+package eu.solven.cleanthat.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Properties;
 
-/**
- * 
- * @author Benoit Lacelle
- *
- */
-public class JavaService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
-	public void sayHello() {
-		LOGGER.info("Java says 'Hello World!'");
+import eu.solven.cleanthat.maven_core.SystemProperties;
+
+public class TestSystemProperties {
+	@Test
+	public void testSystemPropertiesIsSafe() {
+		System.setProperty("TestSystemProperties.secretKey", "secretValue");
+
+		Properties systemProperties = SystemProperties.getSystemProperties();
+
+		Assertions.assertThat(systemProperties)
+				.containsKey("java.version")
+				.doesNotContainKey("TestSystemProperties.secretKey")
+				.hasSizeLessThan(2);
 	}
-
 }

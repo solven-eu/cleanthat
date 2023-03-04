@@ -38,7 +38,7 @@ public class TestAllIncludingDraftCompositeMutators {
 				.map(m -> m.getName())
 				.contains(PMDMutators.class.getName())
 				.contains(AllIncludingDraftSingleMutators.class.getName())
-				.contains(SafeAndConsensualMutators.class.getName())
+				.contains(SafeButNotAndConsensualMutators.class.getName())
 				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName());
 	}
 
@@ -51,6 +51,7 @@ public class TestAllIncludingDraftCompositeMutators {
 				.contains(PMDMutators.class.getName())
 				.contains(AllIncludingDraftSingleMutators.class.getName())
 				.contains(SafeAndConsensualMutators.class.getName())
+				.contains(SafeButNotAndConsensualMutators.class.getName())
 				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName());
 	}
 }

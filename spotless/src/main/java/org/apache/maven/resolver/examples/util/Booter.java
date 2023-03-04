@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -26,6 +27,9 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import eu.solven.cleanthat.maven_core.EnvironmentUtils;
+import eu.solven.cleanthat.maven_core.SystemProperties;
 
 /**
  * A helper to boot the repository system and a repository system session.
@@ -77,7 +81,26 @@ public class Booter {
 		// uncomment to generate dirty trees
 		// session.setDependencyGraphTransformer( null );
 
+		// https://github.com/apache/maven/pull/810
+		// https://github.com/apache/maven/commit/9c6013891504d5eb1d8bad18772a7fe114131d61
+		// System projects are not injected anymore by MavenRepositorySystemUtils
+		{
+
+			session.setSystemProperties(getSystemProperties());
+			session.setUserProperties(new Properties());
+		}
+
 		return session;
+	}
+
+	// Duplicated from org.apache.maven.project.artifact.MavenMetadataSource.getSystemProperties()
+	private static Properties getSystemProperties() {
+		var props = new Properties();
+
+		EnvironmentUtils.addEnvVars(props);
+		SystemProperties.addSystemProperties(props);
+
+		return props;
 	}
 
 	public static List<RemoteRepository> newRepositories(RepositorySystem system, RepositorySystemSession session) {

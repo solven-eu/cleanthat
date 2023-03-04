@@ -72,20 +72,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- https://github.com/google/google-java-format -->
-			<groupId>com.google.googlejavaformat</groupId>
-			<artifactId>google-java-format</artifactId>
-			<version>1.16.0</version>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/spring-io/spring-javaformat -->
-			<groupId>io.spring.javaformat</groupId>
-			<artifactId>spring-javaformat-formatter</artifactId>
-			<version>0.0.38</version>
-		</dependency>
-
-		<dependency>
 			<!-- Used to clean unexpected changes by Javaparser -->
 			<groupId>io.github.java-diff-utils</groupId>
 			<artifactId>java-diff-utils</artifactId>

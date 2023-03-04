@@ -67,12 +67,12 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 				return false;
 			}
 
-			ReflectionTypeSolver typeSolver = new ReflectionTypeSolver();
+			var typeSolver = new ReflectionTypeSolver();
 			SymbolReference<ResolvedReferenceTypeDeclaration> optType =
 					typeSolver.tryToSolveType(RuntimeException.class.getName());
 
 			// https://github.com/javaparser/javaparser/issues/3929
-			ReferenceTypeImpl referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
+			var referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
 
 			if (referenceTypeImpl.isAssignableBy(optResolved.get())) {
 				return true;

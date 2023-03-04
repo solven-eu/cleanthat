@@ -13,7 +13,7 @@
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.00</jacoco.instruction.ratio>
 
-		<maven-resolver.version>1.6.3</maven-resolver.version>
+		<!--		<maven-resolver.version>1.6.3</maven-resolver.version>-->
 		<!-- Not provided as spotless is not executed through maven in CleanThat -->
 		<maven.scope>provided</maven.scope>
 	</properties>

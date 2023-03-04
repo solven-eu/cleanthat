@@ -53,7 +53,12 @@ public class EnvironmentUtils {
 				var tmp = new Properties();
 				var caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
 				for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-					String key = "env." + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));
+					String key;
+					if (caseSensitive) {
+						key = "env." + entry.getKey();
+					} else {
+						key = "env." + entry.getKey().toUpperCase(Locale.ENGLISH);
+					}
 					tmp.setProperty(key, entry.getValue());
 				}
 				envVars = tmp;

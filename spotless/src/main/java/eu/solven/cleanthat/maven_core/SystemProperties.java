@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
 
 /**
  * @since 3.2.3
+ * @author Maven
  */
 // https://github.com/apache/maven/blob/master/maven-core/src/main/java/org/apache/maven/properties/internal/SystemProperties.java
 public class SystemProperties {

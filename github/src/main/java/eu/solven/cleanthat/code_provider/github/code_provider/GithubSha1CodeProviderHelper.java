@@ -103,7 +103,12 @@ public class GithubSha1CodeProviderHelper {
 
 			ICodeProvider localCodeProvider;
 			if (ZIP_ELSE_CLONE) {
-				var zippedLocalRef = downloadGitRefLocally(workingDir);
+				ICodeProvider zippedLocalRef;
+				try {
+					zippedLocalRef = downloadGitRefLocally(workingDir);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
 				// localCodeProvider = new CodeProviderDecoratingWriter(zippedLocalRef, () -> sha1CodeProvider);
 				localCodeProvider = zippedLocalRef;
 			} else {
@@ -127,11 +132,16 @@ public class GithubSha1CodeProviderHelper {
 		return JGitCodeProvider.makeGitRepo(tmpDir, authTransportUrl, sha1CodeProvider.getRef());
 	}
 
-	protected ICodeProvider downloadGitRefLocally(Path tmpDir) {
+	protected ICodeProvider downloadGitRefLocally(Path tmpDir) throws IOException {
 		String ref = sha1CodeProvider.getSha1();
 
 		// We save the repository zip in this hardcoded file
 		var zipPath = tmpDir.resolve("repository.zip");
+
+		// if (!Files.exists(zipPath)) {
+		// throw new IllegalStateException("We expect the path to exists: " + zipPath);
+		// }
+		Files.createDirectories(zipPath.getParent());
 
 		GHRepository repo = sha1CodeProvider.getRepo();
 		LOGGER.info("Downloading the repo={} ref={} into {}", repo.getFullName(), ref, zipPath);
@@ -141,7 +151,7 @@ public class GithubSha1CodeProviderHelper {
 			// https://docs.github.com/en/rest/reference/repos#download-a-repository-archive-zip
 			repo.readZip(inputStream -> {
 				long nbBytes = Files.copy(inputStream, zipPath, StandardCopyOption.REPLACE_EXISTING);
-				LOGGER.info("We wrote a ZIP of size={}", PepperLogHelper.humanBytes(nbBytes));
+				LOGGER.info("We wrote a ZIP of size={} into {}", PepperLogHelper.humanBytes(nbBytes), zipPath);
 				return tmpDir;
 			}, ref);
 		} catch (IOException e) {

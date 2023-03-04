@@ -98,6 +98,11 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		return ResultOrError.result(properties);
 	}
 
+	public static boolean isLimittedSetOfFiles(ICodeProvider codeProvider) {
+		return codeProvider instanceof IListOnlyModifiedFiles || codeProvider instanceof CodeProviderDecoratingWriter
+				&& ((CodeProviderDecoratingWriter) codeProvider).getDecorated() instanceof IListOnlyModifiedFiles;
+	}
+
 	@Override
 	public CodeFormatResult formatCodeGivenConfig(String eventKey, ICodeProviderWriter codeProvider, boolean dryRun) {
 		var optResult = loadAndCheckConfiguration(codeProvider);
@@ -108,8 +113,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 
 		var properties = optResult.getOptResult().get();
 
-		if (codeProvider instanceof IListOnlyModifiedFiles || codeProvider instanceof CodeProviderDecoratingWriter
-				&& ((CodeProviderDecoratingWriter) codeProvider).getDecorated() instanceof IListOnlyModifiedFiles) {
+		if (isLimittedSetOfFiles(codeProvider)) {
 			// We are on a PR event, or a commit_push over a branch which is head of an open PR
 			LOGGER.info("About to clean a limitted set of files");
 		} else {

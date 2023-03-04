@@ -136,9 +136,13 @@ public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implem
 
 	@Override
 	public Optional<String> loadContentForPath(Path contentPath) throws IOException {
+		CleanthatPathHelpers.checkContentPath(contentPath);
+
 		if (helper.localClone.get() != null) {
+			// Switch to a raw path as the underlying ICodeProvider has a different root
+			var contentRawPath = contentPath.toString();
 			// We have a local clone: load the file from it
-			return helper.localClone.get().loadContentForPath(contentPath);
+			return helper.localClone.get().loadContentForPath(contentRawPath);
 		} else {
 			try {
 				String rawPath = CleanthatPathHelpers.makeContentRawPath(getRepositoryRoot(), contentPath);

@@ -72,8 +72,18 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 		});
 	}
 
+	/**
+	 * Typically an older commit
+	 * 
+	 * @return
+	 */
 	protected abstract String getBaseId();
 
+	/**
+	 * Typically a fresher commit
+	 * 
+	 * @return
+	 */
 	protected abstract String getHeadId();
 
 	@Override

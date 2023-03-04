@@ -20,15 +20,18 @@ import java.nio.file.Path;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 
+import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubCommitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.codeprovider.IUpgradableToHeadFullScan;
 
 /**
  * An {@link ICodeProvider} from a commit to a commit
  *
  * @author Benoit Lacelle
  */
-public class GithubCommitToCommitDiffCodeProvider extends AGithubDiffCodeProvider implements IListOnlyModifiedFiles {
+public class GithubCommitToCommitDiffCodeProvider extends AGithubDiffCodeProvider
+		implements IListOnlyModifiedFiles, IUpgradableToHeadFullScan {
 	final GHCommit base;
 	final GHCommit head;
 
@@ -51,6 +54,11 @@ public class GithubCommitToCommitDiffCodeProvider extends AGithubDiffCodeProvide
 	@Override
 	protected String getHeadId() {
 		return head.getSHA1();
+	}
+
+	@Override
+	public ICodeProvider upgradeToFullScan() {
+		return new GithubCommitCodeProvider(getRepositoryRoot(), token, baseRepository, head);
 	}
 
 }

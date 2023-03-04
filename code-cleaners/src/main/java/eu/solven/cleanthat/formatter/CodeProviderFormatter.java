@@ -38,12 +38,14 @@ import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import eu.solven.cleanthat.any_language.ACodeCleaner;
+import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
 import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
-import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
+import eu.solven.cleanthat.codeprovider.IUpgradableToHeadFullScan;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
 import eu.solven.cleanthat.config.IncludeExcludeHelpers;
@@ -98,30 +100,41 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 
 		List<String> prComments = new ArrayList<>();
 
-		if (codeWriter instanceof IListOnlyModifiedFiles) {
+		ICodeProviderWriter finalCodeWriter;
+		if (ACodeCleaner.isLimittedSetOfFiles(codeWriter)) {
 			// TODO Check if number of files is compatible with RateLimit
 			try {
 				codeWriter.listFilesForFilenames(fileChanged -> {
-					if (fileChanged.getPath().startsWith(ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER)) {
+					var path = fileChanged.getPath();
+					if (path.startsWith(ICleanthatConfigConstants.FILENAME_CLEANTHAT_FOLDER)) {
 						// We hit on any change in the '.cleanthat' directory
 						// Then we catch changes in spotless (or any other engine)
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
+						LOGGER.info("Configuration change over path=`{}`", path);
 					}
 				});
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue while checking for config change", e);
 			}
+
+			if (configIsChanged.get()) {
+				finalCodeWriter = upgradeToFullRepoReader(codeWriter);
+			} else {
+				finalCodeWriter = codeWriter;
+			}
+
 		} else {
 			// We are in a branch (but no base-branch as reference): meaningless to check for config change, and anyway
 			LOGGER.debug("We will clean everything");
+			finalCodeWriter = codeWriter;
 		}
 
 		AtomicLongMap<String> languageToNbAddedFiles = AtomicLongMap.create();
 		AtomicLongMap<String> languagesCounters = AtomicLongMap.create();
 		Map<Path, String> pathToMutatedContent = new LinkedHashMap<>();
 
-		var cleanthatSession = new CleanthatSession(codeWriter.getRepositoryRoot(), codeWriter, repoProperties);
+		var cleanthatSession = new CleanthatSession(codeWriter.getRepositoryRoot(), finalCodeWriter, repoProperties);
 
 		repoProperties.getEngines().stream().filter(lp -> !lp.isSkip()).forEach(dirtyLanguageConfig -> {
 			var languageP = prepareLanguageConfiguration(repoProperties, dirtyLanguageConfig);
@@ -176,6 +189,25 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 		codeWriter.cleanTmpFiles();
 
 		return new CodeFormatResult(isEmpty, new LinkedHashMap<>(languagesCounters.asMap()));
+	}
+
+	private ICodeProviderWriter upgradeToFullRepoReader(ICodeProviderWriter codeWriter) {
+		ICodeProvider codeProvider = codeWriter;
+		while (codeProvider instanceof CodeProviderDecoratingWriter) {
+			codeProvider = ((CodeProviderDecoratingWriter) codeWriter).getDecorated();
+		}
+
+		if (codeProvider instanceof IUpgradableToHeadFullScan) {
+			codeProvider = ((IUpgradableToHeadFullScan) codeProvider).upgradeToFullScan();
+		} else {
+			LOGGER.warn("TODO {} does not implements {}",
+					codeProvider.getClass().getName(),
+					IUpgradableToHeadFullScan.class.getName());
+		}
+
+		var fullRepoCodeWriter = new CodeProviderDecoratingWriter(codeProvider, () -> codeWriter);
+		LOGGER.info("We upgraded {} to {}", codeWriter, fullRepoCodeWriter);
+		return fullRepoCodeWriter;
 	}
 
 	private IEngineProperties prepareLanguageConfiguration(CleanthatRepositoryProperties repoProperties,

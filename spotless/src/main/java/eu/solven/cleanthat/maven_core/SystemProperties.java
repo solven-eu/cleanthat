@@ -17,6 +17,8 @@ package eu.solven.cleanthat.maven_core;
 
 import java.util.Properties;
 
+import com.google.common.base.Strings;
+
 /**
  * @since 3.2.3
  */
@@ -30,12 +32,33 @@ public class SystemProperties {
 	}
 
 	/**
+	 * {@link System#getProperties()} is unsafe as it gives potentially access to secrets
+	 * 
+	 * @return
+	 */
+	public static final Properties getSafeSystemProperties() {
+		var safe = new Properties();
+
+		// JdkVersionProfileActivator.isActive(Profile, ProfileActivationContext, ModelProblemCollector)
+		addIfPresent(safe, "java.version");
+
+		return safe;
+	}
+
+	private static void addIfPresent(Properties safe, String key) {
+		var optJavaVersion = System.getProperty(key);
+		if (!Strings.isNullOrEmpty(optJavaVersion)) {
+			safe.put(key, optJavaVersion);
+		}
+	}
+
+	/**
 	 * Returns a copy of {@link System#getProperties()} in a thread-safe manner.
 	 *
 	 * @return {@link System#getProperties()} obtained in a thread-safe manner.
 	 */
 	public static Properties getSystemProperties() {
-		return copyProperties(System.getProperties());
+		return copyProperties(getSafeSystemProperties());
 	}
 
 	/**

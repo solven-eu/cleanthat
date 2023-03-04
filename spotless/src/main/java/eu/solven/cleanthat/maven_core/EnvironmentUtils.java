@@ -49,8 +49,8 @@ public class EnvironmentUtils {
 	 */
 	public static void addEnvVars(Properties props) {
 		if (props != null) {
-			if (envVars == null) {
-				synchronized (EnvironmentUtils.class) {
+			synchronized (EnvironmentUtils.class) {
+				if (envVars == null) {
 					var tmp = new Properties();
 					var caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
 					for (Map.Entry<String, String> entry : System.getenv().entrySet()) {

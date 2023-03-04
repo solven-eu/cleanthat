@@ -47,21 +47,23 @@ public class EnvironmentUtils {
 	 * @param props
 	 *            The properties to add the environment variables to, may be {@code null}.
 	 */
-	public static synchronized void addEnvVars(Properties props) {
+	public static void addEnvVars(Properties props) {
 		if (props != null) {
 			if (envVars == null) {
-				var tmp = new Properties();
-				var caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
-				for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
-					String key;
-					if (caseSensitive) {
-						key = "env." + entry.getKey();
-					} else {
-						key = "env." + entry.getKey().toUpperCase(Locale.ENGLISH);
+				synchronized (EnvironmentUtils.class) {
+					var tmp = new Properties();
+					var caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
+					for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+						String key;
+						if (caseSensitive) {
+							key = "env." + entry.getKey();
+						} else {
+							key = "env." + entry.getKey().toUpperCase(Locale.ENGLISH);
+						}
+						tmp.setProperty(key, entry.getValue());
 					}
-					tmp.setProperty(key, entry.getValue());
+					envVars = tmp;
 				}
-				envVars = tmp;
 			}
 
 			props.putAll(envVars);

@@ -47,7 +47,7 @@ public class EnvironmentUtils {
 	 * @param props
 	 *            The properties to add the environment variables to, may be {@code null}.
 	 */
-	public static void addEnvVars(Properties props) {
+	public static synchronized void addEnvVars(Properties props) {
 		if (props != null) {
 			if (envVars == null) {
 				var tmp = new Properties();

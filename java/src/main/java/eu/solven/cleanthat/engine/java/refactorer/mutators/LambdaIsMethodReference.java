@@ -31,7 +31,6 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.TypeExpr;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -99,8 +98,8 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 			return false;
 		}
 
-		ExpressionStmt asExpressionStmt = body.asExpressionStmt();
-		Expression expression = asExpressionStmt.getExpression();
+		var asExpressionStmt = body.asExpressionStmt();
+		var expression = asExpressionStmt.getExpression();
 		if (expression.isInstanceOfExpr()) {
 			return onInstanceOf(lambdaExpr, singleParameter, expression);
 		} else if (expression.isCastExpr()) {

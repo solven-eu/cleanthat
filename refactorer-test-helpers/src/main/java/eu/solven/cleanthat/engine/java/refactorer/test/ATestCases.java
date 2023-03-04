@@ -46,8 +46,8 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasse
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsResource;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;

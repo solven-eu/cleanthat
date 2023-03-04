@@ -162,21 +162,28 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 
 		var localTransformed = false;
 		if (optMigratedName.isPresent()) {
-			localTransformed = true;
-
 			var migratedName = optMigratedName.get();
-			if (annotation.getName().asString().indexOf('.') >= 0) {
+
+			var currentName = annotation.getNameAsString();
+			String newName;
+
+			if (currentName.indexOf('.') >= 0) {
 				// The existing name is fully qualified
-				annotation.setName(migratedName);
+				newName = migratedName;
 			} else {
 				// The existing name is the simple className
 				var lastDot = migratedName.lastIndexOf('.');
 				if (lastDot < 0) {
 					// No dot: the class is in the root package
-					annotation.setName(migratedName);
+					newName = migratedName;
 				} else {
-					annotation.setName(migratedName.substring(lastDot + 1));
+					newName = migratedName.substring(lastDot + 1);
 				}
+			}
+
+			if (!currentName.equals(newName)) {
+				localTransformed = true;
+				annotation.setName(migratedName);
 			}
 		}
 		return localTransformed;

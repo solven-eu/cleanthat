@@ -43,7 +43,7 @@ public class LoggingRepositoryListener extends AbstractRepositoryListener {
 
 	public void artifactDescriptorInvalid(RepositoryEvent event) {
 		requireNonNull(event, "event cannot be null");
-		LOGGER.info(
+		LOGGER.warn(
 				"Invalid artifact descriptor for " + event.getArtifact() + ": " + event.getException().getMessage());
 	}
 

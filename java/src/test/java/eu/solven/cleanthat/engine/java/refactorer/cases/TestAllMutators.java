@@ -36,8 +36,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
-public class TestStringToStringCustom extends AJavaparserTestCases {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestStringToStringCustom.class);
+public class TestAllMutators extends AJavaparserTestCases {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestAllMutators.class);
 
 	final IJavaparserMutator mutator = new UnnecessaryBoxing();
 
@@ -57,6 +57,7 @@ public class TestStringToStringCustom extends AJavaparserTestCases {
 			try {
 				var transformed = ((IJavaparserMutator) mutator).walkAstHasChanged(compilationUnit);
 			} catch (Throwable t) {
+				// This detects as issue on JUnit4ToJUnit5
 				LOGGER.warn("ARG", t);
 			}
 

@@ -90,10 +90,13 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 	 * 
 	 * Cleanthat will process current directory: it does not need to iterate over modules which are children in the
 	 * {@link FileSystem}
+	 * 
+	 * Default is false as Cleanthat may be run in any folder (would it have a pom.xml or not, would it is the project
+	 * root directory, or any sub directory)
 	 */
 	// https://github.com/maven-download-plugin/maven-download-plugin/blob/master/src/main/java/com/googlecode/download/maven/plugin/internal/WGet.java
 	// https://github.com/khmarbaise/maven-assembly-plugin/blob/master/src/main/java/org/apache/maven/plugin/assembly/mojos/AbstractAssemblyMojo.java#L335
-	@Parameter(property = "runOnlyAtRoot", defaultValue = "true")
+	@Parameter(property = "runOnlyAtRoot", defaultValue = "false")
 	private boolean runOnlyAtRoot;
 
 	FileSystem fs = FileSystems.getDefault();

@@ -19,12 +19,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VarType;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.Pair;
@@ -39,6 +43,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  */
 // https://github.com/openrewrite/rewrite/issues/1656
 public class LocalVariableTypeInference extends AJavaparserMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LocalVariableTypeInference.class);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -48,6 +53,11 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-6212");
+	}
+
+	@Override
+	public Optional<String> getCleanthatId() {
+		return Optional.of("LocalVariableTypeInference");
 	}
 
 	@Override
@@ -123,10 +133,23 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 
 		if (initializerType.isReferenceType() && resolvedVariableType.isReferenceType()) {
 			// We require generics to be the same in both sides
-			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> initializerTypeParametersMap =
-					initializerType.asReferenceType().getTypeParametersMap();
-			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> variableTypeParametersMap =
-					resolvedVariableType.asReferenceType().getTypeParametersMap();
+			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> variableTypeParametersMap;
+			try {
+				var variableReferenceType = resolvedVariableType.asReferenceType();
+				variableTypeParametersMap = variableReferenceType.getTypeParametersMap();
+			} catch (UnsolvedSymbolException e) {
+				LOGGER.debug("Issue solving a Symbol type: {}", e);
+				return false;
+			}
+
+			List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> initializerTypeParametersMap;
+			try {
+				var initializerReferenceType = initializerType.asReferenceType();
+				initializerTypeParametersMap = initializerReferenceType.getTypeParametersMap();
+			} catch (UnsolvedSymbolException e) {
+				LOGGER.debug("Issue solving a Symbol type: {}", e);
+				return false;
+			}
 
 			// In fact, it is not enough. See
 			// eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LocalVariableTypeInferenceCases.Case_UnclearGenericBounds

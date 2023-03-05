@@ -170,8 +170,12 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 	}
 
 	private void logJavaParserIssue(Object o, Throwable e, String issue) {
-		LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'", issue, o);
-		LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'", issue, o, e);
+		String msg = "We encounter a case of {} for `{}`. Full-stack is available in 'debug'";
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.warn(msg, issue, o, e);
+		} else {
+			LOGGER.warn(msg, issue, o);
+		}
 	}
 
 	protected Optional<ResolvedType> optResolvedType(Type type) {

@@ -22,10 +22,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
+import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
@@ -37,6 +41,8 @@ import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
  *
  */
 public class OverlayCodeProviderWrite implements ICodeProviderWriter {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OverlayCodeProviderWrite.class);
+
 	final ICodeProviderWriter underlying;
 
 	final Map<Path, String> pathToOverlay;
@@ -53,8 +59,18 @@ public class OverlayCodeProviderWrite implements ICodeProviderWriter {
 
 	@Override
 	public void listFilesForContent(Set<String> includes, Consumer<ICodeProviderFile> consumer) throws IOException {
-		// TODO Auto-generated method stub
+		pathToOverlay.forEach((path, content) -> {
+			consumer.accept(new DummyCodeProviderFile(path, content));
+		});
 
+		underlying.listFilesForContent(includes, file -> {
+			var path = file.getPath();
+			if (pathToOverlay.containsKey(path)) {
+				LOGGER.debug("Skip an overlayed path: {}", path);
+			} else {
+				consumer.accept(file);
+			}
+		});
 	}
 
 	@Override

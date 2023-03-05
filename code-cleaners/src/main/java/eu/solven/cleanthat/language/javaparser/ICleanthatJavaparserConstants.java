@@ -23,5 +23,5 @@ package eu.solven.cleanthat.language.javaparser;
  */
 public interface ICleanthatJavaparserConstants {
 	String ENGINE_ID = "javaparser";
-	String STEP_ID = ENGINE_ID;
+	// String STEP_ID = ENGINE_ID;
 }

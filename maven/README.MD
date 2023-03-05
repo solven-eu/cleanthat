@@ -35,6 +35,20 @@ reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.
 
 ## Goals
 
+### cleanthat:apply
+
+This Mojo enables one-shot run of a mutator over current directory.
+
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.includeDraft=true
+     
+You can call a specific single rule:
+
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=RSPEC-6212
+     
+You can call most CleanThat rules with:
+
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=SafeAndConsensual -Dcleanthat.mutators=SafeNutNotConsensual -Dcleanthat.includeDraft=true
+
 ### cleanthat:init
 
 This will initialize cleanthat configuration with a standard configuration. It essentially generates a `.cleanthat/cleanthat.yaml` file at the root of the repository.

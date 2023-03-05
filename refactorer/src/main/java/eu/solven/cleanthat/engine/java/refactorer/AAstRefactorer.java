@@ -28,6 +28,7 @@ import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -138,7 +139,11 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	protected abstract boolean isValidResultString(P parser, String resultAsString);
 
 	public static List<IMutator> filterRules(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
-		var engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());
+		var languageLevel = engineProperties.getEngineVersion();
+		if (Strings.isNullOrEmpty(languageLevel)) {
+			languageLevel = IJdkVersionConstants.LAST;
+		}
+		var engineVersion = JavaVersion.parse(languageLevel);
 
 		var includedRules = properties.getIncluded();
 		var excludedRules = properties.getExcluded();

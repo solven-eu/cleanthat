@@ -35,13 +35,17 @@ public class StringFormatterFactory implements IEngineFormatterFactory {
 	}
 
 	@Override
-	public IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties languageProperties) {
-		var language = languageProperties.getEngine();
-		var formatter = engineToFormatter.get(language);
+	public IEngineLintFixerFactory makeLanguageFormatter(IEngineProperties engineProperties) {
+		var engine = engineProperties.getEngine();
+		return makeLanguageFormatter(engine);
+	}
+
+	private IEngineLintFixerFactory makeLanguageFormatter(String engine) {
+		var formatter = engineToFormatter.get(engine);
 
 		if (formatter == null) {
 			throw new IllegalArgumentException(
-					"There is no formatter for language=" + language + " languages=" + engineToFormatter.keySet());
+					"There is no formatter for engine=" + engine + " available engines=" + engineToFormatter.keySet());
 		}
 
 		return formatter;
@@ -49,7 +53,8 @@ public class StringFormatterFactory implements IEngineFormatterFactory {
 
 	@Override
 	public Set<String> getDefaultIncludes(String engine) {
-		return engineToFormatter.get(engine).getDefaultIncludes();
+		var engineFactory = makeLanguageFormatter(engine);
+		return engineFactory.getDefaultIncludes();
 	}
 
 }

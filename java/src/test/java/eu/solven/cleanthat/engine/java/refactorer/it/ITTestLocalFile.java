@@ -62,19 +62,20 @@ public class ITTestLocalFile {
 		var rulesJavaMutator =
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), new JavaRefactorerProperties());
 
-		var compilationUnit =
-				rulesJavaMutator.parseSourceCode(JavaRefactorer.makeDefaultJavaParser(false), pathAsString);
-
 		// TODO Refactor to rely on RulesJavaMutator
 		IJavaparserMutator rule = new LiteralsFirstInComparisons();
-		var changed = rule.walkAstHasChanged(compilationUnit);
+
+		var optCompilationUnit =
+				rulesJavaMutator.parseSourceCode(JavaRefactorer.makeDefaultJavaParser(rule.isJreOnly()), pathAsString);
+
+		var changed = rule.walkAstHasChanged(optCompilationUnit.get());
 
 		if (!changed) {
 			throw new IllegalArgumentException(rule + " did not change: " + file.getAbsolutePath());
 		}
 
 		DiffMatchPatch dmp = new DiffMatchPatch();
-		var newAsString = compilationUnit.toString();
+		var newAsString = optCompilationUnit.toString();
 
 		// TODO We may need to reformat to have a nice diff
 		// see eu.solven.cleanthat.java.mutators.RulesJavaMutator.fixJavaparserUnexpectedChanges(String, String)

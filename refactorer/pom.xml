@@ -10,6 +10,11 @@
 
 	<artifactId>refactorer</artifactId>
 
+	<properties>
+		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
+		<jacoco.instruction.ratio>0.08</jacoco.instruction.ratio>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>

@@ -32,12 +32,9 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
-import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
@@ -57,23 +54,10 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
 
-	private static final ThreadLocal<TypeSolver> TL_TYPESOLVER = ThreadLocal.withInitial(() -> {
-		return JavaRefactorer.makeDefaultTypeSolver(false);
-	});
-
-	private static final ThreadLocal<JavaParserFacade> TL_JAVAPARSER = ThreadLocal.withInitial(() -> {
-		// We allow processing any type available to default classLoader
-		return JavaParserFacade.get(TL_TYPESOLVER.get());
-	});
-
 	@Deprecated
 	@VisibleForTesting
 	public static int getWarnCount() {
 		return WARNS_IDEMPOTENCY_COUNT.get();
-	}
-
-	protected final JavaParserFacade getThreadJavaParser() {
-		return TL_JAVAPARSER.get();
 	}
 
 	@Override
@@ -154,36 +138,40 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 
 	// https://github.com/javaparser/javaparser/issues/1491
 	protected Optional<ResolvedType> optResolvedType(Expression expr) {
+		if (expr.findCompilationUnit().isEmpty()) {
+			// This node is not hooked anymore on a CompilationUnit
+			return Optional.empty();
+		}
+
 		try {
-			return Optional.of(expr.calculateResolvedType());
+			// ResolvedType type = expr.getSymbolResolver().calculateType(expr);
+			var type = expr.calculateResolvedType();
+			return Optional.of(type);
 		} catch (RuntimeException e) {
 			try {
-				Optional<ResolvedType> fallbackType = Optional.of(getThreadJavaParser().getType(expr));
-				if (fallbackType.isPresent()) {
-					// TODO Is this related to code-modifications?
-					LOGGER.debug("1- Does this still happen? As of 2022-12: Yes!", e);
-				}
-				return fallbackType;
+				var secondTryType = expr.calculateResolvedType();
+
+				logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3939");
+
+				return Optional.of(secondTryType);
 			} catch (RuntimeException ee) {
-				LOGGER.debug("Issue with JavaParser: {} {}", ee.getClass().getName(), ee.getMessage());
+				LOGGER.debug("Issue resolving the type of {}", expr, ee);
+				return Optional.empty();
+			} catch (NoClassDefFoundError ee) {
+				logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
+
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			logNoClassDefFoundResolvingType(expr, e);
+			logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
 
 			return Optional.empty();
 		}
 	}
 
-	private void logNoClassDefFoundResolvingType(Object o, NoClassDefFoundError e) {
-		// https://github.com/javaparser/javaparser/issues/3504
-		LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-				"https://github.com/javaparser/javaparser/issues/3504",
-				o);
-		LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'",
-				"https://github.com/javaparser/javaparser/issues/3504",
-				o,
-				e);
+	private void logJavaParserIssue(Object o, Throwable e, String issue) {
+		LOGGER.warn("We encounter a case of {} for {}. Full-stack is available in 'debug'", issue, o);
+		LOGGER.debug("We encounter a case of {} for {}. Full-stack is available in 'debug'", issue, o, e);
 	}
 
 	protected Optional<ResolvedType> optResolvedType(Type type) {
@@ -191,15 +179,11 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 			return Optional.of(type.resolve());
 		} catch (RuntimeException e) {
 			try {
-				var symbolSolver = TL_TYPESOLVER.get();
-				var symbolResolver = new JavaSymbolSolver(symbolSolver);
-				Optional<ResolvedType> fallbackType =
-						Optional.of(symbolResolver.toResolvedType(type, ResolvedType.class));
-				if (fallbackType.isPresent()) {
-					// TODO Is this related to code-modifications?
-					LOGGER.debug("1- Does this still happen? As of ???: Yes!", e);
-				}
-				return fallbackType;
+				var secondTryType = type.resolve();
+
+				logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3939");
+
+				return Optional.of(secondTryType);
 			} catch (RuntimeException ee) {
 				// UnsolvedSymbolException | UnsupportedOperationException
 				// Caused by: java.lang.UnsupportedOperationException: CorrespondingDeclaration not available for
@@ -210,19 +194,24 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			logNoClassDefFoundResolvingType(type, e);
+			logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3504");
 
 			return Optional.empty();
 		}
 	}
 
-	protected Optional<ResolvedDeclaration> optResolved(Expression singleArgument) {
-		if (!(singleArgument instanceof Resolvable<?>)) {
+	protected Optional<ResolvedDeclaration> optResolved(Expression expr) {
+		if (expr.findCompilationUnit().isEmpty()) {
+			// This node is not hooked anymore on a CompilationUnit
+			return Optional.empty();
+		}
+
+		if (!(expr instanceof Resolvable<?>)) {
 			return Optional.empty();
 		}
 
 		try {
-			Object resolved = ((Resolvable<?>) singleArgument).resolve();
+			Object resolved = ((Resolvable<?>) expr).resolve();
 			return Optional.of((ResolvedDeclaration) resolved);
 			// resolved = ((Resolvable<ResolvedValueDeclaration>) singleArgument).resolve();
 		} catch (UnsolvedSymbolException e) {

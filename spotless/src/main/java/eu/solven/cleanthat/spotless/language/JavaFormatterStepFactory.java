@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
@@ -47,13 +50,14 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
+	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatterStepFactory.class);
+
 	static final String KEY_ORDER = "order";
 	// The default eclipse configuration
 	static final String ORDER_DEFAULT_ECLIPSE =
 			Stream.of("java", "javax", "org", "com").collect(Collectors.joining(","));
 
-	public static final List<String> DEFAULT_MUTATORS =
-			ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL).build();
+	public static final List<String> DEFAULT_MUTATORS;
 
 	private static final String LICENSE_HEADER_DELIMITER = "package ";
 
@@ -65,6 +69,18 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 					+ "eclipse_java-stylesheet.xml";
 
 	public static final String ID_ECLIPSE = "eclipse";
+
+	static {
+		ImmutableList.Builder<String> defaultMutatorsBuilder =
+				ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL);
+		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+			LOGGER.warn("We include {} in default mutators",
+					ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
+			defaultMutatorsBuilder.add(ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
+		}
+
+		DEFAULT_MUTATORS = defaultMutatorsBuilder.build();
+	}
 
 	public JavaFormatterStepFactory(JavaFormatterFactory formatterFactory,
 			ICodeProvider codeProvider,
@@ -106,7 +122,11 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		if (cleanthatVersion == null) {
 			// TODO We should fetch latest cleanthat version available, or even current -SNAPSHOT
 			// CleanthatJavaStep.defaultVersion()
-			cleanthatVersion = "2.6";
+			if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+				cleanthatVersion = "2.9-SNAPSHOT";
+			} else {
+				cleanthatVersion = "2.8";
+			}
 		}
 
 		String sourceJdk = parameters.getCustomProperty("source_jdk", String.class);
@@ -121,9 +141,20 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		}
 
 		List<String> excludedMutators = parameters.getCustomProperty("excluded_mutators", List.class);
+
+		Boolean includeDraft = parameters.getCustomProperty("include_draft", Boolean.class);
+		if (includeDraft == null) {
+			includeDraft = false;
+		}
+
 		var defaultGroupArtifact = CleanthatJavaStep.defaultGroupArtifact();
-		return CleanthatJavaStep
-				.create(defaultGroupArtifact, cleanthatVersion, sourceJdk, mutators, excludedMutators, provisioner);
+		return CleanthatJavaStep.create(defaultGroupArtifact,
+				cleanthatVersion,
+				sourceJdk,
+				mutators,
+				excludedMutators,
+				includeDraft,
+				provisioner);
 	}
 
 	private FormatterStep makeEclipse(SpotlessStepParametersProperties parameters, Provisioner provisioner) {

@@ -26,11 +26,12 @@ import org.springframework.core.io.Resource;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
+	final IJavaparserMutator mutator = new LiteralsFirstInComparisons();
 
 	@Test
 	public void testNotIdempotent() throws IOException {
@@ -39,11 +40,9 @@ public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
 		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		var transformer = new LiteralsFirstInComparisons();
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(transformer.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
-		var transformed = transformer.walkAstHasChanged(compilationUnit);
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
 		Assertions.assertThat(AJavaparserMutator.getWarnCount()).isEqualTo(0);

@@ -27,7 +27,6 @@ import org.springframework.core.io.Resource;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
@@ -42,9 +41,7 @@ public class TestLambdaReturnsSingleStatementCustom extends AJavaparserTestCases
 				"/source/do_not_format_me/LambdaReturnsSingleStatement/TestFileSystemCodeProvider.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
-		LexicalPreservingPrinter.setup(compilationUnit);
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
 		var transformed = mutator.walkAstHasChanged(compilationUnit);
 

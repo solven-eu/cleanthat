@@ -65,7 +65,8 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	protected J.CompilationUnit convertToAst(Node pre) {
 		var asString = pre.toString();
 
-		return AAstRefactorer.parse(refactorer, asString);
+		return AAstRefactorer.parse(refactorer, asString)
+				.orElseThrow(() -> new IllegalArgumentException("Invalid input"));
 	}
 
 	@Override

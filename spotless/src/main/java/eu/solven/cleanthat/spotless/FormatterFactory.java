@@ -48,6 +48,7 @@ import eu.solven.cleanthat.spotless.language.MarkdownFormatterFactory;
 import eu.solven.cleanthat.spotless.language.PomXmlFormatterFactory;
 import eu.solven.cleanthat.spotless.language.ScalaFormatterFactory;
 import eu.solven.cleanthat.spotless.language.XmlFormatterFactory;
+import eu.solven.cleanthat.spotless.language.YamlFormatterFactory;
 import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
@@ -143,7 +144,7 @@ public class FormatterFactory {
 		case ID_JSON:
 			return new JsonFormatterFactory();
 		case ID_YAML:
-			return new JsonFormatterFactory();
+			return new YamlFormatterFactory();
 
 		default:
 			throw new IllegalArgumentException("Not managed format: " + format);

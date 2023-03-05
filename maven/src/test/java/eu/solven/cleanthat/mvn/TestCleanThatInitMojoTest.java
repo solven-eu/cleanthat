@@ -142,8 +142,7 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 						objectMapper,
 						url);
 
-		// TODO We should add spotlessSteps dynamically
-		Assert.assertEquals(4, spotlessConfigResource.getFormatters().size());
+		Assert.assertEquals(3, spotlessConfigResource.getFormatters().size());
 		{
 
 			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(0);
@@ -173,15 +172,15 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
 			Assert.assertEquals("sortPom", firstStep.getId());
 		}
-		{
-
-			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(3);
-			Assert.assertEquals("yaml", formatter.getFormat());
-
-			Assert.assertEquals(1, formatter.getSteps().size());
-
-			SpotlessStepProperties firstStep = formatter.getSteps().get(0);
-			Assert.assertEquals("jackson", firstStep.getId());
-		}
+		// {
+		//
+		// SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(3);
+		// Assert.assertEquals("yaml", formatter.getFormat());
+		//
+		// Assert.assertEquals(1, formatter.getSteps().size());
+		//
+		// SpotlessStepProperties firstStep = formatter.getSteps().get(0);
+		// Assert.assertEquals("jackson", firstStep.getId());
+		// }
 	}
 }

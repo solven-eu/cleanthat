@@ -15,10 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
  * {@link ATestCases}for {@link IJavaparserMutator}
@@ -35,10 +38,6 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 		return ast;
 	}
 
-	// protected <T extends Node> String toString(T post) {
-	// return post.toString();
-	// }
-
 	@Override
 	protected String astToString(Node node) {
 		return LexicalPreservingPrinter.print(node);
@@ -49,5 +48,12 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 	protected String resultToString(Node node) {
 		return LexicalPreservingPrinter.print(node);
 		// return post.toString();
+	}
+
+	protected CompilationUnit parseCompilationUnit(IMutator mutator, String asString) {
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
+		var compilationUnit = ATestCases.throwIfProblems(javaParser.parse(asString));
+		LexicalPreservingPrinter.setup(compilationUnit);
+		return compilationUnit;
 	}
 }

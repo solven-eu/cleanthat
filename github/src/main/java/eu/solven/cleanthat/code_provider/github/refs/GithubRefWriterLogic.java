@@ -80,6 +80,11 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	}
 
 	protected void commitIntoRef(Map<Path, String> pathToMutatedContent, List<String> prComments) {
+		if (pathToMutatedContent.isEmpty()) {
+			LOGGER.info("There is not a single path to write");
+			return;
+		}
+
 		String repoName = repo.getFullName();
 		String refName = target.getRef();
 		LOGGER.debug("Persisting into {}:{}", repoName, refName);

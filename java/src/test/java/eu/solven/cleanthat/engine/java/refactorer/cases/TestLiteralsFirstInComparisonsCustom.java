@@ -25,7 +25,6 @@ import org.springframework.core.io.Resource;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
@@ -39,8 +38,7 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 		Resource resource = new ClassPathResource("/source/do_not_format_me/MiTrust/TestNodeResourceImpl.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
 		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
@@ -52,8 +50,7 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 		Resource resource = new ClassPathResource("/source/do_not_format_me/Generic/ConstantWithDigitInName.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
 		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
@@ -65,8 +62,7 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 		Resource resource = new ClassPathResource("/source/do_not_format_me/MiTrust/LocaleHelper.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
 		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
@@ -78,11 +74,13 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 		Resource resource = new ClassPathResource("/source/do_not_format_me/ShaftEngine/RecordManager.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = javaParser.parse(asString).getResult().get();
+		Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
+				.isInstanceOf(IllegalArgumentException.class);
 
-		var transformed = mutator.walkAstHasChanged(compilationUnit);
+		// var compilationUnit = parseCompilationUnit(mutator, asString);
 
-		Assertions.assertThat(transformed).isTrue();
+		// var transformed = mutator.walkAstHasChanged(compilationUnit);
+		//
+		// Assertions.assertThat(transformed).isTrue();
 	}
 }

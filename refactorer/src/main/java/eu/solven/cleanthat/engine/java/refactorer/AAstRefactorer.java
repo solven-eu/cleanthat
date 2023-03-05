@@ -69,7 +69,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		return mutators;
 	}
 
-	public static <AST, P> AST parse(AAstRefactorer<AST, P, ?, ?> refactorer, String sourceCode) {
+	public static <AST, P> Optional<AST> parse(AAstRefactorer<AST, P, ?, ?> refactorer, String sourceCode) {
 		var parser = refactorer.makeAstParser();
 
 		return refactorer.parseSourceCode(parser, sourceCode);
@@ -77,7 +77,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 	protected abstract P makeAstParser();
 
-	protected abstract AST parseSourceCode(P parser, String sourceCode);
+	protected abstract Optional<AST> parseSourceCode(P parser, String sourceCode);
 
 	protected String applyTransformers(String dirtyCode) {
 		AtomicReference<String> refCleanCode = new AtomicReference<>(dirtyCode);
@@ -94,8 +94,14 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			if (optCompilationUnit.get() == null) {
 				try {
 					var sourceCode = refCleanCode.get();
-					var compilationUnit = parseSourceCode(parser, sourceCode);
-					optCompilationUnit.set(compilationUnit);
+					var tryCompilationUnit = parseSourceCode(parser, sourceCode);
+					if (tryCompilationUnit.isEmpty()) {
+						// We are not able to parse the input
+						LOGGER.warn("Not able to parse this content into an AST");
+						return;
+					} else {
+						optCompilationUnit.set(tryCompilationUnit.get());
+					}
 				} catch (RuntimeException e) {
 					throw new RuntimeException("Issue parsing the code", e);
 				}
@@ -115,7 +121,12 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 				LOGGER.debug("IMutator {} linted (with impact)", ct.getClass().getSimpleName());
 
 				// One relevant change: building source-code from the AST
-				refCleanCode.set(toString(walkNodeResult.get()));
+				var resultAsString = toString(walkNodeResult.get());
+				if (isValidResultString(parser, resultAsString)) {
+					refCleanCode.set(resultAsString);
+				} else {
+					LOGGER.warn("{} generated invalid code", ct);
+				}
 
 				// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits
 				optCompilationUnit.set(null);
@@ -123,6 +134,8 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		});
 		return refCleanCode.get();
 	}
+
+	protected abstract boolean isValidResultString(P parser, String resultAsString);
 
 	public static List<IMutator> filterRules(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
 		var engineVersion = JavaVersion.parse(engineProperties.getEngineVersion());

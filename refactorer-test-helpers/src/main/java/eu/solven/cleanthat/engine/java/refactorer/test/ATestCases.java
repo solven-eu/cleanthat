@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
@@ -381,8 +382,8 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			CompareCompilationUnitsAsStrings annotation) {
-		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
-		CompilationUnit post = javaParser.parse(annotation.post()).getResult().get();
+		CompilationUnit pre = throwIfProblems(javaParser.parse(annotation.pre()));
+		CompilationUnit post = throwIfProblems(javaParser.parse(annotation.post()));
 
 		LexicalPreservingPrinter.setup(pre);
 
@@ -393,7 +394,7 @@ public abstract class ATestCases<N, R> {
 			IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsString annotation) {
-		CompilationUnit pre = javaParser.parse(annotation.pre()).getResult().get();
+		CompilationUnit pre = throwIfProblems(javaParser.parse(annotation.pre()));
 		doCheckUnmodifiedNode(transformer, testCase, pre);
 	}
 
@@ -402,11 +403,11 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			CompareCompilationUnitsAsResources annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
-		var pre = javaParser.parse(preAsString).getResult().get();
+		var pre = throwIfProblems(javaParser.parse(preAsString));
 		Assertions.assertThat(pre.getTypes()).hasSize(1);
 
 		String postAsString = PepperResourceHelper.loadAsString(annotation.post());
-		var post = javaParser.parse(postAsString).getResult().get();
+		var post = throwIfProblems(javaParser.parse(postAsString));
 		Assertions.assertThat(post.getTypes()).hasSize(1);
 
 		doCompareExpectedChanges(transformer, testCase, pre, post);
@@ -417,8 +418,15 @@ public abstract class ATestCases<N, R> {
 			ClassOrInterfaceDeclaration testCase,
 			UnmodifiedCompilationUnitAsResource annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
-		var pre = javaParser.parse(preAsString).getResult().get();
+		var pre = throwIfProblems(javaParser.parse(preAsString));
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
+	}
+
+	public static CompilationUnit throwIfProblems(ParseResult<CompilationUnit> parse) {
+		if (!parse.isSuccessful()) {
+			throw new IllegalArgumentException("Issue parsing the input: " + parse.getProblems());
+		}
+		return parse.getResult().get();
 	}
 
 	protected void doCompareClasses(IWalkingMutator<N, R> transformer, CompilationUnit pre, CompilationUnit post) {
@@ -443,4 +451,5 @@ public abstract class ATestCases<N, R> {
 	}
 
 	protected abstract N convertToAst(Node pre);
+
 }

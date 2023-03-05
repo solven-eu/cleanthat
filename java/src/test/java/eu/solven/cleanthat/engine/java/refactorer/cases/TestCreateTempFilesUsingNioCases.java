@@ -65,8 +65,7 @@ public class TestCreateTempFilesUsingNioCases extends AParameterizesJavaparserRe
 
 	@Test
 	public void testImportNioFiles() throws IOException {
-		JavaParser javaParser =
-				JavaRefactorer.makeDefaultJavaParser(getStaticRefactorerCases().getTransformer().isJreOnly());
+		JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
 		CompilationUnit compilationUnit =
 				javaParser.parse(LocalClassTestHelper.localClassAsPath(CreateTempFilesUsingNioCases.class))
 						.getResult()

@@ -37,7 +37,9 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.MemoryTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -55,6 +57,9 @@ import eu.solven.cleanthat.language.IEngineProperties;
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
+
+	// It is ambiguous to give access to access on the classLoader, as it would give insights to custom classes
+	public static final boolean JAVAPARSER_JRE_ONLY = true;
 
 	private final IEngineProperties engineProperties;
 	private final JavaRefactorerProperties refactorerProperties;
@@ -91,20 +96,29 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	@Override
-	public CompilationUnit parseSourceCode(JavaParser parser, String sourceCode) {
+	public Optional<Node> parseSourceCode(JavaParser parser, String sourceCode) {
 		ParseResult<CompilationUnit> parsed = parser.parse(sourceCode);
+
+		if (!parsed.isSuccessful()) {
+			// JavaParser does not manage instanceof patterns as of JP:3.25
+			LOGGER.warn("Issue parsing this. {} problems. First problem: {}",
+					parsed.getProblems().size(),
+					parsed.getProblem(0));
+			return Optional.empty();
+		}
+
 		var compilationUnit = parsed.getResult().get();
 
 		// https://github.com/javaparser/javaparser/issues/3490
 		// We register given node for later prettyPrinting
 		LexicalPreservingPrinter.setup(compilationUnit);
-		return compilationUnit;
+		return Optional.of(compilationUnit);
 	}
 
 	@Override
 	protected JavaParser makeAstParser() {
 		// TODO Adjust this flag depending on filtered rules
-		var isJreOnly = false;
+		var isJreOnly = JAVAPARSER_JRE_ONLY;
 		var parser = makeDefaultJavaParser(isJreOnly);
 		return parser;
 	}
@@ -198,9 +212,16 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 		return LexicalPreservingPrinter.print(compilationUnit);
 	}
 
-	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+	public static TypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+		if (jreOnly != JAVAPARSER_JRE_ONLY) {
+			LOGGER.warn("We force jreOnly to {}", JAVAPARSER_JRE_ONLY);
+			jreOnly = JAVAPARSER_JRE_ONLY;
+		}
+
 		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
-		return reflectionTypeSolver;
+		var memoryTypeSolver = new MemoryTypeSolver();
+		memoryTypeSolver.setParent(reflectionTypeSolver);
+		return memoryTypeSolver;
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
@@ -211,5 +232,10 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
 		var parser = new JavaParser(configuration);
 		return parser;
+	}
+
+	@Override
+	protected boolean isValidResultString(JavaParser parser, String resultAsString) {
+		return parser.parse(resultAsString).isSuccessful();
 	}
 }

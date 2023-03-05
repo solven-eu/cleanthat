@@ -25,11 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
@@ -50,9 +48,7 @@ public class TestAllMutators extends AJavaparserTestCases {
 					new ClassPathResource("/source/do_not_format_me/StringToString/TestJGitCodeProvider.java");
 			var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-			var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-			var compilationUnit = javaParser.parse(asString).getResult().get();
-			LexicalPreservingPrinter.setup(compilationUnit);
+			var compilationUnit = parseCompilationUnit(mutator, asString);
 
 			try {
 				var transformed = ((IJavaparserMutator) mutator).walkAstHasChanged(compilationUnit);

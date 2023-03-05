@@ -28,6 +28,7 @@ import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties.SpotlessStepPropertiesBuilder;
 
 /**
  * Configure Spotless engine for '.java' files
@@ -54,7 +55,15 @@ public class JavaFormatterFactory extends AFormatterFactory {
 	// This is useful to demonstrate all available configuration
 	@Override
 	public List<SpotlessStepProperties> exampleSteps() {
-		SpotlessStepProperties removeUnusedImports = SpotlessStepProperties.builder().id("removeUnusedImports").build();
+		SpotlessStepPropertiesBuilder removeUnusedImportsBuilder =
+				SpotlessStepProperties.builder().id("removeUnusedImports");
+
+		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+			// We skip removeUnusedImports as it make it difficult to get when Cleanthat generates invalid code
+			removeUnusedImportsBuilder.skip(true);
+		}
+
+		SpotlessStepProperties removeUnusedImports = removeUnusedImportsBuilder.build();
 
 		SpotlessStepProperties importOrder = SpotlessStepProperties.builder()
 				.id("importOrder")
@@ -72,8 +81,12 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		// Cleanthat before Eclipse as CleanThat may break the style
 		SpotlessStepProperties cleanthat = SpotlessStepProperties.builder().id("cleanthat").build();
 		SpotlessStepParametersProperties cleanthatParameters = new SpotlessStepParametersProperties();
+		// see com.github.javaparser.ParserConfiguration.LanguageLevel.POPULAR
 		cleanthatParameters.putProperty("source_jdk", "11");
 		cleanthatParameters.putProperty("mutators", JavaFormatterStepFactory.DEFAULT_MUTATORS);
+		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+			cleanthatParameters.putProperty("include_draft", Boolean.TRUE);
+		}
 		cleanthat.setParameters(cleanthatParameters);
 
 		SpotlessStepProperties eclipse = SpotlessStepProperties.builder()

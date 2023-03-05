@@ -117,7 +117,7 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 		// `var` would forbid assigning anything but an ArrayList
 		var initializerType = optInitializerType.get();
 		var resolvedVariableType = optVariableType.get();
-		if (!initializerType.toDescriptor().equals(resolvedVariableType.toDescriptor())) {
+		if (!initializerType.describe().equals(resolvedVariableType.describe())) {
 			return false;
 		}
 

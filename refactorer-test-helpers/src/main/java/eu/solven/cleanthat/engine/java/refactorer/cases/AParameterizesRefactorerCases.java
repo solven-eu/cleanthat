@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ParserConfiguration.LanguageLevel;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -67,11 +68,15 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 
 	// Duplicated from JavaRefactorer
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
+		return makeDefaultJavaParser(jreOnly, LanguageLevel.BLEEDING_EDGE);
+	}
+
+	public static JavaParser makeDefaultJavaParser(boolean jreOnly, LanguageLevel languageLevel) {
 		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
 		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver).setLanguageLevel(languageLevel);
 		var parser = new JavaParser(configuration);
 		return parser;
 	}
@@ -86,7 +91,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		String path = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
 		JavaParser javaParser = makeDefaultJavaParser(testCases.getTransformer().isJreOnly());
-		var compilationUnit = javaParser.parse(path).getResult().get();
+		var compilationUnit = throwIfProblems(javaParser.parse(path));
 
 		List<Object[]> individualCases = new ArrayList<>();
 

@@ -59,7 +59,7 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 
 	@Override
 	public Optional<String> getSonarId() {
-		return Optional.of("S3358");
+		return Optional.of("RSPEC-3358");
 	}
 
 	@Override

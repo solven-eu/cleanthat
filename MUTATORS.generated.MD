@@ -11,6 +11,8 @@ Require sourceJdk: 1.8
 
 CheckStyle: AvoidInlineConditionals
 
+Sonar: S3358
+
 Require sourceJdk: 1
 
 ### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
@@ -43,6 +45,8 @@ Require sourceJdk: 11
 
 ### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
 
+
+Sonar: RSPEC-4034
 
 Require sourceJdk: 1.8
 
@@ -179,6 +183,13 @@ PMD: PrimitiveWrapperInstantiation
 isDraft
 
 Require sourceJdk: 1.5
+
+### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
+
+
+isDraft
+
+Require sourceJdk: 1.6
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 

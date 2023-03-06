@@ -17,9 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
@@ -37,8 +34,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
  * @author Benoit Lacelle
  */
 public class StringStartsWithChar extends AJavaparserExprMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StringStartsWithChar.class);
-
 	@Override
 	public String minimalJavaVersion() {
 		// String.isEmpty has been introduced with JDK6
@@ -61,18 +56,18 @@ public class StringStartsWithChar extends AJavaparserExprMutator {
 			return false;
 		}
 
-		Expression left = binaryExpr.getLeft();
+		var left = binaryExpr.getLeft();
 		if (!left.isMethodCallExpr()) {
 			return false;
 		}
 
-		Expression right = binaryExpr.getRight();
+		var right = binaryExpr.getRight();
 		if (!right.isMethodCallExpr()) {
 			return false;
 		}
 
-		MethodCallExpr leftMethodCall = left.asMethodCallExpr();
-		MethodCallExpr rightMethodCall = right.asMethodCallExpr();
+		var leftMethodCall = left.asMethodCallExpr();
+		var rightMethodCall = right.asMethodCallExpr();
 		Optional<Expression> optRightScope = rightMethodCall.getScope();
 		Optional<Expression> optLeftScope = leftMethodCall.getScope();
 
@@ -82,16 +77,16 @@ public class StringStartsWithChar extends AJavaparserExprMutator {
 			return false;
 		}
 
-		if (isCallIsEmptyString(leftMethodCall) && isCallStartsWithSingleCharString(rightMethodCall).isPresent()) {
-			Character singleChar = isCallStartsWithSingleCharString(rightMethodCall).get();
+		if (isCallIsEmptyString(leftMethodCall) && optCallStartsWithSingleCharString(rightMethodCall).isPresent()) {
+			var singleChar = optCallStartsWithSingleCharString(rightMethodCall).get();
 			return replaceBy(right, makeCharAtEqualsTo(optRightScope, singleChar));
-		} else if (isCallStartsWithSingleCharString(leftMethodCall).isPresent()
+		} else if (optCallStartsWithSingleCharString(leftMethodCall).isPresent()
 				&& isCallIsEmptyString(rightMethodCall)) {
 			// Turns `line.startsWith("#") || line.isEmpty()` into `line.isEmpty() || line.startsWith("#")`
 			binaryExpr.setLeft(right);
 			binaryExpr.setRight(left);
 
-			Character singleChar = isCallStartsWithSingleCharString(leftMethodCall).get();
+			var singleChar = optCallStartsWithSingleCharString(leftMethodCall).get();
 
 			// Turns `line.startsWith("#")` into `line.indexOf('0') == '#'`
 			return replaceBy(left, makeCharAtEqualsTo(optLeftScope, singleChar));
@@ -113,18 +108,25 @@ public class StringStartsWithChar extends AJavaparserExprMutator {
 	}
 
 	private boolean isCallIsEmptyString(MethodCallExpr left) {
-		return left.asMethodCallExpr().getNameAsString().equals("isEmpty")
+		return "isEmpty".equals(left.asMethodCallExpr().getNameAsString())
 				&& scopeHasRequiredType(left.asMethodCallExpr().getScope(), String.class);
 	}
 
-	private Optional<Character> isCallStartsWithSingleCharString(MethodCallExpr left) {
-		boolean hasSingleCharString =
-				left.getNameAsString().equals("startsWith") && scopeHasRequiredType(left.getScope(), String.class)
-						&& left.getArguments().size() == 1
-						&& left.getArgument(0).isStringLiteralExpr()
-						&& left.getArgument(0).asStringLiteralExpr().getValue().length() == 1;
+	private Optional<Character> optCallStartsWithSingleCharString(MethodCallExpr expr) {
+		if (!"startsWith".equals(expr.getNameAsString()) || !scopeHasRequiredType(expr.getScope(), String.class)) {
+			return Optional.empty();
+		}
+
+		NodeList<Expression> arguments = expr.getArguments();
+		if (arguments.size() != 1) {
+			return Optional.empty();
+		}
+
+		var singleArgument = expr.getArgument(0);
+		var hasSingleCharString =
+				singleArgument.isStringLiteralExpr() && singleArgument.asStringLiteralExpr().getValue().length() == 1;
 		if (hasSingleCharString) {
-			return Optional.of(left.getArgument(0).asStringLiteralExpr().getValue().charAt(0));
+			return Optional.of(singleArgument.asStringLiteralExpr().getValue().charAt(0));
 		}
 		return Optional.empty();
 	}

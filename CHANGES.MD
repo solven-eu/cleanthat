@@ -3,6 +3,13 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
+
+## [2.9] - 2023-01-06
+### Added
+* `StringStartsWithChar` is an additional mutator
+* `mvn cleanthat:apply` is a new Mojo enabling one-shotting a rules over current directory [README.MD](./maven/)
+
+## [2.8] - 2023-01-05
 ### Fixed
 * `ArraysDotStream` requires the argument to be an Array to convert use `Arrays.steam()`. It may also rely on `Stream.of` for other cases
 * `ArraysDotStream` will apply only if the scope is `Arrays`
@@ -14,11 +21,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `UseTextBlocks` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/issues/3936).
 * `LambdaReturnsSingleStatement` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/pull/3938).
 * `BoxedPrimitiveConstructor` is renamed `PrimitiveWrapperInstantiation`, as it is the relevant PMD rule.
-### Added
-* `StringStartsWithChar` is an additional mutator
-* `mvn cleanthat:apply` is a new Mojo enabling one-shotting a rules over current directory [README.MD](./maven/)
 
-## [2.7] - 2023-01-01
+## [2.7] - 2023-03-01
 ### Fixed
 * `LocalVariableTypeInference` crashes lesss often on unresolved types
 * `UnnecessaryModifier` will not remove `static` from interface methods

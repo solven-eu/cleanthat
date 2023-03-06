@@ -16,6 +16,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `BoxedPrimitiveConstructor` is renamed `PrimitiveWrapperInstantiation`, as it is the relevant PMD rule.
 ### Added
 * `StringStartsWithChar` is an additional mutator
+* `mvn cleanthat:apply` is a new Mojo enabling one-shotting a rules over current directory [README.MD](./maven/)
 
 ## [2.7] - 2023-01-01
 ### Fixed

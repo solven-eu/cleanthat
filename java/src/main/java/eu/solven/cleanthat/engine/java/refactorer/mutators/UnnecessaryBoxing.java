@@ -65,6 +65,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 
 	@Override
 	public Optional<String> getSonarId() {
+		// Relates with "RSPEC-2153"
 		return Optional.of("RSPEC-1158");
 	}
 

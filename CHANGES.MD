@@ -9,14 +9,18 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `EmptyControlStatement` will not break empty method definitions.
 * `LiteralsFirstInComparisons` better handles unresolved symbols.
 * `LambdaIsMethodReference` will not rely on `T.class::cast` if T is a Type bound (e.g. in `<T> void method(...)`).
+* `LocalVariableTypeInference` crashes lesss often on unresolved types
 ### Changes
 * `UseTextBlocks` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/issues/3936).
 * `LambdaReturnsSingleStatement` is temporarily dropped from `SafeButNotConsensual` as its results are too poor (https://github.com/javaparser/javaparser/pull/3938).
 * `BoxedPrimitiveConstructor` is renamed `PrimitiveWrapperInstantiation`, as it is the relevant PMD rule.
+### Added
+* `StringStartsWithChar` is an additional mutator
 
 ## [2.7] - 2023-01-01
 ### Fixed
-* `LocalVariableTypeInference` improved handling of unresolved types
+* `LocalVariableTypeInference` crashes lesss often on unresolved types
+* `UnnecessaryModifier` will not remove `static` from interface methods
 ### Changes
 * `LineEnding` management is dropped from `ILintFixer` and `ILintFixerWithPath`
 * `ModifierOrder` is promoted in `SafeAndConsensual`

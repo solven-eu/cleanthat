@@ -43,7 +43,7 @@ This Mojo enables one-shot run of a mutator over current directory.
      
 You can call a specific single rule:
 
-     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=RSPEC-6212
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=LocalVariableTypeInference
      
 You can call most CleanThat rules with:
 

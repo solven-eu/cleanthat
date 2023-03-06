@@ -60,6 +60,11 @@ public class StreamAnyMatch extends AJavaparserMutator {
 		return Optional.of("StreamAnyMatch");
 	}
 
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-4034");
+	}
+
 	// TODO Lack of checking for Stream type
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override

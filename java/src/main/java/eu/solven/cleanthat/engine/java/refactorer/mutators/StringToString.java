@@ -33,8 +33,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 public class StringToString extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StringToString.class);
-
 	private static final String METHOD_TO_STRING = "toString";
 
 	@Override
@@ -79,18 +77,6 @@ public class StringToString extends AJavaparserMutator {
 		}
 
 		var scope = optScope.get();
-		var localTransformed = false;
-		var replacement = new MethodCallExpr(scope, METHOD_TO_STRING);
-		LOGGER.info("Turning {} into {}", node, replacement);
-		if (node.replace(scope)) {
-			localTransformed = true;
-		}
-
-		// TODO Add a rule to replace such trivial 'if else return'
-		if (localTransformed) {
-			return true;
-		} else {
-			return false;
-		}
+		return replaceBy(node, scope);
 	}
 }

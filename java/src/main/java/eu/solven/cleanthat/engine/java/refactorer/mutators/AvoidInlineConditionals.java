@@ -58,6 +58,11 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 	}
 
 	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("S3358");
+	}
+
+	@Override
 	public String checkstyleUrl() {
 		return "https://checkstyle.sourceforge.io/config_coding.html#AvoidInlineConditionals";
 	}

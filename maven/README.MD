@@ -39,7 +39,7 @@ reference: https://maven.apache.org/guides/plugin/guide-java-plugin-development.
 
 This Mojo enables one-shot run of a mutator over current directory.
 
-     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.includeDraft=true
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply
      
 You can call a specific single rule:
 
@@ -47,7 +47,7 @@ You can call a specific single rule:
      
 You can call most CleanThat rules with:
 
-     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=SafeAndConsensual -Dcleanthat.mutators=SafeNutNotConsensual -Dcleanthat.includeDraft=true
+     mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:apply -Dcleanthat.mutators=SafeAndConsensual -Dcleanthat.mutators=SafeButNotConsensual -Dcleanthat.includeDraft=true
 
 ### cleanthat:init
 

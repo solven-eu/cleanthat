@@ -3,6 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.io.IOException;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidUncheckedExceptionsInSignatures;
@@ -69,9 +70,27 @@ public class AvoidUncheckedExceptionsInSignaturesCases extends AJavaparserRefact
 		}
 	}
 
-	@UnmodifiedMethod
-	public static class CaseThrowable {
-		public void pre() throws Throwable {
-		}
+	@UnmodifiedCompilationUnitAsString(pre = "package hudson.security;\n" + "\n"
+			+ "public abstract class FederatedLoginService implements ExtensionPoint {\n"
+			+ "\n"
+			+ "    public abstract class FederatedIdentity implements Serializable {\n"
+			+ "        @NonNull\n"
+			+ "        public User signin() throws UnclaimedIdentityException {\n"
+			+ "            throw new UnclaimedIdentityException(this);\n"
+			+ "        }\n"
+			+ "\n"
+			+ "    }\n"
+			+ "\n"
+			+ "    public static class UnclaimedIdentityException extends RuntimeException implements HttpResponse {\n"
+			+ "        public final FederatedIdentity identity;\n"
+			+ "\n"
+			+ "        public UnclaimedIdentityException(FederatedIdentity identity) {\n"
+			+ "            this.identity = identity;\n"
+			+ "        }\n"
+			+ "    }\n"
+			+ "}\n"
+			+ "")
+	public static class UnknownType {
 	}
+
 }

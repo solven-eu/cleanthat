@@ -74,13 +74,9 @@ public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
 		Resource resource = new ClassPathResource("/source/do_not_format_me/ShaftEngine/RecordManager.java");
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
-				.isInstanceOf(IllegalArgumentException.class);
+		var compilationUnit = parseCompilationUnit(mutator, asString);
 
-		// var compilationUnit = parseCompilationUnit(mutator, asString);
-
-		// var transformed = mutator.walkAstHasChanged(compilationUnit);
-		//
-		// Assertions.assertThat(transformed).isTrue();
+		var transformed = mutator.walkAstHasChanged(compilationUnit);
+		Assertions.assertThat(transformed).isTrue();
 	}
 }

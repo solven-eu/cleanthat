@@ -37,8 +37,7 @@ public class TestCleanthatMetaProperties {
 
 	@Test
 	public void testDefaultConstructor() throws JsonProcessingException {
-		var p = new CleanthatMetaProperties();
-
+		var p = CleanthatMetaProperties.builder().build();
 		var json = objectMapper.writeValueAsString(p);
 
 		var backToObject = objectMapper.readValue(json, CleanthatMetaProperties.class);

@@ -19,10 +19,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -30,29 +29,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
-public class TestLocalVariableTypeInferenceCustom extends AJavaparserTestCases {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestLocalVariableTypeInferenceCustom.class);
+public class TestAvoidInlineConditionalsCustom extends AJavaparserTestCases {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestAvoidInlineConditionalsCustom.class);
 
-	final IJavaparserMutator mutator = new LocalVariableTypeInference();
+	final IJavaparserMutator mutator = new AvoidInlineConditionals();
 
-	@Test
-	public void testIssueWithFile() throws IOException {
-		Resource resource = new ClassPathResource(
-				"/source/do_not_format_me/" + mutator.getClass().getSimpleName() + "/CodeProviderHelpers.java");
-		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
-
-		var compilationUnit = parseCompilationUnit(mutator, asString);
-
-		var transformed = mutator.walkAstHasChanged(compilationUnit);
-
-		Assertions.assertThat(transformed).isFalse();
-	}
-
-	// LocalVariableTypeInference catches a ton of JavaParser issues
-	// Probably due to calling type resolution of many different cases
 	@Test
 	public void testEachFileInFolder() throws IOException {
 		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
@@ -63,8 +47,14 @@ public class TestLocalVariableTypeInferenceCustom extends AJavaparserTestCases {
 			LOGGER.info("Processing: {}", resource);
 			var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-			if ("AsyncLoggerConfig.java".equals(resource.getFilename())) {
-				// https://github.com/javaparser/javaparser/issues/3940
+			if ("MavenPluginPlugin.java".equals(resource.getFilename())) {
+				// This file has a feature not managed by JP3.25
+				Assertions.assertThatThrownBy(() -> {
+					var compilationUnit = parseCompilationUnit(mutator, asString);
+					mutator.walkAstHasChanged(compilationUnit);
+				}).isInstanceOf(IllegalArgumentException.class);
+			} else if ("AsyncLoggerConfig.java".equals(resource.getFilename())) {
+				// This file has a feature not managed by JP3.25
 				Assertions.assertThatThrownBy(() -> {
 					var compilationUnit = parseCompilationUnit(mutator, asString);
 					mutator.walkAstHasChanged(compilationUnit);

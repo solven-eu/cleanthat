@@ -29,16 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 
 public class ITAnonymousClass {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ITAnonymousClass.class);
@@ -94,11 +92,7 @@ public class ITAnonymousClass {
 		}
 	}
 
-	// Setup symbol solver
-	final ParserConfiguration configuration = new ParserConfiguration()
-			.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
-	// Setup parser
-	final JavaParser parser = new JavaParser(configuration);
+	final JavaParser parser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
 
 	@Test
 	public void testResolveType() throws IOException {

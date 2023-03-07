@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -78,6 +79,38 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 
 		public Object post() {
 			var i = new ArrayList<String>();
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class NullInitializer {
+		public Object pre() {
+			List<?> i = null;
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class LambdaInitializer {
+		public Object pre() {
+			Function<String, String> i = s -> s.toLowerCase();
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class MethodRefInitializer {
+		public Object pre() {
+			Function<String, String> i = String::toLowerCase;
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class ArrayInitializer {
+		public Object pre() {
+			Object[] i = { 1, 2 };
 			return i;
 		}
 	}

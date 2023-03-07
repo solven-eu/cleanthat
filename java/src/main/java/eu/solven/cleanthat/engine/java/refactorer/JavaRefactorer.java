@@ -34,6 +34,7 @@ import com.github.difflib.patch.PatchFailedException;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ParserConfiguration.LanguageLevel;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
@@ -46,6 +47,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.formatter.LineEnding;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
@@ -89,10 +91,10 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	@Override
-	public String doFormat(String dirtyCode) throws IOException {
-		LOGGER.debug("{}", this.refactorerProperties);
-		var cleanCode = applyTransformers(dirtyCode);
-		return fixJavaparserUnexpectedChanges(dirtyCode, cleanCode);
+	public String doFormat(PathAndContent pathAndContent) throws IOException {
+		LOGGER.debug("Refactoring conf={}", this.refactorerProperties);
+		var cleanCode = applyTransformers(pathAndContent);
+		return fixJavaparserUnexpectedChanges(pathAndContent.getContent(), cleanCode);
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 
 		if (!parsed.isSuccessful()) {
 			// JavaParser does not manage instanceof patterns as of JP:3.25
-			LOGGER.warn("Issue parsing this. {} problems. First problem: {}",
+			LOGGER.warn("Issue parsing some source. {} problems. First problem: {}",
 					parsed.getProblems().size(),
 					parsed.getProblem(0));
 			return Optional.empty();
@@ -225,11 +227,15 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
+		return makeDefaultJavaParser(jreOnly, LanguageLevel.BLEEDING_EDGE);
+	}
+
+	public static JavaParser makeDefaultJavaParser(boolean jreOnly, LanguageLevel languageLevel) {
 		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
 
 		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
 
-		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver);
+		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver).setLanguageLevel(languageLevel);
 		var parser = new JavaParser(configuration);
 		return parser;
 	}

@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 public class TestAAstRefactorer {
 
@@ -53,7 +55,7 @@ public class TestAAstRefactorer {
 		Mockito.when(someInvalidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(someInvalidResultAsString));
 		Mockito.when(otherValidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(otherResultAsString));
 
-		var outputCode = refactorer.applyTransformers(inputJavaCode);
+		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
 
 		Assertions.assertThat(outputCode).isEqualTo(otherResultAsString);
 	}
@@ -68,7 +70,7 @@ public class TestAAstRefactorer {
 		Mockito.when(someValidMutator.walkAst(inputJavaCode)).thenReturn(Optional.of(someResultAsString));
 		Mockito.when(someInvalidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(someInvalidResultAsString));
 
-		var outputCode = refactorer.applyTransformers(inputJavaCode);
+		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
 
 		Assertions.assertThat(outputCode).isEqualTo(someResultAsString);
 	}
@@ -79,7 +81,7 @@ public class TestAAstRefactorer {
 				new AAstRefactorer<String, String, String, IWalkingMutator<String, String>>(mutators) {
 
 					@Override
-					public String doFormat(String content) throws IOException {
+					public String doFormat(PathAndContent pathAndContent) throws IOException {
 						return someResult;
 					}
 

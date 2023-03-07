@@ -111,6 +111,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 						// Then we catch changes in spotless (or any other engine)
 						configIsChanged.set(true);
 						prComments.add("Spotless configuration has changed");
+
+						// BEWARE this may be due to merge-commits
+						// see https://github.com/orgs/community/discussions/45166
+						// https://docs.github.com/en/rest/commits/commits#compare-two-commits
 						LOGGER.info("Configuration change over path=`{}`", path);
 					}
 				});
@@ -119,7 +123,13 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			}
 
 			if (configIsChanged.get()) {
-				finalCodeWriter = upgradeToFullRepoReader(codeWriter);
+				if (repoProperties.getMeta().isFullCleanOnConfigurationChange()) {
+					LOGGER.info("The configuration has changed, then we will process all files in the repository");
+					finalCodeWriter = upgradeToFullRepoReader(codeWriter);
+				} else {
+					LOGGER.info("The configuration has changed, but $.meta.full_clean_on_configuration_change=false");
+					finalCodeWriter = codeWriter;
+				}
 			} else {
 				finalCodeWriter = codeWriter;
 			}
@@ -171,9 +181,10 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			// codeWriter.persistChanges(pathToMutatedContent, prComments, repoProperties.getMeta().getLabels());
 			// }
 		} else {
-			LOGGER.info("(No config change) About to commit+push {} files into {}",
+			LOGGER.info("About to commit+push {} files into {} (configChange={})",
 					languageToNbAddedFiles.sum(),
-					codeWriter);
+					codeWriter,
+					configIsChanged.get());
 			if (dryRun) {
 				// TODO Nice-diff like in eu.solven.cleanthat.engine.java.refactorer.it.ITTestLocalFile
 				LOGGER.info("Skip persisting changes as dryRun=true");

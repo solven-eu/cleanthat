@@ -107,7 +107,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 			return Lists.asList(first, more).stream();
 		}
 	}
-	
+
 	@CompareCompilationUnitsAsStrings(
 			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
@@ -136,8 +136,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 	}
 
 	@CompareCompilationUnitsAsStrings(
-			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
-					+ "\n"
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
 					+ "import java.util.List;\n"
 					+ "import java.util.stream.Collectors;\n"
@@ -154,8 +153,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 					+ "	}\n"
 					+ "}\n"
 					+ "",
-			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
-					+ "\n"
+			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
 					+ "import java.util.List;\n"
 					+ "import java.util.stream.Collectors;\n"
@@ -176,8 +174,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 	}
 
 	@CompareCompilationUnitsAsStrings(
-			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
-					+ "\n"
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
 					+ "import java.util.List;\n"
 					+ "import java.util.stream.Collectors;\n"
@@ -194,8 +191,7 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 					+ "	}\n"
 					+ "}\n"
 					+ "",
-			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
-					+ "\n"
+			post = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
 					+ "import java.util.List;\n"
 					+ "import java.util.stream.Collectors;\n"
@@ -215,11 +211,10 @@ public class ArraysDotStreamCases extends AJavaparserRefactorerCases {
 	public static class AddImports_hasOtherStreamAlready {
 	}
 
-	// TODO
-//	@CompareCompilationUnitsAsStrings
+	// BEWARE One may argue the type is partially available through imports
+	// @CompareCompilationUnitsAsStrings
 	@UnmodifiedCompilationUnitAsString(
-			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n"
-					+ "\n"
+			pre = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
 					+ "import java.util.Arrays;\n"
 					+ "import java.util.List;\n"
 					+ "import java.util.stream.Collectors;\n"

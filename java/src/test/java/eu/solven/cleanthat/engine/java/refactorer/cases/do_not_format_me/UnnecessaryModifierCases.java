@@ -29,7 +29,7 @@ public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			public static interface Baz {
 			}
-			
+
 			static String parse() {
 				return "parsed";
 			}
@@ -49,7 +49,7 @@ public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			interface Baz {
 			}
-			
+
 			static String parse() {
 				return "parsed";
 			}
@@ -89,6 +89,35 @@ public class UnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			interface Baz {
 			}
+		}
+	}
+
+	// https://github.com/skylot/jadx/pull/1792
+	@CompareInnerClasses
+	public static class Jadx {
+
+		public interface Pre {
+			void test1();
+
+			default void test2() {
+			}
+
+			static void test3() {
+			}
+
+			abstract void test4();
+		}
+
+		public interface Post {
+			void test1();
+
+			default void test2() {
+			}
+
+			static void test3() {
+			}
+
+			void test4();
 		}
 	}
 }

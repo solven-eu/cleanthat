@@ -256,7 +256,9 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				githubCheckRunManager.createCheckRun(githubAuthAsInst, baseRepo, pushedRefOrRrHead.getSha(), eventKey);
 		optCheckRun.ifPresent(cr -> {
 			try {
-				cr.update().add(new Output("Branch verification", "Start verification")).create();
+				cr.update()
+						.add(new Output("Branch verification", "Start verification" + "\r\neventKey=" + eventKey))
+						.create();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -280,14 +282,16 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 								.withConclusion(Conclusion.NEUTRAL)
 								.withStatus(Status.COMPLETED)
 
-								.add(new Output("Rejected due to branch or configuration", optRejectedReason.get()))
+								.add(new Output("Rejected due to branch or configuration",
+										optRejectedReason.get() + "\r\neventKey=" + eventKey))
 								.create();
 					} else {
 						checkRun.update()
 								// Not completed as this is to be followed by the cleaning
 								.withStatus(Status.IN_PROGRESS)
 
-								.add(new Output("Branch is accepted for cleaning", "Nice"))
+								.add(new Output("Checking is the branch is valid for cleaning",
+										"someSummary" + "\r\neventKey=" + eventKey))
 								.create();
 					}
 				} catch (IOException e) {
@@ -530,6 +534,17 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		} else {
 			optCheckRun = Optional.empty();
 		}
+
+		optCheckRun.ifPresent(checkRun -> {
+			try {
+				checkRun.update()
+						.withStatus(Status.IN_PROGRESS)
+						.add(new Output("Cleaning is being executed", "someSummary\r\neventKey=" + eventKey))
+						.create();
+			} catch (IOException e) {
+				LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), e);
+			}
+		});
 
 		try {
 			IGitRefCleaner cleaner = cleanerFactory.makeCleaner(githubAuthAsInst).get();

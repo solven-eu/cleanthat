@@ -41,4 +41,28 @@ public class StringStartsWithCharCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// May be relevant for performance, but not readability
+	@UnmodifiedMethod
+	public static class startsWithSingleCharString {
+		public Object pre(String s) {
+			return s.startsWith("#");
+		}
+
+		public Object post(String s) {
+			return !s.isEmpty() && s.charAt(0) == '#';
+		}
+	}
+
+	// May be relevant for performance, but not readability
+	@UnmodifiedMethod
+	public static class startsWith_withOffset {
+		public Object pre(String s) {
+			return s.startsWith("#", 3);
+		}
+
+		public Object post(String s) {
+			return s.length() >= 4 && s.charAt(4) == '#';
+		}
+	}
+
 }

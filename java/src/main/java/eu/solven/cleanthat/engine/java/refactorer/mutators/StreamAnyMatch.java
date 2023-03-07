@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,6 @@ public class StreamAnyMatch extends AJavaparserMutator {
 		return Optional.of("RSPEC-4034");
 	}
 
-	// TODO Lack of checking for Stream type
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {
@@ -83,6 +83,7 @@ public class StreamAnyMatch extends AJavaparserMutator {
 			return false;
 		}
 		var scope = optScope.get();
+
 		if (!(scope instanceof MethodCallExpr)) {
 			return false;
 		}
@@ -106,6 +107,8 @@ public class StreamAnyMatch extends AJavaparserMutator {
 
 		Optional<Expression> optGrandParentScope = parentScopeAsMethodCallExpr.getScope();
 		if (optGrandParentScope.isEmpty()) {
+			return false;
+		} else if (!scopeHasRequiredType(optGrandParentScope, Stream.class)) {
 			return false;
 		}
 		var grandParentScope = optGrandParentScope.get();

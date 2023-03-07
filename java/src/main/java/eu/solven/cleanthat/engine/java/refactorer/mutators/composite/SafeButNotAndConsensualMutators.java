@@ -36,6 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReferen
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StringStartsWithChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
@@ -73,7 +74,8 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					// new UseDiamondOperatorJdk8(),
 					// https://github.com/javaparser/javaparser/issues/3936
 					// new UseTextBlocks(),
-					new UseUnderscoresInNumericLiterals())
+					new UseUnderscoresInNumericLiterals(),
+					new StringStartsWithChar())
 			.build();
 
 	public SafeButNotAndConsensualMutators(JavaVersion sourceJdkVersion) {

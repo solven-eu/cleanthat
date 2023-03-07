@@ -164,7 +164,7 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 			}
 		}
 	}
-	
+
 	// TODO
 	// @CompareMethods
 	@UnmodifiedMethod
@@ -174,7 +174,12 @@ public class AvoidInlineConditionalsCases extends AJavaparserRefactorerCases {
 		}
 
 		public Object post(boolean caseSensitive, Map.Entry<String, String> entry) {
-			return "env." + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));
+			if (caseSensitive) {
+				return "env." + entry.getKey();
+			} else {
+
+				return "env." + entry.getKey().toUpperCase(Locale.ENGLISH);
+			}
 		}
 	}
 

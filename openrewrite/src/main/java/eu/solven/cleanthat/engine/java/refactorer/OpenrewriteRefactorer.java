@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.formatter.PathAndContent;
 
 /**
  * A {@link IMutator} configuring over an OpenRewrite {@link Recipe}
@@ -55,8 +56,8 @@ public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, Jav
 	}
 
 	@Override
-	public String doFormat(String content) throws IOException {
-		return applyTransformers(content);
+	public String doFormat(PathAndContent pathAndContent) throws IOException {
+		return applyTransformers(pathAndContent);
 	}
 
 	@Override

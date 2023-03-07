@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.StringStartsWithCharCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestStringStartsWithChar extends AParameterizesJavaparserRefactorerCases {
+public class TestStringStartsWithCharCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new StringStartsWithCharCases();
 	}
 
-	public TestStringStartsWithChar(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestStringStartsWithCharCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

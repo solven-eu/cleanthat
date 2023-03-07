@@ -15,11 +15,15 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +42,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludin
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
+import eu.solven.cleanthat.formatter.ILintFixerWithPath;
+import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.language.IEngineProperties;
 
 /**
@@ -48,9 +54,12 @@ import eu.solven.cleanthat.language.IEngineProperties;
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
 @SuppressWarnings("PMD.GenericsNaming")
-public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R>> implements ILintFixerWithId {
+public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R>>
+		implements ILintFixerWithId, ILintFixerWithPath {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
+
+	private static final Path NO_PATH = Paths.get("cleanthat/path_is_not_available");
 
 	private final List<M> mutators;
 
@@ -80,15 +89,32 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 	protected abstract Optional<AST> parseSourceCode(P parser, String sourceCode);
 
-	protected String applyTransformers(String dirtyCode) {
-		AtomicReference<String> refCleanCode = new AtomicReference<>(dirtyCode);
+	@Override
+	public String doFormat(PathAndContent pathAndContent) throws IOException {
+		return doFormat(pathAndContent.getContent());
+	}
+
+	@Override
+	public String doFormat(String content) throws IOException {
+		return doFormat(new PathAndContent(NO_PATH, content));
+	}
+
+	protected String applyTransformers(PathAndContent pathAndContent) {
+		AtomicReference<String> refCleanCode = new AtomicReference<>(pathAndContent.getContent());
 
 		// Ensure we compute the compilation-unit only once per String
 		AtomicReference<AST> optCompilationUnit = new AtomicReference<>();
 
 		var parser = makeAstParser();
 
+		var firstMutator = new AtomicBoolean(true);
+		var inputIsBroken = new AtomicBoolean(false);
+
 		getRawMutators().forEach(ct -> {
+			if (inputIsBroken.get()) {
+				LOGGER.trace("We skip {} as the input is broken", ct);
+			}
+
 			LOGGER.debug("Applying {}", ct);
 
 			// Fill cache
@@ -98,7 +124,12 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 					var tryCompilationUnit = parseSourceCode(parser, sourceCode);
 					if (tryCompilationUnit.isEmpty()) {
 						// We are not able to parse the input
-						LOGGER.warn("Not able to parse this content into an AST");
+						LOGGER.warn("Not able to parse path='{}' with {}", pathAndContent.getPath(), parser);
+
+						if (firstMutator.get()) {
+							inputIsBroken.set(true);
+						}
+
 						return;
 					} else {
 						optCompilationUnit.set(tryCompilationUnit.get());
@@ -107,6 +138,8 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 					throw new RuntimeException("Issue parsing the code", e);
 				}
 			}
+
+			firstMutator.set(false);
 
 			var compilationUnit = optCompilationUnit.get();
 			Optional<R> walkNodeResult;

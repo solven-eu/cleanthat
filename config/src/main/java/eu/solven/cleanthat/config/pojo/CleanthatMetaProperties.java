@@ -17,13 +17,14 @@ package eu.solven.cleanthat.config.pojo;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Some metadata properties.
@@ -33,12 +34,19 @@ import lombok.Data;
 @JsonIgnoreProperties({ "commit_pull_requests", "commit_main_branch" })
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Data
+@Builder
+@Jacksonized
 public final class CleanthatMetaProperties {
 
 	// The labels to apply to created PRs
+	@Builder.Default
 	private List<String> labels = Arrays.asList("cleanthat");
 
+	@Builder.Default
 	private CleanthatRefFilterProperties refs = new CleanthatRefFilterProperties();
+
+	@Builder.Default
+	private boolean fullCleanOnConfigurationChange = false;
 
 	public List<String> getLabels() {
 		return labels;
@@ -54,26 +62,6 @@ public final class CleanthatMetaProperties {
 
 	public void setRefs(CleanthatRefFilterProperties refs) {
 		this.refs = refs;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(labels, refs);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		var other = (CleanthatMetaProperties) obj;
-		return Objects.equals(labels, other.labels) && Objects.equals(refs, other.refs);
 	}
 
 }

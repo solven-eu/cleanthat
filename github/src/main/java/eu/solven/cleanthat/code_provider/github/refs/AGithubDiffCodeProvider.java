@@ -93,7 +93,9 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 		if (diff.getTotalCommits() >= LIMIT_COMMIT_IN_COMPARE) {
 			// https://stackoverflow.com/questions/26925312/github-api-how-to-compare-2-commits
 			// https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
-			LOGGER.warn("We are considering a diff of more than 250 Commits ({})", diff.getTotalCommits());
+			LOGGER.warn("We are considering a diff of more than 250 Commits ({}), impacting {} files",
+					diff.getTotalCommits(),
+					diff.getFiles().length);
 		}
 
 		Stream.of(diff.getFiles()).forEach(prFile -> {

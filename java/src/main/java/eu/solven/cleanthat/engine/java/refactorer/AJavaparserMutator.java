@@ -72,7 +72,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 		tree.walk(node -> {
 			boolean hasTransformed;
 			try {
-				LOGGER.debug("{} is going over {}",
+				LOGGER.trace("{} is going over {}",
 						this.getClass().getSimpleName(),
 						PepperLogHelper.getObjectAndClass(node));
 				hasTransformed = processNotRecursively(node);
@@ -277,7 +277,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 			type = type.asConstraintType().getBound();
 		}
 		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(requiredType)) {
-			// We are calling 'isEmpty' not on an Optional object
+			// BEWARE Should we consider some sort of isAssignableFrom?
 			isCorrectClass = true;
 		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
 			// For a primitive double, requiredType is 'double'

@@ -51,7 +51,7 @@ public final class CleanthatRepositoryProperties implements IHasSourceCodeProper
 	private String syntaxVersion = LATEST_SYNTAX_VERSION;
 
 	@Builder.Default
-	private CleanthatMetaProperties meta = new CleanthatMetaProperties();
+	private CleanthatMetaProperties meta = CleanthatMetaProperties.builder().build();
 
 	// Properties to apply to each children
 	@Builder.Default

@@ -26,17 +26,14 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
+import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 
 /**
@@ -78,11 +75,7 @@ public class ITGetType {
 		}
 	}
 
-	// Setup symbol solver
-	final ParserConfiguration configuration = new ParserConfiguration()
-			.setSymbolResolver(new JavaSymbolSolver(new CombinedTypeSolver(new ReflectionTypeSolver())));
-	// Setup parser
-	final JavaParser parser = new JavaParser(configuration);
+	final JavaParser parser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
 
 	// https://github.com/javaparser/javaparser/issues/1439
 	// https://github.com/javaparser/javaparser/issues/1506

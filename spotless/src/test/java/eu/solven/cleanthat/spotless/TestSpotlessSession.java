@@ -51,4 +51,16 @@ public class TestSpotlessSession {
 				.startsWith("/cleanthat_fake_root_for_spotless/")
 				.endsWith("/some/file");
 	}
+
+	// This happens when GithubSha1CodeProviderHelper.ensureLocalClone() kicks-in
+	@Test
+	public void testFormatterInmemory_codeProviderSwitchToDisk() {
+		var fs = Jimfs.newFileSystem();
+
+		File someFile = ss.getFakeFile(fs.getPath("/root"), Paths.get("some/file"));
+		Assertions.assertThat(someFile).doesNotExist().isAbsolute();
+		Assertions.assertThat(someFile.toString())
+				.startsWith("/cleanthat_fake_root_for_spotless/")
+				.endsWith("/some/file");
+	}
 }

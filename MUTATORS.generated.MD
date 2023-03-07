@@ -11,7 +11,7 @@ Require sourceJdk: 1.8
 
 CheckStyle: AvoidInlineConditionals
 
-Sonar: S3358
+Sonar: RSPEC-3358
 
 Require sourceJdk: 1
 

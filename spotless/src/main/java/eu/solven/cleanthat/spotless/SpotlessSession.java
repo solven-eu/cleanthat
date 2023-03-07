@@ -142,7 +142,9 @@ public class SpotlessSession {
 	protected File getFakeFile(Path root, Path relativeContentPath) {
 		// This check is more to demonstrate the kind of expectations over given path
 		CleanthatPathHelpers.checkContentPath(relativeContentPath);
-		var absoluteContentPath = root.resolve(relativeContentPath);
+		// This is necessary as the Path may be attached to different FileSystems
+		var rawRelativeContentPath = relativeContentPath.toString();
+		var absoluteContentPath = root.resolve(rawRelativeContentPath);
 
 		// Spotless expects absolute pathes, as they will be compared with some root
 		if (absoluteContentPath.getFileSystem().equals(FileSystems.getDefault())) {

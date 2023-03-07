@@ -110,6 +110,8 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		var firstMutator = new AtomicBoolean(true);
 		var inputIsBroken = new AtomicBoolean(false);
 
+		var path = pathAndContent.getPath();
+
 		getRawMutators().forEach(ct -> {
 			if (inputIsBroken.get()) {
 				LOGGER.trace("We skip {} as the input is broken", ct);
@@ -124,7 +126,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 					var tryCompilationUnit = parseSourceCode(parser, sourceCode);
 					if (tryCompilationUnit.isEmpty()) {
 						// We are not able to parse the input
-						LOGGER.warn("Not able to parse path='{}' with {}", pathAndContent.getPath(), parser);
+						LOGGER.warn("Not able to parse path='{}' with {}", path, parser);
 
 						if (firstMutator.get()) {
 							inputIsBroken.set(true);
@@ -152,14 +154,14 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			if (walkNodeResult.isPresent()) {
 				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
 				// or removing consecutive EOL
-				LOGGER.debug("IMutator {} linted (with impact)", ct.getClass().getSimpleName());
+				LOGGER.debug("IMutator {} linted succesfully {}", ct.getClass().getSimpleName(), path);
 
 				// One relevant change: building source-code from the AST
 				var resultAsString = toString(walkNodeResult.get());
 				if (isValidResultString(parser, resultAsString)) {
 					refCleanCode.set(resultAsString);
 				} else {
-					LOGGER.warn("{} generated invalid code", ct);
+					LOGGER.warn("{} generated invalid code over {}", ct, path);
 				}
 
 				// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits

@@ -26,6 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -44,26 +45,20 @@ public class TestAvoidInlineConditionalsCustom extends AJavaparserTestCases {
 				.getResources("classpath*:" + "/source/do_not_format_me/" + mutator.getClass().getSimpleName() + "/*");
 
 		for (Resource resource : resources) {
+			if (resource.getFilename().equals("empty")) {
+				// skip
+				continue;
+			}
 			LOGGER.info("Processing: {}", resource);
 			var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-			if ("MavenPluginPlugin.java".equals(resource.getFilename())) {
-				// This file has a feature not managed by JP3.25
-				Assertions.assertThatThrownBy(() -> {
-					var compilationUnit = parseCompilationUnit(mutator, asString);
-					mutator.walkAstHasChanged(compilationUnit);
-				}).isInstanceOf(IllegalArgumentException.class);
-			} else if ("AsyncLoggerConfig.java".equals(resource.getFilename())) {
-				// This file has a feature not managed by JP3.25
-				Assertions.assertThatThrownBy(() -> {
-					var compilationUnit = parseCompilationUnit(mutator, asString);
-					mutator.walkAstHasChanged(compilationUnit);
-				}).isInstanceOf(StackOverflowError.class);
-			} else {
+			{
 				var compilationUnit = parseCompilationUnit(mutator, asString);
 
 				var transformed = mutator.walkAstHasChanged(compilationUnit);
 				Assertions.assertThat(transformed).isNotNull();
+
+				parseCompilationUnit(mutator, LexicalPreservingPrinter.print(compilationUnit));
 			}
 
 		}

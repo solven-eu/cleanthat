@@ -116,6 +116,9 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 			var variableDeclExpr = (VariableDeclarationExpr) grandParent;
 			if (variableDeclExpr.getVariables().size() != 1) {
 				return false;
+			} else if (variableDeclExpr.getElementType().isVarType()) {
+				// We can not have a `var` variable with no initializer
+				return false;
 			}
 			var variableDeclarator = variableDeclExpr.getVariables().get(0);
 

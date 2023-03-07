@@ -45,7 +45,7 @@ public class TestAvoidInlineConditionalsCustom extends AJavaparserTestCases {
 				.getResources("classpath*:" + "/source/do_not_format_me/" + mutator.getClass().getSimpleName() + "/*");
 
 		for (Resource resource : resources) {
-			if (resource.getFilename().equals("empty")) {
+			if ("empty".equals(resource.getFilename())) {
 				// skip
 				continue;
 			}

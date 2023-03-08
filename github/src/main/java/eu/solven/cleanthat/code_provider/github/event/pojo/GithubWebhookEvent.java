@@ -33,8 +33,12 @@ import eu.solven.pepper.collection.PepperMapHelper;
 public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 	public static final String X_GIT_HUB_DELIVERY = "X-GitHub-Delivery";
 
-	private static final String KEY_BODY = "body";
-	private static final String KEY_GITHUB = "github";
+	public static final String KEY_BODY = "body";
+	public static final String KEY_HEADERS = "headers";
+
+	@Deprecated
+	public static final String KEY_GITHUB = "github";
+
 	final String xGithubEvent;
 	final String xGithubDelivery;
 	final String xHubSignature256;
@@ -103,7 +107,7 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 			throw new IllegalArgumentException("This does not hold a github event");
 		}
 
-		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, KEY_GITHUB, "headers");
+		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, KEY_GITHUB, KEY_HEADERS);
 		var xGithubEvent = PepperMapHelper.getOptionalString(headers, "X-GitHub-Event").orElse("");
 		var xGithubDelivery = PepperMapHelper.getOptionalString(headers, X_GIT_HUB_DELIVERY).orElse("");
 		var xGithubSignature256 = PepperMapHelper.getOptionalString(headers, "X-GitHub-Signature-256").orElse("");

@@ -5,9 +5,11 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ## [Unreleased]
 ### Fixed
 * `AvoidUncheckedExceptionsInSignatures` may encounter `UnsolvedSymbolExceptions`
+* `AvoidInlineConditionals` will not produce invalid `var` declarations.
 ### Added
 * `StringStartsWithChar` is added in `SafeButNotConsensual`
 * `$.repository.meta.full_clean_on_configuration_change` is a new option to enable full repository cleaning on a configuration change. It is defaulted to `false` while previous behavior was as if it was always `true`.
+* `EclipseStylesheetGenerator` has a new option to discard ambiguous options (`tryOptionsKeepingExistingFormat`)
 
 ## [2.9] - 2023-01-06
 ### Added

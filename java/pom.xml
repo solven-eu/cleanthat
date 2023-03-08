@@ -39,12 +39,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-spring</artifactId>
-			<version>${sentry-spring.version}</version>
-		</dependency>
-
-		<dependency>
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -57,28 +51,6 @@
 			<artifactId>annotations</artifactId>
 			<version>3.0.1u2</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<!-- https://github.com/spring-io/spring-javaformat -->
-			<groupId>io.spring.javaformat</groupId>
-			<artifactId>spring-javaformat-formatter</artifactId>
-			<version>0.0.38</version>
-		</dependency>
-
-		<dependency>
-			<!-- Used to clean unexpected changes by Javaparser -->
-			<groupId>io.github.java-diff-utils</groupId>
-			<artifactId>java-diff-utils</artifactId>
-			<version>4.12</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<dependency>
-			<!-- Used to find longest common for diff -->
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.10.0</version>
 		</dependency>
 
 		<dependency>

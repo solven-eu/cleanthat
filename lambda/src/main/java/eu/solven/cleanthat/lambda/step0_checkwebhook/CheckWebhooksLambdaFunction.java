@@ -94,7 +94,8 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			Map<String, Object> acceptedEvent = new LinkedHashMap<>();
 
 			// We may add details from processAnswer
-			acceptedEvent.put("github", Map.of("body", githubEvent.getBody(), "headers", githubEvent.getHeaders()));
+			acceptedEvent.put(GithubWebhookEvent.KEY_HEADERS, githubEvent.getHeaders());
+			acceptedEvent.put(GithubWebhookEvent.KEY_BODY, githubEvent.getBody());
 
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_webhooks_github",
 					new CleanThatWebhookEvent(Map.of(), acceptedEvent),

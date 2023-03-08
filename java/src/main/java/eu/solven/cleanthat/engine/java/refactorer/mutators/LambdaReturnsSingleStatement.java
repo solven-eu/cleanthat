@@ -75,11 +75,11 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 			return false;
 		}
 
-		var lambdaBLockStmt = (BlockStmt) body;
+		var lambdaBlockStmt = (BlockStmt) body;
 
-		if (lambdaBLockStmt.getStatements().size() == 1) {
-			if (lambdaBLockStmt.getStatement(0) instanceof ReturnStmt) {
-				var returnStmt = (ReturnStmt) lambdaBLockStmt.getStatement(0);
+		if (lambdaBlockStmt.getStatements().size() == 1) {
+			if (lambdaBlockStmt.getStatement(0) instanceof ReturnStmt) {
+				var returnStmt = (ReturnStmt) lambdaBlockStmt.getStatement(0);
 
 				Optional<Expression> returnedExpr = returnStmt.getExpression();
 
@@ -87,20 +87,32 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 					return false;
 				}
 
-				lambdaExpr.setBody(new ExpressionStmt(returnedExpr.get()));
+				return changeExpression(lambdaExpr, returnedExpr.get());
+			} else if (lambdaBlockStmt.getStatement(0) instanceof ExpressionStmt) {
+				var exprStmt = (ExpressionStmt) lambdaBlockStmt.getStatement(0);
 
-				return true;
-			} else if (lambdaBLockStmt.getStatement(0) instanceof ExpressionStmt) {
-				var exprStmt = (ExpressionStmt) lambdaBLockStmt.getStatement(0);
-
-				lambdaExpr.setBody(new ExpressionStmt(exprStmt.getExpression()));
-
-				return true;
+				return changeExpression(lambdaExpr, exprStmt.getExpression());
 			} else {
 				return false;
 			}
 		} else {
 			return false;
 		}
+	}
+
+	private boolean changeExpression(LambdaExpr lambdaExpr, Expression expr) {
+		// https://github.com/javaparser/javaparser/pull/3938
+		// lambdaExpr.setBody(new ExpressionStmt(expr));
+		// return true;
+
+		// Workaround from https://github.com/javaparser/javaparser/issues/3930#issuecomment-1453652827
+		// We replace the whole LambdaExpr
+		var newLambdaExpr = new LambdaExpr();
+
+		lambdaExpr.getComment().ifPresent(newLambdaExpr::setComment);
+		newLambdaExpr.setParameters(lambdaExpr.getParameters());
+		newLambdaExpr.setBody(new ExpressionStmt(expr));
+
+		return tryReplace(lambdaExpr, newLambdaExpr);
 	}
 }

@@ -28,11 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ParserConfiguration.LanguageLevel;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
@@ -45,6 +41,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.javaparser.JavaparserTestHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
@@ -66,31 +63,10 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 
 	final ClassOrInterfaceDeclaration testCase;
 
-	// Duplicated from JavaRefactorer
-	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {
-		return makeDefaultJavaParser(jreOnly, LanguageLevel.BLEEDING_EDGE);
-	}
-
-	public static JavaParser makeDefaultJavaParser(boolean jreOnly, LanguageLevel languageLevel) {
-		var reflectionTypeSolver = makeDefaultTypeSolver(jreOnly);
-
-		var symbolResolver = new JavaSymbolSolver(reflectionTypeSolver);
-
-		var configuration = new ParserConfiguration().setSymbolResolver(symbolResolver).setLanguageLevel(languageLevel);
-		var parser = new JavaParser(configuration);
-		return parser;
-	}
-
-	// Duplicated from JavaRefactorer
-	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
-		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
-		return reflectionTypeSolver;
-	}
-
 	protected static Collection<Object[]> listCases(ARefactorerCases<?, ?, ?> testCases) throws IOException {
 		String path = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
-		JavaParser javaParser = makeDefaultJavaParser(testCases.getTransformer().isJreOnly());
+		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(testCases.getTransformer().isJreOnly());
 		var compilationUnit = throwIfProblems(javaParser.parse(path));
 
 		List<Object[]> individualCases = new ArrayList<>();

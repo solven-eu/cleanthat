@@ -68,6 +68,11 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 
 	private static final String SETTING_TABULATION_CHAR = "org.eclipse.jdt.core.formatter.tabulation.char";
 
+	// Some options allows specifically to keep the current format
+	// They may be useful if we do not want to enforce some rule
+	// However, the point of this procedure is generally to generate a stylesheet enforcing some style
+	private boolean tryOptionsKeepingExistingFormat = false;
+
 	final CodeDiffHelper diffHelper = new CodeDiffHelper();
 
 	// This is useful to start optimizing these parameters, before optimizing other
@@ -78,6 +83,10 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				"org.eclipse.jdt.core.formatter.comment.line_length",
 				"org.eclipse.jdt.core.formatter.lineSplit",
 				"org.eclipse.jdt.core.formatter.join_wrapped_lines");
+	}
+
+	public void setTryOptionsKeepingExistingFormat(boolean tryOptionsKeepingExistingFormat) {
+		this.tryOptionsKeepingExistingFormat = tryOptionsKeepingExistingFormat;
 	}
 
 	/**
@@ -530,12 +539,28 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	 * @param parameterToSwitch
 	 * @return the different values to consider for given Eclipse {@link IStyleEnforcer} option
 	 */
+	private Set<String> possibleOptions(String parameterToSwitch) {
+		Set<String> allOptions = possibleAllOptions(parameterToSwitch);
+
+		if (!tryOptionsKeepingExistingFormat) {
+			allOptions = new TreeSet<>(allOptions);
+
+			LOGGER.info("We remove options allowing ambiguity in the source code");
+			allOptions.remove(DefaultCodeFormatterConstants.ONE_LINE_PRESERVE);
+			allOptions.remove(DefaultCodeFormatterConstants.PRESERVE_POSITIONS);
+			allOptions.remove(Integer.toString(DefaultCodeFormatterConstants.INDENT_PRESERVE));
+			allOptions.remove(DefaultCodeFormatterConstants.MIXED);
+		}
+
+		return allOptions;
+	}
+
 	// see DefaultCodeFormatterOptions
 	@SuppressWarnings({ "checkstyle:MagicNumber",
 			"checkstyle:MethodLength",
 			"PMD.ExcessiveMethodLength",
 			"PMD.CognitiveComplexity" })
-	private Set<String> possibleOptions(String parameterToSwitch) {
+	private Set<String> possibleAllOptions(String parameterToSwitch) {
 		if ("org.eclipse.jdt.core.formatter.enabling_tag".equals(parameterToSwitch)
 				|| "org.eclipse.jdt.core.formatter.disabling_tag".equals(parameterToSwitch)) {
 			// This parameters are left to their default value
@@ -635,7 +660,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 							DefaultCodeFormatterConstants.INDENT_BY_ONE,
 							DefaultCodeFormatterConstants.INDENT_DEFAULT,
 							DefaultCodeFormatterConstants.INDENT_ON_COLUMN)
-					.mapToObj(String::valueOf)
+					.mapToObj(Integer::toString)
 					.collect(Collectors.toSet());
 		} else {
 			if (parameterToSwitch.startsWith("org.eclipse.jdt.core.formatter.")) {

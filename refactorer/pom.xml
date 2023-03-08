@@ -28,12 +28,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.sentry</groupId>
-			<artifactId>sentry-spring</artifactId>
-			<version>${sentry-spring.version}</version>
-		</dependency>
-
-		<dependency>
 			<!-- Used to parse Java versions with JavaVersion -->
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-java</artifactId>

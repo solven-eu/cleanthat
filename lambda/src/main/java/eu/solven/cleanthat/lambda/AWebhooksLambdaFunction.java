@@ -156,8 +156,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			Map<String, Object> rootBody = PepperMapHelper.getRequiredMap(input, KEY_BODY);
 
-			if (rootBody.containsKey("github")) {
-				Map<String, Object> github = PepperMapHelper.getRequiredMap(rootBody, "github");
+			if (rootBody.containsKey(GithubWebhookEvent.KEY_GITHUB)) {
+				Map<String, Object> github = PepperMapHelper.getRequiredMap(rootBody, GithubWebhookEvent.KEY_GITHUB);
 
 				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(github, KEY_HEADERS);
 
@@ -178,6 +178,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, KEY_HEADERS);
 			event = new CleanThatWebhookEvent(headers, rootBody);
 		} else {
+			// This is a payload right from Github
+			// We lack headers as we are not able to forward them from SQS
 			event = new GithubWebhookEvent(input);
 		}
 		return event;

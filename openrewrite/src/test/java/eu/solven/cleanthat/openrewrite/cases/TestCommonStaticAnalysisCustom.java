@@ -37,7 +37,7 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.engine.java.refactorer.AAstRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteMutator;
 import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
+import eu.solven.cleanthat.engine.java.refactorer.javaparser.JavaparserTestHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import eu.solven.pepper.unittest.ILogDisabler;
 import eu.solven.pepper.unittest.PepperTestHelper;
@@ -59,7 +59,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 		OpenrewriteMutator mutator = new OpenrewriteMutator(recipe);
 
 		// LiteralsFirstInComparisons transformer = new LiteralsFirstInComparisons();
-		JavaParser javaParser = AParameterizesRefactorerCases.makeDefaultJavaParser(true);
+		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(true);
 		var compilationUnit = javaParser.parse(asString).getResult().get();
 
 		CompilationUnit openrewriteCompilationUnit = convertToAst(compilationUnit);

@@ -34,7 +34,9 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 
+import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import eu.solven.pepper.collection.PepperMapHelper;
 
 /**
  * Helps saving into DynamoDB
@@ -76,8 +78,23 @@ public class SaveToDynamoDb {
 		return client;
 	}
 
-	public static void saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
-		String primaryKey = "random-" + UUID.randomUUID();
+	public static String saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
+		// We re-use the same xGitHubDelivery for the different steps (checkEvent, checkConfig, executeClean)
+		String primaryKey = PepperMapHelper.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+				.orElseGet(() -> PepperMapHelper
+						.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+						.orElseGet(() -> {
+							String randomEventKey = "random-" + UUID.randomUUID();
+
+							LOGGER.info("We generate a random {}={} for headers={} body={}",
+									GithubWebhookEvent.X_GIT_HUB_DELIVERY,
+									randomEventKey,
+									input.getHeaders(),
+									input.getBody());
+
+							return randomEventKey;
+						}));
+
 		LOGGER.info("Save something into DynamoDB table={} primaryKey={}", table, primaryKey);
 
 		DynamoDB dynamodb = new DynamoDB(client);
@@ -85,20 +102,22 @@ public class SaveToDynamoDb {
 		// https://stackoverflow.com/questions/31813868/aws-dynamodb-on-android-inserting-json-directly
 
 		Map<String, Object> inputAsMap = new LinkedHashMap<>();
-		inputAsMap.put("X-GitHub-Delivery", primaryKey);
+		inputAsMap.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, primaryKey);
 
 		inputAsMap.put("datetime", OffsetDateTime.now().toString());
 
 		// TODO We should convert to pure Map, as DynamoDb does not accept custom POJO here
 		// see com.amazonaws.services.dynamodbv2.document.internal.ItemValueConformer.transform(Object)
-		inputAsMap.put("body", input.getBody());
-		inputAsMap.put("headers", input.getHeaders());
+		inputAsMap.put(GithubWebhookEvent.KEY_HEADERS, input.getHeaders());
+		inputAsMap.put(GithubWebhookEvent.KEY_BODY, input.getBody());
 
 		PutItemOutcome outcome = myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
 		LOGGER.info("PUT metadata for table={} primaryKey={}: {}",
 				table,
 				primaryKey,
 				outcome.getPutItemResult().getSdkHttpMetadata().getHttpStatusCode());
+
+		return primaryKey;
 
 	}
 }

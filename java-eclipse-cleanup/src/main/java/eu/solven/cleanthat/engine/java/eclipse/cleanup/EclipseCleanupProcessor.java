@@ -28,7 +28,8 @@ import org.eclipse.jdt.core.manipulation.CleanUpContextCore;
 import org.eclipse.jdt.core.manipulation.CleanUpRequirementsCore;
 import org.eclipse.jdt.core.manipulation.ICleanUpFixCore;
 import org.eclipse.jdt.core.refactoring.CompilationUnitChange;
-import org.eclipse.jdt.internal.ui.fix.PlainReplacementCleanUpCore;
+import org.eclipse.jdt.internal.corext.fix.ICleanUpCore;
+import org.eclipse.jdt.internal.ui.fix.InvertEqualsCleanUpCore;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +53,19 @@ public class EclipseCleanupProcessor {
 
 	public void simplifyRegex(Map<String, String> options,
 			IJavaProject project,
-			ICompilationUnit[] units,
+			ICompilationUnit unit,
 			IProgressMonitor monitor,
 			CleanUpContextCore context) throws CoreException {
-		PlainReplacementCleanUpCore cleanup = new PlainReplacementCleanUpCore(options);
-		RefactoringStatus preStatus = cleanup.checkPreConditions(project, units, monitor);
+		ICleanUpCore cleanup = new InvertEqualsCleanUpCore(options);
+		applyCleanup(project, unit, monitor, context, cleanup);
+	}
+
+	private void applyCleanup(IJavaProject project,
+			ICompilationUnit unit,
+			IProgressMonitor monitor,
+			CleanUpContextCore context,
+			ICleanUpCore cleanup) throws CoreException {
+		RefactoringStatus preStatus = cleanup.checkPreConditions(project, new ICompilationUnit[] { unit }, monitor);
 		LOGGER.info("pre status: {}", preStatus);
 
 		CleanUpRequirementsCore requirements = cleanup.getRequirementsCore();
@@ -77,14 +86,10 @@ public class EclipseCleanupProcessor {
 				+ "\n"
 				+ "public class CleanClass {\n"
 				+ "\n"
-				+ "	final LocalDate someLocalDate;\n"
+				+ "	final boolean b;\n"
 				+ "\n"
-				+ "	final LocalDateTime someLocalDateTime;\n"
-				+ "\n"
-				+ "	public CleanClass(LocalDate someLocalDate, LocalDateTime someLocalDateTime) {\n"
-				+ "		super();\n"
-				+ "		this.someLocalDate = someLocalDate;\n"
-				+ "		this.someLocalDateTime = someLocalDateTime;\n"
+				+ "	public CleanClass(String a, String b) {\n"
+				+ "		this.b = a.equals(a + b);\n"
 				+ "	}\n"
 				+ "}\n";
 

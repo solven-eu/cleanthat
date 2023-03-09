@@ -98,7 +98,7 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			acceptedEvent.put(GithubWebhookEvent.KEY_BODY, githubEvent.getBody());
 
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_webhooks_github",
-					new CleanThatWebhookEvent(Map.of(), acceptedEvent),
+					new CleanThatWebhookEvent(githubEvent.getHeaders(), acceptedEvent),
 					client);
 			return Map.of("status", "Recorded in DB for further processing");
 		}

@@ -32,6 +32,7 @@ import eu.solven.cleanthat.code_provider.github.event.ICodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.IGitWebhookHandlerFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
@@ -65,7 +66,8 @@ public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 			var headToClean = processAnswer.optHeadToClean().get();
 
 			ObjectMapper objectMapper = getAppContext().getBean(ObjectMapper.class);
-			acceptedEvent.put("refToClean", objectMapper.convertValue(headToClean, Map.class));
+			acceptedEvent.put(WebhookRelevancyResult.KEY_HEAD_TO_CLEAN,
+					objectMapper.convertValue(headToClean, Map.class));
 
 			SaveToDynamoDb.saveToDynamoDb("cleanthat_accepted_events",
 					new CleanThatWebhookEvent(input.getHeaders(), acceptedEvent),

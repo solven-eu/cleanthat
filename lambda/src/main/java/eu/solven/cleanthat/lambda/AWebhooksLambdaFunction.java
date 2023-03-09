@@ -149,8 +149,10 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	}
 
 	public IWebhookEvent wrapAsEvent(Map<String, ?> input) {
+
 		IWebhookEvent event;
 		if (input.containsKey(KEY_BODY) && input.containsKey(KEY_HEADERS)) {
+			String eventKey = PepperMapHelper.getRequiredString(input, GithubWebhookEvent.X_GIT_HUB_DELIVERY);
 			// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
 			// event = SaveToDynamoDb.NONE;
 
@@ -161,13 +163,20 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(github, KEY_HEADERS);
 
-				// Headers is typically empty as we fails fetching headers from API Gateway
-				if (!githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
+				if (githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
+					Object realDelivery = githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
+					if (realDelivery != null && !realDelivery.equals(eventKey)) {
+						LOGGER.warn("We replace a real {}={} by the fake {}",
+								GithubWebhookEvent.X_GIT_HUB_DELIVERY,
+								realDelivery,
+								eventKey);
+					}
+				} else {
+					// Headers is typically empty as we fails fetching headers from API Gateway
 					githubHeaders = new LinkedHashMap<>(githubHeaders);
 
 					// TODO We should push this to the headers next to the actual github body, which may be deeper
 					// We should also push it when the initial event is received
-					String eventKey = PepperMapHelper.getRequiredString(input, GithubWebhookEvent.X_GIT_HUB_DELIVERY);
 					githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
 
 					// Install the updated headers
@@ -176,6 +185,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 			}
 
 			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, KEY_HEADERS);
+
 			event = new CleanThatWebhookEvent(headers, rootBody);
 		} else {
 			// This is a payload right from Github

@@ -27,6 +27,9 @@ import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
  *
  */
 public class WebhookRelevancyResult {
+	@Deprecated
+	public static final String KEY_HEAD_TO_CLEAN = "refToClean";
+
 	final Optional<HeadAndOptionalBase> oHeadAndOptBase;
 
 	final Optional<String> oRejectedReason;

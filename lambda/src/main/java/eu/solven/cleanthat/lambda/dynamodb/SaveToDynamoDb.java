@@ -82,18 +82,20 @@ public class SaveToDynamoDb {
 		// We re-use the same xGitHubDelivery for the different steps (checkEvent, checkConfig, executeClean)
 		String primaryKey = PepperMapHelper.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
 				.orElseGet(() -> PepperMapHelper
-						.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-						.orElseGet(() -> {
-							String randomEventKey = "random-" + UUID.randomUUID();
+						.getOptionalString(input.getBody(),
+								GithubWebhookEvent.KEY_HEADERS,
+								GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+						.orElseGet(
+								() -> PepperMapHelper
+										.getOptionalString(input.getBody(),
+												GithubWebhookEvent.KEY_GITHUB,
+												GithubWebhookEvent.KEY_HEADERS,
+												GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+										.orElseGet(() -> {
+											return randomEventKey(input);
+										})
 
-							LOGGER.info("We generate a random {}={} for headers={} body={}",
-									GithubWebhookEvent.X_GIT_HUB_DELIVERY,
-									randomEventKey,
-									input.getHeaders(),
-									input.getBody());
-
-							return randomEventKey;
-						}));
+						));
 
 		LOGGER.info("Save something into DynamoDB table={} primaryKey={}", table, primaryKey);
 
@@ -119,5 +121,23 @@ public class SaveToDynamoDb {
 
 		return primaryKey;
 
+	}
+
+	private static String randomEventKey(IWebhookEvent input) {
+		String randomEventKey = "random-" + UUID.randomUUID();
+
+		// This may happen on step0, as we lack a real xGithubDelivery (due to SQS not
+		// transmitting
+		// headers)
+		// Else, it is a bug where we generate a new xGithubDelivery on each step (fixed
+		// around
+		// 2023-03)
+		LOGGER.warn("We generate a random {}={} for headers={} body={}",
+				GithubWebhookEvent.X_GIT_HUB_DELIVERY,
+				randomEventKey,
+				input.getHeaders(),
+				input.getBody());
+
+		return randomEventKey;
 	}
 }

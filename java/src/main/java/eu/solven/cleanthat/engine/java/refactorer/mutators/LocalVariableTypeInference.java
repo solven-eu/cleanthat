@@ -43,6 +43,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  */
 // https://github.com/openrewrite/rewrite/issues/1656
 // https://stackoverflow.com/questions/49210591/restrictions-on-using-local-variable-type-inference-in-java-10
+// https://openjdk.org/projects/amber/guides/lvti-style-guide
 public class LocalVariableTypeInference extends AJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocalVariableTypeInference.class);
 

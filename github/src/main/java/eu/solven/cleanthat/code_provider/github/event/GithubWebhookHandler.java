@@ -514,6 +514,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		var relevancyResult =
 				filterWebhookEventTargetRelevantBranch(root, cleanerFactory, githubAndBranchAcceptedEvent);
+		// TODO We may rely on WebhookRelevancyResult.KEY_HEAD_TO_CLEAN instead of recomputing relevancyResult
 		if (relevancyResult.optHeadToClean().isEmpty()) {
 			// TODO May happen if the PR is closed in the meantime
 			throw new IllegalArgumentException("We should have rejected this earlier");

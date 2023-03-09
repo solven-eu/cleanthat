@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,12 +69,33 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 		}
 	}
 
-	// https://github.com/javaparser/javaparser/issues/3898
 	@UnmodifiedMethod
-	// @CompareMethods
 	public static class CaseDifferentType_noReAssigment {
 		public Object pre() {
-			List<?> i = new ArrayList<String>();
+			final CharSequence i = new StringBuilder();
+
+			return i;
+		}
+	}
+
+	// If the variable type is replaced by var, it takes the initial type, which may not be compatible with further
+	// allocation
+	@UnmodifiedMethod
+	public static class CaseDifferentType_reAssigment {
+		public Object pre() {
+			CharSequence i = new StringBuilder();
+
+			i = i.toString();
+
+			return i;
+		}
+	}
+
+	// https://github.com/javaparser/javaparser/issues/3898
+	@UnmodifiedMethod
+	public static class CaseGenerics {
+		public Object pre() {
+			ArrayList<String> i = new ArrayList<String>();
 			return i;
 		}
 
@@ -111,19 +133,6 @@ public class LocalVariableTypeInferenceCases extends AJavaparserRefactorerCases 
 	public static class ArrayInitializer {
 		public Object pre() {
 			Object[] i = { 1, 2 };
-			return i;
-		}
-	}
-
-	// If the variable type is replaced by var, it takes the initial type, which may not be compatible with further
-	// allocation
-	@UnmodifiedMethod
-	public static class CaseDifferentType_reAssigment {
-		public Object pre() {
-			List<?> i = new ArrayList<>();
-
-			i = ImmutableList.of();
-
 			return i;
 		}
 	}

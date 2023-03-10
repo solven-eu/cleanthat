@@ -2,6 +2,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -103,6 +104,19 @@ public class LambdaReturnsSingleStatementCases extends AJavaparserRefactorerCase
 
 		public void post(ICodeProvider cp) throws IOException {
 			cp.listFilesForContent(file -> Assertions.fail("The FS is empty"));
+		}
+	}
+
+	@CompareMethods
+	public static class InLambda_multipleArgs {
+		public void pre(Map<?, ?> map) throws IOException {
+			map.forEach((k, v) -> {
+				System.out.println(k + ": " + v);
+			});
+		}
+
+		public void post(Map<?, ?> map) throws IOException {
+			map.forEach((k, v) -> System.out.println(k + ": " + v));
 		}
 	}
 }

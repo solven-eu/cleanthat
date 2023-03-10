@@ -97,24 +97,24 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 	}
 
 	public static GithubWebhookEvent fromCleanThatEvent(IWebhookEvent githubAcceptedEvent) {
-		Map<String, ?> body = githubAcceptedEvent.getBody();
+		if (githubAcceptedEvent instanceof GithubWebhookEvent) {
+			return (GithubWebhookEvent) githubAcceptedEvent;
+		} else if (githubAcceptedEvent instanceof CleanThatWebhookEvent) {
+			// Map<String, ?> cleanthatHeaders = githubAcceptedEvent.getHeaders();
+			Map<Object, ?> githubHeaders = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_HEADERS);
 
-		while (!body.containsKey(KEY_GITHUB) && body.containsKey(KEY_BODY)) {
-			body = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_BODY);
+			var xGithubEvent = PepperMapHelper.getOptionalString(githubHeaders, "X-GitHub-Event").orElse("");
+			var xGithubDelivery = PepperMapHelper.getOptionalString(githubHeaders, X_GIT_HUB_DELIVERY).orElse("");
+			var xGithubSignature256 =
+					PepperMapHelper.getOptionalString(githubHeaders, "X-GitHub-Signature-256").orElse("");
+
+			return new GithubWebhookEvent(xGithubEvent,
+					xGithubDelivery,
+					xGithubSignature256,
+					PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_BODY));
+		} else {
+			throw new IllegalArgumentException("What is this? body=" + githubAcceptedEvent.getBody());
 		}
 
-		if (!body.containsKey(KEY_GITHUB)) {
-			throw new IllegalArgumentException("This does not hold a github event");
-		}
-
-		Map<String, ?> headers = PepperMapHelper.getRequiredMap(body, KEY_GITHUB, KEY_HEADERS);
-		var xGithubEvent = PepperMapHelper.getOptionalString(headers, "X-GitHub-Event").orElse("");
-		var xGithubDelivery = PepperMapHelper.getOptionalString(headers, X_GIT_HUB_DELIVERY).orElse("");
-		var xGithubSignature256 = PepperMapHelper.getOptionalString(headers, "X-GitHub-Signature-256").orElse("");
-
-		return new GithubWebhookEvent(xGithubEvent,
-				xGithubDelivery,
-				xGithubSignature256,
-				PepperMapHelper.getRequiredMap(body, KEY_GITHUB, KEY_BODY));
 	}
 }

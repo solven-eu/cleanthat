@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.LambdaReturnsSingleStatementCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UnnecessaryLambdaEnclosingParametersCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestLambdaReturnsSingleStatementCases extends AParameterizesJavaparserRefactorerCases {
+public class TestUnnecessaryLambdaEnclosingParametersCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new LambdaReturnsSingleStatementCases();
+		return new UnnecessaryLambdaEnclosingParametersCases();
 	}
 
-	public TestLambdaReturnsSingleStatementCases(JavaParser javaParser,
+	public TestUnnecessaryLambdaEnclosingParametersCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

@@ -59,8 +59,6 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
 
-	private static final Path NO_PATH = Paths.get("cleanthat/path_is_not_available");
-
 	private final List<M> mutators;
 
 	public AAstRefactorer(List<M> mutators) {
@@ -129,6 +127,8 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 						LOGGER.warn("Not able to parse path='{}' with {}", path, parser);
 
 						if (firstMutator.get()) {
+							// BEWARE we may have mutators based on different parsers
+							LOGGER.info("We mark {} as not parseable by any mutator", path);
 							inputIsBroken.set(true);
 						}
 

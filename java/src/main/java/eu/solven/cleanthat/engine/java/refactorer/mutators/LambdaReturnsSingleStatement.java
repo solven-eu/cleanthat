@@ -57,7 +57,7 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 
 	@Override
 	public Optional<String> getSonarId() {
-		return Optional.of("S1602");
+		return Optional.of("RSPEC-1602");
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
@@ -109,6 +109,7 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 		// We replace the whole LambdaExpr
 		var newLambdaExpr = new LambdaExpr();
 
+		newLambdaExpr.setEnclosingParameters(lambdaExpr.isEnclosingParameters());
 		lambdaExpr.getComment().ifPresent(newLambdaExpr::setComment);
 		newLambdaExpr.setParameters(lambdaExpr.getParameters());
 		newLambdaExpr.setBody(new ExpressionStmt(expr));

@@ -16,13 +16,24 @@
 package eu.solven.cleanthat.formatter;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Knows how to format a piece of code
  *
  * @author Benoit Lacelle
  */
-public interface ILintFixerWithPath {
+public interface ILintFixerWithPath extends ILintFixer {
+	/**
+	 * This can be used as {@link Path} when one is necessary by the API while none is available.
+	 */
+	Path NO_PATH = Paths.get("cleanthat/path_is_not_available");
 
 	String doFormat(PathAndContent pathAndContent) throws IOException;
+
+	default String doFormat(String content) throws IOException {
+		PathAndContent contentWithNoPath = new PathAndContent(NO_PATH, content);
+		return doFormat(contentWithNoPath);
+	}
 }

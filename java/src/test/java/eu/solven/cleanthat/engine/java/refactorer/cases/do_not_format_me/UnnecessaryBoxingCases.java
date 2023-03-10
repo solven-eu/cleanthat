@@ -1,5 +1,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.util.Set;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -116,6 +118,19 @@ public class UnnecessaryBoxingCases extends AJavaparserRefactorerCases {
 			int i2 = i;
 
 			return i1 + i2;
+		}
+	}
+
+	// TODO
+	@UnmodifiedMethod
+	// @CompareMethods
+	public static class CaseLongToInt {
+		public boolean pre(Set<Integer> set, long l) {
+			return set.contains(Long.valueOf(l).intValue());
+		}
+
+		public boolean post(Set<Integer> set, long l) {
+			return set.contains((int) l);
 		}
 	}
 }

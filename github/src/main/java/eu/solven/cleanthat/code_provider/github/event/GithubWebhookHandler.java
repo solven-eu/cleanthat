@@ -480,7 +480,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/
 				// working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork
 				return ResultOrError.error(WebhookRelevancyResult.dismissed(
-						"PR in a fork are not managed (as we are not presumably allowed to write in the fork). eventRepoId="
+						"PR with head in a fork (as we are not presumably allowed to write in the fork). eventRepoId="
 								+ eventRepo.getId()
 								+ " head="
 								+ headRepoFullname));

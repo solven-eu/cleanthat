@@ -74,11 +74,6 @@ public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath, 
 	}
 
 	@Override
-	public String doFormat(String content) throws IOException {
-		return doFormat(new PathAndContent(null, content));
-	}
-
-	@Override
 	public void close() {
 		formatters.forEach(ef -> {
 			ef.getFormatter().close();

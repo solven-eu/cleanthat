@@ -103,15 +103,7 @@ public class SaveToDynamoDb {
 		Table myTable = dynamodb.getTable(table);
 		// https://stackoverflow.com/questions/31813868/aws-dynamodb-on-android-inserting-json-directly
 
-		Map<String, Object> inputAsMap = new LinkedHashMap<>();
-		inputAsMap.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, primaryKey);
-
-		inputAsMap.put("datetime", OffsetDateTime.now().toString());
-
-		// TODO We should convert to pure Map, as DynamoDb does not accept custom POJO here
-		// see com.amazonaws.services.dynamodbv2.document.internal.ItemValueConformer.transform(Object)
-		inputAsMap.put(GithubWebhookEvent.KEY_HEADERS, input.getHeaders());
-		inputAsMap.put(GithubWebhookEvent.KEY_BODY, input.getBody());
+		Map<String, Object> inputAsMap = preparePayloadAsMap(input, primaryKey);
 
 		PutItemOutcome outcome = myTable.putItem(Item.fromMap(Collections.unmodifiableMap(inputAsMap)));
 		LOGGER.info("PUT metadata for table={} primaryKey={}: {}",
@@ -121,6 +113,19 @@ public class SaveToDynamoDb {
 
 		return primaryKey;
 
+	}
+
+	private static Map<String, Object> preparePayloadAsMap(IWebhookEvent input, String primaryKey) {
+		Map<String, Object> inputAsMap = new LinkedHashMap<>();
+		inputAsMap.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, primaryKey);
+
+		inputAsMap.put("datetime", OffsetDateTime.now().toString());
+
+		// TODO We should convert to pure Map, as DynamoDb does not accept custom POJO here
+		// see com.amazonaws.services.dynamodbv2.document.internal.ItemValueConformer.transform(Object)
+		inputAsMap.put(GithubWebhookEvent.KEY_HEADERS, input.getHeaders());
+		inputAsMap.put(GithubWebhookEvent.KEY_BODY, input.getBody());
+		return inputAsMap;
 	}
 
 	private static String randomEventKey(IWebhookEvent input) {

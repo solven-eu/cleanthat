@@ -3,6 +3,13 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
+###
+* `S1602` is renamed `RSPEC-1602`
+* `S1612` is renamed `RSPEC-1612`
+* `LambdaReturnsSingleStatement` now properly handles multiple arguments
+* `UnnecessaryLambdaEnclosingParameters` is introduced but it is not functional
+
+## [2.10] - 2023-03-09
 ### Fixed
 * `AvoidUncheckedExceptionsInSignatures` may encounter `UnsolvedSymbolExceptions`
 * `AvoidInlineConditionals` will not produce invalid `var` declarations.

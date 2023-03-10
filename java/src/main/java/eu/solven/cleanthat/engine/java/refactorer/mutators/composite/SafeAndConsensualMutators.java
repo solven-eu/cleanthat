@@ -33,8 +33,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 
 /**
  * This mutator will apply all {@link IMutator} considered safe (e.g. by not impacting the {@link Runtime}, or only with

@@ -60,13 +60,12 @@ public class GuavaInlineStringsRepeat extends AJavaparserExprMutator {
 		Optional<Expression> optScope = methodCall.getScope();
 
 		if (optScope.isEmpty() || !optScope.get().isNameExpr()
-				|| !optScope.get().asNameExpr().getNameAsString().equals("Strings")) {
+				|| !"Strings".equals(optScope.get().asNameExpr().getNameAsString())) {
 			return false;
 		}
 
-		Expression repeatedString = methodCall.getArgument(0);
-		MethodCallExpr replacement =
-				new MethodCallExpr(repeatedString, "repeat", new NodeList<>(methodCall.getArgument(1)));
+		var repeatedString = methodCall.getArgument(0);
+		var replacement = new MethodCallExpr(repeatedString, "repeat", new NodeList<>(methodCall.getArgument(1)));
 		return tryReplace(expr, replacement);
 	}
 }

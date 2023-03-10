@@ -55,7 +55,7 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
 		var lambdaExpr = (LambdaExpr) node;
 
 		if (lambdaExpr.getParameters().size() == 1 && lambdaExpr.isEnclosingParameters()) {
-			LambdaExpr newLambdaExpr = lambdaExpr.clone();
+			var newLambdaExpr = lambdaExpr.clone();
 			newLambdaExpr.setEnclosingParameters(false);
 			return tryReplace(lambdaExpr, newLambdaExpr);
 		}

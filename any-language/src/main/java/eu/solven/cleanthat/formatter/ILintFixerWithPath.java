@@ -33,7 +33,7 @@ public interface ILintFixerWithPath extends ILintFixer {
 	String doFormat(PathAndContent pathAndContent) throws IOException;
 
 	default String doFormat(String content) throws IOException {
-		PathAndContent contentWithNoPath = new PathAndContent(NO_PATH, content);
+		var contentWithNoPath = new PathAndContent(NO_PATH, content);
 		return doFormat(contentWithNoPath);
 	}
 }

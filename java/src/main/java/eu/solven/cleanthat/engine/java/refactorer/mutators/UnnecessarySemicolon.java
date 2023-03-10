@@ -23,14 +23,14 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Turns `int i = 0;;` into `int i = 0;`
  *
  * @author Benoit Lacelle
  */
-public class UnnecessarySemicolon extends AJavaparserStmtMutator {
+public class UnnecessarySemicolon extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -52,8 +52,17 @@ public class UnnecessarySemicolon extends AJavaparserStmtMutator {
 		return Optional.of("RSPEC-2959");
 	}
 
-	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 	@Override
+	protected boolean processNotRecursively(Node node) {
+		if (node instanceof Statement) {
+			Statement stmt = (Statement) node;
+			return processNotRecursively(stmt);
+		}
+
+		return false;
+	}
+
+	@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 	protected boolean processNotRecursively(Statement stmt) {
 		if (!stmt.isEmptyStmt()) {
 			return false;

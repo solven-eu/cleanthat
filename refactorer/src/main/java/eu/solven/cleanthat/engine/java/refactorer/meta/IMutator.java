@@ -49,7 +49,8 @@ public interface IMutator extends IMutatorExternalReferences {
 						getPmdIds().stream(),
 						getCheckstyleId().stream(),
 						getSonarId().stream(),
-						getCleanthatId().stream())
+						getCleanthatId().stream(),
+						getErrorProneId().stream())
 				.flatMap(Functions.identity())
 				.filter(s -> !"TODO".equals(s))
 				// Not sorted to privilege PMD over SONAR

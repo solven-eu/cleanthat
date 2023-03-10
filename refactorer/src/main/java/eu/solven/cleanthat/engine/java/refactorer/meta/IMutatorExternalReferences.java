@@ -66,6 +66,15 @@ public interface IMutatorExternalReferences {
 		return "";
 	}
 
+	default Optional<String> getErrorProneId() {
+		return Optional.empty();
+	}
+
+	default String errorProneUrl() {
+		// e.g. https://errorprone.info/bugpattern/InlineMeInliner
+		return getErrorProneId().map(id -> "https://errorprone.info/bugpattern/" + id).orElse("");
+	}
+
 	default String jsparrowUrl() {
 		return "";
 	}

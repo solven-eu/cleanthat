@@ -46,7 +46,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  */
 public class CreateTempFilesUsingNio extends AJavaparserMutator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UseCollectionIsEmpty.class);
 
 	@Override
 	public String minimalJavaVersion() {

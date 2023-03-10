@@ -34,7 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInfe
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
@@ -93,7 +93,7 @@ public class TestJavaRefactorer {
 		// UseIsEmptyOnCollections is not productionReady
 		var mutatorsProperties = draftMutatorsProperties;
 
-		var oneRule = new UseIsEmptyOnCollections();
+		var oneRule = new UseCollectionIsEmpty();
 		Set<String> oneRuleIds = oneRule.getIds();
 
 		Assertions.assertThat(oneRuleIds.size()).isGreaterThan(1);

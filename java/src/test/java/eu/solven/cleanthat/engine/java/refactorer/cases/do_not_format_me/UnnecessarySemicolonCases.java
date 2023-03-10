@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.List;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
@@ -77,6 +78,23 @@ public class UnnecessarySemicolonCases extends AJavaparserRefactorerCases {
 		public void post() throws IOException {
 			try (ByteArrayInputStream b = new ByteArrayInputStream(new byte[10]); Reader r = new InputStreamReader(b)) {
 				// do stuff
+			}
+		}
+	}
+
+	@UnmodifiedInnerClass
+	// TODO This seems not cleanable with JavaParser
+	// @CompareInnerClasses
+	public static class caseAfterMethodDefinition {
+		public class Pre {
+			public int someMethod() {
+				return 0;
+			};
+		}
+
+		public class Post {
+			public int someMethod() {
+				return 0;
 			}
 		}
 	}

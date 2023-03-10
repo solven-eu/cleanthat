@@ -17,7 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.meta;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 
 /**
  * Helpers knowing what could be the impact of given rule
@@ -40,7 +40,7 @@ public interface IMutatorDescriber {
 	 * 
 	 * @return true if the rule helps improving performances
 	 * 
-	 * @see UseIsEmptyOnCollections
+	 * @see UseCollectionIsEmpty
 	 */
 	// Relates to https://eslint.org/docs/user-guide/command-line-interface#--fix-type
 	default boolean isPerformanceImprovment() {
@@ -54,7 +54,7 @@ public interface IMutatorDescriber {
 	 * 
 	 * @return true if the rule helps preventing exceptions.
 	 * 
-	 * @see UseIsEmptyOnCollections
+	 * @see UseCollectionIsEmpty
 	 * @see LiteralsFirstInComparisons
 	 */
 	default boolean isPreventingExceptions() {

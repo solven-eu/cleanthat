@@ -27,6 +27,8 @@ public interface IJdkVersionConstants {
 
 	String JDK_1DOT1 = "1.1";
 
+	String JDK_2 = "1.2";
+
 	String JDK_4 = "1.4";
 
 	String JDK_5 = "1.5";

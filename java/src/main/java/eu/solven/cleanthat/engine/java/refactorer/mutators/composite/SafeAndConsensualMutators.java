@@ -34,7 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 
 /**
  * This mutator will apply all {@link IMutator} considered safe (e.g. by not impacting the {@link Runtime}, or only with
@@ -51,7 +51,7 @@ public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implem
 	public static final List<IMutator> SAFE_AND_CONSENSUAL = ImmutableList.<IMutator>builder()
 			.add(new ModifierOrder(),
 					new UseIndexOfChar(),
-					new UseIsEmptyOnCollections(),
+					new UseCollectionIsEmpty(),
 					new OptionalNotEmpty(),
 					new StreamAnyMatch(),
 					new StringToString(),

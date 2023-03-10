@@ -5,47 +5,35 @@ import java.util.List;
 import java.util.Map;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIsEmptyOnCollections;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseStringIsEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class UseIsEmptyOnCollectionsCases extends AJavaparserRefactorerCases {
+public class UseStringIsEmptyCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new UseIsEmptyOnCollections();
+		return new UseStringIsEmpty();
 	}
 
-	@CompareMethods
+	@UnmodifiedMethod
 	public static class CaseCollection {
 		public Object pre(Collection<?> input) {
 			return input.size() == 0;
 		}
-
-		public Object post(Collection<?> input) {
-			return input.isEmpty();
-		}
 	}
 
-	// Check we handle most Collection sub-types
-	@CompareMethods
+	@UnmodifiedMethod
 	public static class CaseList {
 		public Object pre(List<?> input) {
 			return input.size() == 0;
 		}
-
-		public Object post(List<?> input) {
-			return input.isEmpty();
-		}
 	}
 
-	@CompareMethods
+	@UnmodifiedMethod
 	public static class CaseMap {
 		public Object pre(Map<?, ?> input) {
 			return input.size() == 0;
-		}
-
-		public Object post(Map<?, ?> input) {
-			return input.isEmpty();
 		}
 	}
 
@@ -61,13 +49,14 @@ public class UseIsEmptyOnCollectionsCases extends AJavaparserRefactorerCases {
 	}
 
 	// TODO
+	@UnmodifiedMethod
 	// @CompareMethods
-	public static class CaseCollection_NotEmpty {
-		public Object pre(Collection<?> input) {
-			return input.size() != 0;
+	public static class CaseString_NotEmpty {
+		public Object pre(String input) {
+			return input.length() != 0;
 		}
 
-		public Object post(Collection<?> input) {
+		public Object post(String input) {
 			return !input.isEmpty();
 		}
 	}

@@ -38,8 +38,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseIsEmptyOnCollections extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseIsEmptyOnCollections.class);
+public class UseStringIsEmpty extends AJavaparserMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(UseStringIsEmpty.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
 
@@ -50,25 +50,14 @@ public class UseIsEmptyOnCollections extends AJavaparserMutator {
 
 	@Override
 	public String minimalJavaVersion() {
-		// java.util.Collection.isEmpty() exists since 1.2
 		// java.lang.String.isEmpty() exists since 1.6
 		return IJdkVersionConstants.JDK_6;
 	}
 
 	@Override
-	public String pmdUrl() {
-		// https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/bestpractices/UseCollectionIsEmptyRule.java
-		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty";
-	}
-
-	@Override
-	public Optional<String> getPmdId() {
-		return Optional.of("UseCollectionIsEmpty");
-	}
-
-	@Override
-	public Optional<String> getSonarId() {
-		return Optional.of("RSPEC-1155");
+	public Optional<String> getCleanthatId() {
+		// Naming similar to UseCollectionIsEmpty
+		return Optional.of("UseStringIsEmpty");
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
@@ -101,12 +90,10 @@ public class UseIsEmptyOnCollections extends AJavaparserMutator {
 			return false;
 		}
 
-		// Check the called method is .size() or .length()
+		// Check the called method is .length()
 		var calledMethodName = checkmeForIsEmpty.get().getNameAsString();
-		if (!"size".equals(calledMethodName)// For Collection.size()
-				&& !"length".equals(calledMethodName) // For String.length()
-		) {
-			LOGGER.debug("Not calling .size() nor .length()");
+		if (!"length".equals(calledMethodName)) {
+			LOGGER.debug("Not calling `.length()`");
 			return false;
 		}
 		var lengthScope = optLengthScope.get();
@@ -128,20 +115,17 @@ public class UseIsEmptyOnCollections extends AJavaparserMutator {
 			LOGGER.debug("scope={} type={}", lengthScope, type);
 			var doIt = false;
 			var referenceType = type.asReferenceType();
-			if (referenceType.getQualifiedName().equals(Collection.class.getName())
-					|| referenceType.getQualifiedName().equals(Map.class.getName())
-					|| referenceType.getQualifiedName().equals(String.class.getName())) {
+			if (referenceType.getQualifiedName().equals(String.class.getName())) {
 				doIt = true;
 			} else {
 				// Try to load the Class to check if it is a matching sub-type
 				try {
 					Class<?> clazz = Class.forName(referenceType.getQualifiedName());
-					if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-							|| String.class.isAssignableFrom(clazz)) {
+					if (String.class.isAssignableFrom(clazz)) {
 						doIt = true;
 					}
 				} catch (RuntimeException | ClassNotFoundException e) {
-					LOGGER.debug("This class is not available. Can not confirm it is a Colletion/Map/String");
+					LOGGER.debug("This class is not available. Can not confirm it is a String");
 				}
 			}
 			if (doIt) {

@@ -70,11 +70,11 @@ public class ObjectsHashCodePrimitive extends AJavaparserExprMutator {
 		Optional<Expression> optScope = methodCall.getScope();
 
 		if (optScope.isEmpty() || !optScope.get().isNameExpr()
-				|| !optScope.get().asNameExpr().getNameAsString().equals("Objects")) {
+				|| !"Objects".equals(optScope.get().asNameExpr().getNameAsString())) {
 			return false;
 		}
 
-		Expression left = methodCall.getArgument(0);
+		var left = methodCall.getArgument(0);
 
 		Optional<Entry<Class<?>, Class<?>>> optClass = PRIMITIVE_CLASSES.entrySet()
 				.stream()
@@ -82,7 +82,7 @@ public class ObjectsHashCodePrimitive extends AJavaparserExprMutator {
 				.findAny();
 		if (optClass.isPresent()) {
 			// Beware, there may already a custom `Integer` class in imports conflicting with `java.lang.Integer`
-			MethodCallExpr replacement = new MethodCallExpr(new NameExpr(optClass.get().getValue().getSimpleName()),
+			var replacement = new MethodCallExpr(new NameExpr(optClass.get().getValue().getSimpleName()),
 					"hashCode",
 					new NodeList<>(left));
 			return tryReplace(expr, replacement);

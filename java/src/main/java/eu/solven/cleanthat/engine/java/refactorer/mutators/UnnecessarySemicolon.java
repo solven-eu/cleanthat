@@ -55,7 +55,7 @@ public class UnnecessarySemicolon extends AJavaparserMutator {
 	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (node instanceof Statement) {
-			Statement stmt = (Statement) node;
+			var stmt = (Statement) node;
 			return processNotRecursively(stmt);
 		}
 

@@ -64,17 +64,17 @@ public class ObjectEqualsForPrimitives extends AJavaparserExprMutator {
 		Optional<Expression> optScope = methodCall.getScope();
 
 		if (optScope.isEmpty() || !optScope.get().isNameExpr()
-				|| !optScope.get().asNameExpr().getNameAsString().equals("Objects")) {
+				|| !"Objects".equals(optScope.get().asNameExpr().getNameAsString())) {
 			return false;
 		}
 
-		Expression left = methodCall.getArgument(0);
-		Expression right = methodCall.getArgument(1);
+		var left = methodCall.getArgument(0);
+		var right = methodCall.getArgument(1);
 
 		if (PRIMITIVE_CLASSES.stream()
 				.anyMatch(c -> scopeHasRequiredType(Optional.of(left), c)
 						&& scopeHasRequiredType(Optional.of(right), c))) {
-			BinaryExpr replacement = new BinaryExpr(left, right, Operator.EQUALS);
+			var replacement = new BinaryExpr(left, right, Operator.EQUALS);
 			return tryReplace(expr, replacement);
 		} else {
 			return false;

@@ -107,7 +107,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 		}
 
 		var ifAssignExpr = optIfAssignExpr.get();
-		if (ifAssignExpr.getOperator() != AssignExpr.Operator.ASSIGN || !ifAssignExpr.getTarget().isNameExpr()
+		if (isAssignOperator(ifAssignExpr) || !ifAssignExpr.getTarget().isNameExpr()
 				|| !ifAssignExpr.getTarget().asNameExpr().getNameAsString().equals(singleVariable.getNameAsString())) {
 			return false;
 		} else if (!ifAssignExpr.getValue().isBooleanLiteralExpr()) {
@@ -133,6 +133,12 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 			}
 		}
 		return false;
+	}
+
+	// False-positive from PMD
+	@SuppressWarnings("PMD.CompareObjectsWithEquals")
+	private boolean isAssignOperator(AssignExpr ifAssignExpr) {
+		return ifAssignExpr.getOperator() != AssignExpr.Operator.ASSIGN;
 	}
 
 	private Optional<AssignExpr> searchSingleAssignExpr(Statement thenStmt) {

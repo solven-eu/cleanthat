@@ -44,9 +44,9 @@ public abstract class AGithubSha1CodeProviderWriter extends AGithubSha1CodeProvi
 	protected abstract GHRef getAsGHRef();
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		GithubRefWriterLogic githubRefWriterLogic = new GithubRefWriterLogic(eventKey, repo, getAsGHRef(), getSha1());
-		githubRefWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
+		return githubRefWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.inmemory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
@@ -27,6 +28,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -141,18 +143,32 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+		Charset charset = StandardCharsets.UTF_8;
+
+		AtomicBoolean hasWritten = new AtomicBoolean();
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			var resolved = resolvePath(inMemoryPath);
 			try {
 				Files.createDirectories(resolved.getParent());
 
+				if (Files.exists(resolved)) {
+					String existingContent = Files.readString(resolved, charset);
+
+					if (existingContent.equals(content)) {
+						LOGGER.info("We skip writing content as same content already present: {}", resolved);
+						return;
+					}
+				}
+
 				LOGGER.info("Write file: {}", resolved);
-				Files.write(resolved, content.getBytes(StandardCharsets.UTF_8));
+				Files.write(resolved, content.getBytes(charset));
+				hasWritten.set(true);
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue on: " + inMemoryPath + " (resolved into " + resolved + ")", e);
 			}
 		});
+		return hasWritten.get();
 	}
 
 	@Override

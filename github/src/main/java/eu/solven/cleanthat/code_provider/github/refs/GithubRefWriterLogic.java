@@ -75,14 +75,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
-		commitIntoRef(pathToMutatedContent, codeWritingMetadata.getComments());
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+		return commitIntoRef(pathToMutatedContent, codeWritingMetadata.getComments());
 	}
 
-	protected void commitIntoRef(Map<Path, String> pathToMutatedContent, List<String> prComments) {
+	protected boolean commitIntoRef(Map<Path, String> pathToMutatedContent, List<String> prComments) {
 		if (pathToMutatedContent.isEmpty()) {
 			LOGGER.info("There is not a single path to write");
-			return;
+			return false;
 		}
 
 		String repoName = repo.getFullName();
@@ -116,17 +116,17 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 
 		if (pathToCommitableContent.isEmpty()) {
 			LOGGER.warn("Due to ref update, there is not a single file to commit");
-			return;
+			return false;
 		}
 
 		try {
-			doCommitContent(prComments, repoName, refName, refTargetSha, pathToCommitableContent);
+			return doCommitContent(prComments, repoName, refName, refTargetSha, pathToCommitableContent);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	private void doCommitContent(List<String> prComments,
+	private boolean doCommitContent(List<String> prComments,
 			String repoName,
 			String refName,
 			String refTargetSha,
@@ -157,6 +157,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		try {
 			// https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#update-a-reference
 			target.updateTo(newHead);
+			return true;
 		} catch (IOException e) {
 			throw new UncheckedIOException("The ref has been updated in the meantime?", e);
 		}

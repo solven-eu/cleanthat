@@ -192,8 +192,8 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 			} else {
 				ICodeWritingMetadata metadata =
 						new CodeWritingMetadata(prComments, repoProperties.getMeta().getLabels());
-				codeWriter.persistChanges(pathToMutatedContent, metadata);
-				isEmpty = false;
+				
+				isEmpty = codeWriter.persistChanges(pathToMutatedContent, metadata);
 			}
 		}
 

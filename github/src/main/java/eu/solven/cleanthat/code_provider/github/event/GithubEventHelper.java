@@ -92,7 +92,9 @@ public class GithubEventHelper {
 						tryRemoveTmpRef(facade, lazyRefCreated, ref);
 					});
 				} else {
-					LOGGER.info("Clean is done but and some files are impacted: We open a PR if none already exists");
+					LOGGER.info(
+							"Clean is done but and some files are impacted: We open a PR if none already exists ({})",
+							result.getDetails());
 					doOpenPr(relevancyResult, facade, lazyRefCreated);
 				}
 			}

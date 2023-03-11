@@ -76,8 +76,8 @@ public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
-		writerLogicSupplier.get().persistChanges(pathToMutatedContent, metadata);
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
+		return writerLogicSupplier.get().persistChanges(pathToMutatedContent, metadata);
 	}
 
 	@Override

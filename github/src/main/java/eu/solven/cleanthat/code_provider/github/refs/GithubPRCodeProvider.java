@@ -98,7 +98,7 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		GHRepository repo = pr.getRepository();
 		var fullRefName = getRef();
 
@@ -109,7 +109,7 @@ public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 			throw new UncheckedIOException("Issue fetching refName=" + fullRefName, e);
 		}
 		GithubRefWriterLogic refWriterLogic = new GithubRefWriterLogic(eventKey, repo, ref, getSha1());
-		refWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
+		return refWriterLogic.persistChanges(pathToMutatedContent, codeWritingMetadata);
 	}
 
 	@Override

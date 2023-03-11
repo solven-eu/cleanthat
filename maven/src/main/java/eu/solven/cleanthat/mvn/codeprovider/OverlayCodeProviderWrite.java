@@ -91,13 +91,13 @@ public class OverlayCodeProviderWrite implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
 		SetView<Path> conflicts = Sets.intersection(pathToOverlay.keySet(), pathToMutatedContent.keySet());
 		if (!conflicts.isEmpty()) {
 			throw new IllegalArgumentException("Can not write into: " + conflicts);
 		}
 
-		underlying.persistChanges(pathToMutatedContent, codeWritingMetadata);
+		return underlying.persistChanges(pathToMutatedContent, codeWritingMetadata);
 	}
 
 	@Override

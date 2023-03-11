@@ -25,6 +25,13 @@ import java.util.Map;
  */
 public interface ICodeProviderWriterLogic {
 
-	void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata);
+	/**
+	 * 
+	 * @param pathToMutatedContent.
+	 *            Some files may not be commited (e.g. same content already present, branch has diverged)
+	 * @param metadata
+	 * @return true if some commit has been pushed
+	 */
+	boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata);
 
 }

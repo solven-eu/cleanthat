@@ -26,13 +26,13 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.GuavaInlineStringsRepeatCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestGuavaInlineStringsRepeastCases extends AParameterizesJavaparserRefactorerCases {
+public class TestGuavaInlineStringsRepeatCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
 		return new GuavaInlineStringsRepeatCases();
 	}
 
-	public TestGuavaInlineStringsRepeastCases(JavaParser javaParser,
+	public TestGuavaInlineStringsRepeatCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

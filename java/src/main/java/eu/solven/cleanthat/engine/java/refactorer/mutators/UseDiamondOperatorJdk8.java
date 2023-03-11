@@ -48,7 +48,7 @@ public class UseDiamondOperatorJdk8 extends ATodoJavaParserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/diamond-operator.html";
 	}
 

@@ -68,6 +68,9 @@ public class TestAWebhooksLambdaFunction {
 		Map<String, ?> firstEvent = (Map<String, ?>) events.get(0);
 		var inputEvent = (IWebhookEvent) firstEvent.get("input");
 		Assertions.assertThat(inputEvent).isInstanceOf(GithubWebhookEvent.class);
+
+		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(inputEvent);
+		Assertions.assertThat(githubEvent.getxGithubDelivery()).startsWith("random-");
 	}
 
 	@Test
@@ -84,5 +87,29 @@ public class TestAWebhooksLambdaFunction {
 		Map<String, ?> firstEvent = (Map<String, ?>) events.get(0);
 		var inputEvent = (IWebhookEvent) firstEvent.get("input");
 		Assertions.assertThat(inputEvent).isInstanceOf(CleanThatWebhookEvent.class);
+
+		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(inputEvent);
+		Assertions.assertThat(githubEvent.getxGithubDelivery()).startsWith("random-");
+	}
+
+	@Test
+	public void testOnDynamoDbEvent_v2withoutGithubIntermediateKey()
+			throws JsonParseException, JsonMappingException, IOException {
+		Map<String, ?> rawEvent = objectMapper.readValue(
+				new ClassPathResource("/examples/lambda/dynamodb_event_v2.json").getInputStream(),
+				Map.class);
+
+		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(rawEvent);
+
+		Assertions.assertThat(output).hasSize(1);
+		List<?> events = (List<?>) output.get("sqs");
+		Assertions.assertThat(events).hasSize(1);
+
+		Map<String, ?> firstEvent = (Map<String, ?>) events.get(0);
+		var inputEvent = (IWebhookEvent) firstEvent.get("input");
+		Assertions.assertThat(inputEvent).isInstanceOf(CleanThatWebhookEvent.class);
+
+		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(inputEvent);
+		Assertions.assertThat(githubEvent.getxGithubDelivery()).startsWith("random-");
 	}
 }

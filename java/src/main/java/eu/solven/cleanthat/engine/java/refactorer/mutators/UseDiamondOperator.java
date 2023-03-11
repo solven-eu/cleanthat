@@ -59,7 +59,7 @@ public class UseDiamondOperator extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/diamond-operator.html";
 	}
 

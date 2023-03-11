@@ -15,8 +15,12 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.AnnotationDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
@@ -40,14 +44,43 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
 	@Override
 	protected String astToString(Node node) {
-		return LexicalPreservingPrinter.print(node);
-		// return post.toString();
+		return nodeToStringCheckingLexicalPreservation(node);
 	}
 
 	@Override
 	protected String resultToString(Node node) {
-		return LexicalPreservingPrinter.print(node);
-		// return post.toString();
+		return nodeToStringCheckingLexicalPreservation(node);
+	}
+
+	public static String nodeToStringCheckingLexicalPreservation(Node node) {
+		// Many issues are specific to LexicalPreservingPrinter.setup
+		// https://github.com/javaparser/javaparser/issues/3898
+		// https://github.com/javaparser/javaparser/issues/3924
+		var preservedToString = LexicalPreservingPrinter.print(node);
+
+		var javaParser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
+		ParseResult<? extends Node> parsedAgain;
+
+		if (node instanceof CompilationUnit) {
+			parsedAgain = javaParser.parse(preservedToString);
+		} else if (node instanceof ClassOrInterfaceDeclaration) {
+			// TODO Open a JavaParser issue for this
+			// parsedAgain = javaParser.parseClassOrInterfaceType(preservedToString);
+			return preservedToString;
+		} else if (node instanceof AnnotationDeclaration) {
+			// TODO Open a JavaParser issue for this
+			// parsedAgain = javaParser.parseAnnotation(preservedToString);
+			return preservedToString;
+		} else if (node instanceof MethodDeclaration) {
+			parsedAgain = javaParser.parseMethodDeclaration(preservedToString);
+		} else {
+			throw new UnsupportedOperationException("Not managed: " + node.getClass().getSimpleName());
+		}
+
+		Node reparsedNode = ATestCases.throwIfProblems(parsedAgain);
+
+		// Return prettyPrinter result for resilient comparison
+		return reparsedNode.toString();
 	}
 
 	protected CompilationUnit parseCompilationUnit(IMutator mutator, String asString) {

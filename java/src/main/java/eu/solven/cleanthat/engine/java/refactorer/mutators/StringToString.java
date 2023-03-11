@@ -52,6 +52,16 @@ public class StringToString extends AJavaparserMutator {
 		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#stringtostring";
 	}
 
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("RemoveToStringOnString");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/remove-to-string-on-string.html";
+	}
+
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

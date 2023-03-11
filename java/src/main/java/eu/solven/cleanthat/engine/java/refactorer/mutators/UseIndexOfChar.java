@@ -65,7 +65,7 @@ public class UseIndexOfChar extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/use-is-empty-on-collections.html";
 	}
 

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
+import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.pepper.resource.PepperResourceHelper;
 
 /**
@@ -50,7 +51,7 @@ public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 	}
 
 	@Override
-	public RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivate) {
+	public RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivate, String eventKey) {
 		var defaultRepoPropertiesPath = ICleanthatConfigConstants.DEFAULT_PATH_CLEANTHAT;
 
 		// Let's follow Renovate and its configuration PR
@@ -58,6 +59,9 @@ public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 		var body = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/onboarding-body.md");
 		// body = body.replaceAll(Pattern.quote("${REPO_FULL_NAME}"), repo.getFullName());
 		body = body.replaceAll(Pattern.quote("${DEFAULT_PATH}"), defaultRepoPropertiesPath);
+
+		body = body.replaceAll(Pattern.quote("${EVENT_SOURCE}"), I3rdPartyWebhookEvent.X_GIT_HUB_DELIVERY);
+		body = body.replaceAll(Pattern.quote("${EVENT_ID}"), eventKey);
 
 		if (!isPrivate) {
 			body += "\r\n" + "---" + "\r\n" + "@blacelle please look at me";

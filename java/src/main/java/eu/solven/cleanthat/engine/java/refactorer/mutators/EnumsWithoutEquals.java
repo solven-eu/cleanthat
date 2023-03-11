@@ -50,7 +50,7 @@ public class EnumsWithoutEquals extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/enums-without-equals.html";
 	}
 

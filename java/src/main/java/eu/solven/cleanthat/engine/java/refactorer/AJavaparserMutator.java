@@ -40,7 +40,6 @@ import com.google.common.annotations.VisibleForTesting;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorExternalReferences;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -49,7 +48,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public abstract class AJavaparserMutator implements IJavaparserMutator, IMutatorExternalReferences {
+public abstract class AJavaparserMutator implements IJavaparserMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaparserMutator.class);
 
 	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
@@ -132,10 +131,17 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, IMutator
 		}
 	}
 
-	public boolean tryReplace(Node node, Node replacement) {
+	protected boolean tryReplace(Node node, Node replacement) {
 		LOGGER.info("Turning `{}` into `{}`", node, replacement);
 
 		return node.replace(replacement);
+	}
+
+	protected boolean tryRemove(Node node) {
+		var nodeParentAsString = node.getParentNode().map(n -> n.getClass().getSimpleName()).orElse("-");
+		LOGGER.info("Removing `{}` from a {}", node, nodeParentAsString);
+
+		return node.remove();
 	}
 
 	protected Optional<Node> replaceNode(Node node) {

@@ -346,7 +346,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				LOGGER.debug("About to consider creating a default configuration for {} (as default branch)",
 						pushedRef);
 				// Open PR with default relevant configuration
-				boolean initialized = cleaner.tryOpenPRWithCleanThatStandardConfiguration(root,
+				boolean initialized = cleaner.tryOpenPRWithCleanThatStandardConfiguration(eventKey,
+						root,
 						GithubDecoratorHelper.decorate(defaultBranch));
 
 				if (initialized) {

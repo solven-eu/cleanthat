@@ -67,7 +67,12 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public Optional<String> getJSparrowId() {
+		return Optional.of("LambdaToMethodReference");
+	}
+
+	@Override
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/lambda-to-method-reference.html#code-changes";
 	}
 

@@ -24,6 +24,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 
 @RunWith(Parameterized.class)
@@ -47,13 +48,11 @@ public abstract class AParameterizesJavaparserRefactorerCases extends AParameter
 
 	@Override
 	protected String astToString(Node node) {
-		return LexicalPreservingPrinter.print(node);
-		// return node.toString();
+		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
 	}
 
 	@Override
 	protected String resultToString(Node node) {
-		return LexicalPreservingPrinter.print(node);
-		// return node.toString();
+		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
 	}
 }

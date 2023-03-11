@@ -1,0 +1,146 @@
+/*
+ * Copyright 2023 Benoit Lacelle - SOLVEN
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package eu.solven.cleanthat.engine.java.refactorer.mutators;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LambdaExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.expr.UnaryExpr.Operator;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.UnknownType;
+
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+
+/**
+ * See EnhancedForLoopToStreamAnyMatchCases
+ *
+ * @author Benoit Lacelle
+ */
+public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(EnhancedForLoopToStreamAnyMatch.class);
+
+	static final String ANY_MATCH = "anyMatch";
+
+	@Override
+	public String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_8;
+	}
+
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("EnhancedForLoopToStreamAnyMatch");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html";
+	}
+
+	@Override
+	protected boolean processNotRecursively(Statement stmt) {
+		if (!stmt.isForEachStmt()) {
+			return false;
+		}
+
+		var forEachStmt = stmt.asForEachStmt();
+
+		if (!forEachStmt.getBody().isBlockStmt() || forEachStmt.getBody().asBlockStmt().getStatements().size() != 1) {
+			return false;
+		}
+		var singleStatement = forEachStmt.getBody().asBlockStmt().getStatement(0);
+		if (!singleStatement.isIfStmt() || singleStatement.asIfStmt().getElseStmt().isPresent()) {
+			return false;
+		}
+
+		var ifStmt = singleStatement.asIfStmt();
+		var thenStmt = ifStmt.getThenStmt();
+		if (!thenStmt.isBlockStmt()) {
+			return false;
+		}
+
+		var thenAsBlockStmt = thenStmt.asBlockStmt();
+		if (thenAsBlockStmt.getStatements().isEmpty()) {
+			return false;
+		}
+
+		var lastStmt = thenAsBlockStmt.getStatement(thenAsBlockStmt.getStatements().size() - 1);
+
+		// var thenFirst = thenAsBlockStmt.getStatement(0);
+
+		if (lastStmt.isReturnStmt()) {
+			return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+		} else if (lastStmt.isBreakStmt()) {
+			boolean breakIsRemoved = tryRemove(lastStmt);
+			// NodeList<Statement> newThenStmts = new NodeList<>(thenAsBlockStmt.getStatements());
+			// newThenStmts.removeLast();
+			// BlockStmt newThen = new BlockStmt(newThenStmts);
+
+			if (!breakIsRemoved) {
+				LOGGER.warn("Issue removing the last `break` from `{}`", thenAsBlockStmt);
+				return false;
+			}
+
+			return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+		} else {
+			return false;
+		}
+	}
+
+	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {
+		Expression withStream = new MethodCallExpr(forEachStmt.getIterable(), "stream");
+		var variable = forEachStmt.getVariable().getVariables().get(0);
+		// No need for variable.getType()
+		var parameter = new Parameter(new UnknownType(), variable.getName());
+
+		var condition = ifStmt.getCondition();
+
+		String streamMethod;
+
+		// TODO Unclear when we want to swap `anyMatch` by `!allMatch`
+		boolean logicalComplement;
+		// if (condition.isUnaryExpr() && condition.asUnaryExpr().getOperator() == Operator.LOGICAL_COMPLEMENT) {
+		// streamMethod = "noneMatch";
+		// condition = condition.asUnaryExpr().getExpression();
+		// logicalComplement = true;
+		// } else {
+		streamMethod = ANY_MATCH;
+		logicalComplement = false;
+		// }
+
+		var lambdaExpr = new LambdaExpr(parameter, condition);
+		Expression withStream2 = new MethodCallExpr(withStream, streamMethod, new NodeList<>(lambdaExpr));
+
+		if (logicalComplement) {
+			withStream2 = new UnaryExpr(withStream2, Operator.LOGICAL_COMPLEMENT);
+		}
+
+		var newif = new IfStmt(withStream2, thenAsBlockStmt, null);
+
+		return tryReplace(forEachStmt, newif);
+	}
+}

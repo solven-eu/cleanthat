@@ -18,31 +18,17 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.IntegerLiteralExpr;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.resolution.types.ResolvedType;
+import java.util.Set;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
- * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
+ * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection} and {@link Map}.
  *
  * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public class UseCollectionIsEmpty extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseCollectionIsEmpty.class);
-
-	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
-
+public class UseCollectionIsEmpty extends AUseXIsEmpty {
 	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
@@ -70,84 +56,24 @@ public class UseCollectionIsEmpty extends AJavaparserMutator {
 		return Optional.of("RSPEC-1155");
 	}
 
-	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof BinaryExpr)) {
-			return false;
-		}
-		var binaryExpr = (BinaryExpr) node;
-		if (!BinaryExpr.Operator.EQUALS.equals(binaryExpr.getOperator())) {
-			// We search for 'x == 0' or '0 == x'
-			return false;
-		}
-
-		Optional<MethodCallExpr> checkmeForIsEmpty;
-		if (ZERO_EXPR.equals(binaryExpr.getRight()) && binaryExpr.getLeft() instanceof MethodCallExpr) {
-			// xxx.method() == 0
-			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getLeft());
-		} else if (ZERO_EXPR.equals(binaryExpr.getLeft()) && binaryExpr.getRight() instanceof MethodCallExpr) {
-			// 0 == xxx.method()
-			checkmeForIsEmpty = Optional.of((MethodCallExpr) binaryExpr.getRight());
-		} else {
-			checkmeForIsEmpty = Optional.empty();
-		}
-		if (checkmeForIsEmpty.isEmpty()) {
-			return false;
-		}
-		Optional<Expression> optLengthScope = checkmeForIsEmpty.get().getScope();
-		if (optLengthScope.isEmpty()) {
-			return false;
-		}
-
-		// Check the called method is .size()
-		var calledMethodName = checkmeForIsEmpty.get().getNameAsString();
-		if (!"size".equals(calledMethodName)) {
-			LOGGER.debug("Not calling .size() nor .length()");
-			return false;
-		}
-		var lengthScope = optLengthScope.get();
-		Optional<ResolvedType> type = optResolvedType(lengthScope);
-
-		if (type.isPresent()) {
-			var localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
-			if (localTransformed) {
-				return true;
-			}
-		}
-
-		return false;
+	public Optional<String> getJSparrowId() {
+		return Optional.of("UseIsEmptyOnCollections");
 	}
 
-	private boolean checkTypeAndProcess(Node node, Expression lengthScope, ResolvedType type) {
-		boolean transformed;
-		if (type.isReferenceType()) {
-			LOGGER.debug("scope={} type={}", lengthScope, type);
-			var doIt = false;
-			var referenceType = type.asReferenceType();
-			if (referenceType.getQualifiedName().equals(Collection.class.getName())
-					|| referenceType.getQualifiedName().equals(Map.class.getName())) {
-				doIt = true;
-			} else {
-				// Try to load the Class to check if it is a matching sub-type
-				try {
-					Class<?> clazz = Class.forName(referenceType.getQualifiedName());
-					if (Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-						doIt = true;
-					}
-				} catch (RuntimeException | ClassNotFoundException e) {
-					LOGGER.debug("This class is not available. Can not confirm it is a Collection/Map");
-				}
-			}
-			if (doIt) {
-				// replace 'x.size() == 0' with 'x.isEmpty()'
-				transformed = node.replace(new MethodCallExpr(lengthScope, "isEmpty"));
-			} else {
-				transformed = false;
-			}
-		} else {
-			transformed = false;
-		}
-		return transformed;
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/use-is-empty-on-collections.html";
 	}
+
+	@Override
+	protected String getSizeMethod() {
+		return "size";
+	}
+
+	@Override
+	protected Set<Class<?>> getCompatibleTypes() {
+		return Set.of(Collection.class, Map.class);
+	}
+
 }

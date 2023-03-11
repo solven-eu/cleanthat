@@ -22,5 +22,7 @@ package eu.solven.cleanthat.lambda.step0_checkwebhook;
  *
  */
 public interface I3rdPartyWebhookEvent extends IWebhookEvent {
+	// https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#delivery-headers
+	String X_GIT_HUB_DELIVERY = "X-GitHub-Delivery";
 
 }

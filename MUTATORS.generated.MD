@@ -68,6 +68,15 @@ Sonar: RSPEC-2333
 
 Require sourceJdk: 1
 
+### [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)
+
+
+PMD: UseCollectionIsEmpty
+
+Sonar: RSPEC-1155
+
+Require sourceJdk: 1.2
+
 ### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
 
 
@@ -77,12 +86,8 @@ Sonar: RSPEC-1155
 
 Require sourceJdk: 1
 
-### [UseIsEmptyOnCollections](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIsEmptyOnCollections.java)
+### [UseStringIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseStringIsEmpty.java)
 
-
-PMD: UseCollectionIsEmpty
-
-Sonar: RSPEC-1155
 
 Require sourceJdk: 1.6
 
@@ -134,12 +139,26 @@ isDraft
 
 Require sourceJdk: 1
 
+### [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
 
 isDraft
 
 Require sourceJdk: 1.5
+
+### [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
+
+
+isDraft
+
+Require sourceJdk: 11
 
 ### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
 
@@ -151,7 +170,7 @@ Require sourceJdk: 1.8
 ### [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
 
 
-Sonar: S1612
+Sonar: RSPEC-1612
 
 isDraft
 
@@ -160,7 +179,7 @@ Require sourceJdk: 1.8
 ### [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 
 
-Sonar: S1602
+Sonar: RSPEC-1602
 
 isDraft
 
@@ -175,6 +194,20 @@ isDraft
 
 Require sourceJdk: 10
 
+### [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
+
+
+isDraft
+
+Require sourceJdk: 1
+
+### [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
 ### [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 
 
@@ -183,6 +216,13 @@ PMD: PrimitiveWrapperInstantiation
 isDraft
 
 Require sourceJdk: 1.5
+
+### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
+
+
+isDraft
+
+Require sourceJdk: 1
 
 ### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
 
@@ -217,6 +257,13 @@ CheckStyle: UnusedImports
 isDraft
 
 Require sourceJdk: 1
+
+### [UnnecessaryLambdaEnclosingParameters](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryLambdaEnclosingParameters.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
 
 ### [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
 
@@ -284,6 +331,24 @@ Require sourceJdk: 1
 
 ### [CompositeWalkingMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeWalkingMutator.java)
 
+
+isDraft
+
+Require sourceJdk: 1
+
+### [ErrorProneMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/ErrorProneMutators.java)
+
+
+PMD: [ErrorProne]()
+
+isDraft
+
+Require sourceJdk: 1
+
+### [JSparrowMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/JSparrowMutators.java)
+
+
+PMD: [jSparrow]()
 
 isDraft
 

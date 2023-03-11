@@ -31,12 +31,12 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
-import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.engine.java.refactorer.INoOpMutator;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
@@ -62,6 +62,7 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @param <N>
  * @param <R>
  */
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public abstract class ATestCases<N, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
@@ -134,7 +135,6 @@ public abstract class ATestCases<N, R> {
 	protected void doCheckUnmodifiedNode(IWalkingMutator<N, R> transformer,
 			ClassOrInterfaceDeclaration oneCase,
 			Node pre) {
-		// LexicalPreservingPrinter.setup(pre);
 		var preAsAst = convertToAst(pre);
 		var preAsString = astToString(preAsAst);
 
@@ -200,7 +200,14 @@ public abstract class ATestCases<N, R> {
 				// Rename the method before checking full equality
 				// method are lowerCase while classes are camel case
 				if (pre instanceof NodeWithSimpleName<?> && post instanceof NodeWithSimpleName<?>) {
-					((NodeWithSimpleName<?>) pre).setName(((NodeWithSimpleName<?>) post).getName());
+					var newName = ((NodeWithSimpleName<?>) post).getName();
+					((NodeWithSimpleName<?>) pre).setName(newName);
+
+					if (pre instanceof ClassOrInterfaceDeclaration) {
+						pre.findAll(ConstructorDeclaration.class).forEach(cd -> {
+							cd.setName(newName);
+						});
+					}
 				}
 
 				// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
@@ -214,8 +221,7 @@ public abstract class ATestCases<N, R> {
 						+ ". The whole testcase is: "
 						+ oneCase;
 				var actualPost = resultToString(optResult.get());
-				// LexicalPreservingPrinter may indent with 4 whitespaces
-				Assert.assertEquals(msg, sanitizeTestedSource(expectedPost), sanitizeTestedSource(actualPost));
+				Assert.assertEquals(msg, expectedPost, actualPost);
 
 				if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
 					// https://github.com/javaparser/javaparser/pull/2320
@@ -229,7 +235,7 @@ public abstract class ATestCases<N, R> {
 				} else if (expectedPost.contains("java.util.stream.Stream")) {
 					// see ArraysDotStream
 					// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
-					LOGGER.warn("We skip javaParser Node equality due to `packagedname` (NameExpr vs FieldAccessExp)");
+					LOGGER.warn("We skip javaParser Node equality due to `packagedName` (NameExpr vs FieldAccessExp)");
 				} else {
 					// Some cases leads to failure here: nodes are different while they have the same .toString
 					// A Visitor similar to EqualsVisiyot, but returning the first different node would be helpful
@@ -247,13 +253,6 @@ public abstract class ATestCases<N, R> {
 			Assert.assertEquals("After not mutated", postBeforeWalk, post);
 		}
 	}
-
-	@SuppressWarnings("checkstyle:MagicNumber")
-	private String sanitizeTestedSource(String expectedPost) {
-		return expectedPost.replace(Strings.repeat(" ", 4), "\t");
-	}
-
-	// protected abstract <T extends Node> String toString(T post);
 
 	protected abstract String astToString(N asAst);
 
@@ -422,7 +421,7 @@ public abstract class ATestCases<N, R> {
 		doCheckUnmodifiedNode(transformer, testCase, pre.getClassByName("SomeClass").get());
 	}
 
-	public static CompilationUnit throwIfProblems(ParseResult<CompilationUnit> parse) {
+	public static <T> T throwIfProblems(ParseResult<T> parse) {
 		if (!parse.isSuccessful()) {
 			throw new IllegalArgumentException("Issue parsing the input: " + parse.getProblems());
 		}

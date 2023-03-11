@@ -15,6 +15,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `GuavaInlineStringsRepeat` is introduced, and added in `ErrorProneMutators`
 * `ObjectEqualsForPrimitives` is introduced
 * `ObjectsHashCodePrimitive` is introduced
+* `EnhancedForLoopToStreamAnyMatch` is introduced
 
 ## [2.10] - 2023-03-09
 ### Fixed

@@ -35,7 +35,7 @@ public class TestCleanthatConfigInitializer {
 		IEngineLintFixerFactory factory = Mockito.mock(IEngineLintFixerFactory.class);
 		var initializer = new CleanthatConfigInitializer(ConfigHelpers.makeYamlObjectMapper(), Arrays.asList(factory));
 
-		var result = initializer.prepareFile(codeProvider, false);
+		var result = initializer.prepareFile(codeProvider, false, "someEventKey");
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");

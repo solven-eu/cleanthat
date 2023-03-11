@@ -129,7 +129,7 @@ public class SaveToDynamoDb {
 	}
 
 	private static String randomEventKey(IWebhookEvent input) {
-		String randomEventKey = "random-" + UUID.randomUUID();
+		String randomEventKey = generateRandomxGithubDelivery();
 
 		// This may happen on step0, as we lack a real xGithubDelivery (due to SQS not
 		// transmitting
@@ -144,5 +144,9 @@ public class SaveToDynamoDb {
 				input.getBody());
 
 		return randomEventKey;
+	}
+
+	public static String generateRandomxGithubDelivery() {
+		return "random-" + UUID.randomUUID();
 	}
 }

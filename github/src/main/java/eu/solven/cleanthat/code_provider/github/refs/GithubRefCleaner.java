@@ -437,7 +437,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	}
 
 	@Override
-	public boolean tryOpenPRWithCleanThatStandardConfiguration(Path root, IGitBranch branch) {
+	public boolean tryOpenPRWithCleanThatStandardConfiguration(String eventKey, Path root, IGitBranch branch) {
 		GHBranch defaultBranch = branch.getDecorated();
 		GHRepository repo = defaultBranch.getOwner();
 
@@ -460,7 +460,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		}
 
 		var headRef = REF_NAME_CONFIGURE;
-		Optional<GHRef> optRefToPR = optRef(repo, headRef);
+		Optional<GHRef> optRefToPR = Optional.empty();// optRef(repo, headRef);
 		try {
 			if (optRefToPR.isPresent()) {
 				GHRef refToPr = optRefToPR.get();
@@ -473,7 +473,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 				});
 				return false;
 			} else {
-				RepoInitializerResult result = generateDefaultConfiguration(codeProvider, repo.isPrivate());
+				RepoInitializerResult result = generateDefaultConfiguration(codeProvider, repo.isPrivate(), eventKey);
 
 				GHCommit commit = commitConfig(defaultBranch, repo, result);
 				GHRef refToPr = repo.createRef(headRef, commit.getSHA1());

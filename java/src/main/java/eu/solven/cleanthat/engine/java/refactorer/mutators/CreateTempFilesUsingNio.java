@@ -60,7 +60,7 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/create-temp-files-using-java-nio.html";
 	}
 

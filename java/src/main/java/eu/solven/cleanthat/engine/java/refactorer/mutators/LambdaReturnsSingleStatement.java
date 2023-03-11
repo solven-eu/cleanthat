@@ -60,6 +60,16 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 		return Optional.of("RSPEC-1602");
 	}
 
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("StatementLambdaToExpression");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/statement-lambda-to-expression.html";
+	}
+
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

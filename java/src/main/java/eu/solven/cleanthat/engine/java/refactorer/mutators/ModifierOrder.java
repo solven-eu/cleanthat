@@ -79,7 +79,12 @@ public class ModifierOrder extends AJavaparserMutator {
 	}
 
 	@Override
-	public String jsparrowUrl() {
+	public Optional<String> getJSparrowId() {
+		return Optional.of("ReorderModifiers");
+	}
+
+	@Override
+	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/reorder-modifiers.html";
 	}
 

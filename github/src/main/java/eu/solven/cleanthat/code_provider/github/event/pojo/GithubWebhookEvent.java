@@ -18,6 +18,9 @@ package eu.solven.cleanthat.code_provider.github.event.pojo;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
@@ -31,7 +34,7 @@ import eu.solven.pepper.collection.PepperMapHelper;
  *
  */
 public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
-	public static final String X_GIT_HUB_DELIVERY = "X-GitHub-Delivery";
+	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookEvent.class);
 
 	public static final String KEY_BODY = "body";
 	public static final String KEY_HEADERS = "headers";
@@ -100,8 +103,17 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 		if (githubAcceptedEvent instanceof GithubWebhookEvent) {
 			return (GithubWebhookEvent) githubAcceptedEvent;
 		} else if (githubAcceptedEvent instanceof CleanThatWebhookEvent) {
-			// Map<String, ?> cleanthatHeaders = githubAcceptedEvent.getHeaders();
-			Map<Object, ?> githubHeaders = PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_HEADERS);
+			Map<String, ?> cleanthatBody = githubAcceptedEvent.getBody();
+
+			Map<String, ?> githubBodyAndHeaders;
+			if (cleanthatBody.containsKey(GithubWebhookEvent.KEY_GITHUB)) {
+				LOGGER.warn("Processing a legacy input: {}", githubAcceptedEvent);
+				githubBodyAndHeaders = PepperMapHelper.getRequiredMap(cleanthatBody, GithubWebhookEvent.KEY_GITHUB);
+			} else {
+				githubBodyAndHeaders = cleanthatBody;
+			}
+
+			Map<Object, ?> githubHeaders = PepperMapHelper.getRequiredMap(githubBodyAndHeaders, KEY_HEADERS);
 
 			var xGithubEvent = PepperMapHelper.getOptionalString(githubHeaders, "X-GitHub-Event").orElse("");
 			var xGithubDelivery = PepperMapHelper.getOptionalString(githubHeaders, X_GIT_HUB_DELIVERY).orElse("");
@@ -111,7 +123,7 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 			return new GithubWebhookEvent(xGithubEvent,
 					xGithubDelivery,
 					xGithubSignature256,
-					PepperMapHelper.getRequiredMap(githubAcceptedEvent.getBody(), KEY_BODY));
+					PepperMapHelper.getRequiredMap(githubBodyAndHeaders, KEY_BODY));
 		} else {
 			throw new IllegalArgumentException("What is this? body=" + githubAcceptedEvent.getBody());
 		}

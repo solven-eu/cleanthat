@@ -39,6 +39,7 @@ import com.github.seratch.jslack.Slack;
 
 import eu.solven.cleanthat.code_provider.github.event.pojo.CleanThatWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
+import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
@@ -93,8 +94,10 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 					try {
 						if (r.containsKey(KEY_BODY)) {
 							asMap = parseSqsEvent(objectMapper, r);
-						} else {
+						} else if ("aws:dynamodb".equals(r.get("eventSource"))) {
 							asMap = parseDynamoDbEvent(dynamoDbObjectMapper, r);
+						} else {
+							throw new IllegalArgumentException("Not managed: " + r);
 						}
 					} catch (RuntimeException e) {
 						logEvent(objectMapper, input);
@@ -182,15 +185,25 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 					// Install the updated headers
 					github.put(KEY_HEADERS, githubHeaders);
 				}
+			} else if (rootBody.containsKey(GithubWebhookEvent.KEY_HEADERS)) {
+				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(rootBody, KEY_HEADERS);
+				if (!githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
+					githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
+				}
 			}
 
 			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, KEY_HEADERS);
+			if (!headers.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
+				headers.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
+			}
 
 			event = new CleanThatWebhookEvent(headers, rootBody);
 		} else {
 			// This is a payload right from Github
 			// We lack headers as we are not able to forward them from SQS
-			event = new GithubWebhookEvent(input);
+			String xGithubDelivery = SaveToDynamoDb.generateRandomxGithubDelivery();
+
+			event = new GithubWebhookEvent("", xGithubDelivery, "", input);
 		}
 		return event;
 	}

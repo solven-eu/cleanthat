@@ -68,7 +68,8 @@ public class ITGithubRefCleaner {
 
 		cleanerFactory.makeCleaner(githubForRepo)
 				.get()
-				.tryOpenPRWithCleanThatStandardConfiguration(Files.createTempDirectory("cleanthat-ITGithubRefCleaner-"),
+				.tryOpenPRWithCleanThatStandardConfiguration(ITGithubRefCleaner.class.getSimpleName(),
+						Files.createTempDirectory("cleanthat-ITGithubRefCleaner-"),
 						GithubDecoratorHelper.decorate(masterBranch));
 	}
 }

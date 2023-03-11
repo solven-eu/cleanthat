@@ -75,7 +75,11 @@ public interface IMutatorExternalReferences {
 		return getErrorProneId().map(id -> "https://errorprone.info/bugpattern/" + id).orElse("");
 	}
 
-	default String jsparrowUrl() {
+	default Optional<String> getJSparrowId() {
+		return Optional.empty();
+	}
+
+	default String jSparrowUrl() {
 		return "";
 	}
 

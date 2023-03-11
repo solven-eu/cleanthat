@@ -147,8 +147,10 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 		}
 	}
 
-	protected RepoInitializerResult generateDefaultConfiguration(ICodeProvider codeProvider, boolean isPrivateRepo) {
-		return configInitializer.prepareFile(codeProvider, isPrivateRepo);
+	protected RepoInitializerResult generateDefaultConfiguration(ICodeProvider codeProvider,
+			boolean isPrivateRepo,
+			String eventKey) {
+		return configInitializer.prepareFile(codeProvider, isPrivateRepo, eventKey);
 	}
 
 }

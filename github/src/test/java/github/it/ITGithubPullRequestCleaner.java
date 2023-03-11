@@ -79,7 +79,7 @@ public class ITGithubPullRequestCleaner {
 				new GithubCheckRunManager(Mockito.mock(IGitService.class)));
 
 		GitHub installationGithub = githubForRepo.getGithub();
-		cleaner.tryOpenPRWithCleanThatStandardConfiguration(
+		cleaner.tryOpenPRWithCleanThatStandardConfiguration(ITGithubPullRequestCleaner.class.getSimpleName(),
 				Files.createTempDirectory("cleanthat-ITGithubPullRequestCleaner-"),
 				GithubDecoratorHelper
 						.decorate(GithubHelper.getDefaultBranch(installationGithub.getRepository(repoName))));

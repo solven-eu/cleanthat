@@ -34,11 +34,13 @@ public interface IGitRefCleaner {
 
 	/**
 	 * 
+	 * @param eventKey
+	 *            Used to identity if the PR body which event triggered this
 	 * @param root
 	 * @param branch
 	 * @return true if we succeeded opening a PR with a relevant default configuration.
 	 */
-	boolean tryOpenPRWithCleanThatStandardConfiguration(Path root, IGitBranch branch);
+	boolean tryOpenPRWithCleanThatStandardConfiguration(String eventKey, Path root, IGitBranch branch);
 
 	/**
 	 * 

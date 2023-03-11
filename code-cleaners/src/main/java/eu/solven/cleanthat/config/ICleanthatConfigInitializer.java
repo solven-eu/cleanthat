@@ -25,6 +25,6 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
  */
 public interface ICleanthatConfigInitializer {
 
-	RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivateRepo);
+	RepoInitializerResult prepareFile(ICodeProvider codeProvider, boolean isPrivateRepo, String eventKey);
 
 }

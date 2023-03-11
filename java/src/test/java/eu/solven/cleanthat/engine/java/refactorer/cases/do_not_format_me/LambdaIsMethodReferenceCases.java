@@ -1,6 +1,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.time.chrono.ChronoPeriod;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -108,6 +109,19 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// TODO
+	@UnmodifiedMethod
+	public static class CaseToArray {
+
+		Object[] pre(Stream<?> s) {
+			return s.toArray(i -> new Object[i]);
+		}
+
+		Object[] post(Stream<?> s) {
+			return s.toArray(Object[]::new);
+		}
+	}
+
 	@UnmodifiedMethod
 	public static class CaseCast_Generic {
 
@@ -156,7 +170,7 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 	// @CompareMethods
 	// Stuck on https://github.com/javaparser/javaparser/issues/3929
 	@UnmodifiedMethod
-	public static class CaseBiFunction {
+	public static class CaseBiFunction_onInstance {
 		public void pre(Map<String, String> map) {
 			Map<String, String> linkedHashMap = new LinkedHashMap<>();
 			map.forEach((a, b) -> linkedHashMap.put(a, b));
@@ -165,6 +179,20 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 		public void post(Map<String, String> map) {
 			Map<String, String> linkedHashMap = new LinkedHashMap<>();
 			map.forEach(linkedHashMap::put);
+		}
+	}
+
+	// TODO
+	@UnmodifiedMethod
+	public static class CaseBiFunction_onClass {
+		final List<Integer> numbers = Arrays.asList(5, 3, 50, 24, 40, 2, 9, 18);
+
+		public void pre() {
+			numbers.stream().sorted((a, b) -> a.compareTo(b));
+		}
+
+		public void post() {
+			numbers.stream().sorted(Integer::compareTo);
 		}
 	}
 
@@ -184,8 +212,18 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 
 	@UnmodifiedMethod
 	public static class CaseCastToGeneric {
-		public List<Class<? extends CharSequence>> pre(Stream<? extends Class<?>> s) {
+		public List<?> pre(Stream<? extends Class<?>> s) {
 			return s.map(m -> (Class<? extends CharSequence>) m).collect(Collectors.toList());
+		}
+	}
+
+	// https://www.baeldung.com/java-method-references#examples-limitations
+	@UnmodifiedMethod
+	public static class refToExternalVariables {
+
+		public void pre(List<String> numbers) {
+			numbers.forEach(
+					b -> System.out.printf("lowerCase: '%s' upperCase: '%d'%n", b.toLowerCase(), b.toUpperCase()));
 		}
 	}
 

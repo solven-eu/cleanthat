@@ -30,7 +30,7 @@ import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 
 /**
  * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
@@ -38,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 // https://jsparrow.github.io/rules/use-is-empty-on-collections.html
-public abstract class AUseXIsEmpty extends AJavaparserMutator {
+public abstract class AUseXIsEmpty extends AJavaparserExprMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AUseXIsEmpty.class);
 
 	private static final IntegerLiteralExpr ZERO_EXPR = new IntegerLiteralExpr("0");
@@ -48,8 +48,8 @@ public abstract class AUseXIsEmpty extends AJavaparserMutator {
 	protected abstract Set<Class<?>> getCompatibleTypes();
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		Optional<Expression> optLengthScope = checkCallSizeAndCompareWith0(getSizeMethod(), node);
+	protected boolean processNotRecursively(Expression expr) {
+		Optional<Expression> optLengthScope = checkCallSizeAndCompareWith0(getSizeMethod(), expr);
 
 		if (optLengthScope.isEmpty()) {
 			return false;
@@ -59,10 +59,7 @@ public abstract class AUseXIsEmpty extends AJavaparserMutator {
 		Optional<ResolvedType> type = optResolvedType(lengthScope);
 
 		if (type.isPresent()) {
-			var localTransformed = checkTypeAndProcess(node, lengthScope, type.get());
-			if (localTransformed) {
-				return true;
-			}
+			return checkTypeAndProcess(expr, lengthScope, type.get());
 		}
 
 		return false;

@@ -217,12 +217,26 @@ isDraft
 
 Require sourceJdk: 1.5
 
+### [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
 ### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
 
 
 isDraft
 
 Require sourceJdk: 1
+
+### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
 
 ### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
 
@@ -370,7 +384,14 @@ isDraft
 
 Require sourceJdk: 1
 
-### [SafeButNotAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotAndConsensualMutators.java)
+### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
+
+
+isDraft
+
+Require sourceJdk: 1
+
+### [SafeButNotTrivialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotTrivialMutators.java)
 
 
 isDraft

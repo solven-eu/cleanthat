@@ -460,7 +460,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		}
 
 		var headRef = REF_NAME_CONFIGURE;
-		Optional<GHRef> optRefToPR = Optional.empty();// optRef(repo, headRef);
+		Optional<GHRef> optRefToPR = optRef(repo, headRef);
 		try {
 			if (optRefToPR.isPresent()) {
 				GHRef refToPr = optRefToPR.get();

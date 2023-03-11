@@ -48,6 +48,46 @@ public class UseStringIsEmptyCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	@CompareMethods
+	public static class CaseStringEqualsEmpty {
+		public Object pre(String input) {
+			return input.equals("");
+		}
+
+		public Object post(String input) {
+			return input.isEmpty();
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseObjectEqualsEmpty {
+		public Object pre(Object input) {
+			return input.equals("");
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseEmptyEqualsString {
+		public Object pre(String input) {
+			return "".equals(input);
+		}
+
+		public Object post(String input) {
+			return input.isEmpty();
+		}
+	}
+
+	@CompareMethods
+	public static class CaseStringEqualsIgnoreCaseEmpty {
+		public Object pre(String input) {
+			return input.equalsIgnoreCase("");
+		}
+
+		public Object post(String input) {
+			return input.isEmpty();
+		}
+	}
+
 	// TODO
 	@UnmodifiedMethod
 	// @CompareMethods

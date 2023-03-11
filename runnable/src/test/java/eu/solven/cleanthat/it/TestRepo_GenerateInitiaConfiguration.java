@@ -51,7 +51,7 @@ public class TestRepo_GenerateInitiaConfiguration {
 
 		var initializer = new CleanthatConfigInitializer(objectMapper, Arrays.asList(factory));
 
-		var result = initializer.prepareFile(codeProvider, false);
+		var result = initializer.prepareFile(codeProvider, false, "TestRepo_GenerateInitiaConfiguration");
 
 		Assertions.assertThat(result.getPrBody()).contains("Cleanthat").doesNotContain("$");
 		Assertions.assertThat(result.getCommitMessage()).contains("Cleanthat");

@@ -134,14 +134,25 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	protected boolean tryReplace(Node node, Node replacement) {
 		LOGGER.info("Turning `{}` into `{}`", node, replacement);
 
-		return node.replace(replacement);
+		var result = node.replace(replacement);
+
+		if (!result) {
+			LOGGER.warn("We failed turning `{}` into `{}`", node, replacement);
+		}
+
+		return result;
 	}
 
 	protected boolean tryRemove(Node node) {
 		var nodeParentAsString = node.getParentNode().map(n -> n.getClass().getSimpleName()).orElse("-");
 		LOGGER.info("Removing `{}` from a {}", node, nodeParentAsString);
 
-		return node.remove();
+		var result = node.remove();
+
+		if (!result) {
+			LOGGER.warn("Failed removing `{}` from a {}", node, nodeParentAsString);
+		}
+		return result;
 	}
 
 	protected Optional<Node> replaceNode(Node node) {

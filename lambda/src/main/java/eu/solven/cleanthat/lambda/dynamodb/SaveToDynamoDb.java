@@ -129,7 +129,7 @@ public class SaveToDynamoDb {
 	}
 
 	private static String randomEventKey(IWebhookEvent input) {
-		String randomEventKey = generateRandomxGithubDelivery();
+		var randomEventKey = generateRandomxGithubDelivery();
 
 		// This may happen on step0, as we lack a real xGithubDelivery (due to SQS not
 		// transmitting

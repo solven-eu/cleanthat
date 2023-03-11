@@ -25,8 +25,6 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.ast.expr.UnaryExpr.Operator;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -119,25 +117,8 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 
 		var condition = ifStmt.getCondition();
 
-		String streamMethod;
-
-		// TODO Unclear when we want to swap `anyMatch` by `!allMatch`
-		boolean logicalComplement;
-		// if (condition.isUnaryExpr() && condition.asUnaryExpr().getOperator() == Operator.LOGICAL_COMPLEMENT) {
-		// streamMethod = "noneMatch";
-		// condition = condition.asUnaryExpr().getExpression();
-		// logicalComplement = true;
-		// } else {
-		streamMethod = ANY_MATCH;
-		logicalComplement = false;
-		// }
-
 		var lambdaExpr = new LambdaExpr(parameter, condition);
-		Expression withStream2 = new MethodCallExpr(withStream, streamMethod, new NodeList<>(lambdaExpr));
-
-		if (logicalComplement) {
-			withStream2 = new UnaryExpr(withStream2, Operator.LOGICAL_COMPLEMENT);
-		}
+		Expression withStream2 = new MethodCallExpr(withStream, ANY_MATCH, new NodeList<>(lambdaExpr));
 
 		var newif = new IfStmt(withStream2, thenAsBlockStmt, null);
 

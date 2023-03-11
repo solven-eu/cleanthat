@@ -33,17 +33,22 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingN
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectEqualsForPrimitives;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectsHashCodePrimitive;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveExplicitCallToSuper;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringStartsWithChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 
 /**
  * This mutator will apply all {@link IMutator} considered safe (e.g. by not impacting the {@link Runtime}, or only with
- * ultra-safe changes). It is not restricted to changes considered as consensual.
+ * ultra-safe changes). It is not restricted to changes considered as not-consensual.
  * 
  * Example of not consensual mutator: {@link LocalVariableTypeInference} as some people prefer manipulating an object
  * through its interface.
@@ -51,7 +56,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumer
  * @author Benoit Lacelle
  *
  */
-public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
+public class SafeButNotConsensualMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	public static final List<IMutator> SAFE_BUT_NOT_CONSENSUAL = ImmutableList.<IMutator>builder()
 			.add(new ArraysDotStream(),
 					// new AvoidFileStream(),
@@ -75,10 +80,15 @@ public class SafeButNotAndConsensualMutators extends CompositeMutator<IMutator> 
 					// https://github.com/javaparser/javaparser/issues/3936
 					// new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals(),
-					new StringStartsWithChar())
+					new StringStartsWithChar(),
+					new RemoveExplicitCallToSuper(),
+					new UseTextBlocks(),
+					new ObjectEqualsForPrimitives(),
+					new ObjectsHashCodePrimitive(),
+					new LambdaReturnsSingleStatement())
 			.build();
 
-	public SafeButNotAndConsensualMutators(JavaVersion sourceJdkVersion) {
+	public SafeButNotConsensualMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, SAFE_BUT_NOT_CONSENSUAL));
 	}
 

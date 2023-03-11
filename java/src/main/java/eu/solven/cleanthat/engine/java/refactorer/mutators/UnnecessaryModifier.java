@@ -71,6 +71,16 @@ public class UnnecessaryModifier extends AJavaparserMutator {
 		return Optional.of("RSPEC-2333");
 	}
 
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("RemoveModifiersInInterfaceProperties");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/remove-modifiers-in-interface-properties.html";
+	}
+
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

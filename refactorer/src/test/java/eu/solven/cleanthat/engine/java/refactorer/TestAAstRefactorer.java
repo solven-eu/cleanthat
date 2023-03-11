@@ -35,6 +35,8 @@ public class TestAAstRefactorer {
 	final String someParser = "someParser";
 	final String someResult = "someResult";
 
+	final String inputJavaCode = "someInputJavaCode";
+
 	final String someResultAsString = "someResultAsString";
 	final String someInvalidResultAsString = "someInvalidResultAsString";
 	final String otherResultAsString = "otherResultAsString";
@@ -48,8 +50,6 @@ public class TestAAstRefactorer {
 		List<IWalkingMutator<String, String>> mutators =
 				Arrays.asList(someValidMutator, someInvalidMutator, otherValidMutator);
 		AAstRefactorer<String, String, String, IWalkingMutator<String, String>> refactorer = makeRefactorer(mutators);
-
-		String inputJavaCode = "someInputJavaCode";
 
 		Mockito.when(someValidMutator.walkAst(inputJavaCode)).thenReturn(Optional.of(someResultAsString));
 		Mockito.when(someInvalidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(someInvalidResultAsString));
@@ -65,14 +65,25 @@ public class TestAAstRefactorer {
 		List<IWalkingMutator<String, String>> mutators = Arrays.asList(someValidMutator, someInvalidMutator);
 		AAstRefactorer<String, String, String, IWalkingMutator<String, String>> refactorer = makeRefactorer(mutators);
 
-		String inputJavaCode = "someInputJavaCode";
-
 		Mockito.when(someValidMutator.walkAst(inputJavaCode)).thenReturn(Optional.of(someResultAsString));
 		Mockito.when(someInvalidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(someInvalidResultAsString));
 
 		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
 
 		Assertions.assertThat(outputCode).isEqualTo(someResultAsString);
+	}
+
+	@Test
+	public void testRejectInvalidTransformedCode_invalid() throws IOException {
+		List<IWalkingMutator<String, String>> mutators = Arrays.asList(someValidMutator);
+		AAstRefactorer<String, String, String, IWalkingMutator<String, String>> refactorer = makeRefactorer(mutators);
+
+		var outputCode =
+				refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), someInvalidResultAsString));
+
+		Assertions.assertThat(outputCode).isEqualTo(someInvalidResultAsString);
+
+		Mockito.verify(someValidMutator, Mockito.never()).walkAst(Mockito.anyString());
 	}
 
 	private AAstRefactorer<String, String, String, IWalkingMutator<String, String>> makeRefactorer(
@@ -97,7 +108,10 @@ public class TestAAstRefactorer {
 
 					@Override
 					protected Optional<String> parseSourceCode(String parser, String sourceCode) {
-						return Optional.of(sourceCode);
+						if (Set.of(inputJavaCode, someResultAsString, otherResultAsString).contains(sourceCode)) {
+							return Optional.of(sourceCode);
+						}
+						return Optional.empty();
 					}
 
 					@Override

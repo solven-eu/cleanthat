@@ -126,7 +126,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 						if (firstMutator.get()) {
 							// BEWARE we may have mutators based on different parsers
-							LOGGER.info("We mark {} as not parseable by any mutator", path);
+							LOGGER.info("We mark path='{}' as not parseable by any mutator", path);
 							inputIsBroken.set(true);
 						}
 

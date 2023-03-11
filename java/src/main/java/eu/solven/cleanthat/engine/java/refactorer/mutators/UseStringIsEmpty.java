@@ -18,14 +18,19 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 
 /**
  * Migrate from 'm.length() == 0’ to ’m.isEmpty()'. Works with {@link String}.
  *
  * @author Benoit Lacelle
  */
-// https://jsparrow.github.io/rules/use-is-empty-on-collections.html
+// We prefer turning `username.equals("")` into `username.isEmpty()` than `"".equals(username)`
+@ApplyMeBefore({ LiteralsFirstInComparisons.class })
 public class UseStringIsEmpty extends AUseXIsEmpty {
 	@Override
 	public boolean isDraft() {
@@ -52,6 +57,38 @@ public class UseStringIsEmpty extends AUseXIsEmpty {
 	@Override
 	protected Set<Class<?>> getCompatibleTypes() {
 		return Set.of(String.class);
+	}
+
+	@Override
+	protected boolean processNotRecursively(Expression expr) {
+		boolean replaced = super.processNotRecursively(expr);
+
+		if (replaced) {
+			return true;
+		}
+
+		if (!expr.isMethodCallExpr()) {
+			return false;
+		}
+
+		var asMethodCall = expr.asMethodCallExpr();
+		if (!"equals".equals(asMethodCall.getNameAsString())
+				&& !"equalsIgnoreCase".equals(asMethodCall.getNameAsString())) {
+			return false;
+		}
+
+		if (asMethodCall.getArguments().size() != 1 || !asMethodCall.getArgument(0).isLiteralStringValueExpr()
+				|| !"".equals(asMethodCall.getArgument(0).asLiteralStringValueExpr().getValue())) {
+			return false;
+		}
+
+		Optional<Expression> optScope = asMethodCall.getScope();
+		if (!scopeHasRequiredType(optScope, String.class)) {
+			return false;
+		}
+
+		// `input.equals("")` -> `input.isEmpty()`
+		return tryReplace(expr, new MethodCallExpr(optScope.get(), "isEmpty"));
 	}
 
 }

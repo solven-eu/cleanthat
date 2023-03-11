@@ -16,6 +16,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `ObjectEqualsForPrimitives` is introduced
 * `ObjectsHashCodePrimitive` is introduced
 * `EnhancedForLoopToStreamAnyMatch` is introduced
+* `RedundantLogicalComplementsInStream` is introduced
+* `SimplifyBooleanInitialization` is introduced
 
 ## [2.10] - 2023-03-09
 ### Fixed

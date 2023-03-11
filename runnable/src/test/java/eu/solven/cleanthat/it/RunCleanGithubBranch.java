@@ -179,7 +179,9 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 			// At some point, we could prefer remaining silent if we understand the repository tried to integrate
 			// us, but did not completed.
 			LOGGER.info("About to try condiguring CleanThat in the repo");
-			cleaner.tryOpenPRWithCleanThatStandardConfiguration(root, GithubDecoratorHelper.decorate(branch));
+			cleaner.tryOpenPRWithCleanThatStandardConfiguration(this.getClass().getSimpleName(),
+					root,
+					GithubDecoratorHelper.decorate(branch));
 		}
 	}
 }

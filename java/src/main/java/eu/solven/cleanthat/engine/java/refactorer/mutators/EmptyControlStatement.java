@@ -67,6 +67,16 @@ public class EmptyControlStatement extends AJavaparserMutator {
 		return "https://javadoc.io/static/com.puppycrawl.tools/checkstyle/8.37/com/puppycrawl/tools/checkstyle/checks/coding/EmptyStatementCheck.html";
 	}
 
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("RemoveEmptyStatement");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/remove-empty-statement.html";
+	}
+
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Node node) {

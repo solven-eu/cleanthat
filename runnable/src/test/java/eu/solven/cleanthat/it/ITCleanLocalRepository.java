@@ -78,7 +78,7 @@ public class ITCleanLocalRepository extends ACleanThatXxxApplication {
 		if (optConfig.isEmpty()) {
 			LOGGER.info("Generate an initial configuration");
 			ICleanthatConfigInitializer initializer = appContext.getBean(ICleanthatConfigInitializer.class);
-			var result = initializer.prepareFile(codeProvider, false);
+			var result = initializer.prepareFile(codeProvider, false, "ITCleanLocalRepository");
 
 			codeProvider.persistChanges(result.getPathToContents(), CodeWritingMetadata.empty());
 

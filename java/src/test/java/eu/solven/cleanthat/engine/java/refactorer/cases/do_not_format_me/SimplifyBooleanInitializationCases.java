@@ -4,13 +4,13 @@ import java.util.List;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerCases {
+public class SimplifyBooleanInitializationCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new EnhancedForLoopToStreamAnyMatch();
+		return new SimplifyBooleanInitialization();
 	}
 
 	// https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html#loop-with-break-statement-to-stream-anymatch
@@ -18,20 +18,14 @@ public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerC
 	public static class breakToStreamAnyMatch {
 		public boolean pre(List<String> strings) {
 			boolean containsEmpty = false;
-			for (String value : strings) {
-				if (value.isEmpty()) {
-					containsEmpty = true;
-					break;
-				}
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				containsEmpty = true;
 			}
 			return containsEmpty;
 		}
 
 		public boolean post(List<String> strings) {
-			boolean containsEmpty = false;
-			if (strings.stream().anyMatch(value -> value.isEmpty())) {
-				containsEmpty = true;
-			}
+			boolean containsEmpty = strings.stream().anyMatch(value -> value.isEmpty());
 			return containsEmpty;
 		}
 	}
@@ -41,20 +35,14 @@ public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerC
 	public static class breakToStreamNoMatch {
 		public boolean pre(List<String> strings) {
 			boolean noneEmpty = true;
-			for (String value : strings) {
-				if (value.isEmpty()) {
-					noneEmpty = false;
-					break;
-				}
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				noneEmpty = false;
 			}
 			return noneEmpty;
 		}
 
 		public boolean post(List<String> strings) {
-			boolean noneEmpty = true;
-			if (strings.stream().anyMatch(value -> value.isEmpty())) {
-				noneEmpty = false;
-			}
+			boolean noneEmpty = !strings.stream().anyMatch(value -> value.isEmpty());
 			return noneEmpty;
 		}
 	}
@@ -64,43 +52,15 @@ public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerC
 	public static class breakToAllMatch {
 		public boolean pre(List<String> strings) {
 			boolean allEmpty = true;
-			for (String value : strings) {
-				if (!value.isEmpty()) {
-					allEmpty = false;
-					break;
-				}
-			}
-			return allEmpty;
-		}
-
-		public boolean post(List<String> strings) {
-			boolean allEmpty = true;
 			if (strings.stream().anyMatch(value -> !value.isEmpty())) {
 				allEmpty = false;
 			}
 			return allEmpty;
 		}
-	}
-
-	// https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html#loop-with-return-statement
-	@CompareMethods
-	public static class CaseNotString {
-		String someString;
-
-		public boolean pre(List<String> strings) {
-			for (String value : strings) {
-				if (someString.equals(value)) {
-					return true;
-				}
-			}
-			return false;
-		}
 
 		public boolean post(List<String> strings) {
-			if (strings.stream().anyMatch(value -> someString.equals(value))) {
-				return true;
-			}
-			return false;
+			boolean allEmpty = !strings.stream().anyMatch(value -> !value.isEmpty());
+			return allEmpty;
 		}
 	}
 }

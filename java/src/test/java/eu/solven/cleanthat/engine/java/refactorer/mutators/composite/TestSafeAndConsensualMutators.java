@@ -46,7 +46,7 @@ public class TestSafeAndConsensualMutators {
 	@Test
 	public void testIds() {
 		var safeAndConsensual = new SafeAndConsensualMutators(last);
-		var safeButNotConsensual = new SafeButNotAndConsensualMutators(last);
+		var safeButNotConsensual = new SafeButNotConsensualMutators(last);
 
 		Assertions.assertThat(safeAndConsensual.getIds()).doesNotContainAnyElementsOf(safeButNotConsensual.getIds());
 		Assertions.assertThat(safeButNotConsensual.getIds()).doesNotContainAnyElementsOf(safeAndConsensual.getIds());
@@ -55,22 +55,31 @@ public class TestSafeAndConsensualMutators {
 	@Test
 	public void testScanComposite() {
 		Set<String> safeAndConsensual = new SafeAndConsensualMutators(last).getUnderlyingIds();
-		Set<String> safeButNotConsensual = new SafeButNotAndConsensualMutators(last).getUnderlyingIds();
+		Set<String> safeButNotConsensual = new SafeButNotConsensualMutators(last).getUnderlyingIds();
+		Set<String> safeButNotTrivial = new SafeButNotTrivialMutators(last).getUnderlyingIds();
 
 		// Check the intersection is empty
 		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotConsensual);
 		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeAndConsensual);
 
+		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotTrivial);
+		Assertions.assertThat(safeButNotTrivial).doesNotContainAnyElementsOf(safeAndConsensual);
+
+		Assertions.assertThat(safeButNotTrivial).doesNotContainAnyElementsOf(safeButNotConsensual);
+		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeButNotTrivial);
+
 		List<IMutator> allSingle = new AllIncludingDraftSingleMutators(last).getUnderlyings();
 
 		allSingle.stream()
 				.filter(s -> Sets.intersection(s.getIds(), safeAndConsensual).isEmpty()
-						&& Sets.intersection(s.getIds(), safeButNotConsensual).isEmpty())
+						&& Sets.intersection(s.getIds(), safeButNotConsensual).isEmpty()
+						&& Sets.intersection(s.getIds(), safeButNotTrivial).isEmpty())
 				.forEach(notInComposite -> {
-					LOGGER.warn("{} is neither in {} nor in {}",
+					LOGGER.warn("{} is neither in {} nor in {} nor in {}",
 							notInComposite.getClass().getSimpleName(),
 							SafeAndConsensualMutators.class.getSimpleName(),
-							SafeButNotAndConsensualMutators.class.getSimpleName());
+							SafeButNotConsensualMutators.class.getSimpleName(),
+							SafeButNotTrivialMutators.class.getSimpleName());
 				});
 	}
 }

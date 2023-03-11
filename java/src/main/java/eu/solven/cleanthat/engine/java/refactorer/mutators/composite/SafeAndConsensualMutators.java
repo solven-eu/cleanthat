@@ -25,16 +25,20 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaInlineStringsRepeat;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.RedundantLogicalComplementsInStream;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryLambdaEnclosingParameters;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.UseStringIsEmpty;
 
 /**
  * This mutator will apply all {@link IMutator} considered safe (e.g. by not impacting the {@link Runtime}, or only with
@@ -52,12 +56,16 @@ public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implem
 			.add(new ModifierOrder(),
 					new UseIndexOfChar(),
 					new UseCollectionIsEmpty(),
+					new UseStringIsEmpty(),
 					new OptionalNotEmpty(),
 					new StreamAnyMatch(),
 					new StringToString(),
 					new UnnecessaryBoxing(),
 					new UnnecessaryModifier(),
-					new UnnecessaryFullyQualifiedName())
+					new UnnecessaryFullyQualifiedName(),
+					new GuavaInlineStringsRepeat(),
+					new UnnecessaryLambdaEnclosingParameters(),
+					new RedundantLogicalComplementsInStream())
 			.build();
 
 	public SafeAndConsensualMutators(JavaVersion sourceJdkVersion) {

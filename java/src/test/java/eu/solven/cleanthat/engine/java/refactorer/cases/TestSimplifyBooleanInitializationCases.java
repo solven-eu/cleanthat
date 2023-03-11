@@ -23,16 +23,18 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseStringIsEmptyCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.SimplifyBooleanInitializationCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestStringIsEmptyCases extends AParameterizesJavaparserRefactorerCases {
+public class TestSimplifyBooleanInitializationCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new UseStringIsEmptyCases();
+		return new SimplifyBooleanInitializationCases();
 	}
 
-	public TestStringIsEmptyCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestSimplifyBooleanInitializationCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

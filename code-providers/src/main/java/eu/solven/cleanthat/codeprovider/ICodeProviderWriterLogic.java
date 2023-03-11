@@ -27,8 +27,8 @@ public interface ICodeProviderWriterLogic {
 
 	/**
 	 * 
-	 * @param pathToMutatedContent.
-	 *            Some files may not be commited (e.g. same content already present, branch has diverged)
+	 * @param pathToMutatedContent
+	 *            Some files may not be committed (e.g. same content already present, branch has diverged)
 	 * @param metadata
 	 * @return true if some commit has been pushed
 	 */

@@ -10,7 +10,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class CollectionIsEmptyCases extends AJavaparserRefactorerCases {
+public class UseCollectionIsEmptyCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new UseCollectionIsEmpty();

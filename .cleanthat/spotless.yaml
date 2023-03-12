@@ -2,6 +2,10 @@ syntax_version: "2023-01-14"
 encoding: "UTF-8"
 line_ending: "GIT_ATTRIBUTES"
 formatters:
+- format: "markdown"
+  steps:
+  - id: "flexmark"
+    parameters: {}
 - format: "java"
   excludes:
   - "**/do_not_format_me/**"

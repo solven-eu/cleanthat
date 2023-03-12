@@ -56,6 +56,12 @@ import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
 
+/**
+ * This helps showing insights about installations
+ * 
+ * @author Benoit Lacelle
+ * @see https://github.com/marketplace/cleanthat/insights
+ */
 @SpringBootApplication(scanBasePackages = "none")
 @Import({ GithubSpringConfig.class })
 public class RunGithubMonitoring {
@@ -114,6 +120,10 @@ public class RunGithubMonitoring {
 
 		GHApp app = handler.getGithubAsApp();
 		LOGGER.info("CleanThat has been installed {} times", app.getInstallationsCount());
+
+		// app.getInstallationByOrganization("TheSimpleTeam");
+		// app.getInstallationByOrganization("ShaftHQ");
+
 		app.listInstallations().forEach(installation -> {
 			long appId = installation.getAppId();
 			// Date creationDate = installation.getCreatedAt();

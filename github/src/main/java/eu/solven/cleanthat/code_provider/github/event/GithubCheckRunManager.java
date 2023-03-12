@@ -40,6 +40,7 @@ import eu.solven.cleanthat.config.IGitService;
  * @author Benoit Lacelle
  *
  */
+// https://stackoverflow.com/questions/67919168/github-checks-api-vs-check-runs-vs-check-suites
 public class GithubCheckRunManager {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubCheckRunManager.class);
 

@@ -30,11 +30,17 @@ public interface ICleanthatStepParametersProperties {
 	// BEWARE This is specific to JavaRefactorerProperties
 	String SAFE_AND_CONSENSUAL = "SafeAndConsensual";
 
+	/**
+	 * These mutators are not consensual, but their changes are relatively small.
+	 */
 	// BEWARE This is specific to JavaRefactorerProperties
 	String SAFE_BUT_NOT_CONSENSUAL = "SafeButNotConsensual";
 
+	/**
+	 * These mutators are safe but not consensual at all. The larger changes may be controversial.
+	 */
 	// BEWARE This is specific to JavaRefactorerProperties
-	String SAFE_BUT_NOT_TRIVIAL = "SafeButNotTrivial";
+	String SAFE_BUT_CONTROVERSIAL = "SafeButControversial";
 
 	@JsonIgnore
 	Object getCustomProperty(String key);

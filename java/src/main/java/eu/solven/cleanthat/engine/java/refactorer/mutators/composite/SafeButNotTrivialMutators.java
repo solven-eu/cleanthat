@@ -44,6 +44,6 @@ public class SafeButNotTrivialMutators extends CompositeMutator<IMutator> implem
 
 	@Override
 	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.SAFE_BUT_NOT_TRIVIAL);
+		return Optional.of(JavaRefactorerProperties.SAFE_BUT_CONTROVERSIAL);
 	}
 }

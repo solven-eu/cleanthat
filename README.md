@@ -2,7 +2,7 @@ CleanThat
 
 # Disclaimer
 
-`cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. **Please** report them to [report](https://github.com/solven-eu/cleanthat/issues).
+`cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. [**Please report them**](https://github.com/solven-eu/cleanthat/issues).
 
 [![codecov](https://codecov.io/github/solven-eu/cleanthat/branch/master/graph/badge.svg?token=4K4O5GNH32)](https://codecov.io/github/solven-eu/cleanthat)
 
@@ -10,10 +10,10 @@ CleanThat
 
 The point of this project is to enable **automatic cleaning of your code-base**. By cleaning, we include :
 
-1- formatting (with an Eclipse stylesheet, Google-Java-Format, etc)
-2- linting (given any [IMutator](MUTATORS.generated.MD))
-3- refactoring (WIP)
-4- migrating (from JUnit4 to JUnit5)
+1. formatting (with an Eclipse stylesheet, Google-Java-Format, etc)
+2. linting (given any [IMutator](MUTATORS.generated.MD))
+3. refactoring (WIP)
+4. migrating (from JUnit4 to JUnit5)
 
 As of 2022-12, it focuses on Java projects, but enabling formatting various languages through Spotless.
 

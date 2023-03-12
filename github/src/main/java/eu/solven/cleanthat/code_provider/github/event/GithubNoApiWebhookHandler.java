@@ -75,6 +75,8 @@ public class GithubNoApiWebhookHandler {
 				installationId,
 				organizationUrl.orElse("<missing>"));
 
+		// TODO Are we interested in pull_request.synchronize https://github.com/orgs/community/discussions/24567?
+
 		// We are interested in 2 kind of events:
 		// 1- PR being (re)open: it is a good time to clean PR-head modified files (if not in a readonly branch)
 		// 2- Commit to branches: a push to some branch

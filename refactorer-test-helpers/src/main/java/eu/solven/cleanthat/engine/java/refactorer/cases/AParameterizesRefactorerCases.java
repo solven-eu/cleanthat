@@ -63,7 +63,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 
 	final ClassOrInterfaceDeclaration testCase;
 
-	protected static Collection<Object[]> listCases(ARefactorerCases<?, ?, ?> testCases) throws IOException {
+	public static Collection<Object[]> listCases(ARefactorerCases<?, ?, ?> testCases) throws IOException {
 		String path = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
 		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(testCases.getTransformer().isJreOnly());

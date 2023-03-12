@@ -1,7 +1,10 @@
 CleanThat
 
-WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say that you should not
-[report](https://github.com/solven-eu/cleanthat/issues) them :)
+# Disclaimer
+
+`cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. **Please** report them to [report](https://github.com/solven-eu/cleanthat/issues).
+
+[![codecov](https://codecov.io/github/solven-eu/cleanthat/branch/master/graph/badge.svg?token=4K4O5GNH32)](https://codecov.io/github/solven-eu/cleanthat)
 
 # Motivation
 
@@ -22,6 +25,7 @@ Related projects:
 - https://www.moderne.io/ (paid)
 - https://eslint.org/docs/latest/extend/custom-formatters (free)
 - https://errorprone.info/docs/refaster (free)
+- https://github.com/walkmod/walkmod-pmd-plugin (free)
 - https://github.com/XenoAmess/remove-unused-imports-maven-plugin (free, focused on imports)
 
 # Changes

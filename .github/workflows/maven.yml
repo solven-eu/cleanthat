@@ -32,10 +32,14 @@ jobs:
       # https://app.codecov.io/gh/solven-eu/cleanthat/new
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-      - name: Spotless Check
+      - name: Spotless Check - Apply if failed
+        continue-on-error: true
         # https://joht.github.io/johtizen/build/2022/01/20/github-actions-push-into-repository.html#example-1
         # https://stackoverflow.com/questions/55657835/is-there-a-way-to-push-changes-with-a-github-action
         run: |
+          set -euxo pipefail
           git config --local user.email "github-actions@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          mvn spotless:check || mvn spotless:apply && git commit -m "mvn spotless:apply" && git push
+          mvn spotless:check || echo "spotless"check failed to we spotless:apply before commit+push" && mvn spotless:apply && git commit -m "mvn spotless:apply" && git push
+      - name: Spotless Check
+        run: mvn spotless:check

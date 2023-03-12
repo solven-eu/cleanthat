@@ -7,10 +7,12 @@
 		<version>2.11-SNAPSHOT</version>
 	</parent>
 	<artifactId>config</artifactId>
+
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.pepper</groupId>
@@ -42,6 +44,17 @@
 		</dependency>
 	</dependencies>
 	<build>
+
+		<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.properties-and-configuration.expand-properties.maven -->
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>maven.json</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<!-- Useful for GitService -->

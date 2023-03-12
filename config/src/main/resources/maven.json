@@ -1,0 +1,6 @@
+{
+    "project.artifactId": "@project.artifactId@",
+    "project.version": "@project.version@",
+    "timestamp": "@timestamp@",
+    "project.build.sourceEncoding": "@project.build.sourceEncoding@"
+}

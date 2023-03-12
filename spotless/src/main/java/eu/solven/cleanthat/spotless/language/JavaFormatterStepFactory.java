@@ -18,8 +18,10 @@ package eu.solven.cleanthat.spotless.language;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +35,8 @@ import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.diffplug.spotless.java.CleanthatJavaStep;
 import com.diffplug.spotless.java.ImportOrderStep;
 import com.diffplug.spotless.java.RemoveUnusedImportsStep;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
@@ -42,6 +46,8 @@ import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 
 /**
  * Configure Spotless engine for '.java' files
@@ -51,6 +57,9 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatterStepFactory.class);
+
+	private static final String DEFAULT_CLEANTHAT_VERSION = "2.10";
+	private static final String RESOURCE_MAVEN_JSON = "/maven.json";
 
 	static final String KEY_ORDER = "order";
 	// The default eclipse configuration
@@ -70,6 +79,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 
 	public static final String ID_ECLIPSE = "eclipse";
 
+	private static final String CLEANTHAT_VERSION;
+
 	static {
 		ImmutableList.Builder<String> defaultMutatorsBuilder =
 				ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL);
@@ -77,9 +88,38 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			LOGGER.warn("We include {} in default mutators",
 					ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
 			defaultMutatorsBuilder.add(ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
+			defaultMutatorsBuilder.add(ICleanthatStepParametersProperties.SAFE_BUT_CONTROVERSIAL);
 		}
 
 		DEFAULT_MUTATORS = defaultMutatorsBuilder.build();
+
+		CLEANTHAT_VERSION = parseCleanthatDefaultVersion();
+	}
+
+	private static String parseCleanthatDefaultVersion() {
+		String cleanthatVersion;
+
+		var mavenProperties = PepperResourceHelper.loadAsString(RESOURCE_MAVEN_JSON, StandardCharsets.UTF_8);
+		try {
+			Map<?, ?> asMap = new ObjectMapper().readValue(mavenProperties, Map.class);
+			var rawMavenProjectVersion = PepperMapHelper.getRequiredString(asMap, "project.version");
+			if (rawMavenProjectVersion.startsWith("@")) {
+				rawMavenProjectVersion = DEFAULT_CLEANTHAT_VERSION;
+				cleanthatVersion = rawMavenProjectVersion;
+				LOGGER.error("Issue loading from {} (as we found {}). Fallback on {}",
+						RESOURCE_MAVEN_JSON,
+						rawMavenProjectVersion,
+						cleanthatVersion);
+			} else {
+				cleanthatVersion = rawMavenProjectVersion;
+				LOGGER.info("We are running over cleanthat.version={}", cleanthatVersion);
+			}
+		} catch (JsonProcessingException e) {
+			cleanthatVersion = DEFAULT_CLEANTHAT_VERSION;
+			LOGGER.error("Issue loading from {}. Fallback on {}", RESOURCE_MAVEN_JSON, CLEANTHAT_VERSION, e);
+		}
+
+		return cleanthatVersion;
 	}
 
 	public JavaFormatterStepFactory(JavaFormatterFactory formatterFactory,
@@ -120,13 +160,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	private FormatterStep makeCleanthat(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
 		String cleanthatVersion = parameters.getCustomProperty("version", String.class);
 		if (cleanthatVersion == null) {
-			// TODO We should fetch latest cleanthat version available, or even current -SNAPSHOT
-			// CleanthatJavaStep.defaultVersion()
-			if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
-				cleanthatVersion = "2.9-SNAPSHOT";
-			} else {
-				cleanthatVersion = "2.8";
-			}
+			cleanthatVersion = CLEANTHAT_VERSION;
 		}
 
 		String sourceJdk = parameters.getCustomProperty("source_jdk", String.class);

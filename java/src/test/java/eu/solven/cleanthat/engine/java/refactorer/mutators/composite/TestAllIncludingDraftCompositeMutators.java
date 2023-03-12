@@ -52,6 +52,10 @@ public class TestAllIncludingDraftCompositeMutators {
 				.contains(AllIncludingDraftSingleMutators.class.getName())
 				.contains(SafeAndConsensualMutators.class.getName())
 				.contains(SafeButNotConsensualMutators.class.getName())
-				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName());
+				.doesNotContain(AllIncludingDraftCompositeMutators.class.getName())
+				.contains(SafeButControversialMutators.class.getName())
+				.contains(GuavaMutators.class.getName())
+				.contains(ErrorProneMutators.class.getName())
+				.contains(JSparrowMutators.class.getName());
 	}
 }

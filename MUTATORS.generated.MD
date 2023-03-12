@@ -1,5 +1,4 @@
 # Mutators
-
 ## Single Mutators PRD-READY
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
@@ -354,7 +353,6 @@ public static class CaseReturnDouble {
 ```
 
 See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseUnderscoresInNumericLiteralsCases.java)
-
 ## Single Mutators (DRAFTs)
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
@@ -1039,7 +1037,6 @@ public static class caseHtml {
 ```
 
 See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseTextBlocksCases.java)
-
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)
@@ -1076,6 +1073,12 @@ isDraft
 
 languageLevel: jdk1
 
+### [GuavaMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/GuavaMutators.java)
+
+isDraft
+
+languageLevel: jdk1
+
 ### [JSparrowMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/JSparrowMutators.java)
 
 PMD: jSparrow
@@ -1098,13 +1101,13 @@ isDraft
 
 languageLevel: jdk1
 
-### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
+### [SafeButControversialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButControversialMutators.java)
 
 isDraft
 
 languageLevel: jdk1
 
-### [SafeButNotTrivialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotTrivialMutators.java)
+### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
 
 isDraft
 

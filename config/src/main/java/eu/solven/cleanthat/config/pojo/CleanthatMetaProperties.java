@@ -45,8 +45,20 @@ public final class CleanthatMetaProperties {
 	@Builder.Default
 	private CleanthatRefFilterProperties refs = new CleanthatRefFilterProperties();
 
+	/**
+	 * If a file in `.cleanthat` directory changes, one may wish all files to be cleaned (to apply the new
+	 * configuration). This could lead to very large commits from CleanThat.
+	 * 
+	 * Others would prefer the new configuration to apply incrementally, each time given file if modified.
+	 */
 	@Builder.Default
 	private boolean fullCleanOnConfigurationChange = false;
+
+	/**
+	 * By default, Cleanthat will allow itself modifying (not-protected) branches in-place.
+	 */
+	@Builder.Default
+	private boolean canEditNotProtectedBranches = true;
 
 	public List<String> getLabels() {
 		return labels;

@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.github.event;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,11 +35,13 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
+import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.codeprovider.git.HeadAndOptionalBase;
+import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
@@ -57,6 +60,9 @@ public class TestGithubWebhookHandler {
 	final GHRepository repo = Mockito.mock(GHRepository.class);
 	final GithubRepositoryFacade facade = new GithubRepositoryFacade(repo);
 
+	final GithubCodeCleaner refCleaner =
+			new GithubCodeCleaner(Paths.get(this.getClass().getSimpleName()), Mockito.mock(IGitRefCleaner.class));
+
 	final String someRepoFullName = "someOrg/someRepo";
 
 	{
@@ -67,8 +73,8 @@ public class TestGithubWebhookHandler {
 	public void testPrepareHeadSuppler() throws JsonParseException, JsonMappingException, IOException {
 		String refName = "refs/someRef";
 		var headToClean = new GitRepoBranchSha1(someRepoFullName, refName, "someSha1");
-		ILazyGitReference result =
-				handler.prepareHeadSupplier(
+		ILazyGitReference result = refCleaner
+				.prepareHeadSupplier(
 						new WebhookRelevancyResult(Optional.of(new HeadAndOptionalBase(headToClean, Optional.empty())),
 								Optional.empty()),
 						repo,
@@ -100,7 +106,7 @@ public class TestGithubWebhookHandler {
 
 		Mockito.when(repo.getRef(refNameWithRefsPrefix)).thenThrow(new GHFileNotFoundException("Not materialized yet"));
 
-		ILazyGitReference result = handler.prepareHeadSupplier(new WebhookRelevancyResult(
+		ILazyGitReference result = refCleaner.prepareHeadSupplier(new WebhookRelevancyResult(
 				Optional.of(new HeadAndOptionalBase(new GitRepoBranchSha1(someRepoFullName, refName, "someSha1"),
 						Optional.empty())),
 				Optional.empty()), repo, new GithubRepositoryFacade(repo), new AtomicReference<>());
@@ -133,7 +139,7 @@ public class TestGithubWebhookHandler {
 		Mockito.when(someRef.getObject()).thenReturn(someRefObject);
 		Mockito.when(someRef.getRef()).thenReturn(refName);
 
-		ILazyGitReference result = handler.prepareHeadSupplier(new WebhookRelevancyResult(
+		ILazyGitReference result = refCleaner.prepareHeadSupplier(new WebhookRelevancyResult(
 				Optional.of(new HeadAndOptionalBase(new GitRepoBranchSha1(someRepoFullName, refName, "someSha1"),
 						Optional.empty())),
 				Optional.empty()), repo, new GithubRepositoryFacade(repo), new AtomicReference<>());

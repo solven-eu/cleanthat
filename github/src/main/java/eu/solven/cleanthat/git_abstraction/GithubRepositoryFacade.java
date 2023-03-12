@@ -169,14 +169,21 @@ public class GithubRepositoryFacade {
 			throw new IllegalArgumentException("Inconsistent repo: " + repoName + "and " + ref.getRepoFullName());
 		}
 
+		return getRefIfPresent(ref.getRef());
+	}
+
+	public Optional<GHRef> getRefIfPresent(String refName) {
+		Optional<GHRef> optAlreadyExisting;
 		try {
-			return Optional.of(getRef(ref.getRef()));
+			GHRef ref = getRef(refName);
+			optAlreadyExisting = Optional.of(ref);
 		} catch (GHFileNotFoundException e) {
-			LOGGER.debug("There is no ref matching: '{}'", ref.getRef());
-			return Optional.empty();
+			LOGGER.info("The ref={} does not exists yet", refName);
+			optAlreadyExisting = Optional.empty();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		return optAlreadyExisting;
 	}
 
 }

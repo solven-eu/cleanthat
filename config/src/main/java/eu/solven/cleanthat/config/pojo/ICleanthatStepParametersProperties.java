@@ -42,6 +42,13 @@ public interface ICleanthatStepParametersProperties {
 	// BEWARE This is specific to JavaRefactorerProperties
 	String SAFE_BUT_CONTROVERSIAL = "SafeButControversial";
 
+	/**
+	 * The mutators applies Guava-friendly mutators. Most of them would rely on Guava methods. Some of them would get
+	 * out of Guava (e.g. for methods having equivalent in JDK)
+	 */
+	// BEWARE This is specific to JavaRefactorerProperties
+	String GUAVA = "Guava";
+
 	@JsonIgnore
 	Object getCustomProperty(String key);
 }

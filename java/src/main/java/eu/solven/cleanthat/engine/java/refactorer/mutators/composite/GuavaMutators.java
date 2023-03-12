@@ -25,25 +25,28 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaInlineStringsRepeat;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaStringsIsNullOrEmpty;
 
 /**
- * This mutator will apply all {@link IMutator} considered not-trivial. It is relevant to demonstrate the most
- * complex/useful rules, without polluting the diff with trivial changes.
+ * This mutator will apply all {@link IMutator} improving Guava usage. It assume latest version of Guava is a dependency
+ * of your project.
  * 
  * @author Benoit Lacelle
  *
  */
-public class SafeButNotTrivialMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
-	public static final List<IMutator> NOT_TRIVIAL =
-			ImmutableList.<IMutator>builder().add(new EnhancedForLoopToStreamAnyMatch()).build();
+public class GuavaMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
+	public static final List<IMutator> GUAVA = ImmutableList.<IMutator>builder()
+			.add(new GuavaInlineStringsRepeat())
+			.add(new GuavaStringsIsNullOrEmpty())
+			.build();
 
-	public SafeButNotTrivialMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, NOT_TRIVIAL));
+	public GuavaMutators(JavaVersion sourceJdkVersion) {
+		super(filterWithJdk(sourceJdkVersion, GUAVA));
 	}
 
 	@Override
 	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.SAFE_BUT_CONTROVERSIAL);
+		return Optional.of(JavaRefactorerProperties.GUAVA);
 	}
 }

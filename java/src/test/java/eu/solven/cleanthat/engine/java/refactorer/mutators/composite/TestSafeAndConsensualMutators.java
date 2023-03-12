@@ -56,7 +56,7 @@ public class TestSafeAndConsensualMutators {
 	public void testScanComposite() {
 		Set<String> safeAndConsensual = new SafeAndConsensualMutators(last).getUnderlyingIds();
 		Set<String> safeButNotConsensual = new SafeButNotConsensualMutators(last).getUnderlyingIds();
-		Set<String> safeButNotTrivial = new SafeButNotTrivialMutators(last).getUnderlyingIds();
+		Set<String> safeButNotTrivial = new SafeButControversialMutators(last).getUnderlyingIds();
 
 		// Check the intersection is empty
 		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotConsensual);
@@ -79,7 +79,7 @@ public class TestSafeAndConsensualMutators {
 							notInComposite.getClass().getSimpleName(),
 							SafeAndConsensualMutators.class.getSimpleName(),
 							SafeButNotConsensualMutators.class.getSimpleName(),
-							SafeButNotTrivialMutators.class.getSimpleName());
+							SafeButControversialMutators.class.getSimpleName());
 				});
 	}
 }

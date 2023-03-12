@@ -17,6 +17,8 @@ formatters:
       mutators:
       - SafeAndConsensual
       - SafeButNotConsensual
+      - SafeButControversial
+      - Guava
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:

@@ -17,7 +17,6 @@ package eu.solven.cleanthat.code_provider.inmemory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
@@ -144,16 +143,16 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
-		Charset charset = StandardCharsets.UTF_8;
+		var charset = StandardCharsets.UTF_8;
 
-		AtomicBoolean hasWritten = new AtomicBoolean();
+		var hasWritten = new AtomicBoolean();
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			var resolved = resolvePath(inMemoryPath);
 			try {
 				Files.createDirectories(resolved.getParent());
 
 				if (Files.exists(resolved)) {
-					String existingContent = Files.readString(resolved, charset);
+					var existingContent = Files.readString(resolved, charset);
 
 					if (existingContent.equals(content)) {
 						LOGGER.info("We skip writing content as same content already present: {}", resolved);

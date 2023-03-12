@@ -189,7 +189,11 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 	}
 
 	@Override
-	public void persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
+	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata metadata) {
+		if (pathToMutatedContent.isEmpty()) {
+			return false;
+		}
+
 		pathToMutatedContent.forEach((k, v) -> {
 			var resolvedPath = resolvePath(k);
 
@@ -198,7 +202,7 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 			}
 
 			try {
-				// Typically needed for ".cleanthat" directory
+				// Typically needed for ".cleanthat" directory when writing '.cleanthat/cleanthat.yaml'
 				Files.createDirectories(resolvedPath.getParent());
 				Files.writeString(resolvedPath,
 						v,
@@ -214,6 +218,8 @@ public class JGitCodeProvider implements ICodeProviderWriter {
 		if (commitPush) {
 			addCommitPush(metadata.getComments());
 		}
+
+		return true;
 	}
 
 	private void addCommitPush(List<String> prComments) {

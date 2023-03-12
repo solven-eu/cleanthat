@@ -28,6 +28,7 @@ import com.github.javaparser.ast.type.PrimitiveType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
 
 /**
@@ -36,6 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
  * @author Benoit Lacelle
  */
 @RepeatOnSuccess
+@ApplyMeBefore({ RedundantLogicalComplementsInStream.class })
 public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimplifyBooleanInitialization.class);
 

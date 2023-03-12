@@ -238,6 +238,13 @@ isDraft
 
 Require sourceJdk: 1.8
 
+### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
+
+
+isDraft
+
+Require sourceJdk: 1.8
+
 ### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
 
 

@@ -5,7 +5,14 @@ WARNING: `cleanthat` is new. Expect issues of all kinds, which is not to say tha
 
 # Motivation
 
-The point of this project is to enable automatic refactoring of your code-base. As of 2022-12, it focuses on Java projects
+The point of this project is to enable **automatic cleaning of your code-base**. By cleaning, we include :
+
+1- formatting (with an Eclipse stylesheet, Google-Java-Format, etc)
+2- linting (given any [IMutator](MUTATORS.generated.MD))
+3- refactoring (WIP)
+4- migrating (from JUnit4 to JUnit5)
+
+As of 2022-12, it focuses on Java projects, but enabling formatting various languages through Spotless.
 
 Related projects:
 
@@ -33,15 +40,22 @@ See [CHANGES.MD](CHANGES.MD)
 
 [MUTATORS.generated.MD](MUTATORS.generated.MD)
 
-# Compatibility
+# Language Coverage
+
+## As a Robot
 
 Cleanthat Robot is currently compatible with the following languages:
 
 - java (Spotless and OpenRewrite)
 - pom.xml (Spotless)
 - json (Spotless)
+- xml (Spotless)
 - yaml (Spotless)
 - kotlin (Spotless)
+
+see [FormatterFactory](spotless/src/main/java/eu/solven/cleanthat/spotless/FormatterFactory.java)
+
+## As a library
 
 Cleanthat Refactorer is currently compatible with the following languages:
 
@@ -51,8 +65,8 @@ Cleanthat Refactorer is currently compatible with the following languages:
 
 # Limitations
 
-- CleanThat processes files individually, which means limited `Type` resolution. This enables cleaning files on a per-impacted-file basis (e.g. in a Github Pull-Request).
-- The type resolution may be lifted through `cleanthat-maven-plugin`
+- CleanThat processes files individually, which indices limited `Type` resolution. This enables cleaning files on a per-impacted-file basis (e.g. in a Github Pull-Request).
+- The type resolution may be lifted through `cleanthat-maven-plugin` (TODO)
 
 # Installation
 
@@ -89,7 +103,7 @@ or simply `mvn cleanthat:apply`
 
 [![Gradle plugin](https://img.shields.io/badge/plugins.gradle.org-com.diffplug.spotless-blue.svg)](https://plugins.gradle.org/plugin/com.diffplug.spotless)
 
-## Github (Free+Paid)
+## Github App (Free+Paid)
 
 If your repository is hosted by Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/)
 
@@ -110,14 +124,20 @@ It differs from mvn/gradle integration by fetching only relevant (e.g. modified)
 - [Cleanthat](https://github.com/solven-eu/cleanthat/tree/master/.cleanthat) itself
 - [Pepper](https://github.com/solven-eu/pepper/tree/master/.cleanthat)
 
+## CI/CD (Github Actions, CircleCI, Jenkins, etc)
+
+If you integrated Cleanthat through its maven or gradle options, you can get automatic remote cleaning with:
+
+        ./mvnw spotless:check || ./mvnw spotless:apply && git commit -m"Spotless" && git push
+
 # Key design decisions
 
-As of 2022-12, this projects focuses on typical Java projects. Hence, it enables:
+As of 2022-12, this projects focuses on typical JVM projects. Hence, it enables:
 
-- Advanced Refactoring of .java files
-- Advanced Formatting of .java files (to be dropped, to rely on Spotless)
-- Advanced Formatting of pom.xml files (to be dropped, to rely on Spotless)
-- Basic Formatting of .json, .xml, etc files (to be dropped, to rely on Spotless)
+- Advanced Linting of .java files
+- Advanced Formatting of .java files (through Spotless)
+- Advanced Formatting of pom.xml files (through Spotless)
+- Basic Formatting of .json, .xml, etc files (through Spotless)
 
 ## Refactoring on a `per-single-source file` basis
 

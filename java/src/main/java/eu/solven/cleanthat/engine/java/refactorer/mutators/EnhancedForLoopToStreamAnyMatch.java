@@ -33,12 +33,14 @@ import com.github.javaparser.ast.type.UnknownType;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 
 /**
  * See EnhancedForLoopToStreamAnyMatchCases
  *
  * @author Benoit Lacelle
  */
+@ApplyMeBefore({ SimplifyBooleanInitialization.class })
 public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnhancedForLoopToStreamAnyMatch.class);
 

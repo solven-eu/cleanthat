@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -25,14 +24,16 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 
 /**
  * Turns '.stream(s -> {return s.subString(0, 2)})' into '.stream(s -> s.subString(0, 2))'
  *
  * @author Benoit Lacelle
  */
-public class LambdaReturnsSingleStatement extends AJavaparserMutator {
+@ApplyMeBefore({ LambdaIsMethodReference.class })
+public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 	@Override
 	public boolean isDraft() {
@@ -72,12 +73,12 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof LambdaExpr)) {
+	protected boolean processNotRecursively(Expression expr) {
+		if (!expr.isLambdaExpr()) {
 			return false;
 		}
 
-		var lambdaExpr = (LambdaExpr) node;
+		var lambdaExpr = expr.asLambdaExpr();
 
 		var body = lambdaExpr.getBody();
 
@@ -89,6 +90,7 @@ public class LambdaReturnsSingleStatement extends AJavaparserMutator {
 
 		if (lambdaBlockStmt.getStatements().size() == 1) {
 			if (lambdaBlockStmt.getStatement(0) instanceof ReturnStmt) {
+				// This case should be dropped, and left to LambdaIsMethodReference
 				var returnStmt = (ReturnStmt) lambdaBlockStmt.getStatement(0);
 
 				Optional<Expression> returnedExpr = returnStmt.getExpression();

@@ -68,6 +68,16 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 	}
 
 	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("LocalVariableTypeInference");
+	}
+
+	@Override
+	public String jSparrowUrl() {
+		return "https://jsparrow.github.io/rules/local-variable-type-inference.html";
+	}
+
+	@Override
 	protected boolean processNotRecursively(Node node) {
 		if (!(node instanceof VariableDeclarationExpr)) {
 			return false;

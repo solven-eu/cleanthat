@@ -1,7 +1,6 @@
-# For users: 
+# For users:
 
-    https://github.com/marketplace/cleanthat/
-
+        https://github.com/marketplace/cleanthat/
 
 ## Configuration
 
@@ -47,9 +46,10 @@ languages:
 
 This can be generated into an existing repository with:
 
-    mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
-  
+        mvn io.github.solven-eu.cleanthat:cleanthat-maven-plugin:init
+
 # For app administrator:
 
-    https://github.com/organizations/solven-eu/settings/apps/cleanthat
-    https://github.com/marketplace/cleanthat/hook
+        https://github.com/organizations/solven-eu/settings/apps/cleanthat
+        https://github.com/marketplace/cleanthat/hook
+

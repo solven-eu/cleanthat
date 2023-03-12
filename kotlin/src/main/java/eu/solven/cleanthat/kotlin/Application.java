@@ -30,7 +30,7 @@ public final class Application {
 	}
 
 	public static void main(String[] args) {
-		String language = args[0];
+		var language = args[0];
 		switch (language) {
 		case JAVA:
 			new JavaService().sayHello();

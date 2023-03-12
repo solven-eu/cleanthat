@@ -1,8 +1,8 @@
 # Mutators
+
 ## Single Mutators PRD-READY
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
-
 
 languageLevel: jdk1.8
 
@@ -24,7 +24,6 @@ See[ArraysDotStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/ref
 
 ### [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
 
-
 CheckStyle: [AvoidInlineConditionals](https://checkstyle.sourceforge.io/config_coding.html#AvoidInlineConditionals)
 
 Sonar: [RSPEC-3358](https://rules.sonarsource.com/java/RSPEC-3358)
@@ -45,7 +44,6 @@ public static class Checkstyle_booleanExpr {
 See[AvoidInlineConditionalsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidInlineConditionalsCases.java)
 
 ### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
-
 
 PMD: [ComparisonWithNaN](https://pmd.github.io/latest/pmd_rules_java_errorprone.html#comparisonwithnan)
 
@@ -69,7 +67,6 @@ See[ComparisonWithNaNCases](java/src/test/java/eu/solven/cleanthat/engine/java/r
 
 ### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
 
-
 PMD: [LiteralsFirstInComparisons](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons)
 
 languageLevel: jdk1
@@ -91,7 +88,6 @@ public static class CaseConstantString {
 See[LiteralsFirstInComparisonsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/LiteralsFirstInComparisonsCases.java)
 
 ### [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
-
 
 CheckStyle: [ModifierOrder](https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/modifier/ModifierOrderCheck.html)
 
@@ -147,7 +143,6 @@ See[ModifierOrderCases](java/src/test/java/eu/solven/cleanthat/engine/java/refac
 
 ### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
 
-
 languageLevel: jdk11
 
 ```
@@ -167,7 +162,6 @@ public static class CaseNotEmpty {
 See[OptionalNotEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/OptionalNotEmptyCases.java)
 
 ### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
-
 
 Sonar: [RSPEC-4034](https://rules.sonarsource.com/java/RSPEC-4034)
 
@@ -191,7 +185,6 @@ See[StreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat/engine/java/refa
 
 ### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
 
-
 PMD: [StringToString](https://pmd.github.io/latest/pmd_rules_java_performance.html#stringtostring)
 
 jSparrow: [RemoveToStringOnString](https://jsparrow.github.io/rules/remove-to-string-on-string.html)
@@ -211,7 +204,6 @@ public static class CaseNotString {
 See[StringToStringCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringToStringCases.java)
 
 ### [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
-
 
 PMD: [UnnecessaryModifier](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarymodifier)
 
@@ -275,7 +267,6 @@ See[UnnecessaryModifierCases](java/src/test/java/eu/solven/cleanthat/engine/java
 
 ### [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)
 
-
 PMD: [UseCollectionIsEmpty](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty)
 
 Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
@@ -302,7 +293,6 @@ See[UseCollectionIsEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/jav
 
 ### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
 
-
 PMD: [UseIndexOfChar](https://pmd.github.io/latest/pmd_rules_java_performance.html#useindexofchar)
 
 Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
@@ -327,7 +317,6 @@ See[UseIndexOfCharCases](java/src/test/java/eu/solven/cleanthat/engine/java/refa
 
 ### [UseStringIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseStringIsEmpty.java)
 
-
 languageLevel: jdk1.6
 
 ```
@@ -343,7 +332,6 @@ public static class CaseCollection {
 See[UseStringIsEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseStringIsEmptyCases.java)
 
 ### [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
-
 
 PMD: [UseUnderscoresInNumericLiterals](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#useunderscoresinnumericliterals)
 
@@ -366,10 +354,10 @@ public static class CaseReturnDouble {
 ```
 
 See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseUnderscoresInNumericLiteralsCases.java)
+
 ## Single Mutators (DRAFTs)
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
-
 
 PMD: [AvoidFileStream](https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream)
 
@@ -395,7 +383,6 @@ See[AvoidFileStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/ref
 
 ### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 
-
 PMD: [AvoidUncheckedExceptionsInSignatures](https://pmd.github.io/latest/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures)
 
 isDraft
@@ -417,7 +404,6 @@ public static class CaseRuntimeException {
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
 
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
-
 
 Sonar: [RSPEC-2976](https://rules.sonarsource.com/java/RSPEC-2976)
 
@@ -442,7 +428,6 @@ public static class CasePrefixSuffix {
 See[CreateTempFilesUsingNioCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/CreateTempFilesUsingNioCases.java)
 
 ### [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
-
 
 CheckStyle: [EmptyStatementCheck](https://javadoc.io/static/com.puppycrawl.tools/checkstyle/8.37/com/puppycrawl/tools/checkstyle/checks/coding/EmptyStatementCheck.html)
 
@@ -491,7 +476,6 @@ See[EmptyControlStatementCases](java/src/test/java/eu/solven/cleanthat/engine/ja
 
 ### [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
 
-
 jSparrow: [EnhancedForLoopToStreamAnyMatch](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
 
 isDraft
@@ -528,7 +512,6 @@ See[EnhancedForLoopToStreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat
 
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
-
 isDraft
 
 languageLevel: jdk1.5
@@ -550,7 +533,6 @@ public static class EnumInRightHandSide {
 See[EnumsWithoutEqualsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnumsWithoutEqualsCases.java)
 
 ### [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
-
 
 ErrorProne: [InlineMeInliner](https://errorprone.info/bugpattern/InlineMeInliner)
 
@@ -576,7 +558,6 @@ See[GuavaInlineStringsRepeatCases](java/src/test/java/eu/solven/cleanthat/engine
 
 ### [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 
-
 isDraft
 
 languageLevel: jdk11
@@ -599,7 +580,6 @@ See[GuavaStringsIsNullOrEmptyCases](java/src/test/java/eu/solven/cleanthat/engin
 
 ### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
 
-
 isDraft
 
 languageLevel: jdk1.8
@@ -613,7 +593,6 @@ public static class CaseBeforeAfterTest {
 See[JUnit4ToJUnit5Cases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/JUnit4ToJUnit5Cases.java)
 
 ### [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
-
 
 Sonar: [RSPEC-1612](https://rules.sonarsource.com/java/RSPEC-1612)
 
@@ -650,7 +629,6 @@ See[LambdaIsMethodReferenceCases](java/src/test/java/eu/solven/cleanthat/engine/
 
 ### [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 
-
 Sonar: [RSPEC-1602](https://rules.sonarsource.com/java/RSPEC-1602)
 
 jSparrow: [StatementLambdaToExpression](https://jsparrow.github.io/rules/statement-lambda-to-expression.html)
@@ -678,7 +656,6 @@ public static class CaseString {
 See[LambdaReturnsSingleStatementCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/LambdaReturnsSingleStatementCases.java)
 
 ### [LocalVariableTypeInference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LocalVariableTypeInference.java)
-
 
 Sonar: [RSPEC-6212](https://rules.sonarsource.com/java/RSPEC-6212)
 
@@ -708,7 +685,6 @@ See[LocalVariableTypeInferenceCases](java/src/test/java/eu/solven/cleanthat/engi
 
 ### [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
 
-
 ErrorProne: [ObjectEqualsForPrimitives](https://errorprone.info/bugpattern/ObjectEqualsForPrimitives)
 
 isDraft
@@ -732,7 +708,6 @@ public static class CaseInt {
 See[ObjectEqualsForPrimitivesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ObjectEqualsForPrimitivesCases.java)
 
 ### [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
-
 
 ErrorProne: [ObjectsHashCodePrimitive](https://errorprone.info/bugpattern/ObjectsHashCodePrimitive)
 
@@ -758,7 +733,6 @@ See[ObjectsHashCodePrimitiveCases](java/src/test/java/eu/solven/cleanthat/engine
 
 ### [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 
-
 PMD: [PrimitiveWrapperInstantiation](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation)
 
 isDraft
@@ -766,7 +740,6 @@ isDraft
 languageLevel: jdk1.5
 
 ### [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
-
 
 jSparrow: [RedundantLogicalComplementsInStream](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
 
@@ -789,7 +762,6 @@ public static class breakToStreamAnyMatch {
 See[RedundantLogicalComplementsInStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RedundantLogicalComplementsInStreamCases.java)
 
 ### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
-
 
 jSparrow: [RemoveExplicitCallToSuper](https://jsparrow.github.io/rules/remove-explicit-call-to-super.html)
 
@@ -822,7 +794,6 @@ See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engin
 
 ### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
 
-
 isDraft
 
 languageLevel: jdk1.8
@@ -851,7 +822,6 @@ See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/e
 
 ### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
 
-
 isDraft
 
 languageLevel: jdk1.8
@@ -874,7 +844,6 @@ See[SimplifyStreamFilterWithMapCases](java/src/test/java/eu/solven/cleanthat/eng
 
 ### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
 
-
 isDraft
 
 languageLevel: jdk1.6
@@ -896,7 +865,6 @@ public static class startsWithElseIsEmpty {
 See[StringStartsWithCharCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringStartsWithCharCases.java)
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
-
 
 Sonar: [RSPEC-1158](https://rules.sonarsource.com/java/RSPEC-1158)
 
@@ -921,7 +889,6 @@ public static class CaseBoolean_valueOf {
 See[UnnecessaryBoxingCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UnnecessaryBoxingCases.java)
 
 ### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
-
 
 PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)
 
@@ -950,7 +917,6 @@ See[UnnecessaryFullyQualifiedNameCases](java/src/test/java/eu/solven/cleanthat/e
 
 ### [UnnecessaryImport](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryImport.java)
 
-
 CheckStyle: [UnusedImports](https://checkstyle.sourceforge.io/config_imports.html#UnusedImports)
 
 isDraft
@@ -958,7 +924,6 @@ isDraft
 languageLevel: jdk1
 
 ### [UnnecessaryLambdaEnclosingParameters](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryLambdaEnclosingParameters.java)
-
 
 isDraft
 
@@ -977,7 +942,6 @@ public static class CaseRunnable {
 See[UnnecessaryLambdaEnclosingParametersCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UnnecessaryLambdaEnclosingParametersCases.java)
 
 ### [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
-
 
 PMD: [UnnecessarySemicolon](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarysemicolon)
 
@@ -1008,7 +972,6 @@ See[UnnecessarySemicolonCases](java/src/test/java/eu/solven/cleanthat/engine/jav
 
 ### [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
 
-
 PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator)
 
 Sonar: [RSPEC-2293](https://rules.sonarsource.com/java/RSPEC-2293)
@@ -1034,7 +997,6 @@ public static class CaseCollection {
 See[UseDiamondOperatorCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseDiamondOperatorCases.java)
 
 ### [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
-
 
 PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator)
 
@@ -1066,7 +1028,6 @@ See[UseDiamondOperatorJdk8Cases](java/src/test/java/eu/solven/cleanthat/engine/j
 
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
-
 isDraft
 
 languageLevel: jdk15
@@ -1078,17 +1039,16 @@ public static class caseHtml {
 ```
 
 See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseTextBlocksCases.java)
+
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)
-
 
 isDraft
 
 languageLevel: jdk1
 
 ### [CheckStyleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CheckStyleMutators.java)
-
 
 CheckStyle: CheckStyle
 
@@ -1098,20 +1058,17 @@ languageLevel: jdk1
 
 ### [CompositeMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeMutator.java)
 
-
 isDraft
 
 languageLevel: jdk1
 
 ### [CompositeWalkingMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeWalkingMutator.java)
 
-
 isDraft
 
 languageLevel: jdk1
 
 ### [ErrorProneMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/ErrorProneMutators.java)
-
 
 PMD: ErrorProne
 
@@ -1121,7 +1078,6 @@ languageLevel: jdk1
 
 ### [JSparrowMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/JSparrowMutators.java)
 
-
 PMD: jSparrow
 
 isDraft
@@ -1129,7 +1085,6 @@ isDraft
 languageLevel: jdk1
 
 ### [PMDMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/PMDMutators.java)
-
 
 PMD: PMD
 
@@ -1139,13 +1094,11 @@ languageLevel: jdk1
 
 ### [SafeAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeAndConsensualMutators.java)
 
-
 isDraft
 
 languageLevel: jdk1
 
 ### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
-
 
 isDraft
 
@@ -1153,13 +1106,11 @@ languageLevel: jdk1
 
 ### [SafeButNotTrivialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotTrivialMutators.java)
 
-
 isDraft
 
 languageLevel: jdk1
 
 ### [SonarMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SonarMutators.java)
-
 
 Sonar: [Sonar](https://rules.sonarsource.com/java/Sonar)
 

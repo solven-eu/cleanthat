@@ -99,7 +99,6 @@ public class TestGenerateDocumentation {
 	private static void addMutatorInfo(StringBuilder sb, IMutator mutator) {
 		sb.append(EOL).append(EOL).append("### ");
 		appendLinkToClass(sb, mutator.getClass(), URL_PREFIX);
-		sb.append(EOL);
 
 		addRefToExternalRules(sb, mutator);
 

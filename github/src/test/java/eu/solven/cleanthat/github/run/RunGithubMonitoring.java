@@ -143,7 +143,7 @@ public class RunGithubMonitoring {
 					if (Strings.isNullOrEmpty(repo.getLanguage())) {
 						LOGGER.debug("Not very interesting");
 					} else {
-						LOGGER.info("repo: {}", repo.getHtmlUrl());
+						LOGGER.info("repo: {} (private={})", repo.getHtmlUrl(), repo.isPrivate());
 						LOGGER.info("language: {}", repo.getLanguage());
 					}
 				});

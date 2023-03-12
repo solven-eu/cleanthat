@@ -33,4 +33,9 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
       - name: Spotless Check
-        run: mvn spotless:check || mvn spotless:apply && git commit -m "mvn spotless:apply" && git push
+        # https://joht.github.io/johtizen/build/2022/01/20/github-actions-push-into-repository.html#example-1
+        # https://stackoverflow.com/questions/55657835/is-there-a-way-to-push-changes-with-a-github-action
+        run: |
+          git config --local user.email "github-actions@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          mvn spotless:check || mvn spotless:apply && git commit -m "mvn spotless:apply" && git push

@@ -61,7 +61,7 @@ public class IncludeExcludeHelpers {
 		return globOrRegex.stream().flatMap(r -> {
 
 			if (!r.startsWith("glob:") && !r.startsWith("regex:")) {
-				String newPattern = "glob:" + r;
+				var newPattern = "glob:" + r;
 				LOGGER.info("We implied glob from implicit syntax: {} -> {}", r, newPattern);
 				r = newPattern;
 			}
@@ -84,7 +84,7 @@ public class IncludeExcludeHelpers {
 			if (r.startsWith("glob:**/")) {
 				// https://gitlab.com/gitlab-org/gitlab-foss/-/issues/66096
 				// https://github.com/fish-shell/fish-shell/issues/7222
-				String patternFromRoot = "glob:" + r.substring("glob:**/".length());
+				var patternFromRoot = "glob:" + r.substring("glob:**/".length());
 				return Stream.of(newPattern, patternFromRoot);
 			} else {
 				return Stream.of(newPattern);

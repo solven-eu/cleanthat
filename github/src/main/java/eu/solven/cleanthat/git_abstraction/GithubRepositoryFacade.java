@@ -51,15 +51,16 @@ public class GithubRepositoryFacade {
 	}
 
 	public Stream<GHPullRequest> findAnyPrHeadMatchingRef(String ref) throws IOException {
-		return repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
-			return ref.equals(GithubFacade.toFullGitRef(pr.getHead()));
-		});
+		return repository.getPullRequests(GHIssueState.OPEN)
+				.stream()
+				.filter(pr -> ref.equals(GithubFacade.toFullGitRef(pr.getHead())));
 	}
 
 	public Optional<GHPullRequest> findFirstPrBaseMatchingRef(String ref) throws IOException {
-		return repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
-			return ref.equals(GithubFacade.toFullGitRef(pr.getBase()));
-		}).findAny();
+		return repository.getPullRequests(GHIssueState.OPEN)
+				.stream()
+				.filter(pr -> ref.equals(GithubFacade.toFullGitRef(pr.getBase())))
+				.findAny();
 	}
 
 	public Optional<?> openPrIfNoneExists(GitRepoBranchSha1 base, GitRepoBranchSha1 head, String title, String body)
@@ -81,10 +82,11 @@ public class GithubRepositoryFacade {
 		}
 		var headRef = head.getRef();
 
-		Optional<GHPullRequest> existingPr = repository.getPullRequests(GHIssueState.ALL).stream().filter(pr -> {
-			return baseFullRef.equals(GithubFacade.toFullGitRef(pr.getBase()))
-					&& headRef.equals(GithubFacade.toFullGitRef(pr.getHead()));
-		}).findAny();
+		Optional<GHPullRequest> existingPr = repository.getPullRequests(GHIssueState.ALL)
+				.stream()
+				.filter(pr -> baseFullRef.equals(GithubFacade.toFullGitRef(pr.getBase()))
+						&& headRef.equals(GithubFacade.toFullGitRef(pr.getHead())))
+				.findAny();
 
 		if (existingPr.isEmpty()) {
 			// TODO We should allow ourselves to write into a previous RR open by CleanThat (else we would open an

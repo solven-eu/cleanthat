@@ -100,9 +100,12 @@ public class MutatorsScanner {
 	 */
 	public static <T extends IMutator> List<T> instantiate(JavaVersion sourceJdkVersion,
 			List<Class<? extends T>> classes) {
-		return classes.stream().filter(Objects::nonNull).filter(IMutator.class::isAssignableFrom).map(c -> {
-			return instantiate(sourceJdkVersion, c);
-		}).filter(Objects::nonNull).collect(Collectors.toList());
+		return classes.stream()
+				.filter(Objects::nonNull)
+				.filter(IMutator.class::isAssignableFrom)
+				.map(c -> instantiate(sourceJdkVersion, c))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 	}
 
 	public static <T extends IMutator> T instantiate(JavaVersion sourceJdkVersion, Class<? extends T> mutatorClass) {

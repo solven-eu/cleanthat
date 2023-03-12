@@ -245,9 +245,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 	private void analyticsOverOptions(Set<String> settingsToSwitch) {
 		SetMultimap<String, String> rawOptionToValues = MultimapBuilder.treeKeys().hashSetValues().build();
 
-		settingsToSwitch.forEach(key -> {
-			rawOptionToValues.putAll(key, possibleOptions(key));
-		});
+		settingsToSwitch.forEach(key -> rawOptionToValues.putAll(key, possibleOptions(key)));
 
 		SetMultimap<String, String> optionToValues = ImmutableSetMultimap.copyOf(rawOptionToValues);
 
@@ -314,9 +312,9 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				long tweakedDiffScoreDiff = computeDiffScore(formatter, Collections.singleton(entry.getValue()));
 
 				return tweakedDiffScoreDiff > 0;
-			}).forEach(entry -> {
-				LOGGER.warn("Path needing formatting with 'optimal' configuration: {}", entry.getKey());
-			});
+			})
+					.forEach(entry -> LOGGER.warn("Path needing formatting with 'optimal' configuration: {}",
+							entry.getKey()));
 		}
 	}
 
@@ -669,7 +667,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 				var parameterName =
 						parameterToSwitch.substring("org.eclipse.jdt.core.formatter.".length()).replace('.', '_');
 
-				String logPrefix = "Introspection strategy failed for ";
+				var logPrefix = "Introspection strategy failed for ";
 				try {
 					Field field = DefaultCodeFormatterOptions.class.getField(parameterName);
 					if (field.getType() == boolean.class) {

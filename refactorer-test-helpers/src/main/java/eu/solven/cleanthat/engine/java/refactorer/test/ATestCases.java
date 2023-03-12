@@ -204,9 +204,7 @@ public abstract class ATestCases<N, R> {
 					((NodeWithSimpleName<?>) pre).setName(newName);
 
 					if (pre instanceof ClassOrInterfaceDeclaration) {
-						pre.findAll(ConstructorDeclaration.class).forEach(cd -> {
-							cd.setName(newName);
-						});
+						pre.findAll(ConstructorDeclaration.class).forEach(cd -> cd.setName(newName));
 					}
 				}
 

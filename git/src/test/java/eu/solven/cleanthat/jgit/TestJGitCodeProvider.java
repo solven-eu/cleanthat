@@ -35,11 +35,9 @@ public class TestJGitCodeProvider {
 		var fs = Jimfs.newFileSystem();
 		JGitCodeProvider codeProvider =
 				new JGitCodeProvider(fs.getPath("/any"), Mockito.mock(Git.class), "someSha1", true);
-		Consumer<ICodeProviderFile> consumer = file -> {
-			Assertions.assertThat(file.getPath().toString())
-					.doesNotStartWith(fs.getSeparator())
-					.isEqualTo("root/folder/file");
-		};
+		Consumer<ICodeProviderFile> consumer = file -> Assertions.assertThat(file.getPath().toString())
+				.doesNotStartWith(fs.getSeparator())
+				.isEqualTo("root/folder/file");
 		TreeWalk treeWalk = Mockito.mock(TreeWalk.class);
 		Mockito.when(treeWalk.getPathString()).thenReturn("root/folder/file");
 		codeProvider.acceptLocalTreeWalk(consumer, treeWalk);

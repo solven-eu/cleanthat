@@ -59,9 +59,7 @@ public class OverlayCodeProviderWrite implements ICodeProviderWriter {
 
 	@Override
 	public void listFilesForContent(Set<String> includes, Consumer<ICodeProviderFile> consumer) throws IOException {
-		pathToOverlay.forEach((path, content) -> {
-			consumer.accept(new DummyCodeProviderFile(path, content));
-		});
+		pathToOverlay.forEach((path, content) -> consumer.accept(new DummyCodeProviderFile(path, content)));
 
 		underlying.listFilesForContent(includes, file -> {
 			var path = file.getPath();

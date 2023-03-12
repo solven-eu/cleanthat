@@ -23,7 +23,7 @@ import org.junit.Test;
 public class TestCleanThatApplyMojoTest extends ACleanThatMojoTest {
 	@Test
 	public void testCleanthat_noConfig() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -35,7 +35,7 @@ public class TestCleanThatApplyMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testCleanthat_javaJson() throws Exception {
-		String relativePathToParent = "/unit/java-json";
+		var relativePathToParent = "/unit/java-json";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);

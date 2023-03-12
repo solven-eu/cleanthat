@@ -56,7 +56,7 @@ public class ITGithubRefCleaner {
 
 		GHApp app = handler.getGithubAsApp();
 
-		String repoName = "cleanthat-integrationtests";
+		var repoName = "cleanthat-integrationtests";
 
 		// Ensure the repo is available to the app
 		// https://github.com/organizations/solven-eu/settings/installations/9086720

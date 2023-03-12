@@ -28,7 +28,7 @@ public class TestCleanThatGenerateEclipseStylesheetMojoTest extends ACleanThatMo
 
 	@Test
 	public void testGenerateEclipse() throws Exception {
-		String relativePathToParent = "/unit/with-git-ignore";
+		var relativePathToParent = "/unit/with-git-ignore";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);

@@ -88,9 +88,7 @@ public class GithubEventHelper {
 				LOGGER.warn("We created a tmpRef but there is no base");
 			} else {
 				if (result.isEmpty()) {
-					facade.optRef(lazyRefCreated).ifPresent(ref -> {
-						tryRemoveTmpRef(facade, lazyRefCreated, ref);
-					});
+					facade.optRef(lazyRefCreated).ifPresent(ref -> tryRemoveTmpRef(facade, lazyRefCreated, ref));
 				} else {
 					LOGGER.info(
 							"Clean is done but and some files are impacted: We open a PR if none already exists ({})",

@@ -56,7 +56,7 @@ public class TestCleanThatInit {
 	@Test
 	public void testConfigUrlIsAnything_exists() throws IOException {
 		// Where does this come from?
-		String prefixFromMvnTests = "/work/";
+		var prefixFromMvnTests = "/work/";
 
 		mojo.setCleanthatRepositoryConfigPath("someDir/some.yaml");
 		var configPath = fs.getPath(prefixFromMvnTests, "someDir/some.yaml");

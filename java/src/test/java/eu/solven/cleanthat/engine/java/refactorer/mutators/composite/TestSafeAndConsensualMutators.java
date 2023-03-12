@@ -74,12 +74,10 @@ public class TestSafeAndConsensualMutators {
 				.filter(s -> Sets.intersection(s.getIds(), safeAndConsensual).isEmpty()
 						&& Sets.intersection(s.getIds(), safeButNotConsensual).isEmpty()
 						&& Sets.intersection(s.getIds(), safeButNotTrivial).isEmpty())
-				.forEach(notInComposite -> {
-					LOGGER.warn("{} is neither in {} nor in {} nor in {}",
-							notInComposite.getClass().getSimpleName(),
-							SafeAndConsensualMutators.class.getSimpleName(),
-							SafeButNotConsensualMutators.class.getSimpleName(),
-							SafeButControversialMutators.class.getSimpleName());
-				});
+				.forEach(notInComposite -> LOGGER.warn("{} is neither in {} nor in {} nor in {}",
+						notInComposite.getClass().getSimpleName(),
+						SafeAndConsensualMutators.class.getSimpleName(),
+						SafeButNotConsensualMutators.class.getSimpleName(),
+						SafeButControversialMutators.class.getSimpleName()));
 	}
 }

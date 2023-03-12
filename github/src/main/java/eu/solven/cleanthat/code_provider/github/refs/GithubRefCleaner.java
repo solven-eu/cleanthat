@@ -259,8 +259,8 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		// if it is the head of a RR)
 		var baseMatchingRule = optBaseMatchingRule.get();
 
-		String prefix = "Cleaning {} in-place as ";
-		String suffix = " a sensible/cleanable base (rule={})";
+		var prefix = "Cleaning {} in-place as ";
+		var suffix = " a sensible/cleanable base (rule={})";
 		if (result.isReviewRequestOpen()) {
 			LOGGER.info(prefix + "RR has" + suffix, headRef, baseMatchingRule);
 		} else {
@@ -287,9 +287,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			optBaseMatchingRule = Optional.empty();
 		} else {
 			optBaseMatchingRule = regexes.stream().filter(regex -> {
-				var matchingBase = refs.stream().filter(base -> {
-					return Pattern.matches(regex, base);
-				}).findAny();
+				var matchingBase = refs.stream().filter(base -> Pattern.matches(regex, base)).findAny();
 
 				if (matchingBase.isEmpty()) {
 					LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", regex);
@@ -344,7 +342,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		// We do not want to open a ref on every event, so we should not hand a random suffix.
 		// We do not want to resurect previous branch each time a head has to be created, so we need a suffix
 		// We now suggest opening a RR at most once per day. We may not open it if there is a previous day RR still open
-		String nowSuffix = "-" + LocalDate.now();
+		var nowSuffix = "-" + LocalDate.now();
 
 		var ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + nowSuffix;
 		LOGGER.info("We provisioned a (temporary, not-materialized yet) head branch={} to clean base branch={}",

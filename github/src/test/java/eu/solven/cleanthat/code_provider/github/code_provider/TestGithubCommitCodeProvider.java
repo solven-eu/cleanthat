@@ -80,9 +80,7 @@ public class TestGithubCommitCodeProvider {
 
 		{
 			Set<String> paths = new HashSet<>();
-			codeProvider.listFilesForContent(file -> {
-				paths.add(file.getPath().toString());
-			});
+			codeProvider.listFilesForContent(file -> paths.add(file.getPath().toString()));
 
 			Assertions.assertThat(paths).contains("root.txt", "dir/toto.txt");
 		}

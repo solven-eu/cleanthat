@@ -49,9 +49,7 @@ public class TestOpenrewriteMutator {
 		final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 		CompilationUnit pre = AAstRefactorer.parse(refactorer, someClassContent).get();
 
-		Mockito.doAnswer(i -> {
-			return recipeRun;
-		}).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
+		Mockito.doAnswer(i -> recipeRun).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
 
 		Optional<Result> output = mutator.walkAst(pre);
 
@@ -66,9 +64,7 @@ public class TestOpenrewriteMutator {
 		final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 		CompilationUnit pre = AAstRefactorer.parse(refactorer, someClassContent).get();
 
-		Mockito.doAnswer(i -> {
-			return recipeRun;
-		}).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
+		Mockito.doAnswer(i -> recipeRun).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
 
 		Optional<Result> output = mutator.walkAst(pre);
 

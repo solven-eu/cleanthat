@@ -75,9 +75,7 @@ public class SpotlessLintFixer implements ILintFixerWithId, ILintFixerWithPath, 
 
 	@Override
 	public void close() {
-		formatters.forEach(ef -> {
-			ef.getFormatter().close();
-		});
+		formatters.forEach(ef -> ef.getFormatter().close());
 	}
 
 }

@@ -200,9 +200,7 @@ public class CheckGithubEventHasValidConfig {
 				if (prMatchingHead.isEmpty()) {
 					LOGGER.info("There is no open RR with head={}", ref);
 				} else {
-					prMatchingHead.forEach(pr -> {
-						relevantBaseBranches.add(GithubFacade.toFullGitRef(pr.getBase()));
-					});
+					prMatchingHead.forEach(pr -> relevantBaseBranches.add(GithubFacade.toFullGitRef(pr.getBase())));
 					// There is no point in forcing to get a RR, as this is used later only to check the RR is still
 					// open, or to append a comment: given N compatible RR< none should be impacted on a push event
 				}

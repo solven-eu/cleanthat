@@ -106,44 +106,42 @@ public class ITAnonymousClass {
 		tree.findAll(ClassOrInterfaceDeclaration.class).forEach(clazz -> {
 			List<MethodDeclaration> preMethods = clazz.getMethodsByName("post");
 
-			preMethods.forEach(pre -> {
-				pre.walk(node -> {
-					if (node instanceof NodeWithTypeArguments) {
-						Optional<Node> optParentNode = node.getParentNode();
+			preMethods.forEach(pre -> pre.walk(node -> {
+				if (node instanceof NodeWithTypeArguments) {
+					Optional<Node> optParentNode = node.getParentNode();
 
-						if (optParentNode.isPresent() && optParentNode.get() instanceof ObjectCreationExpr) {
-							var objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
-							Optional<ResolvedReferenceTypeDeclaration> optTypeDeclaration =
-									objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
-							if (optTypeDeclaration.isEmpty()) {
-								return;
-							}
+					if (optParentNode.isPresent() && optParentNode.get() instanceof ObjectCreationExpr) {
+						var objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
+						Optional<ResolvedReferenceTypeDeclaration> optTypeDeclaration =
+								objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
+						if (optTypeDeclaration.isEmpty()) {
+							return;
+						}
 
-							if (objectCreationExpr.getAnonymousClassBody().isPresent()) {
-								// https://github.com/javaparser/javaparser/issues/3333#issuecomment-893572693
-								LOGGER.info("Anonymous Class");
-							}
+						if (objectCreationExpr.getAnonymousClassBody().isPresent()) {
+							// https://github.com/javaparser/javaparser/issues/3333#issuecomment-893572693
+							LOGGER.info("Anonymous Class");
+						}
 
-							var typeDecl = optTypeDeclaration.get();
-							if (typeDecl.isAnonymousClass()) {
-								var asClass = typeDecl.asClass();
-								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
-							} else if (typeDecl.isClass()) {
-								var asClass = typeDecl.asClass();
-								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
-							} else if (typeDecl.isFunctionalInterface()) {
-								var asClass = typeDecl.asInterface();
-								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
-							} else if (typeDecl.isInterface()) {
-								var asClass = typeDecl.asInterface();
-								LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
-							} else {
-								System.out.println("?");
-							}
+						var typeDecl = optTypeDeclaration.get();
+						if (typeDecl.isAnonymousClass()) {
+							var asClass = typeDecl.asClass();
+							LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
+						} else if (typeDecl.isClass()) {
+							var asClass = typeDecl.asClass();
+							LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
+						} else if (typeDecl.isFunctionalInterface()) {
+							var asClass = typeDecl.asInterface();
+							LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
+						} else if (typeDecl.isInterface()) {
+							var asClass = typeDecl.asInterface();
+							LOGGER.info("anon={} {}{}", asClass.isAnonymousClass(), eol, optParentNode.get());
+						} else {
+							System.out.println("?");
 						}
 					}
-				});
-			});
+				}
+			}));
 		});
 	}
 }

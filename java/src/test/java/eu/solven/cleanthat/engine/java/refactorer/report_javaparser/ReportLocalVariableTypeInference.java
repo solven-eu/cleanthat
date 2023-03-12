@@ -59,8 +59,6 @@ public class ReportLocalVariableTypeInference {
 
 		node = LexicalPreservingPrinter.setup(node);
 
-		node.walk(innerNode -> {
-			processNotRecursively(innerNode);
-		});
+		node.walk(innerNode -> processNotRecursively(innerNode));
 	}
 }

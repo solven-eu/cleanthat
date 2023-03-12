@@ -113,7 +113,7 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 		List<Expression> arguments = methodExp.getArguments();
 		Optional<Expression> optToPath;
 		var newStaticClass = new NameExpr("Files");
-		String newStaticMethod = "createTempFile";
+		var newStaticMethod = "createTempFile";
 		var minArgSize = 2;
 		if (arguments.size() == minArgSize) {
 			// Create in default tmp directory

@@ -35,7 +35,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testCleanthat_noConfig() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
@@ -54,7 +54,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testCleanthat_initThenCheck() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
@@ -80,7 +80,7 @@ public class TestCleanThatCheckMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testCleanthat_initThenLintThenCheck() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml

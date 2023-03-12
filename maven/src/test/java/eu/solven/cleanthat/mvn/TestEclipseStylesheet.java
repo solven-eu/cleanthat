@@ -39,7 +39,7 @@ public class TestEclipseStylesheet {
 	@Test
 	public void testLoadFiles() {
 
-		final String path = "./src/test/java/";
+		final var path = "./src/test/java/";
 
 		Map<Path, String> contents = mojo.loadAnyJavaFile(Set.of(), generator, Set.of(Paths.get(path)));
 
@@ -50,7 +50,7 @@ public class TestEclipseStylesheet {
 	// Typically on module with no 'src/main/java'
 	@Test
 	public void testLoadFiles_doesNotExist() {
-		final String path = "./src/test/java/does_not_exists";
+		final var path = "./src/test/java/does_not_exists";
 
 		Map<Path, String> contents = mojo.loadAnyJavaFile(Set.of(), generator, Set.of(Paths.get(path)));
 

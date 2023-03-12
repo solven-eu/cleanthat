@@ -71,7 +71,7 @@ public class EclipseCleanupProcessor {
 	}
 
 	public static void main(String[] args) {
-		String sourceCode = "package eu.solven.cleanthat.do_not_format_me;\n" + "\n"
+		var sourceCode = "package eu.solven.cleanthat.do_not_format_me;\n" + "\n"
 				+ "import java.time.LocalDate;\n"
 				+ "import java.time.LocalDateTime;\n"
 				+ "\n"

@@ -178,7 +178,7 @@ public class RunGithubMonitoring {
 		GHUser user = installation.getAccount();
 
 		String login = user.getLogin();
-		String type = "?";
+		var type = "?";
 		try {
 			type = user.getType();
 		} catch (IOException e) {

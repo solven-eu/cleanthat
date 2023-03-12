@@ -96,9 +96,8 @@ public class ITGithub {
 		GithubNoApiWebhookHandler noauth = factory.makeUnderlyingNoAuth();
 		IGithubWebhookHandler fresh = factory.makeGithubWebhookHandler();
 		GHApp app = fresh.getGithubAsApp();
-		app.listInstallations().forEach(install -> {
-			LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl());
-		});
+		app.listInstallations()
+				.forEach(install -> LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl()));
 
 		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9_086_720).getOptResult().get();
 

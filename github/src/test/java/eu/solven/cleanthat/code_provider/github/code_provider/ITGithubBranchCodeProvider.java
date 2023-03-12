@@ -52,7 +52,7 @@ public class ITGithubBranchCodeProvider {
 
 		GHApp app = handler.getGithubAsApp();
 
-		String repoName = "cleanthat";
+		var repoName = "cleanthat";
 
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
 		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();

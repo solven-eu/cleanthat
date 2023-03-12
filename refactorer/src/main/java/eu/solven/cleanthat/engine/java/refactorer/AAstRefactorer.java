@@ -62,9 +62,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 	public AAstRefactorer(List<M> mutators) {
 		this.mutators = ImmutableList.copyOf(mutators);
 
-		this.mutators.forEach(ct -> {
-			LOGGER.debug("Using transformer: {}", ct.getIds());
-		});
+		this.mutators.forEach(ct -> LOGGER.debug("Using transformer: {}", ct.getIds()));
 	}
 
 	public Set<String> getMutators() {

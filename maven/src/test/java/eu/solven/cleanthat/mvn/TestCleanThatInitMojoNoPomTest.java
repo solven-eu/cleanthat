@@ -30,7 +30,7 @@ public class TestCleanThatInitMojoNoPomTest extends ACleanThatMojoTest {
 	@Ignore("TODO It is unclear how one can test a Mojo without an underlying pom")
 	@Test
 	public void testInit() throws Exception {
-		String relativePathToParent = "/unit/no_pom.xml";
+		var relativePathToParent = "/unit/no_pom.xml";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -49,7 +49,7 @@ public class TestCleanThatInitMojoNoPomTest extends ACleanThatMojoTest {
 	@Ignore("TODO It is unclear how one can test a Mojo without an underlying pom")
 	@Test
 	public void testInit2() throws Exception {
-		String relativePathToParent = "/unit/no_pom.xml";
+		var relativePathToParent = "/unit/no_pom.xml";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MojoExecution mojoExec = newMojoExecution("init");

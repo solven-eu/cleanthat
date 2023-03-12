@@ -92,7 +92,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 	}
 
 	private void pad(StringBuilder buffer, int spaces) {
-		String block = "                                        ";
+		var block = "                                        ";
 		while (spaces > 0) {
 			var n = Math.min(spaces, block.length());
 			buffer.append(block, 0, n);
@@ -108,7 +108,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		TransferResource resource = event.getResource();
 		long contentLength = event.getTransferredBytes();
 		if (contentLength >= 0) {
-			String type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
+			var type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
 			String len;
 			if (contentLength >= 1_024) {
 				len = toKB(contentLength) + " KB";
@@ -116,7 +116,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 				len = contentLength + " B";
 			}
 
-			String throughput = "";
+			var throughput = "";
 			long duration = System.currentTimeMillis() - resource.getTransferStartTime();
 			if (duration > 0) {
 				long bytes = contentLength - resource.getResumeOffset();

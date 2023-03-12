@@ -161,9 +161,7 @@ public class CodeProviderFormatter implements ICodeProviderFormatter {
 					.collect(Collectors.joining(EOL));
 
 			prComments.add("engine=" + languageP.getEngine() + EOL + details);
-			languageCounters.asMap().forEach((l, c) -> {
-				languagesCounters.addAndGet(l, c);
-			});
+			languageCounters.asMap().forEach((l, c) -> languagesCounters.addAndGet(l, c));
 		});
 
 		boolean isEmpty;

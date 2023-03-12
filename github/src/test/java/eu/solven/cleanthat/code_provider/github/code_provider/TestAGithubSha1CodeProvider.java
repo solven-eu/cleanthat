@@ -59,9 +59,7 @@ public class TestAGithubSha1CodeProvider {
 		ICodeProvider localCp = codeProvider.getHelper().downloadGitRefLocally(tmpDir);
 
 		Set<String> paths = new HashSet<>();
-		localCp.listFilesForContent(file -> {
-			paths.add(file.getPath().toString());
-		});
+		localCp.listFilesForContent(file -> paths.add(file.getPath().toString()));
 
 		Assertions.assertThat(paths).contains("root.txt", "dir/toto.txt");
 

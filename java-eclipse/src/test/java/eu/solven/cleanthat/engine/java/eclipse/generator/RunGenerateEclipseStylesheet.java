@@ -85,9 +85,7 @@ public class RunGenerateEclipseStylesheet {
 
 		LOGGER.info("Difference with Pepper:");
 		MapDifference<String, String> diff = Maps.difference(pepperConvention, selectedOptions);
-		diff.entriesDiffering().forEach((k, v) -> {
-			LOGGER.info("{} -> {}", k, v);
-		});
+		diff.entriesDiffering().forEach((k, v) -> LOGGER.info("{} -> {}", k, v));
 		EclipseJavaFormatterConfiguration config = new EclipseJavaFormatterConfiguration(pepperConvention);
 		EclipseJavaFormatter formatter = new EclipseJavaFormatter(config);
 		long pepperDiffScoreDiff =

@@ -93,13 +93,12 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 
 			JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(mutator.isJreOnly());
 
-			Stream.of(cases).forEach(oneTestFile -> {
-				individualCases.add(new Object[] { mutatorClassSimpleName,
-						oneTestFile.getFilename(),
-						oneTestFile,
-						javaParser,
-						mutator });
-			});
+			Stream.of(cases)
+					.forEach(oneTestFile -> individualCases.add(new Object[] { mutatorClassSimpleName,
+							oneTestFile.getFilename(),
+							oneTestFile,
+							javaParser,
+							mutator }));
 		});
 
 		return individualCases;
@@ -128,9 +127,8 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 	private void testSourceWithMutator(IWalkingMutator<Node, Node> mutator, String asString) {
 		if ("SealedClassTests.java".equals(resource.getFilename())) {
 			// sealed classes are not managed by JP3.25
-			Assertions.assertThatThrownBy(() -> {
-				parseCompilationUnit(mutator, asString);
-			}).isInstanceOf(IllegalArgumentException.class);
+			Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
+					.isInstanceOf(IllegalArgumentException.class);
 		} else if ("AsyncLoggerConfig.java".equals(resource.getFilename())) {
 			if (mutator.getClass().equals(LocalVariableTypeInference.class)) {
 				// https://github.com/javaparser/javaparser/issues/3940

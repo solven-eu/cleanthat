@@ -71,7 +71,7 @@ public class TestGithubWebhookHandler {
 
 	@Test
 	public void testPrepareHeadSuppler() throws JsonParseException, JsonMappingException, IOException {
-		String refName = "refs/someRef";
+		var refName = "refs/someRef";
 		var headToClean = new GitRepoBranchSha1(someRepoFullName, refName, "someSha1");
 		ILazyGitReference result = refCleaner
 				.prepareHeadSupplier(

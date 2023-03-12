@@ -57,7 +57,7 @@ public class MarketPlaceEventManager {
 		LOGGER.info("Processing a marketplace event: {}", marketplaceEvent);
 
 		// https://api.slack.com/apps/A04AW22QQ9X/incoming-webhooks
-		String whKey = "slack.webhook.marketplace";
+		var whKey = "slack.webhook.marketplace";
 		var marketplaceWebhook = env.getProperty(whKey);
 		if (Strings.isNullOrEmpty(marketplaceWebhook)) {
 			LOGGER.error("We lack a '{}'", whKey);

@@ -48,9 +48,8 @@ public class TestJavaParserParsing extends AJavaparserTestCases {
 
 			if ("SealedClassTests.java".equals(resource.getFilename())) {
 				// sealed classes are not managed by JP3.25
-				Assertions.assertThatThrownBy(() -> {
-					parseCompilationUnit(mutator, asString);
-				}).isInstanceOf(IllegalArgumentException.class);
+				Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
+						.isInstanceOf(IllegalArgumentException.class);
 			} else {
 				parseCompilationUnit(mutator, asString);
 			}

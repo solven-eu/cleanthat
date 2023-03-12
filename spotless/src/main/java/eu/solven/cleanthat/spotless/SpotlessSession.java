@@ -152,7 +152,7 @@ public class SpotlessSession {
 		} else {
 			var realFsFakeRoot = FileSystems.getDefault().getSeparator();
 			// The fake root try to limit the risk of writing in improper locations
-			String someFakeRootDirectory = "cleanthat_fake_root_for_spotless";
+			var someFakeRootDirectory = "cleanthat_fake_root_for_spotless";
 			var preventCollisions = UUID.randomUUID().toString();
 
 			// Spotless requires a real File (instead of a Path)

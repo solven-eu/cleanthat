@@ -36,9 +36,7 @@ public class TestFileSystemCodeProvider {
 		var fs = Jimfs.newFileSystem();
 		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
-		cp.listFilesForContent(file -> {
-			Assertions.fail("The FS is empty");
-		});
+		cp.listFilesForContent(file -> Assertions.fail("The FS is empty"));
 
 		cp.persistChanges(Map.of(fs.getPath("root", "directory", "file.txt"), "newContent"),
 				CodeWritingMetadata.empty());

@@ -277,9 +277,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 
 			return result;
 		} catch (RuntimeException e) {
-			optCheckRun.ifPresent(checkRun -> {
-				githubCheckRunManager.reportFailure(checkRun, e);
-			});
+			optCheckRun.ifPresent(checkRun -> githubCheckRunManager.reportFailure(checkRun, e));
 
 			throw new RuntimeException(e);
 		}
@@ -379,9 +377,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 				}
 			});
 		} catch (RuntimeException e) {
-			optCheckRun.ifPresent(checkRun -> {
-				githubCheckRunManager.reportFailure(checkRun, e);
-			});
+			optCheckRun.ifPresent(checkRun -> githubCheckRunManager.reportFailure(checkRun, e));
 
 			throw new RuntimeException("Propagate", e);
 		}

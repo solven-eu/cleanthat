@@ -69,7 +69,7 @@ public class GithubCheckRunManager {
 			// Limitted to 20 characters
 			var identifier = Ascii.truncate(gitService.getSha1(), LIMIT_IDENTIFIER, "");
 			// Limitted to 40 characters
-			String description = "Cleanthat cleaning/refactoring";
+			var description = "Cleanthat cleaning/refactoring";
 
 			try {
 				Optional<GHCheckRun> optExisting = baseRepo.getCheckRuns(sha1)

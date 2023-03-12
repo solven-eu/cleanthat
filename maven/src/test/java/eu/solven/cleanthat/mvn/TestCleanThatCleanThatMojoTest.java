@@ -32,7 +32,7 @@ import eu.solven.pepper.unittest.PepperTestHelper;
 public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 	@Test
 	public void testCleanthat_noConfig() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml
@@ -51,7 +51,7 @@ public class TestCleanThatCleanThatMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testCleanthat_initThenLint() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		// Ensure the test resources does not hold a cleanthat.yaml

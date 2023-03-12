@@ -262,7 +262,7 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	@SuppressWarnings("PMD.InvalidLogMessageFormat")
 	private void sanityChecks(File baseDir, boolean result, File projectFile) {
-		String template =
+		var template =
 				": Unclear what is the executionRoot: getExecutionRootDirectory()={} vs getProject().getBasedir()={}";
 		if (result) {
 			LOGGER.debug("This is the execution root.");

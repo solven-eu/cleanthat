@@ -91,7 +91,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 
 		var singleVariable = assignExpr.getVariable(0);
 		if (!assignExpr.getElementType().isPrimitiveType()
-				|| !assignExpr.getElementType().asPrimitiveType().getType().equals(PrimitiveType.Primitive.BOOLEAN)) {
+				|| !PrimitiveType.Primitive.BOOLEAN.equals(assignExpr.getElementType().asPrimitiveType().getType())) {
 			return false;
 		} else if (singleVariable.getInitializer().isEmpty()) {
 			return false;

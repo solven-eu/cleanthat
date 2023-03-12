@@ -42,7 +42,7 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testInit_noPom() throws Exception {
-		String relativePathToParent = "/unit/no_pom.xml";
+		var relativePathToParent = "/unit/no_pom.xml";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		Assertions.assertThatThrownBy(() -> prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder))
@@ -51,7 +51,7 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testInit_onlyPom() throws Exception {
-		String relativePathToParent = "/unit/project-to-test";
+		var relativePathToParent = "/unit/project-to-test";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);
@@ -108,7 +108,7 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 
 	@Test
 	public void testInit_javaJson() throws Exception {
-		String relativePathToParent = "/unit/java-json";
+		var relativePathToParent = "/unit/java-json";
 		File readWriteFolder = temporaryFolder(relativePathToParent);
 
 		MavenProject project = prepareMojoInTemporaryFolder(relativePathToParent, readWriteFolder);

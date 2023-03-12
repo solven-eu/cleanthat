@@ -71,9 +71,8 @@ public class TestCreateTempFilesUsingNioCases extends AParameterizesJavaparserRe
 						.getResult()
 						.get();
 
-		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class, c -> {
-			return !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty();
-		});
+		List<ClassOrInterfaceDeclaration> cases = compilationUnit.findAll(ClassOrInterfaceDeclaration.class,
+				c -> !c.getMethodsByName("pre").isEmpty() && !c.getMethodsByName("post").isEmpty());
 		IJavaparserMutator transformer = new CreateTempFilesUsingNio();
 		cases.forEach(oneCase -> {
 			LOGGER.info("Processing the case: {}", oneCase.getName());

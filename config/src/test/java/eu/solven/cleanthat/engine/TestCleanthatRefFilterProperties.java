@@ -44,7 +44,7 @@ public class TestCleanthatRefFilterProperties {
 	public void testEmptyJson() throws JsonProcessingException {
 		var p = new CleanthatRefFilterProperties();
 
-		String json = "{}";
+		var json = "{}";
 
 		var backToObject = objectMapper.readValue(json, CleanthatRefFilterProperties.class);
 

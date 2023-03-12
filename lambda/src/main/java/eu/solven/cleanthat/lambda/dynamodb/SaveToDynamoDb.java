@@ -80,22 +80,20 @@ public class SaveToDynamoDb {
 
 	public static String saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
 		// We re-use the same xGitHubDelivery for the different steps (checkEvent, checkConfig, executeClean)
-		String primaryKey = PepperMapHelper.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-				.orElseGet(() -> PepperMapHelper
-						.getOptionalString(input.getBody(),
-								GithubWebhookEvent.KEY_HEADERS,
-								GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-						.orElseGet(
-								() -> PepperMapHelper
+		String primaryKey =
+				PepperMapHelper.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+						.orElseGet(() -> PepperMapHelper
+								.getOptionalString(input.getBody(),
+										GithubWebhookEvent.KEY_HEADERS,
+										GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+								.orElseGet(() -> PepperMapHelper
 										.getOptionalString(input.getBody(),
 												GithubWebhookEvent.KEY_GITHUB,
 												GithubWebhookEvent.KEY_HEADERS,
 												GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-										.orElseGet(() -> {
-											return randomEventKey(input);
-										})
+										.orElseGet(() -> randomEventKey(input))
 
-						));
+								));
 
 		LOGGER.info("Save something into DynamoDB table={} primaryKey={}", table, primaryKey);
 

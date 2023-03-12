@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -90,7 +91,6 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 		if (lambdaBlockStmt.getStatements().size() == 1) {
 			if (lambdaBlockStmt.getStatement(0) instanceof ReturnStmt) {
-				// This case should be dropped, and left to LambdaIsMethodReference
 				var returnStmt = (ReturnStmt) lambdaBlockStmt.getStatement(0);
 
 				Optional<Expression> returnedExpr = returnStmt.getExpression();
@@ -99,11 +99,11 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 					return false;
 				}
 
-				return changeExpression(lambdaExpr, returnedExpr.get());
+				return changeExpression(lambdaExpr, returnedExpr.get(), returnStmt.getComment());
 			} else if (lambdaBlockStmt.getStatement(0) instanceof ExpressionStmt) {
 				var exprStmt = (ExpressionStmt) lambdaBlockStmt.getStatement(0);
 
-				return changeExpression(lambdaExpr, exprStmt.getExpression());
+				return changeExpression(lambdaExpr, exprStmt.getExpression(), exprStmt.getComment());
 			} else {
 				return false;
 			}
@@ -112,7 +112,12 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 		}
 	}
 
-	private boolean changeExpression(LambdaExpr lambdaExpr, Expression expr) {
+	private boolean changeExpression(LambdaExpr lambdaExpr, Expression expr, Optional<Comment> optComment) {
+		if (optComment.isPresent()) {
+			// comments are not-well managed by JavaParser: we prefer not transforming not to lose comments
+			return false;
+		}
+
 		// https://github.com/javaparser/javaparser/pull/3938
 		// lambdaExpr.setBody(new ExpressionStmt(expr));
 		// return true;

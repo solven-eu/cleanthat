@@ -119,4 +119,20 @@ public class LambdaReturnsSingleStatementCases extends AJavaparserRefactorerCase
 			map.forEach((k, v) -> System.out.println(k + ": " + v));
 		}
 	}
+
+	// Comments are difficult to manage: we do not transform
+	@UnmodifiedMethod
+	public static class CaseWithComment {
+		public Consumer<Integer> pre() {
+			return x -> {
+				// inner comment
+				System.out.println(x + 1);
+			};
+		}
+
+		public Consumer<Integer> post() {
+			// inner comment
+			return x -> System.out.println(x + 1);
+		}
+	}
 }

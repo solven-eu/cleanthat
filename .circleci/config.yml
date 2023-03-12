@@ -2,7 +2,7 @@ version: 2.1 # use CircleCI 2.0
 
 orbs:
   slack: circleci/slack@4.12.1
-  coveralls: coveralls/coveralls@2.0.0
+  #coveralls: coveralls/coveralls@2.0.0
 
 aliases:
   - &exclude-deploy
@@ -44,7 +44,7 @@ jobs: # a collection of steps
       - run: *save_surefire
       - store_test_results:
           path: ~/test-results/junit
-      - coveralls/upload
+      #- coveralls/upload
 
   deploy-lambda: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/circleci-cleanthat # directory where steps will run
@@ -70,7 +70,7 @@ workflows:
       - build:
           context: 
             - slack-secrets
-            - cleanthat-coveralls
+            #- cleanthat-coveralls
       - deploy-lambda:
           # https://ideas.circleci.com/cloud-feature-requests/p/multiple-contexts-in-a-workflow
           context: aws-cleanthat

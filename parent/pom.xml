@@ -475,7 +475,8 @@
 								<spacesPerTab>4</spacesPerTab>
 							</indent>
 							<includes>
-								<include>**/*.json</include>
+								<include>*.json</include>
+								<include>src/**/*.json</include>
 							</includes>
 							<gson />
 						</json>

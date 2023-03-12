@@ -69,6 +69,7 @@ workflows:
       # We might require a manual click in CircleCI UI: https://circleci.com/docs/2.0/workflows/#holding-a-workflow-for-a-manual-approval
       - build:
           context: slack-secrets
+          context: cleanthat-coveralls
       - deploy-lambda:
           # https://ideas.circleci.com/cloud-feature-requests/p/multiple-contexts-in-a-workflow
           context: aws-cleanthat

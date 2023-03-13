@@ -58,7 +58,7 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		SpotlessStepPropertiesBuilder removeUnusedImportsBuilder =
 				SpotlessStepProperties.builder().id("removeUnusedImports");
 
-		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+		if ("true".equals(System.getProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
 			// We skip removeUnusedImports as it make it difficult to get when Cleanthat generates invalid code
 			removeUnusedImportsBuilder.skip(true);
 		}
@@ -84,7 +84,7 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		// see com.github.javaparser.ParserConfiguration.LanguageLevel.POPULAR
 		cleanthatParameters.putProperty("source_jdk", "11");
 		cleanthatParameters.putProperty("mutators", JavaFormatterStepFactory.DEFAULT_MUTATORS);
-		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+		if ("true".equals(System.getProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
 			cleanthatParameters.putProperty("include_draft", Boolean.TRUE);
 		}
 		cleanthat.setParameters(cleanthatParameters);

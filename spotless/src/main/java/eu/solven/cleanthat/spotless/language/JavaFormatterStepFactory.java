@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.diffplug.common.annotations.VisibleForTesting;
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
@@ -56,6 +57,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
+	static final String ENV_CLEANTHAT_INCLUDE_DRAFT = "cleanthat.include_draft";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatterStepFactory.class);
 
 	private static final String DEFAULT_CLEANTHAT_VERSION = "2.10";
@@ -84,7 +87,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	static {
 		ImmutableList.Builder<String> defaultMutatorsBuilder =
 				ImmutableList.<String>builder().add(ICleanthatStepParametersProperties.SAFE_AND_CONSENSUAL);
-		if ("true".equals(System.getProperty("cleanthat.include_draft"))) {
+		if ("true".equals(System.getProperty(ENV_CLEANTHAT_INCLUDE_DRAFT))) {
 			LOGGER.warn("We include {} in default mutators",
 					ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
 			defaultMutatorsBuilder.add(ICleanthatStepParametersProperties.SAFE_BUT_NOT_CONSENSUAL);
@@ -97,29 +100,60 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	}
 
 	private static String parseCleanthatDefaultVersion() {
-		String cleanthatVersion;
-
 		var mavenProperties = PepperResourceHelper.loadAsString(RESOURCE_MAVEN_JSON, StandardCharsets.UTF_8);
+		Map<?, ?> asMap;
 		try {
-			Map<?, ?> asMap = new ObjectMapper().readValue(mavenProperties, Map.class);
-			var rawMavenProjectVersion = PepperMapHelper.getRequiredString(asMap, "project.version");
-			if (rawMavenProjectVersion.startsWith("@")) {
-				rawMavenProjectVersion = DEFAULT_CLEANTHAT_VERSION;
-				cleanthatVersion = rawMavenProjectVersion;
-				LOGGER.error("Issue loading from {} (as we found {}). Fallback on {}",
-						RESOURCE_MAVEN_JSON,
-						rawMavenProjectVersion,
-						cleanthatVersion);
-			} else {
-				cleanthatVersion = rawMavenProjectVersion;
-				LOGGER.info("We are running over cleanthat.version={}", cleanthatVersion);
-			}
+			asMap = new ObjectMapper().readValue(mavenProperties, Map.class);
 		} catch (JsonProcessingException e) {
-			cleanthatVersion = DEFAULT_CLEANTHAT_VERSION;
 			LOGGER.error("Issue loading from {}. Fallback on {}", RESOURCE_MAVEN_JSON, CLEANTHAT_VERSION, e);
+			return DEFAULT_CLEANTHAT_VERSION;
 		}
 
+		String cleanthatVersion = cleanCleanthatVersionFromMvnProperties(asMap);
+
 		return cleanthatVersion;
+	}
+
+	@VisibleForTesting
+	static String cleanCleanthatVersionFromMvnProperties(Map<?, ?> asMap) {
+		String cleanthatVersion;
+		var rawMavenProjectVersion = PepperMapHelper.getRequiredString(asMap, "project.version");
+		if (rawMavenProjectVersion.startsWith("@")) {
+			rawMavenProjectVersion = DEFAULT_CLEANTHAT_VERSION;
+			cleanthatVersion = rawMavenProjectVersion;
+			LOGGER.error("Issue loading from {} (as we found {}). Fallback on {}",
+					RESOURCE_MAVEN_JSON,
+					rawMavenProjectVersion,
+					cleanthatVersion);
+		} else {
+			if (rawMavenProjectVersion.endsWith("-SNAPSHOT")) {
+				if ("true".equals(System.getProperty(ENV_CLEANTHAT_INCLUDE_DRAFT))) {
+					LOGGER.info("Spotless will execute a '-SNAPSHOT' of clenathat");
+					cleanthatVersion = rawMavenProjectVersion;
+				} else {
+					LOGGER.info("Spotless will execute a '-RELEASE' of clenathat");
+					cleanthatVersion = getPreviousRelease(rawMavenProjectVersion);
+				}
+			} else {
+				cleanthatVersion = rawMavenProjectVersion;
+			}
+
+			LOGGER.info("We are running over cleanthat.version={}", cleanthatVersion);
+		}
+		return cleanthatVersion;
+	}
+
+	private static String getPreviousRelease(String rawMavenProjectVersion) {
+		if (!rawMavenProjectVersion.endsWith("-SNAPSHOT")) {
+			throw new IllegalArgumentException(rawMavenProjectVersion + " should be a -SNAPSHOT");
+		}
+
+		int lastIndexOfDot = rawMavenProjectVersion.lastIndexOf('.');
+
+		String snapshotMinorVersion = rawMavenProjectVersion.substring(lastIndexOfDot + 1,
+				rawMavenProjectVersion.length() - "-SNAPSHOT".length());
+
+		return rawMavenProjectVersion.substring(0, lastIndexOfDot + 1) + (Integer.parseInt(snapshotMinorVersion) - 1);
 	}
 
 	public JavaFormatterStepFactory(JavaFormatterFactory formatterFactory,

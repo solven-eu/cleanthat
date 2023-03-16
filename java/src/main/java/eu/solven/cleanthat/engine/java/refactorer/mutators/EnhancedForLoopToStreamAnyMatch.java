@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -69,15 +70,12 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 
 		var forEachStmt = stmt.asForEachStmt();
 
-		if (!forEachStmt.getBody().isBlockStmt() || forEachStmt.getBody().asBlockStmt().getStatements().size() != 1) {
-			return false;
-		}
-		var singleStatement = forEachStmt.getBody().asBlockStmt().getStatement(0);
-		if (!singleStatement.isIfStmt() || singleStatement.asIfStmt().getElseStmt().isPresent()) {
+		Optional<IfStmt> optIfStmt = StreamMutatorHelpers.findSingleIfThenStmt(forEachStmt);
+		if (optIfStmt.isEmpty()) {
 			return false;
 		}
 
-		var ifStmt = singleStatement.asIfStmt();
+		var ifStmt = optIfStmt.get();
 		var thenStmt = ifStmt.getThenStmt();
 		if (!thenStmt.isBlockStmt()) {
 			return false;
@@ -90,16 +88,10 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 
 		var lastStmt = thenAsBlockStmt.getStatement(thenAsBlockStmt.getStatements().size() - 1);
 
-		// var thenFirst = thenAsBlockStmt.getStatement(0);
-
 		if (lastStmt.isReturnStmt()) {
 			return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
 		} else if (lastStmt.isBreakStmt()) {
 			boolean breakIsRemoved = tryRemove(lastStmt);
-			// NodeList<Statement> newThenStmts = new NodeList<>(thenAsBlockStmt.getStatements());
-			// newThenStmts.removeLast();
-			// BlockStmt newThen = new BlockStmt(newThenStmts);
-
 			if (!breakIsRemoved) {
 				LOGGER.warn("Issue removing the last `break` from `{}`", thenAsBlockStmt);
 				return false;
@@ -114,16 +106,21 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {
 		Expression withStream = new MethodCallExpr(forEachStmt.getIterable(), "stream");
 		var variable = forEachStmt.getVariable().getVariables().get(0);
+		var lambdaExpr = ifConditionToLambda(ifStmt, variable);
+		Expression withStream2 = new MethodCallExpr(withStream, ANY_MATCH, new NodeList<>(lambdaExpr));
+
+		var newif = new IfStmt(withStream2, thenAsBlockStmt, null);
+
+		return tryReplace(forEachStmt, newif);
+	}
+
+	public static LambdaExpr ifConditionToLambda(IfStmt ifStmt, VariableDeclarator variable) {
 		// No need for variable.getType()
 		var parameter = new Parameter(new UnknownType(), variable.getName());
 
 		var condition = ifStmt.getCondition();
 
 		var lambdaExpr = new LambdaExpr(parameter, condition);
-		Expression withStream2 = new MethodCallExpr(withStream, ANY_MATCH, new NodeList<>(lambdaExpr));
-
-		var newif = new IfStmt(withStream2, thenAsBlockStmt, null);
-
-		return tryReplace(forEachStmt, newif);
+		return lambdaExpr;
 	}
 }

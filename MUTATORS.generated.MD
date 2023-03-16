@@ -1,5 +1,4 @@
 # Mutators
-
 ## Single Mutators PRD-READY
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
@@ -354,7 +353,6 @@ public static class CaseReturnDouble {
 ```
 
 See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseUnderscoresInNumericLiteralsCases.java)
-
 ## Single Mutators (DRAFTs)
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
@@ -402,6 +400,28 @@ public static class CaseRuntimeException {
 ```
 
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
+
+### [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class CaseFindAnyIsPresent {
+
+    public Object pre(List<?> list) {
+        return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+    }
+
+    public Object post(List<?> list) {
+        return list.stream().findFirst();
+    }
+}
+```
+
+See[CollectionToOptionalCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/CollectionToOptionalCases.java)
 
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 
@@ -509,6 +529,32 @@ public static class breakToStreamAnyMatch {
 ```
 
 See[EnhancedForLoopToStreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamAnyMatchCases.java)
+
+### [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class forEachIfAddAdd {
+
+    public List<String> pre(List<String> strings) {
+        List<String> r = new ArrayList<>();
+        for (String s : strings) if (s.length() >= 5)
+            r.add(s);
+        return r;
+    }
+
+    public List<String> post(List<String> strings) {
+        List<String> r = strings.stream().filter(s -> s.length() >= 5).map(s -> s).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        return r;
+    }
+}
+```
+
+See[EnhancedForLoopToStreamCollectCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamCollectCases.java)
 
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
@@ -1039,7 +1085,6 @@ public static class caseHtml {
 ```
 
 See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseTextBlocksCases.java)
-
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)

@@ -139,8 +139,6 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 
 	@Override
 	public void doClean(ApplicationContext appContext) throws IOException, MojoFailureException {
-		Path cleanthatConfigPath = getRepositoryConfigPath();
-
 		IEclipseStylesheetGenerator generator = appContext.getBean(IEclipseStylesheetGenerator.class);
 
 		Map<Path, String> pathToContent = loadAnyJavaFile(generator);
@@ -156,6 +154,7 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		var eclipseConfigPath = writeSettings(settings);
 
 		// TODO In fact, we go through Spotless to do so
+		Path cleanthatConfigPath = getMayNotExistRepositoryConfigPath();
 		LOGGER.info("About to inject '{}' into '{}'", eclipseConfigPath, cleanthatConfigPath);
 
 		// We expect configPath to be like '.../.cleanthat/cleanthat.yaml'
@@ -163,9 +162,15 @@ public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo
 		if (dotCleanthatFolder == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");
 		} else if (!".cleanthat".equals(dotCleanthatFolder.getFileName().toString())) {
-			throw new IllegalArgumentException(
-					"Issue with configPath: " + cleanthatConfigPath + " (not in .cleanthat)");
+			LOGGER.warn("The configuration is not in a '.cleanthat' parent folder. We skip injecting {} in {}",
+					eclipseConfigPath,
+					cleanthatConfigPath);
+			return;
+		} else if (!Files.exists(cleanthatConfigPath)) {
+			LOGGER.info("We skip injecting {} as {} does not exists", eclipseConfigPath, cleanthatConfigPath);
+			return;
 		}
+
 		var repositoryRoot = dotCleanthatFolder.getParent();
 		if (repositoryRoot == null) {
 			throw new IllegalArgumentException("Issue with configPath: " + cleanthatConfigPath + " (no root)");

@@ -109,7 +109,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			return DEFAULT_CLEANTHAT_VERSION;
 		}
 
-		String cleanthatVersion = cleanCleanthatVersionFromMvnProperties(asMap);
+		var cleanthatVersion = cleanCleanthatVersionFromMvnProperties(asMap);
 
 		return cleanthatVersion;
 	}
@@ -148,9 +148,9 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			throw new IllegalArgumentException(rawMavenProjectVersion + " should be a -SNAPSHOT");
 		}
 
-		int lastIndexOfDot = rawMavenProjectVersion.lastIndexOf('.');
+		var lastIndexOfDot = rawMavenProjectVersion.lastIndexOf('.');
 
-		String snapshotMinorVersion = rawMavenProjectVersion.substring(lastIndexOfDot + 1,
+		var snapshotMinorVersion = rawMavenProjectVersion.substring(lastIndexOfDot + 1,
 				rawMavenProjectVersion.length() - "-SNAPSHOT".length());
 
 		return rawMavenProjectVersion.substring(0, lastIndexOfDot + 1) + (Integer.parseInt(snapshotMinorVersion) - 1);

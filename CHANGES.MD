@@ -4,6 +4,12 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+### Added
+
+* `EnhancedForLoopToStreamCollect`
+
+## [2.11] - 2023-03-12
+
 ### Fixed
 
 * `S1602` is renamed `RSPEC-1602`

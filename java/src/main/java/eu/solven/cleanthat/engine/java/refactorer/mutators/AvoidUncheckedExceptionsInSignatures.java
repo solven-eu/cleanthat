@@ -17,17 +17,9 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.model.SymbolReference;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -38,11 +30,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidUncheckedExceptionsInSignatures.class);
-
-	// Object -> Throwable -> Exception -> RuntimeException
-	// private static final int INDEXOF_RUNTIMEEXCEPTION = 4;
-
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
@@ -72,29 +59,12 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 				return false;
 			}
 
-			var typeSolver = new ReflectionTypeSolver();
-			SymbolReference<ResolvedReferenceTypeDeclaration> optType =
-					typeSolver.tryToSolveType(RuntimeException.class.getName());
-
-			// https://github.com/javaparser/javaparser/issues/3929
-			var referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
-
-			if (isAssignableBy(referenceTypeImpl, optResolved.get())) {
+			if (isAssignableBy(RuntimeException.class.getName(), optResolved.get())) {
 				return true;
 			} else {
 				return false;
 			}
 		});
-	}
-
-	private boolean isAssignableBy(ReferenceTypeImpl referenceTypeImpl, ResolvedType resolvedType) {
-		try {
-			return referenceTypeImpl.isAssignableBy(resolvedType);
-		} catch (UnsolvedSymbolException e) {
-			LOGGER.debug("Unresolved: `{}` .isAssignableBy `{}`", referenceTypeImpl, resolvedType, e);
-
-			return false;
-		}
 	}
 
 }

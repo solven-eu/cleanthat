@@ -543,7 +543,7 @@ public class EclipseStylesheetGenerator implements IEclipseStylesheetGenerator {
 		if (!tryOptionsKeepingExistingFormat) {
 			allOptions = new TreeSet<>(allOptions);
 
-			LOGGER.info("We remove options allowing ambiguity in the source code");
+			LOGGER.debug("We remove options allowing ambiguity in the source code");
 			allOptions.remove(DefaultCodeFormatterConstants.ONE_LINE_PRESERVE);
 			allOptions.remove(DefaultCodeFormatterConstants.PRESERVE_POSITIONS);
 			allOptions.remove(Integer.toString(DefaultCodeFormatterConstants.INDENT_PRESERVE));

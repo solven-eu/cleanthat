@@ -34,7 +34,11 @@ import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
@@ -279,22 +283,66 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, Class<?> requiredType) {
+		// .canonicalName is typically required to handle primitive arrays
+		// For int[]: qualifiedName is [I while canonicalName is int[]
+		// BEWARE: How would it handle local or anonymous class?
+		// https://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
 		return scopeHasRequiredType(optScope, requiredType.getName());
 	}
 
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
 		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
+
+		return typeHasRequiredType(optType, requiredType);
+	}
+
+	protected boolean isAssignableBy(ReferenceTypeImpl referenceTypeImpl, ResolvedType resolvedType) {
+		try {
+			return referenceTypeImpl.isAssignableBy(resolvedType);
+		} catch (UnsolvedSymbolException e) {
+			LOGGER.debug("Unresolved: `{}` .isAssignableBy `{}`", referenceTypeImpl, resolvedType, e);
+
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param qualifiedClassName
+	 * @param resolvedType
+	 * @return true if `qualifiedClassName` is java.util.Collection and `resolvedType` is java.util.List
+	 */
+	protected boolean isAssignableBy(String qualifiedClassName, ResolvedType resolvedType) {
+		var typeSolver = new ReflectionTypeSolver(false);
+		SymbolReference<ResolvedReferenceTypeDeclaration> optType = typeSolver.tryToSolveType(qualifiedClassName);
+
+		if (!optType.isSolved()) {
+			return false;
+		}
+
+		// https://github.com/javaparser/javaparser/issues/3929
+		var referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
+
+		return isAssignableBy(referenceTypeImpl, resolvedType);
+	}
+
+	protected boolean typeHasRequiredType(Optional<ResolvedType> optType, String requiredType) {
 		if (optType.isEmpty()) {
 			return false;
 		}
+
 		var type = optType.get();
+
 		var isCorrectClass = false;
 		if (type.isConstraint()) {
 			// Happens on Lambda
 			type = type.asConstraintType().getBound();
 		}
-		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(requiredType)) {
-			// BEWARE Should we consider some sort of isAssignableFrom?
+
+		if (isAssignableBy(requiredType, type)) {
+			isCorrectClass = true;
+		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
+			// For a primitive double, requiredType is 'double'
 			isCorrectClass = true;
 		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
 			// For a primitive double, requiredType is 'double'
@@ -338,6 +386,14 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 		}
 		// TODO manage wildcards/asterisks
 		return imports.stream().anyMatch(id -> id.getNameAsString().equals(qualifiedName));
+	}
+
+	protected String nameOrQualifiedName(CompilationUnit compilationUnit, Class<?> clazz) {
+		if (isImported(compilationUnit, clazz.getPackageName(), clazz.getName())) {
+			return clazz.getSimpleName();
+		} else {
+			return clazz.getName();
+		}
 	}
 
 	/**

@@ -20,11 +20,8 @@ import java.io.File;
 import org.apache.maven.project.MavenProject;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TestCleanThatGenerateEclipseStylesheetMojoTest extends ACleanThatMojoTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestCleanThatGenerateEclipseStylesheetMojoTest.class);
 
 	@Test
 	public void testGenerateEclipse() throws Exception {
@@ -38,15 +35,11 @@ public class TestCleanThatGenerateEclipseStylesheetMojoTest extends ACleanThatMo
 						CleanThatGenerateEclipseStylesheetMojo.GOAL_ECLIPSE);
 		assertNotNull(myMojo);
 
-		var cleanthatYaml = new File(readWriteFolder, ".cleanthat/eclipse_java-stylesheet.xml");
-		Assertions.assertThat(cleanthatYaml).doesNotExist();
+		var eclipseStylesheet = new File(readWriteFolder, ".cleanthat/eclipse_java-stylesheet.xml");
+		Assertions.assertThat(eclipseStylesheet).doesNotExist();
 
-		try {
-			myMojo.execute();
-		} catch (Exception e) {
-			LOGGER.warn("Issue around generating or injecting the generated Eclipse config", e);
-		}
+		myMojo.execute();
 
-		Assertions.assertThat(cleanthatYaml).isFile();
+		Assertions.assertThat(eclipseStylesheet).isFile();
 	}
 }

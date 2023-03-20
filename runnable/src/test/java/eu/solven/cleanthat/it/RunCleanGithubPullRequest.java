@@ -41,6 +41,7 @@ import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
@@ -81,8 +82,10 @@ public class RunCleanGithubPullRequest extends ACleanThatXxxApplication {
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
+		IGithubAppFactory ghFactory = appContext.getBean(IGithubAppFactory.class);
+
 		// TODO Unclear when we need an installation/server-to-server Github or a user-to-server Github
-		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+		GithubAndToken githubAndToken = ghFactory.makeInstallationGithub(installation.getId()).getOptResult().get();
 		GitHub github = githubAndToken.getGithub();
 		// GitHub userToServerGithub = handler.getGithubAsApp();
 

@@ -87,6 +87,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<!--			-standalone-->
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-jre8</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<!-- https://github.com/spring-cloud/spring-cloud-function/blob/master/spring-cloud-function-samples/function-sample-aws/pom.xml -->

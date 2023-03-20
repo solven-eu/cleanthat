@@ -36,6 +36,12 @@
         },
         {
             "matchPackagePatterns": [
+                "io.sentry"
+            ],
+            "groupName": "sentry"
+        },
+        {
+            "matchPackagePatterns": [
                 "com.microsoft"
             ],
             "groupName": "microsoft"

@@ -136,6 +136,13 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	protected boolean tryReplace(Node node, Node replacement) {
+		if (node.findFirst(Node.class, n -> n.getComment().isPresent()).isPresent()) {
+			// For now, Cleanthat is pretty weak on comment management (due to Javaparser limitations)
+			// So we prefer aborting any modification in case of comment presence, to prevent losing comments
+			LOGGER.info("We skip removing {} due to the presence of a comment", node);
+			return false;
+		}
+
 		LOGGER.info("Turning `{}` into `{}`", node, replacement);
 
 		var result = node.replace(replacement);
@@ -148,6 +155,11 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	protected boolean tryRemove(Node node) {
+		if (node.getComment().isPresent()) {
+			LOGGER.info("We skip removing {} due to the presence of a comment", node);
+			return false;
+		}
+
 		var nodeParentAsString = node.getParentNode().map(n -> n.getClass().getSimpleName()).orElse("-");
 		LOGGER.info("Removing `{}` from a {}", node, nodeParentAsString);
 

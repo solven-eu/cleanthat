@@ -15,27 +15,29 @@
  */
 package eu.solven.cleanthat.code_provider.github.event;
 
-import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GitHub;
 
+import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
+import eu.solven.cleanthat.utils.ResultOrError;
+
 /**
- * Knows how to process a Github webhook
- *
+ * Knows how to implement a {@link GitHub}
+ * 
  * @author Benoit Lacelle
+ *
  */
-public interface IGithubWebhookHandler {
+public interface IGithubAppFactory {
 	/**
-	 * Typically useful to list installations
+	 * Beware this is not specific to a given installation. It enables listing all installations.
 	 * 
-	 * @return a {@link GitHub} instance authenticated as the Github Application.
+	 * @return
 	 */
-	GHApp getGithubAsApp();
+	GitHub makeAppGithub();
 
 	/**
 	 * 
 	 * @param installationId
 	 * @return a {@link GitHub} instance authenticated as given installation, having access to permitted repositories
 	 */
-	// ResultOrError<GithubAndToken, WebhookRelevancyResult> makeInstallationGithub(long installationId);
-
+	ResultOrError<GithubAndToken, WebhookRelevancyResult> makeInstallationGithub(long installationId);
 }

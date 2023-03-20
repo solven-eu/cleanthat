@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -56,7 +57,6 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 			// empty as well
 			if (true) {
 			}
-
 
 		}
 	}
@@ -133,8 +133,8 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	@UnmodifiedMethod
-	// @CompareMethods
+	@CompareMethods
+	@CaseNotYetImplemented
 	public static class InLambda {
 		public void pre(ICodeProvider cp) throws IOException {
 			cp.listFilesForContent(file -> {
@@ -155,6 +155,24 @@ public class EmptyControlStatementCases extends AJavaparserRefactorerCases {
 		public static class Pre {
 			public void testArrayInt() {
 
+			}
+		}
+	}
+
+	@UnmodifiedInnerClass
+	public static class WithComment {
+
+		public static class Pre {
+			public void testArrayInt() {
+				{
+					// Some comment
+				}
+
+				// Comment1
+				;
+				// Comment2
+				;
+				;
 			}
 		}
 

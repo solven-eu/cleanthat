@@ -37,13 +37,16 @@ import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { GithubSpringConfig.class })
 @MockBean({ ICodeFormatterApplier.class })
 public class ITGithubRefCleaner {
+	@Autowired
+	IGithubAppFactory ghFactory;
+
 	@Autowired
 	GithubCodeCleanerFactory cleanerFactory;
 
@@ -52,16 +55,14 @@ public class ITGithubRefCleaner {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
-
-		GHApp app = handler.getGithubAsApp();
+		GHApp app = ghFactory.makeAppGithub().getApp();
 
 		var repoName = "cleanthat-integrationtests";
 
 		// Ensure the repo is available to the app
 		// https://github.com/organizations/solven-eu/settings/installations/9086720
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+		GithubAndToken githubForRepo = ghFactory.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = GithubHelper.getDefaultBranch(cleanthatRepo);

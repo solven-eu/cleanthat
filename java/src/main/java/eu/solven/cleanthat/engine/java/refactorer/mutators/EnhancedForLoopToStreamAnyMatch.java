@@ -26,6 +26,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -89,15 +90,37 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 		var lastStmt = thenAsBlockStmt.getStatement(thenAsBlockStmt.getStatements().size() - 1);
 
 		if (lastStmt.isReturnStmt()) {
-			return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+			NameExpr variableName = forEachStmt.getVariableDeclarator().getNameAsExpression();
+			Optional<NameExpr> optVariableIsReturned =
+					thenAsBlockStmt.findFirst(NameExpr.class, n -> variableName.equals(n));
+
+			if (optVariableIsReturned.isPresent()) {
+				// The return statement depends on the variable
+				// TODO EnhancedForLoopToStreamAnyMatchCases.ReturnVariable
+				return false;
+			} else {
+				// The return statement does not depend on the variable
+				return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+			}
 		} else if (lastStmt.isBreakStmt()) {
 			boolean breakIsRemoved = tryRemove(lastStmt);
 			if (!breakIsRemoved) {
-				LOGGER.warn("Issue removing the last `break` from `{}`", thenAsBlockStmt);
 				return false;
 			}
 
-			return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+			var replaced = replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+
+			if (!replaced) {
+				// We restore the `break`
+				LOGGER.debug("We try restoring the `break` as we failed replacing the `forEach(if)`");
+				// BEWARE it would have been better not to remove it
+				if (!thenAsBlockStmt.getStatements().add(lastStmt)) {
+					throw new IllegalStateException(
+							"We corrupted `" + stmt + "` by failing restoring `" + lastStmt + "`");
+				}
+			}
+
+			return replaced;
 		} else {
 			return false;
 		}

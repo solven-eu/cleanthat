@@ -109,7 +109,7 @@ or simply `mvn cleanthat:apply`
 
 ## Github App (Free+Paid)
 
-If your repository is hosted by Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/)
+If your repository is hosted by Github.com, get zero-configuration cleaning with our [Github App](https://github.com/marketplace/cleanthat/) on Github marketplace.
 
 It can configured through a `/.cleanthat/cleanthat.yaml` file at the root of the repository (e.g. [https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml](https://github.com/solven-eu/cleanthat/blob/master/.cleanthat/cleanthat.yaml)).
 

@@ -1,7 +1,13 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
@@ -101,6 +107,107 @@ public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerC
 				return true;
 			}
 			return false;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class ReturnVariable {
+
+		Map.Entry<String, String> pre(String filePathString, Map<String, String> idToIndex) throws IOException {
+			for (Map.Entry<String, String> item : idToIndex.entrySet()) {
+				if (filePathString.contains(item.getKey())) {
+					return item;
+				}
+			}
+			return null;
+		}
+
+		Map.Entry<String, String> post(String filePathString, Map<String, String> idToIndex) throws IOException {
+			Optional<Map.Entry<String, String>> firstItem =
+					idToIndex.entrySet().stream().filter(item -> filePathString.contains(item.getKey())).map(item -> {
+						return item;
+					}).findFirst();
+			if (firstItem.isPresent()) {
+				return firstItem.get();
+			}
+			return null;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class withCommentBeforeFor {
+		public boolean pre(List<String> strings) {
+			boolean containsEmpty = false;
+			// some comment
+			for (String value : strings) {
+				if (value.isEmpty()) {
+					containsEmpty = true;
+					break;
+				}
+			}
+			return containsEmpty;
+		}
+
+		public boolean post(List<String> strings) {
+			boolean containsEmpty = false;
+			// some comment
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				containsEmpty = true;
+			}
+			return containsEmpty;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class withCommentBeforeIf {
+		public boolean pre(List<String> strings) {
+			boolean containsEmpty = false;
+			for (String value : strings) {
+				// some comment
+				if (value.isEmpty()) {
+					containsEmpty = true;
+					break;
+				}
+			}
+			return containsEmpty;
+		}
+
+		public boolean post(List<String> strings) {
+			boolean containsEmpty = false;
+			// some comment
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				containsEmpty = true;
+			}
+			return containsEmpty;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class withCommentbeforeForBeforeIf {
+		public boolean pre(List<String> strings) {
+			boolean containsEmpty = false;
+			// before for
+			for (String value : strings) {
+				// before if
+				if (value.isEmpty()) {
+					containsEmpty = true;
+					break;
+				}
+			}
+			return containsEmpty;
+		}
+
+		public boolean post(List<String> strings) {
+			boolean containsEmpty = false;
+			// some comment
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				containsEmpty = true;
+			}
+			return containsEmpty;
 		}
 	}
 }

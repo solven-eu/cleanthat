@@ -42,6 +42,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.util.StandardCharset;
 
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
+import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubNoApiWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
@@ -90,7 +91,9 @@ public class ITGithub {
 		// env.setProperty("github.app.app-id", GithubWebhookHandlerFactory.GITHUB_DEFAULT_APP_ID);
 		env.setProperty("github.app.private-jwk", jwk.toJSONString());
 
-		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(env,
+		GithubAppFactory ghFactory = new GithubAppFactory(env);
+
+		GithubWebhookHandlerFactory factory = new GithubWebhookHandlerFactory(ghFactory,
 				Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
 				new GithubCheckRunManager(Mockito.mock(IGitService.class)));
 		GithubNoApiWebhookHandler noauth = factory.makeUnderlyingNoAuth();
@@ -99,7 +102,7 @@ public class ITGithub {
 		app.listInstallations()
 				.forEach(install -> LOGGER.info("appId={} url={}", install.getId(), install.getHtmlUrl()));
 
-		GithubAndToken gitHubInstallation = fresh.makeInstallationGithub(9_086_720).getOptResult().get();
+		GithubAndToken gitHubInstallation = ghFactory.makeInstallationGithub(9_086_720).getOptResult().get();
 
 		// Own repo
 		GithubFacade ownRepo = new GithubFacade(gitHubInstallation.getGithub(), SOLVEN_EU_CLEANTHAT);

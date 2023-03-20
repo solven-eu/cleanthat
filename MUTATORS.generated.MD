@@ -164,6 +164,8 @@ See[OptionalNotEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/java/re
 
 Sonar: [RSPEC-4034](https://rules.sonarsource.com/java/RSPEC-4034)
 
+Cleanthat own ID: StreamAnyMatch
+
 languageLevel: jdk1.8
 
 ```
@@ -316,6 +318,8 @@ See[UseIndexOfCharCases](java/src/test/java/eu/solven/cleanthat/engine/java/refa
 
 ### [UseStringIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseStringIsEmpty.java)
 
+Cleanthat own ID: UseStringIsEmpty
+
 languageLevel: jdk1.6
 
 ```
@@ -402,6 +406,8 @@ public static class CaseRuntimeException {
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
 
 ### [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
+
+Cleanthat own ID: CollectionToOptional
 
 isDraft
 
@@ -532,6 +538,8 @@ See[EnhancedForLoopToStreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat
 
 ### [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
 
+Cleanthat own ID: EnhancedForLoopToStreamCollect
+
 isDraft
 
 languageLevel: jdk1
@@ -604,6 +612,8 @@ See[GuavaInlineStringsRepeatCases](java/src/test/java/eu/solven/cleanthat/engine
 
 ### [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 
+Cleanthat own ID: GuavaStringsIsNullOrEmpty
+
 isDraft
 
 languageLevel: jdk11
@@ -644,6 +654,8 @@ Sonar: [RSPEC-1612](https://rules.sonarsource.com/java/RSPEC-1612)
 
 jSparrow: [LambdaToMethodReference](https://jsparrow.github.io/rules/lambda-to-method-reference.html#code-changes)
 
+Cleanthat own ID: LambdaIsMethodReference
+
 isDraft
 
 languageLevel: jdk1.8
@@ -679,6 +691,8 @@ Sonar: [RSPEC-1602](https://rules.sonarsource.com/java/RSPEC-1602)
 
 jSparrow: [StatementLambdaToExpression](https://jsparrow.github.io/rules/statement-lambda-to-expression.html)
 
+Cleanthat own ID: LambdaReturnsSingleStatement
+
 isDraft
 
 languageLevel: jdk1.8
@@ -706,6 +720,8 @@ See[LambdaReturnsSingleStatementCases](java/src/test/java/eu/solven/cleanthat/en
 Sonar: [RSPEC-6212](https://rules.sonarsource.com/java/RSPEC-6212)
 
 jSparrow: [LocalVariableTypeInference](https://jsparrow.github.io/rules/local-variable-type-inference.html)
+
+Cleanthat own ID: LocalVariableTypeInference
 
 isDraft
 
@@ -781,6 +797,8 @@ See[ObjectsHashCodePrimitiveCases](java/src/test/java/eu/solven/cleanthat/engine
 
 PMD: [PrimitiveWrapperInstantiation](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation)
 
+Cleanthat own ID: BoxedPrimitiveConstructor
+
 isDraft
 
 languageLevel: jdk1.5
@@ -840,6 +858,8 @@ See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engin
 
 ### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
 
+Cleanthat own ID: SimplifyBooleanInitialization
+
 isDraft
 
 languageLevel: jdk1.8
@@ -868,6 +888,8 @@ See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/e
 
 ### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
 
+Cleanthat own ID: SimplifyStreamFilterWithMap
+
 isDraft
 
 languageLevel: jdk1.8
@@ -889,6 +911,8 @@ public static class CaseMethodRef {
 See[SimplifyStreamFilterWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamFilterWithMapCases.java)
 
 ### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
+
+Cleanthat own ID: StringStartsWithChar
 
 isDraft
 
@@ -970,6 +994,8 @@ isDraft
 languageLevel: jdk1
 
 ### [UnnecessaryLambdaEnclosingParameters](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryLambdaEnclosingParameters.java)
+
+Cleanthat own ID: UnnecessaryLambdaEnclosingParameters
 
 isDraft
 
@@ -1074,6 +1100,8 @@ See[UseDiamondOperatorJdk8Cases](java/src/test/java/eu/solven/cleanthat/engine/j
 
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
+Cleanthat own ID: UseTextBlocks
+
 isDraft
 
 languageLevel: jdk15
@@ -1089,6 +1117,8 @@ See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refac
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators
+
 isDraft
 
 languageLevel: jdk1
@@ -1097,17 +1127,23 @@ languageLevel: jdk1
 
 CheckStyle: CheckStyle
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CheckStyleMutators
+
 isDraft
 
 languageLevel: jdk1
 
 ### [CompositeMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeMutator.java)
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator
+
 isDraft
 
 languageLevel: jdk1
 
 ### [CompositeWalkingMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeWalkingMutator.java)
+
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWalkingMutator
 
 isDraft
 
@@ -1117,11 +1153,15 @@ languageLevel: jdk1
 
 PMD: ErrorProne
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.ErrorProneMutators
+
 isDraft
 
 languageLevel: jdk1
 
 ### [GuavaMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/GuavaMutators.java)
+
+Cleanthat own ID: Guava
 
 isDraft
 
@@ -1131,6 +1171,8 @@ languageLevel: jdk1
 
 PMD: jSparrow
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.JSparrowMutators
+
 isDraft
 
 languageLevel: jdk1
@@ -1139,11 +1181,15 @@ languageLevel: jdk1
 
 PMD: PMD
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators
+
 isDraft
 
 languageLevel: jdk1
 
 ### [SafeAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeAndConsensualMutators.java)
+
+Cleanthat own ID: SafeAndConsensual
 
 isDraft
 
@@ -1151,11 +1197,15 @@ languageLevel: jdk1
 
 ### [SafeButControversialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButControversialMutators.java)
 
+Cleanthat own ID: SafeButControversial
+
 isDraft
 
 languageLevel: jdk1
 
 ### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
+
+Cleanthat own ID: SafeButNotConsensual
 
 isDraft
 
@@ -1165,10 +1215,12 @@ languageLevel: jdk1
 
 Sonar: [Sonar](https://rules.sonarsource.com/java/Sonar)
 
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SonarMutators
+
 isDraft
 
 languageLevel: jdk1
 
 ---
 
-Generated by [TestGenerateDocumentation](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/it/TestGenerateDocumentation.java)
+Generated by [TestGenerateDocumentation](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/TestGenerateDocumentation.java)

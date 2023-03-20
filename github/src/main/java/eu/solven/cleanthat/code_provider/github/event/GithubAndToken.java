@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.github.event;
 
 import java.util.Map;
 
+import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GitHub;
 
@@ -30,14 +31,20 @@ public class GithubAndToken {
 	private final GitHub github;
 	private final String token;
 
+	private final GHAppInstallation appInstallation;
+
 	// https://github.com/organizations/solven-eu/settings/apps/cleanthat/permissions
 	// On Permissions change, invite people to go into:
 	// https://github.com/organizations/solven-eu/settings/installations/9086720
 	private final Map<String, GHPermissionType> permissions;
 
-	public GithubAndToken(GitHub github, String token, Map<String, GHPermissionType> permissions) {
+	public GithubAndToken(GitHub github,
+			String token,
+			GHAppInstallation appInstallation,
+			Map<String, GHPermissionType> permissions) {
 		this.github = github;
 		this.token = token;
+		this.appInstallation = appInstallation;
 		this.permissions = permissions;
 	}
 
@@ -51,5 +58,9 @@ public class GithubAndToken {
 
 	public Map<String, GHPermissionType> getPermissions() {
 		return permissions;
+	}
+
+	public GHAppInstallation getGHAppInstallation() {
+		return appInstallation;
 	}
 }

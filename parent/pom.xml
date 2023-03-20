@@ -352,10 +352,6 @@
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>cleanthat-maven-plugin</artifactId>
 					<version>2.12-SNAPSHOT</version>
-					<configuration>
-						<!-- Skipped as it conflicts with Spotless (around Aether) -->
-						<skip>false</skip>
-					</configuration>
 					<executions>
 						<execution>
 							<id>Clean the code</id>
@@ -434,10 +430,12 @@
 
 							<cleanthat>
 								<sourceJdk>${maven.compiler.source}</sourceJdk>
-								<version>2.7</version>
+								<version>${project.version}</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
 									<mutator>SafeButNotConsensual</mutator>
+									<mutator>SafeButControversial</mutator>
+									<mutator>Guava</mutator>
 								</mutators>
 								<includeDraft>true</includeDraft>
 								<excludedMutators>
@@ -512,13 +510,6 @@
 			</plugin>
 
 			<!-- Apply formatters before checks -->
-			<!-- CleanThat is disabled as it conflicts with Spotless (around Aether) -->
-			<!--			<plugin>-->
-			<!--				<groupId>io.github.solven-eu.cleanthat</groupId>-->
-			<!--				<artifactId>cleanthat-maven-plugin</artifactId>-->
-			<!-- CleanThat should be executed only in the top-directory -->
-			<!--				<inherited>false</inherited>-->
-			<!--			</plugin>-->
 			<plugin>
 				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->

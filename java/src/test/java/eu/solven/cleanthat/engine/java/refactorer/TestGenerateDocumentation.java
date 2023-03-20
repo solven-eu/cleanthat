@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.it;
+package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -211,6 +211,10 @@ public class TestGenerateDocumentation {
 			} else {
 				sb.append("jSparrow: [").append(ruleId).append("](").append(url).append(')');
 			}
+		});
+		mutator.getCleanthatId().ifPresent(ruleId -> {
+			sb.append(EOL).append(EOL);
+			sb.append("Cleanthat own ID: ").append(ruleId);
 		});
 	}
 }

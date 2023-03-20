@@ -4,9 +4,15 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+### Fixed
+
+* In many cases, the presence of comment will prevent a mutator, as comments would be lost in many cases
+* `EnhancedForLoopToStreamAnyMatch` will not produce invalid code in case of `return` over the `forEach` variable
+
 ### Added
 
-* `EnhancedForLoopToStreamCollect`
+* `EnhancedForLoopToStreamCollect` is introduced
+* `CaseNotYetImplemented` enables preparing unitTests for future features or limitations
 
 ## [2.11] - 2023-03-12
 

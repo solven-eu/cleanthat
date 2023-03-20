@@ -62,10 +62,11 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 public class TestMutatorOnFiles extends AJavaparserTestCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestMutatorOnFiles.class);
 
+	private static final String DIR = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/source/do_not_format_me/";
+
 	protected static Collection<Object[]> listCases() throws IOException {
 		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-		var resources = patternResolver
-				.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/source/do_not_format_me/*");
+		var resources = patternResolver.getResources(DIR + "*");
 
 		List<Object[]> individualCases = new ArrayList<>();
 
@@ -73,10 +74,7 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 			var mutatorClassSimpleName = mutatorCasesFolder.getFilename();
 			Resource[] cases;
 			try {
-				cases = patternResolver
-						.getResources(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/source/do_not_format_me/"
-								+ mutatorClassSimpleName
-								+ "/*");
+				cases = patternResolver.getResources(DIR + mutatorClassSimpleName + "/*");
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue with " + mutatorCasesFolder, e);
 			}

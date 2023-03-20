@@ -17,6 +17,7 @@ package eu.solven.cleanthat.code_provider.github.event;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Conclusion;
@@ -124,5 +125,27 @@ public class GithubCheckRunManager {
 		} catch (IOException ee) {
 			LOGGER.warn("Issue marking the checkRun as completed: " + checkRun.getUrl(), ee);
 		}
+	}
+
+	/**
+	 * Helps working with {@link Consumer} which may fail an explicit {@link Exception}
+	 * 
+	 * @author Benoit Lacelle
+	 *
+	 * @param <T>
+	 */
+	public interface ThrowingConsumer<T> {
+		void consume(T t) throws IOException;
+	}
+
+	public static void ifPresent(Optional<GHCheckRun> optCheckRun, ThrowingConsumer<GHCheckRun> consumer) {
+		optCheckRun.ifPresent(c -> {
+			try {
+				consumer.consume(c);
+			} catch (IOException e) {
+				// We do not re-throw the Exception as it is considered not a big-deal to fail updating the CheckRun
+				LOGGER.warn("Issue updating CheckRun", e);
+			}
+		});
 	}
 }

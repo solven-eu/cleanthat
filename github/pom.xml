@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>io.github.solven-eu.cleanthat</groupId>
 		<artifactId>aggregator-cleanthat</artifactId>
 		<version>2.12-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>github</artifactId>
-
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.01</jacoco.instruction.ratio>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.github.solven-eu.pepper</groupId>
@@ -26,7 +22,6 @@
 			<artifactId>pepper-with-agent</artifactId>
 			<version>${pepper.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>code-providers</artifactId>
@@ -37,40 +32,35 @@
 			<artifactId>code-cleaners</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<!-- Used to download a ZIP of a ref, and process it given local FS -->
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>local</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>any-language</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.kohsuke/github-api -->
 		<dependency>
 			<!-- https://github-api.kohsuke.org/ -->
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
 			<version>1.314</version>
+			<!--			<version>1.315-SNAPSHOT</version>-->
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>config</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>git</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<!-- Encrypt login token, and sensible data in DB -->
 			<!-- Enables loading a PEM file -->
@@ -79,11 +69,24 @@
 		</dependency>
 
 		<dependency>
+			<!-- Used by JWTTokenProvider while it is optional in org.kohsuke:github-api -->
+			<groupId>io.jsonwebtoken</groupId>
+			<!--			<artifactId>jjwt-api</artifactId>-->
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<!-- Needed to serialization from a Map into a String for JWT -->
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+
+		<dependency>
 			<!-- https://github.com/hub4j/github-api/issues/1202 -->
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 		</dependency>
-
 		<dependency>
 			<!-- Enables loading a PEM file -->
 			<groupId>org.bouncycastle</groupId>
@@ -91,17 +94,20 @@
 			<version>1.70</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-jre8</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

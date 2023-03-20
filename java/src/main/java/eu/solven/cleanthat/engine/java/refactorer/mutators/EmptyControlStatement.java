@@ -93,6 +93,7 @@ public class EmptyControlStatement extends AJavaparserMutator {
 			Optional<Node> optParentNode = blockStmt.getParentNode();
 
 			if (optParentNode.isEmpty()) {
+				// The parent has been removed in the meantime
 				break;
 			}
 

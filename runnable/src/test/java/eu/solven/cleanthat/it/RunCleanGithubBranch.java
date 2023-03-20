@@ -45,6 +45,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
@@ -84,7 +85,8 @@ public class RunCleanGithubBranch extends ACleanThatXxxApplication implements IC
 		GHAppInstallation installation = handler.getGithubAsApp()
 				.getInstallationByRepository(repoFullName.split("/")[0], repoFullName.split("/")[1]);
 
-		GithubAndToken githubAndToken = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+		IGithubAppFactory ghFactory = appContext.getBean(IGithubAppFactory.class);
+		GithubAndToken githubAndToken = ghFactory.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		IGitRefCleaner cleaner = appContext.getBean(GithubCodeCleanerFactory.class).makeCleaner(githubAndToken).get();
 

@@ -15,6 +15,15 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+
+/**
+ * This is some code just to test which could like like a DSL to express an {@link IMutator}
+ * 
+ * @author Benoit Lacelle
+ *
+ */
+@Deprecated
 public class TestDsl {
 	String renameVariable = "VariableDeclarationExpr.name=titi->VariableDeclarationExpr.name.set(var.name + '2')";
 	String streamFilterFindAnyIsPresent = "node.instanceof=MethodCallExpr && node.MethodCallExpr.name=isPresent"

@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -47,6 +48,26 @@ public class RemoveExplicitCallToSuperCases extends AJavaparserRefactorerCases {
 		public class Post extends SomeClass {
 			public void someMethod() {
 				super.someMethod();
+			}
+		}
+	}
+
+	@CompareInnerClasses
+	@CaseNotYetImplemented
+	public static class WithComment {
+		public class Pre {
+			public Pre() {
+				// This is an important comment
+				super();
+
+				"".toString();
+			}
+		}
+
+		public class Post {
+			public Post() {
+
+				"".toString();
 			}
 		}
 	}

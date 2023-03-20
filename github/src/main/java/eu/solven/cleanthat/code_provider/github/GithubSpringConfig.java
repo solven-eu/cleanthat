@@ -25,15 +25,18 @@ import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleanerFactory;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
+import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 
 /**
- * The {@link Configuration} enabling {@link GitHub}
+ * The {@link Configuration} enabling {@link GitHub} as an {@link ICodeProvider}
  * 
  * @author Benoit Lacelle
  *
@@ -42,15 +45,20 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 @Import({ CodeCleanerSpringConfig.class })
 public class GithubSpringConfig {
 	@Bean
+	public IGithubAppFactory githubAppFactory(Environment env) {
+		return new GithubAppFactory(env);
+	}
+
+	@Bean
 	public GithubCheckRunManager githubCheckRunManager(IGitService gitService) {
 		return new GithubCheckRunManager(gitService);
 	}
 
 	@Bean
-	public GithubWebhookHandlerFactory githubWebhookHandler(Environment env,
+	public GithubWebhookHandlerFactory githubWebhookHandler(IGithubAppFactory githubAppFactory,
 			List<ObjectMapper> objectMappers,
 			GithubCheckRunManager githubCheckRunManager) {
-		return new GithubWebhookHandlerFactory(env, objectMappers, githubCheckRunManager);
+		return new GithubWebhookHandlerFactory(githubAppFactory, objectMappers, githubCheckRunManager);
 	}
 
 	@Bean

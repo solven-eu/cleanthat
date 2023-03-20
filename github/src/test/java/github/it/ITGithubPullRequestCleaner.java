@@ -39,7 +39,7 @@ import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.config.IGitService;
@@ -53,6 +53,8 @@ public class ITGithubPullRequestCleaner {
 	GithubRefCleaner cleaner;
 
 	@Autowired
+	IGithubAppFactory ghFactory;
+	@Autowired
 	GithubWebhookHandlerFactory factory;
 
 	@Autowired
@@ -64,13 +66,10 @@ public class ITGithubPullRequestCleaner {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
-		IGithubWebhookHandler handler = factory.makeGithubWebhookHandler();
-
-		GHApp app = handler.getGithubAsApp();
-
 		var repoName = "cleanthat";
-		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+		GHApp ghApp = ghFactory.makeAppGithub().getApp();
+		GHAppInstallation installation = ghApp.getInstallationByRepository("solven-eu", repoName);
+		GithubAndToken githubForRepo = ghFactory.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		cleaner = new GithubRefCleaner(objectMappers,
 				configInitializer,

@@ -36,6 +36,7 @@ import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.event.GithubAndToken;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandlerFactory;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.refs.all_files.GithubBranchCodeProvider;
 import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 
@@ -46,6 +47,9 @@ public class ITGithubBranchCodeProvider {
 	@Autowired
 	GithubWebhookHandlerFactory factory;
 
+	@Autowired
+	IGithubAppFactory ghFactory;
+
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
 		GithubWebhookHandler handler = factory.makeGithubWebhookHandler();
@@ -55,7 +59,7 @@ public class ITGithubBranchCodeProvider {
 		var repoName = "cleanthat";
 
 		GHAppInstallation installation = app.getInstallationByRepository("solven-eu", repoName);
-		GithubAndToken githubForRepo = handler.makeInstallationGithub(installation.getId()).getOptResult().get();
+		GithubAndToken githubForRepo = ghFactory.makeInstallationGithub(installation.getId()).getOptResult().get();
 
 		GHRepository cleanthatRepo = githubForRepo.getGithub().getRepository("solven-eu" + "/" + repoName);
 		GHBranch masterBranch = cleanthatRepo.getBranch("master");

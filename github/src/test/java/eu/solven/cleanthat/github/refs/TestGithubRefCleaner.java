@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.kohsuke.github.GHAppInstallation;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -53,10 +54,11 @@ public class TestGithubRefCleaner {
 		Mockito.when(repository.getRef("heads/someRef")).thenReturn(ref);
 
 		GithubCheckRunManager checkRunManager = new GithubCheckRunManager(Mockito.mock(IGitService.class));
+		GHAppInstallation installationById = Mockito.mock(GHAppInstallation.class);
 		GithubRefCleaner cleaner = new GithubRefCleaner(Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
 				new CleanthatConfigInitializer(ConfigHelpers.makeJsonObjectMapper(), Arrays.asList()),
 				Mockito.any(ICodeProviderFormatter.class),
-				new GithubAndToken(gitHub, "someToken", Map.of()),
+				new GithubAndToken(gitHub, "someToken", installationById, Map.of()),
 				checkRunManager);
 
 		var root = Files.createTempDirectory("cleanthat-TestGithubRefCleaner-");

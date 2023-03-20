@@ -18,36 +18,25 @@ package eu.solven.cleanthat.code_provider.github.event;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHApp;
-import org.kohsuke.github.GHAppCreateTokenBuilder;
 import org.kohsuke.github.GHAppInstallation;
-import org.kohsuke.github.GHAppInstallationToken;
 import org.kohsuke.github.GHCheckRun;
 import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
+import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHCheckRunBuilder.Output;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHMarketplaceAccountPlan;
-import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.HttpException;
-import org.kohsuke.github.connector.GitHubConnector;
-import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
@@ -58,7 +47,6 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.logging.PepperLogHelper;
-import okhttp3.OkHttpClient;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -70,17 +58,25 @@ import okhttp3.OkHttpClient;
 public class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
 
-	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
+	final IGithubAppFactory githubAppFactory;
 	final GHApp githubApp;
+
+	final GithubNoApiWebhookHandler githubNoApiWebhookHandler;
 	final GithubCheckRunManager githubCheckRunManager;
 
 	final List<ObjectMapper> objectMappers;
 
-	public GithubWebhookHandler(GHApp githubApp,
+	public GithubWebhookHandler(IGithubAppFactory githubAppFactory,
 			List<ObjectMapper> objectMappers,
 			GithubCheckRunManager githubCheckRunManager) {
+		this.githubAppFactory = githubAppFactory;
+		try {
+			this.githubApp = githubAppFactory.makeAppGithub().getApp();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 		this.githubNoApiWebhookHandler = new GithubNoApiWebhookHandler(objectMappers);
-		this.githubApp = githubApp;
 		this.githubCheckRunManager = githubCheckRunManager;
 
 		this.objectMappers = objectMappers;
@@ -91,111 +87,40 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		return githubApp;
 	}
 
-	@Override
-	public ResultOrError<GithubAndToken, WebhookRelevancyResult> makeInstallationGithub(long installationId) {
-		try {
-			GHAppInstallation installationById = getGithubAsApp().getInstallationById(installationId);
-
-			// https://github.com/hub4j/github-api/issues/1613
-			// GitHub githubRoot = getGithubAsApp().getRoot();
-			// checkMarketPlacePlan(installationById, githubRoot);
-
-			Map<String, GHPermissionType> availablePermissions = installationById.getPermissions();
-
-			// This check is dumb, as we should also compare the values
-			Map<String, GHPermissionType> requestedPermissions = getRequestedPermissions();
-			if (!availablePermissions.keySet().containsAll(requestedPermissions.keySet())) {
-				return ResultOrError.error(
-						WebhookRelevancyResult.dismissed("We lack proper permissions. Available=" + availablePermissions
-								+ " vs requested="
-								+ requestedPermissions));
-			}
-
-			Map<String, GHPermissionType> permissions = availablePermissions;
-			LOGGER.info("Permissions: {}", permissions);
-			LOGGER.info("RepositorySelection: {}", installationById.getRepositorySelection());
-			// https://github.com/hub4j/github-api/issues/570
-			// Required to open new pull-requests
-			GHAppCreateTokenBuilder installationGithubBuilder =
-					installationById.createToken().permissions(requestedPermissions);
-
-			GHAppInstallationToken installationToken;
-			try {
-				// https://github.com/hub4j/github-api/issues/570
-				installationToken = installationGithubBuilder.create();
-			} catch (HttpException e) {
-				if (e.getMessage().contains("The permissions requested are not granted to this installation.")) {
-					LOGGER.trace("Lack proper permissions", e);
-					return ResultOrError.error(WebhookRelevancyResult
-							.dismissed("We lack proper permissions. Available=" + availablePermissions));
-				} else {
-					throw new UncheckedIOException(e);
-				}
-			}
-
-			String token = installationToken.getToken();
-			GitHub installationGithub = makeInstallationGithub(token);
-
-			// https://stackoverflow.com/questions/45427275/how-to-check-my-github-current-rate-limit
-			LOGGER.info("Initialized an installation github. RateLimit status: {}", installationGithub.getRateLimit());
-			return ResultOrError.result(new GithubAndToken(installationGithub, token, permissions));
-		} catch (GHFileNotFoundException e) {
-			throw new UncheckedIOException("Invalid installationId, or no actual access to it?", e);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	protected void checkMarketPlacePlan(GHAppInstallation installationById, GitHub githubRoot) throws IOException {
+	/**
+	 * 
+	 * @param appInstallation
+	 * @param ghRepository
+	 * @return an {@link Optional} rejection reason
+	 * @throws IOException
+	 */
+	protected Optional<String> checkMarketPlacePlan(GHAppInstallation appInstallation, GHRepository ghRepository)
+			throws IOException {
 		// https://github.com/hub4j/github-api/issues/1613
-		githubRoot.listMarketplacePlans().forEach(plan -> {
-			// Fetching the list for a single account is inefficient
-			List<GHMarketplaceAccountPlan> asList;
-			try {
-				asList = plan.listAccounts().createRequest().toList();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+		// GHMarketplaceAccount account = appInstallation.getMarketplaceAccount();
+		// GHMarketplaceAccountPlan accountPlan = account.getPlan();
+		// GHMarketplacePurchase purchase = accountPlan.getMarketplacePurchase();
+		// GHMarketplacePlan plan = purchase.getPlan();
+		//
+		// String accountPlanName = plan.getName();
+		//
+		// // https://github.com/marketplace/cleanthat/edit/plans
+		// if ("retired".equals(plan.getState())) {
+		// return Optional.of("This plan is retired");
+		// } else if (!"published".equals(plan.getState())) {
+		// return Optional.of("Not-managed plan state: " + plan.getState());
+		// }
+		//
+		// if (ghRepository.isPrivate()) {
+		// if (accountPlanName.contains("Private")) {
+		// LOGGER.info("Accepting an event for a private account");
+		// } else {
+		// LOGGER.warn("Private repositories are not accepted by plan={}", accountPlanName);
+		// return Optional.of("Your plan does not allow private repository");
+		// }
+		// }
 
-			GHUser account = installationById.getAccount();
-			asList.stream()
-					.filter(accountPlan -> 0 == Long.compare(account.getId(), accountPlan.getId()))
-					.findAny()
-					.ifPresent(accountPlan -> {
-						// accountPlan.toString() is seemingly not overriden
-						Map<String, Object> accountPlanAsMap = new LinkedHashMap<>();
-						accountPlanAsMap.put("id", accountPlan.getId());
-						accountPlanAsMap.put("login", accountPlan.getLogin());
-						accountPlanAsMap.put("organizationBillingEmail", accountPlan.getOrganizationBillingEmail());
-						accountPlanAsMap.put("type", accountPlan.getType());
-						accountPlanAsMap.put("url", accountPlan.getUrl());
-
-						LOGGER.info("Account={} is using plan={}", account.getHtmlUrl(), accountPlanAsMap);
-					});
-		});
-	}
-
-	private ImmutableMap<String, GHPermissionType> getRequestedPermissions() {
-		return ImmutableMap.<String, GHPermissionType>builder()
-				// Required to access a repository without having to list all available repositories
-				.put("pull_requests", GHPermissionType.WRITE)
-				// Required to read files, and commit new versions
-				.put("metadata", GHPermissionType.READ)
-				// Required to commit cleaned files
-				.put("contents", GHPermissionType.WRITE)
-				// Required to edit the checks associated to the cleaning operation
-				.put(GithubCheckRunManager.PERMISSION_CHECKS, GHPermissionType.WRITE)
-				.build();
-	}
-
-	protected GitHub makeInstallationGithub(String token) throws IOException {
-		GitHubConnector ghConnector = createGithubConnector();
-		return new GitHubBuilder().withAppInstallationToken(token).withConnector(ghConnector).build();
-	}
-
-	public static GitHubConnector createGithubConnector() {
-		// https://github.com/hub4j/github-api/issues/1202#issuecomment-890362069
-		return new OkHttpGitHubConnector(new OkHttpClient());
+		return Optional.empty();
 	}
 
 	// TODO What if we target a branch which has no configuration, as cleanthat has been introduced in the meantime in
@@ -204,7 +129,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	// @Override
 	public WebhookRelevancyResult filterWebhookEventTargetRelevantBranch(Path root,
 			ICodeCleanerFactory cleanerFactory,
-			IWebhookEvent githubAcceptedEvent) {
+			IWebhookEvent githubAcceptedEvent) throws IOException {
 		GithubWebhookEvent githubEvent = GithubWebhookEvent.fromCleanThatEvent(githubAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult = githubNoApiWebhookHandler.filterWebhookEventRelevant(githubEvent);
 		if (!offlineResult.isReviewRequestOpen() && !offlineResult.isPushRef()) {
@@ -214,7 +139,8 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		Map<String, ?> input = githubEvent.getBody();
 		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 
-		ResultOrError<GithubAndToken, WebhookRelevancyResult> optToken = makeInstallationGithub(installationId);
+		ResultOrError<GithubAndToken, WebhookRelevancyResult> optToken =
+				githubAppFactory.makeInstallationGithub(installationId);
 		if (optToken.getOptError().isPresent()) {
 			return optToken.getOptError().get();
 		}
@@ -233,50 +159,61 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		String eventKey = githubEvent.getxGithubDelivery();
 		Optional<GHCheckRun> optCheckRun =
 				githubCheckRunManager.createCheckRun(githubAuthAsInst, baseRepo, pushedRefOrRrHead.getSha(), eventKey);
-		optCheckRun.ifPresent(cr -> {
-			try {
-				cr.update()
+
+		GithubCheckRunManager.ifPresent(optCheckRun,
+				cr -> cr.update()
 						.add(new Output("Branch verification", "Start verification" + "\r\neventKey=" + eventKey))
-						.create();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		});
+						.create());
 
 		try {
+			{
+				Optional<String> optRejectedReason =
+						checkMarketPlacePlan(githubAuthAsInst.getGHAppInstallation(), baseRepo);
+
+				if (optRejectedReason.isPresent()) {
+					GithubCheckRunManager.ifPresent(optCheckRun,
+							c -> c.update()
+									.add(new Output("You need to switch to a different market-plan plan",
+											optRejectedReason.get() + "\r\n"
+													+ "See "
+													+ "https://github.com/marketplace/cleanthat/"
+													+ "\r\n"
+													+ "eventKey="
+													+ eventKey))
+									.create());
+
+					return WebhookRelevancyResult.dismissed(optRejectedReason.get());
+				}
+			}
+
 			CheckGithubEventHasValidConfig checkGithubEventHasValidConfig =
 					new CheckGithubEventHasValidConfig(root, cleanerFactory);
 			WebhookRelevancyResult result = checkGithubEventHasValidConfig
 					.doVerifyBranch(offlineResult, githubAuthAsInst, baseRepo, pushedRefOrRrHead, eventKey);
 
-			optCheckRun.ifPresent(checkRun -> {
+			GithubCheckRunManager.ifPresent(optCheckRun, checkRun -> {
 				var optRejectedReason = result.optRejectedReason();
 
-				try {
-					if (optRejectedReason.isPresent()) {
-						checkRun.update()
-								.withConclusion(Conclusion.NEUTRAL)
-								.withStatus(Status.COMPLETED)
-
-								.add(new Output("Rejected due to branch or configuration",
-										optRejectedReason.get() + "\r\neventKey=" + eventKey))
-								.create();
-					} else {
-						checkRun.update()
-								// Not completed as this is to be followed by the cleaning
-								.withStatus(Status.IN_PROGRESS)
-
-								.add(new Output("Checking is the branch is valid for cleaning",
-										"someSummary" + "\r\neventKey=" + eventKey))
-								.create();
-					}
-				} catch (IOException e) {
-					LOGGER.warn("Issue updating CheckRun", e);
+				GHCheckRunBuilder update = checkRun.update();
+				if (optRejectedReason.isPresent()) {
+					update.withConclusion(Conclusion.NEUTRAL)
+							.withStatus(Status.COMPLETED)
+							.add(new Output("Rejected due to branch or configuration",
+									optRejectedReason.get() + "\r\neventKey=" + eventKey));
+				} else {
+					update
+							// Not completed as this is to be followed by the cleaning
+							.withStatus(Status.IN_PROGRESS)
+							.add(new Output("Checking is the branch is valid for cleaning",
+									"someSummary" + "\r\neventKey=" + eventKey));
 				}
+				update.create();
 			});
 
 			return result;
-		} catch (RuntimeException e) {
+		} catch (
+
+		RuntimeException e) {
 			optCheckRun.ifPresent(checkRun -> githubCheckRunManager.reportFailure(checkRun, e));
 
 			throw new RuntimeException(e);
@@ -317,7 +254,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	// @Override
 	public void doExecuteClean(Path root,
 			ICodeCleanerFactory cleanerFactory,
-			IWebhookEvent githubAndBranchAcceptedEvent) {
+			IWebhookEvent githubAndBranchAcceptedEvent) throws IOException {
 		I3rdPartyWebhookEvent externalCodeEvent = GithubWebhookEvent.fromCleanThatEvent(githubAndBranchAcceptedEvent);
 		GitWebhookRelevancyResult offlineResult =
 				githubNoApiWebhookHandler.filterWebhookEventRelevant(externalCodeEvent);
@@ -335,7 +272,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = externalCodeEvent.getBody();
 		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
-		GithubAndToken githubAuthAsInst = makeInstallationGithub(installationId).getOptResult().get();
+		GithubAndToken githubAuthAsInst = githubAppFactory.makeInstallationGithub(installationId).getOptResult().get();
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 
 		String eventKey = ((GithubWebhookEvent) externalCodeEvent).getxGithubDelivery();

@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.kohsuke.github.GHApp;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRef.GHObject;
@@ -37,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.solven.cleanthat.code_provider.github.event.GithubCheckRunManager;
 import eu.solven.cleanthat.code_provider.github.event.GithubCodeCleaner;
 import eu.solven.cleanthat.code_provider.github.event.GithubWebhookHandler;
+import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.codeprovider.decorator.ILazyGitReference;
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
@@ -49,9 +49,9 @@ import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
 
 public class TestGithubWebhookHandler {
 
-	private GHApp ghApp = Mockito.mock(GHApp.class);
+	private IGithubAppFactory ghFactory = Mockito.mock(IGithubAppFactory.class, Mockito.RETURNS_DEEP_STUBS);
 
-	final GithubWebhookHandler handler = new GithubWebhookHandler(ghApp,
+	final GithubWebhookHandler handler = new GithubWebhookHandler(ghFactory,
 			Arrays.asList(ConfigHelpers.makeJsonObjectMapper()),
 			new GithubCheckRunManager(Mockito.mock(IGitService.class)));
 

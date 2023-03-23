@@ -21,20 +21,9 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kohsuke.github.AbstractGitHubWireMockTest;
-import org.kohsuke.github.GitHub;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.nimbusds.jose.JOSEException;
-
-import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
-import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
-import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
-import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 
 /**
  * This enables re-processing an event locally. Very useful to reproduce an issue, or test a know workload over a
@@ -44,24 +33,7 @@ import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLamb
  *
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class })
-// `extends AbstractGitHubWireMockTest` is WIP
-// We hope to be able to record the Github answer, to enable integrated tests not depending on Github live API
-public class ITProcessLocallyDynamoDbEvent_ExecuteClean extends AbstractGitHubWireMockTest {
-	@Autowired
-	AWebhooksLambdaFunction lambdaFunction;
-
-	public static class ExecuteCleanWiremockContext {
-		@Primary
-		IGithubAppFactory wiremockGhFactory(Environment env) {
-			return new GithubAppFactory(env) {
-				@Override
-				protected GitHub noCacheMakeAppGithub() throws IOException {
-					return AbstractGitHubWireMockTest.getGitHub();
-				}
-			};
-		}
-	}
+public class ITProcessLocallyDynamoDbEvent_ExecuteClean extends AProcessLocallyDynamoDbEvent_ExecuteClean {
 
 	@Test
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {

@@ -61,6 +61,17 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
 		return Optional.of("RSPEC-2148");
 	}
 
+	/**
+	 * Default is 4, as configured by PMD. Sonar tells requires 6 digits for decimal-base numbers
+	 * 
+	 * @return Length under which literals in base 10 are not required to have underscores
+	 * @see https://sonarsource.atlassian.net/browse/RSPEC-2148
+	 */
+	@SuppressWarnings("PMD.MagicNumber")
+	protected int getAcceptableDecimalLength() {
+		return 4;
+	}
+
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {
@@ -162,6 +173,12 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
 	}
 
 	private void appendWithUnderscores(String noUnderscore, StringBuilder sb, boolean reverseForDecimals) {
+		if (noUnderscore.length() <= getAcceptableDecimalLength()) {
+			sb.append(noUnderscore);
+
+			return;
+		}
+
 		assert noUnderscore.matches("\\d+");
 
 		var nbDigits = noUnderscore.length();

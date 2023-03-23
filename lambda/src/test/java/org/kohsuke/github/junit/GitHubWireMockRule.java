@@ -15,7 +15,8 @@
  */
 package org.kohsuke.github.junit;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.proxyAllTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.recordSpec;
 import static com.github.tomakehurst.wiremock.common.Gzip.unGzipToString;
 
 import java.io.File;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,15 +32,25 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
-import com.github.tomakehurst.wiremock.http.*;
+import com.github.tomakehurst.wiremock.http.HttpHeader;
+import com.github.tomakehurst.wiremock.http.HttpHeaders;
+import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.recording.RecordSpecBuilder;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -49,13 +61,14 @@ import com.google.gson.*;
  */
 // https://github.com/hub4j/github-api/blob/main/src/test/java/org/kohsuke/github/junit/GitHubWireMockRule.java
 public class GitHubWireMockRule extends WireMockMultiServerRule {
+	private static final Logger LOGGER = LoggerFactory.getLogger(GitHubWireMockRule.class);
 
+	public static final String KEY_TAKE_SNAPSHOT = "test.github.takeSnapshot";
 	// By default the wiremock tests will run without proxy or taking a snapshot.
 	// The tests will use only the stubbed data and will fail if requests are made for missing data.
 	// You can use the proxy without taking a snapshot while writing and debugging tests.
 	// You cannot take a snapshot without proxying.
-	private static final boolean takeSnapshot = System.getProperty("test.github.takeSnapshot", "false") != "false";
-	private static final boolean testWithOrg = System.getProperty("test.github.org", "true") == "true";
+	private static final boolean takeSnapshot = Boolean.getBoolean(KEY_TAKE_SNAPSHOT);
 	private static final boolean useProxy =
 			takeSnapshot || System.getProperty("test.github.useProxy", "false") != "false";
 
@@ -164,15 +177,6 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 	}
 
 	/**
-	 * Checks if is test with org.
-	 *
-	 * @return true, if is test with org
-	 */
-	public boolean isTestWithOrg() {
-		return GitHubWireMockRule.testWithOrg;
-	}
-
-	/**
 	 * Initialize servers.
 	 */
 	@Override
@@ -181,21 +185,31 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 		initializeServer("default", new GitHubApiResponseTransformer(this));
 
 		// only start non-api servers if we might need them
-		if (new File(apiServer().getOptions().filesRoot().getPath() + "_raw").exists() || isUseProxy()) {
-			initializeServer("raw");
-		}
-		if (new File(apiServer().getOptions().filesRoot().getPath() + "_uploads").exists() || isUseProxy()) {
-			initializeServer("uploads");
-		}
+		mayInitializeServer("raw");
+		mayInitializeServer("uploads");
+		mayInitializeServer("codeload");
+		mayInitializeServer("actions-user-content");
+	}
 
-		if (new File(apiServer().getOptions().filesRoot().getPath() + "_codeload").exists() || isUseProxy()) {
-			initializeServer("codeload");
-		}
+	private void mayInitializeServer(String serverName) {
+		boolean folderExists = Files.exists(fileToServerRecords(serverName));
+		if (folderExists || isUseProxy()) {
+			if (folderExists && isUseProxy()) {
+				LOGGER.warn("Beware the proxy for `{}` will take advantage of existing stubs", serverName);
+			}
 
-		if (new File(apiServer().getOptions().filesRoot().getPath() + "_actions-user-content").exists()
-				|| isUseProxy()) {
-			initializeServer("actions-user-content");
+			initializeServer(serverName);
 		}
+	}
+
+	private Path fileToServerRecords(String serverName) {
+		WireMockServer apiServer = apiServer();
+		return fileToServerRecords(serverName, apiServer);
+	}
+
+	public static Path fileToServerRecords(String serverName, WireMockServer apiServer) {
+		String serverFileRoot = apiServer.getOptions().filesRoot().getPath();
+		return Paths.get(serverFileRoot + WireMockMultiServerRule.getDirectorySuffix(serverName));
 	}
 
 	/**
@@ -204,29 +218,23 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 	@Override
 	protected void before() {
 		super.before();
-		if (!isUseProxy()) {
-			return;
+		if (isUseProxy()) {
+			this.apiServer().stubFor(proxyAllTo("https://api.github.com").atPriority(100));
+
+			if (this.rawServer() != null) {
+				this.rawServer().stubFor(proxyAllTo("https://raw.githubusercontent.com").atPriority(100));
+			}
+			if (this.uploadsServer() != null) {
+				this.uploadsServer().stubFor(proxyAllTo("https://uploads.github.com").atPriority(100));
+			}
+			if (this.codeloadServer() != null) {
+				this.codeloadServer().stubFor(proxyAllTo("https://codeload.github.com").atPriority(100));
+			}
+			if (this.actionsUserContentServer() != null) {
+				this.actionsUserContentServer()
+						.stubFor(proxyAllTo("https://pipelines.actions.githubusercontent.com").atPriority(100));
+			}
 		}
-
-		this.apiServer().stubFor(proxyAllTo("https://api.github.com").atPriority(100));
-
-		if (this.rawServer() != null) {
-			this.rawServer().stubFor(proxyAllTo("https://raw.githubusercontent.com").atPriority(100));
-		}
-
-		if (this.uploadsServer() != null) {
-			this.uploadsServer().stubFor(proxyAllTo("https://uploads.github.com").atPriority(100));
-		}
-
-		if (this.codeloadServer() != null) {
-			this.codeloadServer().stubFor(proxyAllTo("https://codeload.github.com").atPriority(100));
-		}
-
-		if (this.actionsUserContentServer() != null) {
-			this.actionsUserContentServer()
-					.stubFor(proxyAllTo("https://pipelines.actions.githubusercontent.com").atPriority(100));
-		}
-
 	}
 
 	/**
@@ -235,48 +243,45 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 	@Override
 	protected void after() {
 		super.after();
-		if (!isTakeSnapshot()) {
-			return;
+		if (isTakeSnapshot()) {
+			recordSnapshot(this.apiServer(), "https://api.github.com", false);
+			recordSnapshot(this.uploadsServer(), "https://uploads.github.com", false);
+
+			// For raw server, only fix up mapping files
+			recordSnapshot(this.rawServer(), "https://raw.githubusercontent.com", true);
+			recordSnapshot(this.codeloadServer(), "https://codeload.github.com", true);
+			recordSnapshot(this.actionsUserContentServer(), "https://pipelines.actions.githubusercontent.com", true);
 		}
-
-		recordSnapshot(this.apiServer(), "https://api.github.com", false);
-
-		// For raw server, only fix up mapping files
-		recordSnapshot(this.rawServer(), "https://raw.githubusercontent.com", true);
-
-		recordSnapshot(this.uploadsServer(), "https://uploads.github.com", false);
-
-		recordSnapshot(this.codeloadServer(), "https://codeload.github.com", true);
-
-		recordSnapshot(this.actionsUserContentServer(), "https://pipelines.actions.githubusercontent.com", true);
 	}
 
 	private void recordSnapshot(WireMockServer server, String target, boolean isRawServer) {
-		if (server != null) {
-
-			final RecordSpecBuilder recordSpecBuilder = recordSpec().forTarget(target)
-					// "If-None-Match" header used for ETag matching for caching connections
-					.captureHeader("If-None-Match")
-					// "If-Modified-Since" header used for ETag matching for caching connections
-					.captureHeader("If-Modified-Since")
-					.captureHeader("Cache-Control")
-					// "Accept" header is used to specify previews. If it changes expected data may not be retrieved.
-					.captureHeader("Accept")
-					// This is required, or some requests will return data from unexpected stubs
-					// For example, if you update "title" and "body", and then update just "title" to the same value
-					// the mock framework will treat those two requests as equivalent, which we do not want.
-					.chooseBodyMatchTypeAutomatically(true, false, false)
-					.extractTextBodiesOver(255);
-
-			if (customizeRecordSpec != null) {
-				customizeRecordSpec.accept(recordSpecBuilder);
-			}
-
-			server.snapshotRecord(recordSpecBuilder);
-
-			// After taking the snapshot, format the output
-			formatTestResources(new File(server.getOptions().filesRoot().getPath()).toPath(), isRawServer);
+		if (server == null) {
+			LOGGER.info("There is no server recording {}", target);
+			return;
 		}
+
+		final RecordSpecBuilder recordSpecBuilder = recordSpec().forTarget(target)
+				// "If-None-Match" header used for ETag matching for caching connections
+				.captureHeader("If-None-Match")
+				// "If-Modified-Since" header used for ETag matching for caching connections
+				.captureHeader("If-Modified-Since")
+				.captureHeader("Cache-Control")
+				// "Accept" header is used to specify previews. If it changes expected data may not be retrieved.
+				.captureHeader("Accept")
+				// This is required, or some requests will return data from unexpected stubs
+				// For example, if you update "title" and "body", and then update just "title" to the same value
+				// the mock framework will treat those two requests as equivalent, which we do not want.
+				.chooseBodyMatchTypeAutomatically(true, false, false)
+				.extractTextBodiesOver(255);
+
+		if (customizeRecordSpec != null) {
+			customizeRecordSpec.accept(recordSpecBuilder);
+		}
+
+		server.snapshotRecord(recordSpecBuilder);
+
+		// After taking the snapshot, format the output
+		formatTestResources(fileToServerRecords(target), isRawServer);
 	}
 
 	/**
@@ -323,7 +328,8 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 			// Match all the ids to request indexes
 			Files.walk(path).forEach(filePath -> {
 				try {
-					if (filePath.toString().endsWith(".json") && filePath.toString().contains("/mappings/")) {
+					if (filePath.toString().endsWith(".json")
+							&& filePath.toString().contains("/" + KEY_MAPPINGS + "/")) {
 						var fileText = new String(Files.readAllBytes(filePath));
 						Object parsedObject = g.fromJson(fileText, Object.class);
 						addMappingId((Map<String, Object>) parsedObject, idToIndex);
@@ -341,35 +347,34 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 						filePath = renameFileToIndex(filePath, entry);
 					}
 					// For raw server, only fix up mapping files
-					if (isRawServer && !filePath.toString().contains("mappings")) {
+					if (isRawServer && !filePath.toString().contains(KEY_MAPPINGS)) {
 						return;
 					}
 					if (filePath.toString().endsWith(".json")) {
 						var fileText = new String(Files.readAllBytes(filePath));
 						// while recording responses we replaced all github calls localhost
 						// now we reverse that for storage.
-						fileText = fileText.replace(this.apiServer().baseUrl(), "https://api.github.com");
+						fileText = fileText.replace(apiServer().baseUrl(), "https://api.github.com");
 
 						if (this.rawServer() != null) {
-							fileText =
-									fileText.replace(this.rawServer().baseUrl(), "https://raw.githubusercontent.com");
+							fileText = fileText.replace(rawServer().baseUrl(), "https://raw.githubusercontent.com");
 						}
 
 						if (this.uploadsServer() != null) {
-							fileText = fileText.replace(this.uploadsServer().baseUrl(), "https://uploads.github.com");
+							fileText = fileText.replace(uploadsServer().baseUrl(), "https://uploads.github.com");
 						}
 
 						if (this.codeloadServer() != null) {
-							fileText = fileText.replace(this.codeloadServer().baseUrl(), "https://codeload.github.com");
+							fileText = fileText.replace(codeloadServer().baseUrl(), "https://codeload.github.com");
 						}
 
 						if (this.actionsUserContentServer() != null) {
-							fileText = fileText.replace(this.actionsUserContentServer().baseUrl(),
+							fileText = fileText.replace(actionsUserContentServer().baseUrl(),
 									"https://pipelines.actions.githubusercontent.com");
 						}
 
 						// point bodyFile in the mapping to the renamed body file
-						if (entry != null && filePath.toString().contains("mappings")) {
+						if (entry != null && filePath.toString().contains(KEY_MAPPINGS)) {
 							fileText = fileText.replace("-" + entry.getKey(), "-" + entry.getValue());
 						}
 
@@ -383,7 +388,7 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 				}
 			});
 		} catch (IOException e) {
-			throw new RuntimeException("Files could not be written");
+			throw new RuntimeException("Files could not be written", e);
 		}
 	}
 
@@ -424,21 +429,18 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 	public String mapToMockGitHub(String body) {
 		body = body.replace("https://api.github.com", this.apiServer().baseUrl());
 
-		body = replaceTargetServerUrl(body, this.rawServer(), "https://raw.githubusercontent.com", "/raw");
-
-		body = replaceTargetServerUrl(body, this.uploadsServer(), "https://uploads.github.com", "/uploads");
-
-		body = replaceTargetServerUrl(body, this.codeloadServer(), "https://codeload.github.com", "/codeload");
-
-		body = replaceTargetServerUrl(body,
-				this.actionsUserContentServer(),
+		body = replaceTargetUrl(body, rawServer(), "https://raw.githubusercontent.com", "/raw");
+		body = replaceTargetUrl(body, uploadsServer(), "https://uploads.github.com", "/uploads");
+		body = replaceTargetUrl(body, codeloadServer(), "https://codeload.github.com", "/codeload");
+		body = replaceTargetUrl(body,
+				actionsUserContentServer(),
 				"https://pipelines.actions.githubusercontent.com",
 				"/actions-user-content");
 		return body;
 	}
 
 	@Nonnull
-	private String replaceTargetServerUrl(String body,
+	private String replaceTargetUrl(String body,
 			WireMockServer wireMockServer,
 			String rawTarget,
 			String inactiveTarget) {

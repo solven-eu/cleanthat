@@ -9,6 +9,10 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * In many cases, the presence of comment will prevent a mutator, as comments would be lost in many cases
 * `EnhancedForLoopToStreamAnyMatch` will not produce invalid code in case of `return` over the `forEach` variable
 
+### Changes
+
+* `UseUnderscoresInNumericLiterals` now applies only over 5+ digits (like PMD default configuration)
+
 ### Added
 
 * `EnhancedForLoopToStreamCollect` is introduced

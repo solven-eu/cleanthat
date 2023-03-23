@@ -19,22 +19,21 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.kohsuke.github.junit.GitHubWireMockRule;
 
+import com.github.tomakehurst.wiremock.common.NetworkAddressRules;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 
@@ -48,9 +47,6 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 public abstract class AbstractGitHubWireMockTest {
 
 	private final GitHubBuilder githubBuilder = createGitHubBuilder();
-
-	/** The Constant GITHUB_API_TEST_ORG. */
-	static final String GITHUB_API_TEST_ORG = "hub4j-test-org";
 
 	/** The Constant STUBBED_USER_LOGIN. */
 	static final String STUBBED_USER_LOGIN = "placeholder-user";
@@ -67,9 +63,9 @@ public abstract class AbstractGitHubWireMockTest {
 	/**
 	 * {@link GitHub} instance for use during test. Traffic will be part of snapshot when taken.
 	 */
-	protected static GitHub gitHub;
+	private static GitHub gitHub;
 
-	private GitHub nonRecordingGitHub;
+	private static GitHub nonRecordingGitHub;
 
 	/** The base files class path. */
 	protected final String baseFilesClassPath = this.getClass().getName().replace('.', '/');
@@ -101,38 +97,39 @@ public abstract class AbstractGitHubWireMockTest {
 	 * @return the wire mock options
 	 */
 	protected WireMockConfiguration getWireMockOptions() {
-		return WireMockConfiguration.options().dynamicPort().usingFilesUnderDirectory(baseRecordPath);
+		return WireMockConfiguration.options()
+				.dynamicPort()
+				.usingFilesUnderDirectory(baseRecordPath)
+				// .networkTrafficListener(new ConsoleNotifyingWiremockNetworkTrafficListener())
+
+				// Unclear why `api.github.com` is considered as not matching the target proxy
+				// .limitProxyTargets(NetworkAddressRules.builder().allow("api.github.com").build())
+				.limitProxyTargets(NetworkAddressRules.ALLOW_ALL);
 	}
 
 	private static GitHubBuilder createGitHubBuilder() {
-
-		GitHubBuilder builder = new GitHubBuilder();
-
-		try {
-			var f = new File(System.getProperty("user.home"), ".github.kohsuke2");
-			if (f.exists()) {
-				var props = new Properties();
-				FileInputStream in = null;
-				try {
-					in = new FileInputStream(f);
-					props.load(in);
-				} finally {
-					IOUtils.closeQuietly(in);
-				}
-				// use the non-standard credential preferentially, so that developers of this library do not have
-				// to clutter their event stream.
-				builder = GitHubBuilder.fromProperties(props);
-			} else {
-
-				builder = GitHubBuilder.fromEnvironment();
-
-				// builder = GitHubBuilder.fromCredentials();
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		// builder = GitHubBuilder.fromProperties(props);
+		// builder = GitHubBuilder.fromEnvironment();
+		GitHubBuilder builder = fromSystemProperties();
+		// builder = GitHubBuilder.fromCredentials();
 
 		return builder.withRateLimitHandler(RateLimitHandler.FAIL);
+	}
+
+	// see GitHubBuilder.fromEnvironment()
+	protected static GitHubBuilder fromSystemProperties() {
+		var properties = new Properties();
+
+		for (Entry<Object, Object> e : System.getProperties().entrySet()) {
+			var name = e.getKey().toString().toLowerCase(Locale.ENGLISH);
+			if (name.startsWith("github_"))
+				name = name.substring("github_".length());
+
+			// Unclear why we keep all properties. Doing like `GitHubBuilder.fromEnvironment()`
+			properties.put(name, e.getValue());
+		}
+
+		return GitHubBuilder.fromProperties(properties);
 	}
 
 	/**
@@ -162,6 +159,8 @@ public abstract class AbstractGitHubWireMockTest {
 	@Before
 	public void wireMockSetup() throws Exception {
 		GitHubBuilder builder = getGitHubBuilder().withEndpoint(mockGitHub.apiServer().baseUrl());
+
+		// builder = builder.withConnector(GithubAppFactory.createGithubConnector());
 
 		if (useDefaultGitHub) {
 			gitHub = builder.build();
@@ -199,7 +198,7 @@ public abstract class AbstractGitHubWireMockTest {
 	 * @param instance
 	 *            the instance
 	 */
-	protected void verifyAuthenticated(GitHub instance) {
+	protected static void verifyAuthenticated(GitHub instance) {
 		assertThat(
 				"GitHub connection believes it is anonymous.  Make sure you set GITHUB_OAUTH or both GITHUB_LOGIN and GITHUB_PASSWORD environment variables",
 				instance.isAnonymous(),
@@ -258,7 +257,7 @@ public abstract class AbstractGitHubWireMockTest {
 		if (mockGitHub.isUseProxy()) {
 			cleanupRepository(fullName);
 
-			getCreateBuilder(name).description("A test repository for testing the github-api project: " + name)
+			getCreateBuilder(name).description("A test repository for testing the cleanthat project: " + name)
 					.homepage("http://github-api.kohsuke.org/")
 					.autoInit(true)
 					.wiki(true)
@@ -267,7 +266,7 @@ public abstract class AbstractGitHubWireMockTest {
 					.private_(false)
 					.create();
 			try {
-				Thread.sleep(3_000);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
@@ -321,7 +320,7 @@ public abstract class AbstractGitHubWireMockTest {
 	 *
 	 * @return a github instance after checking Authentication
 	 */
-	public GitHub getNonRecordingGitHub() {
+	public static GitHub getNonRecordingGitHub() {
 		verifyAuthenticated(nonRecordingGitHub);
 		return nonRecordingGitHub;
 	}
@@ -333,11 +332,7 @@ public abstract class AbstractGitHubWireMockTest {
 	}
 
 	private String getOrganization() throws IOException {
-		if (mockGitHub.isTestWithOrg()) {
-			return GITHUB_API_TEST_ORG;
-		} else {
-			return getGitHub().getMyself().getLogin();
-		}
+		return getGitHub().getMyself().getLogin();
 	}
 
 	/**

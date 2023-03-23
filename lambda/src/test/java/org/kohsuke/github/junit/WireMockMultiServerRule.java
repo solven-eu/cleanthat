@@ -43,6 +43,10 @@ import com.github.tomakehurst.wiremock.verification.NearMiss;
  */
 // https://github.com/hub4j/github-api/blob/main/src/test/java/org/kohsuke/github/junit/WireMockMultiServerRule.java
 public class WireMockMultiServerRule implements MethodRule, TestRule {
+	// The name of the server associated to `api.github.com`
+	public static final String SERVER_API = "default";
+
+	public static final String KEY_MAPPINGS = "mappings";
 
 	/** The servers. */
 	protected final Map<String, WireMockServer> servers = new HashMap<>();
@@ -123,7 +127,7 @@ public class WireMockMultiServerRule implements MethodRule, TestRule {
 			public void evaluate() throws Throwable {
 				WireMockMultiServerRule.this.methodName = methodName;
 				initializeServers();
-				WireMock.configureFor("localhost", WireMockMultiServerRule.this.servers.get("default").port());
+				WireMock.configureFor("localhost", WireMockMultiServerRule.this.servers.get(SERVER_API).port());
 
 				try {
 					WireMockMultiServerRule.this.before();
@@ -156,23 +160,28 @@ public class WireMockMultiServerRule implements MethodRule, TestRule {
 	 */
 	protected final void initializeServer(String serverId, Extension... extensions) {
 		var directoryName = methodName;
-		if (!"default".equals(serverId)) {
-			directoryName += "_" + serverId;
-		}
+		directoryName = directoryName + getDirectorySuffix(serverId);
 
 		final Options localOptions =
 				new WireMockRuleConfiguration(WireMockMultiServerRule.this.options, directoryName, extensions);
 
-		new File(localOptions.filesRoot().getPath(), "mappings").mkdirs();
+		new File(localOptions.filesRoot().getPath(), KEY_MAPPINGS).mkdirs();
 		new File(localOptions.filesRoot().getPath(), "__files").mkdirs();
 
 		WireMockServer server = new WireMockServer(localOptions);
 		this.servers.put(serverId, server);
 		server.start();
 
-		if (!"default".equals(serverId)) {
+		if (!SERVER_API.equals(serverId)) {
 			WireMock.configureFor("localhost", server.port());
 		}
+	}
+
+	public static String getDirectorySuffix(String serverId) {
+		if (!SERVER_API.equals(serverId)) {
+			return "_" + serverId;
+		}
+		return "";
 	}
 
 	/**
@@ -228,7 +237,7 @@ public class WireMockMultiServerRule implements MethodRule, TestRule {
 	private void stop() {
 		servers.values().forEach(server -> {
 			server.stop();
-			// server left behinds empty folders delete them
+			// server left behind empty folders delete them
 			deleteEmptyFolders(new File(server.getOptions().filesRoot().getPath()));
 		});
 	}

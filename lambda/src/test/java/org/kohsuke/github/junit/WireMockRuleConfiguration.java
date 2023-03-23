@@ -20,9 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.tomakehurst.wiremock.common.AsynchronousResponseSettings;
+import com.github.tomakehurst.wiremock.common.BrowserProxySettings;
+import com.github.tomakehurst.wiremock.common.DataTruncationSettings;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.common.HttpsSettings;
 import com.github.tomakehurst.wiremock.common.JettySettings;
+import com.github.tomakehurst.wiremock.common.NetworkAddressRules;
 import com.github.tomakehurst.wiremock.common.Notifier;
 import com.github.tomakehurst.wiremock.common.ProxySettings;
 import com.github.tomakehurst.wiremock.core.MappingsSaver;
@@ -39,8 +42,9 @@ import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
 import com.github.tomakehurst.wiremock.standalone.MappingsLoader;
 import com.github.tomakehurst.wiremock.standalone.MappingsSource;
 import com.github.tomakehurst.wiremock.verification.notmatched.NotMatchedRenderer;
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+
+import wiremock.com.google.common.base.Optional;
+import wiremock.com.google.common.collect.Maps;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -234,9 +238,9 @@ public class WireMockRuleConfiguration implements Options {
 	 *
 	 * @return the browser proxy settings
 	 */
-	// public BrowserProxySettings browserProxySettings() {
-	// return parent.browserProxySettings();
-	// }
+	public BrowserProxySettings browserProxySettings() {
+		return parent.browserProxySettings();
+	}
 
 	/**
 	 * Proxy via.
@@ -405,52 +409,52 @@ public class WireMockRuleConfiguration implements Options {
 	 *
 	 * @return the stub cors enabled
 	 */
-	// public boolean getStubCorsEnabled() {
-	// return parent.getStubCorsEnabled();
-	// }
+	public boolean getStubCorsEnabled() {
+		return parent.getStubCorsEnabled();
+	}
 
 	/**
 	 * Timeout.
 	 *
 	 * @return the long
 	 */
-	// public long timeout() {
-	// return parent.timeout();
-	// }
+	public long timeout() {
+		return parent.timeout();
+	}
 
 	/**
 	 * Gets the disable optimize xml factories loading.
 	 *
 	 * @return the disable optimize xml factories loading
 	 */
-	// public boolean getDisableOptimizeXmlFactoriesLoading() {
-	// return parent.getDisableOptimizeXmlFactoriesLoading();
-	// }
+	public boolean getDisableOptimizeXmlFactoriesLoading() {
+		return parent.getDisableOptimizeXmlFactoriesLoading();
+	}
 
 	/**
 	 * Gets the disable strict http headers.
 	 *
 	 * @return the disable strict http headers
 	 */
-	// public boolean getDisableStrictHttpHeaders() {
-	// return parent.getDisableStrictHttpHeaders();
-	// }
+	public boolean getDisableStrictHttpHeaders() {
+		return parent.getDisableStrictHttpHeaders();
+	}
 
 	/**
 	 * Gets the data truncation settings.
 	 *
 	 * @return the data truncation settings
 	 */
-	// public DataTruncationSettings getDataTruncationSettings() {
-	// return parent.getDataTruncationSettings();
-	// }
+	public DataTruncationSettings getDataTruncationSettings() {
+		return parent.getDataTruncationSettings();
+	}
 
 	/**
 	 * Gets the network address rules.
 	 *
 	 * @return the network address rules
 	 */
-	// public NetworkAddressRules getProxyTargetRules() {
-	// return parent.getProxyTargetRules();
-	// }
+	public NetworkAddressRules getProxyTargetRules() {
+		return parent.getProxyTargetRules();
+	}
 }

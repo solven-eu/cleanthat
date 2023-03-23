@@ -344,14 +344,20 @@ languageLevel: jdk1.7
 
 ```
 @CompareMethods
-public static class CaseReturnDouble {
+public static class IntDecimal {
 
     public Object pre() {
-        return 123456789.0123456789;
+        int int4 = 2023;
+        int int6 = 202303;
+        int int8 = 20230323;
+        return int4 + int6 + int8;
     }
 
     public Object post() {
-        return 123_456_789.012_345_678_9;
+        int int4 = 2023;
+        int int6 = 202_303;
+        int int8 = 20_230_323;
+        return int4 + int6 + int8;
     }
 }
 ```

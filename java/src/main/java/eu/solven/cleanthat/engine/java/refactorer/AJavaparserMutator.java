@@ -136,9 +136,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	protected boolean tryReplace(Node node, Node replacement) {
-		if (node.findFirst(Node.class, n -> n.getComment().isPresent()).isPresent()) {
-			// For now, Cleanthat is pretty weak on comment management (due to Javaparser limitations)
-			// So we prefer aborting any modification in case of comment presence, to prevent losing comments
+		if (cancelDueToComment(node)) {
 			LOGGER.info("We skip removing {} due to the presence of a comment", node);
 			return false;
 		}
@@ -155,7 +153,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	protected boolean tryRemove(Node node) {
-		if (node.getComment().isPresent()) {
+		if (cancelDueToComment(node)) {
 			LOGGER.info("We skip removing {} due to the presence of a comment", node);
 			return false;
 		}
@@ -169,6 +167,18 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 			LOGGER.warn("Failed removing `{}` from a {}", node, nodeParentAsString);
 		}
 		return result;
+	}
+
+	protected boolean cancelDueToComment(Node node) {
+		if (node.findFirst(Node.class, n -> n.getComment().isPresent()).isPresent()) {
+			// For now, Cleanthat is pretty weak on comment management (due to Javaparser limitations)
+			// So we prefer aborting any modification in case of comment presence, to prevent losing comments
+			// https://github.com/javaparser/javaparser/issues/3677
+			LOGGER.debug("You should cancel the operation due to the presence of a comment");
+			return true;
+		}
+
+		return false;
 	}
 
 	protected Optional<Node> replaceNode(Node node) {

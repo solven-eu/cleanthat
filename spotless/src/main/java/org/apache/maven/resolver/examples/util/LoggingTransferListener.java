@@ -80,11 +80,11 @@ public class LoggingTransferListener extends AbstractTransferListener {
 	}
 
 	private String getStatus(long complete, long total) {
-		if (total >= 1_024) {
+		if (total >= 1024) {
 			return toKB(complete) + "/" + toKB(total) + " KB ";
 		} else if (total >= 0) {
 			return complete + "/" + total + " B ";
-		} else if (complete >= 1_024) {
+		} else if (complete >= 1024) {
 			return toKB(complete) + " KB ";
 		} else {
 			return complete + " B ";
@@ -110,7 +110,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 		if (contentLength >= 0) {
 			var type = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
 			String len;
-			if (contentLength >= 1_024) {
+			if (contentLength >= 1024) {
 				len = toKB(contentLength) + " KB";
 			} else {
 				len = contentLength + " B";
@@ -121,7 +121,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 			if (duration > 0) {
 				long bytes = contentLength - resource.getResumeOffset();
 				var format = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ENGLISH));
-				var kbPerSec = (bytes / 1_024.0) / (duration / 1_000.0);
+				var kbPerSec = (bytes / 1024.0) / (duration / 1000.0);
 				throughput = " at " + format.format(kbPerSec) + " KB/sec";
 			}
 
@@ -162,7 +162,7 @@ public class LoggingTransferListener extends AbstractTransferListener {
 
 	@SuppressWarnings("checkstyle:magicnumber")
 	protected long toKB(long bytes) {
-		return (bytes + 1_023) / 1_024;
+		return (bytes + 1023) / 1024;
 	}
 
 }

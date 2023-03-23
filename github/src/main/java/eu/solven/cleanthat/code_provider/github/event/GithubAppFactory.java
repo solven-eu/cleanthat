@@ -104,6 +104,7 @@ public class GithubAppFactory implements IGithubAppFactory {
 	public static GitHubConnector createGithubConnector() {
 		// https://github.com/hub4j/github-api/issues/1202#issuecomment-890362069
 		return new OkHttpGitHubConnector(new OkHttpClient());
+		// return new HttpClientGitHubConnector();
 	}
 
 	protected GitHub noCacheMakeAppGithub() throws IOException {

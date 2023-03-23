@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
@@ -11,6 +12,47 @@ public class UseUnderscoresInNumericLiteralsCases extends AJavaparserRefactorerC
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new UseUnderscoresInNumericLiterals();
+	}
+
+	@CompareMethods
+	public static class IntDecimal {
+		public Object pre() {
+			int int4 = 2023;
+			int int6 = 202303;
+			int int8 = 20230323;
+			return int4 + int6 + int8;
+		}
+
+		public Object post() {
+			int int4 = 2023;
+			int int6 = 202_303;
+			int int8 = 20_230_323;
+			return int4 + int6 + int8;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class IntBinary {
+		public Object pre() {
+			return 0b01101001010011011110010101011110;
+		}
+
+		public Object post() {
+			return 0b01101001_01001101_11100101_01011110;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class LongHexa {
+		public Object pre() {
+			return 0x7fffffffffffffffL;
+		}
+
+		public Object post() {
+			return 0x7fff_ffff_ffff_ffffL;
+		}
 	}
 
 	@CompareMethods

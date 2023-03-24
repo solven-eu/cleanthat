@@ -809,6 +809,22 @@ isDraft
 
 languageLevel: jdk1.5
 
+```
+@CompareMethods
+public static class CaseBoolean_valueOf {
+
+    public Object pre(boolean input) {
+        return new Boolean(input);
+    }
+
+    public Object post(boolean input) {
+        return Boolean.valueOf(input);
+    }
+}
+```
+
+See[PrimitiveWrapperInstantiationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/PrimitiveWrapperInstantiationCases.java)
+
 ### [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 
 jSparrow: [RedundantLogicalComplementsInStream](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)

@@ -15,12 +15,15 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import java.awt.geom.Rectangle2D;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class BoxedPrimitiveConstructorCases extends AJavaparserRefactorerCases {
+public class PrimitiveWrapperInstantiationCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
 		return new PrimitiveWrapperInstantiation();
@@ -45,6 +48,13 @@ public class BoxedPrimitiveConstructorCases extends AJavaparserRefactorerCases {
 
 		public Object post(double input) {
 			return Double.valueOf(input);
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class RectangleDouble {
+		public Object pre(double input) {
+			return new Rectangle2D.Double(1, 2, 3, 4);
 		}
 	}
 

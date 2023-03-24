@@ -29,6 +29,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
@@ -41,6 +42,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.google.common.annotations.VisibleForTesting;
 
+import eu.solven.cleanthat.SuppressCleanthat;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -73,6 +75,21 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	public Optional<Node> walkAst(Node tree) {
 		var transformed = new AtomicBoolean();
 		tree.walk(node -> {
+			Optional<NodeWithAnnotations> optSuppressedParent = node.findAncestor(n -> {
+				return n.isAnnotationPresent(SuppressCleanthat.class);
+			}, NodeWithAnnotations.class);
+			Optional<Node> optSuppressedChildren = node.findFirst(Node.class, n -> {
+				return n instanceof NodeWithAnnotations<?>
+						&& ((NodeWithAnnotations<?>) n).isAnnotationPresent(SuppressCleanthat.class);
+			});
+			if (node instanceof NodeWithAnnotations
+					&& ((NodeWithAnnotations<?>) node).isAnnotationPresent(SuppressCleanthat.class)
+					|| optSuppressedParent.isPresent()
+					|| optSuppressedChildren.isPresent()) {
+				LOGGER.debug("We skip {} due to {}", node, SuppressCleanthat.class.getName());
+				return;
+			}
+
 			boolean hasTransformed;
 			try {
 				LOGGER.trace("{} is going over {}",

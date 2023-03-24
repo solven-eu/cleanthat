@@ -24,6 +24,8 @@
 		<!-- The refactoring cross-AST logic. Typically holds IMutator -->
 		<module>refactorer</module>
 
+		<module>annotations</module>
+
 		<!-- JVM languages -->
 		<module>java</module>
 		<module>java-eclipse</module>

@@ -55,6 +55,12 @@
 
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

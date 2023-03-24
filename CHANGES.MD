@@ -6,6 +6,16 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ### Fixed
 
+* `PrimitiveWrapperInstantiation` will not treat nested class as a boxed type anymore (e.g. `java.awt.geom.Rectangle2D.Double`)
+
+### Added
+
+* `@SuppressCleanthat` enables skipping Cleanthat as specific piece of code
+
+## [2.12] - 2023-03-23
+
+### Fixed
+
 * In many cases, the presence of comment will prevent a mutator, as comments would be lost in many cases
 * `EnhancedForLoopToStreamAnyMatch` will not produce invalid code in case of `return` over the `forEach` variable
 
@@ -16,7 +26,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Added
 
 * `EnhancedForLoopToStreamCollect` is introduced
-* `CaseNotYetImplemented` enables preparing unitTests for future features or limitations
+* `@CaseNotYetImplemented` enables preparing unitTests for future features or limitations
 
 ## [2.11] - 2023-03-12
 

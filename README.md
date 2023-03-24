@@ -32,7 +32,7 @@ Related projects:
 
 See [CHANGES.MD](CHANGES.MD)
 
-- 2023-03-01: 2.7 Latest release
+- 2023-03-23: 2.12 Latest release
 - ...
 - 2023-02-06: 2.0 Major Release leveraging from/to [Spotless](https://github.com/diffplug/spotless)
 - ...
@@ -203,6 +203,17 @@ The maven plugin enables generating an Eclipse Stylesheet minimizing changes ove
 see maven/README.MD
 
 # Notes for maintainers
+
+## Compile locally
+
+        git clone git@github.com:solven-eu/cleanthat.git
+        mvn install -Pfast
+
+The `-Pfast` profile may be necessary to circumvent cleanthat depenending on itself to apply `spotless` on itself.
+
+Once done (or re-done after a release), you can simply:
+
+        mvn install
 
 ## Deploy into Production (AWS):
 

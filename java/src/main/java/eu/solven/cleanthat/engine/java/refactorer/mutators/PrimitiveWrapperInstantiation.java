@@ -72,6 +72,7 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 	}
 
 	private boolean isBoxedPrimitive(ClassOrInterfaceType type) {
-		return type.isBoxedType();
+		// We check the scope as a workaround to https://github.com/javaparser/javaparser/issues/3968
+		return type.getScope().isEmpty() && type.isBoxedType();
 	}
 }

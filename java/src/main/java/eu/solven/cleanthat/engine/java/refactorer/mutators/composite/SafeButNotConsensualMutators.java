@@ -40,7 +40,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectEqualsForPrimit
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectsHashCodePrimitive;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveExplicitCallToSuper;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.StringStartsWithChar;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
@@ -80,7 +80,7 @@ public class SafeButNotConsensualMutators extends CompositeMutator<IMutator> imp
 					// https://github.com/javaparser/javaparser/issues/3936
 					// new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals(),
-					new StringStartsWithChar(),
+					new SimplifyStartsWith(),
 					new RemoveExplicitCallToSuper(),
 					new UseTextBlocks(),
 					new ObjectEqualsForPrimitives(),

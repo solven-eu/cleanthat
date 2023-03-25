@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.StringStartsWithCharCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.SimplifyStartsWithCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestStringStartsWithCharCases extends AParameterizesJavaparserRefactorerCases {
+public class TestSimplifyStartsWithCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new StringStartsWithCharCases();
+		return new SimplifyStartsWithCases();
 	}
 
-	public TestStringStartsWithCharCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestSimplifyStartsWithCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

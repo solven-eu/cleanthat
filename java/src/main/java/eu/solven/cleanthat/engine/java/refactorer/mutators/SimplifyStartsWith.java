@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -24,6 +25,7 @@ import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -33,11 +35,21 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
  *
  * @author Benoit Lacelle
  */
-public class StringStartsWithChar extends AJavaparserExprMutator {
+public class SimplifyStartsWith extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
 		// String.isEmpty has been introduced with JDK6
 		return IJdkVersionConstants.JDK_6;
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("SimplifyStartsWith");
+	}
+
+	@Override
+	public String pmdUrl() {
+		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith";
 	}
 
 	@Override
@@ -52,24 +64,38 @@ public class StringStartsWithChar extends AJavaparserExprMutator {
 		}
 		var binaryExpr = expr.asBinaryExpr();
 
-		if (binaryExpr.getOperator() != Operator.OR) {
+		boolean isAndNotEmptyElseOrEmpty;
+		if (binaryExpr.getOperator() == BinaryExpr.Operator.AND) {
+			// Expect to be in `line.startsWith("#") && !line.isEmpty()`
+			isAndNotEmptyElseOrEmpty = true;
+		} else if (binaryExpr.getOperator() == BinaryExpr.Operator.OR) {
+			// Expect to be in `line.startsWith("#") || line.isEmpty()`
+			isAndNotEmptyElseOrEmpty = false;
+		} else {
 			return false;
 		}
 
-		var left = binaryExpr.getLeft();
-		if (!left.isMethodCallExpr()) {
+		Optional<MethodCallExpr> optStartsWith = findStartsWith(binaryExpr.getLeft(), binaryExpr.getRight());
+		Optional<MethodCallExpr> optIsEmpty =
+				findIsEmpty(binaryExpr.getLeft(), binaryExpr.getRight(), isAndNotEmptyElseOrEmpty);
+
+		if (optStartsWith.isEmpty() || optIsEmpty.isEmpty()) {
 			return false;
 		}
 
-		var right = binaryExpr.getRight();
-		if (!right.isMethodCallExpr()) {
-			return false;
+		var startsWithMethodCall = optStartsWith.get();
+		var isEmptyMethodCall = optIsEmpty.get();
+		// May be `line.isEmpty()` or `line.isEmpty()`
+		Expression isEmptyExpr;
+		if (isAndNotEmptyElseOrEmpty) {
+			// This is supposed to be the UnaryExpr, parent of the MethodCallExpr
+			isEmptyExpr = (Expression) isEmptyMethodCall.getParentNode().orElseThrow();
+		} else {
+			isEmptyExpr = isEmptyMethodCall;
 		}
 
-		var leftMethodCall = left.asMethodCallExpr();
-		var rightMethodCall = right.asMethodCallExpr();
-		Optional<Expression> optRightScope = rightMethodCall.getScope();
-		Optional<Expression> optLeftScope = leftMethodCall.getScope();
+		Optional<Expression> optRightScope = isEmptyMethodCall.getScope();
+		Optional<Expression> optLeftScope = startsWithMethodCall.getScope();
 
 		if (optRightScope.isEmpty() || optLeftScope.isEmpty()) {
 			return false;
@@ -77,21 +103,46 @@ public class StringStartsWithChar extends AJavaparserExprMutator {
 			return false;
 		}
 
-		if (isCallIsEmptyString(leftMethodCall) && optCallStartsWithSingleCharString(rightMethodCall).isPresent()) {
-			var singleChar = optCallStartsWithSingleCharString(rightMethodCall).get();
-			return replaceBy(right, makeCharAtEqualsTo(optRightScope, singleChar));
-		} else if (optCallStartsWithSingleCharString(leftMethodCall).isPresent()
-				&& isCallIsEmptyString(rightMethodCall)) {
-			// Turns `line.startsWith("#") || line.isEmpty()` into `line.isEmpty() || line.startsWith("#")`
-			binaryExpr.setLeft(right);
-			binaryExpr.setRight(left);
+		// Turns `line.startsWith("#") || line.isEmpty()` into `line.isEmpty() || line.startsWith("#")`
+		binaryExpr.setLeft(isEmptyExpr);
+		binaryExpr.setRight(startsWithMethodCall);
 
-			var singleChar = optCallStartsWithSingleCharString(leftMethodCall).get();
+		var singleChar = optCallStartsWithSingleCharString(startsWithMethodCall).get();
 
-			// Turns `line.startsWith("#")` into `line.indexOf('0') == '#'`
-			return replaceBy(left, makeCharAtEqualsTo(optLeftScope, singleChar));
+		// Turns `line.startsWith("#")` into `line.indexOf('0') == '#'`
+		return replaceBy(startsWithMethodCall, makeCharAtEqualsTo(optLeftScope, singleChar));
+
+	}
+
+	private Optional<MethodCallExpr> findIsEmpty(Expression left, Expression right, boolean isAndNotEmptyElseOrEmpty) {
+		return Stream.of(left, right).flatMap(expr -> findIsEmpty(expr, isAndNotEmptyElseOrEmpty).stream()).findFirst();
+	}
+
+	private Optional<MethodCallExpr> findIsEmpty(Expression left, boolean isAndNotEmptyElseOrEmpty) {
+		if (isAndNotEmptyElseOrEmpty) {
+			if (!left.isUnaryExpr()) {
+				return Optional.empty();
+			}
+			if (left.asUnaryExpr().getOperator() != UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+				return Optional.empty();
+			}
+			left = left.asUnaryExpr().getExpression();
+		}
+		if (left.isMethodCallExpr() && isCallIsEmptyString(left.asMethodCallExpr())) {
+			return Optional.of(left.asMethodCallExpr());
+		}
+
+		return Optional.empty();
+	}
+
+	private Optional<MethodCallExpr> findStartsWith(Expression left, Expression right) {
+		if (left.isMethodCallExpr() && optCallStartsWithSingleCharString(left.asMethodCallExpr()).isPresent()) {
+			return Optional.of(left.asMethodCallExpr());
+		} else if (right.isMethodCallExpr()
+				&& optCallStartsWithSingleCharString(right.asMethodCallExpr()).isPresent()) {
+			return Optional.of(right.asMethodCallExpr());
 		} else {
-			return false;
+			return Optional.empty();
 		}
 	}
 

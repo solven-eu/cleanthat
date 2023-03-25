@@ -1,15 +1,16 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.StringStartsWithChar;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class StringStartsWithCharCases extends AJavaparserRefactorerCases {
+public class SimplifyStartsWithCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new StringStartsWithChar();
+		return new SimplifyStartsWith();
 	}
 
 	@CompareMethods
@@ -26,11 +27,34 @@ public class StringStartsWithCharCases extends AJavaparserRefactorerCases {
 	@CompareMethods
 	public static class isEmptyOrStartsWith {
 		public Object pre(String s) {
-			return s.startsWith("#") || s.isEmpty();
+			return s.isEmpty() || s.startsWith("#");
 		}
 
 		public Object post(String s) {
 			return s.isEmpty() || s.charAt(0) == '#';
+		}
+	}
+
+	@CompareMethods
+	public static class startsWithAndNotIsEmpty {
+		public Object pre(String s) {
+			return s.startsWith("#") && !s.isEmpty();
+		}
+
+		public Object post(String s) {
+			return !s.isEmpty() && s.charAt(0) == '#';
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class startsWithOrIsEmptyAndSomething {
+		public Object pre(String s, boolean andIsEmpty) {
+			return s.startsWith("#") || s.isEmpty() && andIsEmpty;
+		}
+
+		public Object post(String s, boolean andIsEmpty) {
+			return s.isEmpty() && andIsEmpty || !s.isEmpty() && s.charAt(0) == '#';
 		}
 	}
 

@@ -7,6 +7,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Fixed
 
 * `PrimitiveWrapperInstantiation` will not treat nested class as a boxed type anymore (e.g. `java.awt.geom.Rectangle2D.Double`)
+* `SimplifyStartsWith` is renamed from `StringStartsWithChar` given the existing PMD rule
 
 ### Added
 

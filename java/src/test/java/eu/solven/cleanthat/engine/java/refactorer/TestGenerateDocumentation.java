@@ -212,6 +212,17 @@ public class TestGenerateDocumentation {
 				sb.append("jSparrow: [").append(ruleId).append("](").append(url).append(')');
 			}
 		});
+
+		mutator.getSpotBugsId().ifPresent(ruleId -> {
+			String url = ((IMutatorExternalReferences) mutator).spotBugsUrl();
+
+			sb.append(EOL).append(EOL);
+			if (Strings.isNullOrEmpty(url)) {
+				sb.append("SpotBugs: ").append(ruleId);
+			} else {
+				sb.append("SpotBugs: [").append(ruleId).append("](").append(url).append(')');
+			}
+		});
 		mutator.getCleanthatId().ifPresent(ruleId -> {
 			sb.append(EOL).append(EOL);
 			sb.append("Cleanthat own ID: ").append(ruleId);

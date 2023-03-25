@@ -27,6 +27,7 @@ public class UseDiamondOperatorCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	// https://youtrack.jetbrains.com/issue/IDEA-67125
 	@UnmodifiedMethod
 	public static class CaseAnonymousClass {
 

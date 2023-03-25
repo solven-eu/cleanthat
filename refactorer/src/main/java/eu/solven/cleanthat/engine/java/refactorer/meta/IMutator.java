@@ -51,6 +51,7 @@ public interface IMutator extends IMutatorExternalReferences {
 						getSonarId().stream(),
 						getCleanthatId().stream(),
 						getErrorProneId().stream(),
+						getSpotBugsId().stream(),
 						getJSparrowId().stream())
 				.flatMap(Functions.identity())
 				.filter(s -> !"TODO".equals(s))

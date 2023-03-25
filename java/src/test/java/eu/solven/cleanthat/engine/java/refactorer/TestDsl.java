@@ -34,4 +34,7 @@ public class TestDsl {
 			+ "&& node.scope.scope.resolveType=java.util.stream.Stream"
 
 			+ "-> node.replace(MethodCallExpr(node.scope.scope, 'anyMatch', node.scope.arguments))";
+
+	String indexOfToContains = " '<java.util.String:s1>.indexOf(<java.util.String:s2>) >= 0' into  's1.contains(s2)'";
+	String indexOfToContains2 = "'<java.util.String:s1>.indexOf(<java.util.String:s2>) <  0' into '!s1.contains(s2)'";
 }

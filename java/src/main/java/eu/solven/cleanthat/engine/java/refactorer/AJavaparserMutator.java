@@ -30,6 +30,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
@@ -460,5 +461,19 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 		} else {
 			return qualifiedName.substring(indexOfDot + 1);
 		}
+	}
+
+	protected boolean isMethodReturnUsed(MethodCallExpr methodCall) {
+		if (!methodCall.getParentNode().isPresent()) {
+			return false;
+		}
+
+		Node parentNode = methodCall.getParentNode().get();
+
+		if (parentNode instanceof ExpressionStmt) {
+			// The method is called, and nothing is done with it
+			return false;
+		}
+		return true;
 	}
 }

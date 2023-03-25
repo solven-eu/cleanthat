@@ -13,6 +13,10 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 * `@SuppressCleanthat` enables skipping Cleanthat as specific piece of code
 * `RemoveDoubleNegation` is introduced
+* `RemoveAllToClearCollection` is introduced
+* `SpotBugsMutators` is introduced
+* `CollectionIndexOfToContains` is introduced
+* `StringIndexOfToContains` is introduced
 
 ## [2.12] - 2023-03-23
 

@@ -411,6 +411,32 @@ public static class CaseRuntimeException {
 
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
 
+### [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
+
+jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
+
+Cleanthat own ID: CollectionIndexOfToContains
+
+isDraft
+
+languageLevel: jdk1.2
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public boolean pre(List<?> list, Object o) {
+        return list.indexOf(o) >= 0;
+    }
+
+    public boolean post(List<?> list, Object o) {
+        return list.contains(o);
+    }
+}
+```
+
+See[CollectionIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/CollectionIndexOfToContainsCases.java)
+
 ### [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 
 Cleanthat own ID: CollectionToOptional
@@ -847,6 +873,30 @@ public static class breakToStreamAnyMatch {
 
 See[RedundantLogicalComplementsInStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RedundantLogicalComplementsInStreamCases.java)
 
+### [RemoveAllToClearCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveAllToClearCollection.java)
+
+SpotBugs: [DMI_USING_REMOVEALL_TO_CLEAR_COLLECTION](https://spotbugs.readthedocs.io/en/stable/bugDescriptions.html#dmi-using-removeall-to-clear-collection)
+
+isDraft
+
+languageLevel: jdk1.2
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public void pre(Collection<?> c) {
+        c.removeAll(c);
+    }
+
+    public void post(Collection<?> c) {
+        c.clear();
+    }
+}
+```
+
+See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
+
 ### [RemoveDoubleNegation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveDoubleNegation.java)
 
 Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
@@ -936,6 +986,32 @@ public static class breakToStreamAnyMatch {
 
 See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanInitializationCases.java)
 
+### [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
+
+PMD: [SimplifyStartsWith](https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith)
+
+Cleanthat own ID: StringStartsWithChar
+
+isDraft
+
+languageLevel: jdk1.6
+
+```
+@CompareMethods
+public static class startsWithElseIsEmpty {
+
+    public Object pre(String s) {
+        return s.startsWith("#") || s.isEmpty();
+    }
+
+    public Object post(String s) {
+        return s.isEmpty() || s.charAt(0) == '#';
+    }
+}
+```
+
+See[SimplifyStartsWithCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStartsWithCases.java)
+
 ### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
 
 Cleanthat own ID: SimplifyStreamFilterWithMap
@@ -960,29 +1036,31 @@ public static class CaseMethodRef {
 
 See[SimplifyStreamFilterWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamFilterWithMapCases.java)
 
-### [StringStartsWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringStartsWithChar.java)
+### [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
 
-Cleanthat own ID: StringStartsWithChar
+jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
+
+Cleanthat own ID: StringIndexOfToContains
 
 isDraft
 
-languageLevel: jdk1.6
+languageLevel: jdk1.4
 
 ```
 @CompareMethods
-public static class startsWithElseIsEmpty {
+public static class Nominal {
 
-    public Object pre(String s) {
-        return s.startsWith("#") || s.isEmpty();
+    public boolean pre(String string, String subString) {
+        return string.indexOf(subString) >= 0;
     }
 
-    public Object post(String s) {
-        return s.isEmpty() || s.charAt(0) == '#';
+    public boolean post(String string, String subString) {
+        return string.contains(subString);
     }
 }
 ```
 
-See[StringStartsWithCharCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringStartsWithCharCases.java)
+See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringIndexOfToContainsCases.java)
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 
@@ -1266,6 +1344,16 @@ languageLevel: jdk1
 Sonar: [Sonar](https://rules.sonarsource.com/java/Sonar)
 
 Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SonarMutators
+
+isDraft
+
+languageLevel: jdk1
+
+### [SpotBugsMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SpotBugsMutators.java)
+
+PMD: SpotBugs
+
+Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SpotBugsMutators
 
 isDraft
 

@@ -497,6 +497,41 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<!-- mvn rewrite:run -->
+					<!-- BEWARE: it failed as openRewrite seems to trigger a general gaoal, triggering others plugins -->
+					<!-- https://docs.openrewrite.org/reference/rewrite-maven-plugin -->
+					<groupId>org.openrewrite.maven</groupId>
+					<artifactId>rewrite-maven-plugin</artifactId>
+					<version>4.42.0</version>
+					<configuration>
+						<activeRecipes>
+							<recipe>org.openrewrite.java.Spring</recipe>
+						</activeRecipes>
+						<!-- These are default values, shown for example. It isn't necessary to supply these values manually: -->
+						<configLocation>${maven.multiModuleProjectDirectory}/rewrite.yml</configLocation>
+						<failOnDryRunResults>true</failOnDryRunResults>
+						<exclusions>
+							<exclude>*/do_not_format_me/**</exclude>
+						</exclusions>
+					</configuration>
+					<executions>
+						<execution>
+							<id>applyOpenrewrite</id>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<phase>process-sources</phase>
+						</execution>
+						<execution>
+							<id>dryRunOpenrewrite</id>
+							<goals>
+								<goal>dryRun</goal>
+							</goals>
+							<phase>${staticChecks}</phase>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -510,6 +545,10 @@
 			</plugin>
 
 			<!-- Apply formatters before checks -->
+			<!--			<plugin>-->
+			<!--				<groupId>org.openrewrite.maven</groupId>-->
+			<!--				<artifactId>rewrite-maven-plugin</artifactId>-->
+			<!--			</plugin>-->
 			<plugin>
 				<!-- Ensure formatting sources is executed before checkstyle/PMD, as it will automatically clean some style rules -->
 				<!-- https://stackoverflow.com/questions/8243912/changing-the-order-of-maven-plugin-execution -->

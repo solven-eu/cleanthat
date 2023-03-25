@@ -65,10 +65,11 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 		var binaryExpr = expr.asBinaryExpr();
 
 		boolean isAndNotEmptyElseOrEmpty;
-		if (binaryExpr.getOperator() == BinaryExpr.Operator.AND) {
+		BinaryExpr.Operator operator = binaryExpr.getOperator();
+		if (operator == BinaryExpr.Operator.AND) {
 			// Expect to be in `line.startsWith("#") && !line.isEmpty()`
 			isAndNotEmptyElseOrEmpty = true;
-		} else if (binaryExpr.getOperator() == BinaryExpr.Operator.OR) {
+		} else if (operator == BinaryExpr.Operator.OR) {
 			// Expect to be in `line.startsWith("#") || line.isEmpty()`
 			isAndNotEmptyElseOrEmpty = false;
 		} else {
@@ -86,12 +87,12 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 		var startsWithMethodCall = optStartsWith.get();
 		var isEmptyMethodCall = optIsEmpty.get();
 		// May be `line.isEmpty()` or `line.isEmpty()`
-		Expression isEmptyExpr;
+		Expression callIsEmptyExpr;
 		if (isAndNotEmptyElseOrEmpty) {
 			// This is supposed to be the UnaryExpr, parent of the MethodCallExpr
-			isEmptyExpr = (Expression) isEmptyMethodCall.getParentNode().orElseThrow();
+			callIsEmptyExpr = (Expression) isEmptyMethodCall.getParentNode().orElseThrow();
 		} else {
-			isEmptyExpr = isEmptyMethodCall;
+			callIsEmptyExpr = isEmptyMethodCall;
 		}
 
 		Optional<Expression> optRightScope = isEmptyMethodCall.getScope();
@@ -104,7 +105,7 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 		}
 
 		// Turns `line.startsWith("#") || line.isEmpty()` into `line.isEmpty() || line.startsWith("#")`
-		binaryExpr.setLeft(isEmptyExpr);
+		binaryExpr.setLeft(callIsEmptyExpr);
 		binaryExpr.setRight(startsWithMethodCall);
 
 		var singleChar = optCallStartsWithSingleCharString(startsWithMethodCall).get();

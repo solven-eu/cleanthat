@@ -83,6 +83,14 @@ public interface IMutatorExternalReferences {
 		return "";
 	}
 
+	default Optional<String> getSpotBugsId() {
+		return Optional.empty();
+	}
+
+	default String spotBugsUrl() {
+		return "";
+	}
+
 	default Set<String> getSeeUrls() {
 		return Set.of();
 	}

@@ -11,6 +11,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Added
 
 * `@SuppressCleanthat` enables skipping Cleanthat as specific piece of code
+* `RemoveDoubleNegation` is introduced
 
 ## [2.12] - 2023-03-23
 

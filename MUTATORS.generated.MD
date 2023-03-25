@@ -847,6 +847,34 @@ public static class breakToStreamAnyMatch {
 
 See[RedundantLogicalComplementsInStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RedundantLogicalComplementsInStreamCases.java)
 
+### [RemoveDoubleNegation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveDoubleNegation.java)
+
+Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
+
+jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class NotNotBoolean {
+
+    public boolean pre() {
+        // 2 times
+        return !!true;
+    }
+
+    public boolean post() {
+        // 2 times
+        return true;
+    }
+}
+```
+
+See[RemoveDoubleNegationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveDoubleNegationCases.java)
+
 ### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
 
 jSparrow: [RemoveExplicitCallToSuper](https://jsparrow.github.io/rules/remove-explicit-call-to-super.html)

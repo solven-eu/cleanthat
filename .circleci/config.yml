@@ -32,7 +32,8 @@ jobs: # a collection of steps
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: circleci-cleanthat-{{ checksum "pom.xml" }}
-      - run: mvn package -DskipTests
+      # Build all modules, especially cleanthat which is referred by spotless in cleanthat parent pom
+      - run: mvn package -Pfast
       - save_cache: # saves the project dependencies
           paths:
             - ~/.m2

@@ -223,6 +223,17 @@ Once done (or re-done after a release), you can simply:
 
         mvn release:clean release:prepare release:perform
 
+### In case of failure
+
+The release process may fail for various reasons:
+
+- Sonatype timed-out
+
+They, one would typically need to revert its local head, and force push master before the release. And delete the falsy tags:
+
+    git tag -d v2.XX.RELEASE
+    git push --delete origin v2.XX.RELEASE
+
 ### New computer, new GPG Key
 
 https://stackoverflow.com/questions/29885887/gpg-no-default-secret-key-error-using-maven

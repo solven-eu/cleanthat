@@ -76,13 +76,11 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	public Optional<Node> walkAst(Node tree) {
 		var transformed = new AtomicBoolean();
 		tree.walk(node -> {
-			Optional<NodeWithAnnotations> optSuppressedParent = node.findAncestor(n -> {
-				return n.isAnnotationPresent(SuppressCleanthat.class);
-			}, NodeWithAnnotations.class);
-			Optional<Node> optSuppressedChildren = node.findFirst(Node.class, n -> {
-				return n instanceof NodeWithAnnotations<?>
-						&& ((NodeWithAnnotations<?>) n).isAnnotationPresent(SuppressCleanthat.class);
-			});
+			Optional<NodeWithAnnotations> optSuppressedParent =
+					node.findAncestor(n -> n.isAnnotationPresent(SuppressCleanthat.class), NodeWithAnnotations.class);
+			Optional<Node> optSuppressedChildren = node.findFirst(Node.class,
+					n -> n instanceof NodeWithAnnotations<?>
+							&& ((NodeWithAnnotations<?>) n).isAnnotationPresent(SuppressCleanthat.class));
 			if (node instanceof NodeWithAnnotations
 					&& ((NodeWithAnnotations<?>) node).isAnnotationPresent(SuppressCleanthat.class)
 					|| optSuppressedParent.isPresent()

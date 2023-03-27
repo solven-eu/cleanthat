@@ -1,4 +1,5 @@
 # Mutators
+
 ## Single Mutators PRD-READY
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
@@ -363,6 +364,7 @@ public static class IntDecimal {
 ```
 
 See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseUnderscoresInNumericLiteralsCases.java)
+
 ## Single Mutators (DRAFTs)
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
@@ -1241,6 +1243,7 @@ public static class caseHtml {
 ```
 
 See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseTextBlocksCases.java)
+
 ## Composite Mutators
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)

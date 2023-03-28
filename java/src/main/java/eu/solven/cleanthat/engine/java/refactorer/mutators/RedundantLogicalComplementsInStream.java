@@ -40,6 +40,11 @@ public class RedundantLogicalComplementsInStream extends AJavaparserExprMutator 
 	}
 
 	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-S4034");
+	}
+
+	@Override
 	public Optional<String> getJSparrowId() {
 		return Optional.of("RedundantLogicalComplementsInStream");
 	}

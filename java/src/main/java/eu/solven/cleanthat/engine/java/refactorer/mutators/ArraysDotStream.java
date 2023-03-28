@@ -40,7 +40,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  *
  */
 public class ArraysDotStream extends AJavaparserMutator {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
 
 	private static final String METHOD_ASLIST = "asList";
@@ -58,8 +57,13 @@ public class ArraysDotStream extends AJavaparserMutator {
 	}
 
 	@Override
-	public String getId() {
-		return "ArraysDotStream";
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-3631");
+	}
+
+	@Override
+	public Optional<String> getJSparrowId() {
+		return Optional.of("UseArraysStream");
 	}
 
 	@Override

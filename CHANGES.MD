@@ -4,6 +4,13 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+### Added
+
+* `SimplifyBooleanExpression` is introduced
+* `StringReplaceAllWithQuotableInput` is introduced
+
+## [2.13] - 2023-03-27
+
 ### Fixed
 
 * `PrimitiveWrapperInstantiation` will not treat nested class as a boxed type anymore (e.g. `java.awt.geom.Rectangle2D.Double`)

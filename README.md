@@ -231,8 +231,8 @@ The release process may fail for various reasons:
 
 They, one would typically need to revert its local head, and force push master before the release. And delete the falsy tags:
 
-    git tag -d v2.XX.RELEASE
-    git push --delete origin v2.XX.RELEASE
+        git tag -d v2.XX.RELEASE
+        git push --delete origin v2.XX.RELEASE
 
 ### New computer, new GPG Key
 

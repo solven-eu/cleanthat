@@ -3,6 +3,10 @@
 
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 
+Sonar: [RSPEC-3631](https://rules.sonarsource.com/java/RSPEC-3631)
+
+jSparrow: [UseArraysStream](https://jsparrow.github.io/rules/use-arrays-stream.html)
+
 languageLevel: jdk1.8
 
 ```
@@ -853,6 +857,8 @@ See[PrimitiveWrapperInstantiationCases](java/src/test/java/eu/solven/cleanthat/e
 
 ### [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 
+Sonar: [RSPEC-S4034](https://rules.sonarsource.com/java/RSPEC-S4034)
+
 jSparrow: [RedundantLogicalComplementsInStream](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
 
 isDraft
@@ -955,6 +961,36 @@ public static class SuperInConstructor {
 ```
 
 See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveExplicitCallToSuperCases.java)
+
+### [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)
+
+Sonar: [RSPEC-S1940](https://rules.sonarsource.com/java/RSPEC-S1940)
+
+Cleanthat own ID: SimplifyBooleanExpression
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class IfEquals {
+
+    public void pre(int i) {
+        if (!(i == 2)) {
+            System.out.print(i);
+        }
+    }
+
+    public void post(int i) {
+        if (i != 2) {
+            System.out.print(i);
+        }
+    }
+}
+```
+
+See[SimplifyBooleanExpressionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanExpressionCases.java)
 
 ### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
 
@@ -1061,6 +1097,26 @@ public static class Nominal {
 ```
 
 See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringIndexOfToContainsCases.java)
+
+### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
+
+Sonar: [RSPEC-S5361](https://rules.sonarsource.com/java/RSPEC-S5361)
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@UnmodifiedMethod
+public static class ComplexRegex {
+
+    public Object pre(String s) {
+        return s.replaceAll("\\w*\\sis", "It's");
+    }
+}
+```
+
+See[StringReplaceAllWithQuotableInputCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringReplaceAllWithQuotableInputCases.java)
 
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 

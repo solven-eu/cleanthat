@@ -447,7 +447,7 @@ Cleanthat own ID: CollectionToOptional
 
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk1.2
 
 ```
 @CompareMethods
@@ -937,7 +937,7 @@ jSparrow: [RemoveExplicitCallToSuper](https://jsparrow.github.io/rules/remove-ex
 
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk1.1
 
 ```
 @CompareInnerClasses
@@ -964,7 +964,7 @@ See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engin
 
 ### [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)
 
-Sonar: [RSPEC-S1940](https://rules.sonarsource.com/java/RSPEC-S1940)
+Sonar: [RSPEC-1940](https://rules.sonarsource.com/java/RSPEC-1940)
 
 Cleanthat own ID: SimplifyBooleanExpression
 
@@ -1100,7 +1100,7 @@ See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/
 
 ### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 
-Sonar: [RSPEC-S5361](https://rules.sonarsource.com/java/RSPEC-S5361)
+Sonar: [RSPEC-5361](https://rules.sonarsource.com/java/RSPEC-5361)
 
 isDraft
 

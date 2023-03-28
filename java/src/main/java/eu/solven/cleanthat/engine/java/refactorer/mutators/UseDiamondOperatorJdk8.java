@@ -15,13 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import java.util.Optional;
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
-
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
 
 /**
  * Use the diamond operation {@code <>} whenever possible. Some cases are available only since JDK8
@@ -29,35 +23,10 @@ import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
  * @author Benoit Lacelle
  */
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperatorJdk8 extends ATodoJavaParserMutator {
+public class UseDiamondOperatorJdk8 extends UseDiamondOperator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;
-	}
-
-	@Override
-	public Set<String> getTags() {
-		return ImmutableSet.of("ExplicitToImplicit");
-	}
-
-	@Override
-	public Optional<String> getSonarId() {
-		return Optional.of("RSPEC-2293");
-	}
-
-	@Override
-	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator";
-	}
-
-	@Override
-	public Optional<String> getPmdId() {
-		return Optional.of("UseDiamondOperator");
-	}
-
-	@Override
-	public String jSparrowUrl() {
-		return "https://jsparrow.github.io/rules/diamond-operator.html";
 	}
 
 }

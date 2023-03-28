@@ -44,6 +44,7 @@ public class UseDiamondOperator extends AJavaparserMutator {
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
 	}
+
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("ExplicitToImplicit");

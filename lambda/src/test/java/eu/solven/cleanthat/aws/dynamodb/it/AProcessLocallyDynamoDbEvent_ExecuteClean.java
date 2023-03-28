@@ -15,8 +15,6 @@
  */
 package eu.solven.cleanthat.aws.dynamodb.it;
 
-import java.io.IOException;
-
 import org.junit.runner.RunWith;
 import org.kohsuke.github.AbstractGitHubWireMockTest;
 import org.kohsuke.github.GitHub;
@@ -64,7 +62,7 @@ public abstract class AProcessLocallyDynamoDbEvent_ExecuteClean extends Abstract
 
 			GithubAppFactory wireMockAppFactory = new GithubAppFactory(env) {
 				@Override
-				protected GitHub noCacheMakeAppGithub() throws IOException {
+				public GitHub makeAppGithub() {
 					GitHub gitHub = AbstractGitHubWireMockTest.getGitHub();
 
 					if (gitHub == null) {

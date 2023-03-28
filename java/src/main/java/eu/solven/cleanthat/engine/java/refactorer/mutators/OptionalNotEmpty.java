@@ -52,6 +52,11 @@ public class OptionalNotEmpty extends AJavaparserMutator {
 	}
 
 	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Redundancy");
+	}
+
+	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
 	}

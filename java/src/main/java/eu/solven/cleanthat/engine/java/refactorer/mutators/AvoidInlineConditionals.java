@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
@@ -50,6 +52,11 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of();
 	}
 
 	@Override

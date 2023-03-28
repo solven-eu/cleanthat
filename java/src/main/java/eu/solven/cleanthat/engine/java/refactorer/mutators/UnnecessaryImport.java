@@ -63,6 +63,11 @@ public class UnnecessaryImport extends AJavaparserMutator {
 	}
 
 	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("ExplicitToImplicit");
+	}
+
+	@Override
 	public Set<String> getPmdIds() {
 		return ImmutableSet.of("UnnecessaryImport", "UnusedImports");
 	}

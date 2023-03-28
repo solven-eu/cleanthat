@@ -32,6 +32,7 @@ import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.utils.Pair;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -50,6 +51,11 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_10;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("ExplicitToImplicit");
 	}
 
 	@Override

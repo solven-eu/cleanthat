@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -40,6 +41,11 @@ public class EmptyControlStatement extends AJavaparserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("ExplicitToImplicit");
 	}
 
 	@Override

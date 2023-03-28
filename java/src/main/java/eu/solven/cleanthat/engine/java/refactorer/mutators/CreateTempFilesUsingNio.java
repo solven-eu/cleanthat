@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -52,6 +54,11 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 	public String minimalJavaVersion() {
 		// java.nio.Files has been introduced in JDK7
 		return IJdkVersionConstants.JDK_7;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("NIO");
 	}
 
 	@Override

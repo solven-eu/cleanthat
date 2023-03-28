@@ -16,6 +16,9 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
@@ -30,6 +33,11 @@ public class SimplifyStreamFilterWithMap extends ATodoJavaParserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Stream");
 	}
 
 	@Override

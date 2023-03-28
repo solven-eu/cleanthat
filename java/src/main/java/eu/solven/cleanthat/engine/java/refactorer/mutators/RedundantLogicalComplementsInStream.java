@@ -16,12 +16,14 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr.Operator;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -37,6 +39,11 @@ public class RedundantLogicalComplementsInStream extends AJavaparserExprMutator 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Stream", "Redundancy");
 	}
 
 	@Override

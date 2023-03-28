@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -53,6 +55,11 @@ public class LiteralsFirstInComparisons extends AJavaparserMutator implements IM
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("MayPreventException");
 	}
 
 	@Override

@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -34,6 +35,7 @@ import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -45,15 +47,21 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  */
 @SuppressWarnings("PMD.GodClass")
 public class LambdaIsMethodReference extends AJavaparserMutator {
-	@Override
-	public boolean isDraft() {
-		// Beware of Objects import management
-		return true;
-	}
 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Stream");
+	}
+
+	@Override
+	public boolean isDraft() {
+		// Beware of Objects import management
+		return true;
 	}
 
 	@Override

@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.Expression;
@@ -23,6 +24,7 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -37,14 +39,19 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 	@Override
-	public boolean isDraft() {
-		// TODO CaseConflictingMethods
-		return true;
+	public String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_8;
 	}
 
 	@Override
-	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_8;
+	public Set<String> getTags() {
+		return ImmutableSet.of("Stream");
+	}
+
+	@Override
+	public boolean isDraft() {
+		// TODO CaseConflictingMethods
+		return true;
 	}
 
 	@Override

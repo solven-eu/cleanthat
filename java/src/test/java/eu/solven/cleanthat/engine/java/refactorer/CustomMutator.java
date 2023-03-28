@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.Node;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -34,6 +35,11 @@ public class CustomMutator implements IJavaparserMutator {
 	@Override
 	public boolean isDraft() {
 		return false;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("UnitTest");
 	}
 
 	@Override

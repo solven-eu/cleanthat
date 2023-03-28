@@ -18,10 +18,12 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -39,6 +41,11 @@ public class ObjectEqualsForPrimitives extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Primitive");
 	}
 
 	@Override

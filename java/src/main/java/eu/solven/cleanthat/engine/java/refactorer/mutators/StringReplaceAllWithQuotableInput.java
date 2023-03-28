@@ -16,9 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LiteralStringValueExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -35,8 +37,13 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 	}
 
 	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("String");
+	}
+
+	@Override
 	public Optional<String> getSonarId() {
-		return Optional.of("RSPEC-S5361");
+		return Optional.of("RSPEC-5361");
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })

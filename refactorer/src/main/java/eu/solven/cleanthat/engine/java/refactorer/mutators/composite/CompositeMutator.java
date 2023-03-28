@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
@@ -46,6 +47,11 @@ public class CompositeMutator<T extends IMutator> implements IMutator {
 
 	protected CompositeMutator(List<T> mutators) {
 		this.mutators = ImmutableList.copyOf(mutators);
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of();
 	}
 
 	@Override

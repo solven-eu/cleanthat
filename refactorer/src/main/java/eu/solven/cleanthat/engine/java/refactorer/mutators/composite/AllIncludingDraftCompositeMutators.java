@@ -18,12 +18,14 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -66,5 +68,10 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<Composi
 	public Optional<String> getCleanthatId() {
 		// BEWARE this name is quite long, as not expected to be used by Users
 		return Optional.of(this.getClass().getName());
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of();
 	}
 }

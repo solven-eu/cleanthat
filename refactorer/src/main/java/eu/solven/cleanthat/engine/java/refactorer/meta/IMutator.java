@@ -66,6 +66,12 @@ public interface IMutator extends IMutatorExternalReferences {
 	}
 
 	/**
+	 * 
+	 * @return a {@link Set} of tags describing the domain of applicability
+	 */
+	Set<String> getTags();
+
+	/**
 	 * @return true if this rule process only jre standard classes
 	 * @deprecated Usage is unclear
 	 */

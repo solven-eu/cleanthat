@@ -39,6 +39,10 @@ public class RemoveDoubleNegation extends AJavaparserExprMutator {
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
 	}
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Redundancy");
+	}
 
 	@Override
 	public Optional<String> getSonarId() {

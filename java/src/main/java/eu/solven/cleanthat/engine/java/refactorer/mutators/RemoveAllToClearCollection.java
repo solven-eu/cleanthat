@@ -17,9 +17,11 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -35,6 +37,11 @@ public class RemoveAllToClearCollection extends AJavaparserExprMutator {
 	public String minimalJavaVersion() {
 		// Collection has been introduced in JDK2
 		return IJdkVersionConstants.JDK_2;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Collection");
 	}
 
 	@Override

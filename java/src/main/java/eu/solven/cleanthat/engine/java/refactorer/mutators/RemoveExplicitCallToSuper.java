@@ -16,9 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -31,7 +33,12 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 public class RemoveExplicitCallToSuper extends AJavaparserMutator {
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_1;
+		return IJdkVersionConstants.JDK_1DOT1;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("ExplicitToImplicit");
 	}
 
 	@Override

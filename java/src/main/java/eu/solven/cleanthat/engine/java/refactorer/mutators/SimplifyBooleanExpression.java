@@ -17,12 +17,14 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -48,8 +50,13 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 	}
 
 	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("PitFall");
+	}
+
+	@Override
 	public Optional<String> getSonarId() {
-		return Optional.of("RSPEC-S1940");
+		return Optional.of("RSPEC-1940");
 	}
 
 	@Override

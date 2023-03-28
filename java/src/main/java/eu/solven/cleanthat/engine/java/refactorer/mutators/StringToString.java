@@ -16,10 +16,12 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -40,6 +42,11 @@ public class StringToString extends AJavaparserMutator {
 	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("String");
 	}
 
 	@Override

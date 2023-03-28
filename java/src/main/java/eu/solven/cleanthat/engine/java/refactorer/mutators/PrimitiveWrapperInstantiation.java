@@ -16,11 +16,13 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -36,6 +38,11 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 		// java.lang.Boolean.valueOf(boolean): 1.4
 		// java.lang.Double.valueOf(double): 1.5
 		return IJdkVersionConstants.JDK_5;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Primitive");
 	}
 
 	@Override

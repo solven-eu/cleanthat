@@ -64,11 +64,14 @@ public class GithubAppFactory implements IGithubAppFactory {
 	// https://github.com/apps/cleanthat
 	public static final String GITHUB_DEFAULT_APP_ID = "65550";
 
-	final Supplier<GitHub> appGithub = Suppliers.memoize(() -> {
+	// see org.kohsuke.github.extras.authorization.JWTTokenProvider.refreshJWT()
+	// This will generate tokens valid for up to 2 minutes
+	// JWTTokenProvider has its own cache mechanism
+	final Supplier<JWTTokenProvider> appGithub = Suppliers.memoize(() -> {
 		try {
-			return noCacheMakeAppGithub();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			return makeJwtTokenProvider();
+		} catch (JOSEException e) {
+			throw new IllegalStateException(e);
 		}
 	});
 
@@ -80,7 +83,16 @@ public class GithubAppFactory implements IGithubAppFactory {
 
 	@Override
 	public GitHub makeAppGithub() {
-		return appGithub.get();
+		try {
+			String jwt = makeJwt(appGithub.get());
+			return new GitHubBuilder().withJwtToken(jwt)
+					// This leads to 401. Why?
+					// .withRateLimitChecker(new NoWaitRateLimitChecker())
+					.withConnector(createGithubConnector())
+					.build();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	private ImmutableMap<String, GHPermissionType> getRequestedPermissions() {
@@ -107,40 +119,15 @@ public class GithubAppFactory implements IGithubAppFactory {
 		// return new HttpClientGitHubConnector();
 	}
 
-	protected GitHub noCacheMakeAppGithub() throws IOException {
-		String jwt;
-		try {
-			jwt = makeJWT();
-		} catch (JOSEException e) {
-			throw new IllegalStateException("Issue with configuration?", e);
-		}
-		return new GitHubBuilder().withJwtToken(jwt)
-				// This leads to 401. Why?
-				// .withRateLimitChecker(new NoWaitRateLimitChecker())
-				.withConnector(createGithubConnector())
-				.build();
+	@Deprecated
+	public String makeJWT() throws JOSEException, IOException {
+		JWTTokenProvider jwtTokenProvider = makeJwtTokenProvider();
+
+		return makeJwt(jwtTokenProvider);
 	}
 
 	// https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
-	public String makeJWT() throws JOSEException, IOException {
-		var rawJwk = env.getRequiredProperty(ENV_GITHUB_APP_PRIVATE_JWK);
-
-		// if (rawJwk.equals(GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS)
-		// && GCInspector.inUnitTest()) {
-		// LOGGER.info("We are in a unit-test");
-		// return GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS;
-		// }
-
-		RSAKey rsaJWK;
-		try {
-			rsaJWK = RSAKey.parse(rawJwk);
-		} catch (IllegalStateException | ParseException e) {
-			throw new IllegalStateException("Issue parsing privateKey", e);
-		}
-
-		var githubAppId = env.getProperty("github.app.app-id", GITHUB_DEFAULT_APP_ID);
-		JWTTokenProvider jwtTokenProvider = new JWTTokenProvider(githubAppId, RSAKeyUtils.toRSAPrivateKey(rsaJWK));
-
+	private String makeJwt(JWTTokenProvider jwtTokenProvider) throws IOException {
 		String bearerToken = jwtTokenProvider.getEncodedAuthorization();
 
 		if (!bearerToken.startsWith("Bearer ")) {
@@ -166,6 +153,27 @@ public class GithubAppFactory implements IGithubAppFactory {
 		// // Compute the RSA signature
 		// signedJWT.sign(signer);
 		// return signedJWT.serialize();
+	}
+
+	private JWTTokenProvider makeJwtTokenProvider() throws JOSEException {
+		var rawJwk = env.getRequiredProperty(ENV_GITHUB_APP_PRIVATE_JWK);
+
+		// if (rawJwk.equals(GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS)
+		// && GCInspector.inUnitTest()) {
+		// LOGGER.info("We are in a unit-test");
+		// return GithubWebhookHandlerFactory.GITHUB_APP_PRIVATE_JWK_FORUNITTESTS;
+		// }
+
+		RSAKey rsaJWK;
+		try {
+			rsaJWK = RSAKey.parse(rawJwk);
+		} catch (IllegalStateException | ParseException e) {
+			throw new IllegalStateException("Issue parsing privateKey", e);
+		}
+
+		var githubAppId = env.getProperty("github.app.app-id", GITHUB_DEFAULT_APP_ID);
+		JWTTokenProvider jwtTokenProvider = new JWTTokenProvider(githubAppId, RSAKeyUtils.toRSAPrivateKey(rsaJWK));
+		return jwtTokenProvider;
 	}
 
 	@Override

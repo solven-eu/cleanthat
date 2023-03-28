@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.github.javaparser.ast.NodeList;
@@ -26,6 +27,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -40,6 +42,11 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 	public String minimalJavaVersion() {
 		// String.isEmpty has been introduced with JDK6
 		return IJdkVersionConstants.JDK_6;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("String");
 	}
 
 	@Override

@@ -16,9 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.LambdaExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
@@ -31,14 +33,19 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
 
 	@Override
-	public boolean isDraft() {
-		// see UnnecessaryLambdaEnclosingParametersCases.CaseFunction
-		return true;
+	public String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_8;
 	}
 
 	@Override
-	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_8;
+	public Set<String> getTags() {
+		return ImmutableSet.of("Stream");
+	}
+
+	@Override
+	public boolean isDraft() {
+		// see UnnecessaryLambdaEnclosingParametersCases.CaseFunction
+		return true;
 	}
 
 	@Override

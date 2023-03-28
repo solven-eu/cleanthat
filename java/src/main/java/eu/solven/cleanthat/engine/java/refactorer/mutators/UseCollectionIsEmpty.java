@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 
 /**
@@ -32,6 +34,11 @@ public class UseCollectionIsEmpty extends AUseXIsEmpty {
 	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("Collection");
 	}
 
 	@Override

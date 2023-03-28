@@ -15,7 +15,10 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer;
 
+import java.util.Set;
+
 import com.github.javaparser.ast.Node;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
@@ -28,6 +31,11 @@ public class DeleteAnythingMutator extends AJavaparserMutator {
 	@Override
 	public String getId() {
 		return "Delete";
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("UnitTest");
 	}
 
 	@Override

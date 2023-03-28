@@ -20,6 +20,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
@@ -35,6 +38,11 @@ public class AvoidFileStream extends ATodoJavaParserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("NIO");
 	}
 
 	@Override

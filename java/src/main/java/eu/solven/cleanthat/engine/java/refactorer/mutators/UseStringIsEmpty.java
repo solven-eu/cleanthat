@@ -20,6 +20,7 @@ import java.util.Set;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
@@ -41,6 +42,11 @@ public class UseStringIsEmpty extends AUseXIsEmpty {
 	public String minimalJavaVersion() {
 		// java.lang.String.isEmpty() exists since 1.6
 		return IJdkVersionConstants.JDK_6;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return ImmutableSet.of("String");
 	}
 
 	@Override

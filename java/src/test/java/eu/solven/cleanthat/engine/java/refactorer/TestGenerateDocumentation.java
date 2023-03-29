@@ -111,7 +111,7 @@ public class TestGenerateDocumentation {
 		addExamples(sb, mutator);
 	}
 
-	private static void appendLinkToClass(StringBuilder sb, Class<?> clazz, String urlPrefix) {
+	static void appendLinkToClass(StringBuilder sb, Class<?> clazz, String urlPrefix) {
 		sb.append('[').append(clazz.getSimpleName()).append(']');
 		var relativePath = clazz.getName().replace('.', '/');
 		sb.append('(').append(urlPrefix).append(relativePath).append(".java").append(')');

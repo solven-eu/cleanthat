@@ -393,6 +393,36 @@ public static class FileInputStreamOverFile {
 
 See[AvoidFileStreamCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidFileStreamCases.java)
 
+### [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
+
+PMD: [AvoidMultipleUnaryOperators](http://adangel.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators)
+
+Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
+
+jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class NotNotBoolean {
+
+    public boolean pre() {
+        // 2 times
+        return !!true;
+    }
+
+    public boolean post() {
+        // 2 times
+        return true;
+    }
+}
+```
+
+See[AvoidMultipleUnaryOperatorsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidMultipleUnaryOperatorsCases.java)
+
 ### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 
 PMD: [AvoidUncheckedExceptionsInSignatures](https://pmd.github.io/latest/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures)
@@ -902,34 +932,6 @@ public static class Nominal {
 ```
 
 See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
-
-### [RemoveDoubleNegation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveDoubleNegation.java)
-
-Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
-
-jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
-
-isDraft
-
-languageLevel: jdk1
-
-```
-@CompareMethods
-public static class NotNotBoolean {
-
-    public boolean pre() {
-        // 2 times
-        return !!true;
-    }
-
-    public boolean post() {
-        // 2 times
-        return true;
-    }
-}
-```
-
-See[RemoveDoubleNegationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveDoubleNegationCases.java)
 
 ### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
 

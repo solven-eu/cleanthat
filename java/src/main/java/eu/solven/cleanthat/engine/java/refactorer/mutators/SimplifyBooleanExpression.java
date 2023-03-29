@@ -81,12 +81,6 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 			underlyingExpression = underlyingExpression.asEnclosedExpr().getInner();
 		}
 
-		if (underlyingExpression.isUnaryExpr()
-				&& underlyingExpression.asUnaryExpr().getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
-			// Turn `!!b` into `b`
-			return tryReplace(expr, underlyingExpression.asUnaryExpr().getExpression());
-		}
-
 		if (!underlyingExpression.isBinaryExpr()) {
 			return false;
 		}

@@ -25,13 +25,11 @@ import org.springframework.core.io.Resource;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
-	final IJavaparserMutator mutator = new LiteralsFirstInComparisons();
+	final LiteralsFirstInComparisons mutator = new LiteralsFirstInComparisons();
 
 	@Test
 	public void testNotIdempotent() throws IOException {
@@ -45,6 +43,6 @@ public class TestOptionalNotEmptyCustom extends AJavaparserTestCases {
 		var transformed = mutator.walkAstHasChanged(compilationUnit);
 
 		Assertions.assertThat(transformed).isTrue();
-		Assertions.assertThat(AJavaparserMutator.getWarnCount()).isEqualTo(0);
+		Assertions.assertThat(mutator.getNbIdempotencyIssues()).isEqualTo(0);
 	}
 }

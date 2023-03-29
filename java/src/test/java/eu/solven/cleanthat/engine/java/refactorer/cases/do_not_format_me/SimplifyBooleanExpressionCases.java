@@ -1,7 +1,5 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import org.junit.Ignore;
-
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression;
@@ -36,29 +34,6 @@ public class SimplifyBooleanExpressionCases extends AJavaparserRefactorerCases {
 
 		public boolean post(int i) {
 			return i >= 10;
-		}
-	}
-
-	@CompareMethods
-	public static class ThreeTimesNegated {
-		public boolean pre(String s) {
-			return !!!s.isEmpty();
-		}
-
-		public boolean post(String s) {
-			return !s.isEmpty();
-		}
-	}
-
-	@Ignore("This pin-points issue when processing edited nodes")
-	@CompareMethods
-	public static class FiveTimeNegated {
-		public boolean pre(String s) {
-			return !!!s.isEmpty();
-		}
-
-		public boolean post(String s) {
-			return !s.isEmpty();
 		}
 	}
 

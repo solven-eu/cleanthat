@@ -41,10 +41,10 @@ import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import com.google.common.annotations.VisibleForTesting;
 
 import eu.solven.cleanthat.SuppressCleanthat;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
@@ -55,15 +55,26 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public abstract class AJavaparserMutator implements IJavaparserMutator {
+public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMutatorIssues {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaparserMutator.class);
 
-	private static final AtomicInteger WARNS_IDEMPOTENCY_COUNT = new AtomicInteger();
+	private final AtomicInteger nbIdempotencyIssues = new AtomicInteger();
+	private final AtomicInteger nbReplaceIssues = new AtomicInteger();
+	private final AtomicInteger nbRemoveIssues = new AtomicInteger();
 
-	@Deprecated
-	@VisibleForTesting
-	public static int getWarnCount() {
-		return WARNS_IDEMPOTENCY_COUNT.get();
+	@Override
+	public int getNbIdempotencyIssues() {
+		return nbIdempotencyIssues.get();
+	}
+
+	@Override
+	public int getNbReplaceIssues() {
+		return nbReplaceIssues.get();
+	}
+
+	@Override
+	public int getNbRemoveIssues() {
+		return nbRemoveIssues.get();
 	}
 
 	protected boolean replaceBy(Node replacee, Node replacementNode) {
@@ -119,12 +130,23 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 	}
 
 	private void idempotencySanityCheck(Node node) {
+		if (node.getParentNode().isEmpty()) {
+			// This node has seemingly been removed from its parent
+			return;
+		} else if (node.findCompilationUnit().isEmpty()) {
+			// This node has no compilation unit: either it was not in a compilationUnit from the start (e.g. in a
+			// unitTest)
+			// or it is ancestor which has been replaced (e.g. we analyzed the ancestors to decide to remove an
+			// ancestor: current node still has a parent, but no compilationUnit anymore)
+			return;
+		}
+
 		var transformAgain = processNotRecursively(node);
 		// 'NoOp' is a special parserRule which always returns true even while it did not transform the code
 		if (!this.getIds().contains(IMutator.ID_NOOP) && transformAgain) {
 			// This may restore the initial code (e.g. if the rule is switching 'a.equals(b)' to 'b.equals(a)'
 			// to again 'a.equals(b)')
-			WARNS_IDEMPOTENCY_COUNT.incrementAndGet();
+			nbIdempotencyIssues.incrementAndGet();
 			var messageForIssueReporting = messageForIssueReporting(this, node);
 			LOGGER.warn("A mutator is not idem-potent. {}", messageForIssueReporting);
 		}
@@ -164,6 +186,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 		var result = node.replace(replacement);
 
 		if (!result) {
+			nbReplaceIssues.incrementAndGet();
 			LOGGER.warn("We failed turning `{}` into `{}`", node, replacement);
 		}
 
@@ -182,6 +205,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator {
 		var result = node.remove();
 
 		if (!result) {
+			nbRemoveIssues.incrementAndGet();
 			LOGGER.warn("Failed removing `{}` from a {}", node, nodeParentAsString);
 		}
 		return result;

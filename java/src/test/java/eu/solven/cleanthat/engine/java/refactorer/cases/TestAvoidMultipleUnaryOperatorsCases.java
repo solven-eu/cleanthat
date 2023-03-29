@@ -23,16 +23,18 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.RemoveDoubleNegationCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.AvoidMultipleUnaryOperatorsCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestRemoveDoubleNegationCases extends AParameterizesJavaparserRefactorerCases {
+public class TestAvoidMultipleUnaryOperatorsCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new RemoveDoubleNegationCases();
+		return new AvoidMultipleUnaryOperatorsCases();
 	}
 
-	public TestRemoveDoubleNegationCases(JavaParser javaParser, String testName, ClassOrInterfaceDeclaration testCase) {
+	public TestAvoidMultipleUnaryOperatorsCases(JavaParser javaParser,
+			String testName,
+			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
 	}
 

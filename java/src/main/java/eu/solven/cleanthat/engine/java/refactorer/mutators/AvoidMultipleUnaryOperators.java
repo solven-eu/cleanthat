@@ -31,8 +31,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
  *
  * @author Benoit Lacelle
  */
-public class RemoveDoubleNegation extends AJavaparserExprMutator {
-	private static final Set<Operator> REDUNCANT_IF_DOUBLED =
+public class AvoidMultipleUnaryOperators extends AJavaparserExprMutator {
+	private static final Set<Operator> REDUNDANT_IF_DOUBLED =
 			ImmutableSet.of(Operator.LOGICAL_COMPLEMENT, Operator.MINUS, Operator.PLUS, Operator.BITWISE_COMPLEMENT);
 
 	@Override
@@ -43,6 +43,16 @@ public class RemoveDoubleNegation extends AJavaparserExprMutator {
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("Redundancy");
+	}
+
+	@Override
+	public Optional<String> getPmdId() {
+		return Optional.of("AvoidMultipleUnaryOperators");
+	}
+
+	@Override
+	public String pmdUrl() {
+		return "http://adangel.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators";
 	}
 
 	@Override
@@ -68,7 +78,7 @@ public class RemoveDoubleNegation extends AJavaparserExprMutator {
 		var unaryExpr = expr.asUnaryExpr();
 
 		Operator unaryOperator = unaryExpr.getOperator();
-		if (!REDUNCANT_IF_DOUBLED.contains(unaryOperator)) {
+		if (!REDUNDANT_IF_DOUBLED.contains(unaryOperator)) {
 			return false;
 		}
 

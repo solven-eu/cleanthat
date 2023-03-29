@@ -1,14 +1,16 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import org.junit.Ignore;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveDoubleNegation;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidMultipleUnaryOperators;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class RemoveDoubleNegationCases extends AJavaparserRefactorerCases {
+public class AvoidMultipleUnaryOperatorsCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new RemoveDoubleNegation();
+		return new AvoidMultipleUnaryOperators();
 	}
 
 	@CompareMethods
@@ -30,6 +32,18 @@ public class RemoveDoubleNegationCases extends AJavaparserRefactorerCases {
 
 		public boolean post() {
 			return !true; // 3 times
+		}
+	}
+
+	@Ignore("This pin-points issue when processing edited nodes")
+	@CompareMethods
+	public static class FiveTimeNegated {
+		public boolean pre(String s) {
+			return !!!!!s.isEmpty();
+		}
+
+		public boolean post(String s) {
+			return !!!s.isEmpty();
 		}
 	}
 
@@ -98,4 +112,5 @@ public class RemoveDoubleNegationCases extends AJavaparserRefactorerCases {
 			return ~i;
 		}
 	}
+
 }

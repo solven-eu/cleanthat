@@ -25,12 +25,12 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidMultipleUnaryOperators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaInlineStringsRepeat;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.RedundantLogicalComplementsInStream;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveDoubleNegation;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
@@ -67,7 +67,7 @@ public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implem
 					new GuavaInlineStringsRepeat(),
 					new UnnecessaryLambdaEnclosingParameters(),
 					new RedundantLogicalComplementsInStream(),
-					new RemoveDoubleNegation())
+					new AvoidMultipleUnaryOperators())
 			.build();
 
 	public SafeAndConsensualMutators(JavaVersion sourceJdkVersion) {

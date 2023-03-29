@@ -51,6 +51,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilat
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.pepper.resource.PepperResourceHelper;
 
@@ -238,6 +239,16 @@ public abstract class ATestCases<N, R> {
 					// Some cases leads to failure here: nodes are different while they have the same .toString
 					// A Visitor similar to EqualsVisiyot, but returning the first different node would be helpful
 					Assert.assertEquals(msg, post, pre);
+				}
+
+				if (transformer instanceof ICountMutatorIssues) {
+					ICountMutatorIssues withCounters = (ICountMutatorIssues) transformer;
+
+					Assertions.assertThat(withCounters.getNbIdempotencyIssues())
+							.describedAs("Idempotency")
+							.isEqualTo(0);
+					Assertions.assertThat(withCounters.getNbReplaceIssues()).describedAs("tryReplace").isEqualTo(0);
+					Assertions.assertThat(withCounters.getNbRemoveIssues()).describedAs("tryRemove").isEqualTo(0);
 				}
 			}
 		}

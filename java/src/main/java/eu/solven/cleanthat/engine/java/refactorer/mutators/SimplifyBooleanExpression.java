@@ -71,7 +71,7 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 		}
 		var unaryExpr = expr.asUnaryExpr();
 
-		if (unaryExpr.getOperator() != UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+		if (isLogicalComplement(unaryExpr)) {
 			return false;
 		}
 
@@ -99,5 +99,11 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 			underlyingBinaryExpr.setOperator(operatorToOpposite.get(initialOperator));
 		}
 		return replaced;
+	}
+
+	@SuppressWarnings("PMD.CompareObjectsWithEquals")
+	// PMD False-positive
+	private boolean isLogicalComplement(UnaryExpr unaryExpr) {
+		return unaryExpr.getOperator() != UnaryExpr.Operator.LOGICAL_COMPLEMENT;
 	}
 }

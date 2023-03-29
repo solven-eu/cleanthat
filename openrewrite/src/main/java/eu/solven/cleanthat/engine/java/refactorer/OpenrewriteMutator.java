@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.openrewrite.ExecutionContext;
@@ -47,6 +48,11 @@ public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Re
 
 	public OpenrewriteMutator(Recipe recipe) {
 		this.recipe = recipe;
+	}
+
+	@Override
+	public Set<String> getTags() {
+		return Set.of("OpenRewrite");
 	}
 
 	@Override

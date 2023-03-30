@@ -68,6 +68,11 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 	}
 
 	@Override
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
+	}
+
+	@Override
 	protected boolean processNotRecursively(Statement stmt) {
 		if (!stmt.isBlockStmt()) {
 			return false;

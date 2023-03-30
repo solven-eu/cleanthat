@@ -66,4 +66,12 @@ public class StringReplaceAllWithQuotableInputCases extends AJavaparserRefactore
 		}
 	}
 
+	// `\R` matches any Unicode linebreak sequence
+	@UnmodifiedMethod
+	public static class LineBreaks {
+		public Object pre(String s) {
+			return s.replaceAll("\\R", "");
+		}
+	}
+
 }

@@ -37,6 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
  *
  * @author Benoit Lacelle
  */
+@Deprecated(since = "Dropped with PMD 7.0")
 public class SimplifyStartsWith extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
@@ -62,6 +63,11 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 	@Override
 	public Set<String> getLegacyIds() {
 		return Set.of("StringStartsWithChar");
+	}
+
+	@Override
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

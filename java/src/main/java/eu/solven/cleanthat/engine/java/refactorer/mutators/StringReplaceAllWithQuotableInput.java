@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LiteralStringValueExpr;
@@ -31,6 +32,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
  * @author Benoit Lacelle
  */
 public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
+	private static final Pattern IS_QUOTE = Pattern.compile("(?:\\w| |\\-|_|(?:\\\\\\\\[\\.\\(\\)\\[\\]]))*");
+
 	@Override
 	public String minimalJavaVersion() {
 		// `replaceAll` has been introduced with JDK4
@@ -70,7 +73,12 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 		LiteralStringValueExpr literalRegex = methodCall.getArgument(0).asLiteralStringValueExpr();
 		String regex = literalRegex.getValue();
 
-		if (!regex.matches("[\\w \\-_(\\\\.)]*")) {
+		// We consider as simple quote if:
+		// we have plain chatacters, or space, or dash, or underscore
+		// Or a '\' (which is escaped (x2) in the input (Java text), escaped again in the sourceCode regex (x4), escaped
+		// again in our matching regex (x8))
+		// followed by either a `.` or a `(` or a `)`or a `\`
+		if (!IS_QUOTE.matcher(regex).matches()) {
 			// The regex is not a simple quote
 			return false;
 		}

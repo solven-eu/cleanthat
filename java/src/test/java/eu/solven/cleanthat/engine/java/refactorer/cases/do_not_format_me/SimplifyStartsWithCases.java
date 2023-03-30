@@ -7,6 +7,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
+@Deprecated(since = "Dropped with PMD 7.0")
 public class SimplifyStartsWithCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
@@ -86,6 +87,17 @@ public class SimplifyStartsWithCases extends AJavaparserRefactorerCases {
 
 		public Object post(String s) {
 			return s.length() >= 4 && s.charAt(4) == '#';
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class startsWith_multipleOptions {
+		public Object pre(String line) {
+			return line.isEmpty() || line.startsWith("#") || line.startsWith(";");
+		}
+
+		public Object post(String line) {
+			return line.isEmpty() || line.charAt(0) == '#' || line.startsWith(";");
 		}
 	}
 

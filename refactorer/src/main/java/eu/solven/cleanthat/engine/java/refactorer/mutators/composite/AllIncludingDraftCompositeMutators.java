@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -62,12 +61,6 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<Composi
 	 */
 	public AllIncludingDraftCompositeMutators(JavaVersion sourceJdkVersion) {
 		super(filterWithJdk(sourceJdkVersion, MutatorsScanner.instantiate(sourceJdkVersion, ALL_INCLUDINGDRAFT.get())));
-	}
-
-	@Override
-	public Optional<String> getCleanthatId() {
-		// BEWARE this name is quite long, as not expected to be used by Users
-		return Optional.of(this.getClass().getName());
 	}
 
 	@Override

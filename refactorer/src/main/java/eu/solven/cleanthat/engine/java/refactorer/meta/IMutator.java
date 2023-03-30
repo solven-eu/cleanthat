@@ -49,10 +49,13 @@ public interface IMutator extends IMutatorExternalReferences {
 						getPmdIds().stream(),
 						getCheckstyleId().stream(),
 						getSonarId().stream(),
-						getCleanthatId().stream(),
 						getErrorProneId().stream(),
 						getSpotBugsId().stream(),
-						getJSparrowId().stream())
+						// CleanThat is before jSparrow as jSparrow is a weak referential
+						Stream.of(getCleanthatId()),
+						getJSparrowId().stream(),
+						// Legacy are at the very end
+						getLegacyIds().stream())
 				.flatMap(Functions.identity())
 				.filter(s -> !"TODO".equals(s))
 				// Not sorted to privilege PMD over SONAR

@@ -46,8 +46,8 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("BoxedPrimitiveConstructor");
+	public Set<String> getLegacyIds() {
+		return Set.of("BoxedPrimitiveConstructor");
 	}
 
 	@Override

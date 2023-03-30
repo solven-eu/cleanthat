@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr.Operator;
 import com.github.javaparser.ast.stmt.Statement;
@@ -30,16 +32,21 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
 
 /**
- * @see EnhancedForLoopToStreamAnyMatchCases
+ * Turns `boolean b=false; if(X) b=true;` into `boolean b=X;`
+ * 
+ * BEWARE: One may argue this is a relevant change only if the boolean is not written after its initialization, hence if
+ * the boolean can be turned into a `final` variable.
  *
  * @author Benoit Lacelle
  */
 @RepeatOnSuccess
 @ApplyMeBefore({ RedundantLogicalComplementsInStream.class })
+@ApplyAfterMe({ SimplifyBooleanInitialization.class })
 public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimplifyBooleanInitialization.class);
 
@@ -53,11 +60,6 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("Redundancy");
-	}
-
-	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("SimplifyBooleanInitialization");
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 
 	}
 
-	@SuppressWarnings("PMD.NPathComplexity")
+	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
 	private boolean trySimplifyingBoolean(Statement currentStmt, Statement nextStmt) {
 		if (!currentStmt.isExpressionStmt()
 				|| !currentStmt.asExpressionStmt().getExpression().isVariableDeclarationExpr()) {
@@ -96,13 +98,16 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 			return false;
 		}
 
-		var singleVariable = assignExpr.getVariable(0);
 		if (!assignExpr.getElementType().isPrimitiveType()
 				|| !PrimitiveType.Primitive.BOOLEAN.equals(assignExpr.getElementType().asPrimitiveType().getType())) {
 			return false;
-		} else if (singleVariable.getInitializer().isEmpty()) {
+		}
+
+		var singleVariable = assignExpr.getVariable(0);
+		Optional<Expression> optInitializer = singleVariable.getInitializer();
+		if (optInitializer.isEmpty()) {
 			return false;
-		} else if (!singleVariable.getInitializer().get().isBooleanLiteralExpr()) {
+		} else if (!optInitializer.get().isBooleanLiteralExpr()) {
 			return false;
 		}
 
@@ -123,7 +128,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 			return false;
 		}
 
-		var defaultValue = singleVariable.getInitializer().get().asBooleanLiteralExpr().getValue();
+		var defaultValue = optInitializer.get().asBooleanLiteralExpr().getValue();
 		var ifTrueValue = ifAssignExpr.getValue().asBooleanLiteralExpr().getValue();
 
 		if (!defaultValue && ifTrueValue) {
@@ -135,13 +140,30 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 			}
 		} else if (defaultValue && !ifTrueValue) {
 			if (tryRemove(ifStmt)) {
-				singleVariable.setInitializer(new UnaryExpr(ifStmt.getCondition(), Operator.LOGICAL_COMPLEMENT));
+				Expression positiveExpression = ifStmt.getCondition();
+				if (negatedNeedEnclosing(positiveExpression)) {
+					// Turns `a==b` into `!(a==b)`
+					positiveExpression = new EnclosedExpr(positiveExpression);
+				}
+				singleVariable.setInitializer(new UnaryExpr(positiveExpression, Operator.LOGICAL_COMPLEMENT));
 				return true;
 			} else {
 				LOGGER.debug("Issue removing `{}`", ifStmt);
 			}
 		}
 		return false;
+	}
+
+	private boolean negatedNeedEnclosing(Expression positiveExpression) {
+		if (positiveExpression.isMethodCallExpr()) {
+			return false;
+		} else if (positiveExpression.isEnclosedExpr()) {
+			return false;
+		} else {
+			// This captures BinaryExpr (`a==b`, `a || b`). Does it catch other cases?
+			// Yes, ConditionalExpr : `a > b ? true : false`
+			return true;
+		}
 	}
 
 	// False-positive from PMD

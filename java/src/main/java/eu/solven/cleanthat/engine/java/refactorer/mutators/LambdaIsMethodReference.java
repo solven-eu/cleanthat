@@ -65,11 +65,6 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("LambdaIsMethodReference");
-	}
-
-	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-1612");
 	}

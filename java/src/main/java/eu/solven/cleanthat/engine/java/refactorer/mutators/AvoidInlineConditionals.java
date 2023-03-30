@@ -60,13 +60,13 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 	}
 
 	@Override
-	public Optional<String> getCheckstyleId() {
-		return Optional.of("AvoidInlineConditionals");
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-3358");
 	}
 
 	@Override
-	public Optional<String> getSonarId() {
-		return Optional.of("RSPEC-3358");
+	public Optional<String> getCheckstyleId() {
+		return Optional.of("AvoidInlineConditionals");
 	}
 
 	@Override

@@ -13,6 +13,12 @@ public class RemoveExplicitCallToSuperCases extends AJavaparserRefactorerCases {
 		return new RemoveExplicitCallToSuper();
 	}
 
+	private static class SomeParent {
+		SomeParent(String s) {
+			System.out.print(s);
+		}
+	}
+
 	@CompareInnerClasses
 	public static class SuperInConstructor {
 		public class Pre {
@@ -29,6 +35,18 @@ public class RemoveExplicitCallToSuperCases extends AJavaparserRefactorerCases {
 				"".toString();
 			}
 		}
+	}
+
+	@UnmodifiedInnerClass
+	public static class SuperInConstructor_withArguments {
+		public class Pre extends SomeParent {
+			public Pre() {
+				super("");
+
+				"".toString();
+			}
+		}
+
 	}
 
 	@UnmodifiedInnerClass
@@ -68,6 +86,32 @@ public class RemoveExplicitCallToSuperCases extends AJavaparserRefactorerCases {
 			public Post() {
 
 				"".toString();
+			}
+		}
+	}
+
+	@CompareInnerClasses
+	public static class ThisEmptyInConstructor {
+		public class Pre {
+
+			public Pre() {
+			}
+
+			public Pre(String s) {
+				this();
+
+				s.toString();
+			}
+		}
+
+		public class Post {
+
+			public Post() {
+			}
+
+			public Post(String s) {
+
+				s.toString();
 			}
 		}
 	}

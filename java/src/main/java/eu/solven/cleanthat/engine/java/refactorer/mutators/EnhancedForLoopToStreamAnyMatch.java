@@ -57,7 +57,7 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Stream");
+		return ImmutableSet.of("Stream", "Loop");
 	}
 
 	@Override

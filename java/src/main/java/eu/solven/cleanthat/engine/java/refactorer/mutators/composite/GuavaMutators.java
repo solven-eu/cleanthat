@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
@@ -46,7 +45,7 @@ public class GuavaMutators extends CompositeMutator<IMutator> implements IConstr
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.GUAVA);
+	public String getCleanthatId() {
+		return JavaRefactorerProperties.GUAVA;
 	}
 }

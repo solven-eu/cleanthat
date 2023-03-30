@@ -26,7 +26,9 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
- * Turns 'SomeClassWithConstructor(){super(); someMethod();}` into `SomeClassWithConstructor(){someMethod();}`
+ * Turns 'SomeClassWithConstructor(){super(); someMethod();}` into `SomeClassWithConstructor(){someMethod();}`.
+ * 
+ * This will also remove references to `this()` as same class empty constructor.
  *
  * @author Benoit Lacelle
  */
@@ -49,6 +51,11 @@ public class RemoveExplicitCallToSuper extends AJavaparserMutator {
 	@Override
 	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/remove-explicit-call-to-super.html";
+	}
+
+	@Override
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

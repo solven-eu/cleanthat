@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -77,7 +76,9 @@ public class TestGenerateDocumentation_Tags {
 	}
 
 	private Set<String> getTags(IMutator m) {
-		Set<String> allTags = new HashSet<>(m.getTags());
+		Set<String> allTags = new TreeSet<>(m.getTags());
+
+		allTags.add("With JDK " + m.minimalJavaVersion());
 
 		if (m.getPmdId().isPresent()) {
 			allTags.add("PMD");
@@ -96,6 +97,10 @@ public class TestGenerateDocumentation_Tags {
 		}
 		if (m.getSpotBugsId().isPresent()) {
 			allTags.add("SpotBugs");
+		}
+
+		if (m.isDraft()) {
+			allTags.add("Draft");
 		}
 
 		return allTags;

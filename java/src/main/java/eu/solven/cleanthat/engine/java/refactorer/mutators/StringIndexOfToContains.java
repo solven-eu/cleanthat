@@ -58,11 +58,6 @@ public class StringIndexOfToContains extends AJavaparserExprMutator {
 		return "https://jsparrow.github.io/rules/index-of-to-contains.html";
 	}
 
-	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("StringIndexOfToContains");
-	}
-
 	protected Class<?> expectedArgumentClass() {
 		return String.class;
 	}

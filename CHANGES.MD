@@ -4,6 +4,14 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+### Fixed
+
+* `SimplifyBooleanInitialization` will not produce invalid/corrupted initializer in case of negated initialization.
+
+### Changes
+
+* Each `IMutator` see its simple class name configured as default identifier.
+
 ### Added
 
 * `SimplifyBooleanExpression` is introduced

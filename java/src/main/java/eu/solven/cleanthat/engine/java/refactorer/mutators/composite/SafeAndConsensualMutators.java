@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
@@ -75,7 +74,7 @@ public class SafeAndConsensualMutators extends CompositeMutator<IMutator> implem
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.SAFE_AND_CONSENSUAL);
+	public String getCleanthatId() {
+		return JavaRefactorerProperties.SAFE_AND_CONSENSUAL;
 	}
 }

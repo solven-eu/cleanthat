@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.Node;
@@ -46,11 +45,6 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
 	public boolean isDraft() {
 		// see UnnecessaryLambdaEnclosingParametersCases.CaseFunction
 		return true;
-	}
-
-	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("UnnecessaryLambdaEnclosingParameters");
 	}
 
 	@Override

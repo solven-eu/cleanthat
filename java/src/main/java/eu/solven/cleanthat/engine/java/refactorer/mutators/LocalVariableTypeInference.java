@@ -64,11 +64,6 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("LocalVariableTypeInference");
-	}
-
-	@Override
 	public Set<String> getSeeUrls() {
 		return Set.of("https://openjdk.org/jeps/286");
 	}

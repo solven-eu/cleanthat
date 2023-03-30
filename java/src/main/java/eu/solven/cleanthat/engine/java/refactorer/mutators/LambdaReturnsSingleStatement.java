@@ -55,11 +55,6 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("LambdaReturnsSingleStatement");
-	}
-
-	@Override
 	public String pmdUrl() {
 		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname";
 	}

@@ -52,11 +52,6 @@ public class UseTextBlocks extends AJavaparserMutator {
 		return ImmutableSet.of("String");
 	}
 
-	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("UseTextBlocks");
-	}
-
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
 	protected boolean processNotRecursively(Node node) {

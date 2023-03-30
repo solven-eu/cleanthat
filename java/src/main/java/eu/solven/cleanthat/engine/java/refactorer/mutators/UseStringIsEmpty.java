@@ -32,6 +32,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
  */
 // We prefer turning `username.equals("")` into `username.isEmpty()` than `"".equals(username)`
 @ApplyMeBefore({ LiteralsFirstInComparisons.class })
+// Naming similar to UseCollectionIsEmpty
 public class UseStringIsEmpty extends AUseXIsEmpty {
 	@Override
 	public boolean isDraft() {
@@ -47,12 +48,6 @@ public class UseStringIsEmpty extends AUseXIsEmpty {
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("String");
-	}
-
-	@Override
-	public Optional<String> getCleanthatId() {
-		// Naming similar to UseCollectionIsEmpty
-		return Optional.of("UseStringIsEmpty");
 	}
 
 	@Override

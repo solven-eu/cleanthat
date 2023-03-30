@@ -64,11 +64,6 @@ public class StreamAnyMatch extends AJavaparserMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("StreamAnyMatch");
-	}
-
-	@Override
 	public Optional<String> getSonarId() {
 		return Optional.of("RSPEC-4034");
 	}

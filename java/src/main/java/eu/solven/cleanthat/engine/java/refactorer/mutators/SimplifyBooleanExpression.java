@@ -60,8 +60,8 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("SimplifyBooleanExpression");
+	public boolean isDraft() {
+		return IS_PRODUCTION_READY;
 	}
 
 	@Override

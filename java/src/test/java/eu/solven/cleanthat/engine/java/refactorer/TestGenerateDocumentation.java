@@ -223,9 +223,11 @@ public class TestGenerateDocumentation {
 				sb.append("SpotBugs: [").append(ruleId).append("](").append(url).append(')');
 			}
 		});
-		mutator.getCleanthatId().ifPresent(ruleId -> {
+
+		{
+			String ruleId = mutator.getCleanthatId();
 			sb.append(EOL).append(EOL);
 			sb.append("Cleanthat own ID: ").append(ruleId);
-		});
+		}
 	}
 }

@@ -16,7 +16,9 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 
@@ -34,8 +36,8 @@ public class CollectionIndexOfToContains extends StringIndexOfToContains {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("CollectionIndexOfToContains");
+	public Set<String> getTags() {
+		return ImmutableSet.of("Collection");
 	}
 
 	@Override

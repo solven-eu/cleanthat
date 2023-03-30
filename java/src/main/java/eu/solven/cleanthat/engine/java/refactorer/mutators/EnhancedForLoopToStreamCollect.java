@@ -45,13 +45,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 public class EnhancedForLoopToStreamCollect extends AJavaparserStmtMutator {
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("EnhancedForLoopToStreamCollect");
-	}
-
-	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Stream");
+		return ImmutableSet.of("Stream", "Loop");
 	}
 
 	@Override

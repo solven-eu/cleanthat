@@ -57,5 +57,7 @@ public class TestAllIncludingDraftCompositeMutators {
 				.contains(GuavaMutators.class.getName())
 				.contains(ErrorProneMutators.class.getName())
 				.contains(JSparrowMutators.class.getName());
+
+		Assertions.assertThat(mutator.getUnderlyingIds()).contains("Guava");
 	}
 }

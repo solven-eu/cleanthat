@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
@@ -43,7 +42,7 @@ public class SafeButControversialMutators extends CompositeMutator<IMutator> imp
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of(JavaRefactorerProperties.SAFE_BUT_CONTROVERSIAL);
+	public String getCleanthatId() {
+		return JavaRefactorerProperties.SAFE_BUT_CONTROVERSIAL;
 	}
 }

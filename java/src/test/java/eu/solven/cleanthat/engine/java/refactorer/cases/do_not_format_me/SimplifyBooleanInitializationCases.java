@@ -2,6 +2,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.List;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
@@ -63,4 +64,82 @@ public class SimplifyBooleanInitializationCases extends AJavaparserRefactorerCas
 			return allEmpty;
 		}
 	}
+
+	@CompareMethods
+	// @CaseNotYetImplemented
+	public static class multipleOr {
+		public boolean pre(int i) {
+			boolean good = false;
+			if (i >= 10) {
+				good = true;
+			}
+			if (i < 0) {
+				good = true;
+			}
+			return good;
+		}
+
+		public boolean post(int i) {
+			boolean good = i >= 10;
+			if (i < 0) {
+				good = true;
+			}
+			return good;
+		}
+
+		// TODO This could be an improvement
+		public boolean post_withOr(int i) {
+			boolean good = i >= 10 || i <= 0;
+			return good;
+		}
+	}
+
+	@CompareMethods
+	public static class NeedBlock_equals {
+		public boolean pre(int i) {
+			boolean moveForward = true;
+			if (i > 0) {
+				moveForward = false;
+			}
+			return moveForward;
+		}
+
+		public boolean post(int i) {
+			boolean moveForward = !(i > 0);
+			return moveForward;
+		}
+	}
+
+	@CompareMethods
+	public static class NeedBlock_or {
+		public boolean pre(int i) {
+			boolean moveForward = true;
+			if (i > 10 || i < 0) {
+				moveForward = false;
+			}
+			return moveForward;
+		}
+
+		public boolean post(int i) {
+			boolean moveForward = !(i > 10 || i < 0);
+			return moveForward;
+		}
+	}
+
+	@CompareMethods
+	public static class NeedBlock_Ternary {
+		public boolean pre(int i) {
+			boolean moveForward = true;
+			if (i > 10 ? true : false) {
+				moveForward = false;
+			}
+			return moveForward;
+		}
+
+		public boolean post(int i) {
+			boolean moveForward = !(i > 10 ? true : false);
+			return moveForward;
+		}
+	}
+
 }

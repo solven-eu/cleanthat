@@ -53,11 +53,6 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("GuavaStringsIsNullOrEmpty");
-	}
-
-	@Override
 	protected boolean processNotRecursively(Expression expr) {
 		if (!expr.isBinaryExpr()) {
 			return false;

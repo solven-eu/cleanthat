@@ -7,6 +7,8 @@ Sonar: [RSPEC-3631](https://rules.sonarsource.com/java/RSPEC-3631)
 
 jSparrow: [UseArraysStream](https://jsparrow.github.io/rules/use-arrays-stream.html)
 
+Cleanthat own ID: ArraysDotStream
+
 languageLevel: jdk1.8
 
 ```
@@ -31,6 +33,8 @@ CheckStyle: [AvoidInlineConditionals](https://checkstyle.sourceforge.io/config_c
 
 Sonar: [RSPEC-3358](https://rules.sonarsource.com/java/RSPEC-3358)
 
+Cleanthat own ID: AvoidInlineConditionals
+
 languageLevel: jdk1
 
 ```
@@ -49,6 +53,8 @@ See[AvoidInlineConditionalsCases](java/src/test/java/eu/solven/cleanthat/engine/
 ### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
 
 PMD: [ComparisonWithNaN](https://pmd.github.io/latest/pmd_rules_java_errorprone.html#comparisonwithnan)
+
+Cleanthat own ID: ComparisonWithNaN
 
 languageLevel: jdk11
 
@@ -71,6 +77,8 @@ See[ComparisonWithNaNCases](java/src/test/java/eu/solven/cleanthat/engine/java/r
 ### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
 
 PMD: [LiteralsFirstInComparisons](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons)
+
+Cleanthat own ID: LiteralsFirstInComparisons
 
 languageLevel: jdk1
 
@@ -97,6 +105,8 @@ CheckStyle: [ModifierOrder](https://checkstyle.sourceforge.io/apidocs/com/puppyc
 Sonar: [RSPEC-1124](https://rules.sonarsource.com/java/RSPEC-1124)
 
 jSparrow: [ReorderModifiers](https://jsparrow.github.io/rules/reorder-modifiers.html)
+
+Cleanthat own ID: ModifierOrder
 
 languageLevel: jdk1
 
@@ -146,6 +156,8 @@ See[ModifierOrderCases](java/src/test/java/eu/solven/cleanthat/engine/java/refac
 
 ### [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
 
+Cleanthat own ID: OptionalNotEmpty
+
 languageLevel: jdk11
 
 ```
@@ -163,6 +175,65 @@ public static class CaseNotEmpty {
 ```
 
 See[OptionalNotEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/OptionalNotEmptyCases.java)
+
+### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
+
+jSparrow: [RemoveExplicitCallToSuper](https://jsparrow.github.io/rules/remove-explicit-call-to-super.html)
+
+Cleanthat own ID: RemoveExplicitCallToSuper
+
+languageLevel: jdk1.1
+
+```
+@CompareInnerClasses
+public static class SuperInConstructor {
+
+    public class Pre {
+
+        public Pre() {
+            super();
+            "".toString();
+        }
+    }
+
+    public class Post {
+
+        public Post() {
+            "".toString();
+        }
+    }
+}
+```
+
+See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveExplicitCallToSuperCases.java)
+
+### [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)
+
+Sonar: [RSPEC-1940](https://rules.sonarsource.com/java/RSPEC-1940)
+
+Cleanthat own ID: SimplifyBooleanExpression
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class IfEquals {
+
+    public void pre(int i) {
+        if (!(i == 2)) {
+            System.out.print(i);
+        }
+    }
+
+    public void post(int i) {
+        if (i != 2) {
+            System.out.print(i);
+        }
+    }
+}
+```
+
+See[SimplifyBooleanExpressionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanExpressionCases.java)
 
 ### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
 
@@ -194,6 +265,8 @@ PMD: [StringToString](https://pmd.github.io/latest/pmd_rules_java_performance.ht
 
 jSparrow: [RemoveToStringOnString](https://jsparrow.github.io/rules/remove-to-string-on-string.html)
 
+Cleanthat own ID: StringToString
+
 languageLevel: jdk1
 
 ```
@@ -217,6 +290,8 @@ CheckStyle: [RedundantModifier](https://checkstyle.sourceforge.io/config_modifie
 Sonar: [RSPEC-2333](https://rules.sonarsource.com/java/RSPEC-2333)
 
 jSparrow: [RemoveModifiersInInterfaceProperties](https://jsparrow.github.io/rules/remove-modifiers-in-interface-properties.html)
+
+Cleanthat own ID: UnnecessaryModifier
 
 languageLevel: jdk1
 
@@ -278,6 +353,8 @@ Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
 
 jSparrow: [UseIsEmptyOnCollections](https://jsparrow.github.io/rules/use-is-empty-on-collections.html)
 
+Cleanthat own ID: UseCollectionIsEmpty
+
 languageLevel: jdk1.2
 
 ```
@@ -301,6 +378,8 @@ See[UseCollectionIsEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/jav
 PMD: [UseIndexOfChar](https://pmd.github.io/latest/pmd_rules_java_performance.html#useindexofchar)
 
 Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
+
+Cleanthat own ID: UseIndexOfChar
 
 languageLevel: jdk1
 
@@ -344,6 +423,8 @@ PMD: [UseUnderscoresInNumericLiterals](https://pmd.github.io/latest/pmd_rules_ja
 
 Sonar: [RSPEC-2148](https://rules.sonarsource.com/java/RSPEC-2148)
 
+Cleanthat own ID: UseUnderscoresInNumericLiterals
+
 languageLevel: jdk1.7
 
 ```
@@ -373,6 +454,8 @@ See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat
 
 PMD: [AvoidFileStream](https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream)
 
+Cleanthat own ID: AvoidFileStream
+
 isDraft
 
 languageLevel: jdk1.7
@@ -401,6 +484,8 @@ Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
 
 jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
 
+Cleanthat own ID: AvoidMultipleUnaryOperators
+
 isDraft
 
 languageLevel: jdk1
@@ -426,6 +511,8 @@ See[AvoidMultipleUnaryOperatorsCases](java/src/test/java/eu/solven/cleanthat/eng
 ### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 
 PMD: [AvoidUncheckedExceptionsInSignatures](https://pmd.github.io/latest/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures)
+
+Cleanthat own ID: AvoidUncheckedExceptionsInSignatures
 
 isDraft
 
@@ -499,6 +586,8 @@ See[CollectionToOptionalCases](java/src/test/java/eu/solven/cleanthat/engine/jav
 
 Sonar: [RSPEC-2976](https://rules.sonarsource.com/java/RSPEC-2976)
 
+Cleanthat own ID: CreateTempFilesUsingNio
+
 isDraft
 
 languageLevel: jdk1.7
@@ -526,6 +615,8 @@ CheckStyle: [EmptyStatementCheck](https://javadoc.io/static/com.puppycrawl.tools
 Sonar: [RSPEC-1116](https://rules.sonarsource.com/java/RSPEC-1116)
 
 jSparrow: [RemoveEmptyStatement](https://jsparrow.github.io/rules/remove-empty-statement.html)
+
+Cleanthat own ID: EmptyControlStatement
 
 isDraft
 
@@ -569,6 +660,8 @@ See[EmptyControlStatementCases](java/src/test/java/eu/solven/cleanthat/engine/ja
 ### [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
 
 jSparrow: [EnhancedForLoopToStreamAnyMatch](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
+
+Cleanthat own ID: EnhancedForLoopToStreamAnyMatch
 
 isDraft
 
@@ -632,6 +725,8 @@ See[EnhancedForLoopToStreamCollectCases](java/src/test/java/eu/solven/cleanthat/
 
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
+Cleanthat own ID: EnumsWithoutEquals
+
 isDraft
 
 languageLevel: jdk1.5
@@ -655,6 +750,8 @@ See[EnumsWithoutEqualsCases](java/src/test/java/eu/solven/cleanthat/engine/java/
 ### [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 
 ErrorProne: [InlineMeInliner](https://errorprone.info/bugpattern/InlineMeInliner)
+
+Cleanthat own ID: GuavaInlineStringsRepeat
 
 isDraft
 
@@ -701,6 +798,8 @@ public static class CaseNullElseIsEmpty {
 See[GuavaStringsIsNullOrEmptyCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/GuavaStringsIsNullOrEmptyCases.java)
 
 ### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
+
+Cleanthat own ID: JUnit4ToJUnit5
 
 isDraft
 
@@ -815,6 +914,8 @@ See[LocalVariableTypeInferenceCases](java/src/test/java/eu/solven/cleanthat/engi
 
 ErrorProne: [ObjectEqualsForPrimitives](https://errorprone.info/bugpattern/ObjectEqualsForPrimitives)
 
+Cleanthat own ID: ObjectEqualsForPrimitives
+
 isDraft
 
 languageLevel: jdk1
@@ -838,6 +939,8 @@ See[ObjectEqualsForPrimitivesCases](java/src/test/java/eu/solven/cleanthat/engin
 ### [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
 
 ErrorProne: [ObjectsHashCodePrimitive](https://errorprone.info/bugpattern/ObjectsHashCodePrimitive)
+
+Cleanthat own ID: ObjectsHashCodePrimitive
 
 isDraft
 
@@ -863,7 +966,7 @@ See[ObjectsHashCodePrimitiveCases](java/src/test/java/eu/solven/cleanthat/engine
 
 PMD: [PrimitiveWrapperInstantiation](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation)
 
-Cleanthat own ID: BoxedPrimitiveConstructor
+Cleanthat own ID: PrimitiveWrapperInstantiation
 
 isDraft
 
@@ -891,6 +994,8 @@ Sonar: [RSPEC-S4034](https://rules.sonarsource.com/java/RSPEC-S4034)
 
 jSparrow: [RedundantLogicalComplementsInStream](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
 
+Cleanthat own ID: RedundantLogicalComplementsInStream
+
 isDraft
 
 languageLevel: jdk1.8
@@ -913,6 +1018,8 @@ See[RedundantLogicalComplementsInStreamCases](java/src/test/java/eu/solven/clean
 
 SpotBugs: [DMI_USING_REMOVEALL_TO_CLEAR_COLLECTION](https://spotbugs.readthedocs.io/en/stable/bugDescriptions.html#dmi-using-removeall-to-clear-collection)
 
+Cleanthat own ID: RemoveAllToClearCollection
+
 isDraft
 
 languageLevel: jdk1.2
@@ -932,67 +1039,6 @@ public static class Nominal {
 ```
 
 See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
-
-### [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
-
-jSparrow: [RemoveExplicitCallToSuper](https://jsparrow.github.io/rules/remove-explicit-call-to-super.html)
-
-isDraft
-
-languageLevel: jdk1.1
-
-```
-@CompareInnerClasses
-public static class SuperInConstructor {
-
-    public class Pre {
-
-        public Pre() {
-            super();
-            "".toString();
-        }
-    }
-
-    public class Post {
-
-        public Post() {
-            "".toString();
-        }
-    }
-}
-```
-
-See[RemoveExplicitCallToSuperCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveExplicitCallToSuperCases.java)
-
-### [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)
-
-Sonar: [RSPEC-1940](https://rules.sonarsource.com/java/RSPEC-1940)
-
-Cleanthat own ID: SimplifyBooleanExpression
-
-isDraft
-
-languageLevel: jdk1
-
-```
-@CompareMethods
-public static class IfEquals {
-
-    public void pre(int i) {
-        if (!(i == 2)) {
-            System.out.print(i);
-        }
-    }
-
-    public void post(int i) {
-        if (i != 2) {
-            System.out.print(i);
-        }
-    }
-}
-```
-
-See[SimplifyBooleanExpressionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanExpressionCases.java)
 
 ### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
 
@@ -1028,7 +1074,7 @@ See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/e
 
 PMD: [SimplifyStartsWith](https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith)
 
-Cleanthat own ID: StringStartsWithChar
+Cleanthat own ID: SimplifyStartsWith
 
 isDraft
 
@@ -1104,9 +1150,11 @@ See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/
 
 Sonar: [RSPEC-5361](https://rules.sonarsource.com/java/RSPEC-5361)
 
+Cleanthat own ID: StringReplaceAllWithQuotableInput
+
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk1.4
 
 ```
 @UnmodifiedMethod
@@ -1123,6 +1171,8 @@ See[StringReplaceAllWithQuotableInputCases](java/src/test/java/eu/solven/cleanth
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 
 Sonar: [RSPEC-1158](https://rules.sonarsource.com/java/RSPEC-1158)
+
+Cleanthat own ID: UnnecessaryBoxing
 
 isDraft
 
@@ -1147,6 +1197,8 @@ See[UnnecessaryBoxingCases](java/src/test/java/eu/solven/cleanthat/engine/java/r
 ### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
 
 PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)
+
+Cleanthat own ID: UnnecessaryFullyQualifiedName
 
 isDraft
 
@@ -1174,6 +1226,8 @@ See[UnnecessaryFullyQualifiedNameCases](java/src/test/java/eu/solven/cleanthat/e
 ### [UnnecessaryImport](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryImport.java)
 
 CheckStyle: [UnusedImports](https://checkstyle.sourceforge.io/config_imports.html#UnusedImports)
+
+Cleanthat own ID: UnnecessaryImport
 
 isDraft
 
@@ -1205,6 +1259,8 @@ PMD: [UnnecessarySemicolon](https://pmd.github.io/latest/pmd_rules_java_codestyl
 
 Sonar: [RSPEC-2959](https://rules.sonarsource.com/java/RSPEC-2959)
 
+Cleanthat own ID: UnnecessarySemicolon
+
 isDraft
 
 languageLevel: jdk1
@@ -1234,6 +1290,8 @@ PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.
 
 Sonar: [RSPEC-2293](https://rules.sonarsource.com/java/RSPEC-2293)
 
+Cleanthat own ID: UseDiamondOperator
+
 isDraft
 
 languageLevel: jdk1.7
@@ -1259,6 +1317,8 @@ See[UseDiamondOperatorCases](java/src/test/java/eu/solven/cleanthat/engine/java/
 PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator)
 
 Sonar: [RSPEC-2293](https://rules.sonarsource.com/java/RSPEC-2293)
+
+Cleanthat own ID: UseDiamondOperatorJdk8
 
 isDraft
 
@@ -1303,7 +1363,7 @@ See[UseTextBlocksCases](java/src/test/java/eu/solven/cleanthat/engine/java/refac
 
 ### [AllIncludingDraftSingleMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/AllIncludingDraftSingleMutators.java)
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators
+Cleanthat own ID: AllIncludingDraftSingleMutators
 
 isDraft
 
@@ -1313,7 +1373,7 @@ languageLevel: jdk1
 
 CheckStyle: CheckStyle
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CheckStyleMutators
+Cleanthat own ID: CheckStyleMutators
 
 isDraft
 
@@ -1321,7 +1381,7 @@ languageLevel: jdk1
 
 ### [CompositeMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeMutator.java)
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator
+Cleanthat own ID: CompositeMutator
 
 isDraft
 
@@ -1329,7 +1389,7 @@ languageLevel: jdk1
 
 ### [CompositeWalkingMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeWalkingMutator.java)
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWalkingMutator
+Cleanthat own ID: CompositeWalkingMutator
 
 isDraft
 
@@ -1339,7 +1399,7 @@ languageLevel: jdk1
 
 PMD: ErrorProne
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.ErrorProneMutators
+Cleanthat own ID: ErrorProneMutators
 
 isDraft
 
@@ -1357,7 +1417,7 @@ languageLevel: jdk1
 
 PMD: jSparrow
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.JSparrowMutators
+Cleanthat own ID: JSparrowMutators
 
 isDraft
 
@@ -1367,7 +1427,7 @@ languageLevel: jdk1
 
 PMD: PMD
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators
+Cleanthat own ID: PMDMutators
 
 isDraft
 
@@ -1401,7 +1461,7 @@ languageLevel: jdk1
 
 Sonar: [Sonar](https://rules.sonarsource.com/java/Sonar)
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SonarMutators
+Cleanthat own ID: SonarMutators
 
 isDraft
 
@@ -1411,7 +1471,7 @@ languageLevel: jdk1
 
 PMD: SpotBugs
 
-Cleanthat own ID: eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SpotBugsMutators
+Cleanthat own ID: SpotBugsMutators
 
 isDraft
 

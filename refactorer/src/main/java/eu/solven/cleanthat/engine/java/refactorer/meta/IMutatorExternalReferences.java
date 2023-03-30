@@ -26,11 +26,21 @@ import java.util.Set;
 public interface IMutatorExternalReferences {
 
 	/**
+	 * We default to the className as it is the one mainly referred by the documentation.
 	 * 
 	 * @return an id crafted by CleanThat. Useful when no 3rd-party linter has already a rule ID
 	 */
-	default Optional<String> getCleanthatId() {
-		return Optional.empty();
+	default String getCleanthatId() {
+		return getClass().getSimpleName();
+	}
+
+	/**
+	 * A rule may see its identifiers changing through time (e.g. {@link #getCleanthatId()} on a class name change).
+	 * 
+	 * @return the {@link Set} of legacy identifiers. They may end being removed (e.g. on a major release).
+	 */
+	default Set<String> getLegacyIds() {
+		return Set.of();
 	}
 
 	default Optional<String> getPmdId() {

@@ -60,8 +60,8 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("StringStartsWithChar");
+	public Set<String> getLegacyIds() {
+		return Set.of("StringStartsWithChar");
 	}
 
 	@Override

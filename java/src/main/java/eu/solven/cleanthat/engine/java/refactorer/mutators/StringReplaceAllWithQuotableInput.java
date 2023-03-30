@@ -33,7 +33,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_1;
+		// `replaceAll` has been introduced with JDK4
+		return IJdkVersionConstants.JDK_4;
 	}
 
 	@Override

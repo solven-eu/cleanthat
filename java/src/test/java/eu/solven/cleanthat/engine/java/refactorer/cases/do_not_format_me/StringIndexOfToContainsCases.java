@@ -66,4 +66,25 @@ public class StringIndexOfToContainsCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	@UnmodifiedMethod
+	public static class Left_PlusOneThen {
+		public boolean pre(String string, String subString) {
+			return 1 + string.indexOf(subString) >= 0;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class Left_ThenPlusOne {
+		public boolean pre(String string, String subString) {
+			return string.indexOf(subString) + 1 >= 0;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class Right_ThenPlusOne {
+		public boolean pre(String string, String subString) {
+			return 0 <= string.indexOf(subString) + 1;
+		}
+	}
+
 }

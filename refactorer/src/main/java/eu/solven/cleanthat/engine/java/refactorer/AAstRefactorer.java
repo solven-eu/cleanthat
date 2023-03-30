@@ -213,14 +213,17 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 		var mutatorsMayComposite = includedRules.stream().flatMap(includedRule -> {
 			if (JavaRefactorerProperties.WILDCARD.equals(includedRule)) {
+				LOGGER.warn("'{}' is a legacy keyword, and should be replaced by {} and {}",
+						JavaRefactorerProperties.WILDCARD,
+						AllIncludingDraftCompositeMutators.class.getSimpleName(),
+						AllIncludingDraftSingleMutators.class.getSimpleName());
 				// We suppose there is no mutator from Composite which is not a single mutator
 				// Hence we return all single mutators
 				return compatibleSingleMutators.stream();
 			} else {
 				List<IMutator> matchingMutators =
 						Stream.concat(compatibleSingleMutators.stream(), compatibleCompositeMutators.stream())
-								.filter(someMutator -> someMutator.getIds().contains(includedRule)
-										|| someMutator.getClass().getName().equals(includedRule))
+								.filter(someMutator -> isAcceptedMutator(includedRule, someMutator))
 								.collect(Collectors.toList());
 
 				if (!matchingMutators.isEmpty()) {
@@ -278,6 +281,16 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 			}
 		}).collect(Collectors.toList());
 
+	}
+
+	private static boolean isAcceptedMutator(String includedRule, IMutator someMutator) {
+		if (someMutator.getIds().contains(includedRule)) {
+			return true;
+		} else if (someMutator.getClass().getName().equals(includedRule)) {
+			// We allow loading any rule, from a custom dependency
+			return true;
+		}
+		return false;
 	}
 
 	private static Optional<IMutator> loadMutatorFromClass(JavaVersion sourceCodeVersion, String includedRule) {

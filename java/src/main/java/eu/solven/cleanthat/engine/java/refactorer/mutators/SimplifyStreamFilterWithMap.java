@@ -15,7 +15,6 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -38,11 +37,6 @@ public class SimplifyStreamFilterWithMap extends ATodoJavaParserMutator {
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("Stream");
-	}
-
-	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("SimplifyStreamFilterWithMap");
 	}
 
 }

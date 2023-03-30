@@ -44,11 +44,6 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getCleanthatId() {
-		return Optional.of("CollectionToOptional");
-	}
-
-	@Override
 	protected boolean processNotRecursively(Expression expr) {
 		if (!expr.isConditionalExpr()) {
 			return false;

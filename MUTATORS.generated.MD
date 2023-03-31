@@ -235,6 +235,58 @@ public static class IfEquals {
 
 See[SimplifyBooleanExpressionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanExpressionCases.java)
 
+### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
+
+Cleanthat own ID: SimplifyBooleanInitialization
+
+languageLevel: jdk1.8
+
+```
+// https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html#loop-with-break-statement-to-stream-anymatch
+@CompareMethods
+public static class breakToStreamAnyMatch {
+
+    public boolean pre(List<String> strings) {
+        boolean containsEmpty = false;
+        if (strings.stream().anyMatch(value -> value.isEmpty())) {
+            containsEmpty = true;
+        }
+        return containsEmpty;
+    }
+
+    public boolean post(List<String> strings) {
+        boolean containsEmpty = strings.stream().anyMatch(value -> value.isEmpty());
+        return containsEmpty;
+    }
+}
+```
+
+See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanInitializationCases.java)
+
+### [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
+
+PMD: [SimplifyStartsWith](https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith)
+
+Cleanthat own ID: SimplifyStartsWith
+
+languageLevel: jdk1.6
+
+```
+@CompareMethods
+public static class startsWithElseIsEmpty {
+
+    public Object pre(String s) {
+        return s.startsWith("#") || s.isEmpty();
+    }
+
+    public Object post(String s) {
+        return s.isEmpty() || s.charAt(0) == '#';
+    }
+}
+```
+
+See[SimplifyStartsWithCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStartsWithCases.java)
+
 ### [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
 
 Sonar: [RSPEC-4034](https://rules.sonarsource.com/java/RSPEC-4034)
@@ -1039,62 +1091,6 @@ public static class Nominal {
 ```
 
 See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
-
-### [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
-
-Cleanthat own ID: SimplifyBooleanInitialization
-
-isDraft
-
-languageLevel: jdk1.8
-
-```
-// https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html#loop-with-break-statement-to-stream-anymatch
-@CompareMethods
-public static class breakToStreamAnyMatch {
-
-    public boolean pre(List<String> strings) {
-        boolean containsEmpty = false;
-        if (strings.stream().anyMatch(value -> value.isEmpty())) {
-            containsEmpty = true;
-        }
-        return containsEmpty;
-    }
-
-    public boolean post(List<String> strings) {
-        boolean containsEmpty = strings.stream().anyMatch(value -> value.isEmpty());
-        return containsEmpty;
-    }
-}
-```
-
-See[SimplifyBooleanInitializationCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyBooleanInitializationCases.java)
-
-### [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
-
-PMD: [SimplifyStartsWith](https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith)
-
-Cleanthat own ID: SimplifyStartsWith
-
-isDraft
-
-languageLevel: jdk1.6
-
-```
-@CompareMethods
-public static class startsWithElseIsEmpty {
-
-    public Object pre(String s) {
-        return s.startsWith("#") || s.isEmpty();
-    }
-
-    public Object post(String s) {
-        return s.isEmpty() || s.charAt(0) == '#';
-    }
-}
-```
-
-See[SimplifyStartsWithCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStartsWithCases.java)
 
 ### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
 

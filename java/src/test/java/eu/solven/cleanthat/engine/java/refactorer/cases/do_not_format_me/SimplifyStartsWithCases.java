@@ -90,7 +90,7 @@ public class SimplifyStartsWithCases extends AJavaparserRefactorerCases {
 		}
 	}
 
-	@UnmodifiedMethod
+	@CompareMethods
 	public static class startsWith_multipleOptions {
 		public Object pre(String line) {
 			return line.isEmpty() || line.startsWith("#") || line.startsWith(";");
@@ -98,6 +98,11 @@ public class SimplifyStartsWithCases extends AJavaparserRefactorerCases {
 
 		public Object post(String line) {
 			return line.isEmpty() || line.charAt(0) == '#' || line.startsWith(";");
+		}
+
+		// TODO
+		public Object post_better(String line) {
+			return line.isEmpty() || line.charAt(0) == '#' || line.charAt(0) == ';';
 		}
 	}
 

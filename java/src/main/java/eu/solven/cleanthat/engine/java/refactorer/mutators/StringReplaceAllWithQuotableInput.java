@@ -73,6 +73,7 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 		LiteralStringValueExpr literalRegex = methodCall.getArgument(0).asLiteralStringValueExpr();
 		String regex = literalRegex.getValue();
 
+		// https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
 		// We consider as simple quote if:
 		// we have plain chatacters, or space, or dash, or underscore
 		// Or a '\' (which is escaped (x2) in the input (Java text), escaped again in the sourceCode regex (x4), escaped

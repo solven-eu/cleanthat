@@ -1,14 +1,13 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -207,6 +206,55 @@ public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerC
 			if (strings.stream().anyMatch(value -> value.isEmpty())) {
 				containsEmpty = true;
 			}
+			return containsEmpty;
+		}
+	}
+
+	@CompareMethods
+	public static class setVariable_ifTrue {
+		public boolean pre(List<String> strings) {
+			Object someObject = null;
+
+			boolean containsEmpty = false;
+			for (String value : strings) {
+				if (value.isEmpty()) {
+					someObject = new Object();
+					containsEmpty = true;
+					break;
+				}
+			}
+
+			System.out.println(someObject);
+			return containsEmpty;
+		}
+
+		public boolean post(List<String> strings) {
+			Object someObject = null;
+
+			boolean containsEmpty = false;
+			if (strings.stream().anyMatch(value -> value.isEmpty())) {
+				someObject = new Object();
+				containsEmpty = true;
+			}
+			System.out.println(someObject);
+			return containsEmpty;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class setVariable_duringIf {
+		public boolean pre(List<String> strings) {
+			Object someObject = null;
+
+			boolean containsEmpty = false;
+			for (String value : strings) {
+				if (value.isEmpty() && (someObject = new Object()) != null) {
+					containsEmpty = true;
+					break;
+				}
+			}
+
+			System.out.println(someObject);
 			return containsEmpty;
 		}
 	}

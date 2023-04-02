@@ -22,6 +22,8 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -67,10 +69,13 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 		}
 
 		var objectCreationExpr = expr.asObjectCreationExpr();
+		if (objectCreationExpr.getArguments().size() != 1) {
+			return false;
+		}
 
 		var type = objectCreationExpr.getType();
 
-		if (!isBoxedPrimitive(type)) {
+		if (!isBoxType(type)) {
 			return false;
 		}
 
@@ -78,8 +83,18 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 				new MethodCallExpr(new NameExpr(type.getName()), "valueOf", objectCreationExpr.getArguments()));
 	}
 
-	private boolean isBoxedPrimitive(ClassOrInterfaceType type) {
+	private boolean isBoxType(ClassOrInterfaceType type) {
 		// We check the scope as a workaround to https://github.com/javaparser/javaparser/issues/3968
-		return type.getScope().isEmpty() && type.isBoxedType();
+		if (type.isBoxedType()) {
+			// In fact, it may not be a real Boxed type
+			Optional<ResolvedType> optResolvedType = optResolvedType(type);
+			if (optResolvedType.isEmpty()) {
+				return false;
+			}
+			return ResolvedPrimitiveType.isBoxType(optResolvedType.get());
+		} else {
+			// This is definitely not a boxedType
+			return false;
+		}
 	}
 }

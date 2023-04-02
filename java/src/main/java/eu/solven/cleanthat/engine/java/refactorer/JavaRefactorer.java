@@ -40,8 +40,11 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.reflectionmodel.ReflectionClassDeclaration;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.MemoryTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -222,8 +225,9 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 
 		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
 		var memoryTypeSolver = new MemoryTypeSolver();
-		memoryTypeSolver.setParent(reflectionTypeSolver);
-		return memoryTypeSolver;
+		var guavaImmutableMap = new ReflectionClassDeclaration(ImmutableMap.class, reflectionTypeSolver);
+		memoryTypeSolver.addDeclaration(ImmutableMap.class.getName(), guavaImmutableMap);
+		return new CombinedTypeSolver(reflectionTypeSolver, memoryTypeSolver);
 	}
 
 	public static JavaParser makeDefaultJavaParser(boolean jreOnly) {

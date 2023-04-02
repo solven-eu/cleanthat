@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -91,6 +92,12 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 
 		var thenAsBlockStmt = thenStmt.asBlockStmt();
 		if (thenAsBlockStmt.getStatements().isEmpty()) {
+			// We expect a last statement to be either break or return
+			return false;
+		}
+
+		if (hasAssignExpr(ifStmt.getCondition())) {
+			// We can not put a variableAssignement in a lambda
 			return false;
 		}
 
@@ -131,6 +138,10 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 		} else {
 			return false;
 		}
+	}
+
+	private boolean hasAssignExpr(Expression condition) {
+		return condition.findFirst(AssignExpr.class).isPresent();
 	}
 
 	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {

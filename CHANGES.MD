@@ -7,6 +7,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Fixed
 
 * `SimplifyBooleanInitialization` will not produce invalid/corrupted initializer in case of negated initialization.
+* `PrimitiveWrapperInstantiation` will not confuse class named like a boxed type with a boxed type.
+* `EnhancedForLoopToStreamAnyMatch` will not accept a condition holding an `AssignExpr`
 
 ### Changes
 

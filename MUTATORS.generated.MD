@@ -50,6 +50,30 @@ public static class Checkstyle_booleanExpr {
 
 See[AvoidInlineConditionalsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidInlineConditionalsCases.java)
 
+### [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
+
+jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
+
+Cleanthat own ID: CollectionIndexOfToContains
+
+languageLevel: jdk1.2
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public boolean pre(List<?> list, Object o) {
+        return list.indexOf(o) >= 0;
+    }
+
+    public boolean post(List<?> list, Object o) {
+        return list.contains(o);
+    }
+}
+```
+
+See[CollectionIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/CollectionIndexOfToContainsCases.java)
+
 ### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
 
 PMD: [ComparisonWithNaN](https://pmd.github.io/latest/pmd_rules_java_errorprone.html#comparisonwithnan)
@@ -310,6 +334,30 @@ public static class CaseFindAnyIsPresent {
 ```
 
 See[StreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StreamAnyMatchCases.java)
+
+### [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
+
+jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
+
+Cleanthat own ID: StringIndexOfToContains
+
+languageLevel: jdk1.4
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public boolean pre(String string, String subString) {
+        return string.indexOf(subString) >= 0;
+    }
+
+    public boolean post(String string, String subString) {
+        return string.contains(subString);
+    }
+}
+```
+
+See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringIndexOfToContainsCases.java)
 
 ### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
 
@@ -584,32 +632,6 @@ public static class CaseRuntimeException {
 
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
 
-### [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
-
-jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
-
-Cleanthat own ID: CollectionIndexOfToContains
-
-isDraft
-
-languageLevel: jdk1.2
-
-```
-@CompareMethods
-public static class Nominal {
-
-    public boolean pre(List<?> list, Object o) {
-        return list.indexOf(o) >= 0;
-    }
-
-    public boolean post(List<?> list, Object o) {
-        return list.contains(o);
-    }
-}
-```
-
-See[CollectionIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/CollectionIndexOfToContainsCases.java)
-
 ### [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 
 Cleanthat own ID: CollectionToOptional
@@ -798,6 +820,14 @@ public static class EnumInRightHandSide {
 ```
 
 See[EnumsWithoutEqualsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnumsWithoutEqualsCases.java)
+
+### [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
+
+Cleanthat own ID: GuavaImmutableMapBuilderOverVarargs
+
+isDraft
+
+languageLevel: jdk11
 
 ### [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 
@@ -1115,32 +1145,6 @@ public static class CaseMethodRef {
 ```
 
 See[SimplifyStreamFilterWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamFilterWithMapCases.java)
-
-### [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
-
-jSparrow: [IndexOfToContains](https://jsparrow.github.io/rules/index-of-to-contains.html)
-
-Cleanthat own ID: StringIndexOfToContains
-
-isDraft
-
-languageLevel: jdk1.4
-
-```
-@CompareMethods
-public static class Nominal {
-
-    public boolean pre(String string, String subString) {
-        return string.indexOf(subString) >= 0;
-    }
-
-    public boolean post(String string, String subString) {
-        return string.contains(subString);
-    }
-}
-```
-
-See[StringIndexOfToContainsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringIndexOfToContainsCases.java)
 
 ### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 

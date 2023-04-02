@@ -20,13 +20,13 @@
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
-- [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
 - [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 - [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
 - [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
 - [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
 - [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
+- [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
 - [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 - [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
@@ -39,7 +39,6 @@
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 - [RemoveAllToClearCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveAllToClearCollection.java)
 - [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
-- [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 - [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
@@ -67,6 +66,7 @@
 - [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
 
 ## Guava
+- [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
 - [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 
@@ -166,6 +166,9 @@
 - [UseStringIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseStringIsEmpty.java)
 - [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
+## Varargs
+- [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
+
 ## With JDK 1
 - [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
@@ -230,6 +233,7 @@
 
 ## With JDK 11
 - [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
+- [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
 - [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 - [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)

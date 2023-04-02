@@ -58,4 +58,23 @@ public class PrimitiveWrapperInstantiationCases extends AJavaparserRefactorerCas
 		}
 	}
 
+	// This would conflict with java,lang.Character
+	public static class Character {
+		char nameOfMyCharacter;
+
+		public Character(char nameOfMyCharacter) {
+			this.nameOfMyCharacter = nameOfMyCharacter;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class ConflictWithClassWithSameName {
+		public Object pre(char c) {
+			return new Character(c);
+		}
+
+		public Object post(boolean input) {
+			return Boolean.valueOf(input);
+		}
+	}
 }

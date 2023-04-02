@@ -18,8 +18,13 @@ package eu.solven.cleanthat.engine.java.refactorer.javaparser;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ParserConfiguration.LanguageLevel;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.reflectionmodel.ReflectionClassDeclaration;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.MemoryTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Core helpers for tests relating with JavaParser
@@ -48,8 +53,19 @@ public class JavaparserTestHelpers {
 	}
 
 	// Duplicated from JavaRefactorer
-	public static ReflectionTypeSolver makeDefaultTypeSolver(boolean jreOnly) {
+	public static TypeSolver makeDefaultTypeSolver(boolean jreOnly) {
 		var reflectionTypeSolver = new ReflectionTypeSolver(jreOnly);
-		return reflectionTypeSolver;
+
+		MemoryTypeSolver memoryTypeSolver = new MemoryTypeSolver();
+		var guavaImmutableMap = new ReflectionClassDeclaration(ImmutableMap.class, reflectionTypeSolver);
+
+		// This is typically used by GuavaImmutableMapBuilderOverVarargs
+		// This mechanism needs to be made generic
+		// As it stands, it means the source input will be present by the dependency in the version used by CleanThat at
+		// runtime: this is a bad thing as the sourceCode may rely on a completely different version through its
+		// build-system. However, Cleanthat targets not to load the whole target dependencies
+		memoryTypeSolver.addDeclaration(ImmutableMap.class.getName(), guavaImmutableMap);
+
+		return new CombinedTypeSolver(reflectionTypeSolver, memoryTypeSolver);
 	}
 }

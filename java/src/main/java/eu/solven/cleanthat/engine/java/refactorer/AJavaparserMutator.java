@@ -31,6 +31,7 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -510,7 +511,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 	 * @return true if this node can be moved inside a {@link LambdaExpr}
 	 */
 	protected boolean hasOuterAssignExpr(Node node) {
-		return node.findFirst(AssignExpr.class, assignExpr -> {
+		Optional<AssignExpr> optOuterAssignExpr = node.findFirst(AssignExpr.class, assignExpr -> {
 			Expression assigned = assignExpr.getTarget();
 
 			return node.findFirst(VariableDeclarationExpr.class, variableDeclExpr -> {
@@ -520,6 +521,34 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 						.findAny()
 						.isPresent();
 			}).isEmpty();
-		}).isPresent();
+		});
+		if (optOuterAssignExpr.isPresent()) {
+			return true;
+		}
+
+		Optional<UnaryExpr> optOuterUnaryExpr = node.findFirst(UnaryExpr.class, unaryExpr -> {
+			if (unaryExpr.getOperator() != UnaryExpr.Operator.POSTFIX_DECREMENT
+					&& unaryExpr.getOperator() != UnaryExpr.Operator.POSTFIX_INCREMENT
+					&& unaryExpr.getOperator() != UnaryExpr.Operator.PREFIX_DECREMENT
+					&& unaryExpr.getOperator() != UnaryExpr.Operator.PREFIX_INCREMENT) {
+				// Others operator are not modifying the variable
+				return false;
+			}
+
+			Expression assigned = unaryExpr.getExpression();
+			return node.findFirst(VariableDeclarationExpr.class, variableDeclExpr -> {
+				return variableDeclExpr.getVariables()
+						.stream()
+						.filter(declared -> declared.getNameAsExpression().equals(assigned))
+						.findAny()
+						.isPresent();
+			}).isEmpty();
+
+		});
+		if (optOuterUnaryExpr.isPresent()) {
+			return true;
+		}
+
+		return false;
 	}
 }

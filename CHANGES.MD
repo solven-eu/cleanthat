@@ -19,6 +19,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `SimplifyBooleanExpression` is introduced
 * `StringReplaceAllWithQuotableInput` is introduced
 * `EnhancedForLoopToForEach` is introduced
+* `LoopIntRangeToIntStreamForEach` is introduced
 
 ## [2.13] - 2023-03-27
 

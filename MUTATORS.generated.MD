@@ -731,6 +731,36 @@ public static class VariousCases {
 
 See[EmptyControlStatementCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EmptyControlStatementCases.java)
 
+### [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
+
+jSparrow: [EnhancedForLoopToStreamForEach](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-for-each.html)
+
+Cleanthat own ID: EnhancedForLoopToForEach
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class forEach_singleStatement {
+
+    public void pre(List<String> strings) {
+        for (String string : strings) {
+            System.out.println(string);
+        }
+    }
+
+    public void post(List<String> strings) {
+        strings.forEach(string -> {
+            System.out.println(string);
+        });
+    }
+}
+```
+
+See[EnhancedForLoopToForEachCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToForEachCases.java)
+
 ### [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
 
 jSparrow: [EnhancedForLoopToStreamAnyMatch](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
@@ -775,7 +805,7 @@ Cleanthat own ID: EnhancedForLoopToStreamCollect
 
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk1.8
 
 ```
 @CompareMethods
@@ -796,6 +826,14 @@ public static class forEachIfAddAdd {
 ```
 
 See[EnhancedForLoopToStreamCollectCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamCollectCases.java)
+
+### [EnhancedIntRangeLoopToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedIntRangeLoopToIntStreamForEach.java)
+
+Cleanthat own ID: EnhancedIntRangeLoopToIntStreamForEach
+
+isDraft
+
+languageLevel: jdk1.8
 
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 

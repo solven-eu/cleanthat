@@ -3,6 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.Collection;
 import java.util.List;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -68,13 +69,39 @@ public class EnhancedForLoopToForEachCases extends AJavaparserRefactorerCases {
 
 	@UnmodifiedMethod
 	public static class forEach_assignExpr {
-		public void pre(List<String> strings) {
+		public String pre(List<String> strings) {
 			String s = null;
 
 			for (String string : strings) {
 				System.out.println(string);
 				s = string;
 			}
+
+			return s;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class forEach_assignExpr_outer {
+		String s = null;
+
+		public String pre(List<String> strings) {
+			strings.forEach(string -> {
+				System.out.println(string);
+				s = string;
+			});
+
+			return s;
+		}
+
+		public String post(List<String> strings) {
+			for (String string : strings) {
+				System.out.println(string);
+				s = string;
+			}
+
+			return s;
 		}
 	}
 }

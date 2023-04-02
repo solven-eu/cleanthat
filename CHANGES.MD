@@ -18,6 +18,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 * `SimplifyBooleanExpression` is introduced
 * `StringReplaceAllWithQuotableInput` is introduced
+* `EnhancedForLoopToForEach` is introduced
 
 ## [2.13] - 2023-03-27
 
@@ -28,7 +29,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ### Added
 
-* `@SuppressCleanthat` enables skipping Cleanthat as specific piece of code
+* `@SuppressCleanthat` enables skipping Cleanthat for specific pieces of code
 * `RemoveDoubleNegation` is introduced
 * `RemoveAllToClearCollection` is introduced
 * `SpotBugsMutators` is introduced

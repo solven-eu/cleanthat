@@ -28,14 +28,14 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
  * Turns '.stream(s -> {return s.subString(0, 2)})' into '.stream(s -> s.subString(0, 2))'
  *
  * @author Benoit Lacelle
  */
-@ApplyMeBefore({ LambdaIsMethodReference.class })
+@ApplyAfterMe({ LambdaIsMethodReference.class })
 public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 	@Override
@@ -45,7 +45,7 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Stream");
+		return ImmutableSet.of("Lambda");
 	}
 
 	@Override

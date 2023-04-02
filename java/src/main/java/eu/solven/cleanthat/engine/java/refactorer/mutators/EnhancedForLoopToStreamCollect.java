@@ -35,6 +35,7 @@ import com.github.javaparser.ast.type.UnknownType;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 
 /**
@@ -43,6 +44,11 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
  * @author Benoit Lacelle
  */
 public class EnhancedForLoopToStreamCollect extends AJavaparserStmtMutator {
+
+	@Override
+	public String minimalJavaVersion() {
+		return IJdkVersionConstants.JDK_8;
+	}
 
 	@Override
 	public Set<String> getTags() {

@@ -96,7 +96,7 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 			return false;
 		}
 
-		if (hasAssignExpr(ifStmt.getCondition())) {
+		if (hasOuterAssignExpr(ifStmt.getCondition())) {
 			// We can not put a variableAssignement in a lambda
 			return false;
 		}
@@ -138,10 +138,6 @@ public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
 		} else {
 			return false;
 		}
-	}
-
-	private boolean hasAssignExpr(Expression condition) {
-		return condition.findFirst(AssignExpr.class).isPresent();
 	}
 
 	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {

@@ -19,8 +19,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * This enables indicating given {@link IMutator} is to be applied before given other {@link IMutator}s. Beware of
- * cycles.
+ * This indicates annotated {@link IMutator} is to be applied before given other {@link IMutator}s. Beware of cycles.
  * 
  * @author Benoit Lacelle
  *

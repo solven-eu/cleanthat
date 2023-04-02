@@ -27,8 +27,11 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.PackageDeclaration;
+import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.Type;
@@ -499,5 +502,24 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * 
+	 * @param node
+	 * @return true if this node can be moved inside a {@link LambdaExpr}
+	 */
+	protected boolean hasOuterAssignExpr(Node node) {
+		return node.findFirst(AssignExpr.class, assignExpr -> {
+			Expression assigned = assignExpr.getTarget();
+
+			return node.findFirst(VariableDeclarationExpr.class, variableDeclExpr -> {
+				return variableDeclExpr.getVariables()
+						.stream()
+						.filter(declared -> declared.getNameAsExpression().equals(assigned))
+						.findAny()
+						.isPresent();
+			}).isEmpty();
+		}).isPresent();
 	}
 }

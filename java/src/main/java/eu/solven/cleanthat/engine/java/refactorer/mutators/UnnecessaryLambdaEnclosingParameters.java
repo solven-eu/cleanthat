@@ -38,7 +38,7 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Stream");
+		return ImmutableSet.of("Lambda");
 	}
 
 	@Override

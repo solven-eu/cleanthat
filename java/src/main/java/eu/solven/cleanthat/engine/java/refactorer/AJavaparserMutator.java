@@ -91,13 +91,11 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 	public Optional<Node> walkAst(Node tree) {
 		var transformed = new AtomicBoolean();
 		tree.walk(node -> {
-			Optional<NodeWithAnnotations> optSuppressedParent = node.findAncestor(n -> {
-				return n.isAnnotationPresent(SuppressCleanthat.class);
-			}, NodeWithAnnotations.class);
-			Optional<Node> optSuppressedChildren = node.findFirst(Node.class, n -> {
-				return n instanceof NodeWithAnnotations<?>
-						&& ((NodeWithAnnotations<?>) n).isAnnotationPresent(SuppressCleanthat.class);
-			});
+			Optional<NodeWithAnnotations> optSuppressedParent =
+					node.findAncestor(n -> n.isAnnotationPresent(SuppressCleanthat.class), NodeWithAnnotations.class);
+			Optional<Node> optSuppressedChildren = node.findFirst(Node.class,
+					n -> n instanceof NodeWithAnnotations<?>
+							&& ((NodeWithAnnotations<?>) n).isAnnotationPresent(SuppressCleanthat.class));
 			if (node instanceof NodeWithAnnotations
 					&& ((NodeWithAnnotations<?>) node).isAnnotationPresent(SuppressCleanthat.class)
 					|| optSuppressedParent.isPresent()
@@ -514,13 +512,14 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		Optional<AssignExpr> optOuterAssignExpr = node.findFirst(AssignExpr.class, assignExpr -> {
 			Expression assigned = assignExpr.getTarget();
 
-			return node.findFirst(VariableDeclarationExpr.class, variableDeclExpr -> {
-				return variableDeclExpr.getVariables()
-						.stream()
-						.filter(declared -> declared.getNameAsExpression().equals(assigned))
-						.findAny()
-						.isPresent();
-			}).isEmpty();
+			return node
+					.findFirst(VariableDeclarationExpr.class,
+							variableDeclExpr -> variableDeclExpr.getVariables()
+									.stream()
+									.filter(declared -> declared.getNameAsExpression().equals(assigned))
+									.findAny()
+									.isPresent())
+					.isEmpty();
 		});
 		if (optOuterAssignExpr.isPresent()) {
 			return true;
@@ -536,13 +535,14 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 			}
 
 			Expression assigned = unaryExpr.getExpression();
-			return node.findFirst(VariableDeclarationExpr.class, variableDeclExpr -> {
-				return variableDeclExpr.getVariables()
-						.stream()
-						.filter(declared -> declared.getNameAsExpression().equals(assigned))
-						.findAny()
-						.isPresent();
-			}).isEmpty();
+			return node
+					.findFirst(VariableDeclarationExpr.class,
+							variableDeclExpr -> variableDeclExpr.getVariables()
+									.stream()
+									.filter(declared -> declared.getNameAsExpression().equals(assigned))
+									.findAny()
+									.isPresent())
+					.isEmpty();
 
 		});
 		if (optOuterUnaryExpr.isPresent()) {

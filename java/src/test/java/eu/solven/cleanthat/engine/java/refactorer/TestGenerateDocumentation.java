@@ -81,9 +81,7 @@ public class TestGenerateDocumentation {
 				.stream()
 				.filter(m -> isDraft == m.isDraft())
 				.collect(Collectors.toList())
-				.forEach(mutator -> {
-					addMutatorInfo(sb, mutator);
-				});
+				.forEach(mutator -> addMutatorInfo(sb, mutator));
 	}
 
 	private static void addCompositeMutators(StringBuilder sb) {
@@ -92,9 +90,7 @@ public class TestGenerateDocumentation {
 
 		sb.append(EOL).append(EOL).append("## Composite Mutators");
 
-		allComposites.getUnderlyings().forEach(mutator -> {
-			addMutatorInfo(sb, mutator);
-		});
+		allComposites.getUnderlyings().forEach(mutator -> addMutatorInfo(sb, mutator));
 	}
 
 	private static void addMutatorInfo(StringBuilder sb, IMutator mutator) {

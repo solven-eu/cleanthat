@@ -55,9 +55,7 @@ public class EngineAndLinters implements AutoCloseable {
 	public String toString() {
 		var builder = MoreObjects.toStringHelper(this).add("engine", engineProperties.getEngine());
 
-		IntStream.range(0, linters.size()).forEach(i -> {
-			builder.add("step_" + i, linters.get(i));
-		});
+		IntStream.range(0, linters.size()).forEach(i -> builder.add("step_" + i, linters.get(i)));
 
 		return builder.toString();
 	}

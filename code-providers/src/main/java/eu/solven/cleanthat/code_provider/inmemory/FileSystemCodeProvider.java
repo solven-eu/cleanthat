@@ -17,6 +17,8 @@ package eu.solven.cleanthat.code_provider.inmemory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
@@ -54,20 +56,26 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	final FileSystem fs;
 	final Path root;
+	final Charset charset;
 
-	public FileSystemCodeProvider(Path root) {
+	public FileSystemCodeProvider(Path root, Charset charset) {
 		this.fs = root.getFileSystem();
 		this.root = root.normalize();
+		this.charset = charset;
 
 		if (!this.root.equals(root)) {
 			throw new IllegalArgumentException("The root is illegal: " + root);
 		}
 	}
 
+	public FileSystemCodeProvider(Path root) {
+		this(root, StandardCharsets.UTF_8);
+	}
+
 	@SuppressWarnings("PMD.CloseResource")
 	public static FileSystemCodeProvider forTests() throws IOException {
 		var fs = Jimfs.newFileSystem();
-		return new FileSystemCodeProvider(CodeProviderHelpers.getRoot(fs));
+		return new FileSystemCodeProvider(CodeProviderHelpers.getRoot(fs), StandardCharsets.UTF_8);
 	}
 
 	@Override
@@ -106,29 +114,15 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 				}
 
 				// https://stackoverflow.com/questions/58411668/how-to-replace-backslash-with-the-forwardslash-in-java-nio-file-path
-
 				var relativized2 = root.relativize(file);
 
 				var rawRelativized = CleanthatPathHelpers.makeContentRawPath(root, relativized2);
 				var relativized = CleanthatPathHelpers.makeContentPath(root, rawRelativized);
 
-				// String unixLikePath = toUnixPath(relativized);
-
 				consumer.accept(new DummyCodeProviderFile(relativized, file));
 
 				return FileVisitResult.CONTINUE;
 			}
-
-			// private String toUnixPath(Path relativized) {
-			// String unixLikePath;
-			// if ("\\".equals(relativized.getFileSystem().getSeparator())) {
-			// // We get '\' under Windows
-			// unixLikePath = "/" + relativized.toString().replaceAll(Pattern.quote("\\"), "/");
-			// } else {
-			// unixLikePath = relativized.toString();
-			// }
-			// return unixLikePath;
-			// }
 		});
 	}
 
@@ -143,8 +137,6 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 	@Override
 	public boolean persistChanges(Map<Path, String> pathToMutatedContent, ICodeWritingMetadata codeWritingMetadata) {
-		var charset = StandardCharsets.UTF_8;
-
 		var hasWritten = new AtomicBoolean();
 		pathToMutatedContent.forEach((inMemoryPath, content) -> {
 			var resolved = resolvePath(inMemoryPath);
@@ -176,8 +168,19 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 
 		var pathForRootFS = CleanthatPathHelpers.resolveChild(getRepositoryRoot(), path);
 
+		return safeReadString(pathForRootFS);
+	}
+
+	protected Optional<String> safeReadString(Path pathForRootFS) throws IOException {
 		if (Files.exists(pathForRootFS)) {
-			return Optional.of(Files.readString(pathForRootFS));
+			String asString;
+			try {
+				asString = Files.readString(pathForRootFS, charset);
+			} catch (MalformedInputException e) {
+				LOGGER.warn("Issue reading {}", pathForRootFS, e);
+				return Optional.empty();
+			}
+			return Optional.of(asString);
 		} else {
 			return Optional.empty();
 		}

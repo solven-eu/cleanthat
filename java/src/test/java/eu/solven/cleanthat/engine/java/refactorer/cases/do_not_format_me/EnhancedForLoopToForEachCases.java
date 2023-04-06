@@ -2,6 +2,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -102,6 +103,83 @@ public class EnhancedForLoopToForEachCases extends AJavaparserRefactorerCases {
 			}
 
 			return s;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class ThrowException {
+		public void pre(List<String> strings) throws Exception {
+			for (String string : strings) {
+				throw new Exception(string);
+			}
+		}
+	}
+
+	@CompareMethods
+	public static class ThrowImplicitException {
+		public void pre(List<String> strings) throws IllegalArgumentException {
+			for (String string : strings) {
+				throw new IllegalArgumentException(string);
+			}
+		}
+
+		public void post(List<String> strings) throws IllegalArgumentException {
+			strings.forEach(string -> {
+				throw new IllegalArgumentException(string);
+			});
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class ThrowExplicitException {
+		public void pre(List<String> strings) throws TimeoutException {
+			for (String string : strings) {
+				throw new IllegalArgumentException(string);
+			}
+		}
+	}
+
+	@CompareMethods
+	public static class ThrowError {
+		public void pre(List<String> strings) throws OutOfMemoryError {
+			for (String string : strings) {
+				throw new OutOfMemoryError(string);
+			}
+		}
+
+		public void post(List<String> strings) throws OutOfMemoryError {
+			strings.forEach(string -> {
+				throw new OutOfMemoryError(string);
+			});
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class ThrowThrowable {
+		public void pre(List<String> strings) throws Throwable {
+			for (String string : strings) {
+				throw new Throwable(string);
+			}
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class continueKeyword {
+		public void pre(List<String> strings) {
+			for (String string : strings) {
+				if (string.length() >= 3) {
+					continue;
+				}
+			}
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class forEachArray {
+		public void pre(String... strings) {
+			for (String string : strings) {
+				System.out.println(string);
+			}
 		}
 	}
 }

@@ -49,6 +49,12 @@ public interface ICleanthatStepParametersProperties {
 	// BEWARE This is specific to JavaRefactorerProperties
 	String GUAVA = "Guava";
 
+	/**
+	 * The mutators applies any Stream related IMutator
+	 */
+	// BEWARE This is specific to JavaRefactorerProperties
+	String STREAM = "Stream";
+
 	@JsonIgnore
 	Object getCustomProperty(String key);
 }

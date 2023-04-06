@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.code_provider.local;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -36,6 +37,11 @@ import eu.solven.cleanthat.git.GitIgnoreParser;
  * @author Benoit Lacelle
  */
 public class FileSystemGitCodeProvider extends FileSystemCodeProvider {
+
+	public FileSystemGitCodeProvider(Path root, Charset charset) {
+		super(root, charset);
+	}
+
 	public FileSystemGitCodeProvider(Path root) {
 		super(root);
 	}

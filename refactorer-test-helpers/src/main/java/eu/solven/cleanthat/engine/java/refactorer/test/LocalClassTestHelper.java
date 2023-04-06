@@ -54,7 +54,7 @@ public class LocalClassTestHelper {
 	public static Path localClassAsPath(Class<?> classToLoad) throws IOException {
 		var srcMainJava = getProjectTestSourceCode();
 		// https://stackoverflow.com/questions/3190301/obtaining-java-source-code-from-class-name
-		var path = classToLoad.getName().replaceAll("\\.", "/") + ".java";
+		var path = classToLoad.getName().replace(".", "/") + ".java";
 
 		var pathToDirty = srcMainJava.resolve(path);
 		return pathToDirty;

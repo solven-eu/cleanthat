@@ -144,14 +144,14 @@ public final class GitAttributesLineEndings_InMemory {
 			// is this a bug in original implementation? (.equals instead of .endsWith)
 			rootDir = "/".equals(rootPath) ? rootPath : rootPath + "/";
 			defaultEnding = runtime.defaultEnding;
-			for (Path file : toFormat) {
+			toFormat.forEach(file -> {
 				var ending = runtime.getEndingFor(file);
 				if (!ending.equals(defaultEnding)) {
 					var absPath = FileSignature.pathNativeToUnix(file.toAbsolutePath().toString());
 					var subPath = FileSignature.subpath(rootDir, absPath);
 					hasNonDefaultEnding.put(subPath, ending);
 				}
-			}
+			});
 		}
 
 		/** Returns the line ending appropriate for the given file. */

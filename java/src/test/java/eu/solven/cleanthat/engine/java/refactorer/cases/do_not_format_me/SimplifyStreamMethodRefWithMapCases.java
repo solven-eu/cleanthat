@@ -4,14 +4,14 @@ import java.util.List;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStreamFilterWithMap;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStreamMethodRefWithMap;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class SimplifyStreamFilterWithMapCases extends AJavaparserRefactorerCases {
+public class SimplifyStreamMethodRefWithMapCases extends AJavaparserRefactorerCases {
 
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new SimplifyStreamFilterWithMap();
+		return new SimplifyStreamMethodRefWithMap();
 	}
 
 	@CompareMethods

@@ -54,7 +54,7 @@ public class TestGenerateDocumentation_Tags {
 		sb.append("# Listing by Tags");
 
 		tags.forEach(tag -> {
-			sb.append(EOL).append(EOL).append("## ").append(tag);
+			sb.append(EOL).append(EOL).append("## ").append(tag).append(EOL);
 
 			allSingles.getUnderlyings().stream().filter(m -> getTags(m).contains(tag)).forEach(mutator -> {
 				sb.append(EOL).append("- ");

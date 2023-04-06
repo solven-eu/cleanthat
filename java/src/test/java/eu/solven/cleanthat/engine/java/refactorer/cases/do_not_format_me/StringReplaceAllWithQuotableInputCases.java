@@ -48,7 +48,7 @@ public class StringReplaceAllWithQuotableInputCases extends AJavaparserRefactore
 		}
 	}
 
-	@UnmodifiedMethod
+	@CompareMethods
 	public static class SimpleTextAndEscapedCharacters_Variety {
 		public Object pre(String s) {
 			return s.replaceAll("\\.\\\\\\{", ";");

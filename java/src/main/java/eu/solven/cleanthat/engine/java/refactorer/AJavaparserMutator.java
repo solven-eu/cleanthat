@@ -34,7 +34,11 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
+import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
+import com.github.javaparser.ast.stmt.BreakStmt;
+import com.github.javaparser.ast.stmt.ContinueStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
@@ -508,6 +512,65 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 	 * @param node
 	 * @return true if this node can be moved inside a {@link LambdaExpr}
 	 */
+	protected boolean canBePushedInLambdaExpr(Node node) {
+		if (hasOuterAssignExpr(node)) {
+			return false;
+		} else if (node.findFirst(ReturnStmt.class).isPresent()) {
+			// Can can not move the `return` inside a LambdaExpr
+			return false;
+		} else if (node.findFirst(ContinueStmt.class).isPresent()) {
+			// TODO We would need to turn `continue;` into `return;`
+			// BEWARE of `continue: outerLoop;`
+			return false;
+		} else if (node.findFirst(BreakStmt.class).isPresent()) {
+			return false;
+		}
+
+		if (nodeThrowsExplicitException(node)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Given we do not have the whole classpath, it is difficult to analyze the whole input node. Instead, we will
+	 * analyze the first ancestor of type {@link NodeWithThrownExceptions}, and check the returned exceptions.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private boolean nodeThrowsExplicitException(Node node) {
+		Optional<NodeWithThrownExceptions> optFirstAncestorWithExceptions =
+				node.findAncestor(NodeWithThrownExceptions.class);
+
+		if (optFirstAncestorWithExceptions.isEmpty()) {
+			// What does it mean ? In most cases, we are supposed to be wrapped in a MethodCallExpr
+			return false;
+		}
+
+		Optional<?> firstUnknownOrExplicitException = optFirstAncestorWithExceptions.get()
+				.getThrownExceptions()
+				.stream()
+				.filter(Type.class::isInstance)
+				.map(t -> (Type) t)
+				.filter(t -> {
+					Optional<ResolvedType> optResolved = optResolvedType((Type) t);
+					if (optResolved.isEmpty()) {
+						return true;
+					} else if (typeHasRequiredType(optResolved, RuntimeException.class.getName())) {
+						return false;
+					} else if (typeHasRequiredType(optResolved, Error.class.getName())) {
+						return false;
+					}
+					// A Throwable which is neither a RuntimeException nor an Error is an explicit Exception
+					return true;
+				})
+				.findFirst();
+
+		return firstUnknownOrExplicitException.isPresent();
+	}
+
 	protected boolean hasOuterAssignExpr(Node node) {
 		Optional<AssignExpr> optOuterAssignExpr = node.findFirst(AssignExpr.class, assignExpr -> {
 			Expression assigned = assignExpr.getTarget();

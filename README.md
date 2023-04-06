@@ -27,6 +27,9 @@ Related projects:
 - https://errorprone.info/docs/refaster (free)
 - https://github.com/walkmod/walkmod-pmd-plugin (free)
 - https://github.com/XenoAmess/remove-unused-imports-maven-plugin (free, focused on imports)
+- https://github.com/SpoonLabs/sorald (free)
+- https://github.com/redhat-developer/vscode-java/blob/master/document/_java.learnMoreAboutCleanUps.md (free)
+- [Academic papers](https://github.com/SpoonLabs/sorald/issues/82)
 
 # Changes
 
@@ -71,6 +74,7 @@ Cleanthat Refactorer is currently compatible with the following languages:
 
 - CleanThat processes files individually, which indices limited `Type` resolution. This enables cleaning files on a per-impacted-file basis (e.g. in a Github Pull-Request).
 - The type resolution may be lifted through `cleanthat-maven-plugin` (TODO)
+- The project jhas poor support of charset others than `UTF-8`
 
 # Installation
 

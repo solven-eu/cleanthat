@@ -27,6 +27,7 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 
@@ -45,7 +46,7 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Guava", "String");
+		return ImmutableSet.of(ICleanthatStepParametersProperties.GUAVA, "String");
 	}
 
 	public String minimalGuavaVersion() {

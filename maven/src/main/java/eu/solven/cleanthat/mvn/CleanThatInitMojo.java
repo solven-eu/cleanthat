@@ -37,7 +37,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Charsets;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
-import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
@@ -109,7 +108,7 @@ public class CleanThatInitMojo extends ACleanThatSpringMojo {
 					"Something prevents the generation of a configuration");
 		}
 
-		ICodeProviderWriter codeProvider = new FileSystemGitCodeProvider(getBaseDir().toPath());
+		ICodeProviderWriter codeProvider = CleanThatMavenHelper.makeCodeProviderWriter(this);
 
 		var generateInitialConfig =
 				new GenerateInitialConfig(appContext.getBeansOfType(IEngineLintFixerFactory.class).values());

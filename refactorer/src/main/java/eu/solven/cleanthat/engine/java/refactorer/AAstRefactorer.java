@@ -145,6 +145,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 				walkNodeResult = ct.walkAst(compilationUnit);
 			} catch (RuntimeException | StackOverflowError e) {
 				// StackOverflowError may come from Javaparser
+				// e.g. https://github.com/javaparser/javaparser/issues/3940
 				throw new IllegalArgumentException("Issue with mutator: " + ct, e);
 			}
 			if (walkNodeResult.isPresent()) {

@@ -28,7 +28,8 @@ import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
  *
  * @author Benoit Lacelle
  */
-public class SimplifyStreamFilterWithMap extends ATodoJavaParserMutator {
+@Deprecated(since = "Not-Implemented. It may require to guess relevant variable names")
+public class SimplifyStreamMethodRefWithMap extends ATodoJavaParserMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_8;

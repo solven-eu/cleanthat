@@ -24,7 +24,15 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionToOptional;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamCollect;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LoopIntRangeToIntStreamForEach;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStreamVariablesWithMap;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQuotableInput;
 
 /**
  * This mutator will apply all {@link IMutator} considered not-trivial. It is relevant to demonstrate the most
@@ -34,11 +42,21 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStre
  *
  */
 public class SafeButControversialMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
-	public static final List<IMutator> NOT_TRIVIAL =
-			ImmutableList.<IMutator>builder().add(new EnhancedForLoopToStreamAnyMatch()).build();
+	public static final List<IMutator> BUT_CONTROVERSIAL = ImmutableList.<IMutator>builder()
+			.add(new CollectionToOptional(),
+					new EnhancedForLoopToStreamAnyMatch(),
+					new EnhancedForLoopToForEach(),
+					new EnhancedForLoopToStreamCollect(),
+					new SimplifyBooleanExpression(),
+					new SimplifyBooleanInitialization(),
+					// new SimplifyStreamMethodRefWithMap(),
+					new SimplifyStreamVariablesWithMap(),
+					new StringReplaceAllWithQuotableInput(),
+					new LoopIntRangeToIntStreamForEach())
+			.build();
 
 	public SafeButControversialMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, NOT_TRIVIAL));
+		super(filterWithJdk(sourceJdkVersion, BUT_CONTROVERSIAL));
 	}
 
 	@Override

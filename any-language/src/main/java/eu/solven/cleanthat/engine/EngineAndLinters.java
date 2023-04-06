@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.engine;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +55,9 @@ public class EngineAndLinters implements AutoCloseable {
 	public String toString() {
 		var builder = MoreObjects.toStringHelper(this).add("engine", engineProperties.getEngine());
 
-		for (var i = 0; i < linters.size(); i++) {
+		IntStream.range(0, linters.size()).forEach(i -> {
 			builder.add("step_" + i, linters.get(i));
-		}
+		});
 
 		return builder.toString();
 	}

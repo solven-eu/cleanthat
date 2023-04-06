@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
@@ -30,27 +31,26 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
 /**
- * This mutator will apply all {@link IMutator} improving Guava usage. It assume latest version of Guava is a dependency
- * of your project.
+ * This mutator will apply all {@link IMutator} improving {@link Stream} usage.
  * 
  * @author Benoit Lacelle
  *
  */
-public class GuavaMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
+public class StreamMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 
-	static final Supplier<List<IMutator>> GUAVA = Suppliers.memoize(() -> MutatorsScanner
+	static final Supplier<List<IMutator>> STREAM = Suppliers.memoize(() -> MutatorsScanner
 			.instantiate(JavaVersion.parse(IJdkVersionConstants.LAST),
 					AllIncludingDraftSingleMutators.ALL_INCLUDINGDRAFT.get())
 			.stream()
 			.filter(m -> m.getTags().contains(ICleanthatStepParametersProperties.GUAVA))
 			.collect(Collectors.toList()));
 
-	public GuavaMutators(JavaVersion sourceJdkVersion) {
-		super(filterWithJdk(sourceJdkVersion, GUAVA.get()));
+	public StreamMutators(JavaVersion sourceJdkVersion) {
+		super(filterWithJdk(sourceJdkVersion, STREAM.get()));
 	}
 
 	@Override
 	public String getCleanthatId() {
-		return ICleanthatStepParametersProperties.GUAVA;
+		return ICleanthatStepParametersProperties.STREAM;
 	}
 }

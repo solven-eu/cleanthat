@@ -103,12 +103,12 @@ public class TestJavaRefactorer {
 			Assertions.assertThat(allTransformers).flatMap(IMutator::getIds).containsAll(oneRuleIds);
 		}
 
-		for (String oneRuleId : oneRuleIds) {
+		oneRuleIds.forEach(oneRuleId -> {
 			mutatorsProperties.setExcluded(Arrays.asList(oneRuleId));
 
 			List<IMutator> fileredTransformers = JavaRefactorer.filterRules(engineProperties, mutatorsProperties);
 			Assertions.assertThat(fileredTransformers).flatMap(IMutator::getIds).doesNotContain(oneRuleId);
-		}
+		});
 	}
 
 	@Test

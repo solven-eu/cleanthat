@@ -27,6 +27,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidUncheckedExceptionsInSignatures;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionIndexOfToContains;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ComparisonWithNaN;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement;
@@ -40,6 +41,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectsHashCodePrimit
 import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveExplicitCallToSuper;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StringIndexOfToContains;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
@@ -67,8 +69,6 @@ public class SafeButNotConsensualMutators extends CompositeMutator<IMutator> imp
 					new EmptyControlStatement(),
 					new EnumsWithoutEquals(),
 					new LambdaIsMethodReference(),
-					// https://github.com/javaparser/javaparser/pull/3938
-					// new LambdaReturnsSingleStatement(),
 					new LiteralsFirstInComparisons(),
 					new LocalVariableTypeInference(),
 					new UnnecessaryImport(),
@@ -77,14 +77,16 @@ public class SafeButNotConsensualMutators extends CompositeMutator<IMutator> imp
 					// new UseDiamondOperator(),
 					// new UseDiamondOperatorJdk8(),
 					// https://github.com/javaparser/javaparser/issues/3936
-					// new UseTextBlocks(),
 					new UseUnderscoresInNumericLiterals(),
 					new SimplifyStartsWith(),
 					new RemoveExplicitCallToSuper(),
 					new UseTextBlocks(),
 					new ObjectEqualsForPrimitives(),
 					new ObjectsHashCodePrimitive(),
-					new LambdaReturnsSingleStatement())
+					// https://github.com/javaparser/javaparser/pull/3938
+					new LambdaReturnsSingleStatement(),
+					new CollectionIndexOfToContains(),
+					new StringIndexOfToContains())
 			.build();
 
 	public SafeButNotConsensualMutators(JavaVersion sourceJdkVersion) {

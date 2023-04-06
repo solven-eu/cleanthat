@@ -3,6 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.stream.IntStream;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
@@ -170,5 +171,22 @@ public class LoopIntRangeToIntStreamForEachCases extends AJavaparserRefactorerCa
 				System.out.println(j);
 			}
 		}
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "public class WithoutImport {\n" + "	public void pre() {\n"
+					+ "		for (int j = 0; j < 10; ++j) {\n"
+					+ "			System.out.println(j);\n"
+					+ "		}\n"
+					+ "	}\n"
+					+ "}",
+			post = "public class WithoutImport {\n" + "	public void pre() {\n"
+					+ "		        java.util.stream.IntStream.range(0, 10).forEach(j -> {\n"
+					+ "            System.out.println(j);\n"
+					+ "        });"
+					+ "	}\n"
+					+ "}")
+	public static class IntStreamNotYetImported {
+
 	}
 }

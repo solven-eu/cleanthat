@@ -18,9 +18,11 @@ package eu.solven.cleanthat.code_provider.inmemory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -29,11 +31,14 @@ import com.google.common.jimfs.Jimfs;
 
 import eu.solven.cleanthat.codeprovider.CodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
+import eu.solven.pepper.unittest.ILogDisabler;
+import eu.solven.pepper.unittest.PepperTestHelper;
 
 public class TestFileSystemCodeProvider {
+	final FileSystem fs = Jimfs.newFileSystem();
+
 	@Test
 	public void testInMemoryFileSystem() throws IOException {
-		var fs = Jimfs.newFileSystem();
 		ICodeProviderWriter cp = new FileSystemCodeProvider(fs.getPath(fs.getSeparator()));
 
 		cp.listFilesForContent(file -> Assertions.fail("The FS is empty"));
@@ -55,8 +60,6 @@ public class TestFileSystemCodeProvider {
 
 	@Test
 	public void testLoadFileOutOfRoot() throws IOException {
-		var fs = Jimfs.newFileSystem();
-
 		var secretPath = fs.getPath(fs.getSeparator(), "secretFile");
 		Files.writeString(secretPath, "secretContent");
 
@@ -80,5 +83,53 @@ public class TestFileSystemCodeProvider {
 		Assertions.assertThat(illegalLookingValid.normalize()).isEqualTo(notSecretPath);
 		Assertions.assertThatThrownBy(() -> cp.loadContentForPath(illegalLookingValid))
 				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	public void testReadWrongCharset() throws IOException {
+		var utf8File = fs.getPath(fs.getSeparator(), "project", "someUtf8File");
+		var asciiFile = fs.getPath(fs.getSeparator(), "project", "someAciiFile");
+
+		// https://www.baeldung.com/java-string-encode-utf-8
+		var germanString = "Entwickeln Sie mit Vergnügen";
+
+		Files.createDirectories(utf8File.getParent());
+		Files.writeString(utf8File, germanString);
+
+		var germanBytes = germanString.getBytes();
+		var asciiEncodedString = new String(germanBytes, StandardCharsets.US_ASCII);
+
+		Files.createDirectories(asciiFile.getParent());
+		Files.writeString(asciiFile, asciiEncodedString);
+
+		{
+			ICodeProviderWriter utfCodeProvider =
+					new FileSystemCodeProvider(fs.getPath(fs.getSeparator(), "project"), StandardCharsets.UTF_8);
+
+			Optional<String> optAscii = utfCodeProvider.loadContentForPath("someAciiFile");
+			Assertions.assertThat(optAscii)
+					.isPresent()
+					.get()
+					.asString()
+					.isNotEqualTo(germanString)
+					.startsWith("Entwickeln")
+					.endsWith("gen");
+
+			Optional<String> optUtf8 = utfCodeProvider.loadContentForPath("someUtf8File");
+			Assertions.assertThat(optUtf8).isPresent().get().asString().isEqualTo(germanString);
+		}
+
+		try (ILogDisabler logDisabler = PepperTestHelper.disableLog(FileSystemCodeProvider.class)) {
+			ICodeProviderWriter utfCodeProvider =
+					new FileSystemCodeProvider(fs.getPath(fs.getSeparator(), "project"), StandardCharsets.US_ASCII);
+
+			// This may throws as ascii can not read some UTF-8 codepoints
+			Optional<String> optAscii = utfCodeProvider.loadContentForPath("someAciiFile");
+			Assertions.assertThat(optAscii).isEmpty();
+
+			// This may throws as ascii can not read some UTF-8 codepoints
+			Optional<String> optUtf8 = utfCodeProvider.loadContentForPath("someUtf8File");
+			Assertions.assertThat(optUtf8).isEmpty();
+		}
 	}
 }

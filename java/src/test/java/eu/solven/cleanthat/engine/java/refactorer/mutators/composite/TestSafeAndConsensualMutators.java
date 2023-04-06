@@ -56,24 +56,24 @@ public class TestSafeAndConsensualMutators {
 	public void testScanComposite() {
 		Set<String> safeAndConsensual = new SafeAndConsensualMutators(last).getUnderlyingIds();
 		Set<String> safeButNotConsensual = new SafeButNotConsensualMutators(last).getUnderlyingIds();
-		Set<String> safeButNotTrivial = new SafeButControversialMutators(last).getUnderlyingIds();
+		Set<String> safeButControversial = new SafeButControversialMutators(last).getUnderlyingIds();
 
 		// Check the intersection is empty
 		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotConsensual);
 		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeAndConsensual);
 
-		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotTrivial);
-		Assertions.assertThat(safeButNotTrivial).doesNotContainAnyElementsOf(safeAndConsensual);
+		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButControversial);
+		Assertions.assertThat(safeButControversial).doesNotContainAnyElementsOf(safeAndConsensual);
 
-		Assertions.assertThat(safeButNotTrivial).doesNotContainAnyElementsOf(safeButNotConsensual);
-		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeButNotTrivial);
+		Assertions.assertThat(safeButControversial).doesNotContainAnyElementsOf(safeButNotConsensual);
+		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeButControversial);
 
 		List<IMutator> allSingle = new AllIncludingDraftSingleMutators(last).getUnderlyings();
 
 		allSingle.stream()
 				.filter(s -> Sets.intersection(s.getIds(), safeAndConsensual).isEmpty()
 						&& Sets.intersection(s.getIds(), safeButNotConsensual).isEmpty()
-						&& Sets.intersection(s.getIds(), safeButNotTrivial).isEmpty())
+						&& Sets.intersection(s.getIds(), safeButControversial).isEmpty())
 				.forEach(notInComposite -> LOGGER.warn("{} is neither in {} nor in {} nor in {}",
 						notInComposite.getClass().getSimpleName(),
 						SafeAndConsensualMutators.class.getSimpleName(),

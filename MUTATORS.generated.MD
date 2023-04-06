@@ -829,14 +829,6 @@ public static class forEachIfAddAdd {
 
 See[EnhancedForLoopToStreamCollectCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamCollectCases.java)
 
-### [EnhancedIntRangeLoopToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedIntRangeLoopToIntStreamForEach.java)
-
-Cleanthat own ID: EnhancedIntRangeLoopToIntStreamForEach
-
-isDraft
-
-languageLevel: jdk1.8
-
 ### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
 Cleanthat own ID: EnumsWithoutEquals
@@ -1032,6 +1024,34 @@ public static class PrimitiveInt {
 
 See[LocalVariableTypeInferenceCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/LocalVariableTypeInferenceCases.java)
 
+### [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
+
+Cleanthat own ID: LoopIntRangeToIntStreamForEach
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public void pre() {
+        for (int j = 0; j < 10; ++j) {
+            System.out.println(j);
+        }
+    }
+
+    public void post() {
+        IntStream.range(0, 10).forEach(j -> {
+            System.out.println(j);
+        });
+    }
+}
+```
+
+See[LoopIntRangeToIntStreamForEachCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/LoopIntRangeToIntStreamForEachCases.java)
+
 ### [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
 
 ErrorProne: [ObjectEqualsForPrimitives](https://errorprone.info/bugpattern/ObjectEqualsForPrimitives)
@@ -1162,9 +1182,9 @@ public static class Nominal {
 
 See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
 
-### [SimplifyStreamFilterWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamFilterWithMap.java)
+### [SimplifyStreamMethodRefWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamMethodRefWithMap.java)
 
-Cleanthat own ID: SimplifyStreamFilterWithMap
+Cleanthat own ID: SimplifyStreamMethodRefWithMap
 
 isDraft
 
@@ -1184,7 +1204,40 @@ public static class CaseMethodRef {
 }
 ```
 
-See[SimplifyStreamFilterWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamFilterWithMapCases.java)
+See[SimplifyStreamMethodRefWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamMethodRefWithMapCases.java)
+
+### [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
+
+Cleanthat own ID: SimplifyStreamVariablesWithMap
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class IntStream_forEach_intermediateInt {
+
+    public void pre(String s, StringBuilder sb) {
+        IntStream.range(0, s.length()).forEach(j -> {
+            int c = s.charAt(j);
+            sb.append(c);
+            if (c == '\'')
+                sb.append(c);
+        });
+    }
+
+    public void post(String s, StringBuilder sb) {
+        IntStream.range(0, s.length()).map(j -> s.charAt(j)).forEach(c -> {
+            sb.append(c);
+            if (c == '\'')
+                sb.append(c);
+        });
+    }
+}
+```
+
+See[SimplifyStreamVariablesWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamVariablesWithMapCases.java)
 
 ### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 
@@ -1452,7 +1505,7 @@ Cleanthat own ID: Guava
 
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk11
 
 ### [JSparrowMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/JSparrowMutators.java)
 
@@ -1516,7 +1569,15 @@ Cleanthat own ID: SpotBugsMutators
 
 isDraft
 
-languageLevel: jdk1
+languageLevel: jdk1.2
+
+### [StreamMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/StreamMutators.java)
+
+Cleanthat own ID: Stream
+
+isDraft
+
+languageLevel: jdk11
 
 ---
 

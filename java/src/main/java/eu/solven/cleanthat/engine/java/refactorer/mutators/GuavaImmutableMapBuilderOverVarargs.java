@@ -30,6 +30,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
@@ -56,7 +57,7 @@ public class GuavaImmutableMapBuilderOverVarargs extends AJavaparserExprMutator 
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Guava", "Varargs");
+		return ImmutableSet.of(ICleanthatStepParametersProperties.GUAVA, "Varargs");
 	}
 
 	@Override

@@ -18,23 +18,21 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.SimplifyStreamFilterWithMapCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.SimplifyStreamVariablesWithMapCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-@Ignore("TODO")
-public class TestSimplifyStreamFilterWithMapCases extends AParameterizesJavaparserRefactorerCases {
+public class TestSimplifyStreamVariablesWithMapCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new SimplifyStreamFilterWithMapCases();
+		return new SimplifyStreamVariablesWithMapCases();
 	}
 
-	public TestSimplifyStreamFilterWithMapCases(JavaParser javaParser,
+	public TestSimplifyStreamVariablesWithMapCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

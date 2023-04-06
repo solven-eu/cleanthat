@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class CleanThatMavenHelper {
 	public static ICodeProviderWriter makeCodeProviderWriter(ACleanThatMojo cleanThatCleanThatMojo) {
 		File baseDir = cleanThatCleanThatMojo.getBaseDir().getAbsoluteFile();
 		LOGGER.info("Building a {} over {}", FileSystemGitCodeProvider.class, baseDir);
-		return new FileSystemGitCodeProvider(cleanThatCleanThatMojo.fs.getPath(baseDir.getAbsolutePath()));
+		Path root = cleanThatCleanThatMojo.fs.getPath(baseDir.getAbsolutePath());
+		return new FileSystemGitCodeProvider(root, cleanThatCleanThatMojo.getCharset());
 	}
 }

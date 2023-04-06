@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.mvn;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -74,6 +75,9 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 
 	@Parameter(property = "cleanthat.skip", defaultValue = "false")
 	private boolean skip;
+
+	@Parameter(property = "cleanthat.charset", defaultValue = "UTF-8")
+	private String charset;
 
 	/**
 	 * Base directory of the project.
@@ -275,6 +279,10 @@ public abstract class ACleanThatMojo extends AbstractMojo {
 				LOGGER.warn("`getProject().isExecutionRoot()==true`" + template, baseDir, projectFile);
 			}
 		}
+	}
+
+	public Charset getCharset() {
+		return Charset.forName(charset);
 	}
 
 }

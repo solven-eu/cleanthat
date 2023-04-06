@@ -75,25 +75,26 @@ public class TestGenerateDocumentation {
 		CompositeMutator<IMutator> allSingles =
 				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
 
-		sb.append(EOL).append("## Single Mutators").append(isDraft ? " (DRAFTs)" : " PRD-READY");
+		sb.append(EOL).append(EOL).append("## Single Mutators").append(isDraft ? " (DRAFTs)" : " PRD-READY");
 
-		for (IMutator mutator : allSingles.getUnderlyings()
+		allSingles.getUnderlyings()
 				.stream()
 				.filter(m -> isDraft == m.isDraft())
-				.collect(Collectors.toList())) {
-			addMutatorInfo(sb, mutator);
-		}
+				.collect(Collectors.toList())
+				.forEach(mutator -> {
+					addMutatorInfo(sb, mutator);
+				});
 	}
 
 	private static void addCompositeMutators(StringBuilder sb) {
 		CompositeMutator<CompositeMutator<?>> allComposites =
 				new AllIncludingDraftCompositeMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
 
-		sb.append(EOL).append("## Composite Mutators");
+		sb.append(EOL).append(EOL).append("## Composite Mutators");
 
-		for (CompositeMutator<?> mutator : allComposites.getUnderlyings()) {
+		allComposites.getUnderlyings().forEach(mutator -> {
 			addMutatorInfo(sb, mutator);
-		}
+		});
 	}
 
 	private static void addMutatorInfo(StringBuilder sb, IMutator mutator) {

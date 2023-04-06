@@ -23,6 +23,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 
@@ -41,7 +42,7 @@ public class GuavaInlineStringsRepeat extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Guava");
+		return ImmutableSet.of(ICleanthatStepParametersProperties.GUAVA);
 	}
 
 	@Override

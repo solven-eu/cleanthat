@@ -40,7 +40,7 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Collection");
+		return ImmutableSet.of("Collection", "Optional");
 	}
 
 	@Override

@@ -16,6 +16,8 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators.composite;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,8 +26,8 @@ import java.util.stream.Collectors;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
+import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -50,7 +52,31 @@ public class CompositeMutator<T extends IMutator> implements IMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of();
+		Set<String> tags = new TreeSet<>();
+		tags.add("Composite");
+
+		if (mutators.isEmpty()) {
+			return tags;
+		}
+
+		// Initializae the intersection with the first mutator
+		Set<String> intersection = new TreeSet<>(mutators.iterator().next().getTags());
+
+		mutators.forEach(mutator -> {
+			intersection.retainAll(mutator.getTags());
+		});
+
+		tags.addAll(intersection);
+
+		return Collections.unmodifiableSet(tags);
+	}
+
+	@Override
+	public String minimalJavaVersion() {
+		return mutators.stream()
+				.map(IMutator::minimalJavaVersion)
+				.min(Comparator.comparing(jdk -> JavaVersion.parse(jdk)))
+				.orElse(IJdkVersionConstants.JDK_1);
 	}
 
 	public List<T> getUnderlyings() {

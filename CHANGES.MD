@@ -13,6 +13,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Changes
 
 * Each `IMutator` see its simple class name configured as default identifier.
+* `FileSystemCodeProvider` will log but not throw when loading a file with an incompatible charset.
+* `StringReplaceAllWithQuotableInput` covers more cases of quotable regexes.
 
 ### Added
 
@@ -20,6 +22,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `StringReplaceAllWithQuotableInput` is introduced
 * `EnhancedForLoopToForEach` is introduced
 * `LoopIntRangeToIntStreamForEach` is introduced
+* `FileSystemCodeProvider` now accepts a custom charset (default remains `UTF-8`)
+* `SimplifyStreamVariablesWithMap` is introduced
 
 ## [2.13] - 2023-03-27
 

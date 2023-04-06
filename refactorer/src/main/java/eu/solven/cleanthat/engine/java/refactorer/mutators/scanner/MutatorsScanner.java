@@ -139,9 +139,7 @@ public class MutatorsScanner {
 		try {
 
 			var classpath = ClassPath.from(loader);
-			classpath.getTopLevelClasses(packageName).forEach(classInfo -> {
-				classNames.add(classInfo.getName());
-			});
+			classpath.getTopLevelClasses(packageName).forEach(classInfo -> classNames.add(classInfo.getName()));
 		} catch (IOException e) {
 			throw new UncheckedIOException("Issue with " + packageName, e);
 		}

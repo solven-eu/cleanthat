@@ -62,9 +62,7 @@ public class CompositeMutator<T extends IMutator> implements IMutator {
 		// Initializae the intersection with the first mutator
 		Set<String> intersection = new TreeSet<>(mutators.iterator().next().getTags());
 
-		mutators.forEach(mutator -> {
-			intersection.retainAll(mutator.getTags());
-		});
+		mutators.forEach(mutator -> intersection.retainAll(mutator.getTags()));
 
 		tags.addAll(intersection);
 

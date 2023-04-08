@@ -106,6 +106,9 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 					|| optSuppressedChildren.isPresent()) {
 				LOGGER.debug("We skip {} due to {}", node, SuppressCleanthat.class.getName());
 				return;
+			} else if (node.findCompilationUnit().isEmpty()) {
+				LOGGER.debug("We skip {} as it or one of tis ancestor has been dropped from the AST", node);
+				return;
 			}
 
 			boolean hasTransformed;

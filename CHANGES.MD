@@ -4,6 +4,14 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+### Added
+
+* `ArithmeticOverFloats` is introduced
+* `CastMathOperandsBeforeAssignement` is introduced
+* `UseOptionalOfNullable` is introduced
+
+## [2.14] - 2023-04-06
+
 ### Fixed
 
 * `SimplifyBooleanInitialization` will not produce invalid/corrupted initializer in case of negated initialization.

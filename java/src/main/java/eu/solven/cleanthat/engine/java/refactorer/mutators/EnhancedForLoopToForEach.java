@@ -19,18 +19,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.UnknownType;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -50,7 +49,7 @@ public class EnhancedForLoopToForEach extends AJavaparserStmtMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Iterable", "Loop");
+		return ImmutableSet.of("Iterable", "Loop", "Stream");
 	}
 
 	@Override
@@ -85,21 +84,18 @@ public class EnhancedForLoopToForEach extends AJavaparserStmtMutator {
 		}
 		ResolvedValueDeclaration resolvedValueDeclaration = (ResolvedValueDeclaration) resolved.get();
 		if (resolvedValueDeclaration.getType().isArray()) {
-			// TODO Handle this case
+			// TODO Handle iteration over arrays
 			return false;
 		}
 
-		LambdaExpr lambdaExpr;
-		var parameter = new Parameter(new UnknownType(), forEachStmt.getVariableDeclarator().getName());
-		if (forEachStmt.getBody().isBlockStmt()) {
-			lambdaExpr = new LambdaExpr(parameter, forEachStmt.getBody().asBlockStmt());
-		} else if (forEachStmt.getBody().isExpressionStmt()) {
-			lambdaExpr = new LambdaExpr(parameter, forEachStmt.getBody().asExpressionStmt().getExpression());
-		} else {
+		Optional<LambdaExpr> optLambdaExpr =
+				LambdaExprHelpers.makeLambdaExpr(forEachStmt.getVariableDeclarator().getName(), forEachStmt.getBody());
+		if (optLambdaExpr.isEmpty()) {
 			return false;
 		}
 
-		MethodCallExpr forEach = new MethodCallExpr(forEachStmt.getIterable(), "forEach", new NodeList<>(lambdaExpr));
+		MethodCallExpr forEach =
+				new MethodCallExpr(forEachStmt.getIterable(), "forEach", new NodeList<>(optLambdaExpr.get()));
 		return tryReplace(forEachStmt, new ExpressionStmt(forEach));
 	}
 }

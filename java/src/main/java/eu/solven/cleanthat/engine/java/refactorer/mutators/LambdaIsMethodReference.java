@@ -179,7 +179,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		if (optResolvedType.isEmpty()) {
 			return false;
 		} else if (optResolvedType.get().isTypeVariable()) {
-			// The type is a generic boung
+			// The type is a generic bound
 			// e.g. `<T> void method() {...}`
 			return false;
 		}
@@ -260,6 +260,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 
 			Optional<CompilationUnit> compilationUnit = lambdaExpr.findAncestor(CompilationUnit.class);
 
+			// TODO nameOrQualifiedName(compilationUnit.get(), getClass());
 			String methodRefClassName;
 			if (compilationUnit.isPresent() && isImported(compilationUnit.get(), packageName, qualifiedName)) {
 				methodRefClassName = typeDeclaration.getName();

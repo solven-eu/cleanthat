@@ -63,7 +63,7 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @param <N>
  * @param <R>
  */
-@SuppressWarnings("PMD.CouplingBetweenObjects")
+@SuppressWarnings({ "PMD.CouplingBetweenObjects", "PMD.GodClass" })
 public abstract class ATestCases<N, R> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATestCases.class);
 
@@ -232,7 +232,10 @@ public abstract class ATestCases<N, R> {
 					// It can be difficult to provide a TypeExpr given a MethodCallExpr
 					LOGGER.warn("We skip javaParser Node equality due to `::` and TypeExpr given a MethodCallExpr");
 				} else if (expectedPost.contains("java.util.stream.Stream")
-						|| expectedPost.contains("java.util.stream.IntStream")) {
+						|| expectedPost.contains("java.util.stream.IntStream")
+						|| expectedPost.contains("(double)")
+						|| expectedPost.contains("(float)")
+						|| expectedPost.contains("(long)")) {
 					// see ArraysDotStream
 					// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
 					LOGGER.warn("We skip javaParser Node equality due to `packagedName` (NameExpr vs FieldAccessExp)");

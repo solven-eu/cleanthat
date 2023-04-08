@@ -1,10 +1,14 @@
 CleanThat
 
-# Disclaimer
+# Purpose
 
-`cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. [**Please report them**](https://github.com/solven-eu/cleanthat/issues).
+Cleanthat is a project enabling automatic code cleaning, from formatting to refactoring.
 
-[![codecov](https://codecov.io/github/solven-eu/cleanthat/branch/master/graph/badge.svg?token=4K4O5GNH32)](https://codecov.io/github/solven-eu/cleanthat)
+# List of mutators
+
+[![javadoc](https://javadoc.io/badge2/io.github.solven-eu.cleanthat/java/javadoc.svg)](https://javadoc.io/doc/io.github.solven-eu.cleanthat/java)
+
+[MUTATORS.generated.MD](MUTATORS.generated.MD)
 
 # Motivation
 
@@ -40,12 +44,6 @@ See [CHANGES.MD](CHANGES.MD)
 - 2023-02-06: 2.0 Major Release leveraging from/to [Spotless](https://github.com/diffplug/spotless)
 - ...
 - 2021-08-12: 1.0 Initial Release
-
-# List of mutators
-
-[![javadoc](https://javadoc.io/badge2/io.github.solven-eu.cleanthat/java/javadoc.svg)](https://javadoc.io/doc/io.github.solven-eu.cleanthat/java)
-
-[MUTATORS.generated.MD](MUTATORS.generated.MD)
 
 # Language Coverage
 
@@ -206,64 +204,8 @@ The maven plugin enables generating an Eclipse Stylesheet minimizing changes ove
 
 see maven/README.MD
 
-# Notes for maintainers
+# Disclaimer
 
-## Compile locally
+`cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. [**Please report them**](https://github.com/solven-eu/cleanthat/issues).
 
-        git clone git@github.com:solven-eu/cleanthat.git
-        mvn install -Pfast
-
-The `-Pfast` profile may be necessary to circumvent cleanthat depenending on itself to apply `spotless` on itself.
-
-Once done (or re-done after a release), you can simply:
-
-        mvn install
-
-## Deploy into Production (AWS):
-
-        git push origin master:deploy-prd
-
-## Release a new version (and deploy jars to Sonatype m2central):
-
-        mvn release:clean release:prepare release:perform
-
-### In case of failure
-
-The release process may fail for various reasons:
-
-- Sonatype timed-out
-
-They, one would typically need to revert its local head, and force push master before the release. And delete the falsy tags:
-
-        git tag -d v2.XX.RELEASE
-        git push --delete origin v2.XX.RELEASE
-
-### New computer, new GPG Key
-
-https://stackoverflow.com/questions/29885887/gpg-no-default-secret-key-error-using-maven
-
-        gpg --list-keys
-
-https://keyring.debian.org/creating-key.html
-
-        gpg --gen-key --default-new-key-algo=rsa4096/cert,sign+rsa4096/encr
-        gpg --keyserver https://keyserver.ubuntu.com/ --send-key 90A8________________________________AAB7
-
-BEWARE pool.sks-keyservers.net is down: https://www.reddit.com/r/GnuPG/comments/o5tb6a/keyservers_are_gone/
-
-If it fails, upload manually:
-
-        gpg \-\-armor \-\-export 90A8________________________________AAB7
-
-## Re-run locally events in AWS:
-
-See ITProcessLocallyDynamoDbEvent_CheckConfig
-
-## Release Issues
-
-Issue with Javadoc. For instance:
-
-- https://github.com/projectlombok/lombok/issues/2737
-
-> mvn org.apache.maven.plugins:maven-javadoc-plugin:3.4.1:jar -Dmaven.javadoc.skip=false -PSonatype
-
+[![codecov](https://codecov.io/github/solven-eu/cleanthat/branch/master/graph/badge.svg?token=4K4O5GNH32)](https://codecov.io/github/solven-eu/cleanthat)

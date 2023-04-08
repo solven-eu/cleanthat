@@ -552,6 +552,35 @@ See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat
 
 ## Single Mutators (DRAFTs)
 
+### [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
+
+Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
+
+Cleanthat own ID: ArithmeticOverFloats
+
+isDraft
+
+languageLevel: jdk1
+
+```
+// pre is noncompliant; yields 1.6777216E7 not 1.6777217E7
+@CompareMethods
+public static class Nominal_sumInFloat {
+
+    public double pre() {
+        float c = f1 + f2;
+        return c;
+    }
+
+    public double post() {
+        float c = (float) ((double) f1 + f2);
+        return c;
+    }
+}
+```
+
+See[ArithmeticOverFloatsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ArithmeticOverFloatsCases.java)
+
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 
 PMD: [AvoidFileStream](https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream)
@@ -633,6 +662,16 @@ public static class CaseRuntimeException {
 ```
 
 See[AvoidUncheckedExceptionsInSignaturesCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/AvoidUncheckedExceptionsInSignaturesCases.java)
+
+### [CastMathOperandsBeforeAssignement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CastMathOperandsBeforeAssignement.java)
+
+Sonar: [RSPEC-2184](https://rules.sonarsource.com/java/RSPEC-2184)
+
+Cleanthat own ID: CastMathOperandsBeforeAssignement
+
+isDraft
+
+languageLevel: jdk1
 
 ### [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 
@@ -1261,6 +1300,34 @@ public static class ComplexRegex {
 
 See[StringReplaceAllWithQuotableInputCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StringReplaceAllWithQuotableInputCases.java)
 
+### [ThreadRunToThreadStart](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ThreadRunToThreadStart.java)
+
+Sonar: [RSPEC-1217](https://rules.sonarsource.com/java/RSPEC-1217)
+
+Cleanthat own ID: ThreadRunToThreadStart
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public void pre(Runnable r) {
+        Thread myThread = new Thread(r);
+        myThread.run();
+    }
+
+    public void post(Runnable r) {
+        Thread myThread = new Thread(r);
+        myThread.start();
+    }
+}
+```
+
+See[ThreadRunToThreadStartCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ThreadRunToThreadStartCases.java)
+
 ### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 
 Sonar: [RSPEC-1158](https://rules.sonarsource.com/java/RSPEC-1158)
@@ -1436,6 +1503,44 @@ public static class CaseCollection {
 ```
 
 See[UseDiamondOperatorJdk8Cases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseDiamondOperatorJdk8Cases.java)
+
+### [UseOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseOptionalOfNullable.java)
+
+Cleanthat own ID: UseOptionalOfNullable
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class ChainedConditions {
+
+    public void pre(String s) {
+        if (s != null) {
+            String v = s.toUpperCase();
+            if (v.startsWith("A")) {
+                System.out.println(v);
+            }
+        }
+    }
+
+    public void post(String s) {
+        Optional.ofNullable(s).ifPresent(s_ -> {
+            String v = s_.toUpperCase();
+            if (v.startsWith("A")) {
+                System.out.println(v);
+            }
+        });
+    }
+
+    public void postWithXXX(String s) {
+        Optional.ofNullable(s).map(v -> v.toUpperCase()).filter(v -> v.startsWith("A")).ifPresent(v -> System.out.println(v));
+    }
+}
+```
+
+See[UseOptionalOfNullableCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseOptionalOfNullableCases.java)
 
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 

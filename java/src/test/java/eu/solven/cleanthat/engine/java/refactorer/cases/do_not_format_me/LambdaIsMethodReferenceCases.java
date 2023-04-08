@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
@@ -284,5 +285,27 @@ public class LambdaIsMethodReferenceCases extends AJavaparserRefactorerCases {
 					+ "}\n"
 					+ "")
 	public static class CaseAlreadyImported {
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class Eclipse_579393 {
+		public interface B<T extends A> extends A {
+			T getT();
+		}
+
+		public interface A {
+			default boolean exists_testOpen() {
+				return true;
+			}
+		}
+
+		public A pre(B<?>... sources) {
+			return Stream.of(sources).map(B::getT).filter(x -> x.exists_testOpen()).findFirst().orElse(null);
+		}
+
+		public A post(B<?>... sources) {
+			return Stream.of(sources).map(B::getT).filter(A::exists_testOpen).findFirst().orElse(null);
+		}
 	}
 }

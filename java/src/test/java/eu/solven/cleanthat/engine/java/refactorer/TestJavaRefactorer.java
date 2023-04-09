@@ -38,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-import eu.solven.cleanthat.engine.java.refactorer.test.OneTestCase;
+import eu.solven.cleanthat.engine.java.refactorer.test.OneMutatorCase;
 
 public class TestJavaRefactorer {
 	final CleanthatEngineProperties engineProperties =
@@ -119,7 +119,7 @@ public class TestJavaRefactorer {
 		var rulesJavaMutator = new JavaRefactorer(engineProperties, prdMutatorsProperties);
 
 		var javaParser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
-		var compilationUnit = OneTestCase.throwIfProblems(javaParser.parse(dirtyCode));
+		var compilationUnit = OneMutatorCase.throwIfProblems(javaParser.parse(dirtyCode));
 		LexicalPreservingPrinter.setup(compilationUnit);
 		var rawJavaparserCode = rulesJavaMutator.toString(compilationUnit);
 

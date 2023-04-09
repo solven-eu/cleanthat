@@ -20,7 +20,6 @@ import java.io.UncheckedIOException;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.checkerframework.checker.units.qual.N;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +56,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @param <R>
  */
 @SuppressWarnings({ "PMD.CouplingBetweenObjects", "PMD.GodClass" })
-public class OneTestCase<AST, R> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OneTestCase.class);
+public class OneMutatorCase<N, R> {
+	private static final Logger LOGGER = LoggerFactory.getLogger(OneMutatorCase.class);
 
 	private static final String PRE_METHOD = "pre";
 	private static final String PRE_CLASS = "Pre";
@@ -67,11 +66,11 @@ public class OneTestCase<AST, R> {
 	private static final String POST_CLASS = "Post";
 
 	final JavaParser javaParser;
-	final IWalkingMutator<AST, R> mutator;
+	final IWalkingMutator<N, R> mutator;
 
-	final IAstTestHelper<AST, R> astTestHelper;
+	final IAstTestHelper<N, R> astTestHelper;
 
-	public OneTestCase(JavaParser javaParser, IWalkingMutator<AST, R> mutator, IAstTestHelper<AST, R> astTestHelper) {
+	public OneMutatorCase(JavaParser javaParser, IWalkingMutator<N, R> mutator, IAstTestHelper<N, R> astTestHelper) {
 		this.javaParser = javaParser;
 		this.mutator = mutator;
 		this.astTestHelper = astTestHelper;
@@ -89,7 +88,7 @@ public class OneTestCase<AST, R> {
 	}
 
 	protected void doCheckUnmodifiedNode(ClassOrInterfaceDeclaration oneCase, Node pre) {
-		var preAsAst = astTestHelper.convertToAst(pre);
+		N preAsAst = astTestHelper.convertToAst(pre);
 		var preAsString = astTestHelper.astToString(preAsAst);
 
 		// https://github.com/javaparser/javaparser/issues/3322
@@ -138,34 +137,30 @@ public class OneTestCase<AST, R> {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		// This is done before .toString typically to register LexicalPreservingPrinter
-		var asAst = astTestHelper.convertToAst(pre);
-
-		var preAsString = astTestHelper.astToString(asAst);
+		N asAst = astTestHelper.convertToAst(pre);
 
 		Optional<R> optResult = mutator.walkAst(asAst);
 
 		if (optResult.isPresent() && mutator instanceof IReApplyUntilNoop) {
-			R latestResult = optResult.get();
+			var latestResult = optResult.get();
 			if (latestResult instanceof Node && asAst instanceof Node) {
-				// N potentiallyAgainImproved = preAsAst;
 
-				do {
-					// String latestResultAsString = astTestHelper.resultToString(latestResult);
-					// Node latestResultAsNode = javaParser.parse
-
-					Optional<R> localMutated = mutator.walkAst((AST) latestResult);
+				while (true) {
+					Optional<R> localMutated = mutator.walkAst((N) latestResult);
 
 					if (localMutated.isPresent()) {
 						optResult = localMutated;
+						latestResult = optResult.get();
 					} else {
 						break;
 					}
-				} while (true);
+				}
 			} else {
 				throw new UnsupportedOperationException("Not managed yet");
 			}
 
 		}
+		var preAsString = astTestHelper.astToString(asAst);
 
 		if (optResult.isEmpty()) {
 			Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
@@ -202,7 +197,7 @@ public class OneTestCase<AST, R> {
 
 	private void checkChange(ClassOrInterfaceDeclaration oneCase,
 			Node post,
-			AST asAst,
+			N asAst,
 			String preAsString,
 			String expectedPostAsString,
 			String actualPostAsString) {

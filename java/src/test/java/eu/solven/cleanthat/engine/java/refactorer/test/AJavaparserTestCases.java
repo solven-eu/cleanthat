@@ -77,7 +77,7 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 			throw new UnsupportedOperationException("Not managed: " + node.getClass().getSimpleName());
 		}
 
-		Node reparsedNode = OneTestCase.throwIfProblems(parsedAgain);
+		Node reparsedNode = OneMutatorCase.throwIfProblems(parsedAgain);
 
 		// Return prettyPrinter result for resilient comparison
 		return reparsedNode.toString();
@@ -85,7 +85,7 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
 	protected CompilationUnit parseCompilationUnit(IMutator mutator, String asString) {
 		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = OneTestCase.throwIfProblems(javaParser.parse(asString));
+		var compilationUnit = OneMutatorCase.throwIfProblems(javaParser.parse(asString));
 		LexicalPreservingPrinter.setup(compilationUnit);
 		return compilationUnit;
 	}

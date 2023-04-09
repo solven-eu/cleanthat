@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -36,8 +33,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 public class OptionalNotEmpty extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OptionalNotEmpty.class);
-
 	private static final String ID_NOTEMPTY = "OptionalNotEmpty";
 	private static final String ID_ISPRESENT = "OptionalIsPresent";
 

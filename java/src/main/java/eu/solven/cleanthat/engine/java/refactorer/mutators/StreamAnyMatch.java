@@ -19,9 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
@@ -38,8 +35,6 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 public class StreamAnyMatch extends AJavaparserMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
-
 	private static final String METHOD_FILTER = "filter";
 	private static final String METHOD_FIND_ANY = "findAny";
 	private static final String METHOD_IS_PRESENT = "isPresent";

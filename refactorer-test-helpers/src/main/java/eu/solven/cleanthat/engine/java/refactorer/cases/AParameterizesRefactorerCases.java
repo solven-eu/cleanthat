@@ -46,27 +46,25 @@ import eu.solven.cleanthat.engine.java.refactorer.javaparser.JavaparserTestHelpe
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
-import eu.solven.cleanthat.engine.java.refactorer.test.IAstTestHelper;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
-import eu.solven.cleanthat.engine.java.refactorer.test.OneTestCase;
+import eu.solven.cleanthat.engine.java.refactorer.test.OneMutatorCase;
 
 /**
  * Base class enabling each testCase to appear as an individual JUnit testCase
  * 
  * @author Benoit Lacelle
  *
- * @param <AST>
+ * @param <N>
  * @param <R>
  */
-@SuppressWarnings("PMD.GenericsNaming")
-public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<AST, R> {
+public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, R> {
 
 	public static Stream<Arguments> listCases(AParameterizesRefactorerCases<?, ?> testCases) throws IOException {
 		String casesAsString = LocalClassTestHelper.loadClassAsString(testCases.getClass());
 
 		IMutator mutator = testCases.getTransformer();
 		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = OneTestCase.throwIfProblems(javaParser.parse(casesAsString));
+		var compilationUnit = OneMutatorCase.throwIfProblems(javaParser.parse(casesAsString));
 
 		List<Arguments> individualCases = new ArrayList<>();
 
@@ -84,14 +82,14 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 	@ArgumentsSource(CasesArgumentsProvider.class)
 	void oneTestCase(String testCaseName,
 			JavaParser javaParser,
-			IWalkingMutator<AST, R> mutator,
+			IWalkingMutator<N, R> mutator,
 			ClassOrInterfaceDeclaration testCase) {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
 
 		// ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
 		// IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
-		OneTestCase<AST, R> oneTestCase = new OneTestCase<>(javaParser, mutator, this);
+		OneMutatorCase<N, R> oneTestCase = new OneMutatorCase<>(javaParser, mutator, this);
 
 		var atLeastOnetest = false;
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {

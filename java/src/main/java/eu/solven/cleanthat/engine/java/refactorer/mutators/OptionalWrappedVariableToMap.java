@@ -128,8 +128,7 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 		}
 
 		Expression mapScope = methodCallExpr.getScope().get();
-		Optional<String> optMapMethodName =
-				computeMapMethodName(mapScope, variableDeclaratorExpr.getElementType());
+		Optional<String> optMapMethodName = computeMapMethodName(mapScope, variableDeclaratorExpr.getElementType());
 		if (optMapMethodName.isEmpty()) {
 			return false;
 		}
@@ -165,16 +164,15 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 		LambdaExpr unwrappedMapLambdaExpr =
 				new LambdaExpr(parameter, variableDeclaratorExpr.getVariable(0).getInitializer().get());
 
-		MethodCallExpr callMap = new MethodCallExpr(mapScope,
-				optMapMethodName.get(),
-				new NodeList<>(unwrappedMapLambdaExpr));
+		MethodCallExpr callMap =
+				new MethodCallExpr(mapScope, optMapMethodName.get(), new NodeList<>(unwrappedMapLambdaExpr));
 
 		methodCallExpr.setScope(callMap);
 
 		// We restore the parent, as previous `setScope` removed the parent
 		// This looks like a bug/missing_feature to report to javaParser
 		mapScope.setParentNode(callMap);
-		
+
 		adjustMethodName(methodCallExpr);
 
 		return true;

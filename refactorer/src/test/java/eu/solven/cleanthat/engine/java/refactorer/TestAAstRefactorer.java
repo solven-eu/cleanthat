@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -45,6 +46,22 @@ public class TestAAstRefactorer {
 	final IWalkingMutator<String, String> someInvalidMutator = Mockito.mock(IWalkingMutator.class);
 	final IWalkingMutator<String, String> otherValidMutator = Mockito.mock(IWalkingMutator.class);
 
+	final AtomicInteger nbFailedParsing = new AtomicInteger();
+
+	@Test
+	public void testRejectInvalidTransformedCode_validValid() throws IOException {
+		List<IWalkingMutator<String, String>> mutators = Arrays.asList(someValidMutator, otherValidMutator);
+		AAstRefactorer<String, String, String, IWalkingMutator<String, String>> refactorer = makeRefactorer(mutators);
+
+		Mockito.when(someValidMutator.walkAst(inputJavaCode)).thenReturn(Optional.of(someResultAsString));
+		Mockito.when(otherValidMutator.walkAst(someResultAsString)).thenReturn(Optional.of(otherResultAsString));
+
+		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
+
+		Assertions.assertThat(outputCode).isEqualTo(otherResultAsString);
+		Assertions.assertThat(nbFailedParsing).hasValue(0);
+	}
+
 	@Test
 	public void testRejectInvalidTransformedCode_validInvalidValid() throws IOException {
 		List<IWalkingMutator<String, String>> mutators =
@@ -58,6 +75,7 @@ public class TestAAstRefactorer {
 		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
 
 		Assertions.assertThat(outputCode).isEqualTo(otherResultAsString);
+		Assertions.assertThat(nbFailedParsing).hasValue(1);
 	}
 
 	@Test
@@ -71,11 +89,13 @@ public class TestAAstRefactorer {
 		var outputCode = refactorer.applyTransformers(new PathAndContent(Paths.get("anything"), inputJavaCode));
 
 		Assertions.assertThat(outputCode).isEqualTo(someResultAsString);
+		Assertions.assertThat(nbFailedParsing).hasValue(1);
 	}
 
+	// An invalid input: none of the mutator is used
 	@Test
 	public void testRejectInvalidTransformedCode_invalid() throws IOException {
-		List<IWalkingMutator<String, String>> mutators = Arrays.asList(someValidMutator);
+		List<IWalkingMutator<String, String>> mutators = Arrays.asList(someValidMutator, otherValidMutator);
 		AAstRefactorer<String, String, String, IWalkingMutator<String, String>> refactorer = makeRefactorer(mutators);
 
 		var outputCode =
@@ -83,7 +103,8 @@ public class TestAAstRefactorer {
 
 		Assertions.assertThat(outputCode).isEqualTo(someInvalidResultAsString);
 
-		Mockito.verify(someValidMutator, Mockito.never()).walkAst(Mockito.anyString());
+		Mockito.verify(otherValidMutator, Mockito.never()).walkAst(Mockito.anyString());
+		Assertions.assertThat(nbFailedParsing).hasValue(1);
 	}
 
 	private AAstRefactorer<String, String, String, IWalkingMutator<String, String>> makeRefactorer(
@@ -111,6 +132,8 @@ public class TestAAstRefactorer {
 						if (Set.of(inputJavaCode, someResultAsString, otherResultAsString).contains(sourceCode)) {
 							return Optional.of(sourceCode);
 						}
+
+						nbFailedParsing.incrementAndGet();
 						return Optional.empty();
 					}
 
@@ -121,7 +144,13 @@ public class TestAAstRefactorer {
 
 					@Override
 					protected boolean isValidResultString(String parser, String resultAsString) {
-						return Set.of(someResultAsString, otherResultAsString).contains(resultAsString);
+						boolean isValid = Set.of(someResultAsString, otherResultAsString).contains(resultAsString);
+
+						if (!isValid) {
+							nbFailedParsing.incrementAndGet();
+						}
+
+						return isValid;
 					}
 				};
 		return refactorer;

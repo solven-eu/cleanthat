@@ -35,7 +35,7 @@ public class BinaryExprHelpers {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <S, T> Optional<Map.Entry<S, T>> findPair(BinaryExpr binaryExpr,
+	public static <S extends Expression, T extends Expression> Optional<Map.Entry<S, T>> findPair(BinaryExpr binaryExpr,
 			Predicate<Expression> keyPredicate,
 			Predicate<Expression> valuePredicate) {
 		Expression left = binaryExpr.getLeft();

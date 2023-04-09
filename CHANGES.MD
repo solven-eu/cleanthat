@@ -8,6 +8,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 * `ArithmeticOverFloats` is introduced
 * `CastMathOperandsBeforeAssignement` is introduced
+* `ArithmethicAssignment` is introduced
 * `UseOptionalOfNullable` is introduced
 
 ## [2.14] - 2023-04-06

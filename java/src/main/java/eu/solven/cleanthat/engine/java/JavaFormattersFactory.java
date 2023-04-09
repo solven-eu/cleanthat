@@ -69,7 +69,7 @@ public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
 			JavaRefactorerProperties processorConfig = convertValue(parameters, JavaRefactorerProperties.class);
 			var javaRefactorer = new JavaRefactorer(engineProperties, processorConfig);
 
-			LOGGER.info("Mutators: {}", javaRefactorer.getMutators());
+			LOGGER.info("Mutators: {}", javaRefactorer.getMutatorIds());
 			processor = javaRefactorer;
 			break;
 		}

@@ -17,6 +17,7 @@ package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +66,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		this.mutators.forEach(ct -> LOGGER.debug("Using transformer: {}", ct.getIds()));
 	}
 
-	public Set<String> getMutators() {
+	public Set<String> getMutatorIds() {
 		return mutators.stream().flatMap(m -> m.getIds().stream()).sorted().collect(Collectors.toSet());
 	}
 
@@ -97,7 +98,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		AtomicReference<String> refCleanCode = new AtomicReference<>(pathAndContent.getContent());
 
 		// Ensure we compute the compilation-unit only once per String
-		AtomicReference<AST> optCompilationUnit = new AtomicReference<>();
+		AtomicReference<AST> refCompilationUnit = new AtomicReference<>();
 
 		var parser = makeAstParser();
 
@@ -109,63 +110,84 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		getRawMutators().forEach(ct -> {
 			if (inputIsBroken.get()) {
 				LOGGER.trace("We skip {} as the input is broken", ct);
+				return;
 			}
 
 			LOGGER.debug("Applying {}", ct);
-
-			// Fill cache
-			if (optCompilationUnit.get() == null) {
-				try {
-					var sourceCode = refCleanCode.get();
-					var tryCompilationUnit = parseSourceCode(parser, sourceCode);
-					if (tryCompilationUnit.isEmpty()) {
-						// We are not able to parse the input
-						LOGGER.warn("Not able to parse path='{}' with {}", path, parser);
-
-						if (firstMutator.get()) {
-							// BEWARE we may have mutators based on different parsers
-							LOGGER.info("We mark path='{}' as not parseable by any mutator", path);
-							inputIsBroken.set(true);
-						}
-
-						return;
-					} else {
-						optCompilationUnit.set(tryCompilationUnit.get());
-					}
-				} catch (RuntimeException e) {
-					throw new RuntimeException("Issue parsing the code", e);
-				}
-			}
-
-			firstMutator.set(false);
-
-			var compilationUnit = optCompilationUnit.get();
-			Optional<R> walkNodeResult;
-			try {
-				walkNodeResult = ct.walkAst(compilationUnit);
-			} catch (RuntimeException | StackOverflowError e) {
-				// StackOverflowError may come from Javaparser
-				// e.g. https://github.com/javaparser/javaparser/issues/3940
-				throw new IllegalArgumentException("Issue with mutator: " + ct, e);
-			}
-			if (walkNodeResult.isPresent()) {
-				// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
-				// or removing consecutive EOL
-				LOGGER.debug("IMutator {} linted succesfully {}", ct.getClass().getSimpleName(), path);
-
-				// One relevant change: building source-code from the AST
-				var resultAsString = toString(walkNodeResult.get());
-				if (isValidResultString(parser, resultAsString)) {
-					refCleanCode.set(resultAsString);
-				} else {
-					LOGGER.warn("{} generated invalid code over {}", ct, path);
-				}
-
-				// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits
-				optCompilationUnit.set(null);
-			}
+			parseCompilationUnit(refCompilationUnit, parser, firstMutator, inputIsBroken, refCleanCode.get(), path);
+			applyMutator(refCleanCode, refCompilationUnit, parser, path, ct);
 		});
 		return refCleanCode.get();
+	}
+
+	private void applyMutator(AtomicReference<String> refCleanCode,
+			AtomicReference<AST> optCompilationUnit,
+			P parser,
+			Path path,
+			M ct) {
+		var compilationUnit = optCompilationUnit.get();
+		if (compilationUnit == null) {
+			// For any reason, we failed parsing the compilationUnit: do not apply the mutator
+			return;
+		}
+
+		Optional<R> walkNodeResult;
+		try {
+			walkNodeResult = ct.walkAst(compilationUnit);
+		} catch (RuntimeException | StackOverflowError e) {
+			// StackOverflowError may come from Javaparser
+			// e.g. https://github.com/javaparser/javaparser/issues/3940
+			throw new IllegalArgumentException("Issue with mutator: " + ct, e);
+		}
+		if (walkNodeResult.isPresent()) {
+			// Prevent Javaparser polluting the code, as it often impacts comments when building back code from AST,
+			// or removing consecutive EOL
+			LOGGER.debug("IMutator {} linted succesfully {}", ct.getClass().getSimpleName(), path);
+
+			// One relevant change: building source-code from the AST
+			var resultAsString = toString(walkNodeResult.get());
+			if (isValidResultString(parser, resultAsString)) {
+				refCleanCode.set(resultAsString);
+			} else {
+				LOGGER.warn("{} generated invalid code over {}", ct, path);
+			}
+
+			// Discard cache. It may be useful to prevent issues determining some types in mutated compilationUnits
+			optCompilationUnit.set(null);
+		}
+	}
+
+	private void parseCompilationUnit(AtomicReference<AST> optCompilationUnit,
+			P parser,
+			AtomicBoolean firstMutator,
+			AtomicBoolean inputIsBroken,
+			String refCleanCode,
+			Path path) {
+		// Fill cache
+		if (optCompilationUnit.get() == null) {
+			try {
+				var sourceCode = refCleanCode;
+				var tryCompilationUnit = parseSourceCode(parser, sourceCode);
+				if (tryCompilationUnit.isEmpty()) {
+					// We are not able to parse the input
+					LOGGER.warn("Not able to parse path='{}' with {}", path, parser);
+
+					if (firstMutator.get()) {
+						// BEWARE we may have mutators based on different parsers
+						LOGGER.info("We mark path='{}' as not parseable by any mutator", path);
+						inputIsBroken.set(true);
+					}
+
+					return;
+				} else {
+					optCompilationUnit.set(tryCompilationUnit.get());
+				}
+			} catch (RuntimeException e) {
+				throw new IllegalArgumentException("Issue parsing the code", e);
+			}
+		}
+
+		firstMutator.set(false);
 	}
 
 	protected abstract boolean isValidResultString(P parser, String resultAsString);

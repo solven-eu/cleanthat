@@ -188,85 +188,98 @@ public abstract class ATestCases<N, R> {
 			T post) {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
-		{
-			// This is done before .toString typically to register LexicalPreservingPrinter
-			var asAst = convertToAst(pre);
+		// This is done before .toString typically to register LexicalPreservingPrinter
+		var asAst = convertToAst(pre);
 
-			var preAsString = astToString(asAst);
+		var preAsString = astToString(asAst);
 
-			Optional<R> optResult = transformer.walkAst(asAst);
+		Optional<R> optResult = transformer.walkAst(asAst);
 
-			if (optResult.isEmpty()) {
-				Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
-			} else {
-				// Rename the method before checking full equality
-				// method are lowerCase while classes are camel case
-				if (pre instanceof NodeWithSimpleName<?> && post instanceof NodeWithSimpleName<?>) {
-					var newName = ((NodeWithSimpleName<?>) post).getName();
-					((NodeWithSimpleName<?>) pre).setName(newName);
+		if (optResult.isEmpty()) {
+			Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
+		} else {
+			// Rename the method before checking full equality
+			// method are lowerCase while classes are camel case
+			if (pre instanceof NodeWithSimpleName<?> && post instanceof NodeWithSimpleName<?>) {
+				var newName = ((NodeWithSimpleName<?>) post).getName();
+				((NodeWithSimpleName<?>) pre).setName(newName);
 
-					if (pre instanceof ClassOrInterfaceDeclaration) {
-						pre.findAll(ConstructorDeclaration.class).forEach(cd -> cd.setName(newName));
-					}
-				}
-
-				// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
-
-				var expectedPost = astToString(convertToAst(post));
-				String msg = "Should have mutated " + preAsString
-						+ " into "
-						+ expectedPost
-						+ " but it turned into: "
-						+ pre
-						+ ". The whole testcase is: "
-						+ oneCase;
-				var actualPost = resultToString(optResult.get());
-				Assert.assertEquals(msg, expectedPost, actualPost);
-
-				if (preAsString.contains("\"\"\"") || expectedPost.contains("\"\"\"")) {
-					// https://github.com/javaparser/javaparser/pull/2320
-					// 2 TextBlocks can have the same .toString representation but different underlying value as long as
-					// the underlying value are not both stripped
-					LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
-				} else if (preAsString.contains("::") || expectedPost.contains("::")) {
-					// https://github.com/javaparser/javaparser/pull/2320
-					// It can be difficult to provide a TypeExpr given a MethodCallExpr
-					LOGGER.warn("We skip javaParser Node equality due to `::` and TypeExpr given a MethodCallExpr");
-				} else if (expectedPost.contains("java.util.stream.Stream")
-						|| expectedPost.contains("java.util.stream.IntStream")
-						|| expectedPost.contains("(double)")
-						|| expectedPost.contains("(float)")
-						|| expectedPost.contains("(long)")) {
-					// see ArraysDotStream
-					// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
-					LOGGER.warn("We skip javaParser Node equality due to `packagedName` (NameExpr vs FieldAccessExp)");
-				} else {
-					// Some cases leads to failure here: nodes are different while they have the same .toString
-					// A Visitor similar to EqualsVisitor, but returning the first different node would be helpful
-					Assert.assertEquals(msg, post, pre);
-				}
-
-				if (transformer instanceof ICountMutatorIssues) {
-					ICountMutatorIssues withCounters = (ICountMutatorIssues) transformer;
-
-					if (!(transformer instanceof IReApplyUntilNoop)) {
-						Assertions.assertThat(withCounters.getNbIdempotencyIssues())
-								.describedAs("Idempotency")
-								.isEqualTo(0);
-					}
-					Assertions.assertThat(withCounters.getNbReplaceIssues()).describedAs("tryReplace").isEqualTo(0);
-					Assertions.assertThat(withCounters.getNbRemoveIssues()).describedAs("tryRemove").isEqualTo(0);
+				if (pre instanceof ClassOrInterfaceDeclaration) {
+					pre.findAll(ConstructorDeclaration.class).forEach(cd -> cd.setName(newName));
 				}
 			}
+
+			// Assert.assertNotEquals("Not a single mutation. Case: " + oneCase, clonedPre, pre);
+
+			var expectedPostAsString = astToString(convertToAst(post));
+			var actualPostAsString = resultToString(optResult.get());
+
+			checkChange(transformer, oneCase, post, asAst, preAsString, expectedPostAsString, actualPostAsString);
 		}
+
 		// Check the transformer is impact-less on already clean code
 		// This is a less relevant test: to be done later
 		{
 			// We do not walk the clone as JavaParser has issues inferring types over clones
 			var postBeforeWalk = post.clone();
-			var postAfterWalk = transformer.walkAstHasChanged(convertToAst(post));
-			Assert.assertFalse("Not mutating after", postAfterWalk);
+			var postAfterWalk = transformer.walkAst(convertToAst(post));
+			Assert.assertFalse("Not mutating after", postAfterWalk.isPresent());
 			Assert.assertEquals("After not mutated", postBeforeWalk, post);
+		}
+	}
+
+	private void checkChange(IWalkingMutator<N, R> mutator,
+			ClassOrInterfaceDeclaration oneCase,
+			Node post,
+			N asAst,
+			String preAsString,
+			String expectedPostAsString,
+			String actualPostAsString) {
+		String msg = "Should have mutated " + preAsString
+				+ " into "
+				+ expectedPostAsString
+				+ " but it turned into: "
+				+ actualPostAsString
+				+ ". The whole testcase is: "
+				+ oneCase;
+		Assert.assertEquals(msg, expectedPostAsString, actualPostAsString);
+
+		if (preAsString.contains("\"\"\"") || expectedPostAsString.contains("\"\"\"")) {
+			// https://github.com/javaparser/javaparser/pull/2320
+			// 2 TextBlocks can have the same .toString representation but different underlying value as long as
+			// the underlying value are not both stripped
+			LOGGER.warn("We skip javaParser Node equality due to stripping in TextBlocks");
+		} else if (preAsString.contains("::") || expectedPostAsString.contains("::")) {
+			// https://github.com/javaparser/javaparser/pull/2320
+			// It can be difficult to provide a TypeExpr given a MethodCallExpr
+			LOGGER.warn("We skip javaParser Node equality due to `::` and TypeExpr given a MethodCallExpr");
+		} else if (expectedPostAsString.contains("java.util.stream.Stream")
+				|| expectedPostAsString.contains("java.util.stream.IntStream")
+				|| expectedPostAsString.contains("(double)")
+				|| expectedPostAsString.contains("(float)")
+				|| expectedPostAsString.contains("(long)")) {
+			// see ArraysDotStream
+			// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
+			LOGGER.warn("We skip javaParser Node equality due to `packagedName` (NameExpr vs FieldAccessExp)");
+		} else {
+			// Some cases leads to failure here: nodes are different while they have the same .toString
+			// A Visitor similar to EqualsVisitor, but returning the first different node would be helpful
+			if (asAst instanceof Node) {
+				// This is supposedly a Javaparser IMutator: we can check the mutated node
+				Assert.assertEquals(msg, post, asAst);
+			} else {
+				LOGGER.debug("This is not a Javaparser IMutator: `pre` is not mutated");
+			}
+		}
+
+		if (mutator instanceof ICountMutatorIssues) {
+			ICountMutatorIssues withCounters = (ICountMutatorIssues) mutator;
+
+			if (!(mutator instanceof IReApplyUntilNoop)) {
+				Assertions.assertThat(withCounters.getNbIdempotencyIssues()).describedAs("Idempotency").isEqualTo(0);
+			}
+			Assertions.assertThat(withCounters.getNbReplaceIssues()).describedAs("tryReplace").isEqualTo(0);
+			Assertions.assertThat(withCounters.getNbRemoveIssues()).describedAs("tryRemove").isEqualTo(0);
 		}
 	}
 

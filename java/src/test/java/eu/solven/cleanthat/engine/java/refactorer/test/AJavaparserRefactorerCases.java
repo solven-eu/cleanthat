@@ -16,7 +16,9 @@
 package eu.solven.cleanthat.engine.java.refactorer.test;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
+import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 
 /**
@@ -25,6 +27,26 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
  * @author Benoit Lacelle
  *
  */
-public abstract class AJavaparserRefactorerCases extends ARefactorerCases<Node, Node, IJavaparserMutator> {
+public abstract class AJavaparserRefactorerCases extends AParameterizesRefactorerCases<Node, Node> {
+
+	@Override
+	protected Node convertToAst(Node node) {
+		// Many issues are specific to LexicalPreservingPrinter.setup
+		// https://github.com/javaparser/javaparser/issues/3898
+		// https://github.com/javaparser/javaparser/issues/3924
+		LexicalPreservingPrinter.setup(node);
+
+		return node;
+	}
+
+	@Override
+	protected String astToString(Node node) {
+		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
+	}
+
+	@Override
+	protected String resultToString(Node node) {
+		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
+	}
 
 }

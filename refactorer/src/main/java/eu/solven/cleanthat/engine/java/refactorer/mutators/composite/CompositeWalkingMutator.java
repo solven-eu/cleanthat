@@ -46,12 +46,13 @@ public class CompositeWalkingMutator<AST> extends CompositeMutator<IWalkingMutat
 
 	@Override
 	public Optional<AST> walkAst(AST pre) {
+		Optional<AST> mutated = Optional.empty();
 
 		for (IWalkingMutator<AST, AST> mutator : mutators) {
-			pre = mutator.walkAst(pre).orElse(pre);
+			mutated = mutator.walkAst(mutated.orElse(pre));
 		}
 
-		return Optional.of(pre);
+		return mutated;
 	}
 
 }

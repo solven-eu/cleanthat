@@ -19,11 +19,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.junit.Test;
+import org.junit.jupiter.params.provider.Arguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
@@ -38,7 +39,6 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorExternalReference
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
-import eu.solven.cleanthat.engine.java.refactorer.test.ARefactorerCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
 
 // BEWARE: This will generate a versioned file: It may lead to unexpected result. However, it will also make sure this file is often up-to-date
@@ -129,17 +129,17 @@ public class TestGenerateDocumentation {
 			}
 
 			Class<?> casesClass = Class.forName(casesClassName);
-			ARefactorerCases<?, ?, ?> casesInstance =
-					(ARefactorerCases<?, ?, ?>) casesClass.getConstructor().newInstance();
+			AParameterizesRefactorerCases<?, ?> casesInstance =
+					(AParameterizesRefactorerCases<?, ?>) casesClass.getConstructor().newInstance();
 
 			// JavaParser javaParser = JavaRefactorer.makeDefaultJavaParser(JavaRefactorer.JAVAPARSER_JRE_ONLY);
 
-			Collection<Object[]> cases = AParameterizesRefactorerCases.listCases(casesInstance);
+			Stream<Arguments> cases = AParameterizesRefactorerCases.listCases(casesInstance);
 
 			// We print only the first test. We assume it is the most relevant one to get the rule
-			cases.stream().findFirst().ifPresent(oneCaseDetails -> {
+			cases.findFirst().ifPresent(oneCaseDetails -> {
 				// JavaParser javaParser = (JavaParser) oneCaseDetails[0];
-				var oneCase = (ClassOrInterfaceDeclaration) oneCaseDetails[2];
+				var oneCase = (ClassOrInterfaceDeclaration) oneCaseDetails.get()[3];
 
 				sb.append(EOL)
 						.append(EOL)

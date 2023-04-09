@@ -39,7 +39,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 
 /**
- * See {@link ForEachAddToStreamCollectToCollectionCases}
+ * See {@link TestForEachAddToStreamCollectToCollectionCases}
  *
  * @author Benoit Lacelle
  */

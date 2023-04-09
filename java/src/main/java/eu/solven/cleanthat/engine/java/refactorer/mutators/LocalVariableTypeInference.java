@@ -114,7 +114,7 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 		newVariableDeclarationExpr.setModifiers(variableDeclarationExpr.getModifiers());
 		newVariableDeclarationExpr.setAnnotations(variableDeclarationExpr.getAnnotations());
 
-		return variableDeclarationExpr.replace(newVariableDeclarationExpr);
+		return tryReplace(variableDeclarationExpr, newVariableDeclarationExpr);
 	}
 
 	private boolean isReplaceableAssignement(Type variableType, Expression initializer) {

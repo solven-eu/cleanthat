@@ -110,8 +110,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 				var creation = (ObjectCreationExpr) scope;
 				NodeList<Expression> inputs = creation.getArguments();
 				var replacement = new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
-				LOGGER.info("Turning {} into {}", node, replacement);
-				return node.replace(replacement);
+				return tryReplace(node, replacement);
 			} else if (scope instanceof MethodCallExpr) {
 				// Boolean.valueOf(b).toString()
 				var call = (MethodCallExpr) scope;

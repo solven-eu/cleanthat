@@ -94,7 +94,7 @@ public class ArithmeticOverFloats extends AJavaparserExprMutator {
 				casted = new EnclosedExpr(casted);
 			}
 
-			e.replace(new CastExpr(new ClassOrInterfaceType("float"), casted));
+			tryReplace(e, new CastExpr(new ClassOrInterfaceType("float"), casted));
 		});
 
 		return true;

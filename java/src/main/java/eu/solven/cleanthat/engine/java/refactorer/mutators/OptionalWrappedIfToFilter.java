@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -134,14 +135,18 @@ public class OptionalWrappedIfToFilter extends AJavaparserExprMutator implements
 			return false;
 		}
 
-		ifPresentLambdaExpr.replace(optNewLambdaExpr.get());
+		tryReplace(ifPresentLambdaExpr, optNewLambdaExpr.get());
 
-		ifStmt.replace(thenStmt);
+		tryReplace(ifStmt, thenStmt);
 
-		MethodCallExpr callForEach = new MethodCallExpr(methodCallExpr.getScope().get(),
-				"filter",
-				new NodeList<>(optFilterLambdaExpr.get()));
-		methodCallExpr.setScope(callForEach);
+		Expression filterScope = methodCallExpr.getScope().get();
+		MethodCallExpr callFilter =
+				new MethodCallExpr(filterScope, "filter", new NodeList<>(optFilterLambdaExpr.get()));
+		methodCallExpr.setScope(callFilter);
+
+		// We restore the parent, as previous `setScope` removed the parent
+		// This looks like a bug/missing_feature to report to javaParser
+		filterScope.setParentNode(callFilter);
 
 		return true;
 	}

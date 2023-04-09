@@ -150,7 +150,7 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 			Node newNode =
 					new IfStmt(condition, wrapThenElse(thenExpr, variableName), wrapThenElse(elseExpr, variableName));
 
-			return grandGrandParent.replace(newNode);
+			return tryReplace(grandGrandParent, newNode);
 		} else if (parent instanceof ReturnStmt) {
 			var thenExpr = ternary.getThenExpr();
 			var elseExpr = ternary.getElseExpr();
@@ -159,7 +159,7 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 			Node newNode = new IfStmt(condition,
 					new BlockStmt(new NodeList<>(new ReturnStmt(thenExpr))),
 					new BlockStmt(new NodeList<>(new ReturnStmt(elseExpr))));
-			return parent.replace(newNode);
+			return tryReplace(parent, newNode);
 			// return false;
 		} else {
 			return false;

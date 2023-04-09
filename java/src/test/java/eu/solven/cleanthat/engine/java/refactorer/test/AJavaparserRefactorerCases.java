@@ -30,7 +30,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 public abstract class AJavaparserRefactorerCases extends AParameterizesRefactorerCases<Node, Node> {
 
 	@Override
-	protected Node convertToAst(Node node) {
+	public Node convertToAst(Node node) {
 		// Many issues are specific to LexicalPreservingPrinter.setup
 		// https://github.com/javaparser/javaparser/issues/3898
 		// https://github.com/javaparser/javaparser/issues/3924
@@ -40,12 +40,12 @@ public abstract class AJavaparserRefactorerCases extends AParameterizesRefactore
 	}
 
 	@Override
-	protected String astToString(Node node) {
+	public String astToString(Node node) {
 		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
 	}
 
 	@Override
-	protected String resultToString(Node node) {
+	public String resultToString(Node node) {
 		return AJavaparserTestCases.nodeToStringCheckingLexicalPreservation(node);
 	}
 

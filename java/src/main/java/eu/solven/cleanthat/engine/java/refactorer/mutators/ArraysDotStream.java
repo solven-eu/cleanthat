@@ -141,7 +141,7 @@ public class ArraysDotStream extends AJavaparserMutator {
 
 			// This will catch 0_argument and 2+_arguments
 			// Parsing this text would produce a FieldAccessExpr instead of a NameExpr
-			return node.replace(new MethodCallExpr(nameExpr, "of", scopeAsMethodCallExpr.getArguments()));
+			return tryReplace(node, new MethodCallExpr(nameExpr, "of", scopeAsMethodCallExpr.getArguments()));
 		} else {
 			var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
 
@@ -149,7 +149,7 @@ public class ArraysDotStream extends AJavaparserMutator {
 			Expression replacement = new MethodCallExpr(parentScope, METHOD_STREAM, replaceArguments);
 
 			LOGGER.info("Turning {} into {}", methodCall, replacement);
-			return methodCall.replace(replacement);
+			return tryReplace(methodCall, replacement);
 		}
 	}
 

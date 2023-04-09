@@ -32,7 +32,7 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	}
 
 	@Override
-	protected J.CompilationUnit convertToAst(Node pre) {
+	public J.CompilationUnit convertToAst(Node pre) {
 		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString)
@@ -40,12 +40,12 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	}
 
 	@Override
-	protected String resultToString(Result post) {
+	public String resultToString(Result post) {
 		return post.getAfter().printAll();
 	}
 
 	@Override
-	protected String astToString(CompilationUnit asAst) {
+	public String astToString(CompilationUnit asAst) {
 		return asAst.toString();
 	}
 

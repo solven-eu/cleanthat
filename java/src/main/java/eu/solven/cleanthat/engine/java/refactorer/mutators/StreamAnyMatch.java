@@ -124,8 +124,7 @@ public class StreamAnyMatch extends AJavaparserMutator {
 		if (METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
 			replacement = new UnaryExpr(replacement, UnaryExpr.Operator.LOGICAL_COMPLEMENT);
 		}
-		LOGGER.info("Turning {} into {}", methodCall, replacement);
-		if (methodCall.replace(replacement)) {
+		if (tryReplace(methodCall, replacement)) {
 			localTransformed = true;
 		}
 

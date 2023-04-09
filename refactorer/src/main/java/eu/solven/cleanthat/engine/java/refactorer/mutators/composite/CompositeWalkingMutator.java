@@ -49,7 +49,11 @@ public class CompositeWalkingMutator<AST> extends CompositeMutator<IWalkingMutat
 		Optional<AST> mutated = Optional.empty();
 
 		for (IWalkingMutator<AST, AST> mutator : mutators) {
-			mutated = mutator.walkAst(mutated.orElse(pre));
+			Optional<AST> localMutation = mutator.walkAst(mutated.orElse(pre));
+
+			if (localMutation.isPresent()) {
+				mutated = localMutation;
+			}
 		}
 
 		return mutated;

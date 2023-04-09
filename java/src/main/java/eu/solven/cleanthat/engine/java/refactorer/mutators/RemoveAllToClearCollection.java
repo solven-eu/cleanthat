@@ -77,6 +77,6 @@ public class RemoveAllToClearCollection extends AJavaparserExprMutator {
 			return false;
 		}
 
-		return replaceBy(methodCall, new MethodCallExpr(scope, "clear"));
+		return tryReplace(methodCall, new MethodCallExpr(scope, "clear"));
 	}
 }

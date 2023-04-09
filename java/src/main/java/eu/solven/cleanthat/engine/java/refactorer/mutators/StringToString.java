@@ -91,6 +91,6 @@ public class StringToString extends AJavaparserMutator {
 		}
 
 		var scope = optScope.get();
-		return replaceBy(node, scope);
+		return tryReplace(node, scope);
 	}
 }

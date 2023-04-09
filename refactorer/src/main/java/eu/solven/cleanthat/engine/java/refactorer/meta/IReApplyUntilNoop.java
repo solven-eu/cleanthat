@@ -23,6 +23,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AAstRefactorer;
  *
  * @author Benoit Lacelle
  */
+@Deprecated(
+		since = "Unclear if an Interface is the good way to go, as it prevent dynamic computation in CompositeMutators")
 public interface IReApplyUntilNoop {
 
 }

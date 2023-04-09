@@ -85,12 +85,6 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		return nbRemoveIssues.get();
 	}
 
-	protected boolean replaceBy(Node replacee, Node replacementNode) {
-		LOGGER.info("Replacing `{}` by `{}`", replacee, replacementNode);
-
-		return replacee.replace(replacementNode);
-	}
-
 	@Override
 	public Optional<Node> walkAst(Node tree) {
 		var transformed = new AtomicBoolean();

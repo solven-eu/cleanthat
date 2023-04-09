@@ -31,8 +31,11 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWa
  * @author Benoit Lacelle
  *
  */
+// `IReApplyUntilNoop` as an interface is problematic as it does not enable computing it dynamically, e.g. based on the
+// underlying IMutator
 @SuppressWarnings("PMD.GenericsNaming")
-public class CompositeJavaparserMutator extends CompositeWalkingMutator<Node> implements IJavaparserMutator {
+public class CompositeJavaparserMutator extends CompositeWalkingMutator<Node>
+		implements IJavaparserMutator, IReApplyUntilNoop {
 
 	public CompositeJavaparserMutator() {
 		this(Arrays.asList());

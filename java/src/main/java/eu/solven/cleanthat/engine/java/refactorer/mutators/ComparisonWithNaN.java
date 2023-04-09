@@ -118,7 +118,7 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 			replacement = properNaNCall;
 		}
 
-		return node.replace(replacement);
+		return tryReplace(node, replacement);
 
 	}
 

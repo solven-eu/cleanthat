@@ -167,8 +167,7 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 		}
 		optToPath.ifPresent(toPath -> {
 			methodExp.tryAddImportToParentCompilationUnit(Files.class);
-			LOGGER.info("Turning {} into {}", methodExp, toPath);
-			methodExp.replace(new MethodCallExpr(toPath, "toFile"));
+			tryReplace(methodExp, new MethodCallExpr(toPath, "toFile"));
 		});
 		return optToPath.isPresent();
 	}

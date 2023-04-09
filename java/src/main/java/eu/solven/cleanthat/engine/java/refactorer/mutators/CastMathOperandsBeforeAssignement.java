@@ -98,13 +98,13 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 				BinaryExprHelpers.findAny(binaryExpr, n -> n.isIntegerLiteralExpr(), true);
 		if (optIntegerLiteral.isPresent()) {
 			IntegerLiteralExpr intLiteralExpr = optIntegerLiteral.get().asIntegerLiteralExpr();
-			intLiteralExpr.replace(new DoubleLiteralExpr(intLiteralExpr.getValue() + "F"));
+			tryReplace(intLiteralExpr, new DoubleLiteralExpr(intLiteralExpr.getValue() + "F"));
 		} else {
 			Optional<Expression> optLongLiteral =
 					BinaryExprHelpers.findAny(binaryExpr, n -> n.isLongLiteralExpr(), true);
 			if (optLongLiteral.isPresent()) {
 				LongLiteralExpr longLiteralExpr = optLongLiteral.get().asLongLiteralExpr();
-				longLiteralExpr.replace(new DoubleLiteralExpr(longLiteralExpr.getValue() + "D"));
+				tryReplace(longLiteralExpr, new DoubleLiteralExpr(longLiteralExpr.getValue() + "D"));
 			} else {
 				binaryExpr.setLeft(new CastExpr(new ClassOrInterfaceType("double"), binaryExpr.getLeft()));
 			}
@@ -134,7 +134,7 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 
 		if (optIntegerLiteral.isPresent()) {
 			IntegerLiteralExpr intLiteralExpr = optIntegerLiteral.get().asIntegerLiteralExpr();
-			intLiteralExpr.replace(new LongLiteralExpr(intLiteralExpr.getValue() + "L"));
+			tryReplace(intLiteralExpr, new LongLiteralExpr(intLiteralExpr.getValue() + "L"));
 		} else {
 			binaryExpr.setLeft(new CastExpr(new ClassOrInterfaceType("long"), binaryExpr.getLeft()));
 		}

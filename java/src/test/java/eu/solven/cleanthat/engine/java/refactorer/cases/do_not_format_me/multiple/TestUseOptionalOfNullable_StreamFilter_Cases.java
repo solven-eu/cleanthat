@@ -7,7 +7,9 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.CompositeJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.NullCheckToOptionalOfNullable;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedIfToFilter;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -17,7 +19,9 @@ public class TestUseOptionalOfNullable_StreamFilter_Cases extends AJavaparserRef
 	public IJavaparserMutator getTransformer() {
 		return new CompositeJavaparserMutator(Arrays.asList(new NullCheckToOptionalOfNullable(),
 				new OptionalWrappedVariableToMap(),
-				new LambdaIsMethodReference()));
+				new OptionalWrappedIfToFilter(),
+				new LambdaIsMethodReference(),
+				new LambdaReturnsSingleStatement()));
 	}
 
 	@CompareMethods
@@ -32,18 +36,10 @@ public class TestUseOptionalOfNullable_StreamFilter_Cases extends AJavaparserRef
 		}
 
 		public void post(String s) {
-			Optional.ofNullable(s).map(String::toUpperCase).ifPresent(v -> {
-				if (v.startsWith("A")) {
-					System.out.println(v);
-				}
-			});
-		}
-
-		public void postWithXXX(String s) {
 			Optional.ofNullable(s)
-					.map(v -> v.toUpperCase())
+					.map(String::toUpperCase)
 					.filter(v -> v.startsWith("A"))
-					.ifPresent(v -> System.out.println(v));
+					.ifPresent(System.out::println);
 		}
 	}
 }

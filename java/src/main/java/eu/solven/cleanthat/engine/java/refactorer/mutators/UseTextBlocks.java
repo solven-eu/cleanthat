@@ -80,7 +80,7 @@ public class UseTextBlocks extends AJavaparserMutator {
 
 		Node textBlock = new TextBlockLiteralExpr(concat);
 
-		return node.replace(textBlock);
+		return tryReplace(node, textBlock);
 	}
 
 	private Optional<List<StringLiteralExpr>> optAsList(Expression expr) {

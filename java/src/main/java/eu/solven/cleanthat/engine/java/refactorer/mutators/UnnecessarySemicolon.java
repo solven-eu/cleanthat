@@ -92,7 +92,7 @@ public class UnnecessarySemicolon extends AJavaparserMutator {
 
 				// TODO What is the exact rules allowing to convert an expression to a statement?
 				if (condition.isMethodCallExpr()) {
-					return ifStmt.replace(new ExpressionStmt(condition));
+					return tryReplace(ifStmt, new ExpressionStmt(condition));
 				}
 			}
 		}

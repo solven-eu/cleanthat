@@ -46,7 +46,9 @@ import eu.solven.cleanthat.engine.java.refactorer.javaparser.JavaparserTestHelpe
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
+import eu.solven.cleanthat.engine.java.refactorer.test.IAstTestHelper;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
+import eu.solven.cleanthat.engine.java.refactorer.test.OneTestCase;
 
 /**
  * Base class enabling each testCase to appear as an individual JUnit testCase
@@ -64,7 +66,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 
 		IMutator mutator = testCases.getTransformer();
 		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = throwIfProblems(javaParser.parse(casesAsString));
+		var compilationUnit = OneTestCase.throwIfProblems(javaParser.parse(casesAsString));
 
 		List<Arguments> individualCases = new ArrayList<>();
 
@@ -89,51 +91,53 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 		// ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
 		// IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
+		OneTestCase<AST, R> oneTestCase = new OneTestCase<>(javaParser, mutator, this);
+
 		var atLeastOnetest = false;
 		if (testCase.getAnnotationByClass(CompareMethods.class).isPresent()) {
 			atLeastOnetest |= true;
 
 			if (getNotModifiedUntilImplemented(testCase)) {
-				doCheckUnmodifiedMethod(mutator, testCase);
+				oneTestCase.doCheckUnmodifiedMethod(testCase);
 			} else {
-				doTestMethod(mutator, testCase);
+				oneTestCase.doTestMethod(testCase);
 			}
 		} else if (testCase.getAnnotationByClass(UnmodifiedMethod.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCheckUnmodifiedMethod(mutator, testCase);
+			oneTestCase.doCheckUnmodifiedMethod(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareInnerClasses.class).isPresent()) {
 			atLeastOnetest |= true;
 
 			if (getNotModifiedUntilImplemented(testCase)) {
-				doCheckUnmodifiedClass(mutator, testCase);
+				oneTestCase.doCheckUnmodifiedClass(testCase);
 			} else {
-				doCompareInnerClasses(javaParser, mutator, testCase);
+				oneTestCase.doCompareInnerClasses(testCase);
 			}
 		} else if (testCase.getAnnotationByClass(UnmodifiedInnerClass.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCheckUnmodifiedClass(mutator, testCase);
+			oneTestCase.doCheckUnmodifiedClass(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareTypes.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCompareTypes(mutator, testCase);
+			oneTestCase.doCompareTypes(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareClasses.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCompareClasses(javaParser, mutator, testCase);
+			oneTestCase.doCompareClasses(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCompareInnerAnnotations(javaParser, mutator, testCase);
+			oneTestCase.doCompareInnerAnnotations(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()) {
 			atLeastOnetest |= true;
-			doCompareMethodsAsStrings(javaParser, mutator, testCase);
+			oneTestCase.doCompareMethodsAsStrings(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()) {
@@ -142,14 +146,14 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			CompareCompilationUnitsAsStrings realAnnotation =
 					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsStrings.class)[0];
-			doCompareCompilationUnitsAsStrings(javaParser, mutator, testCase, realAnnotation);
+			oneTestCase.doCompareCompilationUnitsAsStrings(testCase, realAnnotation);
 		} else if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
 			atLeastOnetest |= true;
 			Class<?> realTestCase = loadTestCaseRealClass(testCase);
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			UnmodifiedCompilationUnitAsString realAnnotation =
 					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
-			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, mutator, testCase, realAnnotation);
+			oneTestCase.doCheckUnmodifiedCompilationUnitsAsStrings(testCase, realAnnotation);
 		}
 
 		if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()) {
@@ -158,7 +162,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			UnmodifiedCompilationUnitAsString realAnnotation =
 					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsString.class)[0];
-			doCheckUnmodifiedCompilationUnitsAsStrings(javaParser, mutator, testCase, realAnnotation);
+			oneTestCase.doCheckUnmodifiedCompilationUnitsAsStrings(testCase, realAnnotation);
 		}
 
 		if (testCase.getAnnotationByClass(CompareCompilationUnitsAsResources.class).isPresent()) {
@@ -167,7 +171,7 @@ public abstract class AParameterizesRefactorerCases<AST, R> extends ATestCases<A
 			// This is useful to get fully resolved annotations (e.g. String concatenations)
 			CompareCompilationUnitsAsResources realAnnotation =
 					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsResources.class)[0];
-			doCompareCompilationUnitsAsResources(javaParser, mutator, testCase, realAnnotation);
+			oneTestCase.doCompareCompilationUnitsAsResources(testCase, realAnnotation);
 		}
 
 		Assertions.assertThat(atLeastOnetest).isTrue();

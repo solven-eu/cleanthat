@@ -226,7 +226,7 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 					newScope = new NameExpr(newQualifiedName);
 				}
 				var replacement = new MethodCallExpr(newScope, methodCall.getNameAsString(), methodCall.getArguments());
-				return methodCall.replace(replacement);
+				return tryReplace(methodCall, replacement);
 			}
 		}
 		return false;

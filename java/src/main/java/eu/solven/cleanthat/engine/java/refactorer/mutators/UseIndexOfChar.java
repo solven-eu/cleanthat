@@ -109,17 +109,17 @@ public class UseIndexOfChar extends AJavaparserMutator {
 		var stringLiteralExprValue = stringLiteralExpr.getValue();
 		if (stringLiteralExprValue.isEmpty()) {
 			if (isIndexOf) {
-				return parentNode.replace(new IntegerLiteralExpr("0"));
+				return tryReplace(parentNode, new IntegerLiteralExpr("0"));
 			} else {
 				assert isLastIndexOf;
 				var lengthMethodCall = new MethodCallExpr(optScope.get(), "length");
-				return parentNode.replace(lengthMethodCall);
+				return tryReplace(parentNode, lengthMethodCall);
 			}
 		} else if (stringLiteralExprValue.length() != 1) {
 			// We consider only String with `.length()==1` to `.indexOf` over the single char
 			return false;
 		}
 
-		return node.replace(new CharLiteralExpr(stringLiteralExprValue.charAt(0)));
+		return tryReplace(node, new CharLiteralExpr(stringLiteralExprValue.charAt(0)));
 	}
 }

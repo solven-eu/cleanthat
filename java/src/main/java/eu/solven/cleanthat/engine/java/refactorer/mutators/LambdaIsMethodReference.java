@@ -124,7 +124,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 				if (left.isNullLiteralExpr()) {
 					if (right.isNullLiteralExpr()) {
 						// comparing null with null
-						return binaryExpr.replace(new BooleanLiteralExpr(true));
+						return tryReplace(binaryExpr, new BooleanLiteralExpr(true));
 					} else {
 						notNunull = right;
 					}
@@ -192,7 +192,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		// `a -> (SomeClass) a` -> `SomeClass.class::cast`
 		var newScope = new ClassExpr(castExpr.getType());
 		var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "cast");
-		return lambdaExpr.replace(methodReference);
+		return tryReplace(lambdaExpr, methodReference);
 	}
 
 	private boolean onInstanceOf(LambdaExpr lambdaExpr, Parameter singleParameter, Expression expression) {
@@ -206,7 +206,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		// `a -> a instanceof B` -> `B.class::isInstance`
 		var newScope = new ClassExpr(instanceOfExpr.getType());
 		var methodReference = new MethodReferenceExpr(newScope, new NodeList<>(), "isInstance");
-		return lambdaExpr.replace(methodReference);
+		return tryReplace(lambdaExpr, methodReference);
 	}
 
 	private boolean onMethodCall(LambdaExpr lambdaExpr, Parameter singleParameter, MethodCallExpr methodCallExpr) {
@@ -229,7 +229,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 
 			// `b -> System.out.println(b)` into `System.out::println`
 			var methodReference = new MethodReferenceExpr(scope, new NodeList<>(), methodCallExpr.getNameAsString());
-			return lambdaExpr.replace(methodReference);
+			return tryReplace(lambdaExpr, methodReference);
 		} else if (methodCallExpr.getArguments().isEmpty() && optScope.get().isNameExpr()
 				&& optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
 
@@ -272,7 +272,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 			var methodReference = new MethodReferenceExpr(new NameExpr(methodRefClassName),
 					methodCallExpr.getTypeArguments().orElseGet(() -> new NodeList<>()),
 					methodCallExpr.getNameAsString());
-			return lambdaExpr.replace(methodReference);
+			return tryReplace(lambdaExpr, methodReference);
 		} else {
 			return false;
 		}

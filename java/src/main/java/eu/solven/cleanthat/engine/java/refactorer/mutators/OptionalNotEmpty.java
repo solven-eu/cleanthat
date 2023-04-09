@@ -103,8 +103,7 @@ public class OptionalNotEmpty extends AJavaparserMutator {
 
 		var localTransformed = false;
 		var replacement = new MethodCallExpr(scope, newMethod);
-		LOGGER.info("Turning {} into {}", unaryExpr, replacement);
-		if (unaryExpr.replace(replacement)) {
+		if (tryReplace(unaryExpr, replacement)) {
 			localTransformed = true;
 		}
 		// TODO Add a rule to replace such trivial 'if else return'

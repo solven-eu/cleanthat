@@ -124,7 +124,7 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 		var singleChar = optCallStartsWithSingleCharString(startsWithMethodCall).get();
 
 		// Turns `line.startsWith("#")` into `line.indexOf('0') == '#'`
-		return replaceBy(startsWithMethodCall, makeCharAtEqualsTo(optLeftScope, singleChar));
+		return tryReplace(startsWithMethodCall, makeCharAtEqualsTo(optLeftScope, singleChar));
 
 	}
 

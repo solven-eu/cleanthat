@@ -79,8 +79,9 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 			return false;
 		}
 
-		return objectCreationExpr.replace(
-				new MethodCallExpr(new NameExpr(type.getName()), "valueOf", objectCreationExpr.getArguments()));
+		MethodCallExpr newMethodCall =
+				new MethodCallExpr(new NameExpr(type.getName()), "valueOf", objectCreationExpr.getArguments());
+		return tryReplace(objectCreationExpr, newMethodCall);
 	}
 
 	private boolean isBoxType(ClassOrInterfaceType type) {

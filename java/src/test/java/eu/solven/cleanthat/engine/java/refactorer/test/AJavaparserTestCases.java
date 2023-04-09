@@ -36,19 +36,19 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
 	@Override
-	protected Node convertToAst(Node ast) {
+	public Node convertToAst(Node ast) {
 		LexicalPreservingPrinter.setup(ast);
 
 		return ast;
 	}
 
 	@Override
-	protected String astToString(Node node) {
+	public String astToString(Node node) {
 		return nodeToStringCheckingLexicalPreservation(node);
 	}
 
 	@Override
-	protected String resultToString(Node node) {
+	public String resultToString(Node node) {
 		return nodeToStringCheckingLexicalPreservation(node);
 	}
 
@@ -77,7 +77,7 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 			throw new UnsupportedOperationException("Not managed: " + node.getClass().getSimpleName());
 		}
 
-		Node reparsedNode = ATestCases.throwIfProblems(parsedAgain);
+		Node reparsedNode = OneTestCase.throwIfProblems(parsedAgain);
 
 		// Return prettyPrinter result for resilient comparison
 		return reparsedNode.toString();
@@ -85,7 +85,7 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 
 	protected CompilationUnit parseCompilationUnit(IMutator mutator, String asString) {
 		var javaParser = JavaRefactorer.makeDefaultJavaParser(mutator.isJreOnly());
-		var compilationUnit = ATestCases.throwIfProblems(javaParser.parse(asString));
+		var compilationUnit = OneTestCase.throwIfProblems(javaParser.parse(asString));
 		LexicalPreservingPrinter.setup(compilationUnit);
 		return compilationUnit;
 	}

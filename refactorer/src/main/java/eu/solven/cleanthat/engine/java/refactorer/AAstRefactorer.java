@@ -108,6 +108,7 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 
 		var path = pathAndContent.getPath();
 
+		// TODO What if mutators are applied in order `A->B` but `A` could give good results after `B` being applied?
 		getRawMutators().forEach(ct -> {
 			int maxNbApply;
 			if (ct instanceof IReApplyUntilNoop) {

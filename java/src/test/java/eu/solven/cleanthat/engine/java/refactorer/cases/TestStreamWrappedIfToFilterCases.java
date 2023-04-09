@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.UseOptionalOfNullableCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.StreamWrappedIfToFilterCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestUseOptionalOfNullableCases extends AParameterizesJavaparserRefactorerCases {
+public class TestStreamWrappedIfToFilterCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new UseOptionalOfNullableCases();
+		return new StreamWrappedIfToFilterCases();
 	}
 
-	public TestUseOptionalOfNullableCases(JavaParser javaParser,
+	public TestStreamWrappedIfToFilterCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);
@@ -49,4 +49,5 @@ public class TestUseOptionalOfNullableCases extends AParameterizesJavaparserRefa
 	protected AJavaparserRefactorerCases getCases() {
 		return getStaticRefactorerCases();
 	}
+
 }

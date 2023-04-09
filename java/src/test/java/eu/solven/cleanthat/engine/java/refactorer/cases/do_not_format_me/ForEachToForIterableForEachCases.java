@@ -8,13 +8,13 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemen
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToForEach;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class EnhancedForLoopToForEachCases extends AJavaparserRefactorerCases {
+public class ForEachToForIterableForEachCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new EnhancedForLoopToForEach();
+		return new ForEachToForIterableForEach();
 	}
 
 	@CompareMethods

@@ -160,7 +160,7 @@ public class WireMockMultiServerRule implements MethodRule, TestRule {
 	 */
 	protected final void initializeServer(String serverId, Extension... extensions) {
 		var directoryName = methodName;
-		directoryName = directoryName + getDirectorySuffix(serverId);
+		directoryName += getDirectorySuffix(serverId);
 
 		final Options localOptions =
 				new WireMockRuleConfiguration(WireMockMultiServerRule.this.options, directoryName, extensions);

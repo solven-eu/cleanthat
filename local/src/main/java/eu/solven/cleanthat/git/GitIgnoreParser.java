@@ -111,7 +111,7 @@ public class GitIgnoreParser {
 					var directoryAsFile = s.substring(0, s.length() - 1);
 					return Stream.of(directoryAsFile);
 				} else {
-					s = s + "**";
+					s += "**";
 					return Stream.of(s);
 				}
 			} else {

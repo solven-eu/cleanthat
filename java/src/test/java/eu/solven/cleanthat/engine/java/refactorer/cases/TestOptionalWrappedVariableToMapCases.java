@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.EnhancedForLoopToStreamCollectCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.OptionalWrappedVariableToMapCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestEnhancedForLoopToStreamCollectCases extends AParameterizesJavaparserRefactorerCases {
+public class TestOptionalWrappedVariableToMapCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new EnhancedForLoopToStreamCollectCases();
+		return new OptionalWrappedVariableToMapCases();
 	}
 
-	public TestEnhancedForLoopToStreamCollectCases(JavaParser javaParser,
+	public TestOptionalWrappedVariableToMapCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

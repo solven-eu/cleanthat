@@ -38,7 +38,7 @@ public class CompositeJavaparserMutator extends CompositeWalkingMutator<Node> im
 		this(Arrays.asList());
 	}
 
-	protected CompositeJavaparserMutator(List<IJavaparserMutator> mutators) {
+	public CompositeJavaparserMutator(List<IJavaparserMutator> mutators) {
 		super(ImmutableList.copyOf(mutators));
 	}
 

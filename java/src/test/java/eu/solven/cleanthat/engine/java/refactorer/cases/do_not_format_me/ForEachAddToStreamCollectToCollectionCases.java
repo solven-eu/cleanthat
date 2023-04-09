@@ -13,13 +13,13 @@ import org.junit.Ignore;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamCollect;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachAddToStreamCollectToCollection;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class EnhancedForLoopToStreamCollectCases extends AJavaparserRefactorerCases {
+public class ForEachAddToStreamCollectToCollectionCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new EnhancedForLoopToStreamCollect();
+		return new ForEachAddToStreamCollectToCollection();
 	}
 
 	@CompareMethods

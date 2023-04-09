@@ -9,13 +9,13 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemen
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class EnhancedForLoopToStreamAnyMatchCases extends AJavaparserRefactorerCases {
+public class ForEachIfToIfStreamAnyMatchCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new EnhancedForLoopToStreamAnyMatch();
+		return new ForEachIfToIfStreamAnyMatch();
 	}
 
 	// https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html#loop-with-break-statement-to-stream-anymatch

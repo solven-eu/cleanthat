@@ -51,7 +51,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 		// As this create a LambdaExpr, the LambdaExpr may be optimizable
 		LambdaReturnsSingleStatement.class,
 		// As this create an IntStream, it may be optimizable
-		SimplifyStreamVariablesWithMap.class })
+		StreamWrappedVariableToMap.class })
 public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 
 	@Override

@@ -45,8 +45,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
  * @author Benoit Lacelle
  */
 @ApplyMeBefore({ SimplifyBooleanInitialization.class })
-public class EnhancedForLoopToStreamAnyMatch extends AJavaparserStmtMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EnhancedForLoopToStreamAnyMatch.class);
+public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ForEachIfToIfStreamAnyMatch.class);
 
 	static final String ANY_MATCH = "anyMatch";
 

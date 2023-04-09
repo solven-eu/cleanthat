@@ -25,13 +25,13 @@ import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionToOptional;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToForEach;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamAnyMatch;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.EnhancedForLoopToStreamCollect;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachAddToStreamCollectToCollection;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LoopIntRangeToIntStreamForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStreamVariablesWithMap;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQuotableInput;
 
 /**
@@ -44,13 +44,13 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQ
 public class SafeButControversialMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	public static final List<IMutator> BUT_CONTROVERSIAL = ImmutableList.<IMutator>builder()
 			.add(new CollectionToOptional(),
-					new EnhancedForLoopToStreamAnyMatch(),
-					new EnhancedForLoopToForEach(),
-					new EnhancedForLoopToStreamCollect(),
+					new ForEachIfToIfStreamAnyMatch(),
+					new ForEachToForIterableForEach(),
+					new ForEachAddToStreamCollectToCollection(),
 					new SimplifyBooleanExpression(),
 					new SimplifyBooleanInitialization(),
 					// new SimplifyStreamMethodRefWithMap(),
-					new SimplifyStreamVariablesWithMap(),
+					new StreamWrappedVariableToMap(),
 					new StringReplaceAllWithQuotableInput(),
 					new LoopIntRangeToIntStreamForEach())
 			.build();

@@ -40,7 +40,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
  * @author Benoit Lacelle
  */
 @ApplyAfterMe(LambdaReturnsSingleStatement.class)
-public class EnhancedForLoopToForEach extends AJavaparserStmtMutator {
+public class ForEachToForIterableForEach extends AJavaparserStmtMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -60,6 +60,11 @@ public class EnhancedForLoopToForEach extends AJavaparserStmtMutator {
 	@Override
 	public String jSparrowUrl() {
 		return "https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-for-each.html";
+	}
+
+	@Override
+	public Set<String> getLegacyIds() {
+		return Set.of("EnhancedForLoopToForEach");
 	}
 
 	@Override

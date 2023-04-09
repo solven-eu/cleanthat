@@ -21,6 +21,7 @@
 
 ## Draft
 
+- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
@@ -29,10 +30,10 @@
 - [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 - [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
-- [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
-- [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
 - [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
+- [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
 - [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
@@ -41,13 +42,17 @@
 - [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 - [LocalVariableTypeInference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LocalVariableTypeInference.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
+- [NullCheckToOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/NullCheckToOptionalOfNullable.java)
 - [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
 - [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
+- [OptionalWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedIfToFilter.java)
+- [OptionalWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedVariableToMap.java)
 - [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 - [RemoveAllToClearCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveAllToClearCollection.java)
-- [SimplifyStreamMethodRefWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamMethodRefWithMap.java)
-- [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
+- [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
+- [StreamWrappedMethodRefToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedMethodRefToMap.java)
+- [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [ThreadRunToThreadStart](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ThreadRunToThreadStart.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
@@ -57,7 +62,6 @@
 - [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
 - [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
 - [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
-- [UseOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseOptionalOfNullable.java)
 - [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
 ## ErrorProne
@@ -86,7 +90,7 @@
 
 ## Iterable
 
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 
 ## JUnit
 
@@ -99,11 +103,12 @@
 
 ## Loop
 
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
-- [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
-- [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
+- [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
-- [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
+- [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
+- [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 
 ## MayPreventException
 
@@ -117,8 +122,10 @@
 ## Optional
 
 - [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
+- [NullCheckToOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/NullCheckToOptionalOfNullable.java)
 - [OptionalNotEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalNotEmpty.java)
-- [UseOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseOptionalOfNullable.java)
+- [OptionalWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedIfToFilter.java)
+- [OptionalWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedVariableToMap.java)
 
 ## PMD
 
@@ -145,14 +152,16 @@
 
 ## Primitive
 
+- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [CastMathOperandsBeforeAssignement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CastMathOperandsBeforeAssignement.java)
 - [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
 - [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
 - [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
+- [OptionalWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedVariableToMap.java)
 - [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
-- [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
+- [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 - [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
 
@@ -165,6 +174,7 @@
 
 ## Sonar
 
+- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
@@ -197,15 +207,16 @@
 ## Stream
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
-- [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
-- [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
+- [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
-- [SimplifyStreamMethodRefWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamMethodRefWithMap.java)
-- [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
 - [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
+- [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
+- [StreamWrappedMethodRefToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedMethodRefToMap.java)
+- [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 
 ## String
 
@@ -228,6 +239,7 @@
 
 ## With JDK 1
 
+- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [AvoidInlineConditionals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidInlineConditionals.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
@@ -283,22 +295,25 @@
 ## With JDK 1.8
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
-- [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
-- [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
+- [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
 - [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
 - [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
+- [NullCheckToOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/NullCheckToOptionalOfNullable.java)
 - [ObjectsHashCodePrimitive](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectsHashCodePrimitive.java)
+- [OptionalWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedIfToFilter.java)
+- [OptionalWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedVariableToMap.java)
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 - [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
-- [SimplifyStreamMethodRefWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamMethodRefWithMap.java)
-- [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
 - [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
+- [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
+- [StreamWrappedMethodRefToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedMethodRefToMap.java)
+- [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 - [UnnecessaryLambdaEnclosingParameters](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryLambdaEnclosingParameters.java)
 - [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
-- [UseOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseOptionalOfNullable.java)
 
 ## With JDK 10
 
@@ -318,12 +333,13 @@
 
 ## jSparrow
 
+- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
-- [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
-- [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
+- [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
+- [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
 - [LambdaReturnsSingleStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaReturnsSingleStatement.java)
 - [LocalVariableTypeInference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LocalVariableTypeInference.java)

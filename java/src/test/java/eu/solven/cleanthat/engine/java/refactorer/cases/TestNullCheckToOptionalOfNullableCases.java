@@ -23,16 +23,16 @@ import org.junit.runners.Parameterized.Parameters;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.StreamWrappedVariableToMapCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.NullCheckToOptionalOfNullableCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestSimplifyStreamVariablesWithMapCases extends AParameterizesJavaparserRefactorerCases {
+public class TestNullCheckToOptionalOfNullableCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new StreamWrappedVariableToMapCases();
+		return new NullCheckToOptionalOfNullableCases();
 	}
 
-	public TestSimplifyStreamVariablesWithMapCases(JavaParser javaParser,
+	public TestNullCheckToOptionalOfNullableCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

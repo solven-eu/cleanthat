@@ -49,8 +49,8 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
  *
  * @author Benoit Lacelle
  */
-public class UseOptionalOfNullable extends AJavaparserStmtMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UseOptionalOfNullable.class);
+public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
+	private static final Logger LOGGER = LoggerFactory.getLogger(NullCheckToOptionalOfNullable.class);
 
 	final NullLiteralExpr nullLiteralExpr = new NullLiteralExpr();
 

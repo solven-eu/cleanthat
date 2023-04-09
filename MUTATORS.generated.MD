@@ -552,6 +552,38 @@ See[UseUnderscoresInNumericLiteralsCases](java/src/test/java/eu/solven/cleanthat
 
 ## Single Mutators (DRAFTs)
 
+### [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
+
+Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
+
+jSparrow: [ArithmethicAssignment](https://jsparrow.github.io/rules/arithmethic-assignment.html)
+
+Cleanthat own ID: ArithmethicAssignment
+
+isDraft
+
+languageLevel: jdk1
+
+```
+@CompareMethods
+public static class PlusInt {
+
+    public double pre(int add) {
+        int i = 3;
+        i = i + add;
+        return i;
+    }
+
+    public double post(int add) {
+        int i = 3;
+        i += add;
+        return i;
+    }
+}
+```
+
+See[ArithmethicAssignmentCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ArithmethicAssignmentCases.java)
+
 ### [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 
 Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
@@ -772,11 +804,33 @@ public static class VariousCases {
 
 See[EmptyControlStatementCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EmptyControlStatementCases.java)
 
-### [EnhancedForLoopToForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToForEach.java)
+### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 
-jSparrow: [EnhancedForLoopToStreamForEach](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-for-each.html)
+Cleanthat own ID: EnumsWithoutEquals
 
-Cleanthat own ID: EnhancedForLoopToForEach
+isDraft
+
+languageLevel: jdk1.5
+
+```
+@CompareMethods
+public static class EnumInRightHandSide {
+
+    public boolean pre(RoundingMode roundingMode) {
+        return roundingMode.equals(RoundingMode.UP);
+    }
+
+    public boolean post(RoundingMode roundingMode) {
+        return roundingMode == RoundingMode.UP;
+    }
+}
+```
+
+See[EnumsWithoutEqualsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnumsWithoutEqualsCases.java)
+
+### [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+
+Cleanthat own ID: ForEachAddToStreamCollectToCollection
 
 isDraft
 
@@ -784,29 +838,29 @@ languageLevel: jdk1.8
 
 ```
 @CompareMethods
-public static class forEach_singleStatement {
+public static class forEachIfAddAdd {
 
-    public void pre(List<String> strings) {
-        for (String string : strings) {
-            System.out.println(string);
-        }
+    public List<String> pre(List<String> strings) {
+        List<String> r = new ArrayList<>();
+        for (String s : strings) if (s.length() >= 5)
+            r.add(s);
+        return r;
     }
 
-    public void post(List<String> strings) {
-        strings.forEach(string -> {
-            System.out.println(string);
-        });
+    public List<String> post(List<String> strings) {
+        List<String> r = strings.stream().filter(s -> s.length() >= 5).map(s -> s).collect(Collectors.toCollection(() -> new ArrayList<>()));
+        return r;
     }
 }
 ```
 
-See[EnhancedForLoopToForEachCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToForEachCases.java)
+See[ForEachAddToStreamCollectToCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ForEachAddToStreamCollectToCollectionCases.java)
 
-### [EnhancedForLoopToStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamAnyMatch.java)
+### [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 
 jSparrow: [EnhancedForLoopToStreamAnyMatch](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
 
-Cleanthat own ID: EnhancedForLoopToStreamAnyMatch
+Cleanthat own ID: ForEachIfToIfStreamAnyMatch
 
 isDraft
 
@@ -838,11 +892,13 @@ public static class breakToStreamAnyMatch {
 }
 ```
 
-See[EnhancedForLoopToStreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamAnyMatchCases.java)
+See[ForEachIfToIfStreamAnyMatchCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ForEachIfToIfStreamAnyMatchCases.java)
 
-### [EnhancedForLoopToStreamCollect](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnhancedForLoopToStreamCollect.java)
+### [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 
-Cleanthat own ID: EnhancedForLoopToStreamCollect
+jSparrow: [EnhancedForLoopToStreamForEach](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-for-each.html)
+
+Cleanthat own ID: ForEachToForIterableForEach
 
 isDraft
 
@@ -850,47 +906,23 @@ languageLevel: jdk1.8
 
 ```
 @CompareMethods
-public static class forEachIfAddAdd {
+public static class forEach_singleStatement {
 
-    public List<String> pre(List<String> strings) {
-        List<String> r = new ArrayList<>();
-        for (String s : strings) if (s.length() >= 5)
-            r.add(s);
-        return r;
+    public void pre(List<String> strings) {
+        for (String string : strings) {
+            System.out.println(string);
+        }
     }
 
-    public List<String> post(List<String> strings) {
-        List<String> r = strings.stream().filter(s -> s.length() >= 5).map(s -> s).collect(Collectors.toCollection(() -> new ArrayList<>()));
-        return r;
-    }
-}
-```
-
-See[EnhancedForLoopToStreamCollectCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnhancedForLoopToStreamCollectCases.java)
-
-### [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
-
-Cleanthat own ID: EnumsWithoutEquals
-
-isDraft
-
-languageLevel: jdk1.5
-
-```
-@CompareMethods
-public static class EnumInRightHandSide {
-
-    public boolean pre(RoundingMode roundingMode) {
-        return roundingMode.equals(RoundingMode.UP);
-    }
-
-    public boolean post(RoundingMode roundingMode) {
-        return roundingMode == RoundingMode.UP;
+    public void post(List<String> strings) {
+        strings.forEach(string -> {
+            System.out.println(string);
+        });
     }
 }
 ```
 
-See[EnumsWithoutEqualsCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/EnumsWithoutEqualsCases.java)
+See[ForEachToForIterableForEachCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ForEachToForIterableForEachCases.java)
 
 ### [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
 
@@ -1091,6 +1123,44 @@ public static class Nominal {
 
 See[LoopIntRangeToIntStreamForEachCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/LoopIntRangeToIntStreamForEachCases.java)
 
+### [NullCheckToOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/NullCheckToOptionalOfNullable.java)
+
+Cleanthat own ID: NullCheckToOptionalOfNullable
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class ChainedConditions {
+
+    public void pre(String s) {
+        if (s != null) {
+            String v = s.toUpperCase();
+            if (v.startsWith("A")) {
+                System.out.println(v);
+            }
+        }
+    }
+
+    public void post(String s) {
+        Optional.ofNullable(s).ifPresent(s_ -> {
+            String v = s_.toUpperCase();
+            if (v.startsWith("A")) {
+                System.out.println(v);
+            }
+        });
+    }
+
+    public void postWithXXX(String s) {
+        Optional.ofNullable(s).map(v -> v.toUpperCase()).filter(v -> v.startsWith("A")).ifPresent(v -> System.out.println(v));
+    }
+}
+```
+
+See[NullCheckToOptionalOfNullableCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/NullCheckToOptionalOfNullableCases.java)
+
 ### [ObjectEqualsForPrimitives](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ObjectEqualsForPrimitives.java)
 
 ErrorProne: [ObjectEqualsForPrimitives](https://errorprone.info/bugpattern/ObjectEqualsForPrimitives)
@@ -1142,6 +1212,62 @@ public static class CaseInt {
 ```
 
 See[ObjectsHashCodePrimitiveCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/ObjectsHashCodePrimitiveCases.java)
+
+### [OptionalWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedIfToFilter.java)
+
+Cleanthat own ID: OptionalWrappedIfToFilter
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class Nominal {
+
+    public void pre(Optional<String> o) {
+        o.ifPresent(s -> {
+            if (s.startsWith("_"))
+                System.out.println(s);
+        });
+    }
+
+    public void post(Optional<String> o) {
+        o.filter(s -> s.startsWith("_")).ifPresent(s -> System.out.println(s));
+    }
+}
+```
+
+See[OptionalWrappedIfToFilterCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/OptionalWrappedIfToFilterCases.java)
+
+### [OptionalWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedVariableToMap.java)
+
+Cleanthat own ID: OptionalWrappedVariableToMap
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class Optional_ifPresent {
+
+    public void pre(Optional<String> o) {
+        o.ifPresent(s -> {
+            String subString = s.substring(1);
+            System.out.println(subString);
+        });
+    }
+
+    public void post(Optional<String> o) {
+        o.map(s -> s.substring(1)).ifPresent(subString -> {
+            System.out.println(subString);
+        });
+    }
+}
+```
+
+See[OptionalWrappedVariableToMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/OptionalWrappedVariableToMapCases.java)
 
 ### [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 
@@ -1221,9 +1347,36 @@ public static class Nominal {
 
 See[RemoveAllToClearCollectionCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/RemoveAllToClearCollectionCases.java)
 
-### [SimplifyStreamMethodRefWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamMethodRefWithMap.java)
+### [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
 
-Cleanthat own ID: SimplifyStreamMethodRefWithMap
+Cleanthat own ID: StreamWrappedIfToFilter
+
+isDraft
+
+languageLevel: jdk1.8
+
+```
+@CompareMethods
+public static class IntStream_forEach_intermediateInt {
+
+    public void pre(IntStream is) {
+        is.forEach(i -> {
+            if (i == '\'')
+                System.out.println(i);
+        });
+    }
+
+    public void post(IntStream is) {
+        is.filter(i -> i == '\'').forEach(i -> System.out.println(i));
+    }
+}
+```
+
+See[StreamWrappedIfToFilterCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StreamWrappedIfToFilterCases.java)
+
+### [StreamWrappedMethodRefToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedMethodRefToMap.java)
+
+Cleanthat own ID: StreamWrappedMethodRefToMap
 
 isDraft
 
@@ -1243,11 +1396,11 @@ public static class CaseMethodRef {
 }
 ```
 
-See[SimplifyStreamMethodRefWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamMethodRefWithMapCases.java)
+See[StreamWrappedMethodRefToMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StreamWrappedMethodRefToMapCases.java)
 
-### [SimplifyStreamVariablesWithMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStreamVariablesWithMap.java)
+### [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
 
-Cleanthat own ID: SimplifyStreamVariablesWithMap
+Cleanthat own ID: StreamWrappedVariableToMap
 
 isDraft
 
@@ -1276,7 +1429,7 @@ public static class IntStream_forEach_intermediateInt {
 }
 ```
 
-See[SimplifyStreamVariablesWithMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/SimplifyStreamVariablesWithMapCases.java)
+See[StreamWrappedVariableToMapCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/StreamWrappedVariableToMapCases.java)
 
 ### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 
@@ -1503,44 +1656,6 @@ public static class CaseCollection {
 ```
 
 See[UseDiamondOperatorJdk8Cases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseDiamondOperatorJdk8Cases.java)
-
-### [UseOptionalOfNullable](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseOptionalOfNullable.java)
-
-Cleanthat own ID: UseOptionalOfNullable
-
-isDraft
-
-languageLevel: jdk1.8
-
-```
-@CompareMethods
-public static class ChainedConditions {
-
-    public void pre(String s) {
-        if (s != null) {
-            String v = s.toUpperCase();
-            if (v.startsWith("A")) {
-                System.out.println(v);
-            }
-        }
-    }
-
-    public void post(String s) {
-        Optional.ofNullable(s).ifPresent(s_ -> {
-            String v = s_.toUpperCase();
-            if (v.startsWith("A")) {
-                System.out.println(v);
-            }
-        });
-    }
-
-    public void postWithXXX(String s) {
-        Optional.ofNullable(s).map(v -> v.toUpperCase()).filter(v -> v.startsWith("A")).ifPresent(v -> System.out.println(v));
-    }
-}
-```
-
-See[UseOptionalOfNullableCases](java/src/test/java/eu/solven/cleanthat/engine/java/refactorer/cases/do_not_format_me/UseOptionalOfNullableCases.java)
 
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 

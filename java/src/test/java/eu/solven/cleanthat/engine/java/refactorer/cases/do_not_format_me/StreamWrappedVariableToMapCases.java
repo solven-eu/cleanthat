@@ -11,14 +11,14 @@ import java.util.stream.IntStream;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStreamVariablesWithMap;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class SimplifyStreamVariablesWithMapCases extends AJavaparserRefactorerCases {
+public class StreamWrappedVariableToMapCases extends AJavaparserRefactorerCases {
 
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new SimplifyStreamVariablesWithMap();
+		return new StreamWrappedVariableToMap();
 	}
 
 	@CompareMethods

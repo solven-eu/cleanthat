@@ -18,21 +18,23 @@ package eu.solven.cleanthat.engine.java.refactorer.cases;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
-import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.EnhancedForLoopToForEachCases;
+import eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me.StreamWrappedMethodRefToMapCases;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestEnhancedForLoopToForEachCases extends AParameterizesJavaparserRefactorerCases {
+@Ignore("TODO")
+public class TestStreamWrappedMethodRefToMapCases extends AParameterizesJavaparserRefactorerCases {
 
 	private static AJavaparserRefactorerCases getStaticRefactorerCases() {
-		return new EnhancedForLoopToForEachCases();
+		return new StreamWrappedMethodRefToMapCases();
 	}
 
-	public TestEnhancedForLoopToForEachCases(JavaParser javaParser,
+	public TestStreamWrappedMethodRefToMapCases(JavaParser javaParser,
 			String testName,
 			ClassOrInterfaceDeclaration testCase) {
 		super(javaParser, testCase);

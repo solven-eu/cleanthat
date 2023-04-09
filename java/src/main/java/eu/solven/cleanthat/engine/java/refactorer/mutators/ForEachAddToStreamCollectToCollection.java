@@ -39,11 +39,11 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 
 /**
- * See {@link EnhancedForLoopToStreamCollectCases}
+ * See {@link ForEachAddToStreamCollectToCollectionCases}
  *
  * @author Benoit Lacelle
  */
-public class EnhancedForLoopToStreamCollect extends AJavaparserStmtMutator {
+public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -149,8 +149,8 @@ public class EnhancedForLoopToStreamCollect extends AJavaparserStmtMutator {
 		MethodCallExpr streamMayDoFilter;
 		if (optIfStmt.isPresent()) {
 			var ifStmt = optIfStmt.get();
-			LambdaExpr filterArgument = EnhancedForLoopToStreamAnyMatch.ifConditionToLambda(ifStmt,
-					forEachStmt.getVariable().getVariable(0));
+			LambdaExpr filterArgument =
+					ForEachIfToIfStreamAnyMatch.ifConditionToLambda(ifStmt, forEachStmt.getVariable().getVariable(0));
 			streamMayDoFilter = new MethodCallExpr(stream, "filter", new NodeList<>(filterArgument));
 		} else {
 			streamMayDoFilter = stream;

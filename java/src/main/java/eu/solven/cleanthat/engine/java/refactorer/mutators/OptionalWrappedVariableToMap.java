@@ -17,11 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.BaseStream;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
@@ -34,37 +29,28 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.PrimitiveType.Primitive;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.UnknownType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 
 /**
- * Turns `IntStream.range(0, s.length()).forEach(j -> { int c = s.charAt(j); sb.append(c); });`
+ * Turns `o.ifPresent(s -> { String subString = s.substring(1); System.out.println(subString); });`
  * 
- * into `IntStream.range(0, s.length()).map(j -> s.charAt(j)).forEach(c -> sb.append(c))`
+ * into `o.map(s -> s.substring(1)).ifPresent(subString -> { System.out.println(subString); });`
  *
  * @author Benoit Lacelle
  */
+// https://stackoverflow.com/questions/29104968/can-i-not-map-flatmap-an-optionalint
 @ApplyAfterMe(LambdaReturnsSingleStatement.class)
-public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
+public class OptionalWrappedVariableToMap extends AJavaparserExprMutator implements IReApplyUntilNoop {
 
 	private static final String METHOD_MAP = "map";
-	private static final String METHOD_MAP_TO_INT = "mapToInt";
-	private static final String METHOD_MAP_TO_LNG = "mapToLong";
-	private static final String METHOD_MAP_TO_DBL = "mapToDouble";
-
-	private static final Set<String> ELIGIBLE_FOR_INTERMEDIATE_MAP =
-			Set.of("forEach", METHOD_MAP, METHOD_MAP_TO_INT, METHOD_MAP_TO_LNG, METHOD_MAP_TO_DBL);
-
-	// These methods are turned into a p;lain `.map` by adding a prefix `.map[XXX]`
-	private static final Set<String> SIMPLIFIED_TO_MAP =
-			Set.of(METHOD_MAP_TO_INT, METHOD_MAP_TO_LNG, METHOD_MAP_TO_DBL);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -73,7 +59,15 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Primitive", "Loop", "Stream");
+		return ImmutableSet.of("Optional", "Primitive");
+	}
+
+	protected Set<String> getEligibleForUnwrappedMap() {
+		return Set.of("ifPresent", "ifPresentOrElse", METHOD_MAP);
+	}
+
+	protected Class<?> getExpectedScope() {
+		return Optional.class;
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
@@ -84,11 +78,11 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 		}
 
 		MethodCallExpr methodCallExpr = expr.asMethodCallExpr();
-		if (!ELIGIBLE_FOR_INTERMEDIATE_MAP.contains(methodCallExpr.getNameAsString())) {
+		if (!getEligibleForUnwrappedMap().contains(methodCallExpr.getNameAsString())) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), BaseStream.class)) {
+		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), getExpectedScope())) {
 			return false;
-		} else if (methodCallExpr.getArguments().size() != 1) {
+		} else if (methodCallExpr.getArguments().size() < 1) {
 			return false;
 		}
 
@@ -97,16 +91,16 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 			return false;
 		}
 
-		LambdaExpr lambdaExpr = optLambdaExpr.asLambdaExpr();
+		LambdaExpr mapLambdaExpr = optLambdaExpr.asLambdaExpr();
 
-		if (!lambdaExpr.getBody().isBlockStmt()) {
+		if (!mapLambdaExpr.getBody().isBlockStmt()) {
 			// e.g. A MethodRefExpr can not be split
 			return false;
-		} else if (lambdaExpr.getParameters().size() != 1) {
+		} else if (mapLambdaExpr.getParameters().size() != 1) {
 			return false;
 		}
 
-		BlockStmt lambdaBlock = lambdaExpr.getBody().asBlockStmt();
+		BlockStmt lambdaBlock = mapLambdaExpr.getBody().asBlockStmt();
 		if (lambdaBlock.getStatements().size() <= 1) {
 			// We expect at least a variableDeclaration, and something processing the new variable
 			return false;
@@ -139,7 +133,7 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 			return false;
 		}
 
-		String lambdaVariableName = lambdaExpr.getParameters().get(0).getNameAsString();
+		String lambdaVariableName = mapLambdaExpr.getParameters().get(0).getNameAsString();
 		if (variableDeclaratorExpr
 				.findFirst(NameExpr.class, nameExpr -> nameExpr.getNameAsString().equals(lambdaVariableName))
 				.isEmpty()) {
@@ -154,19 +148,12 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 			return false;
 		}
 
-		// 1- The following makes a typo replacing the variableName
-		// lambdaExpr.getParameter(0).setName(variable.getVariable(0).getName());
-		// 2- The following may lead to exception in LexicalPreservingPrinter
-		var newForEachVariable = new Parameter(new UnknownType(), variableDeclaratorExpr.getVariable(0).getName());
-		// lambdaExpr.setParameter(0, newForEachVariable);
-		// LambdaExpr cloneLambdaExpr = lambdaExpr.clone();
-		// methodCallExpr.setArgument(0, cloneLambdaExpr);
-		// lambdaExpr.getParameter(0).setName(variable.getVariable(0).getName());
-		// https://github.com/javaparser/javaparser/issues/3898#issuecomment-1426961297
-		// lambdaExpr.setEnclosingParameters(false);
-		// lambdaExpr.getParameter(0).replace(newForEachVariable);
-
-		lambdaExpr.replace(new LambdaExpr(newForEachVariable, lambdaBlock));
+		Optional<LambdaExpr> optNewLambdaExpr =
+				LambdaExprHelpers.makeLambdaExpr(variableDeclaratorExpr.getVariable(0).getName(), lambdaBlock);
+		if (optNewLambdaExpr.isEmpty()) {
+			return false;
+		}
+		mapLambdaExpr.replace(optNewLambdaExpr.get());
 
 		if (!tryRemove(firstStatement)) {
 			// Remove the variableDeclaration as it is moved to the `.map(...)` methodCall
@@ -174,17 +161,15 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 		}
 
 		var parameter = new Parameter(new UnknownType(), lambdaVariableName);
-		LambdaExpr mapLambdaExpr =
+		LambdaExpr unwrappedMapLambdaExpr =
 				new LambdaExpr(parameter, variableDeclaratorExpr.getVariable(0).getInitializer().get());
 
 		MethodCallExpr callMap = new MethodCallExpr(methodCallExpr.getScope().get(),
 				optMapMethodName.get(),
-				new NodeList<>(mapLambdaExpr));
+				new NodeList<>(unwrappedMapLambdaExpr));
 
 		methodCallExpr.setScope(callMap);
-		if (SIMPLIFIED_TO_MAP.contains(methodCallExpr.getNameAsString())) {
-			methodCallExpr.setName(METHOD_MAP);
-		}
+		adjustMethodName(methodCallExpr);
 
 		return true;
 	}
@@ -199,35 +184,11 @@ public class SimplifyStreamVariablesWithMap extends AJavaparserExprMutator {
 		return descendant.findAncestor(n -> n == ancestor, Node.class).isPresent();
 	}
 
-	private Optional<String> computeMapMethodName(Expression expression, Type type) {
-		assert scopeHasRequiredType(Optional.of(expression), BaseStream.class);
+	protected Optional<String> computeMapMethodName(Expression expression, Type type) {
+		return Optional.of(METHOD_MAP);
+	}
 
-		if (type.isPrimitiveType()) {
-			Primitive primitiveType = type.asPrimitiveType().getType();
-			if (scopeHasRequiredType(Optional.of(expression), IntStream.class)
-					&& primitiveType == PrimitiveType.Primitive.INT
-					|| scopeHasRequiredType(Optional.of(expression), LongStream.class)
-							&& primitiveType == PrimitiveType.Primitive.LONG
-					|| scopeHasRequiredType(Optional.of(expression), DoubleStream.class)
-							&& primitiveType == PrimitiveType.Primitive.DOUBLE) {
-				return Optional.of(METHOD_MAP);
-			} else if (primitiveType == PrimitiveType.Primitive.INT) {
-				return Optional.of(METHOD_MAP_TO_INT);
-			} else if (primitiveType == PrimitiveType.Primitive.LONG) {
-				return Optional.of(METHOD_MAP_TO_LNG);
-			} else if (primitiveType == PrimitiveType.Primitive.DOUBLE) {
-				return Optional.of(METHOD_MAP_TO_DBL);
-			}
-		} else if (scopeHasRequiredType(Optional.of(expression), Object.class)) {
-			if (scopeHasRequiredType(Optional.of(expression), Stream.class)) {
-				// Object and Stream
-				return Optional.of(METHOD_MAP);
-			} else {
-				// Object and Stream
-				return Optional.of("mapToObj");
-			}
-		}
-
-		return Optional.empty();
+	protected void adjustMethodName(MethodCallExpr methodCallExpr) {
+		// No need to change the methodName by default (Optional)
 	}
 }

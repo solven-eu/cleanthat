@@ -258,4 +258,18 @@ public class TestForEachIfToIfStreamAnyMatchCases extends AJavaparserRefactorerC
 			return containsEmpty;
 		}
 	}
+
+	@UnmodifiedMethod
+	public static class AssignIterated {
+		public String pre(List<String> strings) {
+			String key = "";
+			for (String value : strings) {
+				if (value.length() > 4) {
+					key = value;
+					break;
+				}
+			}
+			return key;
+		}
+	}
 }

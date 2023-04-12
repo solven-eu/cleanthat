@@ -43,12 +43,18 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
  * Turns `if (s != null) {...}` into `Optional.ofNullable(s).ifPresent(...)`
+ * 
+ * BEWARE This case of application should be restricted, as a simple null-check is often simpler than an
+ * `Optional.ofNullable`, especially if the `thenStmt` does not depends on the nullable variable.
  *
  * @author Benoit Lacelle
  */
+// https://community.sonarsource.com/t/java-optional-used-as-replacement-for-local-null-check/43842
+@ApplyAfterMe({ OptionalWrappedIfToFilter.class, OptionalWrappedVariableToMap.class })
 public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NullCheckToOptionalOfNullable.class);
 
@@ -136,6 +142,8 @@ public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 	 * @param nameTemplate
 	 * @return
 	 */
+	// Beware PMD.FormalParameterNamingConventions requires by default variables named like `[a-z][a-zA-Z0-9]*`
+	// We may prefer a policy renaming into `notNull`
 	@SuppressFBWarnings("SBSC_USE_STRINGBUFFER_CONCATENATION")
 	private SimpleName makeUnusedVariablename(Node context, String nameTemplate) {
 		var suffixCandidate = "_";

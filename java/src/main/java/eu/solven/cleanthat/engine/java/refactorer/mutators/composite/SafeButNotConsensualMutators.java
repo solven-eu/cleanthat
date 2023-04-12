@@ -42,6 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInsta
 import eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveExplicitCallToSuper;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringIndexOfToContains;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ThreadRunToThreadStart;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks;
@@ -86,7 +87,8 @@ public class SafeButNotConsensualMutators extends CompositeMutator<IMutator> imp
 					// https://github.com/javaparser/javaparser/pull/3938
 					new LambdaReturnsSingleStatement(),
 					new CollectionIndexOfToContains(),
-					new StringIndexOfToContains())
+					new StringIndexOfToContains(),
+					new ThreadRunToThreadStart())
 			.build();
 
 	public SafeButNotConsensualMutators(JavaVersion sourceJdkVersion) {

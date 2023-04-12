@@ -30,6 +30,7 @@ import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.LongLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
@@ -119,7 +120,7 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 			return false;
 		}
 
-		if (!isUsedAnInt(expr)) {
+		if (!isUsedAsALong(expr)) {
 			return false;
 		}
 
@@ -141,9 +142,19 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 		return true;
 	}
 
-	private boolean isUsedAnInt(Expression expr) {
-		Class[] classes =
-				{ AssignExpr.class, CastExpr.class, LambdaExpr.class, ReturnStmt.class, MethodCallExpr.class };
+	/**
+	 * 
+	 * @param expr
+	 * @return true if we know the expr is used as a long. false if used as an int, or if we do not know.
+	 */
+	private boolean isUsedAsALong(Expression expr) {
+		@SuppressWarnings("rawtypes")
+		Class[] classes = { AssignExpr.class,
+				CastExpr.class,
+				LambdaExpr.class,
+				ReturnStmt.class,
+				MethodCallExpr.class,
+				ObjectCreationExpr.class };
 		Optional<Node> optAncestorDefiningType = expr.findAncestor(classes);
 		if (optAncestorDefiningType.isEmpty()) {
 			return false;
@@ -151,10 +162,9 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 			NodeWithType<?, ?> castExpr = (NodeWithType<?, ?>) optAncestorDefiningType.get();
 			Optional<ResolvedType> optResolvedType = optResolvedType(castExpr.getType());
 
-			if (typeHasRequiredType(optResolvedType, int.class.getName())
-					|| typeHasRequiredType(optResolvedType, Integer.class.getName())) {
+			if (typeWouldNotOverflowFromInt(optResolvedType)) {
 				// No need to prevent overflow as an overflow is expected by the returned type
-				return false;
+				return true;
 			}
 		} else if (optAncestorDefiningType.get() instanceof ReturnStmt) {
 			ReturnStmt returnStmt = (ReturnStmt) optAncestorDefiningType.get();
@@ -171,10 +181,9 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 
 				Optional<ResolvedType> optResolvedType = optResolvedType(methodDecl.getType());
 
-				if (typeHasRequiredType(optResolvedType, int.class.getName())
-						|| typeHasRequiredType(optResolvedType, Integer.class.getName())) {
+				if (typeWouldNotOverflowFromInt(optResolvedType)) {
 					// No need to prevent overflow as an overflow is expected by the returned type
-					return false;
+					return true;
 				}
 			} else if (optParentNodeNotBlock.get() instanceof LambdaExpr) {
 				// TODO Guess the output type from a LambdaExpr
@@ -184,6 +193,20 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 			}
 		}
 
-		return true;
+		// TODO Guess the output type from a MethodCallExpr, ObjectCreationExpr, etc
+		return false;
+	}
+
+	private boolean typeWouldNotOverflowFromInt(Optional<ResolvedType> optResolvedType) {
+		if (typeIsAssignable(optResolvedType, int.class.getName())
+				|| typeIsAssignable(optResolvedType, Integer.class.getName())) {
+			return false;
+		}
+
+		// TODO This looks sub-optimal
+		return typeIsAssignable(optResolvedType, long.class.getName())
+				|| typeIsAssignable(optResolvedType, float.class.getName())
+				|| typeIsAssignable(optResolvedType, double.class.getName())
+				|| typeIsAssignable(optResolvedType, Number.class.getName());
 	}
 }

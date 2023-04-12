@@ -223,7 +223,8 @@ public class OneMutatorCase<N, R> {
 				|| expectedPostAsString.contains("java.util.stream.IntStream")
 				|| expectedPostAsString.contains("(double)")
 				|| expectedPostAsString.contains("(float)")
-				|| expectedPostAsString.contains("(long)")) {
+				|| expectedPostAsString.contains("(long)")
+				|| expectedPostAsString.contains("java.nio.charset.StandardCharsets")) {
 			// see ArraysDotStream
 			// We build with a NameExpr, while the parser interpret java.util.stream.Stream as a FieldAccessExp
 			LOGGER.warn("We skip javaParser Node equality due to `packagedName` (NameExpr vs FieldAccessExp)");

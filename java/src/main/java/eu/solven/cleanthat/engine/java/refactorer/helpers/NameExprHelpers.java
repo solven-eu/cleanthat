@@ -13,23 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.engine.java.refactorer.meta;
+package eu.solven.cleanthat.engine.java.refactorer.helpers;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.expr.NameExpr;
 
 /**
- * This indicates provided {@link IMutator}s are to be applied after the annotated {@link IMutator}. Beware of cycles.
+ * Helps working with {@link NameExpr}
  * 
  * @author Benoit Lacelle
  *
  */
-@Deprecated(since = "This is just for informative purpose, as it is not implemented yet")
-@Target(ElementType.TYPE)
-public @interface ApplyAfterMe {
+public class NameExprHelpers {
+
+	protected NameExprHelpers() {
+		// hidden
+	}
 
 	/**
-	 * {@link IMutator}s which have a lower priority than this
+	 * 
+	 * @param name
+	 *            a searched name
+	 * @param node
+	 *            some {@link Node}
+	 * @return true if the name is referenced anywhere in the {@link Node}
 	 */
-	Class<? extends IMutator>[] value();
+	public static boolean isNameReferenced(NameExpr name, Node node) {
+		return node.findFirst(NameExpr.class, n -> n.equals(name)).isPresent();
+	}
 }

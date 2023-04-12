@@ -3,13 +3,14 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.Date;
 import java.util.function.DoubleSupplier;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CastMathOperandsBeforeAssignement;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestCastMathOperandBeforeAssignementCases extends AJavaparserRefactorerCases {
+public class TestCastMathOperandsBeforeAssignementCases extends AJavaparserRefactorerCases {
 	public static void main(String[] args) {
 		System.out.println((long) (Integer.MAX_VALUE + 2));
 		System.out.println((long) Integer.MAX_VALUE + 2);
@@ -74,6 +75,28 @@ public class TestCastMathOperandBeforeAssignementCases extends AJavaparserRefact
 	}
 
 	@CompareMethods
+	public static class IntSum_toFloat {
+		public float pre() {
+			return Integer.MAX_VALUE + 2;
+		}
+
+		public float post() {
+			return Integer.MAX_VALUE + 2L;
+		}
+	}
+
+	@CompareMethods
+	public static class IntSum_toDouble {
+		public double pre() {
+			return Integer.MAX_VALUE + 2;
+		}
+
+		public double post() {
+			return Integer.MAX_VALUE + 2L;
+		}
+	}
+
+	@CompareMethods
 	public static class IntSum_FieldRefs {
 		public long pre() {
 			return Integer.MAX_VALUE + Integer.MAX_VALUE;
@@ -85,13 +108,21 @@ public class TestCastMathOperandBeforeAssignementCases extends AJavaparserRefact
 	}
 
 	@CompareMethods
-	public static class MethodCall {
+	@CaseNotYetImplemented
+	public static class MethodCall_intToLong {
 		public Date pre(int seconds) {
 			return new Date(seconds * 1_000);
 		}
 
 		public Date post(int seconds) {
 			return new Date(seconds * 1_000L);
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class MethodCall_int {
+		public String pre(int i) {
+			return Integer.toString(1 + i);
 		}
 	}
 
@@ -136,6 +167,20 @@ public class TestCastMathOperandBeforeAssignementCases extends AJavaparserRefact
 
 		public double post(long factor) {
 			return factor / 123F;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class Division_longDividedByInt_ToLong {
+		public long pre(long bytes) {
+			return bytes / 1024;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class Division_longDividedByInt_ToLong_methodCall {
+		public String pre(long bytes) {
+			return Long.toString(bytes / 1024);
 		}
 	}
 

@@ -23,7 +23,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 
 /**
  * Migrate from 'm.length() == 0’ to ’m.isEmpty()'. Works with {@link String}.
@@ -31,7 +31,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
  * @author Benoit Lacelle
  */
 // We prefer turning `username.equals("")` into `username.isEmpty()` than `"".equals(username)`
-@ApplyMeBefore({ LiteralsFirstInComparisons.class })
+@ApplyBeforeMe({ LiteralsFirstInComparisons.class })
 // Naming similar to UseCollectionIsEmpty
 public class UseStringIsEmpty extends AUseXIsEmpty {
 	@Override

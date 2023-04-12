@@ -24,13 +24,17 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.CastMathOperandsBeforeAssignement;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionToOptional;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachAddToStreamCollectToCollection;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LoopIntRangeToIntStreamForEach;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedIfToFilter;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedIfToFilter;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQuotableInput;
 
@@ -49,10 +53,19 @@ public class SafeButControversialMutators extends CompositeMutator<IMutator> imp
 					new ForEachAddToStreamCollectToCollection(),
 					new SimplifyBooleanExpression(),
 					new SimplifyBooleanInitialization(),
-					// new SimplifyStreamMethodRefWithMap(),
-					new StreamWrappedVariableToMap(),
 					new StringReplaceAllWithQuotableInput(),
-					new LoopIntRangeToIntStreamForEach())
+					new LoopIntRangeToIntStreamForEach(),
+					new OptionalWrappedIfToFilter(),
+					new OptionalWrappedVariableToMap(),
+					new StreamWrappedIfToFilter(),
+					new StreamWrappedVariableToMap(),
+					// new StreamWrappedMethodRefToMap(),
+					new CastMathOperandsBeforeAssignement()
+
+			// NullCheckToOptionalOfNullable is often counter-productive. We need to restrict its coverage to more
+			// relevant situations than any nullCheck
+			// new NullCheckToOptionalOfNullable()
+			)
 			.build();
 
 	public SafeButControversialMutators(JavaVersion sourceJdkVersion) {

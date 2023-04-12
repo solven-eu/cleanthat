@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 
@@ -36,6 +37,10 @@ public class TestSafeAndConsensualMutators {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestSafeAndConsensualMutators.class);
 
 	final JavaVersion last = JavaVersion.parse(IJdkVersionConstants.LAST);
+
+	final CompositeMutator<IMutator> safeAndConsensual = new SafeAndConsensualMutators(last);
+	final CompositeMutator<IMutator> safeButNotConsensual = new SafeButNotConsensualMutators(last);
+	final CompositeMutator<IMutator> safeButControversial = new SafeButControversialMutators(last);
 
 	@Before
 	@After
@@ -45,35 +50,41 @@ public class TestSafeAndConsensualMutators {
 
 	@Test
 	public void testIds() {
-		var safeAndConsensual = new SafeAndConsensualMutators(last);
-		var safeButNotConsensual = new SafeButNotConsensualMutators(last);
-
 		Assertions.assertThat(safeAndConsensual.getIds()).doesNotContainAnyElementsOf(safeButNotConsensual.getIds());
 		Assertions.assertThat(safeButNotConsensual.getIds()).doesNotContainAnyElementsOf(safeAndConsensual.getIds());
 	}
 
 	@Test
+	public void testTodos() {
+		Assertions.assertThat(safeAndConsensual.getUnderlyings()).noneMatch(ATodoJavaParserMutator.class::isInstance);
+		Assertions.assertThat(safeButNotConsensual.getUnderlyings())
+				.noneMatch(ATodoJavaParserMutator.class::isInstance);
+		Assertions.assertThat(safeButControversial.getUnderlyings())
+				.noneMatch(ATodoJavaParserMutator.class::isInstance);
+	}
+
+	@Test
 	public void testScanComposite() {
-		Set<String> safeAndConsensual = new SafeAndConsensualMutators(last).getUnderlyingIds();
-		Set<String> safeButNotConsensual = new SafeButNotConsensualMutators(last).getUnderlyingIds();
-		Set<String> safeButControversial = new SafeButControversialMutators(last).getUnderlyingIds();
+		Set<String> safeAndConsensualIds = safeAndConsensual.getUnderlyingIds();
+		Set<String> safeButNotConsensualIds = safeButNotConsensual.getUnderlyingIds();
+		Set<String> safeButControversialIds = safeButControversial.getUnderlyingIds();
 
 		// Check the intersection is empty
-		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButNotConsensual);
-		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeAndConsensual);
+		Assertions.assertThat(safeAndConsensualIds).doesNotContainAnyElementsOf(safeButNotConsensualIds);
+		Assertions.assertThat(safeButNotConsensualIds).doesNotContainAnyElementsOf(safeAndConsensualIds);
 
-		Assertions.assertThat(safeAndConsensual).doesNotContainAnyElementsOf(safeButControversial);
-		Assertions.assertThat(safeButControversial).doesNotContainAnyElementsOf(safeAndConsensual);
+		Assertions.assertThat(safeAndConsensualIds).doesNotContainAnyElementsOf(safeButControversialIds);
+		Assertions.assertThat(safeButControversialIds).doesNotContainAnyElementsOf(safeAndConsensualIds);
 
-		Assertions.assertThat(safeButControversial).doesNotContainAnyElementsOf(safeButNotConsensual);
-		Assertions.assertThat(safeButNotConsensual).doesNotContainAnyElementsOf(safeButControversial);
+		Assertions.assertThat(safeButControversialIds).doesNotContainAnyElementsOf(safeButNotConsensualIds);
+		Assertions.assertThat(safeButNotConsensualIds).doesNotContainAnyElementsOf(safeButControversialIds);
 
 		List<IMutator> allSingle = new AllIncludingDraftSingleMutators(last).getUnderlyings();
 
 		allSingle.stream()
-				.filter(s -> Sets.intersection(s.getIds(), safeAndConsensual).isEmpty()
-						&& Sets.intersection(s.getIds(), safeButNotConsensual).isEmpty()
-						&& Sets.intersection(s.getIds(), safeButControversial).isEmpty())
+				.filter(s -> Sets.intersection(s.getIds(), safeAndConsensualIds).isEmpty()
+						&& Sets.intersection(s.getIds(), safeButNotConsensualIds).isEmpty()
+						&& Sets.intersection(s.getIds(), safeButControversialIds).isEmpty())
 				.forEach(notInComposite -> LOGGER.warn("{} is neither in {} nor in {} nor in {}",
 						notInComposite.getClass().getSimpleName(),
 						SafeAndConsensualMutators.class.getSimpleName(),

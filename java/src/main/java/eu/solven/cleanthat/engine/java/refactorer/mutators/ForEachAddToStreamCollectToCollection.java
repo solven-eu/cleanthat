@@ -37,12 +37,14 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 
 /**
  * See {@link TestForEachAddToStreamCollectToCollectionCases}
  *
  * @author Benoit Lacelle
  */
+@ApplyBeforeMe({ LambdaIsMethodReference.class })
 public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutator {
 
 	@Override
@@ -96,7 +98,7 @@ public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutato
 		}
 		var objectCreationExpr = optInitializer.get().asObjectCreationExpr();
 
-		if (!typeHasRequiredType(optResolvedType(objectCreationExpr.getType()), Collection.class.getName())
+		if (!typeIsAssignable(optResolvedType(objectCreationExpr.getType()), Collection.class.getName())
 				|| !objectCreationExpr.getArguments().isEmpty()) {
 			return false;
 		}

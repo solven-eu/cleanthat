@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -37,17 +34,16 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.NameExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
  * See EnhancedForLoopToStreamAnyMatchCases
  *
  * @author Benoit Lacelle
  */
-@ApplyMeBefore({ SimplifyBooleanInitialization.class })
+@ApplyAfterMe({ RedundantLogicalComplementsInStream.class, LambdaIsMethodReference.class })
 public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ForEachIfToIfStreamAnyMatch.class);
-
 	static final String ANY_MATCH = "anyMatch";
 
 	@Override
@@ -95,48 +91,28 @@ public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
 			return false;
 		}
 
+		NameExpr variableName = forEachStmt.getVariableDeclarator().getNameAsExpression();
+		if (NameExprHelpers.isNameReferenced(variableName, thenAsBlockStmt)) {
+			// We can not move the `if` condition into a `.anyMatch` else the variable would not be available anymore to
+			// the `then` block
+			return false;
+		}
+
 		if (hasOuterAssignExpr(ifStmt.getCondition())) {
 			// We can not put a variableAssignement in a lambda
 			return false;
 		}
 
 		var lastStmt = thenAsBlockStmt.getStatement(thenAsBlockStmt.getStatements().size() - 1);
-
-		if (lastStmt.isReturnStmt()) {
-			NameExpr variableName = forEachStmt.getVariableDeclarator().getNameAsExpression();
-			Optional<NameExpr> optVariableIsReturned =
-					thenAsBlockStmt.findFirst(NameExpr.class, n -> variableName.equals(n));
-
-			if (optVariableIsReturned.isPresent()) {
-				// The return statement depends on the variable
-				// TODO EnhancedForLoopToStreamAnyMatchCases.ReturnVariable
-				return false;
-			} else {
-				// The return statement does not depend on the variable
-				return replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
-			}
-		} else if (lastStmt.isBreakStmt()) {
-			boolean breakIsRemoved = tryRemove(lastStmt);
-			if (!breakIsRemoved) {
-				return false;
-			}
-
-			var replaced = replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
-
-			if (!replaced) {
-				// We restore the `break`
-				LOGGER.debug("We try restoring the `break` as we failed replacing the `forEach(if)`");
-				// BEWARE it would have been better not to remove it
-				if (!thenAsBlockStmt.getStatements().add(lastStmt)) {
-					throw new IllegalStateException(
-							"We corrupted `" + stmt + "` by failing restoring `" + lastStmt + "`");
-				}
-			}
-
-			return replaced;
-		} else {
+		if (!lastStmt.isReturnStmt() && !lastStmt.isBreakStmt()) {
 			return false;
 		}
+
+		var replaced = replaceForEachIfByIfStream(forEachStmt, ifStmt, thenAsBlockStmt);
+		if (replaced && lastStmt.isBreakStmt()) {
+			tryRemove(lastStmt);
+		}
+		return replaced;
 	}
 
 	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {

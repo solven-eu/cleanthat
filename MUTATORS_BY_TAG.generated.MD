@@ -32,6 +32,7 @@
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
 - [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [GuavaImmutableMapBuilderOverVarargs](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaImmutableMapBuilderOverVarargs.java)
@@ -62,6 +63,7 @@
 - [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
 - [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
 - [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
+- [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
 - [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 
 ## ErrorProne
@@ -88,6 +90,11 @@
 - [GuavaInlineStringsRepeat](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaInlineStringsRepeat.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 
+## Initialization
+
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
+- [SimplifyBooleanInitialization](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanInitialization.java)
+
 ## Iterable
 
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -104,6 +111,7 @@
 ## Loop
 
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LoopIntRangeToIntStreamForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LoopIntRangeToIntStreamForEach.java)
@@ -118,6 +126,7 @@
 
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
+- [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
 
 ## Optional
 
@@ -198,6 +207,7 @@
 - [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
 - [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
 - [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
+- [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
 - [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
 
 ## SpotBugs
@@ -208,6 +218,7 @@
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
@@ -290,12 +301,14 @@
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 - [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
+- [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
 - [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
 
 ## With JDK 1.8
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
@@ -338,6 +351,7 @@
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
+- [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
 - [LambdaIsMethodReference](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LambdaIsMethodReference.java)
@@ -350,6 +364,7 @@
 - [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
 - [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 - [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)
+- [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
 
 ---
 

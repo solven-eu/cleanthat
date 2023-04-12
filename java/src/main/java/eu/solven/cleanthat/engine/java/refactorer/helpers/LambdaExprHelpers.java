@@ -18,6 +18,7 @@ package eu.solven.cleanthat.engine.java.refactorer.helpers;
 import java.util.Optional;
 
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.stmt.Statement;
@@ -43,5 +44,10 @@ public class LambdaExprHelpers {
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	public static LambdaExpr makeLambdaExpr(SimpleName simpleName, Expression expression) {
+		var parameter = new Parameter(new UnknownType(), simpleName);
+		return new LambdaExpr(parameter, expression);
 	}
 }

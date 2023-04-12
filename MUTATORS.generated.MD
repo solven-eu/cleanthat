@@ -288,6 +288,16 @@ isDraft
 
 languageLevel: jdk1.8
 
+### [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
+
+jSparrow: [EnhancedForLoopToStreamFindFirst](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-find-first.html)
+
+Cleanthat own ID: ForEachIfBreakToStreamFindFirst
+
+isDraft
+
+languageLevel: jdk1.8
+
 ### [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 
 jSparrow: [EnhancedForLoopToStreamAnyMatch](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-any-match.html)
@@ -579,6 +589,18 @@ Cleanthat own ID: UseDiamondOperatorJdk8
 isDraft
 
 languageLevel: jdk1.8
+
+### [UsePredefinedStandardCharset](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UsePredefinedStandardCharset.java)
+
+Sonar: [RPSEC-4719](https://rules.sonarsource.com/java/RPSEC-4719)
+
+jSparrow: [UsePredefinedStandardCharset](https://jsparrow.github.io/rules/use-predefined-standard-charset.html)
+
+Cleanthat own ID: UsePredefinedStandardCharset
+
+isDraft
+
+languageLevel: jdk1.7
 
 ### [UseTextBlocks](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseTextBlocks.java)
 

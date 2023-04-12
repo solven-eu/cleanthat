@@ -360,7 +360,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
 		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
 
-		return typeHasRequiredType(optType, requiredType);
+		return typeIsAssignable(optType, requiredType);
 	}
 
 	protected boolean isAssignableBy(ReferenceTypeImpl referenceTypeImpl, ResolvedType resolvedType) {
@@ -393,7 +393,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		return isAssignableBy(referenceTypeImpl, resolvedType);
 	}
 
-	protected boolean typeHasRequiredType(Optional<ResolvedType> optType, String requiredType) {
+	protected boolean typeIsAssignable(Optional<ResolvedType> optType, String requiredType) {
 		if (optType.isEmpty()) {
 			return false;
 		}
@@ -407,9 +407,6 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		}
 
 		if (isAssignableBy(requiredType, type)) {
-			isCorrectClass = true;
-		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
-			// For a primitive double, requiredType is 'double'
 			isCorrectClass = true;
 		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
 			// For a primitive double, requiredType is 'double'
@@ -555,9 +552,9 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 					Optional<ResolvedType> optResolved = optResolvedType((Type) t);
 					if (optResolved.isEmpty()) {
 						return true;
-					} else if (typeHasRequiredType(optResolved, RuntimeException.class.getName())) {
+					} else if (typeIsAssignable(optResolved, RuntimeException.class.getName())) {
 						return false;
-					} else if (typeHasRequiredType(optResolved, Error.class.getName())) {
+					} else if (typeIsAssignable(optResolved, Error.class.getName())) {
 						return false;
 					}
 					// A Throwable which is neither a RuntimeException nor an Error is an explicit Exception

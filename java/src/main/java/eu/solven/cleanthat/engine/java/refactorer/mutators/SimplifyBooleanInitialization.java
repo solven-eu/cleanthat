@@ -26,14 +26,14 @@ import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr.Operator;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyMeBefore;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.VariableDeclarationExprHepers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
 
 /**
@@ -45,12 +45,9 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
  * @author Benoit Lacelle
  */
 @RepeatOnSuccess
-@ApplyMeBefore({ RedundantLogicalComplementsInStream.class })
-@ApplyAfterMe({ SimplifyBooleanInitialization.class })
-public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
+@ApplyBeforeMe({ RedundantLogicalComplementsInStream.class })
+public class SimplifyBooleanInitialization extends ARefactorConsecutiveStatements {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimplifyBooleanInitialization.class);
-
-	static final String ANY_MATCH = "anyMatch";
 
 	@Override
 	public String minimalJavaVersion() {
@@ -59,7 +56,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Redundancy");
+		return ImmutableSet.of("Redundancy", "Initialization");
 	}
 
 	@Override
@@ -72,36 +69,15 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 		return IS_PRODUCTION_READY;
 	}
 
-	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isBlockStmt()) {
-			return false;
-		}
-
-		var blockStmt = stmt.asBlockStmt();
-
-		var result = false;
-		for (var i = 0; i < blockStmt.getStatements().size() - 1; i++) {
-			var currentStmt = blockStmt.getStatement(i);
-			var nextStmt = blockStmt.getStatement(i + 1);
-
-			result |= trySimplifyingBoolean(currentStmt, nextStmt);
-		}
-
-		return result;
-
-	}
-
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
-	private boolean trySimplifyingBoolean(Statement currentStmt, Statement nextStmt) {
-		if (!currentStmt.isExpressionStmt()
-				|| !currentStmt.asExpressionStmt().getExpression().isVariableDeclarationExpr()) {
+	@Override
+	protected boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt) {
+		Optional<VariableDeclarationExpr> optAssignExpr =
+				VariableDeclarationExprHepers.optSimpleDeclaration(currentStmt);
+		if (optAssignExpr.isEmpty()) {
 			return false;
 		}
-		var assignExpr = currentStmt.asExpressionStmt().getExpression().asVariableDeclarationExpr();
-		if (assignExpr.getVariables().size() != 1) {
-			return false;
-		}
+		var assignExpr = optAssignExpr.get();
 
 		if (!assignExpr.getElementType().isPrimitiveType()
 				|| !PrimitiveType.Primitive.BOOLEAN.equals(assignExpr.getElementType().asPrimitiveType().getType())) {
@@ -126,7 +102,7 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 		}
 
 		var ifAssignExpr = optIfAssignExpr.get();
-		if (isAssignOperator(ifAssignExpr) || !ifAssignExpr.getTarget().isNameExpr()
+		if (notAssignOperator(ifAssignExpr) || !ifAssignExpr.getTarget().isNameExpr()
 				|| !ifAssignExpr.getTarget().asNameExpr().getNameAsString().equals(singleVariable.getNameAsString())) {
 			return false;
 		} else if (!ifAssignExpr.getValue().isBooleanLiteralExpr()) {
@@ -173,11 +149,11 @@ public class SimplifyBooleanInitialization extends AJavaparserStmtMutator {
 
 	// False-positive from PMD
 	@SuppressWarnings("PMD.CompareObjectsWithEquals")
-	private boolean isAssignOperator(AssignExpr ifAssignExpr) {
+	static boolean notAssignOperator(AssignExpr ifAssignExpr) {
 		return ifAssignExpr.getOperator() != AssignExpr.Operator.ASSIGN;
 	}
 
-	private Optional<AssignExpr> searchSingleAssignExpr(Statement thenStmt) {
+	static Optional<AssignExpr> searchSingleAssignExpr(Statement thenStmt) {
 		if (thenStmt.isExpressionStmt() && thenStmt.asExpressionStmt().getExpression().isAssignExpr()) {
 			return Optional.of(thenStmt.asExpressionStmt().getExpression().asAssignExpr());
 		} else if (thenStmt.isBlockStmt() && thenStmt.asBlockStmt().getStatements().size() == 1) {

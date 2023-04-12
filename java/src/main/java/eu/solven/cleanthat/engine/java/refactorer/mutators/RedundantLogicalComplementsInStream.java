@@ -27,12 +27,14 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
  * Turns `!strings.stream().anyMatch(p)` into `strings.stream().noneMatch(p)`
  *
  * @author Benoit Lacelle
  */
+@ApplyAfterMe({ SimplifyBooleanInitialization.class })
 public class RedundantLogicalComplementsInStream extends AJavaparserExprMutator {
 	static final String ANY_MATCH = "anyMatch";
 

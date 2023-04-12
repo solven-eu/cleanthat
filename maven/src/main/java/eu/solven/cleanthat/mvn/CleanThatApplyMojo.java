@@ -79,6 +79,7 @@ public class CleanThatApplyMojo extends ACleanThatSpringMojo {
 	private List<String> excludedMutators = new ArrayList<>();
 
 	// Follow the naming from https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat
+	// See ENV_CLEANTHAT_INCLUDE_DRAFT
 	@Parameter(defaultValue = "${cleanthat.includeDraft}")
 	private boolean includeDraft = false;
 
@@ -93,6 +94,13 @@ public class CleanThatApplyMojo extends ACleanThatSpringMojo {
 
 	@Override
 	protected List<Class<?>> springClasses() {
+		if (includeDraft) {
+			LOGGER.warn("Given `includeDraft==true`, we call `System.setProperty({}, \"{}\")`",
+					JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT,
+					true);
+			System.setProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT, "true");
+		}
+
 		List<Class<?>> allClasses = new ArrayList<>();
 
 		allClasses.addAll(CleanThatCleanThatMojo.cleanThatSpringClasses());

@@ -19,14 +19,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * This indicates annotated {@link IMutator} is to be applied before given other {@link IMutator}s. Beware of cycles.
+ * This indicates provided {@link IMutator}s are to be applied before the annotated {@link IMutator}. Beware of cycles.
  * 
  * @author Benoit Lacelle
  *
  */
 @Deprecated(since = "This is just for informative purpose, as it is not implemented yet")
 @Target(ElementType.TYPE)
-public @interface ApplyMeBefore {
+public @interface ApplyBeforeMe {
 
 	/**
 	 * {@link IMutator}s which have a higher priority than this

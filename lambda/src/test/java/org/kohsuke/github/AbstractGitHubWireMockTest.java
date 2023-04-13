@@ -73,7 +73,7 @@ public abstract class AbstractGitHubWireMockTest {
 	/** The base record path. */
 	protected final String baseRecordPath = "src/test/resources/" + baseFilesClassPath + "/wiremock";
 
-	/** The mock git hub. */
+	/** The mock github. */
 	@Rule
 	public final GitHubWireMockRule mockGitHub;
 

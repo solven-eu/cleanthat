@@ -108,9 +108,12 @@ public class GithubAppFactory implements IGithubAppFactory {
 				.build();
 	}
 
-	protected GitHub makeInstallationGithub(String appToken) throws IOException {
+	protected GitHub makeInstallationGithub(GitHub github, String appToken) throws IOException {
 		GitHubConnector ghConnector = createGithubConnector();
-		return new GitHubBuilder().withAppInstallationToken(appToken).withConnector(ghConnector).build();
+		return new GitHubBuilder().withEndpoint(github.getApiUrl())
+				.withAppInstallationToken(appToken)
+				.withConnector(ghConnector)
+				.build();
 	}
 
 	public static GitHubConnector createGithubConnector() {
@@ -179,7 +182,8 @@ public class GithubAppFactory implements IGithubAppFactory {
 	@Override
 	public ResultOrError<GithubAndToken, WebhookRelevancyResult> makeInstallationGithub(long installationId) {
 		try {
-			GHAppInstallation installationById = makeAppGithub().getApp().getInstallationById(installationId);
+			GitHub github = makeAppGithub();
+			GHAppInstallation installationById = github.getApp().getInstallationById(installationId);
 			Map<String, GHPermissionType> availablePermissions = installationById.getPermissions();
 
 			// This check is dumb, as we should also compare the values
@@ -214,7 +218,7 @@ public class GithubAppFactory implements IGithubAppFactory {
 			}
 
 			String appToken = installationToken.getToken();
-			GitHub installationGithub = makeInstallationGithub(appToken);
+			GitHub installationGithub = makeInstallationGithub(github, appToken);
 
 			// https://stackoverflow.com/questions/45427275/how-to-check-my-github-current-rate-limit
 			LOGGER.info("Initialized an installation github. RateLimit status: {}", installationGithub.getRateLimit());

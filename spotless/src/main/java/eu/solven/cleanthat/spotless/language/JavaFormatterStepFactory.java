@@ -57,7 +57,7 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  *
  */
 public class JavaFormatterStepFactory extends AFormatterStepFactory {
-	static final String ENV_CLEANTHAT_INCLUDE_DRAFT = "cleanthat.include_draft";
+	public static final String ENV_CLEANTHAT_INCLUDE_DRAFT = "cleanthat.include_draft";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormatterStepFactory.class);
 

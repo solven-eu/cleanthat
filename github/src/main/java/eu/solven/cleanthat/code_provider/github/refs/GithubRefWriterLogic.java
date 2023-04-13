@@ -53,12 +53,14 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	final String eventKey;
 
 	final GHRepository repo;
+	// ref when we started processing the event
 	final GHRef target;
-	final String headSha1;
+	// sha1 of the event
+	final String readSha1;
 
 	/**
 	 * 
-	 * @param headSha1
+	 * @param readSha1
 	 *            the sha1 used to load content before cleaning. It may not be the head of the ref, if some commit has
 	 *            been written in the meantime
 	 * @param eventKey
@@ -66,12 +68,21 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 	 * @param target
 	 *            the refs into which we want to commit this data
 	 */
-	public GithubRefWriterLogic(String eventKey, GHRepository repo, GHRef target, String headSha1) {
+	public GithubRefWriterLogic(String eventKey, GHRepository repo, GHRef target, String readSha1) {
 		this.eventKey = eventKey;
 
 		this.repo = repo;
 		this.target = target;
-		this.headSha1 = headSha1;
+		this.readSha1 = readSha1;
+
+		String freshTargetSha1 = target.getObject().getSha();
+		if (!freshTargetSha1.equals(readSha1)) {
+			// Happens if a commit is pushed after the original event (which may be retried much later)
+			LOGGER.warn("Target '{}' has been updated {} -> {} (between the event generation and its consumption)",
+					target.getRef(),
+					readSha1,
+					freshTargetSha1);
+		}
 	}
 
 	@Override
@@ -100,19 +111,23 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		// We should not commit directly in the branch, but commit in a tmp branch, and merge it right away
 		// Then, in case of conflicts (e.g. due to event being processed very lately, or race-condition), we would just
 		// drop some events/paths
-		String refTargetSha = updatedTarget.getObject().getSha();
+		String veryFreshTargetSha = updatedTarget.getObject().getSha();
+		String freshTargetSha1 = target.getObject().getSha();
 
-		String oldTargetSha1 = target.getObject().getSha();
-		if (!refTargetSha.equals(oldTargetSha1)) {
+		if (!veryFreshTargetSha.equals(freshTargetSha1)) {
 			// Happens if a commit is pushed during the cleaning
-			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, refTargetSha);
-		}
-		if (!refTargetSha.equals(headSha1)) {
-			// Happens if a commit is pushed after the original event (which may be retried much later)
-			LOGGER.warn("Target '{}' has been updated {} -> {}", refName, oldTargetSha1, headSha1);
+			LOGGER.warn("Target '{}' has been updated {} -> {} (during the event processing)",
+					refName,
+					freshTargetSha1,
+					veryFreshTargetSha);
+
+			// This would be rejected in `doCommitContent` as we do not force push, and the built tree is not a
+			// descendant of the new head
 		}
 
-		var pathToCommitableContent = filterOutPathsHavingDiverged(pathToMutatedContent, refName, refTargetSha);
+		var sha1ToConsiderAsHead = freshTargetSha1;
+
+		var pathToCommitableContent = filterOutPathsHavingDiverged(pathToMutatedContent, refName, sha1ToConsiderAsHead);
 
 		if (pathToCommitableContent.isEmpty()) {
 			LOGGER.warn("Due to ref update, there is not a single file to commit");
@@ -120,7 +135,7 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		}
 
 		try {
-			return doCommitContent(prComments, repoName, refName, refTargetSha, pathToCommitableContent);
+			return doCommitContent(prComments, repoName, refName, sha1ToConsiderAsHead, pathToCommitableContent);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -163,22 +178,31 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 		}
 	}
 
-	private Map<Path, String> filterOutPathsHavingDiverged(Map<Path, String> pathToMutatedContent,
+	/**
+	 * This is some sort of merge algorithm. We'd better not re-inventing the wheel, but we want to manage the most
+	 * trivial case (e.g. a commit has modified unrelated pathes).
+	 * 
+	 * @param pathToMutatedContent
+	 * @param refName
+	 * @param refTargetSha
+	 * @return
+	 */
+	protected Map<Path, String> filterOutPathsHavingDiverged(Map<Path, String> pathToMutatedContent,
 			String refName,
 			String refTargetSha) {
 		if (pathToMutatedContent.isEmpty()) {
 			return pathToMutatedContent;
 		}
 
-		var root = pathToMutatedContent.keySet().iterator().next();
+		var fs = pathToMutatedContent.keySet().iterator().next().getFileSystem();
 
 		Map<Path, String> pathToCommitableContent = new LinkedHashMap<>(pathToMutatedContent);
 		{
 			GHCompare compareContentWithHead;
 			try {
-				compareContentWithHead = repo.getCompare(headSha1, refTargetSha);
+				compareContentWithHead = repo.getCompare(readSha1, refTargetSha);
 			} catch (IOException e) {
-				throw new UncheckedIOException("Issue comparing " + headSha1 + " with " + refTargetSha, e);
+				throw new UncheckedIOException("Issue comparing " + readSha1 + " with " + refTargetSha, e);
 			}
 
 			int aheadBy = compareContentWithHead.getAheadBy();
@@ -197,20 +221,23 @@ public class GithubRefWriterLogic implements ICodeProviderWriterLogic {
 			// We clean a head, given the diff-set of files compared to a base.
 			// However, the head may be quite old, and some other commits may have been pushed onto the ref
 			Stream.of(compareContentWithHead.getFiles()).forEach(committedFile -> {
-				String previousFilename = committedFile.getPreviousFilename();
 				String concurrentSha = committedFile.getSha();
-				if (previousFilename != null) {
-					if (null != pathToCommitableContent.remove(root.resolve(previousFilename))) {
-						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
-								committedFile,
-								concurrentSha);
-					}
+
+				String filename = committedFile.getFileName();
+				Path currentAsPath = CleanthatPathHelpers.makeContentPath(fs, filename);
+				if (null != pathToCommitableContent.remove(currentAsPath)) {
+					LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
+							filename,
+							concurrentSha);
 				} else {
-					String filename = committedFile.getFileName();
-					if (null != pathToCommitableContent.remove(root.resolve(filename))) {
-						LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
-								filename,
-								concurrentSha);
+					String previousFilename = committedFile.getPreviousFilename();
+					if (previousFilename != null) {
+						Path previousAsPath = CleanthatPathHelpers.makeContentPath(fs, previousFilename);
+						if (null != pathToCommitableContent.remove(previousAsPath)) {
+							LOGGER.warn("We discarded commit of clean file given a concurrent change: {} (sha={})",
+									previousFilename,
+									concurrentSha);
+						}
 					}
 				}
 			});

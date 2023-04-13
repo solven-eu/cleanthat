@@ -221,11 +221,11 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 		if (isUseProxy()) {
 			this.apiServer().stubFor(proxyAllTo("https://api.github.com").atPriority(100));
 
-			if (this.rawServer() != null) {
-				this.rawServer().stubFor(proxyAllTo("https://raw.githubusercontent.com").atPriority(100));
-			}
 			if (this.uploadsServer() != null) {
 				this.uploadsServer().stubFor(proxyAllTo("https://uploads.github.com").atPriority(100));
+			}
+			if (this.rawServer() != null) {
+				this.rawServer().stubFor(proxyAllTo("https://raw.githubusercontent.com").atPriority(100));
 			}
 			if (this.codeloadServer() != null) {
 				this.codeloadServer().stubFor(proxyAllTo("https://codeload.github.com").atPriority(100));
@@ -251,6 +251,24 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 			recordSnapshot(this.rawServer(), "https://raw.githubusercontent.com", true);
 			recordSnapshot(this.codeloadServer(), "https://codeload.github.com", true);
 			recordSnapshot(this.actionsUserContentServer(), "https://pipelines.actions.githubusercontent.com", true);
+		}
+	}
+
+	private static String targetToId(String target) {
+		switch (target) {
+		case "https://api.github.com":
+			return "default";
+		case "https://uploads.github.com":
+			return "uploads";
+		case "https://raw.githubusercontent.com":
+			return "raw";
+		case "https://codeload.github.com":
+			return "codeload";
+		case "https://pipelines.actions.githubusercontent.com":
+			return "actions-user-content";
+
+		default:
+			throw new IllegalArgumentException("Invalid target: " + target);
 		}
 	}
 
@@ -281,7 +299,7 @@ public class GitHubWireMockRule extends WireMockMultiServerRule {
 		server.snapshotRecord(recordSpecBuilder);
 
 		// After taking the snapshot, format the output
-		formatTestResources(fileToServerRecords(target), isRawServer);
+		formatTestResources(fileToServerRecords(targetToId(target)), isRawServer);
 	}
 
 	/**

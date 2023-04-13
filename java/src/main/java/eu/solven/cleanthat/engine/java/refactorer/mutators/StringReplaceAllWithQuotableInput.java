@@ -45,7 +45,7 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 			.collect(Collectors.joining("", "[^", "]"));
 
 	// isQuote if a wordCharacter, or a space, or a non-regex-semantic character, or the escape of a non-word character.
-	// A backslash followed by a word character is either a known escapewd construct, or a potentially future one (i.e.
+	// A backslash followed by a word character is either a known escaped construct, or a potentially future one (i.e.
 	// it is a reserved syntax) (see backslash section in
 	// https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)
 	// We consider as simple quote if:
@@ -60,7 +60,7 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 	private static final Pattern IS_QUOTE = Pattern.compile(IS_QUOTE_REGEX);
 
 	static {
-		LOGGER.info("Regex matching quotable regex: {}", IS_QUOTE_REGEX);
+		LOGGER.debug("Regex matching quotable regex: {}", IS_QUOTE_REGEX);
 	}
 
 	@Override

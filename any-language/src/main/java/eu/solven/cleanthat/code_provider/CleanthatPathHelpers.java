@@ -200,4 +200,12 @@ public class CleanthatPathHelpers {
 
 		return repositoryRoot.relativize(childrenAbsolutePath).toString();
 	}
+
+	public static Path makeContentPath(FileSystem fs, String relativeToRoot) {
+		var contentPath = fs.getPath(relativeToRoot);
+
+		checkContentPath(contentPath);
+
+		return contentPath;
+	}
 }

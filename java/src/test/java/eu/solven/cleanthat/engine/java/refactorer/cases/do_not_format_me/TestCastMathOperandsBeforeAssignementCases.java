@@ -23,6 +23,10 @@ public class TestCastMathOperandsBeforeAssignementCases extends AJavaparserRefac
 		System.out.println("Multiple negative near overflow - asLong");
 		System.out.println(veryNegative * veryNegative);
 		System.out.println((long) veryNegative * veryNegative);
+
+		System.out.println("Sum int with float");
+		System.out.println(new IntegerToFloat().pre(1F, Integer.MAX_VALUE));
+		System.out.println(new IntegerToFloat().post(1F, Integer.MAX_VALUE));
 	}
 
 	@Override
@@ -38,6 +42,18 @@ public class TestCastMathOperandsBeforeAssignementCases extends AJavaparserRefac
 
 		public float post() {
 			return 2F / 3;
+		}
+	}
+
+	@CaseNotYetImplemented
+	@CompareMethods
+	public static class IntegerToFloat {
+		public float pre(float f, int i) {
+			return (Integer.MAX_VALUE + f - i) / Integer.MAX_VALUE;
+		}
+
+		public float post(float f, int i) {
+			return (float) (((double) Integer.MAX_VALUE + f - i) / Integer.MAX_VALUE);
 		}
 	}
 
@@ -166,13 +182,21 @@ public class TestCastMathOperandsBeforeAssignementCases extends AJavaparserRefac
 		}
 
 		public double post(long factor) {
-			return factor / 123F;
+			return factor / 123D;
 		}
 	}
 
 	@UnmodifiedMethod
 	public static class Division_longDividedByInt_ToLong {
 		public long pre(long bytes) {
+			return bytes / 1024;
+		}
+	}
+
+	// The expectation is ambiguous: let's not touch the code in this case
+	@UnmodifiedMethod
+	public static class Division_longDividedByInt_ToNumber {
+		public Number pre(long bytes) {
 			return bytes / 1024;
 		}
 	}
@@ -185,13 +209,36 @@ public class TestCastMathOperandsBeforeAssignementCases extends AJavaparserRefac
 	}
 
 	@CompareMethods
-	public static class Lambda {
+	public static class Division_fromShort_toFloat {
+		public float pre(short s1, short s2) {
+			return s1 / s2;
+		}
+
+		public float post(short s1, short s2) {
+			return (float) s1 / s2;
+		}
+	}
+
+	@CompareMethods
+	public static class Division_fromShort_toDouble {
+		public double pre(short s1, short s2) {
+			return s1 / s2;
+		}
+
+		public double post(short s1, short s2) {
+			return (double) s1 / s2;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class Lambda_double {
 		public DoubleSupplier pre() {
 			return () -> 2 / 3;
 		}
 
 		public DoubleSupplier post() {
-			return () -> 2F / 3;
+			return () -> 2D / 3;
 		}
 	}
 

@@ -25,7 +25,7 @@ jobs: # a collection of steps
   build: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/cleanthat # directory where steps will run
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:19.0
 
     steps: # a collection of executable commands
       - checkout # check out source code to working directory
@@ -51,7 +51,7 @@ jobs: # a collection of steps
   spotless: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/cleanthat # directory where steps will run
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:19.0
 
     steps: # a collection of executable commands
       - checkout # check out source code to working directory
@@ -77,7 +77,7 @@ jobs: # a collection of steps
   deploy-lambda: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/circleci-cleanthat # directory where steps will run
     docker: # run the steps with Docker
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:19.0
 
     steps: # a collection of executable commands
       - checkout # check out source code to working directory

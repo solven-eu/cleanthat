@@ -1,0 +1,60 @@
+{
+  "sha": "3cf3ccf5978b3b137ed2acae6f384927c1618037",
+  "node_id": "C_kwDOGmYIJtoAKDNjZjNjY2Y1OTc4YjNiMTM3ZWQyYWNhZTZmMzg0OTI3YzE2MTgwMzc",
+  "commit": {
+    "author": {
+      "name": "CleanThat",
+      "email": "CleanThat",
+      "date": "2022-03-11T09:17:54Z"
+    },
+    "committer": {
+      "name": "CleanThat",
+      "email": "CleanThat",
+      "date": "2022-03-11T09:17:54Z"
+    },
+    "message": "someComment",
+    "tree": {
+      "sha": "98d7ace2056aa8027c0b069f7d233138183b9b52",
+      "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/trees/98d7ace2056aa8027c0b069f7d233138183b9b52"
+    },
+    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+    "comment_count": 0,
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null
+    }
+  },
+  "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+  "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+  "comments_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+    {
+      "sha": "6ab259cb4e404810536abd065e215d5e189371de",
+      "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/6ab259cb4e404810536abd065e215d5e189371de",
+      "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/6ab259cb4e404810536abd065e215d5e189371de"
+    }
+  ],
+  "stats": {
+    "total": 2,
+    "additions": 1,
+    "deletions": 1
+  },
+  "files": [
+    {
+      "sha": "da749783c998e1b8396a3e8888e86c2e5643a7d7",
+      "filename": "now",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/3cf3ccf5978b3b137ed2acae6f384927c1618037/now",
+      "raw_url": "https://github.com/solven-eu/cleanthat-integrationtests/raw/3cf3ccf5978b3b137ed2acae6f384927c1618037/now",
+      "contents_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/now?ref=3cf3ccf5978b3b137ed2acae6f384927c1618037",
+      "patch": "@@ -1 +1 @@\n-\n+2022-03-11T10:17:53.873400+01:00\n\\ No newline at end of file"
+    }
+  ]
+}

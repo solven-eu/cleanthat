@@ -1,0 +1,66 @@
+{
+  "id": 12743433533,
+  "name": "Cleanthat",
+  "node_id": "CR_kwDOGmYIJs8AAAAC95FdPQ",
+  "head_sha": "f74dd357cb1e52201a680ccd4180f97542a26025",
+  "external_id": "random-03065cbb-d2ea-4705-a983-dc6bd0158887",
+  "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/check-runs/12743433533",
+  "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/runs/12743433533",
+  "details_url": "https://github.com/solven-eu/cleanthat?event=random-03065cbb-d2ea-4705-a983-dc6bd0158887",
+  "status": "completed",
+  "conclusion": "success",
+  "started_at": "2023-04-14T06:45:04Z",
+  "completed_at": "2023-04-14T06:45:43Z",
+  "output": {
+    "title": "Branch verification",
+    "summary": "Start verification\r\neventKey=random-03065cbb-d2ea-4705-a983-dc6bd0158887",
+    "text": null,
+    "annotations_count": 0,
+    "annotations_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/check-runs/12743433533/annotations"
+  },
+  "check_suite": {
+    "id": 12231776378
+  },
+  "app": {
+    "id": 65550,
+    "slug": "cleanthat",
+    "node_id": "MDM6QXBwNjU1NTA=",
+    "owner": {
+      "login": "solven-eu",
+      "id": 34552197,
+      "node_id": "MDEyOk9yZ2FuaXphdGlvbjM0NTUyMTk3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34552197?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/solven-eu",
+      "html_url": "https://github.com/solven-eu",
+      "followers_url": "https://api.github.com/users/solven-eu/followers",
+      "following_url": "https://api.github.com/users/solven-eu/following{/other_user}",
+      "gists_url": "https://api.github.com/users/solven-eu/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/solven-eu/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/solven-eu/subscriptions",
+      "organizations_url": "https://api.github.com/users/solven-eu/orgs",
+      "repos_url": "https://api.github.com/users/solven-eu/repos",
+      "events_url": "https://api.github.com/users/solven-eu/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/solven-eu/received_events",
+      "type": "Organization",
+      "site_admin": false
+    },
+    "name": "CleanThat",
+    "description": "Cleanthat cleans branches automatically to fix/improve your code.\r\n\r\nFeatures :\r\n- Fix branches a pull_requests head\r\n- Open pull_request to fix protected branches\r\n- Format `.md`, `.java`, `.scala`, `.json`, `.yaml` with the help of [Spotless](https://github.com/diffplug/spotless)\r\n- Refactor `.java` files to improve code-style, security and stability",
+    "external_url": "https://github.com/solven-eu/cleanthat",
+    "html_url": "https://github.com/apps/cleanthat",
+    "created_at": "2020-05-19T13:45:43Z",
+    "updated_at": "2023-01-27T06:10:21Z",
+    "permissions": {
+      "checks": "write",
+      "contents": "write",
+      "metadata": "read",
+      "pull_requests": "write"
+    },
+    "events": [
+      "pull_request",
+      "push"
+    ]
+  },
+  "pull_requests": []
+}

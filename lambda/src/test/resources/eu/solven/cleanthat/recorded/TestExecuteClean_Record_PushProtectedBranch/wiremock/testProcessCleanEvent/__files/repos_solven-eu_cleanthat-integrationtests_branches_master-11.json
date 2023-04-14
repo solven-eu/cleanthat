@@ -1,0 +1,96 @@
+{
+  "name": "master",
+  "commit": {
+    "sha": "f74dd357cb1e52201a680ccd4180f97542a26025",
+    "node_id": "C_kwDOGmYIJtoAKGY3NGRkMzU3Y2IxZTUyMjAxYTY4MGNjZDQxODBmOTc1NDJhMjYwMjU",
+    "commit": {
+      "author": {
+        "name": "Benoit Lacelle",
+        "email": "benoit.lacelle@gmail.com",
+        "date": "2023-04-14T06:44:19Z"
+      },
+      "committer": {
+        "name": "Benoit Lacelle",
+        "email": "benoit.lacelle@gmail.com",
+        "date": "2023-04-14T06:44:19Z"
+      },
+      "message": "Add Cleanthat configuration",
+      "tree": {
+        "sha": "5df7cdea30e4da604ab367322d3f9bc5ee4e637a",
+        "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/trees/5df7cdea30e4da604ab367322d3f9bc5ee4e637a"
+      },
+      "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/f74dd357cb1e52201a680ccd4180f97542a26025",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCAAdFiEEq9UaGuSxNVj1frrAy256TpUC5ooFAmQ49kMACgkQy256TpUC\n5oqRzRAAnSc0dkVnyrRH5ImqECQPTGqPUFvBc9XHX7KprYot/MzOIriwKb7q6XRK\nys2nuY9cNOXv8VGMwRE1jR4xqYFjE1kfQgcgyoxLZ9MjsmsfmL5KeziVse//ajH3\ni0FFAJRAR3hHTlt23PfAL5r3cZASPmZjZArj3KqZOf/6ARFaNPpdZXDS3CNpjO2L\nJMLetXhs4dj0nEu/dwEiJH/VjZfq9XoZOX/6J64j/nCdrx1KzSQLQKaWOakTVDs/\nFK34Ah3/VDkbnvlWWi4NWgEnWA15EMDLB22sWKsngvYYa4fKGgSYOeV4cp3wdyFN\nLA1noxZr8w+4VMqiMRPTGKkVuncFli0jjnI6AVeTaIQNdtrepvKrOcP225xOSHmp\n+x74YaGqJiNfNlXcBP5yAH9c23w2BbhtCVL10+rmMHE5nD9TTi2DWombCWWVc6XX\nt+IgvqJneXyHsuiKGy2k8DSWrlJTuzTcMXVZtkXtahxrN1XGZJ/4BByxMwmQNJS3\nwGYgZa+1f7GwlQAYYjNHE3hKDGkT1KbRHcVxFy3HdKrH2fb3EveFJc5XkPkKFaRZ\nmv7/Z/2NTesuUJk+FpqQRHhKcv/Zz7NTSF8n/tM8umIJ1KjTqF7NGmK9bkHJvgRy\nTsPFQNAvSiiI5fEFJ75SPIuyUal4tBVyN1IT2znZPmdqnEaoMuw=\n=tqg7\n-----END PGP SIGNATURE-----",
+        "payload": "tree 5df7cdea30e4da604ab367322d3f9bc5ee4e637a\nparent 3cf3ccf5978b3b137ed2acae6f384927c1618037\nauthor Benoit Lacelle <benoit.lacelle@gmail.com> 1681454659 +0400\ncommitter Benoit Lacelle <benoit.lacelle@gmail.com> 1681454659 +0400\n\nAdd Cleanthat configuration\n"
+      }
+    },
+    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/f74dd357cb1e52201a680ccd4180f97542a26025",
+    "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/f74dd357cb1e52201a680ccd4180f97542a26025",
+    "comments_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/f74dd357cb1e52201a680ccd4180f97542a26025/comments",
+    "author": {
+      "login": "blacelle",
+      "id": 2117911,
+      "node_id": "MDQ6VXNlcjIxMTc5MTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2117911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/blacelle",
+      "html_url": "https://github.com/blacelle",
+      "followers_url": "https://api.github.com/users/blacelle/followers",
+      "following_url": "https://api.github.com/users/blacelle/following{/other_user}",
+      "gists_url": "https://api.github.com/users/blacelle/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/blacelle/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/blacelle/subscriptions",
+      "organizations_url": "https://api.github.com/users/blacelle/orgs",
+      "repos_url": "https://api.github.com/users/blacelle/repos",
+      "events_url": "https://api.github.com/users/blacelle/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/blacelle/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "blacelle",
+      "id": 2117911,
+      "node_id": "MDQ6VXNlcjIxMTc5MTE=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2117911?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/blacelle",
+      "html_url": "https://github.com/blacelle",
+      "followers_url": "https://api.github.com/users/blacelle/followers",
+      "following_url": "https://api.github.com/users/blacelle/following{/other_user}",
+      "gists_url": "https://api.github.com/users/blacelle/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/blacelle/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/blacelle/subscriptions",
+      "organizations_url": "https://api.github.com/users/blacelle/orgs",
+      "repos_url": "https://api.github.com/users/blacelle/repos",
+      "events_url": "https://api.github.com/users/blacelle/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/blacelle/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/3cf3ccf5978b3b137ed2acae6f384927c1618037"
+      }
+    ]
+  },
+  "_links": {
+    "self": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/branches/master",
+    "html": "https://github.com/solven-eu/cleanthat-integrationtests/tree/master"
+  },
+  "protected": false,
+  "protection": {
+    "enabled": false,
+    "required_status_checks": {
+      "enforcement_level": "off",
+      "contexts": [],
+      "checks": []
+    }
+  },
+  "protection_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/branches/master/protection"
+}

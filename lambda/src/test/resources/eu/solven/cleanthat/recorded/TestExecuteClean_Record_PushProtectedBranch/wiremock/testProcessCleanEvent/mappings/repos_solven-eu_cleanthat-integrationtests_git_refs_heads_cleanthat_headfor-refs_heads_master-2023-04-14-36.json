@@ -1,0 +1,46 @@
+{
+  "id": "f08e898e-def3-4123-80b7-1b594ab038ff",
+  "name": "repos_solven-eu_cleanthat-integrationtests_git_refs_heads_cleanthat_headfor-refs_heads_master-2023-04-14",
+  "request": {
+    "url": "/repos/solven-eu/cleanthat-integrationtests/git/refs/heads/cleanthat/headfor-refs_heads_master-2023-04-14",
+    "method": "GET",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/vnd.github.v3+json"
+      }
+    }
+  },
+  "response": {
+    "status": 404,
+    "body": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/reference/git#get-a-reference\"}",
+    "headers": {
+      "Server": "GitHub.com",
+      "Date": "Fri, 14 Apr 2023 06:48:21 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "X-Poll-Interval": "300",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "x-github-api-version-selected": "2022-11-28",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4932",
+      "X-RateLimit-Reset": "1681458303",
+      "X-RateLimit-Used": "68",
+      "X-RateLimit-Resource": "core",
+      "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+      "Access-Control-Allow-Origin": "*",
+      "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+      "X-Frame-Options": "deny",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "0",
+      "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+      "Content-Security-Policy": "default-src 'none'",
+      "Vary": "Accept-Encoding, Accept, X-Requested-With",
+      "X-GitHub-Request-Id": "FE6A:D06F:6CE6907:6DEAC09:6438F735"
+    }
+  },
+  "uuid": "f08e898e-def3-4123-80b7-1b594ab038ff",
+  "persistent": true,
+  "scenarioName": "scenario-10-repos-solven-eu-cleanthat-integrationtests-git-refs-heads-cleanthat-headfor-refs_heads_master-2023-04-14",
+  "requiredScenarioState": "scenario-10-repos-solven-eu-cleanthat-integrationtests-git-refs-heads-cleanthat-headfor-refs_heads_master-2023-04-14-2",
+  "newScenarioState": "scenario-10-repos-solven-eu-cleanthat-integrationtests-git-refs-heads-cleanthat-headfor-refs_heads_master-2023-04-14-3",
+  "insertionIndex": 36
+}

@@ -52,8 +52,15 @@ public class GithubFacade {
 	}
 
 	public static String toFullGitRef(GHCommitPointer ghCommitPointer) {
-		String githubRef = ghCommitPointer.getRef();
-		return branchToRef(githubRef);
+		String shortRef = ghCommitPointer.getRef();
+		
+		// Contrary to GHCommitPointer.getRef Javadoc, `.getRef` may have a `refs/heads` prefix
+		if (shortRef.startsWith(CleanthatRefFilterProperties.BRANCHES_PREFIX)) {
+			return shortRef;
+		} else {
+			return branchToRef(shortRef);
+		}
+		
 	}
 
 	public static String branchToRef(String branchName) {

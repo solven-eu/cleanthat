@@ -1,0 +1,18 @@
+{
+  "name": "README.MD",
+  "path": "README.MD",
+  "sha": "ac4a74493d786a8c32abe514cdf30227ef9300d3",
+  "size": 40,
+  "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/README.MD?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+  "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/README.MD",
+  "git_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/blobs/ac4a74493d786a8c32abe514cdf30227ef9300d3",
+  "download_url": "https://raw.githubusercontent.com/solven-eu/cleanthat-integrationtests/f74dd357cb1e52201a680ccd4180f97542a26025/README.MD",
+  "type": "file",
+  "content": "VXNlZCBmb3IgaW50ZWdyYXRpb24gdGVzdHMgb2YgQ2xlYW5UaGF0Cg==\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/README.MD?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+    "git": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/blobs/ac4a74493d786a8c32abe514cdf30227ef9300d3",
+    "html": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/README.MD"
+  }
+}

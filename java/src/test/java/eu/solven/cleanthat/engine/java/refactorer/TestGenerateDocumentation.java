@@ -63,6 +63,9 @@ public class TestGenerateDocumentation {
 
 		appendLinkToClass(sb, getClass(), URL_PREFIX_TEST);
 
+		// Add EOL at EOF
+		sb.append(EOL);
+
 		Path srcMainResources = LocalClassTestHelper.getSrcMainResourceFolder();
 
 		var targetFile = srcMainResources.resolve("../../../MUTATORS.generated.MD").normalize();

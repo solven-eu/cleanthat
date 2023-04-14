@@ -1,0 +1,54 @@
+{
+  "id": "d38b0191-af73-4aac-87ea-f3f823bb5d54",
+  "name": "repos_solven-eu_cleanthat-integrationtests_check-runs_12743433533",
+  "request": {
+    "url": "/repos/solven-eu/cleanthat-integrationtests/check-runs/12743433533",
+    "method": "PATCH",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/vnd.github.antiope-preview+json"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "equalToJson": "{\"output\":{\"title\":\"Checking is the branch is valid for cleaning\",\"summary\":\"someSummary\\r\\neventKey=random-03065cbb-d2ea-4705-a983-dc6bd0158887\"},\"status\":\"in_progress\"}",
+        "ignoreArrayOrder": true,
+        "ignoreExtraElements": false
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "repos_solven-eu_cleanthat-integrationtests_check-runs_12743433533-19.json",
+    "headers": {
+      "Server": "GitHub.com",
+      "Date": "Fri, 14 Apr 2023 06:47:45 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "private, max-age=60, s-maxage=60",
+      "Vary": [
+        "Accept, Authorization, Cookie, X-GitHub-OTP",
+        "Accept-Encoding, Accept, X-Requested-With"
+      ],
+      "ETag": "W/\"1347ff388ba3b6255642e354e04a49b9a4de333877f0fb99d2a9ec305631eaf8\"",
+      "X-GitHub-Media-Type": "github.v3; param=antiope-preview; format=json",
+      "x-github-api-version-selected": "2022-11-28",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4944",
+      "X-RateLimit-Reset": "1681458303",
+      "X-RateLimit-Used": "56",
+      "X-RateLimit-Resource": "core",
+      "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+      "Access-Control-Allow-Origin": "*",
+      "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+      "X-Frame-Options": "deny",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "0",
+      "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+      "Content-Security-Policy": "default-src 'none'",
+      "X-GitHub-Request-Id": "FE02:9A3E:5D5F06A:5E610BB:6438F711"
+    }
+  },
+  "uuid": "d38b0191-af73-4aac-87ea-f3f823bb5d54",
+  "persistent": true,
+  "insertionIndex": 19
+}

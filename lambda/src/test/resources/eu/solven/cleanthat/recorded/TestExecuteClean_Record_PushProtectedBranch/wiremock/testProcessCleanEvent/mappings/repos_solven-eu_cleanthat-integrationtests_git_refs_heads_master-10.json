@@ -1,0 +1,52 @@
+{
+  "id": "5216777e-30ea-4973-91e9-e8a75bb65ac6",
+  "name": "repos_solven-eu_cleanthat-integrationtests_git_refs_heads_master",
+  "request": {
+    "url": "/repos/solven-eu/cleanthat-integrationtests/git/refs/heads/master",
+    "method": "GET",
+    "headers": {
+      "Accept": {
+        "equalTo": "application/vnd.github.v3+json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "repos_solven-eu_cleanthat-integrationtests_git_refs_heads_master-10.json",
+    "headers": {
+      "Server": "GitHub.com",
+      "Date": "Fri, 14 Apr 2023 06:47:37 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "private, max-age=60, s-maxage=60",
+      "Vary": [
+        "Accept, Authorization, Cookie, X-GitHub-OTP",
+        "Accept-Encoding, Accept, X-Requested-With"
+      ],
+      "ETag": "W/\"6dfcc1a3f94d2d75662eb4013c399afd41215f7bbc301a1cebd3fdc8d8165e76\"",
+      "Last-Modified": "Fri, 14 Apr 2023 06:44:19 GMT",
+      "X-Poll-Interval": "300",
+      "X-GitHub-Media-Type": "github.v3; format=json",
+      "x-github-api-version-selected": "2022-11-28",
+      "X-RateLimit-Limit": "5000",
+      "X-RateLimit-Remaining": "4953",
+      "X-RateLimit-Reset": "1681458303",
+      "X-RateLimit-Used": "47",
+      "X-RateLimit-Resource": "core",
+      "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+      "Access-Control-Allow-Origin": "*",
+      "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+      "X-Frame-Options": "deny",
+      "X-Content-Type-Options": "nosniff",
+      "X-XSS-Protection": "0",
+      "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+      "Content-Security-Policy": "default-src 'none'",
+      "X-GitHub-Request-Id": "FDF9:D06F:6CDCB57:6DE0CFB:6438F708"
+    }
+  },
+  "uuid": "5216777e-30ea-4973-91e9-e8a75bb65ac6",
+  "persistent": true,
+  "scenarioName": "scenario-7-repos-solven-eu-cleanthat-integrationtests-git-refs-heads-master",
+  "requiredScenarioState": "Started",
+  "newScenarioState": "scenario-7-repos-solven-eu-cleanthat-integrationtests-git-refs-heads-master-2",
+  "insertionIndex": 10
+}

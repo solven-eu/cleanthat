@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.junit.GitHubWireMockRule;

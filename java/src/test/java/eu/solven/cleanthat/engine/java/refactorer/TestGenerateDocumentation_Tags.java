@@ -67,6 +67,9 @@ public class TestGenerateDocumentation_Tags {
 
 		TestGenerateDocumentation.appendLinkToClass(sb, getClass(), TestGenerateDocumentation.URL_PREFIX_TEST);
 
+		// Add EOL at EOF
+		sb.append(EOL);
+
 		Path srcMainResources = LocalClassTestHelper.getSrcMainResourceFolder();
 
 		var targetFile = srcMainResources.resolve("../../../MUTATORS_BY_TAG.generated.MD").normalize();

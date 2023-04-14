@@ -1,0 +1,50 @@
+{
+    "id": "620b24f7-efbb-43cc-bc7e-ef49e7d8d498",
+    "name": "repositories_442894374",
+    "request": {
+        "url": "/repositories/442894374",
+        "method": "GET",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.v3+json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "repositories_442894374-25.json",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:51 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "private, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept, Authorization, Cookie, X-GitHub-OTP",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "W/\"a53b3163f7df1407988d790f983e8b652a0174039446e49a09597b4e2c6b19ad\"",
+            "Last-Modified": "Thu, 30 Dec 2021 22:31:32 GMT",
+            "X-GitHub-Media-Type": "github.v3; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "X-RateLimit-Limit": "5000",
+            "X-RateLimit-Remaining": "4943",
+            "X-RateLimit-Reset": "1681458303",
+            "X-RateLimit-Used": "57",
+            "X-RateLimit-Resource": "core",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FE0D:18A7:2E739:2F227:6438F717"
+        }
+    },
+    "uuid": "620b24f7-efbb-43cc-bc7e-ef49e7d8d498",
+    "persistent": true,
+    "scenarioName": "scenario-5-repositories-442894374",
+    "requiredScenarioState": "scenario-5-repositories-442894374-2",
+    "insertionIndex": 25
+}

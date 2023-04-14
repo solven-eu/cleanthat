@@ -26,21 +26,14 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 
 /**
- * Turns `"someString".toString()` into `"someString"`
+ * Turns `new String("StringLiteral")` into `"StringLiteral"`
  *
  * @author Benoit Lacelle
  */
-public class StringToString extends AJavaparserExprMutator {
-	private static final String METHOD_TO_STRING = "toString";
-
+public class StringFromString extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_1;
-	}
-
-	@Override
-	public boolean isDraft() {
-		return IS_PRODUCTION_READY;
+		return IJdkVersionConstants.JDK_1DOT1;
 	}
 
 	@Override
@@ -49,46 +42,52 @@ public class StringToString extends AJavaparserExprMutator {
 	}
 
 	@Override
-	public Optional<String> getPmdId() {
-		return Optional.of("StringToString");
-	}
-
-	@Override
-	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#stringtostring";
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-2129");
 	}
 
 	@Override
 	public Optional<String> getJSparrowId() {
-		return Optional.of("RemoveToStringOnString");
+		return Optional.of("RemoveNewStringConstructor");
 	}
 
 	@Override
 	public String jSparrowUrl() {
-		return "https://jsparrow.github.io/rules/remove-to-string-on-string.html";
+		return "https://jsparrow.github.io/rules/remove-new-string-constructor.html";
 	}
 
+	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
-			return false;
-		}
-		var methodCall = expr.asMethodCallExpr();
-		var methodCallIdentifier = methodCall.getName().getIdentifier();
-		if (!METHOD_TO_STRING.equals(methodCallIdentifier)) {
-			return false;
-		}
-		Optional<Node> optParent = methodCall.getParentNode();
-		if (methodCall.getScope().isEmpty() || optParent.isEmpty()) {
-			return false;
-		}
-		Optional<Expression> optScope = methodCall.getScope();
-
-		if (!scopeHasRequiredType(optScope, String.class)) {
+		if (!expr.isObjectCreationExpr()) {
 			return false;
 		}
 
-		var scope = optScope.get();
-		return tryReplace(expr, scope);
+		var methodCall = expr.asObjectCreationExpr();
+
+		if (!scopeHasRequiredType(Optional.of(methodCall), String.class)) {
+			return false;
+		} else if (methodCall.getArguments().size() != 1) {
+			return false;
+		}
+
+		Optional<Expression> optStringExpr = findStringExpr(methodCall.getArgument(0));
+		if (optStringExpr.isEmpty()) {
+			return false;
+		}
+
+		return tryReplace(expr, optStringExpr.get());
+	}
+
+	private Optional<Expression> findStringExpr(Expression argument) {
+		while (argument.isEnclosedExpr()) {
+			argument = argument.asEnclosedExpr().getInner();
+		}
+
+		if (!scopeHasRequiredType(Optional.of(argument), String.class)) {
+			return Optional.empty();
+		}
+
+		return Optional.of(argument);
 	}
 }

@@ -1,0 +1,46 @@
+{
+    "id": "a3cc9f95-c06c-4d64-b636-153e2ab4e8b6",
+    "name": "rate_limit",
+    "request": {
+        "url": "/rate_limit",
+        "method": "GET",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.v3+json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "rate_limit-6.json",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:33 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "no-cache",
+            "X-GitHub-Media-Type": "github.v3; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "X-RateLimit-Limit": "5000",
+            "X-RateLimit-Remaining": "4957",
+            "X-RateLimit-Reset": "1681458303",
+            "X-RateLimit-Used": "43",
+            "X-RateLimit-Resource": "core",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "Vary": "Accept-Encoding, Accept, X-Requested-With",
+            "X-GitHub-Request-Id": "FDF4:18A7:2B998:2C3F8:6438F704"
+        }
+    },
+    "uuid": "a3cc9f95-c06c-4d64-b636-153e2ab4e8b6",
+    "persistent": true,
+    "scenarioName": "scenario-4-rate_limit",
+    "requiredScenarioState": "scenario-4-rate_limit-2",
+    "newScenarioState": "scenario-4-rate_limit-3",
+    "insertionIndex": 6
+}

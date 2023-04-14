@@ -1,0 +1,51 @@
+{
+    "id": "1bb56ca3-c14c-401b-9aab-3473e85becdc",
+    "name": "repos_solven-eu_cleanthat-integrationtests_contents_cleanthat_cleanthatyaml",
+    "request": {
+        "url": "/repos/solven-eu/cleanthat-integrationtests/contents/.cleanthat/cleanthat.yaml?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+        "method": "GET",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.v3+json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "repos_solven-eu_cleanthat-integrationtests_contents_cleanthat_cleanthatyaml-14.json",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:40 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "private, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept, Authorization, Cookie, X-GitHub-OTP",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "W/\"f56aa8babc629f25a511e491d6fdbe57b6e02817\"",
+            "Last-Modified": "Fri, 14 Apr 2023 06:44:19 GMT",
+            "X-GitHub-Media-Type": "github.v3; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "X-RateLimit-Limit": "5000",
+            "X-RateLimit-Remaining": "4949",
+            "X-RateLimit-Reset": "1681458303",
+            "X-RateLimit-Used": "51",
+            "X-RateLimit-Resource": "core",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FDFD:11641:6B86308:6C8A474:6438F70C"
+        }
+    },
+    "uuid": "1bb56ca3-c14c-401b-9aab-3473e85becdc",
+    "persistent": true,
+    "scenarioName": "scenario-9-repos-solven-eu-cleanthat-integrationtests-contents-.cleanthat-cleanthat.yaml",
+    "requiredScenarioState": "Started",
+    "newScenarioState": "scenario-9-repos-solven-eu-cleanthat-integrationtests-contents-.cleanthat-cleanthat.yaml-2",
+    "insertionIndex": 14
+}

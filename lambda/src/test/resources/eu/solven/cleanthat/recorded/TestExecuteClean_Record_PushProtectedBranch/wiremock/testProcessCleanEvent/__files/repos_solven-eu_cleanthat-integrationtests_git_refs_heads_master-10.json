@@ -1,0 +1,10 @@
+{
+    "ref": "refs/heads/master",
+    "node_id": "REF_kwDOGmYIJrFyZWZzL2hlYWRzL21hc3Rlcg",
+    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/refs/heads/master",
+    "object": {
+        "sha": "f74dd357cb1e52201a680ccd4180f97542a26025",
+        "type": "commit",
+        "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/f74dd357cb1e52201a680ccd4180f97542a26025"
+    }
+}

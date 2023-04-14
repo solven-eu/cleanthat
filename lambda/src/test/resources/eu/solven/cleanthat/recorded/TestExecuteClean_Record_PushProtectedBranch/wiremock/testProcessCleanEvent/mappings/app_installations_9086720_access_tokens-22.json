@@ -1,0 +1,51 @@
+{
+    "id": "8ab2ed57-819e-4749-9877-64af137110f7",
+    "name": "app_installations_9086720_access_tokens",
+    "request": {
+        "url": "/app/installations/9086720/access_tokens",
+        "method": "POST",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.machine-man-preview+json"
+            }
+        },
+        "bodyPatterns": [
+            {
+                "equalToJson": "{\"permissions\":{\"pull_requests\":\"write\",\"metadata\":\"read\",\"checks\":\"write\",\"contents\":\"write\"}}",
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": false
+            }
+        ]
+    },
+    "response": {
+        "status": 201,
+        "body": "{\"token\":\"ghs_zxaDwuOf1ayMKp6KTxtS9aR0j8OnxR26QT6V\",\"expires_at\":\"2023-04-14T07:47:48Z\",\"permissions\":{\"checks\":\"write\",\"contents\":\"write\",\"metadata\":\"read\",\"pull_requests\":\"write\"},\"repository_selection\":\"selected\"}",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:48 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "public, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "\"d0757ae57b5b6a730f1d992f19772f54861f6a85c2909c89d8f39eebbf4973fa\"",
+            "X-GitHub-Media-Type": "github.v3; param=machine-man-preview; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FE07:4C88:6731D11:6835E89:6438F714"
+        }
+    },
+    "uuid": "8ab2ed57-819e-4749-9877-64af137110f7",
+    "persistent": true,
+    "scenarioName": "scenario-3-app-installations-9086720-access_tokens",
+    "requiredScenarioState": "scenario-3-app-installations-9086720-access_tokens-2",
+    "insertionIndex": 22
+}

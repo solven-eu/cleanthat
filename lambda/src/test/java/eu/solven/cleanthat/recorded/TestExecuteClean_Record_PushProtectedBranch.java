@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.solven.cleanthat.it;
+package eu.solven.cleanthat.recorded;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.junit.GitHubWireMockRule;
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ActiveProfilesResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,25 +45,28 @@ import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 
 /**
- * This is an example of recorded event.
+ * This case represents a push of multiple commits to a branch. It leads to cleanthat receive one `push` events per
+ * push, processing the older first, then considering a late head.
  * 
  * @author Benoit Lacelle
  *
  */
-@Ignore("Still WIP")
 @RunWith(SpringRunner.class)
-public class TestExecuteClean_FirstRecord extends AProcessLocallyDynamoDbEvent_ExecuteClean {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestExecuteClean_FirstRecord.class);
+@ActiveProfiles(resolver = TestExecuteClean_Record_PushProtectedBranch.class)
+public class TestExecuteClean_Record_PushProtectedBranch extends AProcessLocallyDynamoDbEvent_ExecuteClean
+		implements ActiveProfilesResolver {
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestExecuteClean_Record_PushProtectedBranch.class);
 
 	// Please make a first run with this set to true, then keep it to false;
-	public static boolean DO_RECORD = true;
+	public static boolean DO_RECORD = false;
 
-	// https://stackoverflow.com/questions/33855874/testpropertysource-with-dynamic-properties
-	@DynamicPropertySource
-	static void dynamicProperties(DynamicPropertyRegistry registry) {
-		registry.add(ENV_GITHUB_DO_RECORD, () -> {
-			return Boolean.toString(DO_RECORD);
-		});
+	@Override
+	public String[] resolve(Class<?> testClass) {
+		if (DO_RECORD) {
+			return new String[] { ENV_GITHUB_DO_RECORD };
+		} else {
+			return new String[] { ENV_GITHUB_DO_REPLAY };
+		}
 	}
 
 	static {
@@ -93,22 +96,33 @@ public class TestExecuteClean_FirstRecord extends AProcessLocallyDynamoDbEvent_E
 	@Autowired
 	IGithubAppFactory wireMockAppFactory;
 
+	// https://github.com/solven-eu/cleanthat-integrationtests/runs/12743433533
 	@Test
-	public void testRecorded() throws IOException, JOSEException {
+	public void testProcessCleanEvent() throws IOException, JOSEException {
 		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
 		// You can search logs for this key, in order to process given event locally
-		var key = "random-76596173-8e73-4e17-930b-bff57f342078";
+		var key = "random-03065cbb-d2ea-4705-a983-dc6bd0158887";
 
 		Map<String, ?> dynamoDbPureJson;
 
-		Path path = GitHubWireMockRule.fileToServerRecords(WireMockMultiServerRule.SERVER_API, mockGitHub.apiServer());
+		Path recordFolder =
+				GitHubWireMockRule.fileToServerRecords(WireMockMultiServerRule.SERVER_API, mockGitHub.apiServer());
+
+		if (DO_RECORD && Files.find(recordFolder, 2, (testResource, attributes) -> Files.isRegularFile(testResource))
+				.findAny()
+				.isPresent()) {
+			throw new IllegalStateException("Can not record as there is already files in " + recordFolder);
+		}
+
+		var pathToDynamoDbEvent = recordFolder.resolve("cleanthat_accepted_events" + ".json").toFile();
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		if (DO_RECORD) {
 			dynamoDbPureJson = EventFromDynamoDbITHelper.loadEvent("cleanthat_accepted_events", key);
 
-			objectMapper.writeValue(path.toFile(), dynamoDbPureJson);
+			objectMapper.writeValue(pathToDynamoDbEvent, dynamoDbPureJson);
 		} else {
-			dynamoDbPureJson = objectMapper.readValue(path.toFile(), Map.class);
+			dynamoDbPureJson = objectMapper.readValue(pathToDynamoDbEvent, Map.class);
 		}
 
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

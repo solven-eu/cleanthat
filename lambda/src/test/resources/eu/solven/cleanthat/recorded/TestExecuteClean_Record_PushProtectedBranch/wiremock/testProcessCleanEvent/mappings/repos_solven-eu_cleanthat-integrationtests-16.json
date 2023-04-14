@@ -1,0 +1,50 @@
+{
+    "id": "72d60303-48f8-40d1-95ee-86f384f34a1e",
+    "name": "repos_solven-eu_cleanthat-integrationtests",
+    "request": {
+        "url": "/repos/solven-eu/cleanthat-integrationtests",
+        "method": "GET",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.v3+json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "repos_solven-eu_cleanthat-integrationtests-16.json",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:42 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "private, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept, Authorization, Cookie, X-GitHub-OTP",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "W/\"e1ea28abe026fa201371575bcc63b24371edc0e166852303c0f2ee5fab9065f0\"",
+            "Last-Modified": "Thu, 30 Dec 2021 22:31:32 GMT",
+            "X-GitHub-Media-Type": "github.v3; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "X-RateLimit-Limit": "5000",
+            "X-RateLimit-Remaining": "4947",
+            "X-RateLimit-Reset": "1681458303",
+            "X-RateLimit-Used": "53",
+            "X-RateLimit-Resource": "core",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FDFF:8651:567A5EC:576BB61:6438F70E"
+        }
+    },
+    "uuid": "72d60303-48f8-40d1-95ee-86f384f34a1e",
+    "persistent": true,
+    "scenarioName": "scenario-8-repos-solven-eu-cleanthat-integrationtests",
+    "requiredScenarioState": "scenario-8-repos-solven-eu-cleanthat-integrationtests-2",
+    "insertionIndex": 16
+}

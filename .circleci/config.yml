@@ -47,6 +47,32 @@ jobs: # a collection of steps
       - store_test_results:
           path: ~/test-results/junit
       #- coveralls/upload
+      
+  spotless: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/cleanthat # directory where steps will run
+    docker: # run the steps with Docker
+      - image: cimg/openjdk:11.0
+
+    steps: # a collection of executable commands
+      - checkout # check out source code to working directory
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: circleci-cleanthat-{{ checksum "pom.xml" }}
+      # Install all modules, especially cleanthat which is referred by spotless in cleanthat parent pom
+      # 'install' vs 'package' as we need the 'java' module for the 'parent' formatting by spotless
+      - run: mvn install -Pfast
+      - save_cache: # saves the project dependencies
+          paths:
+            - ~/.m2
+          key: circleci-cleanthat-{{ checksum "pom.xml" }}
+      - run: mvn spotless:apply # run the actual tests
+      
+      # This will enable quickly seeing failed tests in CircleCI GUI
+      # https://circleci.com/docs/2.0/collect-test-data/
+      - run: *save_surefire
+      - store_test_results:
+          path: ~/test-results/junit
+      #- coveralls/upload
 
   deploy-lambda: # runs not using Workflows must have a `build` job as entry point
     working_directory: ~/circleci-cleanthat # directory where steps will run
@@ -70,6 +96,10 @@ workflows:
     jobs:
       # We might require a manual click in CircleCI UI: https://circleci.com/docs/2.0/workflows/#holding-a-workflow-for-a-manual-approval
       - build:
+          context: 
+            - slack-secrets
+            #- cleanthat-coveralls
+      - spotless:
           context: 
             - slack-secrets
             #- cleanthat-coveralls

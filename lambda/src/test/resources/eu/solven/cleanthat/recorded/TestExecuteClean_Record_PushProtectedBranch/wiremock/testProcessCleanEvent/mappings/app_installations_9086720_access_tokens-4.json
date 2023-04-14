@@ -1,0 +1,52 @@
+{
+    "id": "fe72cd32-cf51-4f20-b776-50b3795ecafb",
+    "name": "app_installations_9086720_access_tokens",
+    "request": {
+        "url": "/app/installations/9086720/access_tokens",
+        "method": "POST",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.machine-man-preview+json"
+            }
+        },
+        "bodyPatterns": [
+            {
+                "equalToJson": "{\"permissions\":{\"pull_requests\":\"write\",\"metadata\":\"read\",\"checks\":\"write\",\"contents\":\"write\"}}",
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": false
+            }
+        ]
+    },
+    "response": {
+        "status": 201,
+        "body": "{\"token\":\"XXX\",\"expires_at\":\"2023-04-14T07:47:31Z\",\"permissions\":{\"checks\":\"write\",\"contents\":\"write\",\"metadata\":\"read\",\"pull_requests\":\"write\"},\"repository_selection\":\"selected\"}",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:31 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "public, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "\"eb6d08640ea6b01e50f69ff158de3d906d9b6842026b39ae3b5a891f48a53e65\"",
+            "X-GitHub-Media-Type": "github.v3; param=machine-man-preview; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FDEF:D116:62B07A9:63B4895:6438F702"
+        }
+    },
+    "uuid": "fe72cd32-cf51-4f20-b776-50b3795ecafb",
+    "persistent": true,
+    "scenarioName": "scenario-3-app-installations-9086720-access_tokens",
+    "requiredScenarioState": "Started",
+    "newScenarioState": "scenario-3-app-installations-9086720-access_tokens-2",
+    "insertionIndex": 4
+}

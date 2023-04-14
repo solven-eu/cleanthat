@@ -1,0 +1,212 @@
+{
+    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/compare/3cf3ccf5978b3b137ed2acae6f384927c1618037...f74dd357cb1e52201a680ccd4180f97542a26025",
+    "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/compare/3cf3ccf5978b3b137ed2acae6f384927c1618037...f74dd357cb1e52201a680ccd4180f97542a26025",
+    "permalink_url": "https://github.com/solven-eu/cleanthat-integrationtests/compare/solven-eu:3cf3ccf...solven-eu:f74dd35",
+    "diff_url": "https://github.com/solven-eu/cleanthat-integrationtests/compare/3cf3ccf5978b3b137ed2acae6f384927c1618037...f74dd357cb1e52201a680ccd4180f97542a26025.diff",
+    "patch_url": "https://github.com/solven-eu/cleanthat-integrationtests/compare/3cf3ccf5978b3b137ed2acae6f384927c1618037...f74dd357cb1e52201a680ccd4180f97542a26025.patch",
+    "base_commit": {
+        "sha": "3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "node_id": "C_kwDOGmYIJtoAKDNjZjNjY2Y1OTc4YjNiMTM3ZWQyYWNhZTZmMzg0OTI3YzE2MTgwMzc",
+        "commit": {
+            "author": {
+                "name": "CleanThat",
+                "email": "CleanThat",
+                "date": "2022-03-11T09:17:54Z"
+            },
+            "committer": {
+                "name": "CleanThat",
+                "email": "CleanThat",
+                "date": "2022-03-11T09:17:54Z"
+            },
+            "message": "someComment",
+            "tree": {
+                "sha": "98d7ace2056aa8027c0b069f7d233138183b9b52",
+                "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/trees/98d7ace2056aa8027c0b069f7d233138183b9b52"
+            },
+            "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+            "comment_count": 0,
+            "verification": {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null
+            }
+        },
+        "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "comments_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037/comments",
+        "author": null,
+        "committer": null,
+        "parents": [
+            {
+                "sha": "6ab259cb4e404810536abd065e215d5e189371de",
+                "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/6ab259cb4e404810536abd065e215d5e189371de",
+                "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/6ab259cb4e404810536abd065e215d5e189371de"
+            }
+        ]
+    },
+    "merge_base_commit": {
+        "sha": "3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "node_id": "C_kwDOGmYIJtoAKDNjZjNjY2Y1OTc4YjNiMTM3ZWQyYWNhZTZmMzg0OTI3YzE2MTgwMzc",
+        "commit": {
+            "author": {
+                "name": "CleanThat",
+                "email": "CleanThat",
+                "date": "2022-03-11T09:17:54Z"
+            },
+            "committer": {
+                "name": "CleanThat",
+                "email": "CleanThat",
+                "date": "2022-03-11T09:17:54Z"
+            },
+            "message": "someComment",
+            "tree": {
+                "sha": "98d7ace2056aa8027c0b069f7d233138183b9b52",
+                "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/trees/98d7ace2056aa8027c0b069f7d233138183b9b52"
+            },
+            "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+            "comment_count": 0,
+            "verification": {
+                "verified": false,
+                "reason": "unsigned",
+                "signature": null,
+                "payload": null
+            }
+        },
+        "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+        "comments_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037/comments",
+        "author": null,
+        "committer": null,
+        "parents": [
+            {
+                "sha": "6ab259cb4e404810536abd065e215d5e189371de",
+                "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/6ab259cb4e404810536abd065e215d5e189371de",
+                "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/6ab259cb4e404810536abd065e215d5e189371de"
+            }
+        ]
+    },
+    "status": "ahead",
+    "ahead_by": 1,
+    "behind_by": 0,
+    "total_commits": 1,
+    "commits": [
+        {
+            "sha": "f74dd357cb1e52201a680ccd4180f97542a26025",
+            "node_id": "C_kwDOGmYIJtoAKGY3NGRkMzU3Y2IxZTUyMjAxYTY4MGNjZDQxODBmOTc1NDJhMjYwMjU",
+            "commit": {
+                "author": {
+                    "name": "Benoit Lacelle",
+                    "email": "benoit.lacelle@gmail.com",
+                    "date": "2023-04-14T06:44:19Z"
+                },
+                "committer": {
+                    "name": "Benoit Lacelle",
+                    "email": "benoit.lacelle@gmail.com",
+                    "date": "2023-04-14T06:44:19Z"
+                },
+                "message": "Add Cleanthat configuration",
+                "tree": {
+                    "sha": "5df7cdea30e4da604ab367322d3f9bc5ee4e637a",
+                    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/trees/5df7cdea30e4da604ab367322d3f9bc5ee4e637a"
+                },
+                "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/commits/f74dd357cb1e52201a680ccd4180f97542a26025",
+                "comment_count": 0,
+                "verification": {
+                    "verified": true,
+                    "reason": "valid",
+                    "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCAAdFiEEq9UaGuSxNVj1frrAy256TpUC5ooFAmQ49kMACgkQy256TpUC\n5oqRzRAAnSc0dkVnyrRH5ImqECQPTGqPUFvBc9XHX7KprYot/MzOIriwKb7q6XRK\nys2nuY9cNOXv8VGMwRE1jR4xqYFjE1kfQgcgyoxLZ9MjsmsfmL5KeziVse//ajH3\ni0FFAJRAR3hHTlt23PfAL5r3cZASPmZjZArj3KqZOf/6ARFaNPpdZXDS3CNpjO2L\nJMLetXhs4dj0nEu/dwEiJH/VjZfq9XoZOX/6J64j/nCdrx1KzSQLQKaWOakTVDs/\nFK34Ah3/VDkbnvlWWi4NWgEnWA15EMDLB22sWKsngvYYa4fKGgSYOeV4cp3wdyFN\nLA1noxZr8w+4VMqiMRPTGKkVuncFli0jjnI6AVeTaIQNdtrepvKrOcP225xOSHmp\n+x74YaGqJiNfNlXcBP5yAH9c23w2BbhtCVL10+rmMHE5nD9TTi2DWombCWWVc6XX\nt+IgvqJneXyHsuiKGy2k8DSWrlJTuzTcMXVZtkXtahxrN1XGZJ/4BByxMwmQNJS3\nwGYgZa+1f7GwlQAYYjNHE3hKDGkT1KbRHcVxFy3HdKrH2fb3EveFJc5XkPkKFaRZ\nmv7/Z/2NTesuUJk+FpqQRHhKcv/Zz7NTSF8n/tM8umIJ1KjTqF7NGmK9bkHJvgRy\nTsPFQNAvSiiI5fEFJ75SPIuyUal4tBVyN1IT2znZPmdqnEaoMuw=\n=tqg7\n-----END PGP SIGNATURE-----",
+                    "payload": "tree 5df7cdea30e4da604ab367322d3f9bc5ee4e637a\nparent 3cf3ccf5978b3b137ed2acae6f384927c1618037\nauthor Benoit Lacelle <benoit.lacelle@gmail.com> 1681454659 +0400\ncommitter Benoit Lacelle <benoit.lacelle@gmail.com> 1681454659 +0400\n\nAdd Cleanthat configuration\n"
+                }
+            },
+            "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/f74dd357cb1e52201a680ccd4180f97542a26025",
+            "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/f74dd357cb1e52201a680ccd4180f97542a26025",
+            "comments_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/f74dd357cb1e52201a680ccd4180f97542a26025/comments",
+            "author": {
+                "login": "blacelle",
+                "id": 2117911,
+                "node_id": "MDQ6VXNlcjIxMTc5MTE=",
+                "avatar_url": "https://avatars.githubusercontent.com/u/2117911?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/blacelle",
+                "html_url": "https://github.com/blacelle",
+                "followers_url": "https://api.github.com/users/blacelle/followers",
+                "following_url": "https://api.github.com/users/blacelle/following{/other_user}",
+                "gists_url": "https://api.github.com/users/blacelle/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/blacelle/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/blacelle/subscriptions",
+                "organizations_url": "https://api.github.com/users/blacelle/orgs",
+                "repos_url": "https://api.github.com/users/blacelle/repos",
+                "events_url": "https://api.github.com/users/blacelle/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/blacelle/received_events",
+                "type": "User",
+                "site_admin": false
+            },
+            "committer": {
+                "login": "blacelle",
+                "id": 2117911,
+                "node_id": "MDQ6VXNlcjIxMTc5MTE=",
+                "avatar_url": "https://avatars.githubusercontent.com/u/2117911?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/blacelle",
+                "html_url": "https://github.com/blacelle",
+                "followers_url": "https://api.github.com/users/blacelle/followers",
+                "following_url": "https://api.github.com/users/blacelle/following{/other_user}",
+                "gists_url": "https://api.github.com/users/blacelle/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/blacelle/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/blacelle/subscriptions",
+                "organizations_url": "https://api.github.com/users/blacelle/orgs",
+                "repos_url": "https://api.github.com/users/blacelle/repos",
+                "events_url": "https://api.github.com/users/blacelle/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/blacelle/received_events",
+                "type": "User",
+                "site_admin": false
+            },
+            "parents": [
+                {
+                    "sha": "3cf3ccf5978b3b137ed2acae6f384927c1618037",
+                    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/commits/3cf3ccf5978b3b137ed2acae6f384927c1618037",
+                    "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/commit/3cf3ccf5978b3b137ed2acae6f384927c1618037"
+                }
+            ]
+        }
+    ],
+    "files": [
+        {
+            "sha": "f56aa8babc629f25a511e491d6fdbe57b6e02817",
+            "filename": ".cleanthat/cleanthat.yaml",
+            "status": "added",
+            "additions": 23,
+            "deletions": 0,
+            "changes": 23,
+            "blob_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat%2Fcleanthat.yaml",
+            "raw_url": "https://github.com/solven-eu/cleanthat-integrationtests/raw/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat%2Fcleanthat.yaml",
+            "contents_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/.cleanthat%2Fcleanthat.yaml?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+            "patch": "@@ -0,0 +1,23 @@\n+syntax_version: \"2023-01-09\"\n+meta:\n+  full_clean_on_configuration_change: true\n+  labels:\n+  - \"cleanthat\"\n+  refs:\n+    protected_patterns:\n+      - master\n+      - deploy-prd\n+source_code:\n+  excludes:\n+  - \"regex:.*/generated/.*\"\n+  - \"regex:.*/do_not_format_me/.*\"\n+  encoding: \"UTF-8\"\n+  line_ending: \"GIT\"\n+engines:\n+# https://github.com/diffplug/spotless/pull/568\n+- engine: \"spotless\"\n+  skip: false\n+  steps:\n+  - id: \"spotless\"\n+    parameters:\n+      configuration: \"repository:/.cleanthat/spotless.yaml\""
+        },
+        {
+            "sha": "2ee4a755445fd262392001f04fa4007a80aee25c",
+            "filename": ".cleanthat/spotless.yaml",
+            "status": "added",
+            "additions": 7,
+            "deletions": 0,
+            "changes": 7,
+            "blob_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat%2Fspotless.yaml",
+            "raw_url": "https://github.com/solven-eu/cleanthat-integrationtests/raw/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat%2Fspotless.yaml",
+            "contents_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/.cleanthat%2Fspotless.yaml?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+            "patch": "@@ -0,0 +1,7 @@\n+syntax_version: \"2023-01-14\"\n+encoding: \"UTF-8\"\n+line_ending: \"GIT_ATTRIBUTES\"\n+formatters:\n+- format: \"markdown\"\n+  steps:\n+  - id: \"flexmark\"\n\\ No newline at end of file"
+        },
+        {
+            "sha": "e43b0f988953ae3a84b00331d0ccf5f7d51cb3cf",
+            "filename": ".gitignore",
+            "status": "added",
+            "additions": 1,
+            "deletions": 0,
+            "changes": 1,
+            "blob_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/.gitignore",
+            "raw_url": "https://github.com/solven-eu/cleanthat-integrationtests/raw/f74dd357cb1e52201a680ccd4180f97542a26025/.gitignore",
+            "contents_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/.gitignore?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+            "patch": "@@ -0,0 +1 @@\n+.DS_Store"
+        }
+    ]
+}

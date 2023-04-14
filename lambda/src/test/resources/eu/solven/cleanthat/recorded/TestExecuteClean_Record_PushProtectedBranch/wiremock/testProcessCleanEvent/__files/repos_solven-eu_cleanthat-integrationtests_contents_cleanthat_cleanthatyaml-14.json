@@ -1,0 +1,18 @@
+{
+    "name": "cleanthat.yaml",
+    "path": ".cleanthat/cleanthat.yaml",
+    "sha": "f56aa8babc629f25a511e491d6fdbe57b6e02817",
+    "size": 495,
+    "url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/.cleanthat/cleanthat.yaml?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+    "html_url": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat/cleanthat.yaml",
+    "git_url": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/blobs/f56aa8babc629f25a511e491d6fdbe57b6e02817",
+    "download_url": "https://raw.githubusercontent.com/solven-eu/cleanthat-integrationtests/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat/cleanthat.yaml",
+    "type": "file",
+    "content": "c3ludGF4X3ZlcnNpb246ICIyMDIzLTAxLTA5IgptZXRhOgogIGZ1bGxfY2xl\nYW5fb25fY29uZmlndXJhdGlvbl9jaGFuZ2U6IHRydWUKICBsYWJlbHM6CiAg\nLSAiY2xlYW50aGF0IgogIHJlZnM6CiAgICBwcm90ZWN0ZWRfcGF0dGVybnM6\nCiAgICAgIC0gbWFzdGVyCiAgICAgIC0gZGVwbG95LXByZApzb3VyY2VfY29k\nZToKICBleGNsdWRlczoKICAtICJyZWdleDouKi9nZW5lcmF0ZWQvLioiCiAg\nLSAicmVnZXg6LiovZG9fbm90X2Zvcm1hdF9tZS8uKiIKICBlbmNvZGluZzog\nIlVURi04IgogIGxpbmVfZW5kaW5nOiAiR0lUIgplbmdpbmVzOgojIGh0dHBz\nOi8vZ2l0aHViLmNvbS9kaWZmcGx1Zy9zcG90bGVzcy9wdWxsLzU2OAotIGVu\nZ2luZTogInNwb3RsZXNzIgogIHNraXA6IGZhbHNlCiAgc3RlcHM6CiAgLSBp\nZDogInNwb3RsZXNzIgogICAgcGFyYW1ldGVyczoKICAgICAgY29uZmlndXJh\ndGlvbjogInJlcG9zaXRvcnk6Ly5jbGVhbnRoYXQvc3BvdGxlc3MueWFtbCIK\n",
+    "encoding": "base64",
+    "_links": {
+        "self": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/contents/.cleanthat/cleanthat.yaml?ref=f74dd357cb1e52201a680ccd4180f97542a26025",
+        "git": "https://api.github.com/repos/solven-eu/cleanthat-integrationtests/git/blobs/f56aa8babc629f25a511e491d6fdbe57b6e02817",
+        "html": "https://github.com/solven-eu/cleanthat-integrationtests/blob/f74dd357cb1e52201a680ccd4180f97542a26025/.cleanthat/cleanthat.yaml"
+    }
+}

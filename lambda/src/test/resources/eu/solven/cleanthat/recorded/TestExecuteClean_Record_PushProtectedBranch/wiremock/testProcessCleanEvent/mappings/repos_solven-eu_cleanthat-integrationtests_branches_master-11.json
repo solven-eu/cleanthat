@@ -1,0 +1,47 @@
+{
+    "id": "be01b6bd-ff2a-48d9-97c0-b3133572f79b",
+    "name": "repos_solven-eu_cleanthat-integrationtests_branches_master",
+    "request": {
+        "url": "/repos/solven-eu/cleanthat-integrationtests/branches/master",
+        "method": "GET",
+        "headers": {
+            "Accept": {
+                "equalTo": "application/vnd.github.v3+json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "repos_solven-eu_cleanthat-integrationtests_branches_master-11.json",
+        "headers": {
+            "Server": "GitHub.com",
+            "Date": "Fri, 14 Apr 2023 06:47:38 GMT",
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "private, max-age=60, s-maxage=60",
+            "Vary": [
+                "Accept, Authorization, Cookie, X-GitHub-OTP",
+                "Accept-Encoding, Accept, X-Requested-With"
+            ],
+            "ETag": "W/\"aca2feef0ea7dfa49b8d8aa9ba3d6d408317bcbf6dd7c2c8f95107f79a52a7a7\"",
+            "X-GitHub-Media-Type": "github.v3; format=json",
+            "x-github-api-version-selected": "2022-11-28",
+            "X-RateLimit-Limit": "5000",
+            "X-RateLimit-Remaining": "4952",
+            "X-RateLimit-Reset": "1681458303",
+            "X-RateLimit-Used": "48",
+            "X-RateLimit-Resource": "core",
+            "Access-Control-Expose-Headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
+            "Access-Control-Allow-Origin": "*",
+            "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+            "X-Frame-Options": "deny",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "0",
+            "Referrer-Policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+            "Content-Security-Policy": "default-src 'none'",
+            "X-GitHub-Request-Id": "FDFA:4C88:672FC6A:6833D95:6438F709"
+        }
+    },
+    "uuid": "be01b6bd-ff2a-48d9-97c0-b3133572f79b",
+    "persistent": true,
+    "insertionIndex": 11
+}

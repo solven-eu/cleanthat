@@ -27,31 +27,19 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
-import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
-import com.github.javaparser.ast.stmt.BreakStmt;
-import com.github.javaparser.ast.stmt.ContinueStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.model.SymbolReference;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.SuppressCleanthat;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -263,38 +251,12 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		}
 	}
 
-	private void logJavaParserIssue(Object o, Throwable e, String issue) {
+	public static void logJavaParserIssue(Object o, Throwable e, String issue) {
 		var msg = "We encounter a case of {} for `{}`. Full-stack is available in 'debug'";
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.warn(msg, issue, o, e);
 		} else {
 			LOGGER.warn(msg, issue, o);
-		}
-	}
-
-	protected Optional<ResolvedType> optResolvedType(Type type) {
-		try {
-			return Optional.of(type.resolve());
-		} catch (RuntimeException e) {
-			try {
-				var secondTryType = type.resolve();
-
-				logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3939");
-
-				return Optional.of(secondTryType);
-			} catch (RuntimeException ee) {
-				// UnsolvedSymbolException | UnsupportedOperationException
-				// Caused by: java.lang.UnsupportedOperationException: CorrespondingDeclaration not available for
-				// unsolved symbol.
-				// at com.github.javaparser.resolution.model.SymbolReference.getCorrespondingDeclaration
-				// (SymbolReference.java:116)
-				LOGGER.debug("Issue with JavaParser over {}", type, ee);
-				return Optional.empty();
-			}
-		} catch (NoClassDefFoundError e) {
-			logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3504");
-
-			return Optional.empty();
 		}
 	}
 
@@ -360,63 +322,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
 		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
 
-		return typeIsAssignable(optType, requiredType);
-	}
-
-	protected boolean isAssignableBy(ReferenceTypeImpl referenceTypeImpl, ResolvedType resolvedType) {
-		try {
-			return referenceTypeImpl.isAssignableBy(resolvedType);
-		} catch (UnsolvedSymbolException e) {
-			LOGGER.debug("Unresolved: `{}` .isAssignableBy `{}`", referenceTypeImpl, resolvedType, e);
-
-			return false;
-		}
-	}
-
-	/**
-	 * 
-	 * @param qualifiedClassName
-	 * @param resolvedType
-	 * @return true if `qualifiedClassName` is java.util.Collection and `resolvedType` is java.util.List
-	 */
-	protected boolean isAssignableBy(String qualifiedClassName, ResolvedType resolvedType) {
-		var typeSolver = new ReflectionTypeSolver(false);
-		SymbolReference<ResolvedReferenceTypeDeclaration> optType = typeSolver.tryToSolveType(qualifiedClassName);
-
-		if (!optType.isSolved()) {
-			return false;
-		}
-
-		// https://github.com/javaparser/javaparser/issues/3929
-		var referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
-
-		return isAssignableBy(referenceTypeImpl, resolvedType);
-	}
-
-	protected boolean typeIsAssignable(Optional<ResolvedType> optType, String requiredType) {
-		if (optType.isEmpty()) {
-			return false;
-		}
-
-		var type = optType.get();
-
-		var isCorrectClass = false;
-		if (type.isConstraint()) {
-			// Happens on Lambda
-			type = type.asConstraintType().getBound();
-		}
-
-		if (isAssignableBy(requiredType, type)) {
-			isCorrectClass = true;
-		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
-			// For a primitive double, requiredType is 'double'
-			isCorrectClass = true;
-		}
-		if (!isCorrectClass) {
-			return false;
-		}
-
-		return true;
+		return ResolvedTypeHelpers.typeIsAssignable(optType, requiredType);
 	}
 
 	/**
@@ -501,111 +407,4 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 		return true;
 	}
 
-	/**
-	 * 
-	 * @param node
-	 * @return true if this node can be moved inside a {@link LambdaExpr}
-	 */
-	protected boolean canBePushedInLambdaExpr(Node node) {
-		if (hasOuterAssignExpr(node)) {
-			return false;
-		} else if (node.findFirst(ReturnStmt.class).isPresent()) {
-			// Can can not move the `return` inside a LambdaExpr
-			return false;
-		} else if (node.findFirst(ContinueStmt.class).isPresent()) {
-			// TODO We would need to turn `continue;` into `return;`
-			// BEWARE of `continue: outerLoop;`
-			return false;
-		} else if (node.findFirst(BreakStmt.class).isPresent()) {
-			return false;
-		}
-
-		if (nodeThrowsExplicitException(node)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Given we do not have the whole classpath, it is difficult to analyze the whole input node. Instead, we will
-	 * analyze the first ancestor of type {@link NodeWithThrownExceptions}, and check the returned exceptions.
-	 * 
-	 * @param node
-	 * @return
-	 */
-	private boolean nodeThrowsExplicitException(Node node) {
-		Optional<NodeWithThrownExceptions> optFirstAncestorWithExceptions =
-				node.findAncestor(NodeWithThrownExceptions.class);
-
-		if (optFirstAncestorWithExceptions.isEmpty()) {
-			// What does it mean ? In most cases, we are supposed to be wrapped in a MethodCallExpr
-			return false;
-		}
-
-		Optional<?> firstUnknownOrExplicitException = optFirstAncestorWithExceptions.get()
-				.getThrownExceptions()
-				.stream()
-				.filter(Type.class::isInstance)
-				.map(t -> (Type) t)
-				.filter(t -> {
-					Optional<ResolvedType> optResolved = optResolvedType((Type) t);
-					if (optResolved.isEmpty()) {
-						return true;
-					} else if (typeIsAssignable(optResolved, RuntimeException.class.getName())) {
-						return false;
-					} else if (typeIsAssignable(optResolved, Error.class.getName())) {
-						return false;
-					}
-					// A Throwable which is neither a RuntimeException nor an Error is an explicit Exception
-					return true;
-				})
-				.findFirst();
-
-		return firstUnknownOrExplicitException.isPresent();
-	}
-
-	protected boolean hasOuterAssignExpr(Node node) {
-		Optional<AssignExpr> optOuterAssignExpr = node.findFirst(AssignExpr.class, assignExpr -> {
-			Expression assigned = assignExpr.getTarget();
-
-			return node
-					.findFirst(VariableDeclarationExpr.class,
-							variableDeclExpr -> variableDeclExpr.getVariables()
-									.stream()
-									.filter(declared -> declared.getNameAsExpression().equals(assigned))
-									.findAny()
-									.isPresent())
-					.isEmpty();
-		});
-		if (optOuterAssignExpr.isPresent()) {
-			return true;
-		}
-
-		Optional<UnaryExpr> optOuterUnaryExpr = node.findFirst(UnaryExpr.class, unaryExpr -> {
-			if (unaryExpr.getOperator() != UnaryExpr.Operator.POSTFIX_DECREMENT
-					&& unaryExpr.getOperator() != UnaryExpr.Operator.POSTFIX_INCREMENT
-					&& unaryExpr.getOperator() != UnaryExpr.Operator.PREFIX_DECREMENT
-					&& unaryExpr.getOperator() != UnaryExpr.Operator.PREFIX_INCREMENT) {
-				// Others operator are not modifying the variable
-				return false;
-			}
-
-			Expression assigned = unaryExpr.getExpression();
-			return node
-					.findFirst(VariableDeclarationExpr.class,
-							variableDeclExpr -> variableDeclExpr.getVariables()
-									.stream()
-									.filter(declared -> declared.getNameAsExpression().equals(assigned))
-									.findAny()
-									.isPresent())
-					.isEmpty();
-
-		});
-		if (optOuterUnaryExpr.isPresent()) {
-			return true;
-		}
-
-		return false;
-	}
 }

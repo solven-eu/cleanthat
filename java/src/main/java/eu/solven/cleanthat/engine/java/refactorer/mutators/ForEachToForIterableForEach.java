@@ -23,8 +23,7 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -75,20 +74,11 @@ public class ForEachToForIterableForEach extends AJavaparserStmtMutator {
 
 		var forEachStmt = stmt.asForEachStmt();
 
-		if (!canBePushedInLambdaExpr(forEachStmt.getBody())) {
-			// We can not move AssignExpr inside a LambdaExpr
-			return false;
-		}
-
-		Optional<ResolvedDeclaration> resolved = optResolved(forEachStmt.getIterable());
+		Optional<ResolvedType> resolved = optResolvedType(forEachStmt.getIterable());
 		if (resolved.isEmpty()) {
 			// We need to make sure the type is not an array
 			return false;
-		} else if (!(resolved.get() instanceof ResolvedValueDeclaration)) {
-			return false;
-		}
-		ResolvedValueDeclaration resolvedValueDeclaration = (ResolvedValueDeclaration) resolved.get();
-		if (resolvedValueDeclaration.getType().isArray()) {
+		} else if (resolved.get().isArray()) {
 			// TODO Handle iteration over arrays
 			return false;
 		}

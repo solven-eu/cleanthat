@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -33,11 +32,11 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.UnknownType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -72,14 +71,6 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 		}
 
 		var forStmt = stmt.asForStmt();
-
-		Statement body = forStmt.getBody();
-		{
-			if (!canBePushedInLambdaExpr(body)) {
-				// We can not move AssignExpr inside a LambdaExpr
-				return false;
-			}
-		}
 
 		if (forStmt.getInitialization().size() != 1) {
 			// Stick to simple loops
@@ -136,16 +127,11 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 			} else {
 				return false;
 			}
-
 		}
 
-		LambdaExpr lambdaExpr;
-		var parameter = new Parameter(new UnknownType(), singleVariable.getName());
-		if (body.isBlockStmt()) {
-			lambdaExpr = new LambdaExpr(parameter, body.asBlockStmt());
-		} else if (body.isExpressionStmt()) {
-			lambdaExpr = new LambdaExpr(parameter, body.asExpressionStmt().getExpression());
-		} else {
+		Statement body = forStmt.getBody();
+		Optional<LambdaExpr> lambdaExpr = LambdaExprHelpers.makeLambdaExpr(singleVariable.getName(), body);
+		if (lambdaExpr.isEmpty()) {
 			return false;
 		}
 
@@ -157,7 +143,7 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 						"range",
 						new NodeList<>(from, to));
 
-		MethodCallExpr forEach = new MethodCallExpr(intRange, "forEach", new NodeList<>(lambdaExpr));
+		MethodCallExpr forEach = new MethodCallExpr(intRange, "forEach", new NodeList<>(lambdaExpr.get()));
 		return tryReplace(forStmt, new ExpressionStmt(forEach));
 	}
 }

@@ -104,10 +104,6 @@ public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 		}
 		Statement thenStmt = ifStmt.getThenStmt();
 
-		if (!canBePushedInLambdaExpr(thenStmt)) {
-			return false;
-		}
-
 		String nullableVariableName = nameAndNull.get().getKey().getNameAsString();
 		SimpleName notNullVariableName = makeUnusedVariablename(thenStmt, nullableVariableName);
 

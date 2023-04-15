@@ -3,9 +3,11 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
@@ -182,4 +184,73 @@ public class TestForEachToForIterableForEachCases extends AJavaparserRefactorerC
 			}
 		}
 	}
+
+	@UnmodifiedCompilationUnitAsString(pre = "class SomeClass {\n" + "\n"
+			+ "	 String findAttributeInRules(String subpath,\n"
+			+ "			boolean isFolder,\n"
+			+ "			String key,\n"
+			+ "			List<AttributesRule> rules) {\n"
+			+ "		String value = null;\n"
+			+ "		for (AttributesRule rule : rules) {\n"
+			+ "			if (rule.isMatch(subpath, isFolder)) {\n"
+			+ "				for (Attribute attribute : rule.getAttributes()) {\n"
+			+ "					if (attribute.getKey().equals(key)) {\n"
+			+ "						value = attribute.getValue();\n"
+			+ "					}\n"
+			+ "				}\n"
+			+ "			}\n"
+			+ "		}\n"
+			+ "		return value;\n"
+			+ "	}\n"
+			+ "}")
+	public static class UnresolvedType {
+
+	}
+
+	@CompareMethods
+	public static class Imbricated_simple {
+		public void pre(List<String> strings, List<String> strings2) {
+			for (String string : strings) {
+				for (String string2 : strings2) {
+					System.out.println(string + string2);
+				}
+			}
+		}
+
+		public void post(List<String> strings, List<String> strings2) {
+			strings.forEach(string -> {
+				strings2.forEach(string2 -> {
+					System.out.println(string + string2);
+				});
+			});
+		}
+	}
+
+	@CompareMethods
+	public static class Imbricated_complex {
+		void pre(int key, List<String> rules) {
+			for (String rule : rules) {
+				if (rule.isEmpty()) {
+					for (int attribute : rule.chars().mapToObj(i -> i).collect(Collectors.toList())) {
+						if (attribute == key) {
+							System.out.println(attribute);
+						}
+					}
+				}
+			}
+		}
+
+		void post(int key, List<String> rules) {
+			rules.forEach(rule -> {
+				if (rule.isEmpty()) {
+					rule.chars().mapToObj(i -> i).collect(Collectors.toList()).forEach(attribute -> {
+						if (attribute == key) {
+							System.out.println(attribute);
+						}
+					});
+				}
+			});
+		}
+	}
+
 }

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Use the diamond operation {@code <>} whenever possible.
@@ -83,7 +84,8 @@ public class UseDiamondOperator extends AJavaparserMutator {
 		if (optParentNode.isPresent() && optParentNode.get() instanceof ObjectCreationExpr
 				&& !withTypeArgument.isUsingDiamondOperator()) {
 			var objectCreationExpr = (ObjectCreationExpr) optParentNode.get();
-			Optional<ResolvedType> optTypeDeclaration = optResolvedType(objectCreationExpr.getType());
+			Optional<ResolvedType> optTypeDeclaration =
+					ResolvedTypeHelpers.optResolvedType(objectCreationExpr.getType());
 			// objectCreationExpr.calculateResolvedType().asReferenceType().getTypeDeclaration();
 			if (optTypeDeclaration.isEmpty()) {
 				return false;

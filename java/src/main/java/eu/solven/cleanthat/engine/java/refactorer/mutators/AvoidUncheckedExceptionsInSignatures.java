@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns `throws RuntimeException` into ``
@@ -60,13 +61,13 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 		NodeWithThrownExceptions<?> nodeWithThrown = (NodeWithThrownExceptions<?>) node;
 
 		return nodeWithThrown.getThrownExceptions().removeIf(t -> {
-			Optional<ResolvedType> optResolved = optResolvedType(t);
+			Optional<ResolvedType> optResolved = ResolvedTypeHelpers.optResolvedType(t);
 
 			if (optResolved.isEmpty()) {
 				return false;
 			}
 
-			if (isAssignableBy(RuntimeException.class.getName(), optResolved.get())) {
+			if (ResolvedTypeHelpers.isAssignableBy(RuntimeException.class.getName(), optResolved.get())) {
 				return true;
 			} else {
 				return false;

@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns `new Double(d)` into `Double.valueOf(d)`
@@ -88,7 +89,7 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 		// We check the scope as a workaround to https://github.com/javaparser/javaparser/issues/3968
 		if (type.isBoxedType()) {
 			// In fact, it may not be a real Boxed type
-			Optional<ResolvedType> optResolvedType = optResolvedType(type);
+			Optional<ResolvedType> optResolvedType = ResolvedTypeHelpers.optResolvedType(type);
 			if (optResolvedType.isEmpty()) {
 				return false;
 			}

@@ -23,6 +23,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
+import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -36,16 +37,19 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.VariableDeclarationExprHepers;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
- * See EnhancedForLoopToStreamAnyMatchCases
+ * Turns `String key = ""; for (String value : values) { if (value.length() > 4) { key = value; break; } }`
+ * 
+ * into `String key = values.stream().filter(value -> value.length() > 4).findFirst().orElse("");`
  *
  * @author Benoit Lacelle
  */
 // This is similar to SimplifyBooleanInitialization
-@ApplyBeforeMe({ LambdaIsMethodReference.class })
+@ApplyAfterMe({ LambdaIsMethodReference.class })
 public class ForEachIfBreakToStreamFindFirst extends ARefactorConsecutiveStatements {
 	@Override
 	public String minimalJavaVersion() {
@@ -115,20 +119,28 @@ public class ForEachIfBreakToStreamFindFirst extends ARefactorConsecutiveStateme
 
 		MethodCallExpr streamCall = new MethodCallExpr(forEachStmt.getIterable(), "stream");
 		VariableDeclarator forEachVariable = forEachStmt.getVariableDeclarator();
-		MethodCallExpr filterCall = new MethodCallExpr(streamCall,
-				"filter",
-				new NodeList<>(LambdaExprHelpers.makeLambdaExpr(forEachVariable.getName(), ifStmt.getCondition())));
+		MethodCallExpr filterCall;
+		{
+			Optional<LambdaExpr> lambdaExpr =
+					LambdaExprHelpers.makeLambdaExpr(forEachVariable.getName(), ifStmt.getCondition());
+			if (lambdaExpr.isEmpty()) {
+				return false;
+			}
+			filterCall = new MethodCallExpr(streamCall, "filter", new NodeList<>(lambdaExpr.get()));
+		}
 		MethodCallExpr findFirstCall = new MethodCallExpr(filterCall, "findFirst");
 
 		if (!ifAssignExpr.getValue().isNameExpr()) {
-			findFirstCall = new MethodCallExpr(findFirstCall,
-					"map",
-					new NodeList<>(
-							LambdaExprHelpers.makeLambdaExpr(forEachVariable.getName(), ifAssignExpr.getValue())));
+			Optional<LambdaExpr> optLambdaExpr =
+					LambdaExprHelpers.makeLambdaExpr(forEachVariable.getName(), ifAssignExpr.getValue());
+			if (optLambdaExpr.isEmpty()) {
+				return false;
+			}
+			findFirstCall = new MethodCallExpr(findFirstCall, "map", new NodeList<>(optLambdaExpr.get()));
 		}
 
-		Optional<ResolvedType> optVariableType = optResolvedType(singleVariable.getType());
-		Optional<ResolvedType> optForEachType = optResolvedType(forEachVariable.getType());
+		Optional<ResolvedType> optVariableType = ResolvedTypeHelpers.optResolvedType(singleVariable.getType());
+		Optional<ResolvedType> optForEachType = ResolvedTypeHelpers.optResolvedType(forEachVariable.getType());
 		if (optVariableType.isEmpty() || optForEachType.isEmpty()) {
 			return false;
 		}

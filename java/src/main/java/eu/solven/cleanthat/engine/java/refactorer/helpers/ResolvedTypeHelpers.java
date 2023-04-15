@@ -15,8 +15,21 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.helpers;
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.model.typesystem.LazyType;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
+
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 
 /**
  * Helps working with {@link ResolvedType}
@@ -25,6 +38,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
  *
  */
 public class ResolvedTypeHelpers {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ResolvedTypeHelpers.class);
 
 	protected ResolvedTypeHelpers() {
 		// hidden
@@ -44,6 +58,88 @@ public class ResolvedTypeHelpers {
 		}
 
 		return left.equals(right);
+	}
+
+	public static Optional<ResolvedType> optResolvedType(Type type) {
+		try {
+			return Optional.of(type.resolve());
+		} catch (RuntimeException e) {
+			try {
+				var secondTryType = type.resolve();
+
+				AJavaparserMutator.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3939");
+
+				return Optional.of(secondTryType);
+			} catch (RuntimeException ee) {
+				// UnsolvedSymbolException | UnsupportedOperationException
+				// Caused by: java.lang.UnsupportedOperationException: CorrespondingDeclaration not available for
+				// unsolved symbol.
+				// at com.github.javaparser.resolution.model.SymbolReference.getCorrespondingDeclaration
+				// (SymbolReference.java:116)
+				LOGGER.debug("Issue with JavaParser over {}", type, ee);
+				return Optional.empty();
+			}
+		} catch (NoClassDefFoundError e) {
+			AJavaparserMutator.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3504");
+
+			return Optional.empty();
+		}
+	}
+
+	public static boolean isAssignableBy(ReferenceTypeImpl referenceTypeImpl, ResolvedType resolvedType) {
+		try {
+			return referenceTypeImpl.isAssignableBy(resolvedType);
+		} catch (UnsolvedSymbolException e) {
+			LOGGER.debug("Unresolved: `{}` .isAssignableBy `{}`", referenceTypeImpl, resolvedType, e);
+
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * @param qualifiedClassName
+	 * @param resolvedType
+	 * @return true if `qualifiedClassName` is java.util.Collection and `resolvedType` is java.util.List
+	 */
+	public static boolean isAssignableBy(String qualifiedClassName, ResolvedType resolvedType) {
+		var typeSolver = new ReflectionTypeSolver(false);
+		SymbolReference<ResolvedReferenceTypeDeclaration> optType = typeSolver.tryToSolveType(qualifiedClassName);
+
+		if (!optType.isSolved()) {
+			return false;
+		}
+
+		// https://github.com/javaparser/javaparser/issues/3929
+		var referenceTypeImpl = new ReferenceTypeImpl(optType.getCorrespondingDeclaration());
+
+		return isAssignableBy(referenceTypeImpl, resolvedType);
+	}
+
+	public static boolean typeIsAssignable(Optional<ResolvedType> optType, String requiredType) {
+		if (optType.isEmpty()) {
+			return false;
+		}
+
+		var type = optType.get();
+
+		var isCorrectClass = false;
+		if (type.isConstraint()) {
+			// Happens on Lambda
+			type = type.asConstraintType().getBound();
+		}
+
+		if (isAssignableBy(requiredType, type)) {
+			isCorrectClass = true;
+		} else if (type.isPrimitive() && type.asPrimitive().describe().equals(requiredType)) {
+			// For a primitive double, requiredType is 'double'
+			isCorrectClass = true;
+		}
+		if (!isCorrectClass) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

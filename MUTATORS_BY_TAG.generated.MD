@@ -32,6 +32,7 @@
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
 - [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -54,6 +55,7 @@
 - [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
 - [StreamWrappedMethodRefToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedMethodRefToMap.java)
 - [StreamWrappedVariableToMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedVariableToMap.java)
+- [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [ThreadRunToThreadStart](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ThreadRunToThreadStart.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
@@ -111,6 +113,7 @@
 ## Loop
 
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -198,6 +201,7 @@
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 - [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)
 - [StreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamAnyMatch.java)
+- [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [ThreadRunToThreadStart](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ThreadRunToThreadStart.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
@@ -218,6 +222,7 @@
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -233,6 +238,7 @@
 
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 - [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
+- [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
 - [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
@@ -272,6 +278,7 @@
 ## With JDK 1.1
 
 - [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
+- [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
 
 ## With JDK 1.2
@@ -308,6 +315,7 @@
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
+- [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -351,6 +359,7 @@
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
 - [EmptyControlStatement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EmptyControlStatement.java)
+- [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 - [ForEachIfToIfStreamAnyMatch](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfToIfStreamAnyMatch.java)
 - [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
@@ -360,6 +369,7 @@
 - [ModifierOrder](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ModifierOrder.java)
 - [RedundantLogicalComplementsInStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RedundantLogicalComplementsInStream.java)
 - [RemoveExplicitCallToSuper](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveExplicitCallToSuper.java)
+- [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
 - [StringIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringIndexOfToContains.java)
 - [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
 - [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)

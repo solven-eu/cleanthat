@@ -36,16 +36,16 @@ import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
  * See {@link TestForEachAddToStreamCollectToCollectionCases}
  *
  * @author Benoit Lacelle
  */
-@ApplyBeforeMe({ LambdaIsMethodReference.class })
-public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutator {
+@ApplyAfterMe({ LambdaIsMethodReference.class })
+public class ForEachAddToStreamCollectToCollection extends ARefactorConsecutiveStatements {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -58,29 +58,12 @@ public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutato
 	}
 
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isBlockStmt()) {
+	protected boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt) {
+		if (currentStmt.isExpressionStmt() && nextStmt.isForEachStmt()) {
+			return onForEachStmt(currentStmt.asExpressionStmt(), nextStmt.asForEachStmt());
+		} else {
 			return false;
 		}
-
-		var blockStmt = stmt.asBlockStmt();
-
-		if (blockStmt.getStatements().size() <= 1) {
-			return false;
-		}
-
-		var modified = false;
-
-		for (var i = 0; i < blockStmt.getStatements().size() - 1; i++) {
-			var first = blockStmt.getStatement(i);
-			var second = blockStmt.getStatement(i + 1);
-
-			if (first.isExpressionStmt() && second.isForEachStmt()) {
-				modified |= onForEachStmt(first.asExpressionStmt(), second.asForEachStmt());
-			}
-		}
-
-		return modified;
 	}
 
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
@@ -98,8 +81,8 @@ public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutato
 		}
 		var objectCreationExpr = optInitializer.get().asObjectCreationExpr();
 
-		if (!typeIsAssignable(optResolvedType(objectCreationExpr.getType()), Collection.class.getName())
-				|| !objectCreationExpr.getArguments().isEmpty()) {
+		if (!ResolvedTypeHelpers.typeIsAssignable(ResolvedTypeHelpers.optResolvedType(objectCreationExpr.getType()),
+				Collection.class.getName()) || !objectCreationExpr.getArguments().isEmpty()) {
 			return false;
 		}
 
@@ -151,9 +134,13 @@ public class ForEachAddToStreamCollectToCollection extends AJavaparserStmtMutato
 		MethodCallExpr streamMayDoFilter;
 		if (optIfStmt.isPresent()) {
 			var ifStmt = optIfStmt.get();
-			LambdaExpr filterArgument =
+			Optional<LambdaExpr> filterArgument =
 					ForEachIfToIfStreamAnyMatch.ifConditionToLambda(ifStmt, forEachStmt.getVariable().getVariable(0));
-			streamMayDoFilter = new MethodCallExpr(stream, "filter", new NodeList<>(filterArgument));
+			if (filterArgument.isEmpty()) {
+				return false;
+			}
+
+			streamMayDoFilter = new MethodCallExpr(stream, "filter", new NodeList<>(filterArgument.get()));
 		} else {
 			streamMayDoFilter = stream;
 		}

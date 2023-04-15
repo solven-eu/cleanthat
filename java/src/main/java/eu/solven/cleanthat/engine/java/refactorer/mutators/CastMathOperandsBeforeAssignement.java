@@ -43,6 +43,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns 'float f = 2/3;` into `float f = (float)2/3;`
@@ -181,25 +182,25 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 	}
 
 	private boolean typeWouldNotOverflowFromInt(Optional<ResolvedType> optResolvedType) {
-		if (typeIsAssignable(optResolvedType, int.class.getName())
-				|| typeIsAssignable(optResolvedType, Integer.class.getName())) {
+		if (ResolvedTypeHelpers.typeIsAssignable(optResolvedType, int.class.getName())
+				|| ResolvedTypeHelpers.typeIsAssignable(optResolvedType, Integer.class.getName())) {
 			return false;
 		}
 
 		// TODO This looks sub-optimal
-		return typeIsAssignable(optResolvedType, long.class.getName())
-				|| typeIsAssignable(optResolvedType, float.class.getName())
-				|| typeIsAssignable(optResolvedType, double.class.getName())
-				|| typeIsAssignable(optResolvedType, Number.class.getName());
+		return ResolvedTypeHelpers.typeIsAssignable(optResolvedType, long.class.getName())
+				|| ResolvedTypeHelpers.typeIsAssignable(optResolvedType, float.class.getName())
+				|| ResolvedTypeHelpers.typeIsAssignable(optResolvedType, double.class.getName())
+				|| ResolvedTypeHelpers.typeIsAssignable(optResolvedType, Number.class.getName());
 	}
 
 	private boolean isIntOrLong(Optional<ResolvedType> optResolvedType) {
 		if (optResolvedType.isEmpty()) {
 			return false;
 		} else if (optResolvedType.get().isPrimitive()) {
-			return typeIsAssignable(optResolvedType, int.class.getName())
-					|| typeIsAssignable(optResolvedType, long.class.getName());
-		} else if (typeIsAssignable(optResolvedType, Number.class.getName())) {
+			return ResolvedTypeHelpers.typeIsAssignable(optResolvedType, int.class.getName())
+					|| ResolvedTypeHelpers.typeIsAssignable(optResolvedType, long.class.getName());
+		} else if (ResolvedTypeHelpers.typeIsAssignable(optResolvedType, Number.class.getName())) {
 			// Storing `i1/i2` in a Number is ambiguous. Then we keep the Number as an int/long
 			// This would also catch boxed FLoat and Double. However, the code `(Float) (i1 / i2)` is illegal, then it
 			// is not a case need to be considered. (i.e. if we encounter this code, it means the input code is illegal)
@@ -232,9 +233,9 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 	 */
 	private Optional<PrimitiveType> optFloatOrDoubleUsage(Expression expr) {
 		return doMap(expr, optResolvedType -> {
-			if (typeIsAssignable(optResolvedType, float.class.getName())) {
+			if (ResolvedTypeHelpers.typeIsAssignable(optResolvedType, float.class.getName())) {
 				return Optional.of(PrimitiveType.floatType());
-			} else if (typeIsAssignable(optResolvedType, double.class.getName())) {
+			} else if (ResolvedTypeHelpers.typeIsAssignable(optResolvedType, double.class.getName())) {
 				return Optional.of(PrimitiveType.doubleType());
 			} else {
 				return Optional.empty();
@@ -255,7 +256,7 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 			return Optional.empty();
 		} else if (optAncestorDefiningType.get() instanceof NodeWithType) {
 			NodeWithType<?, ?> castExpr = (NodeWithType<?, ?>) optAncestorDefiningType.get();
-			Optional<ResolvedType> optResolvedType = optResolvedType(castExpr.getType());
+			Optional<ResolvedType> optResolvedType = ResolvedTypeHelpers.optResolvedType(castExpr.getType());
 
 			return mapper.apply(optResolvedType);
 		} else if (optAncestorDefiningType.get() instanceof ReturnStmt) {
@@ -271,7 +272,7 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 			} else if (optParentNodeNotBlock.get() instanceof MethodDeclaration) {
 				MethodDeclaration methodDecl = (MethodDeclaration) optParentNodeNotBlock.get();
 
-				Optional<ResolvedType> optResolvedType = optResolvedType(methodDecl.getType());
+				Optional<ResolvedType> optResolvedType = ResolvedTypeHelpers.optResolvedType(methodDecl.getType());
 
 				return mapper.apply(optResolvedType);
 			} else if (optParentNodeNotBlock.get() instanceof LambdaExpr) {

@@ -116,7 +116,7 @@ public class TestStreamWrappedVariableToMapCases extends AJavaparserRefactorerCa
 		public Set<String> post(Set<String> classNames) {
 			return classNames.stream()
 					.map(className -> className.substring(className.lastIndexOf('.') + 1))
-					.map(name -> {
+					.map((name) -> {
 						return name;
 					})
 					.collect(Collectors.toCollection(TreeSet::new));

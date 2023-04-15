@@ -20,17 +20,16 @@ import java.util.Set;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.type.UnknownType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -133,39 +132,38 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 			return false;
 		}
 
-		String lambdaVariableName = mapLambdaExpr.getParameters().get(0).getNameAsString();
+		SimpleName lambdaVariableName = mapLambdaExpr.getParameters().get(0).getName();
+		String lambdaVariableNameAsString = lambdaVariableName.asString();
 		if (variableDeclaratorExpr
-				.findFirst(NameExpr.class, nameExpr -> nameExpr.getNameAsString().equals(lambdaVariableName))
+				.findFirst(NameExpr.class, nameExpr -> nameExpr.getNameAsString().equals(lambdaVariableNameAsString))
 				.isEmpty()) {
 			// We expect the variableDeclaration to be based on the lambda input
 			return false;
 		} else if (!lambdaBlock
 				.findAll(NameExpr.class,
-						nameExpr -> nameExpr.getNameAsString().equals(lambdaVariableName)
+						nameExpr -> nameExpr.getNameAsString().equals(lambdaVariableNameAsString)
 								&& !isAncestor(variableDeclaratorExpr, nameExpr))
 				.isEmpty()) {
 			// We ensure the only lambda input usage is for the initial variable declaration
 			return false;
 		}
 
-		Optional<LambdaExpr> optNewLambdaExpr =
-				LambdaExprHelpers.makeLambdaExpr(variableDeclaratorExpr.getVariable(0).getName(), lambdaBlock);
-		if (optNewLambdaExpr.isEmpty()) {
-			return false;
-		}
-		tryReplace(mapLambdaExpr, optNewLambdaExpr.get());
-
 		if (!tryRemove(firstStatement)) {
 			// Remove the variableDeclaration as it is moved to the `.map(...)` methodCall
 			return false;
 		}
+		if (!LambdaExprHelpers.changeName(mapLambdaExpr, variableDeclaratorExpr.getVariable(0).getName())) {
+			return false;
+		}
 
-		var parameter = new Parameter(new UnknownType(), lambdaVariableName);
-		LambdaExpr unwrappedMapLambdaExpr =
-				new LambdaExpr(parameter, variableDeclaratorExpr.getVariable(0).getInitializer().get());
+		Optional<LambdaExpr> unwrappedMapLambdaExpr = LambdaExprHelpers.makeLambdaExpr(lambdaVariableName,
+				variableDeclaratorExpr.getVariable(0).getInitializer().get());
+		if (unwrappedMapLambdaExpr.isEmpty()) {
+			return false;
+		}
 
 		MethodCallExpr callMap =
-				new MethodCallExpr(mapScope, optMapMethodName.get(), new NodeList<>(unwrappedMapLambdaExpr));
+				new MethodCallExpr(mapScope, optMapMethodName.get(), new NodeList<>(unwrappedMapLambdaExpr.get()));
 
 		methodCallExpr.setScope(callMap);
 

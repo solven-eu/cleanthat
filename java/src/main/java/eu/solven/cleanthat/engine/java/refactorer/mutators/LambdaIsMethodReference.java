@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns `.stream(s -> s.size())` into `.stream(String::size)`
@@ -175,7 +176,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 			return false;
 		}
 
-		Optional<ResolvedType> optResolvedType = optResolvedType(asClassOrInterfaceType);
+		Optional<ResolvedType> optResolvedType = ResolvedTypeHelpers.optResolvedType(asClassOrInterfaceType);
 		if (optResolvedType.isEmpty()) {
 			return false;
 		} else if (optResolvedType.get().isTypeVariable()) {

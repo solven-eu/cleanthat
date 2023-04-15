@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.OptionalOrRejection;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns '1F + 0.1F` into `(double) 1F + 0.1F`
@@ -128,14 +129,14 @@ public class ArithmeticOverFloats extends AJavaparserExprMutator {
 			} else if (parent instanceof NodeWithType<?, ?>) {
 				Type type = ((NodeWithType<?, ?>) parent).getType();
 
-				Optional<ResolvedType> optResolvedType = optResolvedType(type);
+				Optional<ResolvedType> optResolvedType = ResolvedTypeHelpers.optResolvedType(type);
 
 				if (optResolvedType.isEmpty()) {
 					return OptionalOrRejection.reject();
-				} else if (isAssignableBy(Float.class.getName(), optResolvedType.get())) {
+				} else if (ResolvedTypeHelpers.isAssignableBy(Float.class.getName(), optResolvedType.get())) {
 					// We cast the double into float as it is the type of the initialized variable
 					needCastToDouble = Optional.of(child);
-				} else if (isAssignableBy(Number.class.getName(), optResolvedType.get())) {
+				} else if (ResolvedTypeHelpers.isAssignableBy(Number.class.getName(), optResolvedType.get())) {
 					// We turned a float into a double, which is finally assigned to a double: fine
 					needCastToDouble = Optional.empty();
 				} else {

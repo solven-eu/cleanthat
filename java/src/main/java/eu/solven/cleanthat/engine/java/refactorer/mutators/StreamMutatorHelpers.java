@@ -49,6 +49,11 @@ public class StreamMutatorHelpers {
 		return Optional.of(singleStatement);
 	}
 
+	/**
+	 * 
+	 * @param forEachStmt
+	 * @return the simple {@link IfStmt} in this {@link ForEachStmt} if it is alone, and has to `else` clause
+	 */
 	public static Optional<IfStmt> findSingleIfThenStmt(ForEachStmt forEachStmt) {
 		Optional<Statement> optSingleStatement = findSingleStatement(forEachStmt.getBody());
 		if (optSingleStatement.isEmpty()) {
@@ -57,11 +62,20 @@ public class StreamMutatorHelpers {
 
 		var singleStatement = optSingleStatement.get();
 
-		if (!singleStatement.isIfStmt() || singleStatement.asIfStmt().getElseStmt().isPresent()) {
+		return findSingleIfThenStmt(singleStatement);
+	}
+
+	public static Optional<IfStmt> findSingleIfThenStmt(Statement singleStatement) {
+		if (!singleStatement.isIfStmt()) {
 			return Optional.empty();
 		}
 
 		var ifStmt = singleStatement.asIfStmt();
+		if (ifStmt.getElseStmt().isPresent()) {
+			// We need a simple `if`, without an `else`
+			return Optional.empty();
+		}
+
 		return Optional.of(ifStmt);
 	}
 

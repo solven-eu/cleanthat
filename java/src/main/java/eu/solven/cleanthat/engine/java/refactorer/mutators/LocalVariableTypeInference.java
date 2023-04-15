@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns 'int i = 10;' into 'var i = 10'
@@ -131,7 +132,7 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 		}
 		// TODO Would there be a way to get the mostly qualified type (i.e. based on imports, and no package if the type
 		// was actually coming from a wildcard import)
-		Optional<ResolvedType> optVariableType = optResolvedType(variableType);
+		Optional<ResolvedType> optVariableType = ResolvedTypeHelpers.optResolvedType(variableType);
 		if (optVariableType.isEmpty()) {
 			return false;
 		}

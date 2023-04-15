@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.NameExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
@@ -98,11 +99,6 @@ public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
 			return false;
 		}
 
-		if (hasOuterAssignExpr(ifStmt.getCondition())) {
-			// We can not put a variableAssignement in a lambda
-			return false;
-		}
-
 		var lastStmt = thenAsBlockStmt.getStatement(thenAsBlockStmt.getStatements().size() - 1);
 		if (!lastStmt.isReturnStmt() && !lastStmt.isBreakStmt()) {
 			return false;
@@ -116,23 +112,31 @@ public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
 	}
 
 	protected boolean replaceForEachIfByIfStream(ForEachStmt forEachStmt, IfStmt ifStmt, BlockStmt thenAsBlockStmt) {
-		Expression withStream = new MethodCallExpr(forEachStmt.getIterable(), "stream");
 		var variable = forEachStmt.getVariable().getVariables().get(0);
 		var lambdaExpr = ifConditionToLambda(ifStmt, variable);
-		Expression withStream2 = new MethodCallExpr(withStream, ANY_MATCH, new NodeList<>(lambdaExpr));
+		if (lambdaExpr.isEmpty()) {
+			return false;
+		}
+		Expression withStream = new MethodCallExpr(forEachStmt.getIterable(), "stream");
+		Expression withStream2 = new MethodCallExpr(withStream, ANY_MATCH, new NodeList<>(lambdaExpr.get()));
 
 		var newif = new IfStmt(withStream2, thenAsBlockStmt, null);
 
 		return tryReplace(forEachStmt, newif);
 	}
 
-	public static LambdaExpr ifConditionToLambda(IfStmt ifStmt, VariableDeclarator variable) {
+	public static Optional<LambdaExpr> ifConditionToLambda(IfStmt ifStmt, VariableDeclarator variable) {
+		if (LambdaExprHelpers.hasOuterAssignExpr(ifStmt.getCondition())) {
+			// We can not put a variableAssignement in a lambda
+			return Optional.empty();
+		}
+
 		// No need for variable.getType()
 		var parameter = new Parameter(new UnknownType(), variable.getName());
 
 		var condition = ifStmt.getCondition();
 
 		var lambdaExpr = new LambdaExpr(parameter, condition);
-		return lambdaExpr;
+		return Optional.of(lambdaExpr);
 	}
 }

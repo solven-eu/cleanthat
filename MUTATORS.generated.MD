@@ -288,6 +288,16 @@ isDraft
 
 languageLevel: jdk1.8
 
+### [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
+
+jSparrow: [EnhancedForLoopToStreamTakeWhile](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-take-while.html)
+
+Cleanthat own ID: ForEachIfBreakElseToStreamTakeWhile
+
+isDraft
+
+languageLevel: jdk1.8
+
 ### [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)
 
 jSparrow: [EnhancedForLoopToStreamFindFirst](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-find-first.html)
@@ -495,6 +505,18 @@ Cleanthat own ID: StreamWrappedVariableToMap
 isDraft
 
 languageLevel: jdk1.8
+
+### [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)
+
+Sonar: [RSPEC-2129](https://rules.sonarsource.com/java/RSPEC-2129)
+
+jSparrow: [RemoveNewStringConstructor](https://jsparrow.github.io/rules/remove-new-string-constructor.html)
+
+Cleanthat own ID: StringFromString
+
+isDraft
+
+languageLevel: jdk1.1
 
 ### [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 

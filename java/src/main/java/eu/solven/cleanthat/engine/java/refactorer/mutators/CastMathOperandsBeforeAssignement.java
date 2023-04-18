@@ -126,7 +126,7 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 		} else {
 			Expression needToCast = binaryExpr.getLeft();
 
-			optResolvedType(binaryExpr.getLeft());
+			// MethodCallExprHelpers.optResolvedType(binaryExpr.getLeft());
 
 			CastExpr newLeft = new CastExpr(optFloatOrDouble.get(), needToCast);
 			binaryExpr.setLeft(newLeft);

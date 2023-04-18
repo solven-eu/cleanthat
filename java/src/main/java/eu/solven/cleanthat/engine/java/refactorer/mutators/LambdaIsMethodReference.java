@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -220,7 +221,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		if (methodCallExpr.getArguments().size() == 1 && methodCallExpr.getArguments().get(0).isNameExpr()
 				&& methodCallExpr.getArguments().get(0).asNameExpr().getName().equals(singleParameter.getName())) {
 
-			Optional<ResolvedType> scopeType = optResolvedType(scope);
+			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(scope);
 
 			if (scopeType.isEmpty()) {
 				return false;
@@ -234,7 +235,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		} else if (methodCallExpr.getArguments().isEmpty() && optScope.get().isNameExpr()
 				&& optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
 
-			Optional<ResolvedType> scopeType = optResolvedType(scope);
+			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(scope);
 
 			if (scopeType.isEmpty()) {
 				return false;

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -39,7 +40,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
  * @author Benoit Lacelle
  */
 @ApplyAfterMe(LambdaReturnsSingleStatement.class)
-public class ForEachToForIterableForEach extends AJavaparserStmtMutator {
+public class ForEachToIterableForEach extends AJavaparserStmtMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -74,7 +75,7 @@ public class ForEachToForIterableForEach extends AJavaparserStmtMutator {
 
 		var forEachStmt = stmt.asForEachStmt();
 
-		Optional<ResolvedType> resolved = optResolvedType(forEachStmt.getIterable());
+		Optional<ResolvedType> resolved = MethodCallExprHelpers.optResolvedType(forEachStmt.getIterable());
 		if (resolved.isEmpty()) {
 			// We need to make sure the type is not an array
 			return false;

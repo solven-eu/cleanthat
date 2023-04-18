@@ -318,11 +318,11 @@ isDraft
 
 languageLevel: jdk1.8
 
-### [ForEachToForIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToForIterableForEach.java)
+### [ForEachToIterableForEach](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachToIterableForEach.java)
 
 jSparrow: [EnhancedForLoopToStreamForEach](https://jsparrow.github.io/rules/enhanced-for-loop-to-stream-for-each.html)
 
-Cleanthat own ID: ForEachToForIterableForEach
+Cleanthat own ID: ForEachToIterableForEach
 
 isDraft
 
@@ -434,6 +434,14 @@ isDraft
 
 languageLevel: jdk1.8
 
+### [OptionalMapIdentity](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalMapIdentity.java)
+
+Cleanthat own ID: OptionalMapIdentity
+
+isDraft
+
+languageLevel: jdk1.8
+
 ### [OptionalWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/OptionalWrappedIfToFilter.java)
 
 Cleanthat own ID: OptionalWrappedIfToFilter
@@ -481,6 +489,34 @@ Cleanthat own ID: RemoveAllToClearCollection
 isDraft
 
 languageLevel: jdk1.2
+
+### [StreamFlatMapStreamToFlatMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamFlatMapStreamToFlatMap.java)
+
+jSparrow: [FlatMapInsteadOfNestedLoops](https://jsparrow.github.io/rules/flat-map-instead-of-nested-loops.html)
+
+Cleanthat own ID: StreamFlatMapStreamToFlatMap
+
+isDraft
+
+languageLevel: jdk1.8
+
+### [StreamForEachNestingForLoopToFlatMap](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamForEachNestingForLoopToFlatMap.java)
+
+jSparrow: [FlatMapInsteadOfNestedLoops](https://jsparrow.github.io/rules/flat-map-instead-of-nested-loops.html)
+
+Cleanthat own ID: StreamForEachNestingForLoopToFlatMap
+
+isDraft
+
+languageLevel: jdk1.8
+
+### [StreamMapIdentity](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamMapIdentity.java)
+
+Cleanthat own ID: StreamMapIdentity
+
+isDraft
+
+languageLevel: jdk1.8
 
 ### [StreamWrappedIfToFilter](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StreamWrappedIfToFilter.java)
 

@@ -143,6 +143,8 @@ public class OneMutatorCase<N, R> {
 
 		if (optResult.isPresent() && mutator instanceof IReApplyUntilNoop) {
 			var latestResult = optResult.get();
+
+			// BEWARE The following is valid only for JavaParser-based mutator
 			if (latestResult instanceof Node && asAst instanceof Node) {
 
 				while (true) {

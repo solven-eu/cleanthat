@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
@@ -120,7 +121,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 				}
 
 				var calledScope = call.getScope().get();
-				Optional<ResolvedType> calledType = optResolvedType(calledScope);
+				Optional<ResolvedType> calledType = MethodCallExprHelpers.optResolvedType(calledScope);
 
 				if (calledType.isEmpty() || !calledType.get().isReferenceType()) {
 					return false;

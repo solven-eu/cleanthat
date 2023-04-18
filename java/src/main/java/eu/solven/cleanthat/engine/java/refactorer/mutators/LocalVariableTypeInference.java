@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -126,7 +127,7 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 			return false;
 		}
 
-		Optional<ResolvedType> optInitializerType = optResolvedType(initializer);
+		Optional<ResolvedType> optInitializerType = MethodCallExprHelpers.optResolvedType(initializer);
 		if (optInitializerType.isEmpty()) {
 			return false;
 		}

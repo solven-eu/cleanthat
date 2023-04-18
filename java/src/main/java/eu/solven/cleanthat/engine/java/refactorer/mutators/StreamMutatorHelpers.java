@@ -18,6 +18,10 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.LambdaExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -77,6 +81,34 @@ public class StreamMutatorHelpers {
 		}
 
 		return Optional.of(ifStmt);
+	}
+
+	/**
+	 * 
+	 * @param maybeExpressionStmtOrStatement
+	 *            typically a {@link LambdaExpr} body
+	 * @return
+	 */
+	public static Optional<MethodCallExpr> findSingleMethodCallExpr(Statement maybeExpressionStmtOrStatement) {
+		if (maybeExpressionStmtOrStatement.isExpressionStmt()) {
+			Expression expr = maybeExpressionStmtOrStatement.asExpressionStmt().getExpression();
+
+			if (expr.isMethodCallExpr()) {
+				return Optional.of(expr.asMethodCallExpr());
+			} else {
+				return Optional.empty();
+			}
+		} else if (maybeExpressionStmtOrStatement.isBlockStmt()) {
+			BlockStmt blockStmt = maybeExpressionStmtOrStatement.asBlockStmt();
+
+			if (blockStmt.getStatements().size() != 1) {
+				return Optional.empty();
+			} else {
+				return findSingleMethodCallExpr(blockStmt.getStatement(0));
+			}
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }

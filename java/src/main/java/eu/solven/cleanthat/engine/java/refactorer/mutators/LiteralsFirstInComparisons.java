@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
@@ -192,7 +193,7 @@ public class LiteralsFirstInComparisons extends AJavaparserMutator implements IM
 	}
 
 	private boolean isStringScope(Expression scope) {
-		Optional<ResolvedType> optType = optResolvedType(scope);
+		Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(scope);
 		if (optType.isEmpty()) {
 			return false;
 		}

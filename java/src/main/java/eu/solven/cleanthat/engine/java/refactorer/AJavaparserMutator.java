@@ -39,7 +39,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.SuppressCleanthat;
 import eu.solven.cleanthat.engine.java.refactorer.function.OnMethodName;
-import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -168,7 +168,7 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 
 	protected boolean tryReplace(Node node, Node replacement) {
 		if (cancelDueToComment(node)) {
-			LOGGER.info("We skip removing {} due to the presence of a comment", node);
+			LOGGER.info("We skip replacing {} due to the presence of a comment", node);
 			return false;
 		}
 
@@ -216,39 +216,6 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 
 	protected Optional<Node> replaceNode(Node node) {
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
-	}
-
-	// https://github.com/javaparser/javaparser/issues/1491
-	protected Optional<ResolvedType> optResolvedType(Expression expr) {
-		if (expr.findCompilationUnit().isEmpty()) {
-			// This node is not hooked anymore on a CompilationUnit
-			return Optional.empty();
-		}
-
-		try {
-			// ResolvedType type = expr.getSymbolResolver().calculateType(expr);
-			var type = expr.calculateResolvedType();
-			return Optional.of(type);
-		} catch (RuntimeException e) {
-			try {
-				var secondTryType = expr.calculateResolvedType();
-
-				logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3939");
-
-				return Optional.of(secondTryType);
-			} catch (RuntimeException ee) {
-				LOGGER.debug("Issue resolving the type of {}", expr, ee);
-				return Optional.empty();
-			} catch (NoClassDefFoundError ee) {
-				logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
-
-				return Optional.empty();
-			}
-		} catch (NoClassDefFoundError e) {
-			logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
-
-			return Optional.empty();
-		}
 	}
 
 	public static void logJavaParserIssue(Object o, Throwable e, String issue) {
@@ -304,25 +271,21 @@ public abstract class AJavaparserMutator implements IJavaparserMutator, ICountMu
 				return;
 			}
 			var scope = optScope.get();
-			Optional<ResolvedType> type = optResolvedType(scope);
+			Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(scope);
 			if (type.isPresent()) {
 				consumer.onMethodName(methodCall, scope, type.get());
 			}
 		}
 	}
 
+	@Deprecated
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, Class<?> requiredType) {
-		// .canonicalName is typically required to handle primitive arrays
-		// For int[]: qualifiedName is [I while canonicalName is int[]
-		// BEWARE: How would it handle local or anonymous class?
-		// https://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
-		return scopeHasRequiredType(optScope, requiredType.getName());
+		return MethodCallExprHelpers.scopeHasRequiredType(optScope, requiredType);
 	}
 
+	@Deprecated
 	protected boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
-		Optional<ResolvedType> optType = optScope.flatMap(this::optResolvedType);
-
-		return ResolvedTypeHelpers.typeIsAssignable(optType, requiredType);
+		return MethodCallExprHelpers.scopeHasRequiredType(optScope, requiredType);
 	}
 
 	/**

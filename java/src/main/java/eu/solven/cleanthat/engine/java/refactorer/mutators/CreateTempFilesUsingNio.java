@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * cases inspired from #description
@@ -92,7 +93,7 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 		}
 		Optional<Expression> optScope = methodCallExpr.getScope();
 		if (optScope.isPresent()) {
-			Optional<ResolvedType> type = optResolvedType(optScope.get());
+			Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(optScope);
 			if (type.isEmpty() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
 				return false;
 			}

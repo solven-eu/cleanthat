@@ -28,7 +28,8 @@ import com.github.javaparser.ast.stmt.Statement;
  * @author Benoit Lacelle
  *
  */
-@Deprecated(since = "This is just for informative purpose, as it is not implemented yet")
+@Deprecated(
+		since = "This is just for informative purpose, as it is not implemented yet. Rather implements `IReApplyUntilNoop`")
 @Target(ElementType.TYPE)
 public @interface RepeatOnSuccess {
 

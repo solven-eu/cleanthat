@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'Arrays.asList("1", 2).stream()' into 'Arrays.stream("1", 2)'
@@ -122,7 +123,7 @@ public class ArraysDotStream extends AJavaparserMutator {
 		} else {
 			var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
 
-			Optional<ResolvedType> optType = optResolvedType(filterPredicate);
+			Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(filterPredicate);
 
 			if (optType.isEmpty()) {
 				// TODO Ask JavaParser how can one get a qualifiedname, especially given imports

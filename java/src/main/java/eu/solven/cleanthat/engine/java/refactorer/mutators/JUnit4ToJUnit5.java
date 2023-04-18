@@ -42,6 +42,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Migrate from JUnit4 to JUnit5/Jupiter.
@@ -203,7 +204,7 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 			return false;
 		}
 		var scope = optScope.get();
-		Optional<ResolvedType> type = optResolvedType(scope);
+		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(scope);
 
 		if (type.isPresent() && type.get().isReferenceType()) {
 			var referenceType = type.get().asReferenceType();

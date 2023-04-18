@@ -28,7 +28,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.CastMathOperandsBefor
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionToOptional;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachAddToStreamCollectToCollection;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LoopIntRangeToIntStreamForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedIfToFilter;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedVariableToMap;
@@ -49,7 +49,7 @@ public class SafeButControversialMutators extends CompositeMutator<IMutator> imp
 	public static final List<IMutator> BUT_CONTROVERSIAL = ImmutableList.<IMutator>builder()
 			.add(new CollectionToOptional(),
 					new ForEachIfToIfStreamAnyMatch(),
-					new ForEachToForIterableForEach(),
+					new ForEachToIterableForEach(),
 					new ForEachAddToStreamCollectToCollection(),
 					new SimplifyBooleanExpression(),
 					new SimplifyBooleanInitialization(),

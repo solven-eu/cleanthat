@@ -10,13 +10,13 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToForIterableForEach;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestForEachToForIterableForEachCases extends AJavaparserRefactorerCases {
+public class TestForEachToIterableForEachCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserMutator getTransformer() {
-		return new ForEachToForIterableForEach();
+		return new ForEachToIterableForEach();
 	}
 
 	@CompareMethods

@@ -31,6 +31,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Migrate from 'm.size() == 0’ to ’m.isEmpty()'. Works with {@link Collection}, {@link Map} and {@link String}.
@@ -56,7 +57,7 @@ public abstract class AUseXIsEmpty extends AJavaparserExprMutator {
 		}
 
 		var lengthScope = optLengthScope.get();
-		Optional<ResolvedType> type = optResolvedType(lengthScope);
+		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(lengthScope);
 
 		if (type.isPresent()) {
 			return checkTypeAndProcess(expr, lengthScope, type.get());

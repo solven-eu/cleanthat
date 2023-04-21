@@ -34,7 +34,9 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 
@@ -71,15 +73,16 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
 
-		MethodCallExpr methodCallExpr = expr.asMethodCallExpr();
+		MethodCallExpr methodCallExpr = expr.getNode().asMethodCallExpr();
 		if (!getEligibleForUnwrappedMap().contains(methodCallExpr.getNameAsString())) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), getExpectedScope())) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCallExpr.getScope()),
+				getExpectedScope())) {
 			return false;
 		} else if (methodCallExpr.getArguments().size() < 1) {
 			return false;
@@ -127,7 +130,8 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 		}
 
 		Expression mapScope = methodCallExpr.getScope().get();
-		Optional<String> optMapMethodName = computeMapMethodName(mapScope, variableDeclaratorExpr.getElementType());
+		Optional<String> optMapMethodName =
+				computeMapMethodName(expr.editNode(mapScope), variableDeclaratorExpr.getElementType());
 		if (optMapMethodName.isEmpty()) {
 			return false;
 		}
@@ -186,7 +190,7 @@ public class OptionalWrappedVariableToMap extends AJavaparserExprMutator impleme
 		return descendant.findAncestor(n -> n == ancestor, Node.class).isPresent();
 	}
 
-	protected Optional<String> computeMapMethodName(Expression expression, Type type) {
+	protected Optional<String> computeMapMethodName(NodeAndSymbolSolver<? extends Expression> expression, Type type) {
 		return Optional.of(METHOD_MAP);
 	}
 

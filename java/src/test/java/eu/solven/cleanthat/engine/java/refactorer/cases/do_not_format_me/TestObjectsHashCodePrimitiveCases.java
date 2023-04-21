@@ -4,13 +4,13 @@ import java.util.Objects;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectsHashCodePrimitive;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 public class TestObjectsHashCodePrimitiveCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new ObjectsHashCodePrimitive();
 	}
 

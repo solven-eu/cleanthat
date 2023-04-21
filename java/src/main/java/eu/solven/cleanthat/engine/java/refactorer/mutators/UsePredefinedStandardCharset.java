@@ -29,6 +29,9 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -64,18 +67,19 @@ public class UsePredefinedStandardCharset extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
 
-		MethodCallExpr methodCallExpr = expr.asMethodCallExpr();
+		MethodCallExpr methodCallExpr = expr.getNode().asMethodCallExpr();
 
 		if (!"forName".equals(methodCallExpr.getNameAsString())) {
 			return false;
 		} else if (methodCallExpr.getArguments().size() != 1) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), Charset.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCallExpr.getScope()),
+				Charset.class)) {
 			return false;
 		}
 
@@ -87,8 +91,7 @@ public class UsePredefinedStandardCharset extends AJavaparserExprMutator {
 			return false;
 		}
 
-		NameExpr className =
-				new NameExpr(nameOrQualifiedName(expr.findCompilationUnit().get(), StandardCharsets.class));
+		NameExpr className = ImportDeclarationHelpers.nameOrQualifiedName(expr, StandardCharsets.class);
 		return tryReplace(methodCallExpr, new FieldAccessExpr(className, optFieldName.get()));
 
 	}

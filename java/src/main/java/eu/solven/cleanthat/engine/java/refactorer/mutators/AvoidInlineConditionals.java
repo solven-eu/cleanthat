@@ -38,7 +38,8 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.google.common.collect.ImmutableSet;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'boolean b = (x > 1 ) ? true : callback.doIt() || true' into 'if (x > 1) { ... } else { ...}'
@@ -46,7 +47,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  *
  */
-public class AvoidInlineConditionals extends AJavaparserMutator {
+public class AvoidInlineConditionals extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AvoidInlineConditionals.class);
 
 	@Override
@@ -77,11 +78,11 @@ public class AvoidInlineConditionals extends AJavaparserMutator {
 	// TODO Lack of checking for Stream type
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof ConditionalExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof ConditionalExpr)) {
 			return false;
 		}
-		var ternary = (ConditionalExpr) node;
+		var ternary = (ConditionalExpr) node.getNode();
 
 		if (ternary.getParentNode().isEmpty()) {
 			return false;

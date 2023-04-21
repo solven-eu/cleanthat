@@ -16,7 +16,6 @@
 package eu.solven.cleanthat.maven_core;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 
 import org.codehaus.plexus.util.Os;
@@ -53,7 +52,7 @@ public class EnvironmentUtils {
 				if (envVars == null) {
 					var tmp = new Properties();
 					var caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
-					for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+					System.getenv().entrySet().forEach(entry -> {
 						String key;
 						if (caseSensitive) {
 							key = "env." + entry.getKey();
@@ -61,7 +60,7 @@ public class EnvironmentUtils {
 							key = "env." + entry.getKey().toUpperCase(Locale.ENGLISH);
 						}
 						tmp.setProperty(key, entry.getValue());
-					}
+					});
 					envVars = tmp;
 				}
 			}

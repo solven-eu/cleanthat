@@ -43,7 +43,7 @@ import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinte
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.IDisabledMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
@@ -164,9 +164,10 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 		LOGGER.info("Processing: {}", resource);
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-		for (IMutator anyMutator : new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST))
-				.getUnderlyings()) {
-			if (anyMutator instanceof ATodoJavaParserMutator) {
+		AllIncludingDraftSingleMutators composite =
+				new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
+		for (IMutator anyMutator : composite.getUnderlyings()) {
+			if (anyMutator instanceof IDisabledMutator) {
 				// These mutators are not ready
 				continue;
 			}

@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'Strings.repeat("abc", 3)` into `"abc".repeat(3)`
@@ -51,11 +52,11 @@ public class GuavaInlineStringsRepeat extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!"repeat".equals(methodCallIdentifier)) {
 			return false;

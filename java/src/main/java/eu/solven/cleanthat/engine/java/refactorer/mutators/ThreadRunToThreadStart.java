@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'myThread.run()` into `myThread.start()`
@@ -47,15 +49,16 @@ public class ThreadRunToThreadStart extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCallExpr = expr.asMethodCallExpr();
+		var methodCallExpr = expr.getNode().asMethodCallExpr();
 
 		if (!"run".equals(methodCallExpr.getNameAsString())) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), Thread.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCallExpr.getScope()),
+				Thread.class)) {
 			return false;
 		}
 

@@ -17,14 +17,14 @@ import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 public class TestLocalVariableTypeInferenceCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new LocalVariableTypeInference();
 	}
 

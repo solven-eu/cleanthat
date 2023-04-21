@@ -3,14 +3,14 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.Optional;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.NullCheckToOptionalOfNullable;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 // https://dzone.com/articles/optional-in-java-a-swiss-army-knife-for-handling-n
 public class TestNullCheckToOptionalOfNullableCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new NullCheckToOptionalOfNullable();
 	}
 

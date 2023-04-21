@@ -29,6 +29,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'Object.hashCode(1)` into `Integer.hashCode(1)`
@@ -60,11 +62,11 @@ public class ObjectsHashCodePrimitive extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!"hashCode".equals(methodCallIdentifier)) {
 			return false;
@@ -85,7 +87,7 @@ public class ObjectsHashCodePrimitive extends AJavaparserExprMutator {
 
 		Optional<Entry<Class<?>, Class<?>>> optClass = PRIMITIVE_CLASSES.entrySet()
 				.stream()
-				.filter(c -> scopeHasRequiredType(Optional.of(left), c.getKey()))
+				.filter(c -> MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(left), c.getKey()))
 				.findAny();
 		if (optClass.isPresent()) {
 			// Beware, there may already a custom `Integer` class in imports conflicting with `java.lang.Integer`

@@ -25,14 +25,16 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns '!o.isEmpty()' into 'o.isPresent()'
  *
  * @author Benoit Lacelle
  */
-public class OptionalNotEmpty extends AJavaparserMutator {
+public class OptionalNotEmpty extends AJavaparserExprMutator {
 	private static final String ID_NOTEMPTY = "OptionalNotEmpty";
 	private static final String ID_ISPRESENT = "OptionalIsPresent";
 
@@ -63,11 +65,11 @@ public class OptionalNotEmpty extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof MethodCallExpr)) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = (MethodCallExpr) node;
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_IS_EMPTY.equals(methodCallIdentifier) && !METHOD_IS_PRESENT.equals(methodCallIdentifier)) {
 			return false;
@@ -83,7 +85,7 @@ public class OptionalNotEmpty extends AJavaparserMutator {
 		}
 		Optional<Expression> optScope = methodCall.getScope();
 
-		if (!scopeHasRequiredType(optScope, Optional.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(optScope), Optional.class)) {
 			return false;
 		}
 

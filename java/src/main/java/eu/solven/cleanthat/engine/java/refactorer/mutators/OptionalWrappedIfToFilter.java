@@ -31,7 +31,9 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 
@@ -66,15 +68,16 @@ public class OptionalWrappedIfToFilter extends AJavaparserExprMutator implements
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
 
-		MethodCallExpr methodCallExpr = expr.asMethodCallExpr();
+		MethodCallExpr methodCallExpr = expr.getNode().asMethodCallExpr();
 		if (!getEligibleForUnwrappedFilter().contains(methodCallExpr.getNameAsString())) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), getExpectedScope())) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCallExpr.getScope()),
+				getExpectedScope())) {
 			return false;
 		} else if (methodCallExpr.getArguments().size() < 1) {
 			return false;

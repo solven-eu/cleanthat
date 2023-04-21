@@ -21,7 +21,7 @@ import java.util.Set;
 import com.github.javaparser.ast.Node;
 import com.google.common.collect.ImmutableSet;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -30,7 +30,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  * @author Benoit Lacelle
  *
  */
-public class CustomDraftMutator implements IJavaparserMutator {
+public class CustomDraftMutator implements IJavaparserAstMutator {
 
 	@Override
 	public boolean isDraft() {

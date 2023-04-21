@@ -32,14 +32,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Order modifiers according the the Java specification.
  *
  * @author Benoit Lacelle
  */
-public class ModifierOrder extends AJavaparserMutator {
+public class ModifierOrder extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",
@@ -96,7 +97,8 @@ public class ModifierOrder extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndContext) {
+		Node node = nodeAndContext.getNode();
 		if (node instanceof NodeWithModifiers<?>) {
 			NodeWithModifiers<?> nodeWithModifiers = (NodeWithModifiers<?>) node;
 			NodeList<Modifier> modifiers = nodeWithModifiers.getModifiers();

@@ -19,10 +19,10 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 
 /**
- * {@link ARefactorerCases} for {@link IJavaparserMutator}
+ * {@link ARefactorerCases} for {@link IJavaparserAstMutator}
  * 
  * @author Benoit Lacelle
  *

@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
@@ -38,7 +37,9 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
@@ -48,7 +49,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class LambdaIsMethodReference extends AJavaparserMutator {
+public class LambdaIsMethodReference extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -83,7 +84,8 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
+		Node node = nodeAndSymbolSolver.getNode();
 		if (!(node instanceof LambdaExpr)) {
 			return false;
 		}
@@ -93,7 +95,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		if (lambdaExpr.getParameters().size() == 1) {
 			var singleParameter = lambdaExpr.getParameters().get(0);
 
-			return hasOneVariable(lambdaExpr, singleParameter);
+			return hasOneVariable(nodeAndSymbolSolver, lambdaExpr, singleParameter);
 		} else {
 			return false;
 		}
@@ -101,7 +103,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 	}
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
-	private boolean hasOneVariable(LambdaExpr lambdaExpr, Parameter singleParameter) {
+	private boolean hasOneVariable(NodeAndSymbolSolver<?> context, LambdaExpr lambdaExpr, Parameter singleParameter) {
 		var body = lambdaExpr.getBody();
 
 		if (!body.isExpressionStmt()) {
@@ -158,7 +160,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		} else if (expression.isMethodCallExpr()) {
 			var methodCallExpr = expression.asMethodCallExpr();
 
-			return onMethodCall(lambdaExpr, singleParameter, methodCallExpr);
+			return onMethodCall(context, lambdaExpr, singleParameter, methodCallExpr);
 
 		}
 		return false;
@@ -211,7 +213,10 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		return tryReplace(lambdaExpr, methodReference);
 	}
 
-	private boolean onMethodCall(LambdaExpr lambdaExpr, Parameter singleParameter, MethodCallExpr methodCallExpr) {
+	private boolean onMethodCall(NodeAndSymbolSolver<?> context,
+			LambdaExpr lambdaExpr,
+			Parameter singleParameter,
+			MethodCallExpr methodCallExpr) {
 		Optional<Expression> optScope = methodCallExpr.getScope();
 		if (optScope.isEmpty()) {
 			return false;
@@ -221,7 +226,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		if (methodCallExpr.getArguments().size() == 1 && methodCallExpr.getArguments().get(0).isNameExpr()
 				&& methodCallExpr.getArguments().get(0).asNameExpr().getName().equals(singleParameter.getName())) {
 
-			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(scope);
+			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(context.editNode(scope));
 
 			if (scopeType.isEmpty()) {
 				return false;
@@ -235,7 +240,7 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 		} else if (methodCallExpr.getArguments().isEmpty() && optScope.get().isNameExpr()
 				&& optScope.get().asNameExpr().getName().equals(singleParameter.getName())) {
 
-			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(scope);
+			Optional<ResolvedType> scopeType = MethodCallExprHelpers.optResolvedType(context.editNode(scope));
 
 			if (scopeType.isEmpty()) {
 				return false;
@@ -260,11 +265,9 @@ public class LambdaIsMethodReference extends AJavaparserMutator {
 			var packageName = typeDeclaration.getPackageName();
 			var qualifiedName = refType.getQualifiedName();
 
-			Optional<CompilationUnit> compilationUnit = lambdaExpr.findAncestor(CompilationUnit.class);
-
 			// TODO nameOrQualifiedName(compilationUnit.get(), getClass());
 			String methodRefClassName;
-			if (compilationUnit.isPresent() && isImported(compilationUnit.get(), packageName, qualifiedName)) {
+			if (ImportDeclarationHelpers.isImported(context, packageName, qualifiedName)) {
 				methodRefClassName = typeDeclaration.getName();
 			} else {
 				methodRefClassName = qualifiedName;

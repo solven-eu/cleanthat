@@ -27,7 +27,8 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns '{}' into ''
@@ -35,7 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/blob/main/rewrite-java/src/main/java/org/openrewrite/java/cleanup/EmptyBlockVisitor.java
-public class EmptyControlStatement extends AJavaparserMutator {
+public class EmptyControlStatement extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmptyControlStatement.class);
 
 	@Override
@@ -85,11 +86,11 @@ public class EmptyControlStatement extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof BlockStmt)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof BlockStmt)) {
 			return false;
 		}
-		var blockStmt = (BlockStmt) node;
+		var blockStmt = (BlockStmt) node.getNode();
 
 		var removed = false;
 

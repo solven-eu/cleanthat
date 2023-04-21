@@ -31,6 +31,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
@@ -49,7 +50,7 @@ public abstract class AUseXIsEmpty extends AJavaparserExprMutator {
 	protected abstract Set<Class<?>> getCompatibleTypes();
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
 		Optional<Expression> optLengthScope = checkCallSizeAndCompareWith0(getSizeMethod(), expr);
 
 		if (optLengthScope.isEmpty()) {
@@ -57,16 +58,18 @@ public abstract class AUseXIsEmpty extends AJavaparserExprMutator {
 		}
 
 		var lengthScope = optLengthScope.get();
-		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(lengthScope);
+		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(expr.editNode(lengthScope));
 
 		if (type.isPresent()) {
-			return checkTypeAndProcess(expr, lengthScope, type.get());
+			return checkTypeAndProcess(expr.getNode(), lengthScope, type.get());
 		}
 
 		return false;
 	}
 
-	protected Optional<Expression> checkCallSizeAndCompareWith0(String methodName, Node node) {
+	protected Optional<Expression> checkCallSizeAndCompareWith0(String methodName,
+			NodeAndSymbolSolver<Expression> expr) {
+		Expression node = expr.getNode();
 		if (!(node instanceof BinaryExpr)) {
 			return Optional.empty();
 		}

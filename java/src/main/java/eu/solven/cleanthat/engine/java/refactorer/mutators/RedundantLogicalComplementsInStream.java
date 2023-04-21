@@ -27,6 +27,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -65,17 +67,17 @@ public class RedundantLogicalComplementsInStream extends AJavaparserExprMutator 
 
 	@SuppressWarnings("PMD.NPathComplexity")
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
 
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 
 		if (!"anyMatch".equals(methodCall.getNameAsString()) || methodCall.getArguments().size() != 1) {
 			return false;
 		}
-		if (!scopeHasRequiredType(methodCall.getScope(), Stream.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCall.getScope()), Stream.class)) {
 			return false;
 		}
 

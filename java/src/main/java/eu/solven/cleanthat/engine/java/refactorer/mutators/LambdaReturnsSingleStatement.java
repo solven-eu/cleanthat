@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -76,12 +77,12 @@ public class LambdaReturnsSingleStatement extends AJavaparserExprMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isLambdaExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isLambdaExpr()) {
 			return false;
 		}
 
-		var lambdaExpr = expr.asLambdaExpr();
+		var lambdaExpr = expr.getNode().asLambdaExpr();
 
 		var body = lambdaExpr.getBody();
 

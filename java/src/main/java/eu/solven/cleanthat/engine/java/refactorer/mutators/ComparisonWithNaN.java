@@ -29,14 +29,16 @@ import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'd == Double.NaN' into 'Double.isNaN(d)'
  *
  * @author Benoit Lacelle
  */
-public class ComparisonWithNaN extends AJavaparserMutator {
+public class ComparisonWithNaN extends AJavaparserNodeMutator {
 
 	// Optional exists since 8
 	// Optional.isPresent exists since 11
@@ -67,11 +69,11 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof BinaryExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof BinaryExpr)) {
 			return false;
 		}
-		var binaryExpr = (BinaryExpr) node;
+		var binaryExpr = (BinaryExpr) node.getNode();
 
 		if (isEquals(binaryExpr)) {
 			return false;
@@ -82,9 +84,9 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 
 		Expression mayNotBeNaN;
 
-		if (isNaNReference(right)) {
+		if (isNaNReference(node.editNode(right))) {
 			mayNotBeNaN = left;
-		} else if (isNaNReference(left)) {
+		} else if (isNaNReference(node.editNode(left))) {
 			mayNotBeNaN = right;
 		} else {
 			return false;
@@ -92,16 +94,16 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 
 		boolean prefixNullCheck;
 		Class<?> methodHolderClass;
-		if (scopeHasRequiredType(Optional.of(mayNotBeNaN), float.class)) {
+		if (MethodCallExprHelpers.scopeHasRequiredType(node.editNode(mayNotBeNaN), float.class)) {
 			prefixNullCheck = false;
 			methodHolderClass = Float.class;
-		} else if (scopeHasRequiredType(Optional.of(mayNotBeNaN), double.class)) {
+		} else if (MethodCallExprHelpers.scopeHasRequiredType(node.editNode(mayNotBeNaN), double.class)) {
 			prefixNullCheck = false;
 			methodHolderClass = Double.class;
-		} else if (scopeHasRequiredType(Optional.of(mayNotBeNaN), Float.class)) {
+		} else if (MethodCallExprHelpers.scopeHasRequiredType(node.editNode(mayNotBeNaN), Float.class)) {
 			prefixNullCheck = true;
 			methodHolderClass = Float.class;
-		} else if (scopeHasRequiredType(Optional.of(mayNotBeNaN), Double.class)) {
+		} else if (MethodCallExprHelpers.scopeHasRequiredType(node.editNode(mayNotBeNaN), Double.class)) {
 			prefixNullCheck = true;
 			methodHolderClass = Double.class;
 		} else {
@@ -128,18 +130,19 @@ public class ComparisonWithNaN extends AJavaparserMutator {
 		return binaryExpr.getOperator() != BinaryExpr.Operator.EQUALS;
 	}
 
-	private boolean isNaNReference(Expression left) {
-		if (!(left.isFieldAccessExpr())) {
+	private boolean isNaNReference(NodeAndSymbolSolver<? extends Expression> left) {
+		if (!(left.getNode().isFieldAccessExpr())) {
 			return false;
 		}
 
-		var fieldAccessExpr = left.asFieldAccessExpr();
+		var fieldAccessExpr = left.getNode().asFieldAccessExpr();
 
 		if (!("NaN".equals(fieldAccessExpr.getNameAsString()))) {
 			return false;
 		}
-		if (!scopeHasRequiredType(Optional.of(fieldAccessExpr.getScope()), Double.class)
-				&& !scopeHasRequiredType(Optional.of(fieldAccessExpr.getScope()), Float.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(left.editNode(fieldAccessExpr.getScope()), Double.class)
+				&& !MethodCallExprHelpers.scopeHasRequiredType(left.editNode(fieldAccessExpr.getScope()),
+						Float.class)) {
 			return false;
 		}
 

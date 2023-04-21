@@ -28,6 +28,7 @@ import com.google.common.collect.Maps;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
 
 /**
@@ -71,11 +72,11 @@ public class ArithmethicAssignment extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isAssignExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isAssignExpr()) {
 			return false;
 		}
-		var assignExpr = expr.asAssignExpr();
+		var assignExpr = expr.getNode().asAssignExpr();
 
 		if (assignExpr.getOperator() != AssignExpr.Operator.ASSIGN) {
 			// We can use turn from the assign operation `=`

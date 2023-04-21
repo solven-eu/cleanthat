@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `"someString".toString()` into `"someString"`
@@ -69,11 +71,11 @@ public class StringToString extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_TO_STRING.equals(methodCallIdentifier)) {
 			return false;
@@ -84,7 +86,7 @@ public class StringToString extends AJavaparserExprMutator {
 		}
 		Optional<Expression> optScope = methodCall.getScope();
 
-		if (!scopeHasRequiredType(optScope, String.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(optScope), String.class)) {
 			return false;
 		}
 

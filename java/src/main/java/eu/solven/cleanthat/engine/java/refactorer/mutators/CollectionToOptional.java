@@ -16,16 +16,17 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `list.isEmpty() ? Optional.empty() : Optional.of(list.get(0))` into `list.stream().findFirst()`
@@ -44,12 +45,12 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isConditionalExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isConditionalExpr()) {
 			return false;
 		}
 
-		var conditionalExpr = expr.asConditionalExpr();
+		var conditionalExpr = expr.getNode().asConditionalExpr();
 
 		var conditionExpr = conditionalExpr.getCondition();
 		var thenExpr = conditionalExpr.getThenExpr();
@@ -64,7 +65,7 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 		var elseMethod = elseExpr.asMethodCallExpr();
 
 		if (!"isEmpty".equals(conditionMethod.getNameAsString())
-				|| !scopeHasRequiredType(conditionMethod.getScope(), List.class)) {
+				|| !MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(conditionMethod.getScope()), List.class)) {
 			return false;
 		} else if (!"Optional.empty()".equals(thenMethod.toString()) || !hasImported(expr, "java.util.Optional")) {
 			return false;
@@ -73,20 +74,11 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 			return false;
 		}
 
-		return tryReplace(expr,
+		return tryReplace(expr.getNode(),
 				new MethodCallExpr(new MethodCallExpr(conditionMethod.getScope().get(), "stream"), "findFirst"));
 	}
 
-	private boolean hasImported(Expression expr, String imported) {
-		Optional<CompilationUnit> optCompilationUnit = expr.findCompilationUnit();
-		if (optCompilationUnit.isEmpty()) {
-			return false;
-		}
-
-		return optCompilationUnit.get()
-				.getImports()
-				.stream()
-				.anyMatch(importDecl -> !importDecl.isAsterisk() && !importDecl.isStatic()
-						&& imported.equals(importDecl.getNameAsString()));
+	private boolean hasImported(NodeAndSymbolSolver<Expression> expr, String imported) {
+		return ImportDeclarationHelpers.isImported(expr, imported);
 	}
 }

@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.CompositeJavaparserMutator;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToIterableForEach;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
@@ -18,7 +18,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCase
 
 public class TestNestedForLoopsToStreamFlatMapCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new CompositeJavaparserMutator(Arrays.asList(new ForEachToIterableForEach(),
 				new StreamForEachNestingForLoopToFlatMap(),
 				new LoopIntRangeToIntStreamForEach(),
@@ -76,11 +76,31 @@ public class TestNestedForLoopsToStreamFlatMapCases extends AJavaparserRefactore
 		}
 
 		public void post(List<String> values) {
-			values.forEach(user -> IntStream.range(0, user.length()).forEach(System.out::println));
+			values.stream().flatMapToInt(user -> IntStream.range(0, user.length())).forEach(System.out::println);
+		}
+	}
+
+	@CompareMethods
+	public static class InnerIsIntToDoubleLoop {
+		public void pre(List<String> values, double[] doubles) {
+			for (String user : values) {
+				for (int length = 0; length < user.length(); length++) {
+					System.out.println(doubles[length]);
+				}
+			}
 		}
 
-		public void postTodo(List<String> values) {
-			values.stream().flatMapToInt(user -> IntStream.range(0, user.length())).forEach(System.out::println);
+		public void post(List<String> values, double[] doubles) {
+			values.stream()
+					.flatMapToInt(user -> IntStream.range(0, user.length()))
+					.forEach(length -> System.out.println(doubles[length]));
+		}
+
+		public void postTodo(List<String> values, double[] doubles) {
+			values.stream()
+					.flatMapToInt(user -> IntStream.range(0, user.length()))
+					.mapToDouble(length -> doubles[length])
+					.forEach(System.out::println);
 		}
 	}
 
@@ -95,10 +115,6 @@ public class TestNestedForLoopsToStreamFlatMapCases extends AJavaparserRefactore
 		}
 
 		public void post(List<String> values) {
-			values.forEach(user -> IntStream.range(0, user.length()).forEach(System.out::println));
-		}
-
-		public void postTodo(List<String> values) {
 			values.stream().flatMapToInt(user -> IntStream.range(0, user.length())).forEach(System.out::println);
 		}
 	}

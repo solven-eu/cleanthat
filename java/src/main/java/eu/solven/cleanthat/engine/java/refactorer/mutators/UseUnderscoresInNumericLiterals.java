@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.DoubleLiteralExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LiteralStringValueExpr;
@@ -27,14 +26,15 @@ import com.github.javaparser.ast.expr.LongLiteralExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'int i = 1234567’ into ’int i = 1_234_567'
  *
  * @author Benoit Lacelle
  */
-public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
+public class UseUnderscoresInNumericLiterals extends AJavaparserNodeMutator {
 	// We groups digits per block of thousands
 	private static final int BLOCK_SIZE = 3;
 
@@ -81,17 +81,17 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof LiteralStringValueExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof LiteralStringValueExpr)) {
 			return false;
 		}
 
-		var literalStringExpr = (LiteralStringValueExpr) node;
+		var literalStringExpr = (LiteralStringValueExpr) node.getNode();
 
 		var asString = literalStringExpr.getValue();
 		Optional<String> optNewValue;
 
-		if (node instanceof IntegerLiteralExpr || node instanceof LongLiteralExpr) {
+		if (literalStringExpr instanceof IntegerLiteralExpr || literalStringExpr instanceof LongLiteralExpr) {
 
 			var noUnderscore = asString.replaceAll("_", "");
 
@@ -105,7 +105,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserMutator {
 			} else {
 				optNewValue = Optional.empty();
 			}
-		} else if (node instanceof DoubleLiteralExpr) {
+		} else if (literalStringExpr instanceof DoubleLiteralExpr) {
 			var noUnderscore = asString.replaceAll("_", "");
 
 			if (noUnderscore.matches("\\d+(\\.\\d+)?([dDfF])?")) {

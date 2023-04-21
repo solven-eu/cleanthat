@@ -3,13 +3,13 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import java.util.List;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 public class TestStreamAnyMatchCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new StreamAnyMatch();
 	}
 

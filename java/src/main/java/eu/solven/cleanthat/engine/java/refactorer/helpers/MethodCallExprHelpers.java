@@ -23,9 +23,11 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.types.ResolvedType;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Helps working with {@link MethodCallExpr}
@@ -40,74 +42,95 @@ public class MethodCallExprHelpers {
 		// hidden
 	}
 
-	public static boolean scopeHasRequiredType(Optional<Expression> optScope, Class<?> requiredType) {
+	public static boolean scopeHasRequiredType(NodeAndSymbolSolver<? extends Expression> node, Class<?> requiredType) {
+		return scopeHasRequiredType(node.getSymbolResolver(), Optional.of(node.getNode()), requiredType);
+	}
+
+	public static boolean scopeHasRequiredType(Optional<NodeAndSymbolSolver<? extends Expression>> optNode,
+			Class<?> expectedScope) {
+		if (optNode.isEmpty()) {
+			return false;
+		}
+		return scopeHasRequiredType(optNode.get(), expectedScope);
+	}
+
+	public static boolean scopeHasRequiredType(SymbolResolver symbolResolver,
+			Optional<Expression> optScope,
+			Class<?> requiredType) {
 		// .canonicalName is typically required to handle primitive arrays
 		// For int[]: qualifiedName is [I while canonicalName is int[]
 		// BEWARE: How would it handle local or anonymous class?
 		// https://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
-		return scopeHasRequiredType(optScope, requiredType.getName());
+		return scopeHasRequiredType(symbolResolver, optScope, requiredType.getName());
 	}
 
-	public static boolean scopeHasRequiredType(Optional<Expression> optScope, String requiredType) {
-		Optional<ResolvedType> optType = optScope.flatMap(MethodCallExprHelpers::optResolvedType);
+	public static boolean scopeHasRequiredType(SymbolResolver symbolResolver,
+			Optional<Expression> optScope,
+			String requiredType) {
+		Optional<ResolvedType> optType =
+				optScope.flatMap(scope -> MethodCallExprHelpers.optResolvedType(symbolResolver, scope));
 
 		return ResolvedTypeHelpers.typeIsAssignable(optType, requiredType);
 	}
 
-	public static Optional<ResolvedType> optResolvedType(Optional<Expression> expr) {
-		return expr.flatMap(MethodCallExprHelpers::optResolvedType);
+	public static Optional<ResolvedType> optResolvedType(NodeAndSymbolSolver<? extends Expression> expr) {
+		return optResolvedType(expr.getSymbolResolver(), expr.getNode());
+	}
+
+	public static Optional<ResolvedType> optResolvedType(Optional<NodeAndSymbolSolver<? extends Expression>> optExpr) {
+		if (optExpr.isEmpty()) {
+			return Optional.empty();
+		}
+		return optResolvedType(optExpr.get());
 	}
 
 	// https://github.com/javaparser/javaparser/issues/1491
-	public static Optional<ResolvedType> optResolvedType(Expression expr) {
-		if (expr.findCompilationUnit().isEmpty()) {
-			// This node is not hooked anymore on a CompilationUnit
-			return Optional.empty();
-		}
-
+	public static Optional<ResolvedType> optResolvedType(SymbolResolver symbolResolver, Expression expr) {
 		try {
 			// ResolvedType type = expr.getSymbolResolver().calculateType(expr);
-			var type = expr.calculateResolvedType();
+			var type = symbolResolver.calculateType(expr);
 			return Optional.of(type);
 		} catch (RuntimeException e) {
 			try {
 				var secondTryType = expr.calculateResolvedType();
 
-				AJavaparserMutator.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3939");
+				AJavaparserNodeMutator
+						.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3939");
 
 				return Optional.of(secondTryType);
 			} catch (RuntimeException ee) {
 				LOGGER.debug("Issue resolving the type of {}", expr, ee);
 				return Optional.empty();
 			} catch (NoClassDefFoundError ee) {
-				AJavaparserMutator.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
+				AJavaparserNodeMutator
+						.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
 
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			AJavaparserMutator.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
+			AJavaparserNodeMutator.logJavaParserIssue(expr, e, "https://github.com/javaparser/javaparser/issues/3504");
 
 			return Optional.empty();
 		}
 	}
 
 	@SafeVarargs
-	public static Optional<MethodCallExpr> match(Expression expr,
+	public static Optional<MethodCallExpr> match(NodeAndSymbolSolver<Expression> expr,
 			Class<?> scope,
 			String methodName,
 			Predicate<Expression>... acceptArguments) {
-		if (!expr.isMethodCallExpr()) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return Optional.empty();
 		}
 
-		var methodCallExpr = expr.asMethodCallExpr();
+		var methodCallExpr = expr.getNode().asMethodCallExpr();
 		if (!methodName.equals(methodCallExpr.getNameAsString())) {
 			return Optional.empty();
 		} else if (methodCallExpr.getArguments().size() != acceptArguments.length) {
 			return Optional.empty();
 		}
 
-		if (!scopeHasRequiredType(methodCallExpr.getScope(), scope)) {
+		if (!scopeHasRequiredType(expr.getSymbolResolver(), methodCallExpr.getScope(), scope)) {
 			return Optional.empty();
 		}
 
@@ -121,4 +144,5 @@ public class MethodCallExprHelpers {
 
 		return Optional.of(methodCallExpr);
 	}
+
 }

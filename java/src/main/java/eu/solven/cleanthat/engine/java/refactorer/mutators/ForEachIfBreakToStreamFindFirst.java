@@ -36,6 +36,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.VariableDeclarationExprHepers;
@@ -73,7 +75,9 @@ public class ForEachIfBreakToStreamFindFirst extends ARefactorConsecutiveStateme
 
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
 	@Override
-	protected boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt) {
+	protected boolean trySimplifyingStatements(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			Statement currentStmt,
+			Statement nextStmt) {
 		Optional<VariableDeclarationExpr> optAssignExpr =
 				VariableDeclarationExprHepers.optSimpleDeclaration(currentStmt);
 		if (optAssignExpr.isEmpty()) {
@@ -157,11 +161,9 @@ public class ForEachIfBreakToStreamFindFirst extends ARefactorConsecutiveStateme
 					ResolvedPrimitiveType asPrimitive = variableResolvedType.asPrimitive();
 
 					// There is an implicit cast between 2 primitive types
-					methodReferenceExpr = new MethodReferenceExpr(
-							new NameExpr(nameOrQualifiedName(currentStmt.findCompilationUnit().get(),
-									asPrimitive.getBoxTypeClass())),
-							new NodeList<>(),
-							"valueOf");
+					methodReferenceExpr =
+							new MethodReferenceExpr(ImportDeclarationHelpers.nameOrQualifiedName(blockStmtAndSolver,
+									asPrimitive.getBoxTypeClass()), new NodeList<>(), "valueOf");
 				} else {
 
 					// There is an implicit cast

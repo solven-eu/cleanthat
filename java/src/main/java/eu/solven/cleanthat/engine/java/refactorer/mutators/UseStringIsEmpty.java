@@ -23,6 +23,8 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 
 /**
@@ -61,18 +63,18 @@ public class UseStringIsEmpty extends AUseXIsEmpty {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		boolean replaced = super.processNotRecursively(expr);
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		boolean replaced = super.processExpression(expr);
 
 		if (replaced) {
 			return true;
 		}
 
-		if (!expr.isMethodCallExpr()) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
 
-		var asMethodCall = expr.asMethodCallExpr();
+		var asMethodCall = expr.getNode().asMethodCallExpr();
 		if (!"equals".equals(asMethodCall.getNameAsString())
 				&& !"equalsIgnoreCase".equals(asMethodCall.getNameAsString())) {
 			return false;
@@ -84,7 +86,7 @@ public class UseStringIsEmpty extends AUseXIsEmpty {
 		}
 
 		Optional<Expression> optScope = asMethodCall.getScope();
-		if (!scopeHasRequiredType(optScope, String.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(optScope), String.class)) {
 			return false;
 		}
 

@@ -27,7 +27,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
  *
  * @author Benoit Lacelle
  */
-public abstract class ATodoJavaParserMutator extends AJavaparserMutator {
+public abstract class ATodoJavaParserMutator extends AJavaparserNodeMutator implements IDisabledMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ATodoJavaParserMutator.class);
 
 	@Override
@@ -43,6 +43,11 @@ public abstract class ATodoJavaParserMutator extends AJavaparserMutator {
 	@Override
 	public boolean walkAstHasChanged(Node tree) {
 		LOGGER.debug("TODO");
+		return false;
+	}
+
+	@Override
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
 		return false;
 	}
 }

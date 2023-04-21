@@ -20,6 +20,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 * `OptionalMapIdentity` is introduced
 * `StreamMapIdentity` is introduced
 * `StreamForEachNestingForLoopToFlatMap` is introduced
+* `StreamFlatMapStreamToFlatMap` is introduced
 
 ## [2.14] - 2023-04-06
 

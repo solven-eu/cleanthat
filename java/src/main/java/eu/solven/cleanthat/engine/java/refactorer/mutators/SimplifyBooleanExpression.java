@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns `!(a == 2)` into `a != 2`
@@ -65,11 +66,11 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isUnaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isUnaryExpr()) {
 			return false;
 		}
-		var unaryExpr = expr.asUnaryExpr();
+		var unaryExpr = expr.getNode().asUnaryExpr();
 
 		if (isLogicalComplement(unaryExpr)) {
 			return false;
@@ -92,7 +93,7 @@ public class SimplifyBooleanExpression extends AJavaparserExprMutator {
 			return false;
 		}
 
-		boolean replaced = tryReplace(expr, underlyingBinaryExpr);
+		boolean replaced = tryReplace(expr.getNode(), underlyingBinaryExpr);
 
 		if (replaced) {
 			// Edit the operator only if the optional node replace succeeded

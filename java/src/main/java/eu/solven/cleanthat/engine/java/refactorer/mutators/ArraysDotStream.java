@@ -23,8 +23,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -33,7 +31,9 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
@@ -42,7 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  * @author Benoit Lacelle
  *
  */
-public class ArraysDotStream extends AJavaparserMutator {
+public class ArraysDotStream extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamAnyMatch.class);
 
 	private static final String METHOD_ASLIST = "asList";
@@ -82,11 +82,11 @@ public class ArraysDotStream extends AJavaparserMutator {
 	// TODO Lack of checking for Stream type
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof MethodCallExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
-		var methodCall = (MethodCallExpr) node;
+		var methodCall = (MethodCallExpr) node.getNode();
 		var methodCallIdentifier = methodCall.getNameAsString();
 		if (!METHOD_STREAM.equals(methodCallIdentifier)) {
 			return false;
@@ -123,7 +123,7 @@ public class ArraysDotStream extends AJavaparserMutator {
 		} else {
 			var filterPredicate = scopeAsMethodCallExpr.getArgument(0);
 
-			Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(filterPredicate);
+			Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(node.editNode(filterPredicate));
 
 			if (optType.isEmpty()) {
 				// TODO Ask JavaParser how can one get a qualifiedname, especially given imports
@@ -136,8 +136,7 @@ public class ArraysDotStream extends AJavaparserMutator {
 		}
 
 		if (useStreamOf) {
-			Optional<CompilationUnit> compilationUnit = node.findAncestor(CompilationUnit.class);
-			var methodRefClassName = getStaticMethodClassRefMayAddImport(compilationUnit, Stream.class);
+			var methodRefClassName = ImportDeclarationHelpers.getStaticMethodClassRefMayAddImport(node, Stream.class);
 			var nameExpr = new NameExpr(methodRefClassName);
 
 			// This will catch 0_argument and 2+_arguments
@@ -152,28 +151,5 @@ public class ArraysDotStream extends AJavaparserMutator {
 			LOGGER.info("Turning {} into {}", methodCall, replacement);
 			return tryReplace(methodCall, replacement);
 		}
-	}
-
-	// https://stackoverflow.com/questions/147454/why-is-using-a-wild-card-with-a-java-import-statement-bad
-	private String getStaticMethodClassRefMayAddImport(Optional<CompilationUnit> optCompilationUnit, Class<?> clazz) {
-		var qualifiedName = clazz.getName();
-		if (optCompilationUnit.isEmpty()) {
-			return qualifiedName;
-		}
-
-		var classSimpleName = clazz.getSimpleName();
-
-		String methodRefClassName;
-		var compilationUnit = optCompilationUnit.get();
-		if (isImported(compilationUnit, clazz.getPackageName(), qualifiedName)) {
-			methodRefClassName = classSimpleName;
-		} else if (isImportable(compilationUnit, qualifiedName)) {
-			compilationUnit.addImport(qualifiedName, false, false);
-			methodRefClassName = classSimpleName;
-		} else {
-			methodRefClassName = qualifiedName;
-
-		}
-		return methodRefClassName;
 	}
 }

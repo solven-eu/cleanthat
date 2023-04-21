@@ -3,7 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -11,7 +11,7 @@ public class TestUnnecessaryImportsCases extends AJavaparserRefactorerCases {
 	static final String PREFIX = "source/do_not_format_me/UnnecessaryImport/";
 
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new UnnecessaryImport();
 	}
 

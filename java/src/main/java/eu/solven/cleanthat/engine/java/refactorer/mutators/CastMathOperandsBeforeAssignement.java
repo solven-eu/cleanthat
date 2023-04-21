@@ -42,7 +42,9 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -72,28 +74,35 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isBinaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isBinaryExpr()) {
 			return false;
 		}
-		var binaryExpr = expr.asBinaryExpr();
+		var binaryExpr = expr.getNode().asBinaryExpr();
+		NodeAndSymbolSolver<BinaryExpr> binaryExprWithContext = expr.editNode(binaryExpr);
 
 		Operator operator = binaryExpr.getOperator();
 		if (MATH_NOT_DIVIDE_OPERATORS.contains(operator)) {
-			return onNotDivision(expr, binaryExpr);
+			return onNotDivision(binaryExprWithContext);
 
 		} else if (MATH_DIVIDE_OPERATORS.contains(operator)) {
-			return onDivision(binaryExpr);
+			return onDivision(binaryExprWithContext);
 
 		}
 		return false;
 	}
 
-	private boolean onDivision(BinaryExpr binaryExpr) {
-		var leftIsFloating = scopeHasRequiredType(Optional.of(binaryExpr.getLeft()), float.class)
-				|| scopeHasRequiredType(Optional.of(binaryExpr.getLeft()), double.class);
-		var rightIsFloating = scopeHasRequiredType(Optional.of(binaryExpr.getRight()), float.class)
-				|| scopeHasRequiredType(Optional.of(binaryExpr.getRight()), double.class);
+	private boolean onDivision(NodeAndSymbolSolver<BinaryExpr> binaryExprAndSolver) {
+		BinaryExpr binaryExpr = binaryExprAndSolver.getNode();
+
+		var leftIsFloating = MethodCallExprHelpers
+				.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getLeft()), float.class)
+				|| MethodCallExprHelpers.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getLeft()),
+						double.class);
+		var rightIsFloating = MethodCallExprHelpers
+				.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getRight()), float.class)
+				|| MethodCallExprHelpers.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getRight()),
+						double.class);
 		if (leftIsFloating || rightIsFloating) {
 			return false;
 		}
@@ -136,21 +145,24 @@ public class CastMathOperandsBeforeAssignement extends AJavaparserExprMutator {
 		return true;
 	}
 
-	private boolean onNotDivision(Expression expr, BinaryExpr binaryExpr) {
-		if (!scopeHasRequiredType(Optional.of(binaryExpr.getLeft()), int.class)) {
+	private boolean onNotDivision(NodeAndSymbolSolver<BinaryExpr> binaryExprAndSolver) {
+		BinaryExpr binaryExpr = binaryExprAndSolver.getNode();
+		if (!MethodCallExprHelpers.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getLeft()),
+				int.class)) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(binaryExpr.getRight()), int.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(binaryExprAndSolver.editNode(binaryExpr.getRight()),
+				int.class)) {
 			return false;
 		}
 
-		if (!isUsedAsALong(expr)) {
+		if (!isUsedAsALong(binaryExprAndSolver.getNode())) {
 			return false;
 		}
 
 		Optional<Expression> optBinaryExpr = BinaryExprHelpers.findAny(binaryExpr, n -> n.isBinaryExpr(), true);
 		if (optBinaryExpr.isPresent()) {
 			// Search deeper, as the cast should be done as deeply as possible
-			return processNotRecursively(optBinaryExpr.get());
+			return processNotRecursively(binaryExprAndSolver.editNode(optBinaryExpr.get()));
 		}
 
 		Optional<Expression> optIntegerLiteral =

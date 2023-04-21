@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
@@ -63,7 +64,7 @@ public class StreamFlatMapStreamToFlatMap extends AJavaparserExprMutator impleme
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
 		var optFlatMapExpr = MethodCallExprHelpers.match(expr, Stream.class, "flatMap", Expression::isLambdaExpr);
 		if (optFlatMapExpr.isEmpty()) {
 			return false;

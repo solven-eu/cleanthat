@@ -24,7 +24,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BinaryExpr.Operator;
@@ -39,7 +38,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
@@ -47,7 +47,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  *
  * @author Sébastien Collard
  */
-public class CreateTempFilesUsingNio extends AJavaparserMutator {
+public class CreateTempFilesUsingNio extends AJavaparserNodeMutator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseCollectionIsEmpty.class);
 
@@ -78,12 +78,12 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
 		// ResolvedMethodDeclaration test;
-		if (!(node instanceof MethodCallExpr)) {
+		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
-		var methodCallExpr = (MethodCallExpr) node;
+		var methodCallExpr = (MethodCallExpr) node.getNode();
 		if (!"createTempFile".equals(methodCallExpr.getName().getIdentifier())) {
 			return false;
 		}
@@ -93,7 +93,7 @@ public class CreateTempFilesUsingNio extends AJavaparserMutator {
 		}
 		Optional<Expression> optScope = methodCallExpr.getScope();
 		if (optScope.isPresent()) {
-			Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(optScope);
+			Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(node.editNode(optScope));
 			if (type.isEmpty() || !"java.io.File".equals(type.get().asReferenceType().getQualifiedName())) {
 				return false;
 			}

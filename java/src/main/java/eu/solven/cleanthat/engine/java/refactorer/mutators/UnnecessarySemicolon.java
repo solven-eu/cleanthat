@@ -25,14 +25,15 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns `int i = 0;;` into `int i = 0;`
  *
  * @author Benoit Lacelle
  */
-public class UnnecessarySemicolon extends AJavaparserMutator {
+public class UnnecessarySemicolon extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -65,9 +66,9 @@ public class UnnecessarySemicolon extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (node instanceof Statement) {
-			var stmt = (Statement) node;
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (node.getNode() instanceof Statement) {
+			var stmt = (Statement) node.getNode();
 			return processNotRecursively(stmt);
 		}
 

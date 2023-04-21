@@ -213,6 +213,7 @@
 - [StringReplaceAllWithQuotableInput](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringReplaceAllWithQuotableInput.java)
 - [ThreadRunToThreadStart](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ThreadRunToThreadStart.java)
 - [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
+- [UnnecessaryImport](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryImport.java)
 - [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 - [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
 - [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)

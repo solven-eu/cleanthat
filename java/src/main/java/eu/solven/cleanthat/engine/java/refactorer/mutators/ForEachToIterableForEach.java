@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
@@ -68,14 +69,15 @@ public class ForEachToIterableForEach extends AJavaparserStmtMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isForEachStmt()) {
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> stmt) {
+		if (!stmt.getNode().isForEachStmt()) {
 			return false;
 		}
 
-		var forEachStmt = stmt.asForEachStmt();
+		var forEachStmt = stmt.getNode().asForEachStmt();
 
-		Optional<ResolvedType> resolved = MethodCallExprHelpers.optResolvedType(forEachStmt.getIterable());
+		Optional<ResolvedType> resolved =
+				MethodCallExprHelpers.optResolvedType(stmt.editNode(forEachStmt.getIterable()));
 		if (resolved.isEmpty()) {
 			// We need to make sure the type is not an array
 			return false;

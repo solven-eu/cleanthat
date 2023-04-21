@@ -21,35 +21,36 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.Expression;
 
 /**
- * Most {@link AJavaparserMutator} will trigger over an {@link Expression}
+ * Most {@link AJavaparserAstMutator} will trigger over an {@link Expression}
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaparserExprMutator extends AJavaparserMutator {
+public abstract class AJavaparserExprMutator extends AJavaparserNodeMutator {
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
+		Node node = nodeAndSymbolSolver.getNode();
 		if (node instanceof Expression) {
-			var expr = (Expression) node;
+			var expr = (Expression) nodeAndSymbolSolver.getNode();
 
-			return processNotRecursively(expr);
+			return processExpression(nodeAndSymbolSolver.editNode(expr));
 		} else {
 			return false;
 		}
 
 	}
 
-	protected boolean processNotRecursively(Expression expr) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
 		Optional<Expression> optReplacement = replaceExpression(expr);
 
 		if (optReplacement.isPresent()) {
 			var replacement = optReplacement.get();
-			return tryReplace(expr, replacement);
+			return tryReplace(expr.getNode(), replacement);
 		} else {
 			return false;
 		}
 	}
 
-	protected Optional<Expression> replaceExpression(Expression expr) {
+	protected Optional<Expression> replaceExpression(NodeAndSymbolSolver<Expression> expr) {
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 }

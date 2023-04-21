@@ -27,6 +27,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'Object.equals(1, 5)` into `1 == 5`
@@ -54,11 +56,11 @@ public class ObjectEqualsForPrimitives extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!"equals".equals(methodCallIdentifier)) {
 			return false;
@@ -79,8 +81,8 @@ public class ObjectEqualsForPrimitives extends AJavaparserExprMutator {
 		var right = methodCall.getArgument(1);
 
 		if (PRIMITIVE_CLASSES.stream()
-				.anyMatch(c -> scopeHasRequiredType(Optional.of(left), c)
-						&& scopeHasRequiredType(Optional.of(right), c))) {
+				.anyMatch(c -> MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(left), c)
+						&& MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(right), c))) {
 			var replacement = new BinaryExpr(left, right, Operator.EQUALS);
 			return tryReplace(expr, replacement);
 		} else {

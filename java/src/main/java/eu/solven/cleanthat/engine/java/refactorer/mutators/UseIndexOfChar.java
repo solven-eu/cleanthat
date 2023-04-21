@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
@@ -27,14 +26,16 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 's.indexOf("s")’ into ’s.indexOf('s')'.
  *
  * @author Benoit Lacelle
  */
-public class UseIndexOfChar extends AJavaparserMutator {
+public class UseIndexOfChar extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -78,11 +79,11 @@ public class UseIndexOfChar extends AJavaparserMutator {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof StringLiteralExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof StringLiteralExpr)) {
 			return false;
 		}
-		var stringLiteralExpr = (StringLiteralExpr) node;
+		var stringLiteralExpr = (StringLiteralExpr) node.getNode();
 
 		if (stringLiteralExpr.getParentNode().isEmpty()) {
 			return false;
@@ -102,7 +103,7 @@ public class UseIndexOfChar extends AJavaparserMutator {
 		}
 
 		Optional<Expression> optScope = parentMethodCall.getScope();
-		if (!scopeHasRequiredType(optScope, String.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(node.editNode(optScope), String.class)) {
 			return false;
 		}
 

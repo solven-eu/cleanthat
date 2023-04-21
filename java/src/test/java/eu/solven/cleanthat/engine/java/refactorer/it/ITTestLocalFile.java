@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 
 /**
@@ -63,7 +63,7 @@ public class ITTestLocalFile {
 				new JavaRefactorer(CleanthatEngineProperties.builder().build(), new JavaRefactorerProperties());
 
 		// TODO Refactor to rely on RulesJavaMutator
-		IJavaparserMutator rule = new LiteralsFirstInComparisons();
+		IJavaparserAstMutator rule = new LiteralsFirstInComparisons();
 
 		var optCompilationUnit =
 				rulesJavaMutator.parseSourceCode(JavaRefactorer.makeDefaultJavaParser(rule.isJreOnly()), pathAsString);

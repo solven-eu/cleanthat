@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -27,14 +26,16 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 's.filter(p).findAny().isPresent()' into 's.anyMatch(predicate)'
  *
  * @author Benoit Lacelle
  */
-public class StreamAnyMatch extends AJavaparserMutator {
+public class StreamAnyMatch extends AJavaparserNodeMutator {
 	private static final String METHOD_FILTER = "filter";
 	private static final String METHOD_FIND_ANY = "findAny";
 	private static final String METHOD_IS_PRESENT = "isPresent";
@@ -65,11 +66,11 @@ public class StreamAnyMatch extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof MethodCallExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
-		var methodCall = (MethodCallExpr) node;
+		var methodCall = (MethodCallExpr) node.getNode();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!METHOD_IS_PRESENT.equals(methodCallIdentifier) && !METHOD_IS_EMPTY.equals(methodCallIdentifier)) {
 			return false;
@@ -105,7 +106,7 @@ public class StreamAnyMatch extends AJavaparserMutator {
 		Optional<Expression> optGrandParentScope = parentScopeAsMethodCallExpr.getScope();
 		if (optGrandParentScope.isEmpty()) {
 			return false;
-		} else if (!scopeHasRequiredType(optGrandParentScope, Stream.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(node.editNode(optGrandParentScope), Stream.class)) {
 			return false;
 		}
 		var grandParentScope = optGrandParentScope.get();

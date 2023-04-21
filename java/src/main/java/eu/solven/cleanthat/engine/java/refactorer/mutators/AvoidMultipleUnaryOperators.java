@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns '!!someBoolean()' into 'someBoolean()'
@@ -71,11 +72,11 @@ public class AvoidMultipleUnaryOperators extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isUnaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isUnaryExpr()) {
 			return false;
 		}
-		var unaryExpr = expr.asUnaryExpr();
+		var unaryExpr = expr.getNode().asUnaryExpr();
 
 		Operator unaryOperator = unaryExpr.getOperator();
 		if (!REDUNDANT_IF_DOUBLED.contains(unaryOperator)) {

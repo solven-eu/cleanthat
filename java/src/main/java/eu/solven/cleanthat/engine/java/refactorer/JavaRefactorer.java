@@ -47,7 +47,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 import com.google.common.collect.ImmutableMap;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.cleanthat.formatter.PathAndContent;
@@ -60,7 +60,7 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
-public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserMutator> {
+public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJavaparserAstMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JavaRefactorer.class);
 
 	// It is ambiguous to give access to access on the classLoader, as it would give insights to custom classes
@@ -75,8 +75,8 @@ public class JavaRefactorer extends AAstRefactorer<Node, JavaParser, Node, IJava
 
 	public JavaRefactorer(IEngineProperties engineProperties, JavaRefactorerProperties properties) {
 		super(filterRules(engineProperties, properties).stream()
-				.filter(c -> IJavaparserMutator.class.isAssignableFrom(c.getClass()))
-				.map(IJavaparserMutator.class::cast)
+				.filter(c -> IJavaparserAstMutator.class.isAssignableFrom(c.getClass()))
+				.map(IJavaparserAstMutator.class::cast)
 				.collect(Collectors.toList()));
 
 		this.engineProperties = engineProperties;

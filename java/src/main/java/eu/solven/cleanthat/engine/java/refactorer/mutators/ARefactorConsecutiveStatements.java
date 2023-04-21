@@ -19,6 +19,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
@@ -29,24 +30,28 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 public abstract class ARefactorConsecutiveStatements extends AJavaparserStmtMutator {
 
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isBlockStmt()) {
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> stmt) {
+		if (!stmt.getNode().isBlockStmt()) {
 			return false;
 		}
 
-		var blockStmt = stmt.asBlockStmt();
+		var blockStmt = stmt.getNode().asBlockStmt();
+
+		NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver = stmt.editNode(blockStmt);
 
 		var result = false;
 		for (var i = 0; i < blockStmt.getStatements().size() - 1; i++) {
 			var currentStmt = blockStmt.getStatement(i);
 			var nextStmt = blockStmt.getStatement(i + 1);
 
-			result |= trySimplifyingStatements(currentStmt, nextStmt);
+			result |= trySimplifyingStatements(blockStmtAndSolver, currentStmt, nextStmt);
 		}
 
 		return result;
 	}
 
-	protected abstract boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt);
+	protected abstract boolean trySimplifyingStatements(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			Statement currentStmt,
+			Statement nextStmt);
 
 }

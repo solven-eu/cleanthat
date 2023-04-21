@@ -22,6 +22,6 @@ import com.github.javaparser.ast.Node;
  *
  * @author Benoit Lacelle
  */
-public interface IJavaparserMutator extends IWalkingMutator<Node, Node> {
+public interface IJavaparserAstMutator extends IWalkingMutator<Node, Node> {
 
 }

@@ -31,14 +31,15 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'java.lang.String' into 'String'
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryFullyQualifiedName extends AJavaparserMutator {
+public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
 	@Override
@@ -85,7 +86,8 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndContext) {
+		Node node = nodeAndContext.getNode();
 		if (!(node instanceof NodeWithType)) {
 			return false;
 

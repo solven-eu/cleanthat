@@ -21,7 +21,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
@@ -38,7 +37,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
@@ -48,7 +48,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
  * @author Benoit Lacelle
  */
 @SuppressWarnings("PMD.GodClass")
-public class LiteralsFirstInComparisons extends AJavaparserMutator implements IMutatorDescriber {
+public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implements IMutatorDescriber {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LiteralsFirstInComparisons.class);
 
 	private static final String METHOD_EQUALS = "equals";
@@ -88,11 +88,11 @@ public class LiteralsFirstInComparisons extends AJavaparserMutator implements IM
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof MethodCallExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
-		var methodCall = (MethodCallExpr) node;
+		var methodCall = (MethodCallExpr) node.getNode();
 		if (methodCall.getArguments().size() != 1) {
 			return false;
 		}
@@ -138,7 +138,7 @@ public class LiteralsFirstInComparisons extends AJavaparserMutator implements IM
 		}
 		var scope = optScope.get();
 
-		if (stringScopeOnly && !isStringScope(scope)) {
+		if (stringScopeOnly && !isStringScope(node.editNode(scope))) {
 			return false;
 		}
 
@@ -192,7 +192,7 @@ public class LiteralsFirstInComparisons extends AJavaparserMutator implements IM
 		return name.asString().matches("[A-Z0-9_]+");
 	}
 
-	private boolean isStringScope(Expression scope) {
+	private boolean isStringScope(NodeAndSymbolSolver<? extends Expression> scope) {
 		Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(scope);
 		if (optType.isEmpty()) {
 			return false;

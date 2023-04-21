@@ -598,6 +598,8 @@ languageLevel: jdk1
 
 CheckStyle: [UnusedImports](https://checkstyle.sourceforge.io/config_imports.html#UnusedImports)
 
+Sonar: [RSPEC-2208](https://rules.sonarsource.com/java/RSPEC-2208)
+
 Cleanthat own ID: UnnecessaryImport
 
 isDraft

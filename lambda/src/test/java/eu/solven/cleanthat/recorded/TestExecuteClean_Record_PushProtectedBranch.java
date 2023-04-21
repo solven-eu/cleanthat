@@ -42,6 +42,7 @@ import eu.solven.cleanthat.aws.dynamodb.it.AProcessLocallyDynamoDbEvent_ExecuteC
 import eu.solven.cleanthat.aws.dynamodb.it.EventFromDynamoDbITHelper;
 import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
+import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 
 /**
@@ -59,6 +60,10 @@ public class TestExecuteClean_Record_PushProtectedBranch extends AProcessLocally
 
 	// Please make a first run with this set to true, then keep it to false;
 	public static boolean DO_RECORD = false;
+
+	static {
+		System.setProperty(GithubRefCleaner.ENV_TEMPORARY_BRANCH_SUFFIX, "2023-04-14");
+	}
 
 	@Override
 	public String[] resolve(Class<?> testClass) {

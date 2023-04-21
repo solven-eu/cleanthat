@@ -29,7 +29,7 @@ import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 
 /**
  * Helps working with {@link ResolvedType}
@@ -67,7 +67,8 @@ public class ResolvedTypeHelpers {
 			try {
 				var secondTryType = type.resolve();
 
-				AJavaparserMutator.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3939");
+				AJavaparserNodeMutator
+						.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3939");
 
 				return Optional.of(secondTryType);
 			} catch (RuntimeException ee) {
@@ -80,7 +81,7 @@ public class ResolvedTypeHelpers {
 				return Optional.empty();
 			}
 		} catch (NoClassDefFoundError e) {
-			AJavaparserMutator.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3504");
+			AJavaparserNodeMutator.logJavaParserIssue(type, e, "https://github.com/javaparser/javaparser/issues/3504");
 
 			return Optional.empty();
 		}

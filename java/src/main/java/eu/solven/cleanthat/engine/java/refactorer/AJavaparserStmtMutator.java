@@ -22,35 +22,36 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.stmt.Statement;
 
 /**
- * Most {@link AJavaparserMutator} will trigger over an {@link Statement}
+ * Most {@link AJavaparserNodeMutator} will trigger over an {@link Statement}
  *
  * @author Benoit Lacelle
  */
-public abstract class AJavaparserStmtMutator extends AJavaparserMutator {
+public abstract class AJavaparserStmtMutator extends AJavaparserNodeMutator {
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
+		Node node = nodeAndSymbolSolver.getNode();
 		if (node instanceof Statement) {
-			var expr = (Statement) node;
+			var stmt = (Statement) nodeAndSymbolSolver.getNode();
 
-			return processNotRecursively(expr);
+			return processStatement(nodeAndSymbolSolver.editNode(stmt));
 		} else {
 			return false;
 		}
 
 	}
 
-	protected boolean processNotRecursively(Statement stmt) {
-		Optional<Expression> optReplacement = replaceStatement(stmt);
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> expr) {
+		Optional<Expression> optReplacement = replaceStatement(expr);
 
 		if (optReplacement.isPresent()) {
 			var replacement = optReplacement.get();
-			return tryReplace(stmt, replacement);
+			return tryReplace(expr.getNode(), replacement);
 		} else {
 			return false;
 		}
 	}
 
-	protected Optional<Expression> replaceStatement(Statement stmt) {
+	protected Optional<Expression> replaceStatement(NodeAndSymbolSolver<Statement> expr) {
 		throw new UnsupportedOperationException("TODO Implement me in overriden classes");
 	}
 }

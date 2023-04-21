@@ -30,6 +30,8 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 's == null || s.isEmpty()` into `Strings.isNullOrEmpty(s)`
@@ -54,11 +56,11 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isBinaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isBinaryExpr()) {
 			return false;
 		}
-		var binaryExpr = expr.asBinaryExpr();
+		var binaryExpr = expr.getNode().asBinaryExpr();
 
 		if (binaryExpr.getOperator() != Operator.OR) {
 			return false;
@@ -67,12 +69,12 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 		var left = binaryExpr.getLeft();
 		var right = binaryExpr.getRight();
 
-		Optional<Expression> stringIsNullOrEmpty = oneIsNullOtherIsEmpty(left, right);
+		Optional<Expression> stringIsNullOrEmpty = oneIsNullOtherIsEmpty(expr, left, right);
 		if (stringIsNullOrEmpty.isEmpty()) {
 			return false;
 		}
 
-		Optional<CompilationUnit> optCompilationUnit = expr.findCompilationUnit();
+		Optional<CompilationUnit> optCompilationUnit = expr.getNode().findCompilationUnit();
 		if (optCompilationUnit.isEmpty()) {
 			return false;
 		}
@@ -84,18 +86,20 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 		return tryReplace(binaryExpr, replacement);
 	}
 
-	private Optional<Expression> oneIsNullOtherIsEmpty(Expression left, Expression right) {
+	private Optional<Expression> oneIsNullOtherIsEmpty(NodeAndSymbolSolver<?> context,
+			Expression left,
+			Expression right) {
 		Optional<Expression> leftIsNullCheck = searchNullCheck(left);
 
 		if (leftIsNullCheck.isPresent()) {
-			if (isEmpty(right, leftIsNullCheck.get())) {
+			if (isEmpty(context, right, leftIsNullCheck.get())) {
 				return right.asMethodCallExpr().getScope();
 			} else {
 				return Optional.empty();
 			}
 		} else {
 			Optional<Expression> rightIsNullCheck = searchNullCheck(right);
-			if (rightIsNullCheck.isPresent() && isEmpty(left, rightIsNullCheck.get())) {
+			if (rightIsNullCheck.isPresent() && isEmpty(context, left, rightIsNullCheck.get())) {
 				return left.asMethodCallExpr().getScope();
 			} else {
 				return Optional.empty();
@@ -103,7 +107,7 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 		}
 	}
 
-	private boolean isEmpty(Expression shouldCallIsEmpty, Expression isNullChecked) {
+	private boolean isEmpty(NodeAndSymbolSolver<?> context, Expression shouldCallIsEmpty, Expression isNullChecked) {
 		if (!shouldCallIsEmpty.isMethodCallExpr()) {
 			return false;
 		}
@@ -113,8 +117,8 @@ public class GuavaStringsIsNullOrEmpty extends AJavaparserExprMutator {
 			return false;
 		}
 
-		if (!"isEmpty".equals(asMethodCallExpr.getNameAsString())
-				|| !scopeHasRequiredType(asMethodCallExpr.getScope(), String.class)) {
+		if (!"isEmpty".equals(asMethodCallExpr.getNameAsString()) || !MethodCallExprHelpers
+				.scopeHasRequiredType(context.editNode(asMethodCallExpr.getScope()), String.class)) {
 			return false;
 		}
 

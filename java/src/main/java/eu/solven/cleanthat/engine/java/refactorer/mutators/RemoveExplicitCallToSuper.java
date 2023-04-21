@@ -18,12 +18,12 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'SomeClassWithConstructor(){super(); someMethod();}` into `SomeClassWithConstructor(){someMethod();}`.
@@ -32,7 +32,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  *
  * @author Benoit Lacelle
  */
-public class RemoveExplicitCallToSuper extends AJavaparserMutator {
+public class RemoveExplicitCallToSuper extends AJavaparserNodeMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1DOT1;
@@ -59,12 +59,12 @@ public class RemoveExplicitCallToSuper extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof ConstructorDeclaration)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof ConstructorDeclaration)) {
 			return false;
 		}
 
-		var constructor = (ConstructorDeclaration) node;
+		var constructor = (ConstructorDeclaration) node.getNode();
 
 		var body = constructor.getBody();
 

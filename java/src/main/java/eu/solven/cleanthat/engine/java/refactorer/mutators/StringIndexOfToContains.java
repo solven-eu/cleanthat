@@ -27,6 +27,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 's.indexOf(subString) >= 0' into 'c.contains(subString)' in String
@@ -72,11 +74,11 @@ public class StringIndexOfToContains extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isBinaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isBinaryExpr()) {
 			return false;
 		}
-		var binaryExpr = expr.asBinaryExpr();
+		var binaryExpr = expr.getNode().asBinaryExpr();
 
 		boolean negateContains;
 
@@ -98,10 +100,10 @@ public class StringIndexOfToContains extends AJavaparserExprMutator {
 		}
 
 		Expression containsCall;
-		if (isIndexOf(left)) {
+		if (isIndexOf(expr.editNode(left))) {
 			MethodCallExpr indexOfCall = left.asMethodCallExpr();
 			containsCall = new MethodCallExpr(indexOfCall.getScope().get(), "contains", indexOfCall.getArguments());
-		} else if (isIndexOf(right)) {
+		} else if (isIndexOf(expr.editNode(right))) {
 			MethodCallExpr indexOfCall = right.asMethodCallExpr();
 			containsCall = new MethodCallExpr(indexOfCall.getScope().get(), "contains", indexOfCall.getArguments());
 		} else {
@@ -115,18 +117,20 @@ public class StringIndexOfToContains extends AJavaparserExprMutator {
 		return tryReplace(expr, containsCall);
 	}
 
-	private boolean isIndexOf(Expression left) {
-		if (!left.isMethodCallExpr()) {
+	private boolean isIndexOf(NodeAndSymbolSolver<Expression> left) {
+		if (!left.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		MethodCallExpr methodCallExpr = left.asMethodCallExpr();
+		MethodCallExpr methodCallExpr = left.getNode().asMethodCallExpr();
 		if (!"indexOf".equals(methodCallExpr.getNameAsString())) {
 			return false;
 		} else if (methodCallExpr.getArguments().size() != 1) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCallExpr.getScope(), expectedScopeClass())) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(left.editNode(methodCallExpr.getScope()),
+				expectedScopeClass())) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(methodCallExpr.getArgument(0)), expectedArgumentClass())) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(left.editNode(methodCallExpr.getArgument(0)),
+				expectedArgumentClass())) {
 			return false;
 		}
 

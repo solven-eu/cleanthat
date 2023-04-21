@@ -41,7 +41,8 @@ import com.github.javaparser.javadoc.description.JavadocSnippet;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Remove imports from a Java source file by analyzing {@link ImportDeclaration}.
@@ -49,13 +50,13 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  * More precisely, it will analyze each Tokens being used in the code-base, and remove imports not matching given
  * import.
  * <p>
- * One limitation is it will not strip away wildcard imports. (https://sonarsource.atlassian.net/browse/RSPEC-2208)
+ * One limitation is it will not strip away wildcard imports.
  *
  * @author Benoit Lacelle
  */
 // https://github.com/javaparser/javaparser/issues/1590
 // https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java
-public class UnnecessaryImport extends AJavaparserMutator {
+public class UnnecessaryImport extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -88,19 +89,19 @@ public class UnnecessaryImport extends AJavaparserMutator {
 		return "https://checkstyle.sourceforge.io/config_imports.html#UnusedImports";
 	}
 
-	// @Override
-	// public Optional<String> getSonarId() {
-	// return Optional.of("RSPEC-2333");
-	// }
+	@Override
+	public Optional<String> getSonarId() {
+		return Optional.of("RSPEC-2208");
+	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof CompilationUnit)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof CompilationUnit)) {
 			return false;
 		}
 
-		var compilationUnit = (CompilationUnit) node;
+		var compilationUnit = (CompilationUnit) node.getNode();
 
 		NodeList<ImportDeclaration> importDeclarations = compilationUnit.getImports();
 		if (importDeclarations.isEmpty()) {

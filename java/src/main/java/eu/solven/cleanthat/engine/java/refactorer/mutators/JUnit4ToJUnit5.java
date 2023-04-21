@@ -15,10 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import static com.github.javaparser.StaticJavaParser.parseName;
-
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,7 +29,6 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
@@ -41,7 +37,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.IDisabledMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
@@ -55,11 +54,8 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
 // https://docs.openrewrite.org/running-recipes/popular-recipe-guides/migrate-from-junit-4-to-junit-5
-public class JUnit4ToJUnit5 extends AJavaparserMutator {
+public class JUnit4ToJUnit5 extends AJavaparserNodeMutator implements IDisabledMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
-
-	// Duplicated from com.github.javaparser.ast.CompilationUnit.JAVA_LANG
-	private static final String JAVA_LANG = "java.lang";
 
 	private final Map<String, String> fromTo = ImmutableMap.<String, String>builder()
 			.put("org.junit.Before", "org.junit.jupiter.api.BeforeEach")
@@ -123,13 +119,13 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
 		var localTransformed = false;
 
-		if (node instanceof AnnotationExpr) {
-			localTransformed = processAnnotation((AnnotationExpr) node);
-		} else if (node instanceof MethodCallExpr) {
-			localTransformed = processMethodCall((MethodCallExpr) node);
+		if (node.getNode() instanceof AnnotationExpr) {
+			localTransformed = processAnnotation(node.editNode((AnnotationExpr) node.getNode()));
+		} else if (node.getNode() instanceof MethodCallExpr) {
+			localTransformed = processMethodCall(node.editNode((MethodCallExpr) node.getNode()));
 		}
 
 		if (localTransformed) {
@@ -153,11 +149,12 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 		return optMigratedName;
 	}
 
-	protected boolean processAnnotation(AnnotationExpr annotation) {
+	protected boolean processAnnotation(NodeAndSymbolSolver<? extends AnnotationExpr> annotation) {
 		ResolvedAnnotationDeclaration resolvedAnnotation;
 		try {
 			// https://github.com/javaparser/javaparser/issues/1621
-			resolvedAnnotation = annotation.resolve();
+			resolvedAnnotation = annotation.getSymbolResolver()
+					.resolveDeclaration(annotation.getNode(), ResolvedAnnotationDeclaration.class);
 		} catch (UnsolvedSymbolException e) {
 			// This typically happens when processing a node after having migrated to junit5: junit5 annotations are
 			// unknown, hence this fails
@@ -172,7 +169,7 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 		if (optMigratedName.isPresent()) {
 			var migratedName = optMigratedName.get();
 
-			var currentName = annotation.getNameAsString();
+			var currentName = annotation.getNode().getNameAsString();
 			String newName;
 
 			if (currentName.indexOf('.') >= 0) {
@@ -191,20 +188,21 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 
 			if (!currentName.equals(newName)) {
 				localTransformed = true;
-				annotation.setName(migratedName);
+				annotation.getNode().setName(migratedName);
 			}
 		}
 		return localTransformed;
 	}
 
-	private boolean processMethodCall(MethodCallExpr methodCall) {
-		Optional<Expression> optScope = methodCall.getScope();
+	private boolean processMethodCall(NodeAndSymbolSolver<MethodCallExpr> nodeAndSymbolSolver) {
+		MethodCallExpr node = nodeAndSymbolSolver.getNode();
+		Optional<Expression> optScope = node.getScope();
 		if (optScope.isEmpty()) {
 			// TODO Document when this would happen
 			return false;
 		}
 		var scope = optScope.get();
-		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(scope);
+		Optional<ResolvedType> type = MethodCallExprHelpers.optResolvedType(nodeAndSymbolSolver.editNode(scope));
 
 		if (type.isPresent() && type.get().isReferenceType()) {
 			var referenceType = type.get().asReferenceType();
@@ -216,8 +214,8 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 
 				// JUnit5 imports are not added yet: check import status based on JUnit4 imports
 				// see com.github.javaparser.ast.CompilationUnit.addImport(ImportDeclaration)
-				var compilationUnit = methodCall.findAncestor(CompilationUnit.class).get();
-				var imported = isImported(compilationUnit, new ImportDeclaration(newQualifiedName, false, false));
+				var imported = ImportDeclarationHelpers.isImported(nodeAndSymbolSolver,
+						new ImportDeclaration(newQualifiedName, false, false));
 
 				NameExpr newScope;
 				if (imported) {
@@ -226,49 +224,10 @@ public class JUnit4ToJUnit5 extends AJavaparserMutator {
 				} else {
 					newScope = new NameExpr(newQualifiedName);
 				}
-				var replacement = new MethodCallExpr(newScope, methodCall.getNameAsString(), methodCall.getArguments());
-				return tryReplace(methodCall, replacement);
+				var replacement = new MethodCallExpr(newScope, node.getNameAsString(), node.getArguments());
+				return tryReplace(nodeAndSymbolSolver, replacement);
 			}
 		}
 		return false;
-	}
-
-	// Mostly duplicated from com.github.javaparser.ast.CompilationUnit.addImport(ImportDeclaration)
-	private boolean isImported(CompilationUnit compilationUnit, ImportDeclaration importDeclaration) {
-		return !isImplicitImport(compilationUnit, importDeclaration) && compilationUnit.getImports()
-				.stream()
-				.noneMatch(im -> im.equals(importDeclaration) || im.isAsterisk() && Objects
-						.equals(getImportPackageName(im).get(), getImportPackageName(importDeclaration).orElse(null)));
-	}
-
-	/**
-	 * @param importDeclaration
-	 * @return {@code true}, if the import is implicit
-	 */
-	// Duplicated from com.github.javaparser.ast.CompilationUnit.isImplicitImport(ImportDeclaration)
-	private boolean isImplicitImport(CompilationUnit compilationUnit, ImportDeclaration importDeclaration) {
-		Optional<Name> importPackageName = getImportPackageName(importDeclaration);
-		if (importPackageName.isPresent()) {
-			if (parseName(JAVA_LANG).equals(importPackageName.get())) {
-				// java.lang is implicitly imported
-				return true;
-			}
-			if (compilationUnit.getPackageDeclaration().isPresent()) {
-				// the import is within the same package
-				var currentPackageName = compilationUnit.getPackageDeclaration().get().getName();
-				return currentPackageName.equals(importPackageName.get());
-			}
-			return false;
-		} else {
-			// imports of unnamed package are not allowed
-			return true;
-		}
-	}
-
-	// Duplicated from com.github.javaparser.ast.CompilationUnit.getImportPackageName(ImportDeclaration)
-	@SuppressWarnings("checkstyle:AvoidInlineConditionals")
-	private static Optional<Name> getImportPackageName(ImportDeclaration importDeclaration) {
-		return (importDeclaration.isAsterisk() ? new Name(importDeclaration.getName(), "*")
-				: importDeclaration.getName()).getQualifier();
 	}
 }

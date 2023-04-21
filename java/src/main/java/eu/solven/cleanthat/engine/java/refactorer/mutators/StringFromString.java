@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `new String("StringLiteral")` into `"StringLiteral"`
@@ -57,33 +59,34 @@ public class StringFromString extends AJavaparserExprMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isObjectCreationExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isObjectCreationExpr()) {
 			return false;
 		}
 
-		var methodCall = expr.asObjectCreationExpr();
+		var methodCall = expr.getNode().asObjectCreationExpr();
 
-		if (!scopeHasRequiredType(Optional.of(methodCall), String.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCall), String.class)) {
 			return false;
 		} else if (methodCall.getArguments().size() != 1) {
 			return false;
 		}
 
-		Optional<Expression> optStringExpr = findStringExpr(methodCall.getArgument(0));
+		Optional<Expression> optStringExpr = findStringExpr(expr.editNode(methodCall.getArgument(0)));
 		if (optStringExpr.isEmpty()) {
 			return false;
 		}
 
-		return tryReplace(expr, optStringExpr.get());
+		return tryReplace(expr.getNode(), optStringExpr.get());
 	}
 
-	private Optional<Expression> findStringExpr(Expression argument) {
+	private Optional<Expression> findStringExpr(NodeAndSymbolSolver<Expression> argumentAndSolver) {
+		Expression argument = argumentAndSolver.getNode();
 		while (argument.isEnclosedExpr()) {
 			argument = argument.asEnclosedExpr().getInner();
 		}
 
-		if (!scopeHasRequiredType(Optional.of(argument), String.class)) {
+		if (!MethodCallExprHelpers.scopeHasRequiredType(argumentAndSolver.editNode(argument), String.class)) {
 			return Optional.empty();
 		}
 

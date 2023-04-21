@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.any_language.ACodeCleaner;
@@ -88,6 +89,8 @@ import eu.solven.cleanthat.utils.ResultOrError;
 public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, ICleanthatGitRefsConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
+	public static final String ENV_TEMPORARY_BRANCH_SUFFIX = "cleanthat.temporary_branch_suffix";
+
 	final GithubAndToken githubAndToken;
 
 	final GithubCheckRunManager githubCheckRunManager;
@@ -102,6 +105,14 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		this.githubAndToken = githubAndToken;
 
 		this.githubCheckRunManager = githubCheckRunManager;
+	}
+
+	protected String temporaryBranchSuffix() {
+		var suffixFromEnv = System.getProperty(ENV_TEMPORARY_BRANCH_SUFFIX);
+		if (!Strings.isNullOrEmpty(suffixFromEnv)) {
+			return suffixFromEnv;
+		}
+		return LocalDate.now().toString();
 	}
 
 	// We may have no ref to clean (e.g. there is no cleanthat configuration, or the ref is excluded)
@@ -340,9 +351,9 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 	 */
 	public String prepareRefNameForHead(String baseToClean) {
 		// We do not want to open a ref on every event, so we should not hand a random suffix.
-		// We do not want to resurect previous branch each time a head has to be created, so we need a suffix
+		// We do not want to resurrect previous branch each time a head has to be created, so we need a suffix
 		// We now suggest opening a RR at most once per day. We may not open it if there is a previous day RR still open
-		var nowSuffix = "-" + LocalDate.now();
+		var nowSuffix = "-" + temporaryBranchSuffix();
 
 		var ref = PREFIX_REF_CLEANTHAT_TMPHEAD + baseToClean.replace('/', '_').replace('-', '_') + nowSuffix;
 		LOGGER.info("We provisioned a (temporary, not-materialized yet) head branch={} to clean base branch={}",

@@ -27,6 +27,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -36,6 +37,9 @@ import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
@@ -58,16 +62,20 @@ public class ForEachAddToStreamCollectToCollection extends ARefactorConsecutiveS
 	}
 
 	@Override
-	protected boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt) {
+	protected boolean trySimplifyingStatements(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			Statement currentStmt,
+			Statement nextStmt) {
 		if (currentStmt.isExpressionStmt() && nextStmt.isForEachStmt()) {
-			return onForEachStmt(currentStmt.asExpressionStmt(), nextStmt.asForEachStmt());
+			return onForEachStmt(blockStmtAndSolver, currentStmt.asExpressionStmt(), nextStmt.asForEachStmt());
 		} else {
 			return false;
 		}
 	}
 
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
-	private boolean onForEachStmt(ExpressionStmt asExpressionStmt, ForEachStmt forEachStmt) {
+	private boolean onForEachStmt(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			ExpressionStmt asExpressionStmt,
+			ForEachStmt forEachStmt) {
 		if (!asExpressionStmt.getExpression().isVariableDeclarationExpr()) {
 			return false;
 		}
@@ -125,7 +133,7 @@ public class ForEachAddToStreamCollectToCollection extends ARefactorConsecutiveS
 			return false;
 		}
 
-		var optStream = iterableToStream(forEachStmt);
+		var optStream = iterableToStream(blockStmtAndSolver, forEachStmt);
 		if (optStream.isEmpty()) {
 			return false;
 		}
@@ -179,26 +187,25 @@ public class ForEachAddToStreamCollectToCollection extends ARefactorConsecutiveS
 		return true;
 	}
 
-	private Optional<MethodCallExpr> iterableToStream(ForEachStmt forEachStmt) {
+	private Optional<MethodCallExpr> iterableToStream(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			ForEachStmt forEachStmt) {
 		// May be a Collection or an Array
 		var iterable = forEachStmt.getIterable();
 
-		if (scopeHasRequiredType(Optional.of(iterable), Collection.class)) {
+		if (MethodCallExprHelpers.scopeHasRequiredType(blockStmtAndSolver.editNode(iterable), Collection.class)) {
 			return Optional.of(new MethodCallExpr(iterable, "stream"));
 		} else {
 			Optional<ResolvedDeclaration> optType = optResolved(iterable);
 
-			if (scopeHasRequiredType(Optional.of(iterable), int[].class)) {
+			if (MethodCallExprHelpers.scopeHasRequiredType(blockStmtAndSolver.editNode(iterable), int[].class)) {
 				// TODO https://github.com/javaparser/javaparser/issues/3955
 				// return Optional.of(new MethodCallExpr(iterable, "stream"));
 				return Optional.empty();
 			} else if (optType.isPresent() && optType.get().isParameter()
 					&& optType.get().asParameter().getType().isArray()) {
 
-				return Optional.of(new MethodCallExpr(
-						new NameExpr(nameOrQualifiedName(forEachStmt.findCompilationUnit().get(), Stream.class)),
-						"of",
-						new NodeList<>(iterable)));
+				NameExpr scope = ImportDeclarationHelpers.nameOrQualifiedName(blockStmtAndSolver, Stream.class);
+				return Optional.of(new MethodCallExpr(scope, "of", new NodeList<>(iterable)));
 			} else {
 				return Optional.empty();
 			}

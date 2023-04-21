@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Disabled;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -16,7 +16,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCase
 public class TestUseDiamondOperatorJdk8Cases extends AJavaparserRefactorerCases {
 
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new UseDiamondOperatorJdk8();
 	}
 

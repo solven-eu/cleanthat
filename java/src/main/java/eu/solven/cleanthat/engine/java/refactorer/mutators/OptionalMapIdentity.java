@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `optional.map(name -> name)`
@@ -49,16 +51,16 @@ public class OptionalMapIdentity extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var mapCall = expr.asMethodCallExpr();
+		var mapCall = expr.getNode().asMethodCallExpr();
 		if (!"map".equals(mapCall.getNameAsString())) {
 			return false;
 		} else if (mapCall.getArguments().size() != 1) {
 			return false;
-		} else if (!scopeHasRequiredType(mapCall.getScope(), getRequiredType())) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(mapCall.getScope()), getRequiredType())) {
 			return false;
 		}
 

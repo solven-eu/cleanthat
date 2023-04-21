@@ -48,6 +48,7 @@ public class CompositeWalkingMutator<AST> extends CompositeMutator<IWalkingMutat
 	public Optional<AST> walkAst(AST pre) {
 		Optional<AST> mutated = Optional.empty();
 
+		// Apply once every mutator, even if previous mutator is a no-op
 		for (IWalkingMutator<AST, AST> mutator : mutators) {
 			Optional<AST> localMutation = mutator.walkAst(mutated.orElse(pre));
 

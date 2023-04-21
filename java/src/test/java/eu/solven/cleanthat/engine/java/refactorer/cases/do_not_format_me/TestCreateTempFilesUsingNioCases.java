@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -19,7 +19,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCase
 public class TestCreateTempFilesUsingNioCases extends AJavaparserRefactorerCases {
 
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new CreateTempFilesUsingNio();
 	}
 

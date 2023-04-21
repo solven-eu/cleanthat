@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -120,14 +119,14 @@ public abstract class AbstractGitHubWireMockTest {
 	protected static GitHubBuilder fromSystemProperties() {
 		var properties = new Properties();
 
-		for (Entry<Object, Object> e : System.getProperties().entrySet()) {
+		System.getProperties().entrySet().forEach(e -> {
 			var name = e.getKey().toString().toLowerCase(Locale.ENGLISH);
 			if (name.startsWith("github_"))
 				name = name.substring("github_".length());
 
 			// Unclear why we keep all properties. Doing like `GitHubBuilder.fromEnvironment()`
 			properties.put(name, e.getValue());
-		}
+		});
 
 		return GitHubBuilder.fromProperties(properties);
 	}

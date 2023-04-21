@@ -25,12 +25,12 @@ import org.springframework.core.io.Resource;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestLiteralsFirstInComparisonsCustom extends AJavaparserTestCases {
-	final IJavaparserMutator mutator = new LiteralsFirstInComparisons();
+	final IJavaparserAstMutator mutator = new LiteralsFirstInComparisons();
 
 	// Cannot keep element because we reached the end of nodetext
 	@Test

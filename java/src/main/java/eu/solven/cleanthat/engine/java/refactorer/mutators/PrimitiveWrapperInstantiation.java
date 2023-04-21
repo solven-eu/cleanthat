@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -64,12 +65,12 @@ public class PrimitiveWrapperInstantiation extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isObjectCreationExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isObjectCreationExpr()) {
 			return false;
 		}
 
-		var objectCreationExpr = expr.asObjectCreationExpr();
+		var objectCreationExpr = expr.getNode().asObjectCreationExpr();
 		if (objectCreationExpr.getArguments().size() != 1) {
 			return false;
 		}

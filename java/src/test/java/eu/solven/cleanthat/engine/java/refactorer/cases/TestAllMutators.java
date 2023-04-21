@@ -28,7 +28,7 @@ import org.springframework.core.io.Resource;
 import com.google.common.io.ByteStreams;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
@@ -37,7 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 public class TestAllMutators extends AJavaparserTestCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestAllMutators.class);
 
-	final IJavaparserMutator mutator = new UnnecessaryBoxing();
+	final IJavaparserAstMutator mutator = new UnnecessaryBoxing();
 
 	@Test
 	public void testIssueWithFile() throws IOException {
@@ -51,7 +51,7 @@ public class TestAllMutators extends AJavaparserTestCases {
 			var compilationUnit = parseCompilationUnit(mutator, asString);
 
 			try {
-				var transformed = ((IJavaparserMutator) mutator).walkAstHasChanged(compilationUnit);
+				var transformed = ((IJavaparserAstMutator) mutator).walkAstHasChanged(compilationUnit);
 			} catch (Throwable t) {
 				// This detects as issue on JUnit4ToJUnit5
 				LOGGER.warn("ARG", t);

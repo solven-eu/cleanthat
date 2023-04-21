@@ -36,7 +36,10 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -65,12 +68,12 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isForStmt()) {
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> stmt) {
+		if (!stmt.getNode().isForStmt()) {
 			return false;
 		}
 
-		var forStmt = stmt.asForStmt();
+		var forStmt = stmt.getNode().asForStmt();
 
 		if (forStmt.getInitialization().size() != 1) {
 			// Stick to simple loops
@@ -89,7 +92,7 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 
 		if (singleVariable.getInitializer().isEmpty()) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(singleDeclaration), int.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(stmt.editNode(singleDeclaration), int.class)) {
 			return false;
 		}
 
@@ -139,7 +142,7 @@ public class LoopIntRangeToIntStreamForEach extends AJavaparserStmtMutator {
 		Expression to = compareBinaryExpr.getRight();
 
 		MethodCallExpr intRange =
-				new MethodCallExpr(new NameExpr(nameOrQualifiedName(stmt.findCompilationUnit().get(), IntStream.class)),
+				new MethodCallExpr(ImportDeclarationHelpers.nameOrQualifiedName(stmt, IntStream.class),
 						"range",
 						new NodeList<>(from, to));
 

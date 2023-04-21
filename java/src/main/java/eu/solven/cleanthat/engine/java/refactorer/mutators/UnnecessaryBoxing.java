@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -32,16 +31,16 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
-import eu.solven.pepper.logging.PepperLogHelper;
 
 /**
  * Turns `Integer integer = Integer.valueOf(2)` into `Integer integer = 2`
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryBoxing extends AJavaparserMutator {
+public class UnnecessaryBoxing extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryBoxing.class);
 
 	@Override
@@ -77,12 +76,11 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
 		var transformed = new AtomicBoolean();
 
-		LOGGER.debug("{}", PepperLogHelper.getObjectAndClass(node));
-		onMethodName(node, "toString", (methodNode, scope, type) -> {
-			if (process(methodNode, scope, type)) {
+		onMethodName(nodeAndSymbolSolver, "toString", (methodNode, scope, type) -> {
+			if (process(nodeAndSymbolSolver.editNode(methodNode), scope, type)) {
 				transformed.set(true);
 			}
 		});
@@ -91,7 +89,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 	}
 
 	@SuppressWarnings({ "PMD.AvoidDeeplyNestedIfStmts", "PMD.CognitiveComplexity" })
-	private boolean process(Node node, Expression scope, ResolvedType type) {
+	private boolean process(NodeAndSymbolSolver<?> nodeAndSymbolSolver, Expression scope, ResolvedType type) {
 		if (!type.isReferenceType()) {
 			return false;
 		}
@@ -111,7 +109,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 				var creation = (ObjectCreationExpr) scope;
 				NodeList<Expression> inputs = creation.getArguments();
 				var replacement = new MethodCallExpr(new NameExpr(creation.getType().getName()), "toString", inputs);
-				return tryReplace(node, replacement);
+				return tryReplace(nodeAndSymbolSolver.getNode(), replacement);
 			} else if (scope instanceof MethodCallExpr) {
 				// Boolean.valueOf(b).toString()
 				var call = (MethodCallExpr) scope;
@@ -121,7 +119,8 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 				}
 
 				var calledScope = call.getScope().get();
-				Optional<ResolvedType> calledType = MethodCallExprHelpers.optResolvedType(calledScope);
+				Optional<ResolvedType> calledType =
+						MethodCallExprHelpers.optResolvedType(nodeAndSymbolSolver.editNode(calledScope));
 
 				if (calledType.isEmpty() || !calledType.get().isReferenceType()) {
 					return false;
@@ -132,7 +131,7 @@ public class UnnecessaryBoxing extends AJavaparserMutator {
 				if (referenceType.hasName() && primitiveQualifiedName.equals(referenceType.getQualifiedName())) {
 					var replacement = new MethodCallExpr(calledScope, "toString", call.getArguments());
 
-					return node.replace(replacement);
+					return tryReplace(nodeAndSymbolSolver.getNode(), replacement);
 				}
 			}
 		}

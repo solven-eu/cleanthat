@@ -18,13 +18,13 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithThrownExceptions;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -32,7 +32,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
  *
  * @author Benoit Lacelle
  */
-public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
+public class AvoidUncheckedExceptionsInSignatures extends AJavaparserNodeMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_1;
@@ -54,11 +54,11 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof NodeWithThrownExceptions<?>)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof NodeWithThrownExceptions<?>)) {
 			return false;
 		}
-		NodeWithThrownExceptions<?> nodeWithThrown = (NodeWithThrownExceptions<?>) node;
+		NodeWithThrownExceptions<?> nodeWithThrown = (NodeWithThrownExceptions<?>) node.getNode();
 
 		return nodeWithThrown.getThrownExceptions().removeIf(t -> {
 			Optional<ResolvedType> optResolved = ResolvedTypeHelpers.optResolvedType(t);

@@ -29,6 +29,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `s.replaceAll("abc", "")` into `s.replace("abc", "")`
@@ -81,19 +83,20 @@ public class StringReplaceAllWithQuotableInput extends AJavaparserExprMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 
 		if (!"replaceAll".equals(methodCall.getNameAsString())) {
 			return false;
 		} else if (methodCall.getArguments().size() != 2) {
 			return false;
-		} else if (!scopeHasRequiredType(methodCall.getScope(), String.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCall.getScope()), String.class)) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(methodCall.getArgument(0)), String.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(methodCall.getArgument(0)),
+				String.class)) {
 			return false;
 		} else if (!methodCall.getArgument(0).isLiteralStringValueExpr()) {
 			return false;

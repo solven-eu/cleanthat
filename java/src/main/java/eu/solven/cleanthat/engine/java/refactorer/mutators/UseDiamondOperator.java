@@ -28,7 +28,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
@@ -38,7 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
  */
 // see org.openrewrite.java.cleanup.UseDiamondOperator
 @Deprecated(since = "Not-ready")
-public class UseDiamondOperator extends AJavaparserMutator {
+public class UseDiamondOperator extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UseDiamondOperator.class);
 
 	@Override
@@ -73,7 +74,8 @@ public class UseDiamondOperator extends AJavaparserMutator {
 
 	// NodeWithTypeArguments
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSolver) {
+		Node node = nodeAndSolver.getNode();
 		if (!(node instanceof NodeWithTypeArguments)) {
 			return false;
 		}

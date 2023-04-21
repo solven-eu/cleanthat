@@ -27,11 +27,13 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr.Operator;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.VariableDeclarationExprHepers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
@@ -71,7 +73,9 @@ public class SimplifyBooleanInitialization extends ARefactorConsecutiveStatement
 
 	@SuppressWarnings({ "PMD.NPathComplexity", "PMD.CognitiveComplexity" })
 	@Override
-	protected boolean trySimplifyingStatements(Statement currentStmt, Statement nextStmt) {
+	protected boolean trySimplifyingStatements(NodeAndSymbolSolver<BlockStmt> blockStmtAndSolver,
+			Statement currentStmt,
+			Statement nextStmt) {
 		Optional<VariableDeclarationExpr> optAssignExpr =
 				VariableDeclarationExprHepers.optSimpleDeclaration(currentStmt);
 		if (optAssignExpr.isEmpty()) {

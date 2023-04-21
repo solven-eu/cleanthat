@@ -22,7 +22,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -41,7 +40,9 @@ import com.google.common.collect.ImmutableSet;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
@@ -72,12 +73,12 @@ public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isIfStmt()) {
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> stmt) {
+		if (!stmt.getNode().isIfStmt()) {
 			return false;
 		}
 
-		IfStmt ifStmt = stmt.asIfStmt();
+		IfStmt ifStmt = stmt.getNode().asIfStmt();
 		Expression expr = ifStmt.getCondition();
 
 		if (!expr.isBinaryExpr()) {
@@ -98,10 +99,6 @@ public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 			return false;
 		}
 
-		Optional<CompilationUnit> optCompilationUnit = expr.findCompilationUnit();
-		if (optCompilationUnit.isEmpty()) {
-			return false;
-		}
 		Statement thenStmt = ifStmt.getThenStmt();
 
 		String nullableVariableName = nameAndNull.get().getKey().getNameAsString();
@@ -117,16 +114,14 @@ public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
 		}
 
 		MethodCallExpr callOfNullable =
-				new MethodCallExpr(new NameExpr(nameOrQualifiedName(optCompilationUnit.get(), Optional.class)),
+				new MethodCallExpr(ImportDeclarationHelpers.nameOrQualifiedName(stmt, Optional.class),
 						"ofNullable",
 						new NodeList<>(nameAndNull.get().getKey()));
 
 		MethodCallExpr callIfPresent =
 				new MethodCallExpr(callOfNullable, "ifPresent", new NodeList<>(optLambdaExpr.get()));
 
-		return
-
-		tryReplace(ifStmt, new ExpressionStmt(callIfPresent));
+		return tryReplace(ifStmt, new ExpressionStmt(callIfPresent));
 
 	}
 

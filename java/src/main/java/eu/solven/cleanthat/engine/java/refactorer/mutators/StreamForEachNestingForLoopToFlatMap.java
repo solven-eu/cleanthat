@@ -16,8 +16,12 @@
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -31,7 +35,9 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
@@ -48,7 +54,14 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
 public class StreamForEachNestingForLoopToFlatMap extends AJavaparserExprMutator implements IReApplyUntilNoop {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreamForEachNestingForLoopToFlatMap.class);
 
-	static final String ANY_MATCH = "anyMatch";
+	private static final Map<Class<?>, String> TYPE_TO_FLATMAP = Map.of(Stream.class,
+			"flatMap",
+			IntStream.class,
+			"flatMapToInt",
+			LongStream.class,
+			"flatMapToLong",
+			DoubleStream.class,
+			"flatMapToDouble");
 
 	@Override
 	public String minimalJavaVersion() {
@@ -71,33 +84,26 @@ public class StreamForEachNestingForLoopToFlatMap extends AJavaparserExprMutator
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		Optional<MethodCallExpr> optMethodCall =
+				MethodCallExprHelpers.match(expr, Object.class, "forEach", e -> e.isLambdaExpr());
+		if (optMethodCall.isEmpty()) {
 			return false;
 		}
 
-		var callForEach = expr.asMethodCallExpr();
-		if (!"forEach".equals(callForEach.getNameAsString())) {
-			return false;
-		} else if (callForEach.getArguments().size() != 1) {
-			return false;
-		}
+		var callForEach = optMethodCall.get();
 
 		Expression ensureStream;
-		if (scopeHasRequiredType(callForEach.getScope(), Stream.class)) {
+		if (MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(callForEach.getScope()), Stream.class)) {
 			ensureStream = callForEach.getScope().get();
-		} else if (scopeHasRequiredType(callForEach.getScope(), Collection.class)) {
+		} else if (MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(callForEach.getScope()),
+				Collection.class)) {
 			ensureStream = new MethodCallExpr(callForEach.getScope().get(), "stream");
 		} else {
 			return false;
 		}
 
-		Expression forEachArgument = callForEach.getArgument(0);
-		if (!forEachArgument.isLambdaExpr()) {
-			return false;
-		}
-
-		LambdaExpr forEachLambdaExpr = forEachArgument.asLambdaExpr();
+		LambdaExpr forEachLambdaExpr = callForEach.getArgument(0).asLambdaExpr();
 
 		Optional<MethodCallExpr> optSingleMethodCall =
 				StreamMutatorHelpers.findSingleMethodCallExpr(forEachLambdaExpr.getBody());
@@ -105,17 +111,32 @@ public class StreamForEachNestingForLoopToFlatMap extends AJavaparserExprMutator
 			return false;
 		}
 
-		if (!"forEach".equals(optSingleMethodCall.get().getNameAsString())) {
+		MethodCallExpr singleMethodCall = optSingleMethodCall.get();
+		if (!"forEach".equals(singleMethodCall.getNameAsString())) {
 			return false;
 		}
 
-		Expression flatMapExpression = optSingleMethodCall.get().getScope().get();
+		Expression rawFlatMapExpression = singleMethodCall.getScope().get();
 
-		if (scopeHasRequiredType(Optional.of(flatMapExpression), Stream.class)) {
-			LOGGER.debug("We are flattening into something like `.flatMap(s -> s)`");
-		} else if (scopeHasRequiredType(Optional.of(flatMapExpression), Collection.class)) {
-			flatMapExpression = new MethodCallExpr(flatMapExpression, "stream");
+		Expression flatMapExpression;
+		Optional<String> flatMapMethod;
+		if (MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(rawFlatMapExpression), Collection.class)) {
+			// We clone as creating a `MethodCallExpr` will change the parent, and the whole mutator can still be
+			// cancelled
+			flatMapExpression = new MethodCallExpr(rawFlatMapExpression.clone(), "stream");
+			flatMapMethod = Optional.of("flatMap");
 		} else {
+			LOGGER.debug("We are flattening into something like `.flatMap(s -> s)`");
+			flatMapExpression = rawFlatMapExpression;
+			flatMapMethod = TYPE_TO_FLATMAP.entrySet()
+					.stream()
+					.filter(e -> MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(rawFlatMapExpression),
+							e.getKey()))
+					.map(Map.Entry::getValue)
+					.findAny();
+		}
+
+		if (flatMapMethod.isEmpty()) {
 			return false;
 		}
 
@@ -126,9 +147,8 @@ public class StreamForEachNestingForLoopToFlatMap extends AJavaparserExprMutator
 		}
 
 		MethodCallExpr callFlatMap =
-				new MethodCallExpr(ensureStream, "flatMap", new NodeList<>(flatMapLambdaExpr.get()));
-		MethodCallExpr callInnerForEach =
-				new MethodCallExpr(callFlatMap, "forEach", optSingleMethodCall.get().getArguments());
+				new MethodCallExpr(ensureStream, flatMapMethod.get(), new NodeList<>(flatMapLambdaExpr.get()));
+		MethodCallExpr callInnerForEach = new MethodCallExpr(callFlatMap, "forEach", singleMethodCall.getArguments());
 
 		return tryReplace(callForEach, callInnerForEach);
 	}

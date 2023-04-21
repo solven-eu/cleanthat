@@ -35,6 +35,8 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.OptionalOrRejection;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
@@ -67,17 +69,17 @@ public class ArithmeticOverFloats extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isBinaryExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isBinaryExpr()) {
 			return false;
 		}
-		var binaryExpr = expr.asBinaryExpr();
+		var binaryExpr = expr.getNode().asBinaryExpr();
 
 		if (!MATH_FLOAT_OPERATORS.contains(binaryExpr.getOperator())) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(binaryExpr.getLeft()), float.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(binaryExpr.getLeft()), float.class)) {
 			return false;
-		} else if (!scopeHasRequiredType(Optional.of(binaryExpr.getRight()), float.class)) {
+		} else if (!MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(binaryExpr.getRight()), float.class)) {
 			return false;
 		}
 

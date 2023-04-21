@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.Disabled;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidFileStream;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -26,7 +26,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCase
 @Disabled("IMutator not-ready")
 public class TestAvoidFileStreamCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new AvoidFileStream();
 	}
 

@@ -17,18 +17,17 @@ package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * This {@link AJavaparserMutator} does not modify the AST, but always report it as changed. It can be useful to
+ * This {@link AJavaparserAstMutator} does not modify the AST, but always report it as changed. It can be useful to
  * checkthe default behavior of JavaParser.
  *
  * @author Benoit Lacelle
  */
-public class NoOpJavaParserRule extends AJavaparserMutator implements INoOpMutator {
+public class NoOpJavaParserRule extends AJavaparserNodeMutator implements INoOpMutator {
 	@Override
 	public String getId() {
 		return IMutator.ID_NOOP;
@@ -40,7 +39,7 @@ public class NoOpJavaParserRule extends AJavaparserMutator implements INoOpMutat
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
 		// We return true to indicate we did modify the node, even through this is a no-op operator
 		return true;
 	}

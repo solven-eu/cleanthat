@@ -2,17 +2,18 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamForEachNestingForLoopToFlatMap;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
 public class TestStreamForEachNestingForLoopToFlatMapCases extends AJavaparserRefactorerCases {
 	@Override
-	public IJavaparserMutator getTransformer() {
+	public IJavaparserAstMutator getTransformer() {
 		return new StreamForEachNestingForLoopToFlatMap();
 	}
 
@@ -97,6 +98,18 @@ public class TestStreamForEachNestingForLoopToFlatMapCases extends AJavaparserRe
 					.forEach(item -> {
 						System.out.println(item);
 					});
+		}
+	}
+
+	@CompareMethods
+	public static class InnerIsIntStream {
+
+		public void pre(List<String> values) {
+			values.forEach(user -> IntStream.range(0, user.length()).forEach(System.out::println));
+		}
+
+		public void post(List<String> values) {
+			values.stream().flatMapToInt(user -> IntStream.range(0, user.length())).forEach(System.out::println);
 		}
 	}
 

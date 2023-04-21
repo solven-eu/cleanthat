@@ -28,7 +28,8 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Prevent relying .equals on {@link Enum} types
@@ -37,8 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 // https://stackoverflow.com/questions/1750435/comparing-java-enum-members-or-equals
-public class EnumsWithoutEquals extends AJavaparserMutator {
-
+public class EnumsWithoutEquals extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
 	@Override
@@ -64,7 +64,7 @@ public class EnumsWithoutEquals extends AJavaparserMutator {
 	// https://stackoverflow.com/questions/55309460/how-to-replace-expression-by-string-in-javaparser-ast
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	protected boolean processNotRecursively(Node node) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
 		var mutated = new AtomicBoolean(false);
 		onMethodName(node, "equals", (methodCall, scope, type) -> {
 			if (type.isReferenceType()) {

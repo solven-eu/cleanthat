@@ -20,7 +20,6 @@ import java.util.Set;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -29,14 +28,15 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns 'public static final someMethod();' into 'someMethod();' in interfaces
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryModifier extends AJavaparserMutator {
+public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -90,11 +90,11 @@ public class UnnecessaryModifier extends AJavaparserMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof Modifier)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof Modifier)) {
 			return false;
 		}
-		var modifier = (Modifier) node;
+		var modifier = (Modifier) node.getNode();
 
 		if (modifier.getParentNode().isEmpty()) {
 			return false;

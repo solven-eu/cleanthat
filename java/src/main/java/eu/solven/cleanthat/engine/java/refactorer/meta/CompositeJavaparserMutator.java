@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWalkingMutator;
 
 /**
- * This mutator make it easy to composite multiple {@link IJavaparserMutator}s in a single one.
+ * This mutator make it easy to composite multiple {@link IJavaparserAstMutator}s in a single one.
  * 
  * The extended classes should generally implement a constructor taking a JavaVersions as single argument.
  * 
@@ -35,13 +35,13 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWa
 // underlying IMutator
 @SuppressWarnings("PMD.GenericsNaming")
 public class CompositeJavaparserMutator extends CompositeWalkingMutator<Node>
-		implements IJavaparserMutator, IReApplyUntilNoop {
+		implements IJavaparserAstMutator, IReApplyUntilNoop {
 
 	public CompositeJavaparserMutator() {
 		this(Arrays.asList());
 	}
 
-	public CompositeJavaparserMutator(List<IJavaparserMutator> mutators) {
+	public CompositeJavaparserMutator(List<IJavaparserAstMutator> mutators) {
 		super(ImmutableList.copyOf(mutators));
 	}
 

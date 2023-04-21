@@ -17,19 +17,19 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns '.stream((s) -> s.subString(0, 2))' into '.stream(s -> s.subString(0, 2))'
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
+public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -48,12 +48,12 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof LambdaExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof LambdaExpr)) {
 			return false;
 		}
 
-		var lambdaExpr = (LambdaExpr) node;
+		var lambdaExpr = (LambdaExpr) node.getNode();
 
 		if (lambdaExpr.getParameters().size() == 1 && lambdaExpr.isEnclosingParameters()) {
 			var newLambdaExpr = lambdaExpr.clone();

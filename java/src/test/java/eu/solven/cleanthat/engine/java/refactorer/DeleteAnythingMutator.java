@@ -17,7 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer;
 
 import java.util.Set;
 
-import com.github.javaparser.ast.Node;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
@@ -27,7 +26,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
  *
  * @author Benoit Lacelle
  */
-public class DeleteAnythingMutator extends AJavaparserMutator {
+public class DeleteAnythingMutator extends AJavaparserNodeMutator {
 	@Override
 	public String getId() {
 		return "Delete";
@@ -39,7 +38,7 @@ public class DeleteAnythingMutator extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		return node.remove();
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		return node.getNode().remove();
 	}
 }

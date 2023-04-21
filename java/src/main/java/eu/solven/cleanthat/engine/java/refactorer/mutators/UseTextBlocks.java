@@ -31,7 +31,8 @@ import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
  * Turns '"a\r\n" + "b\r\n"’ into ’"""aEOLbEOL"""'
@@ -41,7 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
 // https://www.baeldung.com/java-text-blocks
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 // TODO Handle intermediate parenthesis
-public class UseTextBlocks extends AJavaparserMutator {
+public class UseTextBlocks extends AJavaparserNodeMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_15;
@@ -54,12 +55,12 @@ public class UseTextBlocks extends AJavaparserMutator {
 
 	@SuppressWarnings("PMD.CognitiveComplexity")
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof Expression)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof Expression)) {
 			return false;
 		}
 
-		var rootExp = (Expression) node;
+		var rootExp = (Expression) node.getNode();
 
 		Optional<List<StringLiteralExpr>> optAsList = optAsList(rootExp);
 

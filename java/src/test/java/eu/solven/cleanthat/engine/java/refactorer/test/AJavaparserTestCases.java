@@ -24,11 +24,11 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 
 /**
- * {@link ATestCases}for {@link IJavaparserMutator}
+ * {@link ATestCases}for {@link IJavaparserAstMutator}
  * 
  * @author Benoit Lacelle
  *

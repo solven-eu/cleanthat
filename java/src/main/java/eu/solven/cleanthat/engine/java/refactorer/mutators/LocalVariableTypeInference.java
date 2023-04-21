@@ -22,7 +22,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
@@ -35,7 +34,8 @@ import com.github.javaparser.utils.Pair;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
@@ -47,7 +47,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 // https://github.com/openrewrite/rewrite/issues/1656
 // https://stackoverflow.com/questions/49210591/restrictions-on-using-local-variable-type-inference-in-java-10
 // https://openjdk.org/projects/amber/guides/lvti-style-guide
-public class LocalVariableTypeInference extends AJavaparserMutator {
+public class LocalVariableTypeInference extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LocalVariableTypeInference.class);
 
 	@Override
@@ -81,11 +81,11 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Node node) {
-		if (!(node instanceof VariableDeclarationExpr)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof VariableDeclarationExpr)) {
 			return false;
 		}
-		var variableDeclarationExpr = (VariableDeclarationExpr) node;
+		var variableDeclarationExpr = (VariableDeclarationExpr) node.getNode();
 
 		if (variableDeclarationExpr.getVariables().size() >= 2) {
 			return false;
@@ -102,7 +102,7 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 		// We can not change the Type, as it would fail in the case of Type with Diamond
 		var initializer = singleVariableDeclaration.getInitializer().orElse(null);
 
-		if (!isReplaceableAssignement(type, initializer)) {
+		if (!isReplaceableAssignement(node, type, initializer)) {
 			return false;
 		}
 
@@ -119,7 +119,9 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 		return tryReplace(variableDeclarationExpr, newVariableDeclarationExpr);
 	}
 
-	private boolean isReplaceableAssignement(Type variableType, Expression initializer) {
+	private boolean isReplaceableAssignement(NodeAndSymbolSolver<?> context,
+			Type variableType,
+			Expression initializer) {
 		if (initializer == null) {
 			return false;
 		} else if (initializer.isLambdaExpr()) {
@@ -127,7 +129,8 @@ public class LocalVariableTypeInference extends AJavaparserMutator {
 			return false;
 		}
 
-		Optional<ResolvedType> optInitializerType = MethodCallExprHelpers.optResolvedType(initializer);
+		Optional<ResolvedType> optInitializerType =
+				MethodCallExprHelpers.optResolvedType(context.editNode(initializer));
 		if (optInitializerType.isEmpty()) {
 			return false;
 		}

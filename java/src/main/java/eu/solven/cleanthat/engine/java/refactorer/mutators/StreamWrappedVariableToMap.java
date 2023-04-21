@@ -31,6 +31,8 @@ import com.github.javaparser.ast.type.Type;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
@@ -78,16 +80,16 @@ public class StreamWrappedVariableToMap extends OptionalWrappedVariableToMap {
 	}
 
 	@Override
-	protected Optional<String> computeMapMethodName(Expression expression, Type type) {
-		assert scopeHasRequiredType(Optional.of(expression), BaseStream.class);
+	protected Optional<String> computeMapMethodName(NodeAndSymbolSolver<? extends Expression> expression, Type type) {
+		assert MethodCallExprHelpers.scopeHasRequiredType(expression, BaseStream.class);
 
 		if (type.isPrimitiveType()) {
 			Primitive primitiveType = type.asPrimitiveType().getType();
-			if (scopeHasRequiredType(Optional.of(expression), IntStream.class)
+			if (MethodCallExprHelpers.scopeHasRequiredType(expression, IntStream.class)
 					&& primitiveType == PrimitiveType.Primitive.INT
-					|| scopeHasRequiredType(Optional.of(expression), LongStream.class)
+					|| MethodCallExprHelpers.scopeHasRequiredType(expression, LongStream.class)
 							&& primitiveType == PrimitiveType.Primitive.LONG
-					|| scopeHasRequiredType(Optional.of(expression), DoubleStream.class)
+					|| MethodCallExprHelpers.scopeHasRequiredType(expression, DoubleStream.class)
 							&& primitiveType == PrimitiveType.Primitive.DOUBLE) {
 				return Optional.of(METHOD_MAP);
 			} else if (primitiveType == PrimitiveType.Primitive.INT) {
@@ -97,8 +99,8 @@ public class StreamWrappedVariableToMap extends OptionalWrappedVariableToMap {
 			} else if (primitiveType == PrimitiveType.Primitive.DOUBLE) {
 				return Optional.of(METHOD_MAP_TO_DBL);
 			}
-		} else if (scopeHasRequiredType(Optional.of(expression), Object.class)) {
-			if (scopeHasRequiredType(Optional.of(expression), Stream.class)) {
+		} else if (MethodCallExprHelpers.scopeHasRequiredType(expression, Object.class)) {
+			if (MethodCallExprHelpers.scopeHasRequiredType(expression, Stream.class)) {
 				// Object and Stream
 				return Optional.of(METHOD_MAP);
 			} else {

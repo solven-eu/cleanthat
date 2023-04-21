@@ -34,6 +34,8 @@ import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns 'ImmutableMap.of("k1", 0, "k2", 1)` into `ImmutableMap.builder().put("k1", 0).put("k2", 1).build()`
@@ -61,11 +63,11 @@ public class GuavaImmutableMapBuilderOverVarargs extends AJavaparserExprMutator 
 	}
 
 	@Override
-	protected boolean processNotRecursively(Expression expr) {
-		if (!expr.isMethodCallExpr()) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expr) {
+		if (!expr.getNode().isMethodCallExpr()) {
 			return false;
 		}
-		var methodCall = expr.asMethodCallExpr();
+		var methodCall = expr.getNode().asMethodCallExpr();
 		var methodCallIdentifier = methodCall.getName().getIdentifier();
 		if (!"of".equals(methodCallIdentifier)) {
 			return false;
@@ -83,7 +85,8 @@ public class GuavaImmutableMapBuilderOverVarargs extends AJavaparserExprMutator 
 
 		Optional<Expression> optScope = methodCall.getScope();
 
-		if (optScope.isEmpty() || !optScope.get().isNameExpr() || !scopeHasRequiredType(optScope, ImmutableMap.class)) {
+		if (optScope.isEmpty() || !optScope.get().isNameExpr()
+				|| !MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(optScope), ImmutableMap.class)) {
 			return false;
 		}
 

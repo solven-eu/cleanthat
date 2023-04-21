@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserStmtMutator;
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.NameExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
@@ -68,12 +69,12 @@ public class ForEachIfToIfStreamAnyMatch extends AJavaparserStmtMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(Statement stmt) {
-		if (!stmt.isForEachStmt()) {
+	protected boolean processStatement(NodeAndSymbolSolver<Statement> stmt) {
+		if (!stmt.getNode().isForEachStmt()) {
 			return false;
 		}
 
-		var forEachStmt = stmt.asForEachStmt();
+		var forEachStmt = stmt.getNode().asForEachStmt();
 
 		Optional<IfStmt> optIfStmt = StreamMutatorHelpers.findSingleIfThenStmt(forEachStmt);
 		if (optIfStmt.isEmpty()) {

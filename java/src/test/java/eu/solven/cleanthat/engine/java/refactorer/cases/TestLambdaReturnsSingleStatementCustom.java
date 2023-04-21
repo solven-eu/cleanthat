@@ -27,12 +27,12 @@ import org.springframework.core.io.Resource;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestLambdaReturnsSingleStatementCustom extends AJavaparserTestCases {
-	final IJavaparserMutator mutator = new LambdaReturnsSingleStatement();
+	final IJavaparserAstMutator mutator = new LambdaReturnsSingleStatement();
 
 	@Ignore("https://github.com/javaparser/javaparser/issues/3930")
 	@Test

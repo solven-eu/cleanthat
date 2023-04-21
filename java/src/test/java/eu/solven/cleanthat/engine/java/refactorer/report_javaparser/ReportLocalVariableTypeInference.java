@@ -16,10 +16,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.report_javaparser;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+
+import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 public class ReportLocalVariableTypeInference {
 	static final String testCase = "package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;\n" + "\n"
@@ -33,11 +34,11 @@ public class ReportLocalVariableTypeInference {
 			+ "}\n"
 			+ "";
 
-	static boolean processNotRecursively(Node node) {
-		if (!(node instanceof VariableDeclarationExpr)) {
+	static boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+		if (!(node.getNode() instanceof VariableDeclarationExpr)) {
 			return false;
 		}
-		var variableDeclarationExpr = (VariableDeclarationExpr) node;
+		var variableDeclarationExpr = (VariableDeclarationExpr) node.getNode();
 
 		if (variableDeclarationExpr.getVariables().size() >= 2) {
 			return false;
@@ -59,6 +60,6 @@ public class ReportLocalVariableTypeInference {
 
 		node = LexicalPreservingPrinter.setup(node);
 
-		node.walk(innerNode -> processNotRecursively(innerNode));
+		node.walk(innerNode -> processNotRecursively(NodeAndSymbolSolver.make(innerNode)));
 	}
 }

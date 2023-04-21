@@ -29,14 +29,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.google.common.io.ByteStreams;
 
-import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
 
 public class TestLocalVariableTypeInferenceCustom extends AJavaparserTestCases {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestLocalVariableTypeInferenceCustom.class);
 
-	final IJavaparserMutator mutator = new LocalVariableTypeInference();
+	final IJavaparserAstMutator mutator = new LocalVariableTypeInference();
 
 	@Test
 	public void testIssueWithFile() throws IOException {

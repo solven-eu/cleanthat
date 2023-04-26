@@ -20,11 +20,12 @@ import java.util.Set;
 import eu.solven.cleanthat.engine.IEngineStep;
 
 /**
- *
+ * CleanThat as an {@link IEngineStep}. It is typically used for incremental pull_requests.
+ * 
  * @author Benoit Lacelle
  */
 public class JavaRefactorerStep implements IEngineStep {
-	public static final String ID_REFACTORER = "refactorer";
+	public static final String ID_REFACTORER = "cleanthat";
 
 	@Override
 	public String getStep() {

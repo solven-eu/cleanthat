@@ -43,15 +43,17 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 	@Deprecated(since = "One should rather rely on a CompositeMutator")
 	public static final String WILDCARD = "*";
 
+	private String sourceJdk;
+
 	/**
 	 * A {@link List} of included rules (by ID). '*' can be used to include all rules
 	 */
-	private List<String> included = List.of(SAFE_AND_CONSENSUAL);
+	private List<String> mutators = List.of(SAFE_AND_CONSENSUAL);
 
 	/**
 	 * A {@link List} of excluded rules (by ID)
 	 */
-	private List<String> excluded = List.of();
+	private List<String> excludedMutators = List.of();
 
 	/**
 	 * One may activate not-production-ready rules. It may be useful to test a new rule over some external repository
@@ -61,10 +63,12 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 
 	@Override
 	public Object getCustomProperty(String key) {
-		if ("included".equalsIgnoreCase(key)) {
-			return included;
-		} else if ("excluded".equalsIgnoreCase(key)) {
-			return excluded;
+		if ("source_jdk".equalsIgnoreCase(key)) {
+			return sourceJdk;
+		} else if ("mutators".equalsIgnoreCase(key)) {
+			return mutators;
+		} else if ("excluded_mutators".equalsIgnoreCase(key)) {
+			return excludedMutators;
 		} else if ("include_draft".equalsIgnoreCase(key)) {
 			return includeDraft;
 		}
@@ -87,7 +91,7 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 		var properties = new JavaRefactorerProperties();
 
 		properties.setIncludeDraft(false);
-		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
+		properties.setMutators(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
 
 		return properties;
 	}
@@ -101,9 +105,19 @@ public class JavaRefactorerProperties implements ICleanthatStepParametersPropert
 		var properties = new JavaRefactorerProperties();
 
 		properties.setIncludeDraft(true);
-		properties.setIncluded(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
+		properties.setMutators(Arrays.asList(AllIncludingDraftSingleMutators.class.getName()));
 
 		return properties;
+	}
+
+	@Deprecated(since = "Use .setMutators")
+	public void setIncluded(List<String> included) {
+		this.mutators = included;
+	}
+
+	@Deprecated(since = "Use .setExcludedMutators")
+	public void setExcluded(List<String> excluded) {
+		this.excludedMutators = excluded;
 	}
 
 }

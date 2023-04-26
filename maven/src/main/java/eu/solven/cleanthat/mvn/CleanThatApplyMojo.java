@@ -46,9 +46,9 @@ import eu.solven.cleanthat.engine.java.JavaFormattersFactory;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerStep;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
+import eu.solven.cleanthat.language.cleanthat.CleanthatForIntegrators;
 import eu.solven.cleanthat.language.javaparser.ICleanthatJavaparserConstants;
 import eu.solven.cleanthat.mvn.codeprovider.OverlayCodeProviderWrite;
-import eu.solven.cleanthat.spotless.language.JavaFormatterStepFactory;
 
 /**
  * This {@link org.apache.maven.plugin.Mojo} enables applying a single {@link IMutator} over current directory.
@@ -72,7 +72,7 @@ public class CleanThatApplyMojo extends ACleanThatSpringMojo {
 
 	// Follow the naming from https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat
 	@Parameter(defaultValue = "${cleanthat.mutators}", required = true)
-	private List<String> mutators = new ArrayList<>(JavaFormatterStepFactory.DEFAULT_MUTATORS);
+	private List<String> mutators = new ArrayList<>(CleanthatForIntegrators.getDefaultMutators());
 
 	// Follow the naming from https://github.com/diffplug/spotless/tree/main/plugin-maven#cleanthat
 	@Parameter(defaultValue = "${cleanthat.excludedMutators}")
@@ -96,9 +96,9 @@ public class CleanThatApplyMojo extends ACleanThatSpringMojo {
 	protected List<Class<?>> springClasses() {
 		if (includeDraft) {
 			LOGGER.warn("Given `includeDraft==true`, we call `System.setProperty({}, \"{}\")`",
-					JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT,
+					CleanthatForIntegrators.ENV_CLEANTHAT_INCLUDE_DRAFT,
 					true);
-			System.setProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT, "true");
+			System.setProperty(CleanthatForIntegrators.ENV_CLEANTHAT_INCLUDE_DRAFT, "true");
 		}
 
 		List<Class<?>> allClasses = new ArrayList<>();
@@ -126,8 +126,8 @@ public class CleanThatApplyMojo extends ACleanThatSpringMojo {
 		var topConfig = CleanthatRepositoryProperties.defaultRepository();
 
 		var properties = new JavaRefactorerProperties();
-		properties.setIncluded(mutators);
-		properties.setExcluded(excludedMutators);
+		properties.setMutators(mutators);
+		properties.setExcludedMutators(excludedMutators);
 		properties.setIncludeDraft(includeDraft);
 
 		var engineProperties = CleanthatEngineProperties.builder()

@@ -66,7 +66,7 @@ public class ITTestRemoteFile {
 				new String(ByteStreams.toByteArray(new URI(path).toURL().openStream()), StandardCharsets.UTF_8);
 
 		var properties = new JavaRefactorerProperties();
-		properties.setIncluded(
+		properties.setMutators(
 				Arrays.asList(SafeAndConsensualMutators.class.getName(), LiteralsFirstInComparisons.class.getName()));
 
 		var rulesJavaMutator = new JavaRefactorer(CleanthatEngineProperties.builder()

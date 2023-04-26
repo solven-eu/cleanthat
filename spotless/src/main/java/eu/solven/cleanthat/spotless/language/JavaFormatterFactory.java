@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.resource.CleanthatUrlLoader;
+import eu.solven.cleanthat.language.cleanthat.CleanthatForIntegrators;
 import eu.solven.cleanthat.spotless.AFormatterFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
@@ -58,7 +59,7 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		SpotlessStepPropertiesBuilder removeUnusedImportsBuilder =
 				SpotlessStepProperties.builder().id("removeUnusedImports");
 
-		if ("true".equals(System.getProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
+		if ("true".equals(System.getProperty(CleanthatForIntegrators.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
 			// We skip removeUnusedImports as it make it difficult to get when Cleanthat generates invalid code
 			removeUnusedImportsBuilder.skip(true);
 		}
@@ -83,8 +84,8 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		SpotlessStepParametersProperties cleanthatParameters = new SpotlessStepParametersProperties();
 		// see com.github.javaparser.ParserConfiguration.LanguageLevel.POPULAR
 		cleanthatParameters.putProperty("source_jdk", "11");
-		cleanthatParameters.putProperty("mutators", JavaFormatterStepFactory.DEFAULT_MUTATORS);
-		if ("true".equals(System.getProperty(JavaFormatterStepFactory.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
+		cleanthatParameters.putProperty("mutators", CleanthatForIntegrators.DEFAULT_MUTATORS);
+		if ("true".equals(System.getProperty(CleanthatForIntegrators.ENV_CLEANTHAT_INCLUDE_DRAFT))) {
 			cleanthatParameters.putProperty("include_draft", Boolean.TRUE);
 		}
 		cleanthat.setParameters(cleanthatParameters);

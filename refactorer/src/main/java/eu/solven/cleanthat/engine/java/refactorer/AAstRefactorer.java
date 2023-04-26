@@ -148,8 +148,8 @@ public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R
 		}
 		var engineVersion = JavaVersion.parse(languageLevel);
 
-		var includedRules = properties.getIncluded();
-		var excludedRules = properties.getExcluded();
+		var includedRules = properties.getMutators();
+		var excludedRules = properties.getExcludedMutators();
 		var includeDraft = properties.isIncludeDraft();
 
 		// TODO Enable a custom rule in includedRules (e.g. to load from a 3rd party JAR)

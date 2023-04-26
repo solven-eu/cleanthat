@@ -31,10 +31,10 @@ import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
@@ -90,10 +90,15 @@ public class TestJavaRefactorer {
 	public void testFilterOnExcluded() {
 		engineProperties.setEngineVersion(IJdkVersionConstants.JDK_11);
 
-		// UseIsEmptyOnCollections is not productionReady
 		var mutatorsProperties = draftMutatorsProperties;
 
-		var oneRule = new UseCollectionIsEmpty();
+		// Pick a rule with at least 2 IDs
+		IMutator oneRule;
+		{
+			var mutator = new AllIncludingDraftSingleMutators(JavaVersion.parse(IJdkVersionConstants.LAST));
+			oneRule = mutator.getUnderlyings().stream().filter(m -> m.getIds().size() >= 2).findAny().get();
+		}
+
 		Set<String> oneRuleIds = oneRule.getIds();
 
 		Assertions.assertThat(oneRuleIds.size()).isGreaterThan(1);
@@ -103,8 +108,9 @@ public class TestJavaRefactorer {
 			Assertions.assertThat(allTransformers).flatMap(IMutator::getIds).containsAll(oneRuleIds);
 		}
 
+		// Exclude the selected mutator by each of its id
 		oneRuleIds.forEach(oneRuleId -> {
-			mutatorsProperties.setExcluded(Arrays.asList(oneRuleId));
+			mutatorsProperties.setExcludedMutators(Arrays.asList(oneRuleId));
 
 			List<IMutator> fileredTransformers = JavaRefactorer.filterRules(engineProperties, mutatorsProperties);
 			Assertions.assertThat(fileredTransformers).flatMap(IMutator::getIds).doesNotContain(oneRuleId);
@@ -184,7 +190,7 @@ public class TestJavaRefactorer {
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded() {
 		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
-		customProperties.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName()));
+		customProperties.setMutators(Arrays.asList(CustomCompositeMutator.class.getName()));
 
 		List<IMutator> rules = JavaRefactorer.filterRules(engineProperties, customProperties);
 
@@ -198,7 +204,7 @@ public class TestJavaRefactorer {
 	public void testIncludeRuleByClassName_draftRule_draftIncluded() {
 		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(true);
-		customProperties.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName()));
+		customProperties.setMutators(Arrays.asList(CustomCompositeMutator.class.getName()));
 
 		List<IMutator> rules = JavaRefactorer.filterRules(engineProperties, customProperties);
 
@@ -213,7 +219,7 @@ public class TestJavaRefactorer {
 	public void testIncludeRuleByClassName_draftRule_draftNotIncluded_butExplicitlyListed() {
 		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
-		customProperties.setIncluded(Arrays.asList(CustomDraftMutator.class.getName()));
+		customProperties.setMutators(Arrays.asList(CustomDraftMutator.class.getName()));
 
 		List<IMutator> rules = JavaRefactorer.filterRules(engineProperties, customProperties);
 
@@ -228,7 +234,7 @@ public class TestJavaRefactorer {
 		final var customProperties = new JavaRefactorerProperties();
 		customProperties.setIncludeDraft(false);
 		customProperties
-				.setIncluded(Arrays.asList(CustomCompositeMutator.class.getName(), CustomDraftMutator.class.getName()));
+				.setMutators(Arrays.asList(CustomCompositeMutator.class.getName(), CustomDraftMutator.class.getName()));
 
 		List<IMutator> rules = JavaRefactorer.filterRules(engineProperties, customProperties);
 

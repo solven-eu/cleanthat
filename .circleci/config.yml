@@ -1,7 +1,7 @@
 version: 2.1 # use CircleCI 2.0
 
 orbs:
-  slack: circleci/slack@4.12.3
+  slack: circleci/slack@4.12.5
   #coveralls: coveralls/coveralls@2.0.0
 
 aliases:

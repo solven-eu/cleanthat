@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
-import com.diffplug.spotless.extra.EclipseBasedStepBuilder;
+import com.diffplug.spotless.extra.EquoBasedStepBuilder;
 import com.diffplug.spotless.extra.java.EclipseJdtFormatterStep;
 import com.diffplug.spotless.java.CleanthatJavaStep;
 import com.diffplug.spotless.java.ImportOrderStep;
@@ -132,7 +132,7 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 	}
 
 	private FormatterStep makeEclipse(SpotlessStepParametersProperties parameters, Provisioner provisioner) {
-		EclipseBasedStepBuilder eclipseConfig = EclipseJdtFormatterStep.createBuilder(provisioner);
+		EquoBasedStepBuilder eclipseConfig = EclipseJdtFormatterStep.createBuilder(provisioner);
 
 		String eclipseVersion = parameters.getCustomProperty("version", String.class);
 		if (eclipseVersion == null) {

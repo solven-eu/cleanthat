@@ -18,7 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.javaparser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +45,13 @@ public class TestJavaParserParsing extends AJavaparserTestCases {
 			LOGGER.info("Processing: {}", resource);
 			var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
-			if ("SealedClassTests.java".equals(resource.getFilename())) {
-				// sealed classes are not managed by JP3.25
-				Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
-						.isInstanceOf(IllegalArgumentException.class);
-			} else {
-				parseCompilationUnit(mutator, asString);
-			}
+			// if ("SealedClassTests.java".equals(resource.getFilename())) {
+			// sealed classes are not managed by JP3.25
+			// Assertions.assertThatThrownBy(() -> parseCompilationUnit(mutator, asString))
+			// .isInstanceOf(IllegalArgumentException.class);
+			// } else {
+			parseCompilationUnit(mutator, asString);
+			// }
 		}
 	}
 }

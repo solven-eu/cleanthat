@@ -49,7 +49,6 @@ public class TestStreamMapIdentityCases extends AJavaparserRefactorerCases {
 	}
 
 	@CompareMethods
-	@CaseNotYetImplemented
 	// https://github.com/javaparser/javaparser/issues/3995
 	public static class CaseIntStream {
 		public OptionalDouble pre(int[] values) {

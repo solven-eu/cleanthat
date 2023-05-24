@@ -4,6 +4,11 @@ CleanThat
 
 Cleanthat is a project enabling automatic code cleaning, from formatting to refactoring.
 
+Beware CleanThat currently refers to 2 sub-projects:
+
+1. `Cleanthat Refactorer`: A library enabling Java linting rules/mutators
+2. `Cleanthat HouseKeeper`: A GitHub App enabling automatic house-keeping of your `Git` repository, for various languages, given external linting engines (e.g. `Spotless`, `OpenRewrite`, `Cleanthat Refactorer`, etc)
+
 # List of mutators
 
 [![javadoc](https://javadoc.io/badge2/io.github.solven-eu.cleanthat/java/javadoc.svg)](https://javadoc.io/doc/io.github.solven-eu.cleanthat/java)
@@ -47,9 +52,9 @@ See [CHANGES.MD](CHANGES.MD)
 
 # Language Coverage
 
-## As a Robot
+## As a Robot (`Cleanthat HouseKeeper`)
 
-Cleanthat Robot is currently compatible with the following languages:
+`Cleanthat HouseKeeper` is currently compatible with the following languages:
 
 - java (Spotless and OpenRewrite)
 - pom.xml (Spotless)
@@ -60,9 +65,9 @@ Cleanthat Robot is currently compatible with the following languages:
 
 see [FormatterFactory](spotless/src/main/java/eu/solven/cleanthat/spotless/FormatterFactory.java)
 
-## As a library
+## As a library (`Cleanthat Refactorer`)
 
-Cleanthat Refactorer is currently compatible with the following languages:
+`Cleanthat Refactorer` is currently compatible with the following languages:
 
 - java (Cleanthat)
 - java (OpenRewrite)

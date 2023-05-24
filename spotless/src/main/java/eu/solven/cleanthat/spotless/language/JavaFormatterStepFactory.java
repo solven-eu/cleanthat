@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -161,6 +162,12 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			wildcardsLast = false;
 		}
 
+		Boolean semanticSort = parameters.getCustomProperty("semanticSort", Boolean.class);
+		if (semanticSort == null) {
+			// https://github.com/diffplug/spotless/tree/main/plugin-maven#java
+			semanticSort = false;
+		}
+
 		String ordersFile = parameters.getCustomProperty(KEY_FILE, String.class);
 		if (ordersFile != null) {
 			File orderFileAsFile;
@@ -169,7 +176,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 			} catch (IOException e) {
 				throw new UncheckedIOException("Issue locating " + ordersFile, e);
 			}
-			return ImportOrderStep.forJava().createFrom(wildcardsLast, orderFileAsFile);
+			return ImportOrderStep.forJava()
+					.createFrom(wildcardsLast, semanticSort, Set.of(), Set.of(), orderFileAsFile);
 		}
 
 		// You can use an empty string for all the imports you didn't specify explicitly, '|' to join group without
@@ -178,7 +186,8 @@ public class JavaFormatterStepFactory extends AFormatterStepFactory {
 		if (ordersString == null) {
 			ordersString = ORDER_DEFAULT_ECLIPSE;
 		}
-		return ImportOrderStep.forJava().createFrom(wildcardsLast, ordersString.split(","));
+		return ImportOrderStep.forJava()
+				.createFrom(wildcardsLast, semanticSort, Set.of(), Set.of(), ordersString.split(","));
 	}
 
 }

@@ -4,6 +4,14 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ## [Unreleased]
 
+## [2.16] - 2023-05-24
+
+### Fixed
+
+* [`UnnecessaryImport` removes star import from same package](https://github.com/solven-eu/cleanthat/issues/553)
+
+## [2.15] - 2023-05-23
+
 ### Added
 
 * `ArithmeticOverFloats` is introduced

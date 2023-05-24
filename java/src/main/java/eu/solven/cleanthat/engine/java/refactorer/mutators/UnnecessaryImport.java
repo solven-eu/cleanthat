@@ -110,16 +110,16 @@ public class UnnecessaryImport extends AJavaparserNodeMutator {
 
 		Set<String> tokensInUse = tokensInUse(compilationUnit);
 
-		List<ImportDeclaration> unusedImports = new ArrayList<>();
+		List<ImportDeclaration> unnecessaryImports = new ArrayList<>();
 
-		unusedImports.addAll(removeUnusedImports(importDeclarations, tokensInUse));
-		unusedImports.addAll(removeSamePackageImports(importDeclarations, compilationUnit.getPackageDeclaration()));
+		unnecessaryImports.addAll(unusedImports(importDeclarations, tokensInUse));
+		unnecessaryImports.addAll(samePackageImports(importDeclarations, compilationUnit.getPackageDeclaration()));
 
-		if (unusedImports.isEmpty()) {
+		if (unnecessaryImports.isEmpty()) {
 			return false;
 		} else {
 			// Remove all unused imports
-			unusedImports.forEach(importDeclaration -> {
+			unnecessaryImports.forEach(importDeclaration -> {
 				try {
 					importDeclaration.remove();
 				} catch (RuntimeException e) {
@@ -181,7 +181,7 @@ public class UnnecessaryImport extends AJavaparserNodeMutator {
 	 * This means that it is not possible to remove import statements with wildcards.
 	 */
 	// https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java#L350
-	private static List<ImportDeclaration> removeUnusedImports(Collection<ImportDeclaration> imports,
+	private static List<ImportDeclaration> unusedImports(Collection<ImportDeclaration> imports,
 			Set<String> tokensInUse) {
 		return imports.stream().filter(i -> {
 			if (i.isAsterisk()) {
@@ -199,16 +199,25 @@ public class UnnecessaryImport extends AJavaparserNodeMutator {
 	}
 
 	// https://github.com/revelc/impsort-maven-plugin/blob/main/src/main/java/net/revelc/code/impsort/ImpSort.java#L366
-	static List<ImportDeclaration> removeSamePackageImports(Collection<ImportDeclaration> imports,
+	static List<ImportDeclaration> samePackageImports(Collection<ImportDeclaration> imports,
 			Optional<PackageDeclaration> packageDeclaration) {
 		var packageName = packageDeclaration.map(p -> p.getName().toString()).orElse("");
 
 		return imports.stream().filter(i -> {
-			var imp = i.getNameAsString();
+			var imported = i.getNameAsString();
 			if (packageName.isEmpty()) {
-				return !imp.contains(".");
+				// removeIf imported is also packageLess
+				return !imported.contains(".");
+			} else if (i.isAsterisk()) {
+				// This is a wildcard import: discard it only if equals to current package
+				return imported.equals(packageName);
+			} else if (!imported.startsWith(packageName)) {
+				// This is an unrelated package
+				return false;
 			}
-			return imp.startsWith(packageName) && imp.lastIndexOf('.') <= packageName.length();
+			// Given we checked previously for `imported.startsWith(packageName)`
+			// Then this checks for `imported LIKE packageName.XXX` where `XXX` has no `.`
+			return imported.lastIndexOf('.') == packageName.length();
 		}).collect(Collectors.toList());
 	}
 

@@ -61,7 +61,7 @@
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->
 		<pmd.version>6.55.0</pmd.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
-		<maven-checkstyle-plugin.version>3.2.2</maven-checkstyle-plugin.version>
+		<maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
 		<checkstyle.version>10.11.0</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->

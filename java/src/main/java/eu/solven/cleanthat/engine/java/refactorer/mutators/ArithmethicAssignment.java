@@ -23,6 +23,7 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -30,6 +31,8 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
  * Turns 'i = i + 3;` into `i = i + (3 + 4);`
@@ -95,7 +98,7 @@ public class ArithmethicAssignment extends AJavaparserExprMutator {
 		BinaryExpr binaryExpr = assignExpr.getValue().asBinaryExpr();
 		Optional<Entry<Expression, Expression>> optValueIfValue;
 
-		if (SYMETRIC_OPERATORS.contains(binaryExpr.getOperator())) {
+		if (isSymetric(expr.editNode(binaryExpr))) {
 			optValueIfValue = BinaryExprHelpers.findPair(binaryExpr, n -> n.equals(target), n -> true);
 		} else {
 			if (binaryExpr.getLeft().equals(target)) {
@@ -117,6 +120,31 @@ public class ArithmethicAssignment extends AJavaparserExprMutator {
 		}
 
 		return replaced;
+	}
+
+	private boolean isSymetric(NodeAndSymbolSolver<BinaryExpr> refBinaryExpr) {
+		BinaryExpr binaryExpr = refBinaryExpr.getNode();
+		boolean isSymetricOperator = SYMETRIC_OPERATORS.contains(binaryExpr.getOperator());
+
+		if (!isSymetricOperator) {
+			return false;
+		}
+
+		Optional<ResolvedType> leftResolvedType =
+				MethodCallExprHelpers.optResolvedType(refBinaryExpr.editNode(binaryExpr.getLeft()));
+		if (leftResolvedType.isEmpty() || !leftResolvedType.get().isPrimitive()) {
+			// One of the operator is not a primitive: we are seemingly manipulating String
+			return false;
+		}
+
+		Optional<ResolvedType> rightResolvedType =
+				MethodCallExprHelpers.optResolvedType(refBinaryExpr.editNode(binaryExpr.getRight()));
+		if (rightResolvedType.isEmpty() || !rightResolvedType.get().isPrimitive()) {
+			// One of the operator is not a primitive: we are seemingly manipulating String
+			return false;
+		}
+
+		return isSymetricOperator;
 	}
 
 	private AssignExpr.Operator toAssignOperator(BinaryExpr.Operator operator) {

@@ -2,7 +2,11 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
-## [Unreleased]
+## [2.17 - Unreleased]
+
+### Fixed
+
+* `ArithmethicAssignment` should not assume String concatenation is symmetric.
 
 ## [2.16] - 2023-05-24
 

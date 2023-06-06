@@ -129,4 +129,76 @@ public class TestArithmethicAssignmentCases extends AJavaparserRefactorerCases {
 		}
 	}
 
+	@CompareMethods
+	public static class PlusString_suffix {
+		public String pre(String add) {
+			String i = "initial";
+			i = i + add;
+			return i;
+		}
+
+		public String post(String add) {
+			String i = "initial";
+			i += add;
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class PlusString_prefix {
+		public String pre(String add) {
+			String i = "initial";
+			i = add + i;
+			return i;
+		}
+	}
+
+	@CompareMethods
+	public static class PlusString_suffix_object {
+		public String pre(Object add) {
+			String i = "initial";
+			i = i + add;
+			return i;
+		}
+
+		public String post(Object add) {
+			String i = "initial";
+			i += add;
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class PlusString_prefix_object {
+		public String pre(Object add) {
+			String i = "initial";
+			i = add + i;
+			return i;
+		}
+	}
+
+	@CompareMethods
+	public static class PlusString_suffix_int {
+		public String pre(int add) {
+			String i = "initial";
+			i = i + add;
+			return i;
+		}
+
+		public String post(int add) {
+			String i = "initial";
+			i += add;
+			return i;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class PlusString_prefix_int {
+		public String pre(int add) {
+			String i = "initial";
+			i = add + i;
+			return i;
+		}
+
+	}
 }

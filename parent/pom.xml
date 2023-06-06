@@ -450,7 +450,7 @@
 
 							<removeUnusedImports />
 							<importOrder>
-								<file>eclipse/eclipse.importorder</file>
+								<file>${maven.multiModuleProjectDirectory}/.cleanthat/eclipse.importorder</file>
 								<!--order>java,javax,org,com</order-->
 							</importOrder>
 

@@ -30,6 +30,10 @@ import org.kohsuke.github.GHCheckRun.Conclusion;
 import org.kohsuke.github.GHCheckRun.Status;
 import org.kohsuke.github.GHCheckRunBuilder;
 import org.kohsuke.github.GHCheckRunBuilder.Output;
+import org.kohsuke.github.GHMarketplaceAccount;
+import org.kohsuke.github.GHMarketplaceAccountPlan;
+import org.kohsuke.github.GHMarketplacePlan;
+import org.kohsuke.github.GHMarketplacePurchase;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -97,28 +101,28 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	protected Optional<String> checkMarketPlacePlan(GHAppInstallation appInstallation, GHRepository ghRepository)
 			throws IOException {
 		// https://github.com/hub4j/github-api/issues/1613
-		// GHMarketplaceAccount account = appInstallation.getMarketplaceAccount();
-		// GHMarketplaceAccountPlan accountPlan = account.getPlan();
-		// GHMarketplacePurchase purchase = accountPlan.getMarketplacePurchase();
-		// GHMarketplacePlan plan = purchase.getPlan();
-		//
-		// String accountPlanName = plan.getName();
-		//
-		// // https://github.com/marketplace/cleanthat/edit/plans
-		// if ("retired".equals(plan.getState())) {
-		// return Optional.of("This plan is retired");
-		// } else if (!"published".equals(plan.getState())) {
-		// return Optional.of("Not-managed plan state: " + plan.getState());
-		// }
-		//
-		// if (ghRepository.isPrivate()) {
-		// if (accountPlanName.contains("Private")) {
-		// LOGGER.info("Accepting an event for a private account");
-		// } else {
-		// LOGGER.warn("Private repositories are not accepted by plan={}", accountPlanName);
-		// return Optional.of("Your plan does not allow private repository");
-		// }
-		// }
+		GHMarketplaceAccount account = appInstallation.getMarketplaceAccount();
+		GHMarketplaceAccountPlan accountPlan = account.getPlan();
+		GHMarketplacePurchase purchase = accountPlan.getMarketplacePurchase();
+		GHMarketplacePlan plan = purchase.getPlan();
+
+		String accountPlanName = plan.getName();
+
+		// https://github.com/marketplace/cleanthat/edit/plans
+		if ("retired".equals(plan.getState())) {
+			return Optional.of("This plan is retired");
+		} else if (!"published".equals(plan.getState())) {
+			return Optional.of("Not-managed plan state: " + plan.getState());
+		}
+
+		if (ghRepository.isPrivate()) {
+			if (accountPlanName.contains("Private")) {
+				LOGGER.info("Accepting an event for a private account");
+			} else {
+				LOGGER.warn("Private repositories are not accepted by plan={}", accountPlanName);
+				return Optional.of("Your plan does not allow private repository");
+			}
+		}
 
 		return Optional.empty();
 	}
@@ -199,13 +203,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					update.withConclusion(Conclusion.NEUTRAL)
 							.withStatus(Status.COMPLETED)
 							.add(new Output("Rejected due to branch or configuration",
-									optRejectedReason.get() + "\r\neventKey=" + eventKey));
+									optRejectedReason.get() + "\r\n" + "eventKey=" + eventKey));
 				} else {
 					update
 							// Not completed as this is to be followed by the cleaning
 							.withStatus(Status.IN_PROGRESS)
 							.add(new Output("Checking is the branch is valid for cleaning",
-									"someSummary" + "\r\neventKey=" + eventKey));
+									"someSummary" + "\r\n" + "eventKey=" + eventKey));
 				}
 				update.create();
 			});

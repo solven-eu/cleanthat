@@ -34,6 +34,7 @@ import org.springframework.core.env.Profiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
@@ -78,7 +79,9 @@ public abstract class AProcessLocallyDynamoDbEvent_ExecuteClean extends Abstract
 			if (doRecord && doReplay) {
 				throw new IllegalStateException("Can not both record and replay");
 			} else if (!doRecord && !doReplay) {
-				return null;
+				// Should rely on default GithubSpringConfig.githubAppFactory(Environment)
+				// But returning a null bean lead to bean appearing as missing
+				return new GithubSpringConfig().githubAppFactory(env);
 			} else if (doRecord) {
 				LOGGER.info("Recording Github API");
 			} else if (doReplay) {

@@ -147,9 +147,24 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		// TODO If the configuration changed, trigger full-clean only if the change is an effective change (and not just
 		// json/yaml/etc formatting)
 		migrateConfigurationCode(properties);
-		var protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
 
 		var headRef = head.getRef();
+		{
+			var excludedPatterns = properties.getMeta().getRefs().getExcludedPatterns();
+			var optHeadMatchingRule = selectPatternOfSensibleHead(excludedPatterns, headRef);
+			if (optHeadMatchingRule.isPresent()) {
+				LOGGER.info("We skip this event as head={} is excluded by {}", headRef, optHeadMatchingRule.get());
+				return Optional.empty();
+			}
+
+			if (selectNotMatchingBase(eventBaseRefs, excludedPatterns).isEmpty()) {
+				LOGGER.info("We skip this event as base={} is excluded by {}", eventBaseRefs, excludedPatterns);
+				return Optional.empty();
+			}
+		}
+
+		var protectedPatterns = properties.getMeta().getRefs().getProtectedPatterns();
+
 		if (canCleanInPlace(eventBaseRefs, protectedPatterns, headRef)) {
 			logWhyCanCleanInPlace(eventBaseRefs, protectedPatterns, result, headRef);
 
@@ -249,7 +264,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			return false;
 		}
 
-		var optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, protectedPatterns);
+		var optBaseMatchingRule = selectMatchingBase(eventBaseRefs, protectedPatterns);
 
 		return optBaseMatchingRule.isPresent();
 	}
@@ -260,7 +275,7 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 			List<String> refToCleanRegexes,
 			IExternalWebhookRelevancyResult result,
 			String headRef) {
-		var optBaseMatchingRule = selectValidBaseBranch(eventBaseRefs, refToCleanRegexes);
+		var optBaseMatchingRule = selectMatchingBase(eventBaseRefs, refToCleanRegexes);
 
 		if (optBaseMatchingRule.isEmpty()) {
 			throw new IllegalStateException("Should be called only if .canCleanInPlace() returns true");
@@ -283,34 +298,33 @@ public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, IC
 		return protectedPatterns.stream().filter(regex -> Pattern.matches(regex, fullRef)).findAny();
 	}
 
+	private boolean hasMatch(Set<String> refs, String regex) {
+		var matchingBase = refs.stream().filter(base -> Pattern.matches(regex, base)).findAny();
+
+		if (matchingBase.isEmpty()) {
+			LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", regex);
+			return false;
+		} else {
+			LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}", regex, matchingBase.get());
+			return true;
+		}
+	}
+
 	/**
 	 * 
-	 * @param refs
+	 * @param baseRefs
 	 *            eligible full refs
-	 * @param regexes
+	 * @param refPatterns
 	 *            the regex of the branches allowed to be clean. Fact is these branches should never be cleaned by
 	 *            themselves, but only through RR
 	 * @return
 	 */
-	private Optional<String> selectValidBaseBranch(Set<String> refs, List<String> regexes) {
-		Optional<String> optBaseMatchingRule;
-		if (refs.isEmpty()) {
-			optBaseMatchingRule = Optional.empty();
-		} else {
-			optBaseMatchingRule = regexes.stream().filter(regex -> {
-				var matchingBase = refs.stream().filter(base -> Pattern.matches(regex, base)).findAny();
+	private Optional<String> selectMatchingBase(Set<String> baseRefs, List<String> refPatterns) {
+		return refPatterns.stream().filter(regex -> hasMatch(baseRefs, regex)).findAny();
+	}
 
-				if (matchingBase.isEmpty()) {
-					LOGGER.info("Not a single base with open RR matches cleanableBranchRegex={}", regex);
-					return false;
-				} else {
-					LOGGER.info("We have a match for ruleBranch={} eventBaseBranch={}", regex, matchingBase.get());
-				}
-
-				return true;
-			}).findAny();
-		}
-		return optBaseMatchingRule;
+	private Optional<String> selectNotMatchingBase(Set<String> baseRefs, List<String> refPatterns) {
+		return refPatterns.stream().filter(regex -> !hasMatch(baseRefs, regex)).findAny();
 	}
 
 	private Optional<HeadAndOptionalBase> cleanHeadInPlace(IExternalWebhookRelevancyResult result,

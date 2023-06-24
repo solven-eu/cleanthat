@@ -7,6 +7,8 @@ meta:
     protected_patterns:
       - master
       - deploy-prd
+    excluded_patterns:
+      - deploy-prd
 source_code:
   excludes:
   - "regex:.*/generated/.*"

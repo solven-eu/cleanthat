@@ -78,7 +78,7 @@
 		<!-- <eclipse.jt.core.version>3.30.0</eclipse.jt.core.version> -->
 		<!-- <eclipse.jdt.core.manipulation.version>1.16.100</eclipse.jdt.core.manipulation.version> -->
 		<maven.version>3.9.2</maven.version>
-		<maven-resolver.version>1.9.10</maven-resolver.version>
+		<maven-resolver.version>1.9.13</maven-resolver.version>
 
 		<!-- Not provided as spotless is not executed through maven in CleanThat -->
 		<maven.scope>compile</maven.scope>
@@ -97,7 +97,7 @@
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>1.12.481</version>
+				<version>1.12.495</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

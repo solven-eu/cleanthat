@@ -4,9 +4,8 @@ import java.util.Arrays;
 
 import org.openrewrite.Recipe;
 import org.openrewrite.Result;
+import org.openrewrite.SourceFile;
 import org.openrewrite.config.Environment;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.J.CompilationUnit;
 
 import com.github.javaparser.ast.Node;
 
@@ -16,19 +15,19 @@ import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
 
-public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
+public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases<SourceFile, Result> {
 	final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 
 	@Override
 	public OpenrewriteMutator getTransformer() {
-		Environment environment = Environment.builder().scanRuntimeClasspath().build();
-		Recipe recipe = environment.activateRecipes("org.openrewrite.java.cleanup.CommonStaticAnalysis");
+		Environment environment = Environment.builder().scanRuntimeClasspath("org.openrewrite.staticanalysis").build();
+		Recipe recipe = environment.activateRecipes("org.openrewrite.staticanalysis.CommonStaticAnalysis");
 
 		return new OpenrewriteMutator(recipe);
 	}
 
 	@Override
-	public J.CompilationUnit convertToAst(Node pre) {
+	public SourceFile convertToAst(Node pre) {
 		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString)
@@ -41,7 +40,7 @@ public class TestCommonStaticAnalysisCases extends AParameterizesRefactorerCases
 	}
 
 	@Override
-	public String astToString(CompilationUnit asAst) {
+	public String astToString(SourceFile asAst) {
 		return asAst.printAll();
 	}
 

@@ -11,7 +11,8 @@
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>
 		<jacoco.instruction.ratio>0.05</jacoco.instruction.ratio>
-		<openrewrite.dependency.version>1.19.4</openrewrite.dependency.version>
+
+		<openrewrite.dependency.version>2.0.1</openrewrite.dependency.version>
 	</properties>
 
 	<dependencyManagement>
@@ -40,6 +41,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.openrewrite.recipe/rewrite-static-analysis -->
+		<dependency>
+			<groupId>org.openrewrite.recipe</groupId>
+			<artifactId>rewrite-static-analysis</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.openrewrite</groupId>
 			<artifactId>rewrite-java</artifactId>
@@ -47,6 +53,11 @@
 		<dependency>
 			<groupId>org.openrewrite</groupId>
 			<artifactId>rewrite-java-11</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openrewrite</groupId>
+			<artifactId>rewrite-java-17</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

@@ -24,9 +24,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.Recipe;
+import org.openrewrite.RecipeRun;
 import org.openrewrite.Result;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.J.CompilationUnit;
+import org.openrewrite.SourceFile;
+import org.openrewrite.internal.InMemoryLargeSourceSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  * @author Benoit Lacelle
  *
  */
-public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Result> {
+public class OpenrewriteMutator implements IWalkingMutator<SourceFile, Result> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteMutator.class);
 
 	final Recipe recipe;
@@ -56,7 +57,7 @@ public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Re
 	}
 
 	@Override
-	public Optional<Result> walkAst(CompilationUnit pre) {
+	public Optional<Result> walkAst(SourceFile pre) {
 		AtomicReference<Throwable> refFirstError = new AtomicReference<>();
 
 		ExecutionContext ctx = new InMemoryExecutionContext(t -> {
@@ -67,7 +68,8 @@ public class OpenrewriteMutator implements IWalkingMutator<J.CompilationUnit, Re
 			}
 		});
 
-		List<Result> results = recipe.run(Arrays.asList(pre), ctx).getResults();
+		RecipeRun run = recipe.run(new InMemoryLargeSourceSet(Arrays.asList(pre)), ctx);
+		List<Result> results = run.getChangeset().getAllResults();
 		if (results.isEmpty()) {
 			return Optional.empty();
 		} else if (refFirstError.get() != null) {

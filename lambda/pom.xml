@@ -172,6 +172,8 @@
 
 			<!-- mvn package lambda:deploy-lambda -->
 			<!-- mvn lambda:deploy-lambda -->
+			<!-- GITHUB_APP_PRIVATE_JWK=XXX -->
+			<!-- JAVA_TOOL_OPTIONS=-Duser.home=/tmp/cleanthat/user_home -Dcleanthat-spotless-m2repository=/tmp/cleanthat/spotless/.m2/repository -->
 			<plugin>
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin -->
 				<groupId>com.github.seanroy</groupId>
@@ -194,7 +196,7 @@
 					<!-- olapless-us-east-1-unittests -->
 					<s3Bucket>olapless-lambda-us-east-1</s3Bucket>
 
-					<runtime>java11</runtime>
+					<runtime>java17</runtime>
 
 					<publish>true</publish>
 					<forceUpdate>true</forceUpdate>

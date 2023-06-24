@@ -20,4 +20,4 @@ engines:
   - id: "openrewrite"
     parameters:
       recipes:
-      - "org.openrewrite.java.cleanup.CommonStaticAnalysis"
+      - "org.openrewrite.staticanalysis.CommonStaticAnalysis"

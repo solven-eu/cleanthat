@@ -6,9 +6,8 @@ import java.util.Collection;
 import org.junit.jupiter.api.Disabled;
 import org.openrewrite.Recipe;
 import org.openrewrite.Result;
+import org.openrewrite.SourceFile;
 import org.openrewrite.config.Environment;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.J.CompilationUnit;
 
 import com.github.javaparser.ast.Node;
 
@@ -20,7 +19,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
 import eu.solven.cleanthat.engine.java.refactorer.cases.AParameterizesRefactorerCases;
 
 @Disabled
-public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.CompilationUnit, Result> {
+public class TestReorderModifiersCases extends AParameterizesRefactorerCases<SourceFile, Result> {
 	final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 
 	@Override
@@ -32,7 +31,7 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	}
 
 	@Override
-	public J.CompilationUnit convertToAst(Node pre) {
+	public SourceFile convertToAst(Node pre) {
 		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString)
@@ -45,7 +44,7 @@ public class TestReorderModifiersCases extends AParameterizesRefactorerCases<J.C
 	}
 
 	@Override
-	public String astToString(CompilationUnit asAst) {
+	public String astToString(SourceFile asAst) {
 		return asAst.toString();
 	}
 

@@ -119,11 +119,6 @@ public class TestOpenrewriteFormatter_CommonStaticAnalysis {
 	{
 		// https://github.com/marschall/memoryfilesystem/issues/141
 		fileSystem = Jimfs.newFileSystem();
-		// try {
-		// fileSystem = MemoryFileSystemBuilder.newEmpty().build();
-		// } catch (IOException e) {
-		// throw new UncheckedIOException(e);
-		// }
 		cleanthatSession = new CleanthatSession(fileSystem.getPath(fileSystem.getSeparator()),
 				classpathCodeProvider,
 				repositoryProperties);

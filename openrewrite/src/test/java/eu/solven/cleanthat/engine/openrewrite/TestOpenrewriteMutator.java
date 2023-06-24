@@ -21,11 +21,13 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.openrewrite.Changeset;
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.LargeSourceSet;
 import org.openrewrite.Recipe;
 import org.openrewrite.RecipeRun;
 import org.openrewrite.Result;
-import org.openrewrite.java.tree.J.CompilationUnit;
+import org.openrewrite.SourceFile;
 
 import eu.solven.cleanthat.engine.java.refactorer.AAstRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.OpenrewriteMutator;
@@ -41,15 +43,22 @@ public class TestOpenrewriteMutator {
 
 	final Recipe recipe = Mockito.mock(Recipe.class);
 	final RecipeRun recipeRun = Mockito.mock(RecipeRun.class);
+	final Changeset changeSet = Mockito.mock(Changeset.class);
+
+	{
+		Mockito.when(recipeRun.getChangeset()).thenReturn(changeSet);
+	}
 
 	@Test
 	public void testEmptyResult() {
 		OpenrewriteMutator mutator = new OpenrewriteMutator(recipe);
 
 		final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
-		CompilationUnit pre = AAstRefactorer.parse(refactorer, someClassContent).get();
+		SourceFile pre = AAstRefactorer.parse(refactorer, someClassContent).get();
 
-		Mockito.doAnswer(i -> recipeRun).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
+		Mockito.doAnswer(i -> recipeRun)
+				.when(recipe)
+				.run(Mockito.any(LargeSourceSet.class), Mockito.any(ExecutionContext.class));
 
 		Optional<Result> output = mutator.walkAst(pre);
 
@@ -62,9 +71,11 @@ public class TestOpenrewriteMutator {
 		OpenrewriteMutator mutator = new OpenrewriteMutator(recipe);
 
 		final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
-		CompilationUnit pre = AAstRefactorer.parse(refactorer, someClassContent).get();
+		SourceFile pre = AAstRefactorer.parse(refactorer, someClassContent).get();
 
-		Mockito.doAnswer(i -> recipeRun).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
+		Mockito.doAnswer(i -> recipeRun)
+				.when(recipe)
+				.run(Mockito.any(LargeSourceSet.class), Mockito.any(ExecutionContext.class));
 
 		Optional<Result> output = mutator.walkAst(pre);
 
@@ -77,14 +88,14 @@ public class TestOpenrewriteMutator {
 		OpenrewriteMutator mutator = new OpenrewriteMutator(recipe);
 
 		final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
-		CompilationUnit pre = AAstRefactorer.parse(refactorer, someClassContent).get();
+		SourceFile pre = AAstRefactorer.parse(refactorer, someClassContent).get();
 
 		Mockito.doAnswer(i -> {
 			ExecutionContext ec = i.getArgument(1, ExecutionContext.class);
 			ec.getOnError().accept(new RuntimeException("Something went bad during the process"));
 
 			return recipeRun;
-		}).when(recipe).run(Mockito.anyList(), Mockito.any(ExecutionContext.class));
+		}).when(recipe).run(Mockito.any(LargeSourceSet.class), Mockito.any(ExecutionContext.class));
 
 		Optional<Result> output = mutator.walkAst(pre);
 

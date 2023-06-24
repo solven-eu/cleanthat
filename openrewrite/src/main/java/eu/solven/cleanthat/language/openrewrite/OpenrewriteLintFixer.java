@@ -19,15 +19,19 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
+import org.openrewrite.LargeSourceSet;
 import org.openrewrite.Parser.Input;
 import org.openrewrite.Recipe;
 import org.openrewrite.Result;
+import org.openrewrite.SourceFile;
 import org.openrewrite.config.CompositeRecipe;
+import org.openrewrite.internal.InMemoryLargeSourceSet;
 import org.openrewrite.java.JavaParser;
-import org.openrewrite.java.tree.J;
 
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
@@ -77,10 +81,12 @@ public class OpenrewriteLintFixer implements ILintFixerWithId, ILintFixerWithPat
 		ExecutionContext ctx = new InMemoryExecutionContext(Throwable::printStackTrace);
 
 		// parser the source files into LSTs
-		List<J.CompilationUnit> cus = javaParser.parseInputs(Collections.singleton(input), null, ctx);
+		Stream<SourceFile> cus = javaParser.parseInputs(Collections.singleton(input), null, ctx);
+
+		LargeSourceSet sourceSet = new InMemoryLargeSourceSet(cus.collect(Collectors.toList()));
 
 		// collect results
-		List<Result> results = recipe.run(cus, ctx).getResults();
+		List<Result> results = recipe.run(sourceSet, ctx).getChangeset().getAllResults();
 
 		if (results.isEmpty()) {
 			// no change

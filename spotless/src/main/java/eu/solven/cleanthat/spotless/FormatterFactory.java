@@ -88,6 +88,10 @@ public class FormatterFactory {
 		// This means each Lambda will download its own jars (wtill sharing JARs through executions within the same
 		// JVM/Lambda instance)
 		if (REF_LOCALREPO.get() == null) {
+			// https://stackoverflow.com/questions/68425517/aws-lambda-function-scaling-and-tmp-directory
+			// https://stackoverflow.com/questions/61614561/aws-lambda-java-runtime-home-directory-does-not-exist
+			// https://github.com/diffplug/spotless/issues/1687
+			
 			if (System.getProperty(PATH_M2_REPO) == null) {
 				REF_LOCALREPO.compareAndSet(null, Files.createTempDirectory("cleanthat-spotless-m2repository"));
 				LOGGER.info("We initialized local m2repository: {}", REF_LOCALREPO.get());

@@ -24,9 +24,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.Recipe;
 import org.openrewrite.Result;
+import org.openrewrite.SourceFile;
 import org.openrewrite.config.Environment;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.J.CompilationUnit;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -42,7 +41,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.ATestCases;
 import eu.solven.pepper.unittest.ILogDisabler;
 import eu.solven.pepper.unittest.PepperTestHelper;
 
-public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit, Result> {
+public class TestCommonStaticAnalysisCustom extends ATestCases<SourceFile, Result> {
 
 	final OpenrewriteRefactorer refactorer = new OpenrewriteRefactorer(Arrays.asList());
 
@@ -53,8 +52,8 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 		var asString =
 				new String(ByteStreams.toByteArray(testRoaringBitmapSource.getInputStream()), StandardCharsets.UTF_8);
 
-		Environment environment = Environment.builder().scanRuntimeClasspath().build();
-		Recipe recipe = environment.activateRecipes("org.openrewrite.java.cleanup.CommonStaticAnalysis");
+		Environment environment = Environment.builder().scanRuntimeClasspath("org.openrewrite.staticanalysis").build();
+		Recipe recipe = environment.activateRecipes("org.openrewrite.staticanalysis.CommonStaticAnalysis");
 
 		OpenrewriteMutator mutator = new OpenrewriteMutator(recipe);
 
@@ -62,7 +61,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 		JavaParser javaParser = JavaparserTestHelpers.makeDefaultJavaParser(true);
 		var compilationUnit = javaParser.parse(asString).getResult().get();
 
-		CompilationUnit openrewriteCompilationUnit = convertToAst(compilationUnit);
+		SourceFile openrewriteCompilationUnit = convertToAst(compilationUnit);
 
 		Optional<Result> transformed;
 		try (ILogDisabler logDisabler = PepperTestHelper.disableLog(OpenrewriteMutator.class)) {
@@ -80,7 +79,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 	}
 
 	@Override
-	public J.CompilationUnit convertToAst(Node pre) {
+	public SourceFile convertToAst(Node pre) {
 		var asString = pre.toString();
 
 		return AAstRefactorer.parse(refactorer, asString)
@@ -93,7 +92,7 @@ public class TestCommonStaticAnalysisCustom extends ATestCases<J.CompilationUnit
 	}
 
 	@Override
-	public String astToString(CompilationUnit asAst) {
+	public String astToString(SourceFile asAst) {
 		return asAst.toString();
 	}
 }

@@ -22,15 +22,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.Parser.Input;
 import org.openrewrite.Recipe;
 import org.openrewrite.Result;
+import org.openrewrite.SourceFile;
 import org.openrewrite.java.JavaParser;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.J.CompilationUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ import eu.solven.cleanthat.formatter.PathAndContent;
  * @author Benoit Lacelle
  *
  */
-public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, JavaParser, Result, OpenrewriteMutator> {
+public class OpenrewriteRefactorer extends AAstRefactorer<SourceFile, JavaParser, Result, OpenrewriteMutator> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteRefactorer.class);
 
 	// Is this threadsafe/stateless?
@@ -77,7 +77,7 @@ public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, Jav
 	}
 
 	@Override
-	protected Optional<CompilationUnit> parseSourceCode(JavaParser javaParser, String sourceCode) {
+	protected Optional<SourceFile> parseSourceCode(JavaParser javaParser, String sourceCode) {
 		Input input = Input.fromString(sourceCode, StandardCharsets.UTF_8);
 
 		AtomicReference<Throwable> refFirstError = new AtomicReference<>();
@@ -94,7 +94,8 @@ public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, Jav
 
 		// TODO Unclear if we could apply the visitor right away
 		// see org.openrewrite.Recipe.getVisitor()
-		List<J.CompilationUnit> cus = javaParser.parseInputs(Collections.singleton(input), relativeTo, ctx);
+		List<SourceFile> cus =
+				javaParser.parseInputs(Collections.singleton(input), relativeTo, ctx).collect(Collectors.toList());
 
 		if (refFirstError.get() != null) {
 			LOGGER.warn("Issue while parsing the input", refFirstError.get());
@@ -102,7 +103,7 @@ public class OpenrewriteRefactorer extends AAstRefactorer<J.CompilationUnit, Jav
 		} else if (cus.isEmpty()) {
 			return Optional.empty();
 		} else {
-			CompilationUnit result = Iterables.getOnlyElement(cus);
+			SourceFile result = Iterables.getOnlyElement(cus);
 			return Optional.of(result);
 		}
 	}

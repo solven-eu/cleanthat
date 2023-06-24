@@ -86,7 +86,7 @@ public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
 
 			// put any rewrite recipe jars on this main method's runtime classpath
 			// and either construct the recipe directly or via an Environment
-			Environment environment = Environment.builder().scanRuntimeClasspath().build();
+			Environment environment = Environment.builder().scanRuntimeClasspath("org.openrewrite").build();
 			Recipe recipe = environment.activateRecipes(rawRecipes);
 
 			lintFixer = new OpenrewriteLintFixer(recipe);

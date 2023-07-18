@@ -173,7 +173,8 @@
 			<!-- mvn package lambda:deploy-lambda -->
 			<!-- mvn lambda:deploy-lambda -->
 			<!-- GITHUB_APP_PRIVATE_JWK=XXX -->
-			<!-- JAVA_TOOL_OPTIONS=-Duser.home=/tmp/cleanthat/user_home -Dcleanthat-spotless-m2repository=/tmp/cleanthat/spotless/.m2/repository -->
+			<!-- https://github.com/equodev/equo-ide/issues/146 about -DlockFileGenerousTimeout=true -->
+			<!-- JAVA_TOOL_OPTIONS=-Duser.home=/tmp/cleanthat/user_home -Dcleanthat-spotless-m2repository=/tmp/cleanthat/spotless/.m2/repository -DlockFileGenerousTimeout=true -->
 			<plugin>
 				<!-- https://github.com/SeanRoy/lambda-maven-plugin -->
 				<groupId>com.github.seanroy</groupId>

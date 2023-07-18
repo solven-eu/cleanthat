@@ -2,7 +2,14 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
+
 ## [2.17 - Unreleased]
+
+### Changes
+
+* Change notified by PR from @blacelle to @solven-eu/cleanthat-notify
+
+## [2.17]
 
 ### Fixed
 
@@ -12,7 +19,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ### Fixed
 
-* [`UnnecessaryImport` removes star import from same package](https://github.com/solven-eu/cleanthat/issues/553)
+* [`UnnecessaryImport`] removes star import from same package](https://github.com/solven-eu/cleanthat/issues/553)
 
 ## [2.15] - 2023-05-23
 

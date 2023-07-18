@@ -37,6 +37,9 @@ import eu.solven.pepper.resource.PepperResourceHelper;
 public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 	public static final String TEMPLATES_FOLDER = "/templates";
 
+	// This can be useful to be automatically notified on new PRs
+	public static final String REF_TO_BLACELLE = "@solven-eu/cleanthat-notify please look at me";
+
 	// final ICodeProvider codeProvider;
 	final ObjectMapper objectMapper;
 	final Collection<IEngineLintFixerFactory> factories;
@@ -64,7 +67,7 @@ public class CleanthatConfigInitializer implements ICleanthatConfigInitializer {
 		body = body.replaceAll(Pattern.quote("${EVENT_ID}"), eventKey);
 
 		if (!isPrivate) {
-			body += "\r\n" + "---" + "\r\n" + "@blacelle please look at me";
+			body += "\r\n" + "---" + "\r\n" + REF_TO_BLACELLE;
 		}
 
 		var commitMessage = PepperResourceHelper.loadAsString(TEMPLATES_FOLDER + "/commit-message.txt");

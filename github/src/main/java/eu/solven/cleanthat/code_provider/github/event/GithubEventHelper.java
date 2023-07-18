@@ -148,7 +148,7 @@ public class GithubEventHelper {
 					.loadAsString(CleanthatConfigInitializer.TEMPLATES_FOLDER + "/cleaning-body.md");
 
 			if (!facade.getRepository().isPrivate()) {
-				body += "\r\n" + "@blacelle please look at me";
+				body += "\r\n" + CleanthatConfigInitializer.REF_TO_BLACELLE;
 			}
 
 			optOpenPr = facade.openPrIfNoneExists(base, lazyRefCreated, "Cleanthat", body);

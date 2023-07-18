@@ -42,10 +42,14 @@ public class CleanthatForIntegrators {
 
 	public static final String ENV_CLEANTHAT_INCLUDE_DRAFT = "cleanthat.include_draft";
 
-	private static final String DEFAULT_CLEANTHAT_VERSION = "2.10";
+	// The version of cleanthat to use when the proper-version detection mechanism fails
+	private static final String DEFAULT_DEFAULT_CLEANTHAT_VERSION = "2.10";
 	private static final String RESOURCE_MAVEN_JSON = "/maven.json";
 
-	private static final String CLEANTHAT_VERSION;
+	// The default version of cleanthat to use. When running in PRD, it may typically be the previous RELEASE version
+	// (if the checked-out code is -SNAPSHOT), .
+	private static final String DEFAULT_CLEANTHAT_VERSION;
+
 	public static final List<String> DEFAULT_MUTATORS;
 
 	static {
@@ -60,7 +64,7 @@ public class CleanthatForIntegrators {
 
 		DEFAULT_MUTATORS = defaultMutatorsBuilder.build();
 
-		CLEANTHAT_VERSION = parseCleanthatDefaultVersion();
+		DEFAULT_CLEANTHAT_VERSION = parseCleanthatDefaultVersion();
 	}
 
 	protected CleanthatForIntegrators() {
@@ -73,8 +77,8 @@ public class CleanthatForIntegrators {
 		try {
 			asMap = new ObjectMapper().readValue(mavenProperties, Map.class);
 		} catch (JsonProcessingException e) {
-			LOGGER.error("Issue loading from {}. Fallback on {}", RESOURCE_MAVEN_JSON, CLEANTHAT_VERSION, e);
-			return DEFAULT_CLEANTHAT_VERSION;
+			LOGGER.error("Issue loading from {}. Fallback on {}", RESOURCE_MAVEN_JSON, DEFAULT_CLEANTHAT_VERSION, e);
+			return DEFAULT_DEFAULT_CLEANTHAT_VERSION;
 		}
 
 		var cleanthatVersion = cleanCleanthatVersionFromMvnProperties(asMap);
@@ -87,7 +91,7 @@ public class CleanthatForIntegrators {
 		String cleanthatVersion;
 		var rawMavenProjectVersion = PepperMapHelper.getRequiredString(asMap, "project.version");
 		if (rawMavenProjectVersion.startsWith("@")) {
-			rawMavenProjectVersion = DEFAULT_CLEANTHAT_VERSION;
+			rawMavenProjectVersion = DEFAULT_DEFAULT_CLEANTHAT_VERSION;
 			cleanthatVersion = rawMavenProjectVersion;
 			LOGGER.error("Issue loading from {} (as we found {}). Fallback on {}",
 					RESOURCE_MAVEN_JSON,
@@ -96,10 +100,10 @@ public class CleanthatForIntegrators {
 		} else {
 			if (rawMavenProjectVersion.endsWith("-SNAPSHOT")) {
 				if ("true".equals(System.getProperty(ENV_CLEANTHAT_INCLUDE_DRAFT))) {
-					LOGGER.info("Spotless will execute a '-SNAPSHOT' of clenathat");
+					LOGGER.info("Spotless will execute a '-SNAPSHOT' of cleanthat");
 					cleanthatVersion = rawMavenProjectVersion;
 				} else {
-					LOGGER.info("Spotless will execute a '-RELEASE' of clenathat");
+					LOGGER.info("Spotless will execute a '-RELEASE' of cleanthat");
 					cleanthatVersion = getPreviousRelease(rawMavenProjectVersion);
 				}
 			} else {

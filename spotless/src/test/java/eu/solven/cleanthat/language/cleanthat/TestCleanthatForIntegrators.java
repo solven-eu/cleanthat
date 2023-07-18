@@ -52,4 +52,9 @@ public class TestCleanthatForIntegrators {
 		Assertions.assertThat(CleanthatForIntegrators.cleanCleanthatVersionFromMvnProperties(properties))
 				.isEqualTo("1.9");
 	}
+
+	@Test
+	public void testDefaultVersion() {
+		Assertions.assertThat(CleanthatForIntegrators.getDefaultVersion()).endsWith("-SNAPSHOT");
+	}
 }

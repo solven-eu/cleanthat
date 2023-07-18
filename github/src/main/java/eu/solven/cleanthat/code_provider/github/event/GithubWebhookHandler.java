@@ -209,7 +209,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					update
 							// Not completed as this is to be followed by the cleaning
 							.withStatus(Status.IN_PROGRESS)
-							.add(new Output("Checking is the branch is valid for cleaning",
+							.add(new Output("Checking if the branch is valid for cleaning",
 									"someSummary" + EOL + "eventKey=" + eventKey));
 				}
 				update.create();

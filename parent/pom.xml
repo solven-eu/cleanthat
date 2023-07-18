@@ -55,7 +55,7 @@
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
 		<spotless.version>2.37.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
-		<spotbugs.version>4.7.3.4</spotbugs.version>
+		<spotbugs.version>4.7.3.5</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
 		<maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version>
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd -->

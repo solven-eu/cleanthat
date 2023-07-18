@@ -32,6 +32,8 @@ import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
 
 		// JavaFormattersFactory.class,
 		SpotlessFormattersFactory.class,
+
+		// OpenRewrite is disabled for now, as it leads to a JAR too big for AWS
 		OpenrewriteFormattersFactory.class,
 
 })

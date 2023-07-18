@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.junit.GitHubWireMockRule;
@@ -102,6 +103,7 @@ public class TestExecuteClean_Record_PushProtectedBranch extends AProcessLocally
 	IGithubAppFactory wireMockAppFactory;
 
 	// https://github.com/solven-eu/cleanthat-integrationtests/runs/12743433533
+	@Ignore("Disabled since we check the MarkplaceInstallation")
 	@Test
 	public void testProcessCleanEvent() throws IOException, JOSEException {
 		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent

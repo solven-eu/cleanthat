@@ -86,6 +86,7 @@ import eu.solven.cleanthat.utils.ResultOrError;
  *
  * @author Benoit Lacelle
  */
+@SuppressWarnings("PMD.GodClass")
 public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, ICleanthatGitRefsConstants {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 

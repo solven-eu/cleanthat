@@ -54,10 +54,18 @@
 			<artifactId>spotless</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- OpenRewrite is disabled for now, as it leads to a JAR too big for AWS -->
 		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>openrewrite</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- This dependency is quite large (regarding AWS Lambda .jar size restriction). -->
+					<groupId>com.ibm.icu</groupId>
+					<artifactId>icu4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- <dependency> -->

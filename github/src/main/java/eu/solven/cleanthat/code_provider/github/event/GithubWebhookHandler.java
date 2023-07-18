@@ -60,6 +60,8 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
 @SuppressWarnings("PMD.GodClass")
 public class GithubWebhookHandler implements IGithubWebhookHandler {
+	private static final String EOL = "\r\n";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
 
 	final IGithubAppFactory githubAppFactory;
@@ -106,8 +108,6 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 		GHMarketplacePurchase purchase = accountPlan.getMarketplacePurchase();
 		GHMarketplacePlan plan = purchase.getPlan();
 
-		String accountPlanName = plan.getName();
-
 		// https://github.com/marketplace/cleanthat/edit/plans
 		if ("retired".equals(plan.getState())) {
 			return Optional.of("This plan is retired");
@@ -115,6 +115,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 			return Optional.of("Not-managed plan state: " + plan.getState());
 		}
 
+		String accountPlanName = plan.getName();
 		if (ghRepository.isPrivate()) {
 			if (accountPlanName.contains("Private")) {
 				LOGGER.info("Accepting an event for a private account");
@@ -178,10 +179,10 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					GithubCheckRunManager.ifPresent(optCheckRun,
 							c -> c.update()
 									.add(new Output("You need to switch to a different market-plan plan",
-											optRejectedReason.get() + "\r\n"
+											optRejectedReason.get() + EOL
 													+ "See "
 													+ "https://github.com/marketplace/cleanthat/"
-													+ "\r\n"
+													+ EOL
 													+ "eventKey="
 													+ eventKey))
 									.create());
@@ -203,13 +204,13 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 					update.withConclusion(Conclusion.NEUTRAL)
 							.withStatus(Status.COMPLETED)
 							.add(new Output("Rejected due to branch or configuration",
-									optRejectedReason.get() + "\r\n" + "eventKey=" + eventKey));
+									optRejectedReason.get() + EOL + "eventKey=" + eventKey));
 				} else {
 					update
 							// Not completed as this is to be followed by the cleaning
 							.withStatus(Status.IN_PROGRESS)
 							.add(new Output("Checking is the branch is valid for cleaning",
-									"someSummary" + "\r\n" + "eventKey=" + eventKey));
+									"someSummary" + EOL + "eventKey=" + eventKey));
 				}
 				update.create();
 			});

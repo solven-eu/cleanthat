@@ -25,11 +25,16 @@
 			<artifactId>runnable</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
-				<!-- Scala is big, and it overweight the JAR. -->
+				<!-- Scala is big, and it overweight the JAR with respect to AWS constrains. -->
 				<!-- To be re-incroporated when each language is processed by its own Lambda -->
 				<exclusion>
 					<groupId>io.github.solven-eu.cleanthat</groupId>
 					<artifactId>scala</artifactId>
+				</exclusion>
+				<exclusion>
+					<!-- Scala is big, and it overweight the JAR with respect to AWS constrains. -->
+					<groupId>org.jetbrains.kotlin</groupId>
+					<artifactId>kotlin-compiler-embeddable</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

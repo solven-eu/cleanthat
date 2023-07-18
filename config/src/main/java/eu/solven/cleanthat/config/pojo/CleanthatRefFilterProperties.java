@@ -68,18 +68,8 @@ public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 	@Setter(AccessLevel.NONE)
 	private List<String> excludedPatterns = ImmutableList.of(BRANCHES_PREFIX + "release/" + "*");
 
-	/**
-	 * 
-	 * @param protectedPatterns
-	 *            the branches-patterns considered as protected. These branches should never be cleaned by themselves,
-	 *            but only through RR.
-	 * 
-	 *            A pattern is prefixed by 'refs/heads' if not prefixed by 'refs/'.
-	 * 
-	 *            The pattern is later tested with java {@link Pattern#matches(String, CharSequence)}
-	 */
-	public void setProtectedPatterns(List<String> protectedPatterns) {
-		this.protectedPatterns = protectedPatterns.stream().map(branch -> {
+	private ImmutableList<String> cleanRefs(List<String> protectedPatterns) {
+		return protectedPatterns.stream().map(branch -> {
 			if (!branch.startsWith(REFS_PREFIX)) {
 				var qualifiedRef = BRANCHES_PREFIX + branch;
 				LOGGER.debug("We qualify {} into {} (i.e. we supposed it is a branch name)", branch, qualifiedRef);
@@ -93,18 +83,21 @@ public final class CleanthatRefFilterProperties implements IGitRefsConstants {
 		}).distinct().collect(ImmutableList.toImmutableList());
 	}
 
+	/**
+	 * 
+	 * @param protectedPatterns
+	 *            the branches-patterns considered as protected. These branches should never be cleaned by themselves,
+	 *            but only through RR.
+	 * 
+	 *            A pattern is prefixed by 'refs/heads' if not prefixed by 'refs/'.
+	 * 
+	 *            The pattern is later tested with java {@link Pattern#matches(String, CharSequence)}
+	 */
+	public void setProtectedPatterns(List<String> protectedPatterns) {
+		this.protectedPatterns = cleanRefs(protectedPatterns);
+	}
+
 	public void setExcludedPatterns(List<String> excludedPatterns) {
-		this.excludedPatterns = excludedPatterns.stream().map(branch -> {
-			if (!branch.startsWith(REFS_PREFIX)) {
-				var qualifiedRef = BRANCHES_PREFIX + branch;
-				LOGGER.debug("We qualify {} into {} (i.e. we supposed it is a branch name)", branch, qualifiedRef);
-				return qualifiedRef;
-			} else {
-				if (!branch.startsWith(BRANCHES_PREFIX)) {
-					LOGGER.warn("Unusual protected ref: {}", branch);
-				}
-				return branch;
-			}
-		}).distinct().collect(ImmutableList.toImmutableList());
+		this.excludedPatterns = cleanRefs(excludedPatterns);
 	}
 }

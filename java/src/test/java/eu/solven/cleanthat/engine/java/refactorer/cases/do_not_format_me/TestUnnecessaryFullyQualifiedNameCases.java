@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Ignore;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
@@ -101,5 +102,37 @@ public class TestUnnecessaryFullyQualifiedNameCases extends AJavaparserRefactore
 		public Object pre(java.util.Map<?, ?> m) {
 			return m;
 		}
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "package some.pkg;\n" + "\n"
+					+ "import java.util.Map;\n"
+					+ "\n"
+					+ "class SomeClass {\n"
+					+ "  java.util.Map.Entry<?,?> e = null;"
+					+ "}",
+			post = "package some.pkg;\n" + "\n"
+					+ "import java.util.Map;\n"
+					+ "\n"
+					+ "class SomeClass {\n"
+					+ "  Map.Entry<?,?> e = null;"
+					+ "}")
+	public static class CaseAnonymousClass_ImportRootClass {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "package some.pkg;\n" + "\n"
+					+ "import java.util.*;\n"
+					+ "\n"
+					+ "class SomeClass {\n"
+					+ "  java.util.Map.Entry<?,?> e = null;"
+					+ "}",
+			post = "package some.pkg;\n" + "\n"
+					+ "import java.util.*;\n"
+					+ "\n"
+					+ "class SomeClass {\n"
+					+ "  Map.Entry<?,?> e = null;"
+					+ "}")
+	public static class CaseAnonymousClass_ImportRootClassPackage {
 	}
 }

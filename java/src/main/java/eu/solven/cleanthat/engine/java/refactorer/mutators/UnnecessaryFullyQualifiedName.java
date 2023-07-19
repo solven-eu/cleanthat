@@ -91,7 +91,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 		if (!(node instanceof NodeWithType)) {
 			return false;
 
-			// We can improve this by handling statis method calls
+			// We can improve this by handling static method calls
 			// if (!(node instanceof MethodCallExpr)) {
 			// return false;
 			// }
@@ -111,36 +111,42 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 		NodeWithType<?, ?> nodeWithType = (NodeWithType<?, ?>) node;
 		Type nodeType = nodeWithType.getType();
 
-		boolean doSimplifyType;
-
 		// https://stackoverflow.com/questions/51257256/why-dont-we-import-java-lang-package
+		Optional<String> optImportedPrefix;
 		if (nodeType.asString().startsWith("java.lang")) {
-			doSimplifyType = true;
+			optImportedPrefix = Optional.of("java.lang.*");
 		} else {
 			List<ImportDeclaration> imports = getImports(node);
 
 			Optional<ImportDeclaration> optMatchingImport = searchMatchingImport(imports, nodeWithType.getType());
-			if (optMatchingImport.isEmpty()) {
-				doSimplifyType = false;
-			} else {
-				doSimplifyType = true;
-			}
+
+			optImportedPrefix = optMatchingImport.map(id -> withAsterisk(id));
 		}
 
-		if (!doSimplifyType) {
+		if (optImportedPrefix.isEmpty()) {
 			return false;
 		}
 
-		var nodeTypeLastDot = nodeType.asString().lastIndexOf('.');
+		var nodeTypeLastDot = optImportedPrefix.get().lastIndexOf('.');
 		if (nodeTypeLastDot < 0) {
-			LOGGER.debug("Import without a '.' ?");
+			LOGGER.debug("Import without a '.' ?: {}", optImportedPrefix);
 			return false;
 		}
 
+		// `+1` to skip the dot
 		String newType = nodeWithType.getType().asString().substring(nodeTypeLastDot + 1);
 		nodeWithType.setType(newType);
 
 		return true;
+	}
+
+	private String withAsterisk(ImportDeclaration id) {
+		String importedName = id.getNameAsString();
+		if (id.isAsterisk()) {
+			return importedName + ".*";
+		} else {
+			return importedName;
+		}
 	}
 
 	private List<ImportDeclaration> getImports(Node node) {
@@ -161,11 +167,22 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 			var importedTypeOrPackage = i.getNameAsString();
 			var nodeTypeMayDiamond = type.asString();
 
+			String nodeTypeNoDiamond;
 			if (nodeTypeMayDiamond.indexOf('<') >= 0) {
-				nodeTypeMayDiamond = nodeTypeMayDiamond.substring(0, nodeTypeMayDiamond.indexOf('<'));
+				nodeTypeNoDiamond = nodeTypeMayDiamond.substring(0, nodeTypeMayDiamond.indexOf('<'));
+			} else {
+				nodeTypeNoDiamond = nodeTypeMayDiamond;
 			}
 
-			return importedTypeOrPackage.equals(nodeTypeMayDiamond);
+			if (nodeTypeNoDiamond.equals(importedTypeOrPackage)) {
+				// this is an exact match
+				return true;
+			} else if (nodeTypeNoDiamond.startsWith(importedTypeOrPackage + ".")) {
+				// this is an exact match
+				return true;
+			} else {
+				return false;
+			}
 		}).findFirst();
 	}
 }

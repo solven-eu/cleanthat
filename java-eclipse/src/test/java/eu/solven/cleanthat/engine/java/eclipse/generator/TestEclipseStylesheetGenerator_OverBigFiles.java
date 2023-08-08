@@ -65,7 +65,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 			Assertions.assertThat(defaultConfigs.entrySet()
 					.stream()
 					.filter(e -> e.getValue().equals(defaultConf.getOption()))
-					.map(java.util.Map.Entry::getKey)
+					.map(Map.Entry::getKey)
 					.findAny()
 					.get()).isEqualTo("google");
 		}
@@ -114,7 +114,7 @@ public class TestEclipseStylesheetGenerator_OverBigFiles {
 			Assertions.assertThat(defaultConfigs.entrySet()
 					.stream()
 					.filter(e -> e.getValue().equals(defaultConf.getOption()))
-					.map(java.util.Map.Entry::getKey)
+					.map(Map.Entry::getKey)
 					.findAny()
 					.get()).isEqualTo("default");
 		}

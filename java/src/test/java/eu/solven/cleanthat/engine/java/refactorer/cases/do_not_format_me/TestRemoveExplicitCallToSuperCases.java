@@ -116,4 +116,27 @@ public class TestRemoveExplicitCallToSuperCases extends AJavaparserRefactorerCas
 		}
 	}
 
+	@UnmodifiedInnerClass
+	public static class StandardExceptionConstructors {
+		public class Pre extends Exception {
+			private static final long serialVersionUID = 5838323818892271987L;
+
+			public Pre() {
+				super();
+			}
+
+			public Pre(String message, Throwable cause) {
+				super(message, cause);
+			}
+
+			protected Pre(String message) {
+				super(message);
+			}
+
+			public Pre(Throwable cause) {
+				super(cause);
+			}
+		}
+
+	}
 }

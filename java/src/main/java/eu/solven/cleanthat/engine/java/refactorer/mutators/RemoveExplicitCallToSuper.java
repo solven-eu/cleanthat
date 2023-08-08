@@ -29,6 +29,12 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  * Turns 'SomeClassWithConstructor(){super(); someMethod();}` into `SomeClassWithConstructor(){someMethod();}`.
  * 
  * This will also remove references to `this()` as same class empty constructor.
+ * 
+ * This will not remove `super();` if it is the only statement of a constructor, as it is considered better to have
+ * `super();` than an empty constructor. See `PMD.UncommentedEmptyConstructor`.
+ * 
+ * This mutator would contradict `PMD.CallSuperInConstructor`. See
+ * https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#callsuperinconstructor
  *
  * @author Benoit Lacelle
  */
@@ -78,10 +84,16 @@ public class RemoveExplicitCallToSuper extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		if (firstStatement.asExplicitConstructorInvocationStmt().getArguments().isEmpty()) {
-			return tryRemove(firstStatement);
+		if (!firstStatement.asExplicitConstructorInvocationStmt().getArguments().isEmpty()) {
+			return false;
 		}
 
-		return false;
+		if (body.getStatements().size() == 1) {
+			// We keep `super();` if it is the only statement, as it is generally considered better than having an empty
+			// constructor.
+			return false;
+		}
+
+		return tryRemove(firstStatement);
 	}
 }

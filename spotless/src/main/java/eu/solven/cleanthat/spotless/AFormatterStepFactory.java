@@ -62,6 +62,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
 // see com.diffplug.spotless.maven.FormatterFactory
 public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 
+	public static final String KEY_CONTENT = "content";
+
 	private static final Cache<String, File> CONTENT_TO_FILE =
 			CacheBuilder.newBuilder().maximumSize(IPepperMemoryConstants.KB).build();
 
@@ -210,19 +212,28 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 		String file = parameters.getCustomProperty(KEY_FILE, String.class);
 		String content;
 		if (file != null) {
-			if (parameters.getCustomProperty("content", String.class) != null) {
+			if (parameters.getCustomProperty(KEY_CONTENT, String.class) != null) {
 				throw new IllegalArgumentException("Can not set both 'file' and 'content'");
 			}
 
 			var fileBytes = PepperResourceHelper.loadAsBinary(CleanthatUrlLoader.loadUrl(codeProvider, file));
 			content = new String(fileBytes, StandardCharsets.UTF_8);
 		} else {
-			content = parameters.getCustomProperty("content", String.class);
+			content = parameters.getCustomProperty(KEY_CONTENT, String.class);
 		}
 		// Enable with next Spotless version
 		// String skipLinesMatching = s.getCustomProperty("skipLinesMatching", String.class);
 
-		var yearMode = YearMode.PRESERVE;
+		// While the default mode in the step is PRESERVE
+		// https://github.com/diffplug/spotless/blob/main/lib/src/main/java/com/diffplug/spotless/generic/LicenseHeaderStep.java#L61
+		// mvn-plugin switches to UPDATE_TO_TODAY if there is a ratchetFrom
+		// https://github.com/diffplug/spotless/blob/main/plugin-maven/src/main/java/com/diffplug/spotless/maven/generic/LicenseHeader.java#L55
+		// As most of cleanthat work is done in comparison with some base branch, we are implicitly with a ratchetFrom
+		// parameter
+		// Hence, `UPDATE_TO_TODAY` seems the most relevant option
+		// TODO Add an option through configuration?
+		var yearMode = YearMode.UPDATE_TO_TODAY;
+
 		return LicenseHeaderStep.headerDelimiter(() -> content, delimiter)
 				.withYearMode(yearMode)
 				// .withSkipLinesMatching(skipLinesMatching)

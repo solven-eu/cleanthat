@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-lambda-java-core</artifactId>
-			<version>1.2.2</version>
+			<version>1.2.3</version>
 			<!-- TODO Why provided? -->
 			<scope>provided</scope>
 		</dependency>

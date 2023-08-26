@@ -48,7 +48,7 @@
 			<!-- https://github-api.kohsuke.org/ -->
 			<groupId>org.kohsuke</groupId>
 			<artifactId>github-api</artifactId>
-			<version>1.315</version>
+			<version>1.316</version>
 			<!--			<version>1.315-SNAPSHOT</version>-->
 		</dependency>
 		<dependency>

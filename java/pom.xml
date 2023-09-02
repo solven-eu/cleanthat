@@ -35,7 +35,7 @@
 			<!-- JavaParser seems a better option to later handle more languages -->
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-symbol-solver-core</artifactId>
-			<version>3.25.4</version>
+			<version>3.25.5</version>
 		</dependency>
 
 		<dependency>

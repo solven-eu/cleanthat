@@ -79,7 +79,7 @@
 			<!-- Needed to serialization from a Map into a String for JWT -->
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.11.5</version>
+			<version>0.12.2</version>
 		</dependency>
 
 		<dependency>

@@ -59,7 +59,7 @@
 		<release.suffix>RELEASE</release.suffix>
 
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
-		<jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
 		<sentry-spring.version>6.31.0</sentry-spring.version>
 		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2021.0.8</spring-cloud.version>

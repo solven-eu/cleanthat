@@ -63,7 +63,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
 		<maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
-		<checkstyle.version>10.12.4</checkstyle.version>
+		<checkstyle.version>10.12.5</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
 		<license-maven-plugin.version>4.3</license-maven-plugin.version>
 

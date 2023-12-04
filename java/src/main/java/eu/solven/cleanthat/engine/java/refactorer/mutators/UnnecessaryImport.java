@@ -65,7 +65,7 @@ public class UnnecessaryImport extends AJavaparserNodeMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("ExplicitToImplicit");
+		return ImmutableSet.of("ExplicitToImplicit", "Import");
 	}
 
 	@Override

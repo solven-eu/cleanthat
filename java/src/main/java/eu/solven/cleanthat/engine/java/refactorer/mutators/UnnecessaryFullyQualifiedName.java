@@ -35,7 +35,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
- * Turns 'java.lang.String' into 'String'
+ * Turns 'java.lang.String' into 'String' if already imported. See `UnnecessaryFullyQualifiedName` for a mutator adding
+ * proper imports automatically.
  *
  * @author Benoit Lacelle
  */

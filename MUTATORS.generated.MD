@@ -354,6 +354,14 @@ isDraft
 
 languageLevel: jdk11
 
+### [ImportQualifiedTokens](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ImportQualifiedTokens.java)
+
+Cleanthat own ID: ImportQualifiedTokens
+
+isDraft
+
+languageLevel: jdk1
+
 ### [JUnit4ToJUnit5](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/JUnit4ToJUnit5.java)
 
 Cleanthat own ID: JUnit4ToJUnit5

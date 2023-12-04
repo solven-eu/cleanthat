@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
+import org.mockito.Mockito;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -133,6 +135,16 @@ public class TestLambdaReturnsSingleStatementCases extends AJavaparserRefactorer
 		public Consumer<Integer> post() {
 			// inner comment
 			return x -> System.out.println(x + 1);
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseWithComment_2 {
+		public void pre(Stream<String> stream) {
+			stream.forEach(accountId -> {
+				// inner comment
+				System.out.println(accountId);
+			});
 		}
 	}
 }

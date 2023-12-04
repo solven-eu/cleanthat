@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubCodeProvider;
 import eu.solven.cleanthat.code_provider.github.code_provider.FileIsTooBigException;
@@ -56,6 +57,7 @@ public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implem
 
 	final Supplier<GHCompare> diffSupplier;
 
+	@SuppressFBWarnings(value = "CT_CONSTRUCTOR_THROW", justification = "Unclear FB case")
 	public AGithubDiffCodeProvider(Path repositoryRoot, String token, GHRepository baseRepository) {
 		super(repositoryRoot);
 		this.token = token;

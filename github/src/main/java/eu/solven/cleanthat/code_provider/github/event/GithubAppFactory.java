@@ -43,6 +43,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.impl.RSAKeyUtils;
 import com.nimbusds.jose.jwk.RSAKey;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.utils.ResultOrError;
 import okhttp3.OkHttpClient;
@@ -53,6 +54,8 @@ import okhttp3.OkHttpClient;
  * @author Benoit Lacelle
  *
  */
+// https://github.com/spotbugs/spotbugs/issues/2695
+@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 public class GithubAppFactory implements IGithubAppFactory {
 	private static final int PUBLIC_CHARS_IN_TOKEN = 10;
 
@@ -108,7 +111,7 @@ public class GithubAppFactory implements IGithubAppFactory {
 				.build();
 	}
 
-	protected GitHub makeInstallationGithub(GitHub github, String appToken) throws IOException {
+	private GitHub makeInstallationGithub(GitHub github, String appToken) throws IOException {
 		GitHubConnector ghConnector = createGithubConnector();
 		return new GitHubBuilder().withEndpoint(github.getApiUrl())
 				.withAppInstallationToken(appToken)

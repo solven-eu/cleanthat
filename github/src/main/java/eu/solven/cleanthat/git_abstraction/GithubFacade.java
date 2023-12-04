@@ -36,7 +36,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
  * @author Benoit Lacelle
  *
  */
-public class GithubFacade {
+public final class GithubFacade {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubFacade.class);
 
 	final GitHub github;

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.jimfs.Jimfs;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
@@ -58,6 +59,8 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 	final Path root;
 	final Charset charset;
 
+	@SuppressFBWarnings(value = "CT_CONSTRUCTOR_THROW",
+			justification = "We need to derive this class in FileSystemGitCodeProvider")
 	public FileSystemCodeProvider(Path root, Charset charset) {
 		this.fs = root.getFileSystem();
 		this.root = root.normalize();
@@ -131,7 +134,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		return root.toAbsolutePath().toString();
 	}
 
-	protected Path resolvePath(Path inMemoryPath) {
+	private Path resolvePath(Path inMemoryPath) {
 		return CleanthatPathHelpers.resolveChild(root, inMemoryPath);
 	}
 
@@ -171,7 +174,7 @@ public class FileSystemCodeProvider implements ICodeProviderWriter {
 		return safeReadString(pathForRootFS);
 	}
 
-	protected Optional<String> safeReadString(Path pathForRootFS) throws IOException {
+	private Optional<String> safeReadString(Path pathForRootFS) throws IOException {
 		if (Files.exists(pathForRootFS)) {
 			String asString;
 			try {

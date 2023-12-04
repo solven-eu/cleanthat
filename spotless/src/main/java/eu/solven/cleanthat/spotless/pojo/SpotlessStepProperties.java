@@ -36,7 +36,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 // @JsonDeserialize(converter = SpotlessStepPropertiesSanitizer.class)
-public class SpotlessStepProperties {
+public final class SpotlessStepProperties {
 
 	// the step name/id
 	@lombok.NonNull

@@ -25,7 +25,7 @@ import eu.solven.cleanthat.github.IGitRefsConstants;
  *
  */
 // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#webhook-payload-example-32
-public class GitRepoBranchSha1 {
+public final class GitRepoBranchSha1 {
 	final String repoName;
 	final String ref;
 	final String sha;

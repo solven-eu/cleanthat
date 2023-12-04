@@ -25,7 +25,7 @@ import java.util.Optional;
  * @param <R>
  * @param <E>
  */
-public class ResultOrError<R, E> {
+public final class ResultOrError<R, E> {
 	final Optional<R> optResult;
 	final Optional<E> optError;
 

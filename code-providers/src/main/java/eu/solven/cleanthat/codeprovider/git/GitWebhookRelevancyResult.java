@@ -23,7 +23,7 @@ import java.util.Optional;
  * @author Benoit Lacelle
  *
  */
-public class GitWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
+public final class GitWebhookRelevancyResult implements IExternalWebhookRelevancyResult {
 	final boolean rrOpen;
 	final boolean pushRef;
 	final Optional<GitRepoBranchSha1> optRef;

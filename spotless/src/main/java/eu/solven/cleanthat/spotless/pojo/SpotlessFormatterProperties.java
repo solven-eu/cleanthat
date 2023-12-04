@@ -39,7 +39,7 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Builder
 @Jacksonized
-public class SpotlessFormatterProperties {
+public final class SpotlessFormatterProperties {
 	// If left to default, we will rely on the engine encoding
 	private String encoding;
 

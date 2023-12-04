@@ -25,7 +25,7 @@ import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
  * @author Benoit Lacelle
  *
  */
-public class DummyCodeProviderFile implements ICodeProviderFile {
+public final class DummyCodeProviderFile implements ICodeProviderFile {
 	private final Path path;
 	private final Object raw;
 

@@ -59,7 +59,7 @@ import eu.solven.pepper.logging.PepperLogHelper;
  */
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
 @SuppressWarnings("PMD.GodClass")
-public class GithubWebhookHandler implements IGithubWebhookHandler {
+public final class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final String EOL = "\r\n";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
@@ -100,7 +100,7 @@ public class GithubWebhookHandler implements IGithubWebhookHandler {
 	 * @return an {@link Optional} rejection reason
 	 * @throws IOException
 	 */
-	protected Optional<String> checkMarketPlacePlan(GHAppInstallation appInstallation, GHRepository ghRepository)
+	private Optional<String> checkMarketPlacePlan(GHAppInstallation appInstallation, GHRepository ghRepository)
 			throws IOException {
 		// https://github.com/hub4j/github-api/issues/1613
 		GHMarketplaceAccount account = appInstallation.getMarketplaceAccount();

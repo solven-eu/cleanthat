@@ -51,6 +51,10 @@ public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
 	 */
 	protected Encoder<ILoggingEvent> encoder;
 
+	public void setEncoder(Encoder<ILoggingEvent> encoder) {
+		this.encoder = encoder;
+	}
+
 	@Override
 	protected void append(ILoggingEvent event) {
 		byte[] byteArray = this.encoder.encode(event);

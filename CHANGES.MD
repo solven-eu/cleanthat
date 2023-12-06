@@ -12,6 +12,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 ### Fixed
 
 * `UnnecessaryFullyQualifiedName` now handle FullyQualifiedName on anonymous/nested classes when the nesting class is imported.
+* `ModifierOrder` should not crash on use of `sealed` keyword (JDK17, https://github.com/solven-eu/cleanthat/issues/713).
 
 ### Changes
 

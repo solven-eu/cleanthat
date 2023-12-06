@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
@@ -39,6 +40,8 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  * Order modifiers according the the Java specification.
  *
  * @author Benoit Lacelle
+ * @see https://github.com/checkstyle/checkstyle/blob/master/src/xdocs/checks/modifier/modifierorder.xml
+ * @see
  */
 public class ModifierOrder extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
@@ -49,6 +52,8 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 			"abstract",
 			"default",
 			"static",
+			"sealed",
+			"non-sealed",
 			"final",
 			"transient",
 			"volatile",
@@ -120,16 +125,33 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 			var changed = areSameReferences(modifiers, mutableModifiers);
 
 			if (changed) {
-				// https://github.com/javaparser/javaparser/issues/3935
-				nodeWithModifiers.setModifiers();
-
-				LOGGER.debug("We fixed the ordering of modifiers");
-				nodeWithModifiers.setModifiers(mutableModifiers);
-				return true;
+				return applyModifiers(nodeWithModifiers, modifiers, mutableModifiers);
 			}
 		}
 
 		return false;
+	}
+
+	private boolean applyModifiers(NodeWithModifiers<?> nodeWithModifiers,
+			NodeList<Modifier> originalModifiers,
+			NodeList<Modifier> sortedModifiers) {
+		if (sortedModifiers.stream()
+				.map(m -> m.getKeyword())
+				.anyMatch(m -> m == Keyword.SEALED || m == Keyword.NON_SEALED)) {
+			LOGGER.warn("We do not re-order {} into {} due to {}",
+					originalModifiers,
+					sortedModifiers,
+					"https://github.com/javaparser/javaparser/issues/4245");
+			return false;
+		}
+
+		// https://github.com/javaparser/javaparser/issues/3935
+		nodeWithModifiers.setModifiers();
+
+		LOGGER.debug("We fixed the ordering of modifiers");
+		nodeWithModifiers.setModifiers(sortedModifiers);
+
+		return true;
 	}
 
 	@SuppressWarnings("PMD.CompareObjectsWithEquals")

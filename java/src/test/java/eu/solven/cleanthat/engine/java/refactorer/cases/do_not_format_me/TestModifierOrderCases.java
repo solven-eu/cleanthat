@@ -1,8 +1,11 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import org.junit.jupiter.api.Disabled;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -59,7 +62,7 @@ public class TestModifierOrderCases extends AJavaparserRefactorerCases {
 		public Object post() {
 			return new Object() {
 				@SuppressWarnings("unused")
-	   protected final synchronized void staticMethod() {
+				protected final synchronized void staticMethod() {
 					// Empty
 				}
 			};
@@ -78,19 +81,18 @@ public class TestModifierOrderCases extends AJavaparserRefactorerCases {
 	}
 
 	// https://github.com/javaparser/javaparser/issues/3935
-	@CompareCompilationUnitsAsStrings(pre = "package org.eclipse.mat.snapshot.model;\n"
-			+ "\n"
-			+ "import java.io.Serializable;\n"
-			+ "\n"
-			+ "import org.eclipse.mat.internal.Messages;\n"
-			+ "\n"
-			+ "abstract public class GCRootInfo implements Serializable {\n"
-			+ "	private static final long serialVersionUID = 2L;\n"
-			+ "\n"
-			+ "}\n"
-			+ "",
-			post = "package org.eclipse.mat.snapshot.model;\n"
+	@CompareCompilationUnitsAsStrings(
+			pre = "package org.eclipse.mat.snapshot.model;\n" + "\n"
+					+ "import java.io.Serializable;\n"
 					+ "\n"
+					+ "import org.eclipse.mat.internal.Messages;\n"
+					+ "\n"
+					+ "abstract public class GCRootInfo implements Serializable {\n"
+					+ "	private static final long serialVersionUID = 2L;\n"
+					+ "\n"
+					+ "}\n"
+					+ "",
+			post = "package org.eclipse.mat.snapshot.model;\n" + "\n"
 					+ "import java.io.Serializable;\n"
 					+ "\n"
 					+ "import org.eclipse.mat.internal.Messages;\n"
@@ -98,8 +100,20 @@ public class TestModifierOrderCases extends AJavaparserRefactorerCases {
 					+ "public abstract class GCRootInfo implements Serializable {\n"
 					+ "	private static final long serialVersionUID = 2L;\n"
 					+ "\n"
-					+ "}\n"
-					+ "")
+					+ "}\n")
 	public static class Issue_MissingWhitespaceAfterLastModifier {
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/713
+	@UnmodifiedCompilationUnitAsString(
+			pre = "public sealed interface IUpdatePortCommand permits UpdateScheduleCommand, UpdateStateCommand {}")
+	public static class Issue_SealedClass_rightOrder {
+	}
+
+	// https://github.com/javaparser/javaparser/issues/4245
+	@UnmodifiedCompilationUnitAsString(
+			pre = "sealed public interface IUpdatePortCommand permits UpdateScheduleCommand, UpdateStateCommand {}",
+			post = "public sealed interface IUpdatePortCommand permits UpdateScheduleCommand, UpdateStateCommand {}")
+	public static class Issue_SealedClass_wrongOrder {
 	}
 }

@@ -35,8 +35,12 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
- * Turns 'java.lang.String' into 'String' if already imported. See `UnnecessaryFullyQualifiedName` for a mutator adding
- * proper imports automatically.
+ * This will remove unnecessary fully qualified type reference, typically because given type if imported.
+ * 
+ * For instance, it will turns 'java.lang.String' into 'String' as `java.lang` is already imported.
+ * 
+ * It assumes there is no class in current package with same name as some class in a wildcard imported package
+ * (especially `java.lang`). (e.g. https://www.baeldung.com/java-classes-same-name)
  *
  * @author Benoit Lacelle
  */
@@ -92,7 +96,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 		if (!(node instanceof NodeWithType)) {
 			return false;
 
-			// We can improve this by handling static method calls
+			// We can improve this mutator by handling static method calls
 			// if (!(node instanceof MethodCallExpr)) {
 			// return false;
 			// }
@@ -112,14 +116,21 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 		NodeWithType<?, ?> nodeWithType = (NodeWithType<?, ?>) node;
 		Type nodeType = nodeWithType.getType();
 
+		String nodeTypeAsString = nodeType.asString();
+
 		// https://stackoverflow.com/questions/51257256/why-dont-we-import-java-lang-package
 		Optional<String> optImportedPrefix;
-		if (nodeType.asString().startsWith("java.lang")) {
+
+		if (nodeTypeAsString.indexOf('.') <= 0) {
+			// Current node type can not be simplified (either reference to imported type, or to type in current+default
+			// package)
+			return false;
+		} else if (nodeTypeAsString.startsWith("java.lang.")) {
 			optImportedPrefix = Optional.of("java.lang.*");
 		} else {
 			List<ImportDeclaration> imports = getImports(node);
 
-			Optional<ImportDeclaration> optMatchingImport = searchMatchingImport(imports, nodeWithType.getType());
+			Optional<ImportDeclaration> optMatchingImport = searchMatchingImport(imports, nodeType);
 
 			optImportedPrefix = optMatchingImport.map(id -> withAsterisk(id));
 		}
@@ -134,8 +145,13 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 			return false;
 		}
 
+		if (!nodeTypeAsString.startsWith(optImportedPrefix.get().substring(0, nodeTypeLastDot))) {
+			throw new IllegalStateException(
+					"We computed `" + nodeTypeAsString + "` should be imported by `" + optImportedPrefix.get() + "`");
+		}
+
 		// `+1` to skip the dot
-		String newType = nodeWithType.getType().asString().substring(nodeTypeLastDot + 1);
+		String newType = nodeTypeAsString.substring(nodeTypeLastDot + 1);
 		nodeWithType.setType(newType);
 
 		return true;

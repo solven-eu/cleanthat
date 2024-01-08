@@ -28,9 +28,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
- * Turns `optional.map(name -> name)`
- * 
- * into `optional`
+ * Turns `optional.map(name -> name)` into `optional`
  *
  * @author Benoit Lacelle
  */

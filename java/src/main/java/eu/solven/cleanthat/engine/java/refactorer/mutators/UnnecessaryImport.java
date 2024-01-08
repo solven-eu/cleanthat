@@ -45,12 +45,13 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
- * Remove imports from a Java source file by analyzing {@link ImportDeclaration}.
+ * Remove unnecessary imports by analyzing {@link ImportDeclaration} and used tokens in current `.java` file.
  * <p>
  * More precisely, it will analyze each Tokens being used in the code-base, and remove imports not matching given
  * import.
  * <p>
- * One limitation is it will not strip away wildcard imports.
+ * One limitation is it will not strip away wildcard imports, as cleanthat does not process the classes available to the
+ * classloader.
  *
  * @author Benoit Lacelle
  */

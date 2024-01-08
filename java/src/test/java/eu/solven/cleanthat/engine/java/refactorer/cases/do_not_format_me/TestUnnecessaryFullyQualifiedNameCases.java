@@ -135,4 +135,17 @@ public class TestUnnecessaryFullyQualifiedNameCases extends AJavaparserRefactore
 					+ "}")
 	public static class CaseAnonymousClass_ImportRootClassPackage {
 	}
+
+	@UnmodifiedMethod
+	@Ignore("TODO This case demonstrate a large range of not working cases (based on developper bad-practises")
+	public static class NotARealLongType {
+		public static class Long {
+			boolean notARealLong = true;
+		}
+
+		// The reference to qualified type is to be kept as there is a conflicting type
+		public Object pre(java.lang.Long l) {
+			return l;
+		}
+	}
 }

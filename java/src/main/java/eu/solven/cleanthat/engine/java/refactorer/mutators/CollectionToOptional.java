@@ -36,7 +36,8 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 public class CollectionToOptional extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
-		return IJdkVersionConstants.JDK_2;
+		// Optional and Stream has been introduced with JDK8
+		return IJdkVersionConstants.JDK_8;
 	}
 
 	@Override
@@ -52,20 +53,20 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 
 		var conditionalExpr = expr.getNode().asConditionalExpr();
 
-		var conditionExpr = conditionalExpr.getCondition();
+		var ifExpr = conditionalExpr.getCondition();
 		var thenExpr = conditionalExpr.getThenExpr();
 		var elseExpr = conditionalExpr.getElseExpr();
 
-		if (!conditionExpr.isMethodCallExpr() || !thenExpr.isMethodCallExpr() || !elseExpr.isMethodCallExpr()) {
+		if (!ifExpr.isMethodCallExpr() || !thenExpr.isMethodCallExpr() || !elseExpr.isMethodCallExpr()) {
 			return false;
 		}
 
-		var conditionMethod = conditionExpr.asMethodCallExpr();
+		var ifMethod = ifExpr.asMethodCallExpr();
 		var thenMethod = thenExpr.asMethodCallExpr();
 		var elseMethod = elseExpr.asMethodCallExpr();
 
-		if (!"isEmpty".equals(conditionMethod.getNameAsString())
-				|| !MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(conditionMethod.getScope()), List.class)) {
+		if (!"isEmpty".equals(ifMethod.getNameAsString())
+				|| !MethodCallExprHelpers.scopeHasRequiredType(expr.editNode(ifMethod.getScope()), List.class)) {
 			return false;
 		} else if (!"Optional.empty()".equals(thenMethod.toString()) || !hasImported(expr, "java.util.Optional")) {
 			return false;
@@ -75,7 +76,7 @@ public class CollectionToOptional extends AJavaparserExprMutator {
 		}
 
 		return tryReplace(expr.getNode(),
-				new MethodCallExpr(new MethodCallExpr(conditionMethod.getScope().get(), "stream"), "findFirst"));
+				new MethodCallExpr(new MethodCallExpr(ifMethod.getScope().get(), "stream"), "findFirst"));
 	}
 
 	private boolean hasImported(NodeAndSymbolSolver<Expression> expr, String imported) {

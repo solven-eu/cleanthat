@@ -21,10 +21,8 @@
 
 ## Draft
 
-- [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
-- [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 - [CastMathOperandsBeforeAssignement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CastMathOperandsBeforeAssignement.java)
 - [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
@@ -304,7 +302,6 @@
 ## With JDK 1.2
 
 - [CollectionIndexOfToContains](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionIndexOfToContains.java)
-- [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 - [RemoveAllToClearCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveAllToClearCollection.java)
 - [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)
 
@@ -334,6 +331,7 @@
 ## With JDK 1.8
 
 - [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
+- [CollectionToOptional](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CollectionToOptional.java)
 - [ForEachAddToStreamCollectToCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachAddToStreamCollectToCollection.java)
 - [ForEachIfBreakElseToStreamTakeWhile](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakElseToStreamTakeWhile.java)
 - [ForEachIfBreakToStreamFindFirst](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ForEachIfBreakToStreamFindFirst.java)

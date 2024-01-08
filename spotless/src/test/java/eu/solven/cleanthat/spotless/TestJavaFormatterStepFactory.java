@@ -16,6 +16,7 @@
 package eu.solven.cleanthat.spotless;
 
 import java.nio.file.Files;
+import java.time.LocalDate;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -52,7 +53,8 @@ public class TestJavaFormatterStepFactory {
 		String formatted = licenseHeader.format("package somePackage;", tmpFile);
 
 		Assertions.assertThat(formatted)
-				.containsSubsequence("// someHeaderPrefix 2023 someHeaderSuffix", "package somePackage;");
+				.containsSubsequence("// someHeaderPrefix " + LocalDate.now().getYear() + " someHeaderSuffix",
+						"package somePackage;");
 	}
 
 	@Test
@@ -70,7 +72,8 @@ public class TestJavaFormatterStepFactory {
 				licenseHeader.format("// someHeaderPrefix 1985 someHeaderSuffix\r\npackage somePackage;", tmpFile);
 
 		Assertions.assertThat(formatted)
-				.containsSubsequence("// someHeaderPrefix 1985-2023 someHeaderSuffix", "package somePackage;");
+				.containsSubsequence("// someHeaderPrefix 1985-" + LocalDate.now().getYear() + " someHeaderSuffix",
+						"package somePackage;");
 	}
 
 	@Test
@@ -88,6 +91,7 @@ public class TestJavaFormatterStepFactory {
 				licenseHeader.format("// someHeaderPrefix 1985-2000 someHeaderSuffix\r\npackage somePackage;", tmpFile);
 
 		Assertions.assertThat(formatted)
-				.containsSubsequence("// someHeaderPrefix 1985-2023 someHeaderSuffix", "package somePackage;");
+				.containsSubsequence("// someHeaderPrefix 1985-" + LocalDate.now().getYear() + " someHeaderSuffix",
+						"package somePackage;");
 	}
 }

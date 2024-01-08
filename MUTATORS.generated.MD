@@ -2,6 +2,16 @@
 
 ## Single Mutators PRD-READY
 
+### [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
+
+Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
+
+jSparrow: [ArithmethicAssignment](https://jsparrow.github.io/rules/arithmethic-assignment.html)
+
+Cleanthat own ID: ArithmethicAssignment
+
+languageLevel: jdk1
+
 ### [ArraysDotStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArraysDotStream.java)
 
 Sonar: [RSPEC-3631](https://rules.sonarsource.com/java/RSPEC-3631)
@@ -19,6 +29,18 @@ CheckStyle: [AvoidInlineConditionals](https://checkstyle.sourceforge.io/config_c
 Sonar: [RSPEC-3358](https://rules.sonarsource.com/java/RSPEC-3358)
 
 Cleanthat own ID: AvoidInlineConditionals
+
+languageLevel: jdk1
+
+### [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
+
+PMD: [AvoidMultipleUnaryOperators](https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators)
+
+Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
+
+jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
+
+Cleanthat own ID: AvoidMultipleUnaryOperators
 
 languageLevel: jdk1
 
@@ -174,18 +196,6 @@ languageLevel: jdk1.7
 
 ## Single Mutators (DRAFTs)
 
-### [ArithmethicAssignment](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmethicAssignment.java)
-
-Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
-
-jSparrow: [ArithmethicAssignment](https://jsparrow.github.io/rules/arithmethic-assignment.html)
-
-Cleanthat own ID: ArithmethicAssignment
-
-isDraft
-
-languageLevel: jdk1
-
 ### [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 
 Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)
@@ -205,20 +215,6 @@ Cleanthat own ID: AvoidFileStream
 isDraft
 
 languageLevel: jdk1.7
-
-### [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
-
-PMD: [AvoidMultipleUnaryOperators](http://adangel.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators)
-
-Sonar: [RSPEC-2761](https://rules.sonarsource.com/java/RSPEC-2761)
-
-jSparrow: [RemoveDoubleNegation](https://jsparrow.github.io/rules/remove-double-negation.html)
-
-Cleanthat own ID: AvoidMultipleUnaryOperators
-
-isDraft
-
-languageLevel: jdk1
 
 ### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 
@@ -246,7 +242,7 @@ Cleanthat own ID: CollectionToOptional
 
 isDraft
 
-languageLevel: jdk1.2
+languageLevel: jdk1.8
 
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 

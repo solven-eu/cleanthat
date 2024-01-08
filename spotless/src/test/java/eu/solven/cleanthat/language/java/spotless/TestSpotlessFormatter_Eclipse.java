@@ -22,6 +22,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -161,7 +162,7 @@ public class TestSpotlessFormatter_Eclipse {
 				"",
 				"").collect(Collectors.joining(System.lineSeparator()));
 
-		var expectedCleaned = Stream.of("/* (C)2023 */",
+		var expectedCleaned = Stream.of("/* (C)" + LocalDate.now().getYear() + " */",
 				"package eu.solven.cleanthat.do_not_format_me;",
 				"",
 				"import java.time.LocalDate;",

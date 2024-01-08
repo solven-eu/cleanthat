@@ -151,7 +151,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 		}
 
 		// `+1` to skip the dot
-		String newType = nodeTypeAsString.substring(nodeTypeLastDot + 1);
+		var newType = nodeTypeAsString.substring(nodeTypeLastDot + 1);
 		nodeWithType.setType(newType);
 
 		return true;

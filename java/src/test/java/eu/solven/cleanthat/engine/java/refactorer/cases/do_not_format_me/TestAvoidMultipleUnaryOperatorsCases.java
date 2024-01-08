@@ -2,6 +2,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import org.junit.Ignore;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidMultipleUnaryOperators;
@@ -88,6 +89,18 @@ public class TestAvoidMultipleUnaryOperatorsCases extends AJavaparserRefactorerC
 
 		public int post(int i) {
 			return +i;
+		}
+	}
+
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class PlusMinusPlusInt {
+		public int pre(int i) {
+			return +-+i;
+		}
+
+		public int post(int i) {
+			return -i;
 		}
 	}
 

@@ -34,7 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
- * Turns 'i = i + 3;` into `i = i + (3 + 4);`
+ * Turns 'i = i + 3;` into `i += 3;`
  *
  * @author Benoit Lacelle
  */
@@ -71,6 +71,11 @@ public class ArithmethicAssignment extends AJavaparserExprMutator {
 	@Override
 	public Set<String> getTags() {
 		return ImmutableSet.of("Primitive");
+	}
+
+	@Override
+	public boolean isDraft() {
+		return false;
 	}
 
 	@Override

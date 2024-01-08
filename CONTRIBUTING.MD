@@ -58,3 +58,7 @@ Issue with Javadoc. For instance:
 - https://github.com/projectlombok/lombok/issues/2737
 
 > mvn org.apache.maven.plugins:maven-javadoc-plugin:3.4.1:jar -Dmaven.javadoc.skip=false -PSonatype
+
+# Note for Mutator contributors
+
+A given rule can be tested against a large set of codebases with https://github.com/solven-eu/cleanthat-showcases. See its README for more details

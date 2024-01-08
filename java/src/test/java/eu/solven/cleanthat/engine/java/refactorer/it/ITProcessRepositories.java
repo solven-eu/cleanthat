@@ -22,6 +22,8 @@ public class ITProcessRepositories {
 	static final String CHECKOUT = "/Users/blacelle/workspace3/cleanthat_checkouts";
 
 	public static void main(String[] args) {
+		System.out.println(System.getenv("USER"));
+
 		Stream.of("https://github.com/spring-projects/spring-boot", "https://github.com/openjdk/jdk")
 				.forEach(repoHumanUrl -> {
 					// new JGitCodeProv

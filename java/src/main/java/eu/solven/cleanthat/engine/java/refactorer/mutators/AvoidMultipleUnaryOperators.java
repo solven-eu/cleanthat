@@ -33,8 +33,16 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  * @author Benoit Lacelle
  */
 public class AvoidMultipleUnaryOperators extends AJavaparserExprMutator {
+	/**
+	 * List the operators which can be removed if doubled.
+	 */
 	private static final Set<Operator> REDUNDANT_IF_DOUBLED =
 			ImmutableSet.of(Operator.LOGICAL_COMPLEMENT, Operator.MINUS, Operator.PLUS, Operator.BITWISE_COMPLEMENT);
+
+	@Override
+	public boolean isDraft() {
+		return false;
+	}
 
 	@Override
 	public String minimalJavaVersion() {
@@ -53,7 +61,7 @@ public class AvoidMultipleUnaryOperators extends AJavaparserExprMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "http://adangel.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators";
+		return "https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#avoidmultipleunaryoperators";
 	}
 
 	@Override
@@ -89,6 +97,7 @@ public class AvoidMultipleUnaryOperators extends AJavaparserExprMutator {
 		UnaryExpr parentUnaryExpr = (UnaryExpr) unaryExpr.getParentNode().get();
 
 		if (parentUnaryExpr.getOperator() != unaryOperator) {
+			// The 2 consecutive operators are different
 			return false;
 		}
 

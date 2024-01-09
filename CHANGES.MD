@@ -8,6 +8,8 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 * `RemoveExplicitCallToSuper` now removes `super();` in constructor only if it is not the only statement.
 * Spotless licenseHeader default YearMode has been updated to `UPDATE_TO_TODAY`, as CleanThat generally behave as if `ratchetFrom` is the base branch
+* `UnnecessaryBoxing` is not draft anymore
+* `AvoidMultipleUnaryOperators` is not draft anymore
 
 ### Fixed
 

@@ -36,12 +36,19 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
- * Turns `Integer integer = Integer.valueOf(2)` into `Integer integer = 2`
+ * Turns `Integer i = Integer.valueOf(2)` into `Integer i = 2`
+ * 
+ * Turns `String i = Integer.valueOf(2).toString()` into `Integer i = Integer.toString(2)`
  *
  * @author Benoit Lacelle
  */
 public class UnnecessaryBoxing extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryBoxing.class);
+
+	@Override
+	public boolean isDraft() {
+		return false;
+	}
 
 	@Override
 	public String minimalJavaVersion() {
@@ -61,7 +68,7 @@ public class UnnecessaryBoxing extends AJavaparserNodeMutator {
 	@Override
 	public String pmdUrl() {
 		// "https://pmd.github.io/latest/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
-		return "https://docs.pmd-code.org/pmd-doc-7.0.0-SNAPSHOT/pmd_rules_java_codestyle.html#unnecessaryboxing";
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryboxing";
 	}
 
 	@Override

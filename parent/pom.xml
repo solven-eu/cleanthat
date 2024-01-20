@@ -53,7 +53,7 @@
 		<error-prone.version>2.24.1</error-prone.version>
 		<!-- 2.36.0 is broken due to https://github.com/diffplug/spotless/issues/1583 -->
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
-		<spotless.version>2.41.1</spotless.version>
+		<spotless.version>2.42.0</spotless.version>
 		<!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 		<spotbugs.version>4.8.2.0</spotbugs.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->

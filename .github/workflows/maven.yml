@@ -32,7 +32,7 @@ jobs:
         run: mvn install -PskipStyle,skipITs
       # https://app.codecov.io/gh/solven-eu/cleanthat/new
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
       - name: Spotless Check - Apply if failed
         continue-on-error: true
         # https://joht.github.io/johtizen/build/2022/01/20/github-actions-push-into-repository.html#example-1

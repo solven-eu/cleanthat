@@ -64,6 +64,7 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  */
 // see com.diffplug.spotless.maven.FormatterFactory
 public abstract class AFormatterStepFactory implements IFormatterStepConstants {
+	public static final String ID_TOGGLE_OFF_ON = "toggleOffOn";
 
 	public static final String KEY_CONTENT = "content";
 
@@ -139,14 +140,15 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 		SpotlessStepParametersProperties parameters = stepProperties.getParameters();
 
 		switch (stepName) {
-		case "toggleOffOn": {
+		case ID_TOGGLE_OFF_ON: {
 			// see ToggleOffOn
 			PipeStepPair pair = PipeStepPair.named(PipeStepPair.defaultToggleName())
 					.openClose(PipeStepPair.defaultToggleOff(), PipeStepPair.defaultToggleOn())
 					.buildPair();
 
 			return Optional.of(l -> {
-				l.set(0, pair.in());
+				// Open the toggleOffOn feature as first step
+				l.add(0, pair.in());
 				l.add(pair.out());
 			});
 		}

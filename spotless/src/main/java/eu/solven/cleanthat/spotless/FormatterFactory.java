@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -207,13 +208,25 @@ public class FormatterFactory {
 			Provisioner provisioner) {
 		List<FormatterStep> outputSteps = new ArrayList<>();
 
+		// We assume there is a single toggleOffOn
+		Optional<SpotlessStepProperties> optToggleOffOn = spotlessProperties.getSteps()
+				.stream()
+				.filter(s -> s.getId().equals(AFormatterStepFactory.ID_TOGGLE_OFF_ON))
+				.findFirst();
+
 		for (SpotlessStepProperties step : spotlessProperties.getSteps()) {
-			if (step.isSkip()) {
+			if (step.getId().equals(AFormatterStepFactory.ID_TOGGLE_OFF_ON)) {
+				// Process toggleOffOn as last step in order to be set as first and last steps
+				LOGGER.trace("{} will be processed as last step", AFormatterStepFactory.ID_TOGGLE_OFF_ON);
+				continue;
+			} else if (step.isSkip()) {
 				continue;
 			}
 
 			stepFactory.makeStep(step, provisioner).accept(outputSteps);
 		}
+
+		optToggleOffOn.ifPresent(toggleOffOn -> stepFactory.makeStep(toggleOffOn, provisioner));
 
 		return outputSteps;
 	}

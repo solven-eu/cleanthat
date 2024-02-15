@@ -211,11 +211,11 @@ public class FormatterFactory {
 		// We assume there is a single toggleOffOn
 		Optional<SpotlessStepProperties> optToggleOffOn = spotlessProperties.getSteps()
 				.stream()
-				.filter(s -> s.getId().equals(AFormatterStepFactory.ID_TOGGLE_OFF_ON))
+				.filter(s -> AFormatterStepFactory.ID_TOGGLE_OFF_ON.equals(s.getId()))
 				.findFirst();
 
 		for (SpotlessStepProperties step : spotlessProperties.getSteps()) {
-			if (step.getId().equals(AFormatterStepFactory.ID_TOGGLE_OFF_ON)) {
+			if (AFormatterStepFactory.ID_TOGGLE_OFF_ON.equals(step.getId())) {
 				// Process toggleOffOn as last step in order to be set as first and last steps
 				LOGGER.trace("{} will be processed as last step", AFormatterStepFactory.ID_TOGGLE_OFF_ON);
 				continue;

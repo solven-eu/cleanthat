@@ -178,6 +178,7 @@ public class ForEachAddToStreamCollectToCollection extends ARefactorConsecutiveS
 
 		var collectorLambda = new LambdaExpr(new NodeList<>(), objectCreationExpr);
 
+		// TODO Import `Collectors`
 		var toCollection =
 				new MethodCallExpr(new NameExpr("Collectors"), "toCollection", new NodeList<>(collectorLambda));
 

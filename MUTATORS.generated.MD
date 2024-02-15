@@ -142,6 +142,14 @@ Cleanthat own ID: StringToString
 
 languageLevel: jdk1
 
+### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
+
+Sonar: [RSPEC-1158](https://rules.sonarsource.com/java/RSPEC-1158)
+
+Cleanthat own ID: UnnecessaryBoxing
+
+languageLevel: jdk1.1
+
 ### [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 
 PMD: [UnnecessaryModifier](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarymodifier)
@@ -578,16 +586,6 @@ isDraft
 
 languageLevel: jdk1
 
-### [UnnecessaryBoxing](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryBoxing.java)
-
-Sonar: [RSPEC-1158](https://rules.sonarsource.com/java/RSPEC-1158)
-
-Cleanthat own ID: UnnecessaryBoxing
-
-isDraft
-
-languageLevel: jdk1.1
-
 ### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
 
 PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)
@@ -799,6 +797,14 @@ Cleanthat own ID: Stream
 isDraft
 
 languageLevel: jdk11
+
+### [UnsafeDueToGenerics](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/UnsafeDueToGenerics.java)
+
+Cleanthat own ID: UnsafeGenerics
+
+isDraft
+
+languageLevel: jdk1.8
 
 ---
 

@@ -40,7 +40,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.NameExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 
 /**
- * See EnhancedForLoopToStreamAnyMatchCases
+ * See TestForEachIfToIfStreamAnyMatchCases
  *
  * @author Benoit Lacelle
  */

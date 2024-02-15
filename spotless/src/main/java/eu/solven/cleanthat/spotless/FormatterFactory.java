@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +54,7 @@ import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
+import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -203,10 +205,16 @@ public class FormatterFactory {
 	private List<FormatterStep> buildSteps(AFormatterStepFactory stepFactory,
 			SpotlessFormatterProperties spotlessProperties,
 			Provisioner provisioner) {
-		return spotlessProperties.getSteps()
-				.stream()
-				.filter(s -> !s.isSkip())
-				.map(s -> stepFactory.makeStep(s, provisioner))
-				.collect(Collectors.toList());
+		List<FormatterStep> outputSteps = new ArrayList<>();
+
+		for (SpotlessStepProperties step : spotlessProperties.getSteps()) {
+			if (step.isSkip()) {
+				continue;
+			}
+
+			stepFactory.makeStep(step, provisioner).accept(outputSteps);
+		}
+
+		return outputSteps;
 	}
 }

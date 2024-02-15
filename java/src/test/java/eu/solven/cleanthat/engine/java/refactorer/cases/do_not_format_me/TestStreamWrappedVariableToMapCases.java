@@ -2,12 +2,17 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.junit.Ignore;
+
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
@@ -143,4 +148,40 @@ public class TestStreamWrappedVariableToMapCases extends AJavaparserRefactorerCa
 			});
 		}
 	}
+
+	@UnmodifiedMethod
+	public static class IssueIdempotency {
+		private char anonymize(Character c) {
+			return c;
+		}
+
+		public void pre(String input, StringBuilder output) {
+			input.chars().mapToObj(rawChar -> (char) rawChar).map(c -> anonymize(c)).forEach(anonymizedChar -> {
+				output.append(anonymizedChar);
+			});
+		}
+	}
+
+	@Ignore("We need to restore generics in the .map")
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class IssueWithGenerics {
+		List<? extends Map<String, ?>> pre(Map<String, ?> properties, List<Map<String, ?>> documentFields) {
+			return documentFields.stream().map(m -> {
+				Map<String, Object> enriched = new LinkedHashMap<>(m);
+
+				enriched.putAll(properties);
+
+				return enriched;
+			}).collect(Collectors.toList());
+		}
+
+		List<? extends Map<String, ?>> post(Map<String, ?> properties, List<Map<String, ?>> documentFields) {
+			return documentFields.stream().map(m -> new LinkedHashMap<String, Object>(m)).map(enriched -> {
+				enriched.putAll(properties);
+				return enriched;
+			}).collect(Collectors.toList());
+		}
+	}
+
 }

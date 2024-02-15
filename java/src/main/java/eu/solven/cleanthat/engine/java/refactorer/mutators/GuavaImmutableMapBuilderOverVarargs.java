@@ -50,6 +50,7 @@ public class GuavaImmutableMapBuilderOverVarargs extends AJavaparserExprMutator 
 	private static final int MINIMAL_ENTRY_TO_TRIGGER = 2;
 
 	// Broken due to https://github.com/javaparser/javaparser/issues/3976
+	// TODO This needs to detect when generics are necessary or not
 	private static final boolean CAN_MANAGE_GENERIC_TYPES = false;
 
 	@Override

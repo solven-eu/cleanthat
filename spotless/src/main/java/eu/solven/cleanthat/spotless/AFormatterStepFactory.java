@@ -25,9 +25,11 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.diffplug.spotless.FormatterStep;
@@ -38,6 +40,7 @@ import com.diffplug.spotless.generic.EndWithNewlineStep;
 import com.diffplug.spotless.generic.IndentStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep;
 import com.diffplug.spotless.generic.LicenseHeaderStep.YearMode;
+import com.diffplug.spotless.generic.PipeStepPair;
 import com.diffplug.spotless.generic.TrimTrailingWhitespaceStep;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
@@ -105,29 +108,53 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 		}
 	}
 
-	@SuppressWarnings("PMD.TooFewBranchesForASwitchStatement")
-	public FormatterStep makeStep(SpotlessStepProperties stepProperties, Provisioner provisioner) {
-		Optional<FormatterStep> commonStep = makeCommonStep(stepProperties, provisioner);
+	/**
+	 * 
+	 * @param stepProperties
+	 * @param provisioner
+	 * @return a {@link Consumer} of {@link List} of {@link FormatterStep} describing how current
+	 *         {@link SpotlessStepProperties} should impact such a {@link List}.
+	 */
+	public Consumer<List<FormatterStep>> makeStep(SpotlessStepProperties stepProperties, Provisioner provisioner) {
+		Optional<Consumer<List<FormatterStep>>> commonStep = makeCommonStep(stepProperties, provisioner);
 
-		return commonStep.orElseGet(() -> makeSpecializedStep(stepProperties, provisioner));
+		return commonStep.orElseGet(() -> {
+			FormatterStep formatterStep = makeSpecializedStep(stepProperties, provisioner);
+
+			return l -> l.add(formatterStep);
+		});
 	}
 
 	/**
+	 * This returns a {@link Optional} as unknown steps may be language-specific steps. This returns a {@link Consumer}
+	 * as some steps need specific position in the {@link List} of steps
 	 * 
 	 * @param stepProperties
 	 * @param provisioner
 	 * @return an {@link Optional} {@link FormatterStep} common to all {@link AFormatterStepFactory}
 	 */
-	protected Optional<FormatterStep> makeCommonStep(SpotlessStepProperties stepProperties, Provisioner provisioner) {
+	protected Optional<Consumer<List<FormatterStep>>> makeCommonStep(SpotlessStepProperties stepProperties,
+			Provisioner provisioner) {
 		String stepName = stepProperties.getId();
 		SpotlessStepParametersProperties parameters = stepProperties.getParameters();
 
 		switch (stepName) {
+		case "toggleOffOn": {
+			// see ToggleOffOn
+			PipeStepPair pair = PipeStepPair.named(PipeStepPair.defaultToggleName())
+					.openClose(PipeStepPair.defaultToggleOff(), PipeStepPair.defaultToggleOn())
+					.buildPair();
+
+			return Optional.of(l -> {
+				l.set(0, pair.in());
+				l.add(pair.out());
+			});
+		}
 		case "trimTrailingWhitespace": {
-			return Optional.of(TrimTrailingWhitespaceStep.create());
+			return Optional.of(l -> l.add(TrimTrailingWhitespaceStep.create()));
 		}
 		case "endWithNewline": {
-			return Optional.of(EndWithNewlineStep.create());
+			return Optional.of(l -> l.add(EndWithNewlineStep.create()));
 		}
 		case "indent": {
 			Integer spacesPerTab = parameters.getCustomProperty("spacesPerTab", Integer.class);
@@ -155,13 +182,13 @@ public abstract class AFormatterStepFactory implements IFormatterStepConstants {
 				throw new IllegalArgumentException("Must specify exactly one of 'spaces: true' or 'tabs: true'.");
 			}
 
-			return Optional.of(indentStep);
+			return Optional.of(l -> l.add(indentStep));
 		}
 		case "licenseHeader": {
-			return Optional.of(makeLicenseHeader(parameters));
+			return Optional.of(l -> l.add(makeLicenseHeader(parameters)));
 		}
 		case "eclipseWtp": {
-			return Optional.of(makeEclipseWtp(parameters, provisioner));
+			return Optional.of(l -> l.add(makeEclipseWtp(parameters, provisioner)));
 		}
 
 		default: {

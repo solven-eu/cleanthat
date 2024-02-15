@@ -2,6 +2,8 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import java.util.stream.IntStream;
 
+import org.junit.Ignore;
+
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
@@ -188,5 +190,21 @@ public class TestLoopIntRangeToIntStreamForEachCases extends AJavaparserRefactor
 					+ "}")
 	public static class IntStreamNotYetImported {
 
+	}
+
+	@Ignore("TODO Prevent the IntStream.forEach as `row` is not final as it is re-assigned")
+	@UnmodifiedMethod
+	public static class SomeVariableIsReAssignedHenceNotFinal {
+		void pre(boolean[][] matrix, int height, int width, Runnable r) {
+			boolean[] row = new boolean[width];
+			{
+				row = matrix[0];
+				for (int x = 0; x < width; ++x) {
+					if (row[x]) {
+						r.run();
+					}
+				}
+			}
+		}
 	}
 }

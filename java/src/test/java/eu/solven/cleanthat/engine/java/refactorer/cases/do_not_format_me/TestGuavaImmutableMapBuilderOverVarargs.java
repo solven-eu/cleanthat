@@ -7,13 +7,14 @@ import org.junit.Ignore;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaImmutableMapBuilderOverVarargs;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-public class TestGuavaImmutableMapBuilderInsteadOfVarargs extends AJavaparserRefactorerCases {
+public class TestGuavaImmutableMapBuilderOverVarargs extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserAstMutator getTransformer() {
 		return new GuavaImmutableMapBuilderOverVarargs();
@@ -74,8 +75,9 @@ public class TestGuavaImmutableMapBuilderInsteadOfVarargs extends AJavaparserRef
 		}
 	}
 
-	@Ignore("TODO")
+	@Ignore("It is turned to the incomplete `ImmutableMap.builder().put(\"k0\", 0).put(\"k1\", 1D).build();`")
 	@CompareMethods
+	@CaseNotYetImplemented
 	public static class WithGenerics_Wildcard {
 		public Map<String, ?> pre() {
 			return ImmutableMap.of("k0", 0, "k1", 1D);
@@ -86,8 +88,35 @@ public class TestGuavaImmutableMapBuilderInsteadOfVarargs extends AJavaparserRef
 		}
 	}
 
-	@Ignore("TODO")
+	@Ignore("It is turned to the incomplete `ImmutableMap.builder().put(\"k0\", 0).put(\"k1\", 1D).build();`")
 	@CompareMethods
+	@CaseNotYetImplemented
+	public static class WithGenerics_Explicit {
+		public Map<String, Object> pre() {
+			return ImmutableMap.of("k0", 0, "k1", 1D);
+		}
+
+		public Map<String, Object> post() {
+			return ImmutableMap.<String, Object>builder().put("k0", 0).put("k1", 1D).build();
+		}
+	}
+
+	@Ignore("It is turned to the incomplete `ImmutableMap.builder().put(\"k0\", 0).put(\"k1\", 1D).build();`")
+	@CompareMethods
+	@CaseNotYetImplemented
+	public static class WithoutGenerics {
+		public Map pre() {
+			return ImmutableMap.of("k0", 0, "k1", 1D);
+		}
+
+		public Map<String, Object> post() {
+			return ImmutableMap.<String, Object>builder().put("k0", 0).put("k1", 1D).build();
+		}
+	}
+
+	@Ignore("It is turned to the incomplete `ImmutableMap.builder().put(\"k0\", 0).put(\"k1\", 1D).build();`")
+	@CompareMethods
+	@CaseNotYetImplemented
 	public static class WithGenerics_Wildcard_inLambda {
 		public Map<Number, ?> pre() {
 			Supplier<Map<String, ?>> mapSupplier = () -> {

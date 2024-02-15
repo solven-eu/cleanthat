@@ -148,9 +148,10 @@ public class TestCleanThatInitMojoTest extends ACleanThatMojoTest {
 			SpotlessFormatterProperties formatter = spotlessConfigResource.getFormatters().get(0);
 			Assert.assertEquals("java", formatter.getFormat());
 
-			Assert.assertEquals(4, formatter.getSteps().size());
+			Assert.assertEquals(5, formatter.getSteps().size());
 
-			Assert.assertEquals("cleanthat", Iterables.getFirst(formatter.getSteps(), null).getId());
+			Assert.assertEquals("toggleOffOn", Iterables.getFirst(formatter.getSteps(), null).getId());
+			Assert.assertEquals("cleanthat", Iterables.get(formatter.getSteps(), 1).getId());
 			Assert.assertEquals("eclipse", Iterables.getLast(formatter.getSteps()).getId());
 		}
 		{

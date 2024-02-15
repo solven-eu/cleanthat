@@ -35,7 +35,6 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedVariab
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedIfToFilter;
-import eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedVariableToMap;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQuotableInput;
 
 /**
@@ -58,7 +57,10 @@ public class SafeButControversialMutators extends CompositeMutator<IMutator> imp
 					new OptionalWrappedIfToFilter(),
 					new OptionalWrappedVariableToMap(),
 					new StreamWrappedIfToFilter(),
-					new StreamWrappedVariableToMap(),
+
+					// Next commented mutators are included in UnsafeDueToGenerics
+					// new StreamWrappedVariableToMap(),
+
 					// new StreamWrappedMethodRefToMap(),
 					new CastMathOperandsBeforeAssignement()
 

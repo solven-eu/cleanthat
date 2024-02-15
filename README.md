@@ -39,6 +39,7 @@ Related projects:
 - https://github.com/SpoonLabs/sorald (free)
 - https://github.com/redhat-developer/vscode-java/blob/master/document/_java.learnMoreAboutCleanUps.md (free)
 - [Academic papers](https://github.com/SpoonLabs/sorald/issues/82)
+- https://github.com/detekt/detekt (free)
 
 # Changes
 
@@ -140,6 +141,83 @@ It differs from mvn/gradle integration by fetching only relevant (e.g. modified)
 If you integrated Cleanthat through its maven or gradle options, you can get automatic remote cleaning with:
 
         ./mvnw spotless:check || ./mvnw spotless:apply && git commit -m"Spotless" && git push
+
+# Configuration
+
+## Default configuration: [SafeAndConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeAndConsensualMutators.java)
+
+By default, we rely on a safe and consensual configuration. This composite mutators should be integrated by all projects as most projects would benefit from these rules, and most developers would agree this is better style.
+
+Spotless:
+
+```
+cleanthat()
+	[...]
+	.addMutator('SafeAndConsensual')
+```
+
+## Customizations
+
+Most integrations enable:
+
+1. Adding some mutators
+2. Excluding some mutators
+3. Activating `isDraft` mutators (which is `false` by default, not to include not-production-ready mutators)
+
+Spotless:
+
+```
+cleanthat()
+	[...]
+	.addMutator('SafeAndConsensual')
+	.includeMutator('StreamForEachNestingForLoopToFlatMap')
+	.excludeMutator('UseCollectionIsEmpty')
+	.includeDraft(true) 
+```
+
+## More composite mutators
+
+### [SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java)
+
+[SafeButNotConsensualMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButNotConsensualMutators.java) relates to SafeAndConsensualMutators, but it includes also some rules which may be rejected by a **minority** of developers.
+
+Spotless:
+
+```
+cleanthat()
+	[...]
+	.addMutator('SafeAndConsensual')
+	.addMutator('SafeButNotConsensual')
+```
+
+### [SafeButControversialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButControversialMutators.java)
+
+[SafeButControversialMutators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/SafeButControversialMutators.java) relates to SafeButNotConsensualMutators, but it includes also some rules which may be rejected by a **majority** of developers. This may be due to eager use of new language syntax.
+
+Spotless:
+
+```
+cleanthat()
+	[...]
+	.addMutator('SafeAndConsensual')
+	.addMutator('SafeButNotConsensual')
+	.addMutator('SafeButControversial')
+```
+
+### Activate **all** mutators
+
+One may switch to activate all mutators. This can be achieved through:
+
+Spotless:
+
+```
+cleanthat()
+	[...]
+	.addMutator('SafeAndConsensual')
+	.addMutator('SafeButNotConsensual')
+	.addMutator('SafeButControversial')
+	.includeDraft(true) 
+```
 
 # Key design decisions
 

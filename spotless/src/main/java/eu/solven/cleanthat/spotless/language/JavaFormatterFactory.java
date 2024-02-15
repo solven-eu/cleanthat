@@ -64,6 +64,8 @@ public class JavaFormatterFactory extends AFormatterFactory {
 			removeUnusedImportsBuilder.skip(true);
 		}
 
+		SpotlessStepProperties toggleOffOn = SpotlessStepProperties.builder().id("toggleOffOn").build();
+
 		SpotlessStepProperties removeUnusedImports = removeUnusedImportsBuilder.build();
 
 		SpotlessStepProperties importOrder = SpotlessStepProperties.builder()
@@ -103,6 +105,7 @@ public class JavaFormatterFactory extends AFormatterFactory {
 		eclipse.setParameters(eclipseParameters);
 
 		return ImmutableList.<SpotlessStepProperties>builder()
+				.add(toggleOffOn)
 				// CleanThat is first as it may generate unoptimized imports and break stylesheet
 				.add(cleanthat)
 				.add(removeUnusedImports)

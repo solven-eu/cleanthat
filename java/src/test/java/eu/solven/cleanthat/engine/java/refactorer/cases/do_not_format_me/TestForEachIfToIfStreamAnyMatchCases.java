@@ -9,6 +9,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemen
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
+import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfBreakToStreamFindFirst;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
@@ -259,6 +260,8 @@ public class TestForEachIfToIfStreamAnyMatchCases extends AJavaparserRefactorerC
 		}
 	}
 
+	// This should be turned into `strings.stream().filter(value -> value.length() >= 4).findFirst().orElse("")`
+	// which is managed by ForEachIfBreakToStreamFindFirst
 	@UnmodifiedMethod
 	public static class AssignIterated {
 		public String pre(List<String> strings) {
@@ -269,6 +272,7 @@ public class TestForEachIfToIfStreamAnyMatchCases extends AJavaparserRefactorerC
 					break;
 				}
 			}
+
 			return key;
 		}
 	}

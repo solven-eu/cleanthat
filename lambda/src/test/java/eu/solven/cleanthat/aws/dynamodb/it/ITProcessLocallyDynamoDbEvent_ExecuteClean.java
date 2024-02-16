@@ -39,7 +39,8 @@ public class ITProcessLocallyDynamoDbEvent_ExecuteClean extends AProcessLocallyD
 	public void testInitWithDefaultConfiguration() throws IOException, JOSEException {
 		// This is logged by: e.s.c.lambda.AWebhooksLambdaFunction|parseDynamoDbEvent
 		// You can search logs for this key, in order to process given event locally
-		var key = "random-54d3f147-5f0c-4f71-bc94-522f415e96cd";
+		// It is available from Github at URLs like https://github.com/solven-eu/mitrust-datasharing/runs/21642494427
+		var key = "random-63cbebec-b5ac-408a-9f38-092e171eae98";
 
 		Map<String, ?> dynamoDbPureJson = EventFromDynamoDbITHelper.loadEvent("cleanthat_accepted_events", key);
 		Map<String, ?> output = lambdaFunction.ingressRawWebhook().apply(dynamoDbPureJson);

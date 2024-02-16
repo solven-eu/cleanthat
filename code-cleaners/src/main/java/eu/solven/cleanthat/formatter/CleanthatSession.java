@@ -19,7 +19,9 @@ import java.nio.file.Path;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 
 /**
  * The core components attached to a clean session. The cleaning session granularity is a full repository: it will
@@ -28,7 +30,9 @@ import lombok.Data;
  * @author Benoit Lacelle
  *
  */
-@Data
+@Value
+@Builder
+@AllArgsConstructor
 public class CleanthatSession {
 	final Path repositoryRoot;
 	final ICodeProvider codeProvider;

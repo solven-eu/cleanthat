@@ -117,6 +117,23 @@ public class TestRemoveExplicitCallToSuperCases extends AJavaparserRefactorerCas
 	}
 
 	@UnmodifiedInnerClass
+	public static class ThisEmptyInConstructor_notEmptyCtor {
+		public class Pre {
+			final String s;
+
+			public Pre() {
+				s = "";
+			}
+
+			public Pre(String s) {
+				this();
+
+				s.toString();
+			}
+		}
+	}
+
+	@UnmodifiedInnerClass
 	public static class StandardExceptionConstructors {
 		public class Pre extends Exception {
 			private static final long serialVersionUID = 5838323818892271987L;

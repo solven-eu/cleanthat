@@ -378,7 +378,10 @@
 					<version>${spotless.version}</version>
 					<configuration>
 						<!-- optional: limit format enforcement to just the files changed by this feature branch -->
-						<!--ratchetFrom>origin/master</ratchetFrom-->
+						<!-- We keep a ratchetFrom to ensure `LicenseHeader.YearMode==UPDATE_TO_TODAY` -->
+						<!-- https://github.com/diffplug/spotless/blob/main/plugin-maven/src/main/java/com/diffplug/spotless/maven/generic/LicenseHeader.java -->
+						<ratchetFrom>origin/master</ratchetFrom>
+
 						<formats>
 							<!-- you can define as many formats as you want, each is independent -->
 							<format>
@@ -435,11 +438,14 @@
 								<version>${project.version}</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
+									-
 									<mutator>SafeButNotConsensual</mutator>
+									-
 									<mutator>SafeButControversial</mutator>
+									-
 									<mutator>Guava</mutator>
 								</mutators>
-								<includeDraft>true</includeDraft>
+								<includeDraft>false</includeDraft>
 								<excludedMutators>
 									<!-- https://github.com/javaparser/javaparser/issues/3930 -->
 									<excludedMutator>LambdaReturnsSingleStatement</excludedMutator>

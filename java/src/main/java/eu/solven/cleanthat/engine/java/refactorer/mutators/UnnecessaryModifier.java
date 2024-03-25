@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Set;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -90,11 +91,12 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
-		if (!(node.getNode() instanceof Modifier)) {
+	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
+		Node node = nodeAndSymbolSolver.getNode();
+		if (!(node instanceof Modifier)) {
 			return false;
 		}
-		var modifier = (Modifier) node.getNode();
+		var modifier = (Modifier) node;
 
 		if (modifier.getParentNode().isEmpty()) {
 			return false;

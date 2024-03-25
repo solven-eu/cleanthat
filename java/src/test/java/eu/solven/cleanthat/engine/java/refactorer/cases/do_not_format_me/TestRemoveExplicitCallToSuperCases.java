@@ -90,7 +90,8 @@ public class TestRemoveExplicitCallToSuperCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	@CompareInnerClasses
+	// `this();` can be removed for equivalent behavior only because `Pre()` exists but is a noop
+	@UnmodifiedInnerClass
 	public static class ThisEmptyInConstructor {
 		public class Pre {
 
@@ -103,11 +104,65 @@ public class TestRemoveExplicitCallToSuperCases extends AJavaparserRefactorerCas
 				s.toString();
 			}
 		}
+	}
 
-		public class Post {
+	// Dropping `this` would lead to compilation error as `s` in final
+	@UnmodifiedInnerClass
+	public static class ThisEmptyInConstructor_notEmptyCtor_finalField {
+		public class Pre {
+			final String s;
 
-			public Post() {
+			public Pre() {
+				s = "";
 			}
+
+			public Pre(String s) {
+				this();
+
+				s.toString();
+			}
+		}
+	}
+
+	// Dropping `this` would prevent `s` initialization
+	@UnmodifiedInnerClass
+	public static class ThisEmptyInConstructor_notEmptyCtor_notFinalField {
+		public class Pre {
+			String s;
+
+			public Pre() {
+				s = "";
+			}
+
+			public Pre(String s) {
+				this();
+
+				s.toString();
+			}
+		}
+	}
+
+	@CompareInnerClasses
+	public static class SuperEmptyInConstructor_notEmptyCtor {
+		class Parent {
+			final String s;
+
+			public Parent() {
+				s = "";
+			}
+
+		}
+
+		public class Pre extends Parent {
+
+			public Pre(String s) {
+				super();
+
+				s.toString();
+			}
+		}
+
+		public class Post extends Parent {
 
 			public Post(String s) {
 

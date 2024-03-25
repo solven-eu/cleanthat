@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 
 /**
  * Order modifiers according the the Java specification.
@@ -43,6 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  * @see https://github.com/checkstyle/checkstyle/blob/master/src/xdocs/checks/modifier/modifierorder.xml
  * @see
  */
+@ApplyBeforeMe(UnnecessaryModifier.class)
 public class ModifierOrder extends AJavaparserNodeMutator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
@@ -108,19 +111,11 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 			NodeWithModifiers<?> nodeWithModifiers = (NodeWithModifiers<?>) node;
 			NodeList<Modifier> modifiers = nodeWithModifiers.getModifiers();
 
-			NodeList<Modifier> mutableModifiers = new NodeList<>(modifiers);
+			// Do not rely on a `NodeList` to prevent transfer of modifiers ownership
+			// https://github.com/solven-eu/cleanthat/issues/802
+			List<Modifier> mutableModifiers = new ArrayList<>(modifiers);
 
-			Collections.sort(mutableModifiers, new Comparator<Modifier>() {
-
-				@Override
-				public int compare(Modifier o1, Modifier o2) {
-					return compare2(o1.getKeyword().asString(), o2.getKeyword().asString());
-				}
-
-				private int compare2(String left, String right) {
-					return Integer.compare(ORDERED_MODIFIERS.indexOf(left), ORDERED_MODIFIERS.indexOf(right));
-				}
-			});
+			Collections.sort(mutableModifiers, modifiersComparator());
 
 			var changed = areSameReferences(modifiers, mutableModifiers);
 
@@ -132,9 +127,23 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 		return false;
 	}
 
+	private Comparator<Modifier> modifiersComparator() {
+		return new Comparator<Modifier>() {
+
+			@Override
+			public int compare(Modifier o1, Modifier o2) {
+				return compare2(o1.getKeyword().asString(), o2.getKeyword().asString());
+			}
+
+			private int compare2(String left, String right) {
+				return Integer.compare(ORDERED_MODIFIERS.indexOf(left), ORDERED_MODIFIERS.indexOf(right));
+			}
+		};
+	}
+
 	private boolean applyModifiers(NodeWithModifiers<?> nodeWithModifiers,
 			NodeList<Modifier> originalModifiers,
-			NodeList<Modifier> sortedModifiers) {
+			List<Modifier> sortedModifiers) {
 		if (sortedModifiers.stream()
 				.map(m -> m.getKeyword())
 				.anyMatch(m -> m == Keyword.SEALED || m == Keyword.NON_SEALED)) {
@@ -149,13 +158,18 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 		nodeWithModifiers.setModifiers();
 
 		LOGGER.debug("We fixed the ordering of modifiers");
-		nodeWithModifiers.setModifiers(sortedModifiers);
+		NodeList<Modifier> asNodeList = new NodeList<>(sortedModifiers);
+		nodeWithModifiers.setModifiers(asNodeList);
 
 		return true;
 	}
 
 	@SuppressWarnings("PMD.CompareObjectsWithEquals")
-	private boolean areSameReferences(NodeList<Modifier> modifiers, NodeList<Modifier> mutableModifiers) {
+	private boolean areSameReferences(List<Modifier> modifiers, List<Modifier> mutableModifiers) {
+		if (modifiers.size() != mutableModifiers.size()) {
+			return false;
+		}
+
 		var changed = false;
 		for (var i = 0; i < modifiers.size(); i++) {
 			// Check by reference

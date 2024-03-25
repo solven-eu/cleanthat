@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -76,21 +77,27 @@ public class RemoveExplicitCallToSuper extends AJavaparserNodeMutator {
 
 		if (body.getStatements().isEmpty()) {
 			return false;
+		} else if (body.getStatements().size() == 1) {
+			// We keep `super();` if it is the only statement, as it is generally considered better than having an empty
+			// constructor.
+			return false;
 		}
 
 		var firstStatement = body.getStatement(0);
 
 		if (!firstStatement.isExplicitConstructorInvocationStmt()) {
+			// We need either `this(...)` or `super(...)`
 			return false;
 		}
 
-		if (!firstStatement.asExplicitConstructorInvocationStmt().getArguments().isEmpty()) {
+		ExplicitConstructorInvocationStmt asCtorInvocationStmt = firstStatement.asExplicitConstructorInvocationStmt();
+		if (!asCtorInvocationStmt.getArguments().isEmpty()) {
+			// We would remove only a ref to the default constructor
 			return false;
 		}
 
-		if (body.getStatements().size() == 1) {
-			// We keep `super();` if it is the only statement, as it is generally considered better than having an empty
-			// constructor.
+		if (asCtorInvocationStmt.isThis()) {
+			// `this(...)` can not be turned into explicit invocations
 			return false;
 		}
 

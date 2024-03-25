@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,19 +133,24 @@ public class OneMutatorCase<N, R> {
 		doCompareExpectedChanges(oneCase, pre, post);
 	}
 
+	// `PMD.PrematureDeclaration` as `.walkAst` may mutate the AST
+	@SuppressWarnings("PMD.PrematureDeclaration")
 	private <T extends Node> void doCompareExpectedChanges(ClassOrInterfaceDeclaration oneCase, T pre, T post) {
 		// Check 'pre' is transformed into 'post'
 		// This is generally the most relevant test: to be done first
 		// This is done before .toString typically to register LexicalPreservingPrinter
-		N asAst = astTestHelper.convertToAst(pre);
+		N preAsAst = astTestHelper.convertToAst(pre);
 
-		Optional<R> optResult = mutator.walkAst(asAst);
+		// Convert to String before `.walkAst` which may mutate the AST
+		var preAsString = astTestHelper.astToString(preAsAst);
+
+		Optional<R> optResult = mutator.walkAst(preAsAst);
 
 		if (optResult.isPresent() && mutator instanceof IReApplyUntilNoop) {
 			var latestResult = optResult.get();
 
 			// BEWARE The following is valid only for JavaParser-based mutator
-			if (latestResult instanceof Node && asAst instanceof Node) {
+			if (latestResult instanceof Node && preAsAst instanceof Node) {
 
 				while (true) {
 					Optional<R> localMutated = mutator.walkAst((N) latestResult);
@@ -160,9 +165,7 @@ public class OneMutatorCase<N, R> {
 			} else {
 				throw new UnsupportedOperationException("Not managed yet");
 			}
-
 		}
-		var preAsString = astTestHelper.astToString(asAst);
 
 		if (optResult.isEmpty()) {
 			Assertions.assertThat(optResult).as("We miss a transformation flag for: " + preAsString).isPresent();
@@ -183,7 +186,7 @@ public class OneMutatorCase<N, R> {
 			var expectedPostAsString = astTestHelper.astToString(astTestHelper.convertToAst(post));
 			var actualPostAsString = astTestHelper.resultToString(optResult.get());
 
-			checkChange(oneCase, post, asAst, preAsString, expectedPostAsString, actualPostAsString);
+			checkChange(oneCase, post, preAsAst, preAsString, expectedPostAsString, actualPostAsString);
 		}
 
 		// Check the mutator is impact-less on already clean code

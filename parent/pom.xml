@@ -438,11 +438,14 @@
 								<version>${project.version}</version>
 								<mutators>
 									<mutator>SafeAndConsensual</mutator>
+									-
 									<mutator>SafeButNotConsensual</mutator>
+									-
 									<mutator>SafeButControversial</mutator>
+									-
 									<mutator>Guava</mutator>
 								</mutators>
-								<includeDraft>true</includeDraft>
+								<includeDraft>false</includeDraft>
 								<excludedMutators>
 									<!-- https://github.com/javaparser/javaparser/issues/3930 -->
 									<excludedMutator>LambdaReturnsSingleStatement</excludedMutator>

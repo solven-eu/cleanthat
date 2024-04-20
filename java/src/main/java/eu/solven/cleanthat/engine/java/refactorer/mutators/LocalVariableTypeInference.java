@@ -40,7 +40,10 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
 
 /**
- * Turns 'int i = 10;' into 'var i = 10'
+ * Turns 'int i = 10;' into 'var i = 10'.
+ * 
+ * PMD7.0 introduced `UseExplicitTypes`, which recommend not activating this mutator.
+ * (https://github.com/pmd/pmd/issues/2847)
  *
  * @author Benoit Lacelle
  */

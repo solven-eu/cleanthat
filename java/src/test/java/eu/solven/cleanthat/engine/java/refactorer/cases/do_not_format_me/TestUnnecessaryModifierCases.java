@@ -1,8 +1,8 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -119,6 +119,19 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			}
 
 			void test4();
+		}
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/807
+	@UnmodifiedInnerClass
+	public static class InterfacePrivateMethod {
+		public interface Pre {
+			private void privateMethod() {
+			}
+
+			default void callingPrivateMethod() {
+				privateMethod();
+			}
 		}
 	}
 }

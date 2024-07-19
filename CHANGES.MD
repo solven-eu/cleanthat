@@ -2,7 +2,25 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
-## [2.19 - Unreleased]
+## [2.21 - Unreleased]
+
+### Changes
+
+* `UseTextBlocks` have stricter rules to elect texts as multi-line.
+* `javaparser` to updated to `3.26.1` to fix #817
+
+## [2.20]
+
+### Changes
+
+* Update `JavaParser` to `3.25.10` to fix #807
+
+### Fixed
+
+* `ModifierOrder` shall not prevent further modifiers mutators to operate correctly.
+
+
+## [2.19]
 
 ### Changes
 

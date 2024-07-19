@@ -11,8 +11,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.Ignore;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
@@ -208,6 +212,33 @@ public class TestLambdaIsMethodReferenceCases extends AJavaparserRefactorerCases
 
 		public void post(List<Runnable> runnables) {
 			runnables.forEach(Runnable::run);
+		}
+	}
+
+	@CompareMethods
+	public static class CaseRefConstant {
+
+		Set<String> someSet = ImmutableSet.of("a", "b");
+
+		public boolean pre(Set<String> set) {
+			return set.stream().anyMatch(c -> someSet.contains(c));
+		}
+
+		public boolean post(Set<String> set) {
+			return set.stream().anyMatch(someSet::contains);
+		}
+	}
+
+	@Ignore("JavaParser fails inferring the type of e")
+	@CompareMethods
+	public static class CaseMapEntryGetKey {
+
+		public Map<Object, Object> pre(Map<?, ?> userInfo) {
+			return userInfo.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> ""));
+		}
+
+		public Map<Object, Object> post(Map<?, ?> userInfo) {
+			return userInfo.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Functions.constant("")));
 		}
 	}
 

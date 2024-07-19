@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasse
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsResource;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsString;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
@@ -85,9 +86,6 @@ public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, 
 			IWalkingMutator<N, R> mutator,
 			ClassOrInterfaceDeclaration testCase) {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
-
-		// ARefactorerCases<AST, R, ? extends IWalkingMutator<AST, R>> cases = getCases();
-		// IWalkingMutator<AST, R> transformer = cases.getTransformer();
 
 		OneMutatorCase<N, R> oneTestCase = new OneMutatorCase<>(javaParser, mutator, this);
 
@@ -170,6 +168,13 @@ public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, 
 			CompareCompilationUnitsAsResources realAnnotation =
 					realTestCase.getAnnotationsByType(CompareCompilationUnitsAsResources.class)[0];
 			oneTestCase.doCompareCompilationUnitsAsResources(testCase, realAnnotation);
+		} else if (testCase.getAnnotationByClass(UnmodifiedCompilationUnitAsResource.class).isPresent()) {
+			atLeastOnetest |= true;
+			Class<?> realTestCase = loadTestCaseRealClass(testCase);
+			// This is useful to get fully resolved annotations (e.g. String concatenations)
+			UnmodifiedCompilationUnitAsResource realAnnotation =
+					realTestCase.getAnnotationsByType(UnmodifiedCompilationUnitAsResource.class)[0];
+			oneTestCase.doCheckUnmodifiedCompilationUnitsAsResources(testCase, realAnnotation);
 		}
 
 		Assertions.assertThat(atLeastOnetest).isTrue();

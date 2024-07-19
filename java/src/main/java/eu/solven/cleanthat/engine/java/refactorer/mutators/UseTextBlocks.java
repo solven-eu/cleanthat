@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns '"a\r\n" + "b\r\n"’ into ’"""aEOLbEOL"""'
@@ -42,6 +43,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 // https://www.baeldung.com/java-text-blocks
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 // TODO Handle intermediate parenthesis
+@Slf4j
 public class UseTextBlocks extends AJavaparserNodeMutator {
 	@Override
 	public String minimalJavaVersion() {
@@ -70,12 +72,25 @@ public class UseTextBlocks extends AJavaparserNodeMutator {
 
 		List<StringLiteralExpr> listStringExpr = optAsList.get();
 
-		var concat = listStringExpr.stream().map(StringLiteralExpr::asString).collect(Collectors.joining());
+		List<String> listString = listStringExpr.stream().map(StringLiteralExpr::asString).collect(Collectors.toList());
+
+		if (listString.stream().filter(s -> s.endsWith("\n")).count() == 0) {
+			// We expect at least one explicit blocks ending with `\n`
+			// This would then reject things like `Je\nsuis\nla`
+			return false;
+		}
+
+		String concat = listString.stream().collect(Collectors.joining());
 
 		// TextBlocks are '\n'-based
 		List<String> rows = Arrays.asList(concat.split("\n"));
 
 		if (rows.size() <= 1) {
+			// A text block with a single row is less readable than a plain String
+			return false;
+		} else if (rows.stream().anyMatch(s -> s.indexOf('\r') >= 0)) {
+			// A text block with `\r` character would be difficult for a human to read
+			// This may also pin-point specific `\r\n` usages
 			return false;
 		}
 

@@ -1,5 +1,8 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import org.junit.Ignore;
+
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
@@ -133,5 +136,12 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 				privateMethod();
 			}
 		}
+	}
+
+	@Ignore("Still broken")
+	// https://github.com/solven-eu/cleanthat/issues/807
+	@CompareCompilationUnitsAsResources(pre = "/source/do_not_format_me/UnnecessaryModifier/Issue807.java",
+			post = "/source/do_not_format_me/UnnecessaryModifier/Issue807.java")
+	public static class Issue807 {
 	}
 }

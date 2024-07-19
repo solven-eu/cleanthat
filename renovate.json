@@ -69,6 +69,12 @@
                 "org.eclipse.jdt"
             ],
             "groupName": "eclipse"
+        },
+        {
+            "matchPackagePatterns": [
+                "io.jsonwebtoken"
+            ],
+            "groupName": "jsonwebtoken"
         }
     ]
 }

@@ -105,7 +105,7 @@ public class OneMutatorCase<N, R> {
 
 			Assert.assertEquals("Should not have mutated " + preAsString
 					+ " but it turned into: "
-					+ preAsString
+					+ modifiedPreAsString
 					+ ". The whole testcase is: "
 					+ oneCase, preAsString, modifiedPreAsString);
 

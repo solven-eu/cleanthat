@@ -15,17 +15,21 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -124,7 +128,24 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
 					|| modifier.getKeyword() == Keyword.FINAL
 					|| modifier.getKeyword() == Keyword.STATIC && !(parentNode instanceof MethodDeclaration)) {
-				return modifier.remove();
+
+				// https://github.com/javaparser/javaparser/issues/3935
+				NodeWithModifiers<?> nodeWithModifiers = (NodeWithModifiers<?>) modifier.getParentNode().get();
+
+				// Do not rely on a `NodeList` to prevent transfer of modifiers ownership
+				// https://github.com/solven-eu/cleanthat/issues/802
+				List<Modifier> mutableModifiers = new ArrayList<>(nodeWithModifiers.getModifiers());
+
+				// Remove from the plainList: it won't change the AST (yet)
+				mutableModifiers.remove(modifier);
+
+				// https://github.com/javaparser/javaparser/issues/3935
+				nodeWithModifiers.setModifiers();
+
+				NodeList<Modifier> asNodeList = new NodeList<>(mutableModifiers);
+				nodeWithModifiers.setModifiers(asNodeList);
+
+				return true;
 			}
 
 			return false;

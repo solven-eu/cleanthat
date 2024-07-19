@@ -153,8 +153,13 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 	@Test
 	public void testWithDedicatedMutator() throws IOException {
 		LOGGER.info("Processing: {}", resource);
-		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
+		if (resource.getFilename().equals("Issue807.java")) {
+			LOGGER.warn("We skip {} because JavaParser produces an invalid Java file", resource.getFilename());
+			return;
+		}
+
+		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 		testSourceWithMutator(mutator, asString);
 	}
 
@@ -162,6 +167,12 @@ public class TestMutatorOnFiles extends AJavaparserTestCases {
 	@Test
 	public void testWithAllMutators() throws IOException {
 		LOGGER.info("Processing: {}", resource);
+
+		if (resource.getFilename().equals("Issue807.java")) {
+			LOGGER.warn("We skip {} because JavaParser produces an invalid Java file", resource.getFilename());
+			return;
+		}
+
 		var asString = new String(ByteStreams.toByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
 
 		AllIncludingDraftSingleMutators composite =

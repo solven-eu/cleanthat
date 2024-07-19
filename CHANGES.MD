@@ -19,7 +19,6 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 * `ModifierOrder` shall not prevent further modifiers mutators to operate correctly.
 
-
 ## [2.19]
 
 ### Changes

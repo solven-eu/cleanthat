@@ -80,7 +80,7 @@ public class UseTextBlocks extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		String concat = listString.stream().collect(Collectors.joining());
+		var concat = listString.stream().collect(Collectors.joining());
 
 		// TextBlocks are '\n'-based
 		List<String> rows = Arrays.asList(concat.split("\n"));

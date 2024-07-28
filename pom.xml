@@ -389,7 +389,7 @@
 					<!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
 					<groupId>io.github.git-commit-id</groupId>
 					<artifactId>git-commit-id-maven-plugin</artifactId>
-					<version>8.0.2</version>
+					<version>9.0.1</version>
 					<configuration>
 						<format>json</format>
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>

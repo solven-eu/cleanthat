@@ -27,6 +27,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
@@ -109,6 +110,8 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 		var parentNode = modifier.getParentNode().get();
 		if (!(parentNode instanceof MethodDeclaration) && !(parentNode instanceof FieldDeclaration)
 				&& !(parentNode instanceof ClassOrInterfaceDeclaration)
+				&& !(parentNode instanceof AnnotationDeclaration)
+				&& !(parentNode instanceof EnumDeclaration)
 				&& !(parentNode instanceof AnnotationMemberDeclaration)) {
 			return false;
 		}
@@ -124,9 +127,11 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 				return false;
 			}
 
-			// We are considering a modifier from an interface method|field|classOrInterface
-			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
-					|| modifier.getKeyword() == Keyword.FINAL
+			// We are considering a modifier from an interface method|field|classOrInterface|annotation|enum
+			if (modifier.getKeyword() == Keyword.PUBLIC
+					|| (modifier.getKeyword() == Keyword.ABSTRACT || modifier.getKeyword() == Keyword.FINAL)
+							&& !(parentNode instanceof ClassOrInterfaceDeclaration
+									&& !((ClassOrInterfaceDeclaration) parentNode).isInterface())
 					|| modifier.getKeyword() == Keyword.STATIC && !(parentNode instanceof MethodDeclaration)) {
 
 				// https://github.com/javaparser/javaparser/issues/3935
@@ -150,9 +155,11 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 			return false;
 		} else if (grandParentNode instanceof AnnotationDeclaration) {
-			// We are considering a modifier from an annotation method|field|classOrInterface
-			if (modifier.getKeyword() == Keyword.PUBLIC || modifier.getKeyword() == Keyword.ABSTRACT
-					|| modifier.getKeyword() == Keyword.FINAL
+			// We are considering a modifier from an annotation classOrInterface|annotation|enum|annotationMember
+			if (modifier.getKeyword() == Keyword.PUBLIC
+					|| (modifier.getKeyword() == Keyword.ABSTRACT || modifier.getKeyword() == Keyword.FINAL)
+							&& !(parentNode instanceof ClassOrInterfaceDeclaration
+									&& !((ClassOrInterfaceDeclaration) parentNode).isInterface())
 					|| modifier.getKeyword() == Keyword.STATIC) {
 				return modifier.remove();
 			}

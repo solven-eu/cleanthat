@@ -37,6 +37,21 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			static String parse() {
 				return "parsed";
 			}
+
+			// public, static, and abstract are redundant
+			public static abstract interface MyInterface {}
+
+			// public and static are redundant, but not abstract
+			public static abstract class MyAbstractClass implements MyInterface {}
+
+			// public and static are redundant, but not final
+			public static final class MyFinalClass extends MyAbstractClass {}
+
+			// public, static, and abstract are redundant
+			public static abstract @interface MyAnnotation {}
+
+			// public and static are redundant
+			public static enum MyEnum {}
 		}
 
 		public interface Post {
@@ -57,6 +72,21 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			static String parse() {
 				return "parsed";
 			}
+
+			// public, static, and abstract are redundant
+			interface MyInterface {}
+
+			// public and static are redundant, but not abstract
+			abstract class MyAbstractClass implements MyInterface {}
+
+			// public and static are redundant, but not final
+			final class MyFinalClass extends MyAbstractClass {}
+
+			// public, static, and abstract are redundant
+			@interface MyAnnotation {}
+
+			// public and static are redundant
+			enum MyEnum {}
 		}
 	}
 
@@ -77,6 +107,21 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			public static interface Baz {
 			}
+
+			// public, static, and abstract are redundant
+			public static abstract interface MyInterface {}
+
+			// public and static are redundant, but not abstract
+			public static abstract class MyAbstractClass implements MyInterface {}
+
+			// public and static are redundant, but not final
+			public static final class MyFinalClass extends MyAbstractClass {}
+
+			// public, static, and abstract are redundant
+			public static abstract @interface MyAnnotation {}
+
+			// public and static are redundant
+			public static enum MyEnum {}
 		}
 
 		public @interface Post {
@@ -93,6 +138,21 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// ditto
 			interface Baz {
 			}
+
+			// public, static, abstract are redundant
+			interface MyInterface {}
+
+			// public and static are redundant, but not abstract
+			abstract class MyAbstractClass implements MyInterface {}
+
+			// public and static are redundant, but not final
+			final class MyFinalClass extends MyAbstractClass {}
+
+			// public, static, and abstract are redundant
+			@interface MyAnnotation {}
+
+			// public and static are redundant
+			enum MyEnum {}
 		}
 	}
 

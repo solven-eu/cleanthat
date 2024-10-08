@@ -2,7 +2,17 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
-## [2.21 - Unreleased]
+## [2.22 - Unreleased]
+
+### Fixed
+
+* `UnnecessaryModifier` handles properly abstract nested-classes (https://github.com/solven-eu/cleanthat/issues/842)
+
+### Changes
+
+* `UnnecessaryModifier` handles annotations and enums (https://github.com/solven-eu/cleanthat/issues/843) 
+
+## [2.21]
 
 ### Changes
 

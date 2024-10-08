@@ -292,3 +292,7 @@ see maven/README.MD
 `cleanthat` is fairly new. While it is tested on many large projects, you may encounter issues of all kinds. [**Please report them**](https://github.com/solven-eu/cleanthat/issues).
 
 [![codecov](https://codecov.io/github/solven-eu/cleanthat/branch/master/graph/badge.svg?token=4K4O5GNH32)](https://codecov.io/github/solven-eu/cleanthat)
+
+# Contributors
+
+- Thanks[Mark Chesney](https://github.com/mches) for reporting and fixing https://github.com/solven-eu/cleanthat/issues/842 and https://github.com/solven-eu/cleanthat/issues/843

@@ -23,7 +23,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// both abstract and public are ignored by the compiler
 			public abstract void bar();
 
-			// public, static, and final all ignored
+			// public, static and final all ignored
 			public static final int X = 0;
 
 			// public, static ignored
@@ -38,7 +38,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 				return "parsed";
 			}
 
-			// public, static, and abstract are redundant
+			// public, static and abstract are redundant
 			public static abstract interface MyInterface {}
 
 			// public and static are redundant, but not abstract
@@ -58,7 +58,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// both abstract and public are ignored by the compiler
 			void bar();
 
-			// public, static, and final all ignored
+			// public, static and final all ignored
 			int X = 0;
 
 			// public, static ignored
@@ -73,7 +73,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 				return "parsed";
 			}
 
-			// public, static, and abstract are redundant
+			// public, static and abstract are redundant
 			interface MyInterface {}
 
 			// public and static are redundant, but not abstract
@@ -97,7 +97,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// both abstract and public are ignored by the compiler
 			public abstract String bar();
 
-			// public, static, and final all ignored
+			// public, static and final all ignored
 			public static final int X = 0;
 
 			// public, static ignored
@@ -108,7 +108,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			public static interface Baz {
 			}
 
-			// public, static, and abstract are redundant
+			// public, static and abstract are redundant
 			public static abstract interface MyInterface {}
 
 			// public and static are redundant, but not abstract
@@ -128,7 +128,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// both abstract and public are ignored by the compiler
 			String bar();
 
-			// public, static, and final all ignored
+			// public, static and final all ignored
 			int X = 0;
 
 			// public, static ignored
@@ -139,7 +139,7 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			interface Baz {
 			}
 
-			// public, static, abstract are redundant
+			// public, static and abstract are redundant
 			interface MyInterface {}
 
 			// public and static are redundant, but not abstract

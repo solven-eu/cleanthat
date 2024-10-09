@@ -117,10 +117,10 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		boolean isPublic = modifier.getKeyword() == Keyword.PUBLIC;
-		boolean isStatic = modifier.getKeyword() == Keyword.STATIC;
-		boolean isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
-		boolean isFinal = modifier.getKeyword() == Keyword.FINAL;
+		var isPublic = modifier.getKeyword() == Keyword.PUBLIC;
+		var isStatic = modifier.getKeyword() == Keyword.STATIC;
+		var isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
+		var isFinal = modifier.getKeyword() == Keyword.FINAL;
 
 		// Some modifiers can be removed based only on their parent
 		{
@@ -164,13 +164,13 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			// Only types like Interfaces and Annotations may have fields|methods with implicit modifiers
 			return false;
 		}
-		
+
 		boolean isInInterfaceLike = isInterfaceLike(grandParentNode);
 		if (!isInInterfaceLike) {
 			return false;
 		}
 
-		boolean isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
+		var isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
 				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface());
 
 		// We are considering a modifier from an interface method|field|classOrInterface|annotation|enum

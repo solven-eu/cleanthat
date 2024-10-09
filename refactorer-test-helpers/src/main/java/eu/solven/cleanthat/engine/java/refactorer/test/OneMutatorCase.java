@@ -343,7 +343,6 @@ public class OneMutatorCase<N, R> {
 		doCompareExpectedChanges(oneCase, pre, post);
 	}
 
-
 	public void doCompareInnerEnums(ClassOrInterfaceDeclaration oneCase) {
 		var pre = ATestCases.getEnumWithName(oneCase, PRE_CLASS);
 		var post = ATestCases.getEnumWithName(oneCase, POST_CLASS);

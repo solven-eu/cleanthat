@@ -14,7 +14,7 @@ We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
 ### Changes
 
-* `UnnecessaryModifier` handles annotations and enums (https://github.com/solven-eu/cleanthat/issues/843) 
+* `UnnecessaryModifier` handles annotations and enums (https://github.com/solven-eu/cleanthat/issues/843)
 
 ## [2.21]
 

@@ -116,7 +116,7 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		boolean isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
+		var isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
 				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface());
 
 		if (parentNode instanceof RecordDeclaration) {
@@ -124,9 +124,9 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			if (modifier.getKeyword() == Keyword.FINAL) {
 				return removeModifier(modifier);
 			}
-			
+
 			// Records are implicitly static, independently of their parentNode
-			// https://github.com/projectlombok/lombok/issues/3140 
+			// https://github.com/projectlombok/lombok/issues/3140
 			if (modifier.getKeyword() == Keyword.STATIC) {
 				return removeModifier(modifier);
 			}
@@ -148,10 +148,10 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		boolean isPublic = modifier.getKeyword() == Keyword.PUBLIC;
-		boolean isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
-		boolean isFinal = modifier.getKeyword() == Keyword.FINAL;
-		boolean isStatic = modifier.getKeyword() == Keyword.STATIC;
+		var isPublic = modifier.getKeyword() == Keyword.PUBLIC;
+		var isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
+		var isFinal = modifier.getKeyword() == Keyword.FINAL;
+		var isStatic = modifier.getKeyword() == Keyword.STATIC;
 
 		boolean isInInterfaceLike = isInterfaceLike(grandParentNode);
 

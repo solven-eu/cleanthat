@@ -1,13 +1,13 @@
 # How to compile the project
 
-    git clone git@github.com:solven-eu/cleanthat.git
-    mvn install -Pfast -T 8
+        git clone git@github.com:solven-eu/cleanthat.git
+        mvn install -Pfast -T 8
 
 The `-Pfast` profile may be necessary to circumvent cleanthat depenending on itself to apply `spotless` on itself.
 
 Once done (or re-done after a release), you can simply:
 
-    mvn install
+        mvn install
 
 # Note for `mutator` contributors
 
@@ -18,6 +18,7 @@ Mutators are subject to many edge-cases, due to the complexity of syntaxes (incl
 ### Unmodified code
 
 One can check a given code is not impacted with `@UnmodifiedMethod` over a nested-class. The nest-class represents a unit-case:
+
 ```
 @UnmodifiedMethod
 public static class CaseCollection {
@@ -30,6 +31,7 @@ public static class CaseCollection {
 ### Simple code comparison
 
 On can check some code is modified as expected with `CompareMethods` over a nested-class. The nest-class represents a unit-case:
+
 ```
 @CompareMethods
 public static class CaseStringEqualsIgnoreCaseEmpty {
@@ -56,7 +58,6 @@ One can rely on `@CompareCompilationUnitsAsResources`:
 public static class Issue807 {
 }
 ```
-
 
 ## Manual test over large code-bases
 
@@ -111,3 +112,4 @@ Issue with Javadoc. For instance:
 - https://github.com/projectlombok/lombok/issues/2737
 
 > mvn org.apache.maven.plugins:maven-javadoc-plugin:3.4.1:jar -Dmaven.javadoc.skip=false -PSonatype
+

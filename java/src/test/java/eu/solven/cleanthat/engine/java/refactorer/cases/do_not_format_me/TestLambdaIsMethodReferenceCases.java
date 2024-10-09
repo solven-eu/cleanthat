@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -246,6 +247,16 @@ public class TestLambdaIsMethodReferenceCases extends AJavaparserRefactorerCases
 	public static class CaseCastToGeneric {
 		public List<?> pre(Stream<? extends Class<?>> s) {
 			return s.map(m -> (Class<? extends CharSequence>) m).collect(Collectors.toList());
+		}
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/847
+	@UnmodifiedMethod
+	public static class CaseRootIsNotLambdaVariable {
+		// Must not be turned into
+		// `o.ifPresent(sb.append("/")::append);`
+		public void pre(Optional<?> o, StringBuilder sb) {
+			o.ifPresent(s -> sb.append("/").append(s));
 		}
 	}
 

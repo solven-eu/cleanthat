@@ -223,6 +223,13 @@ public class LambdaIsMethodReference extends AJavaparserNodeMutator {
 		}
 		var scope = optScope.get();
 
+		if (!scope.isNameExpr() && !scope.isFieldAccessExpr()) {
+			// https://github.com/solven-eu/cleanthat/issues/847
+			// There is a risk of side-effect if the scope is not the lambda parameter (e.g. if the lambda chains
+			// multiple calls)
+			return false;
+		}
+
 		if (methodCallExpr.getArguments().size() == 1 && methodCallExpr.getArguments().get(0).isNameExpr()
 				&& methodCallExpr.getArguments().get(0).asNameExpr().getName().equals(singleParameter.getName())) {
 

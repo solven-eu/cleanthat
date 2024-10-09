@@ -1,17 +1,70 @@
-# Notes for maintainers
+# How to compile the project
 
-## Compile locally
-
-        git clone git@github.com:solven-eu/cleanthat.git
-        mvn install -Pfast
+    git clone git@github.com:solven-eu/cleanthat.git
+    mvn install -Pfast -T 8
 
 The `-Pfast` profile may be necessary to circumvent cleanthat depenending on itself to apply `spotless` on itself.
 
 Once done (or re-done after a release), you can simply:
 
-        mvn install
+    mvn install
 
-## Deploy into Production (AWS):
+# Note for `mutator` contributors
+
+## Unit-tests
+
+Mutators are subject to many edge-cases, due to the complexity of syntaxes (including Java).
+
+### Unmodified code
+
+One can check a given code is not impacted with `@UnmodifiedMethod` over a nested-class. The nest-class represents a unit-case:
+```
+@UnmodifiedMethod
+public static class CaseCollection {
+    public Object pre(Collection<?> input) {
+        return input.size() == 0;
+    }
+}
+```
+
+### Simple code comparison
+
+On can check some code is modified as expected with `CompareMethods` over a nested-class. The nest-class represents a unit-case:
+```
+@CompareMethods
+public static class CaseStringEqualsIgnoreCaseEmpty {
+    public Object pre(String input) {
+        return input.equalsIgnoreCase("");
+    }
+
+    public Object post(String input) {
+        return input.isEmpty();
+    }
+}
+```
+
+## Code not compiling with Cleanthat own classpath
+
+You may consider rules with advanced edge-case, requiring specific code which would not compile in `test` module classpath. It happens when testing code with a java language-level different from Cleanthat own language-level (e.g. a rule processing `JDK21` while cleanthat is compiled as `JDK11`).
+
+One can rely on `@CompareCompilationUnitsAsResources`:
+
+```
+@CompareCompilationUnitsAsResources(
+    pre =  "/source/do_not_format_me/UnnecessaryModifier/Issue807.java",
+    post = "/source/do_not_format_me/UnnecessaryModifier/Issue807.java")
+public static class Issue807 {
+}
+```
+
+
+## Manual test over large code-bases
+
+A given rule can be tested against a large set of codebases with https://github.com/solven-eu/cleanthat-showcases. See its README for more details.
+
+# Notes for maintainers
+
+## Deploy into Production (AWS Lambda):
 
         git push origin master:deploy-prd
 
@@ -58,7 +111,3 @@ Issue with Javadoc. For instance:
 - https://github.com/projectlombok/lombok/issues/2737
 
 > mvn org.apache.maven.plugins:maven-javadoc-plugin:3.4.1:jar -Dmaven.javadoc.skip=false -PSonatype
-
-# Note for Mutator contributors
-
-A given rule can be tested against a large set of codebases with https://github.com/solven-eu/cleanthat-showcases. See its README for more details

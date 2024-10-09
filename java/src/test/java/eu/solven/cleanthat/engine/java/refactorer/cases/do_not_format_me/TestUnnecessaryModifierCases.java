@@ -3,6 +3,7 @@ package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 import org.junit.Ignore;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsResources;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
@@ -39,19 +40,24 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			}
 
 			// public, static and abstract are redundant
-			public static abstract interface MyInterface {}
+			public static abstract interface MyInterface {
+			}
 
 			// public and static are redundant, but not abstract
-			public static abstract class MyAbstractClass implements MyInterface {}
+			public static abstract class MyAbstractClass implements MyInterface {
+			}
 
 			// public and static are redundant, but not final
-			public static final class MyFinalClass extends MyAbstractClass {}
+			public static final class MyFinalClass extends MyAbstractClass {
+			}
 
 			// public, static, and abstract are redundant
-			public static abstract @interface MyAnnotation {}
+			public static abstract @interface MyAnnotation {
+			}
 
 			// public and static are redundant
-			public static enum MyEnum {}
+			public static enum MyEnum {
+			}
 		}
 
 		public interface Post {
@@ -74,19 +80,24 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			}
 
 			// public, static and abstract are redundant
-			interface MyInterface {}
+			interface MyInterface {
+			}
 
 			// public and static are redundant, but not abstract
-			abstract class MyAbstractClass implements MyInterface {}
+			abstract class MyAbstractClass implements MyInterface {
+			}
 
 			// public and static are redundant, but not final
-			final class MyFinalClass extends MyAbstractClass {}
+			final class MyFinalClass extends MyAbstractClass {
+			}
 
 			// public, static, and abstract are redundant
-			@interface MyAnnotation {}
+			@interface MyAnnotation {
+			}
 
 			// public and static are redundant
-			enum MyEnum {}
+			enum MyEnum {
+			}
 		}
 	}
 
@@ -109,19 +120,24 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			}
 
 			// public, static and abstract are redundant
-			public static abstract interface MyInterface {}
+			public static abstract interface MyInterface {
+			}
 
 			// public and static are redundant, but not abstract
-			public static abstract class MyAbstractClass implements MyInterface {}
+			public static abstract class MyAbstractClass implements MyInterface {
+			}
 
 			// public and static are redundant, but not final
-			public static final class MyFinalClass extends MyAbstractClass {}
+			public static final class MyFinalClass extends MyAbstractClass {
+			}
 
 			// public, static, and abstract are redundant
-			public static abstract @interface MyAnnotation {}
+			public static abstract @interface MyAnnotation {
+			}
 
 			// public and static are redundant
-			public static enum MyEnum {}
+			public static enum MyEnum {
+			}
 		}
 
 		public @interface Post {
@@ -140,19 +156,24 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			}
 
 			// public, static and abstract are redundant
-			interface MyInterface {}
+			interface MyInterface {
+			}
 
 			// public and static are redundant, but not abstract
-			abstract class MyAbstractClass implements MyInterface {}
+			abstract class MyAbstractClass implements MyInterface {
+			}
 
 			// public and static are redundant, but not final
-			final class MyFinalClass extends MyAbstractClass {}
+			final class MyFinalClass extends MyAbstractClass {
+			}
 
 			// public, static, and abstract are redundant
-			@interface MyAnnotation {}
+			@interface MyAnnotation {
+			}
 
 			// public and static are redundant
-			enum MyEnum {}
+			enum MyEnum {
+			}
 		}
 	}
 
@@ -204,4 +225,20 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			post = "/source/do_not_format_me/UnnecessaryModifier/Issue807.java")
 	public static class Issue807 {
 	}
+
+	@CompareCompilationUnitsAsStrings(pre = "public final record Person (String name, String address) {}",
+			post = "public record Person (String name, String address) {}")
+	public static class Issue844_record {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "public class NestingRecord {\n"
+					+ "		public static final record Person (String name, String address) {}\n"
+					+ "	}",
+			post = "public class NestingRecord {\n"
+					+ "		public record Person (String name, String address) {}\n"
+					+ "	}")
+	public static class Issue844_record_nested {
+	}
+
 }

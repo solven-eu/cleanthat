@@ -27,6 +27,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
@@ -116,24 +117,40 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		var isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
-				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface());
+		boolean isPublic = modifier.getKeyword() == Keyword.PUBLIC;
+		boolean isStatic = modifier.getKeyword() == Keyword.STATIC;
+		boolean isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
+		boolean isFinal = modifier.getKeyword() == Keyword.FINAL;
 
-		if (parentNode instanceof RecordDeclaration) {
-			// Records are implicitly final, independently of their parentNode
-			if (modifier.getKeyword() == Keyword.FINAL) {
-				return removeModifier(modifier);
-			}
+		// Some modifiers can be removed based only on their parent
+		{
+			if (parentNode instanceof RecordDeclaration) {
+				// Records are implicitly static, independently of their parentNode
+				// https://github.com/projectlombok/lombok/issues/3140
+				if (isStatic) {
+					return removeModifier(modifier);
+				}
 
-			// Records are implicitly static, independently of their parentNode
-			// https://github.com/projectlombok/lombok/issues/3140
-			if (modifier.getKeyword() == Keyword.STATIC) {
-				return removeModifier(modifier);
-			}
-		} else if (parentNode instanceof MethodDeclaration) {
-			// static methods is never implicit
-			if (modifier.getKeyword() == Keyword.STATIC) {
-				return false;
+				// Records are implicitly final, independently of their parentNode
+				if (isFinal) {
+					return removeModifier(modifier);
+				}
+			} else if (parentNode instanceof MethodDeclaration) {
+				// static methods are never implicit
+				if (isStatic) {
+					return false;
+				}
+			} else if (isInterfaceLike(parentNode)) {
+				// interfaceLike are implicitly static and abstract
+				if (isStatic || isAbstract) {
+					return removeModifier(modifier);
+				}
+			} else if (parentNode instanceof EnumDeclaration) {
+				// enums are implicitly static
+				// https://stackoverflow.com/questions/23127926/static-enum-vs-non-static-enum
+				if (isStatic) {
+					return removeModifier(modifier);
+				}
 			}
 		}
 
@@ -147,21 +164,23 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			// Only types like Interfaces and Annotations may have fields|methods with implicit modifiers
 			return false;
 		}
-
-		var isPublic = modifier.getKeyword() == Keyword.PUBLIC;
-		var isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
-		var isFinal = modifier.getKeyword() == Keyword.FINAL;
-		var isStatic = modifier.getKeyword() == Keyword.STATIC;
-
+		
 		boolean isInInterfaceLike = isInterfaceLike(grandParentNode);
-
 		if (!isInInterfaceLike) {
 			return false;
 		}
 
+		boolean isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
+				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface());
+
 		// We are considering a modifier from an interface method|field|classOrInterface|annotation|enum
-		if (isPublic || isAbstract && !isNestedOrInnerClass || isFinal && !isNestedOrInnerClass || isStatic) {
+		if (isPublic || isStatic) {
 			return removeModifier(modifier);
+		} else if (!isNestedOrInnerClass) {
+			// Even in an interface, nested|inner class needs to keep abstract and final
+			if (isAbstract || isFinal) {
+				return removeModifier(modifier);
+			}
 		}
 
 		return false;

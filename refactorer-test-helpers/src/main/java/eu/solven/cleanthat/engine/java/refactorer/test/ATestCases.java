@@ -20,6 +20,7 @@ import java.util.List;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareClasses;
@@ -27,6 +28,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilation
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerEnums;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
@@ -55,6 +57,7 @@ public abstract class ATestCases<N, R> implements IAstTestHelper<N, R> {
 						|| c.getAnnotationByClass(CompareInnerClasses.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedInnerClass.class).isPresent()
 						|| c.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()
+						|| c.getAnnotationByClass(CompareInnerEnums.class).isPresent()
 						|| c.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(CompareCompilationUnitsAsStrings.class).isPresent()
 						|| c.getAnnotationByClass(UnmodifiedCompilationUnitAsString.class).isPresent()
@@ -90,6 +93,17 @@ public abstract class ATestCases<N, R> implements IAstTestHelper<N, R> {
 		if (matching.size() != 1) {
 			throw new IllegalStateException(
 					"We expected a single annotation named '" + name + "' but they were: " + matching.size());
+		}
+
+		return matching.get(0);
+	}
+
+	public static EnumDeclaration getEnumWithName(ClassOrInterfaceDeclaration oneCase, String name) {
+		List<EnumDeclaration> matching = oneCase.findAll(EnumDeclaration.class, n -> name.equals(n.getNameAsString()));
+
+		if (matching.size() != 1) {
+			throw new IllegalStateException(
+					"We expected a single enum named '" + name + "' but they were: " + matching.size());
 		}
 
 		return matching.get(0);

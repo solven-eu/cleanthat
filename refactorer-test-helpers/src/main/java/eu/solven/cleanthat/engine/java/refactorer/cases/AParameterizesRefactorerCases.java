@@ -36,6 +36,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilation
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareCompilationUnitsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerAnnotations;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerEnums;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethodsAsStrings;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareTypes;
@@ -129,6 +130,11 @@ public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, 
 		if (testCase.getAnnotationByClass(CompareInnerAnnotations.class).isPresent()) {
 			atLeastOnetest |= true;
 			oneTestCase.doCompareInnerAnnotations(testCase);
+		}
+
+		if (testCase.getAnnotationByClass(CompareInnerEnums.class).isPresent()) {
+			atLeastOnetest |= true;
+			oneTestCase.doCompareInnerEnums(testCase);
 		}
 
 		if (testCase.getAnnotationByClass(CompareMethodsAsStrings.class).isPresent()) {

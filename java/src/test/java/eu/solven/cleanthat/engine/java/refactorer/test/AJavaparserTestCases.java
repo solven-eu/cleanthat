@@ -20,6 +20,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
@@ -68,6 +69,10 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 			// parsedAgain = javaParser.parseClassOrInterfaceType(preservedToString);
 			return preservedToString;
 		} else if (node instanceof AnnotationDeclaration) {
+			// TODO Open a JavaParser issue for this
+			// parsedAgain = javaParser.parseAnnotation(preservedToString);
+			return preservedToString;
+		} else if (node instanceof EnumDeclaration) {
 			// TODO Open a JavaParser issue for this
 			// parsedAgain = javaParser.parseAnnotation(preservedToString);
 			return preservedToString;

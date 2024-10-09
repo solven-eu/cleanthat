@@ -2,6 +2,10 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
+## [2.23 - Unreleased]
+
+* `UnnecessaryModifier` is reworked for simplification. It includes further management of `record`. (https://github.com/solven-eu/cleanthat/pull/848)
+
 ## [2.22 - Unreleased]
 
 ### Fixed

@@ -19,6 +19,9 @@ formatters:
       - SafeButNotConsensual
       - SafeButControversial
       - Guava
+      excluded_mutators:
+      # PMD recommends not using `var`
+      - LocalVariableTypeInference
   - id: "removeUnusedImports"
   - id: "importOrder"
     parameters:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2024 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
 
@@ -68,6 +69,10 @@ public class AJavaparserTestCases extends ATestCases<Node, Node> {
 			// parsedAgain = javaParser.parseClassOrInterfaceType(preservedToString);
 			return preservedToString;
 		} else if (node instanceof AnnotationDeclaration) {
+			// TODO Open a JavaParser issue for this
+			// parsedAgain = javaParser.parseAnnotation(preservedToString);
+			return preservedToString;
+		} else if (node instanceof EnumDeclaration) {
 			// TODO Open a JavaParser issue for this
 			// parsedAgain = javaParser.parseAnnotation(preservedToString);
 			return preservedToString;

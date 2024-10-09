@@ -451,6 +451,8 @@
 									<excludedMutator>LambdaReturnsSingleStatement</excludedMutator>
 									<!-- Too much instable -->
 									<excludedMutator>UseDiamondOperator</excludedMutator>
+									<!-- PMD recommends not using `var` -->
+									<excludedMutator>LocalVariableTypeInference</excludedMutator>
 								</excludedMutators>
 							</cleanthat>
 

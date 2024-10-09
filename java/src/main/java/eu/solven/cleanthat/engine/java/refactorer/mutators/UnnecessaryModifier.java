@@ -38,12 +38,14 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns 'public static final someMethod();' into 'someMethod();' in interfaces
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 	@Override
@@ -117,10 +119,9 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		var isPublic = modifier.getKeyword() == Keyword.PUBLIC;
-		var isStatic = modifier.getKeyword() == Keyword.STATIC;
-		var isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
-		var isFinal = modifier.getKeyword() == Keyword.FINAL;
+		boolean isStatic = modifier.getKeyword() == Keyword.STATIC;
+		boolean isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
+		boolean isFinal = modifier.getKeyword() == Keyword.FINAL;
 
 		// Some modifiers can be removed based only on their parent
 		{
@@ -151,6 +152,8 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 				if (isStatic) {
 					return removeModifier(modifier);
 				}
+			} else {
+				log.trace("Let's check rules for inner|nested nodes");
 			}
 		}
 
@@ -170,17 +173,20 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 			return false;
 		}
 
-		var isNestedOrInnerClass = (parentNode instanceof ClassOrInterfaceDeclaration
-				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface());
+		boolean isNestedOrInnerClass = parentNode instanceof ClassOrInterfaceDeclaration
+				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface();
+
+		boolean isPublic = modifier.getKeyword() == Keyword.PUBLIC;
 
 		// We are considering a modifier from an interface method|field|classOrInterface|annotation|enum
 		if (isPublic || isStatic) {
 			return removeModifier(modifier);
-		} else if (!isNestedOrInnerClass) {
-			// Even in an interface, nested|inner class needs to keep abstract and final
-			if (isAbstract || isFinal) {
-				return removeModifier(modifier);
-			}
+		} else if (isNestedOrInnerClass) {
+			// nestedOrInnerClass: no more qualifiers could be removed
+			return false;
+		} else if (isAbstract || isFinal) {
+			// interface: field|method are implicitly abstract|final
+			return removeModifier(modifier);
 		}
 
 		return false;

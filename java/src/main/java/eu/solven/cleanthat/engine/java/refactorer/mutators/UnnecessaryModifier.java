@@ -141,6 +141,9 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 				if (isStatic) {
 					return false;
 				}
+				if (isFinal && ((MethodDeclaration) parentNode).isPrivate()) {
+					return removeModifier(modifier);
+				}
 			} else if (isInterfaceLike(parentNode)) {
 				// interfaceLike are implicitly static and abstract
 				if (isStatic || isAbstract) {

@@ -65,7 +65,7 @@
 		<!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
 		<checkstyle.version>10.17.0</checkstyle.version>
 		<!-- https://mvnrepository.com/artifact/com.mycila/license-maven-plugin -->
-		<license-maven-plugin.version>4.5</license-maven-plugin.version>
+		<license-maven-plugin.version>4.6</license-maven-plugin.version>
 
 		<!-- By default (i.e. in local environments), check for code formatting AFTER trying automatic fixes. -->
 		<!-- We suppose the developper would see the fixed and include them in his commit. -->

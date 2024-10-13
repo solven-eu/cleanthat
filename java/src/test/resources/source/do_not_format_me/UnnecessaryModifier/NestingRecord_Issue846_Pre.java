@@ -26,6 +26,6 @@ public record SomeRecord(int i) {
 	public static enum SomeEnum {
 	}
 
-	public static final record SomeRecord(int i) {
+	public static final record SomeNestedRecord(int i) {
 	}
 }

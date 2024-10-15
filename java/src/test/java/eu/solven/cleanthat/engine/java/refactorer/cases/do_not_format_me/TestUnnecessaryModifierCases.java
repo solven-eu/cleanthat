@@ -224,6 +224,19 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 			// public and static are redundant
 			public static enum MyEnum {
 			}
+
+			// final is redundant
+			private static final void privateStaticFinalMethod() {
+			}
+
+			// final is not redundant
+			// https://stackoverflow.com/questions/1743715/behaviour-of-final-static-method/1743748#1743748
+			static final void staticFinalMethod() {
+			}
+
+			// final is redundant
+			private final void privateFinalMethod() {
+			}
 		}
 
 		public static class Post {
@@ -268,6 +281,19 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 
 			// public and static are redundant
 			public enum MyEnum {
+			}
+
+			// final is redundant
+			private static void privateStaticFinalMethod() {
+			}
+
+			// final is not redundant
+			// https://stackoverflow.com/questions/1743715/behaviour-of-final-static-method/1743748#1743748
+			static final void staticFinalMethod() {
+			}
+
+			// final is redundant
+			private void privateFinalMethod() {
 			}
 		}
 	}
@@ -424,17 +450,47 @@ public class TestUnnecessaryModifierCases extends AJavaparserRefactorerCases {
 
 	@CompareCompilationUnitsAsStrings(
 			pre = "public class NestingRecord {\n"
-					+ "		public static final record Person (String name, String address) {}\n"
-					+ "	}",
-			post = "public class NestingRecord {\n" + "		public record Person (String name, String address) {}\n"
-					+ "	}")
-	public static class Issue846_record_nested {
+					+ "\tpublic static final record Person (String name, String address) {}\n"
+					+ "}",
+			post = "public class NestingRecord {\n" + "\tpublic record Person (String name, String address) {}\n" + "}")
+	public static class Issue846_record_nested_within_class {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "public interface NestingRecord {\n"
+					+ "\tpublic static final record Person (String name, String address) {}\n"
+					+ "}",
+			post = "public interface NestingRecord {\n"
+					+ "\trecord Person (String name, String address) {}\n"
+					+ "}")
+	public static class Issue846_record_nested_within_interface {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "public @interface NestingRecord {\n"
+					+ "\tpublic static final record Person (String name, String address) {}\n"
+					+ "}",
+			post = "public @interface NestingRecord {\n"
+					+ "\trecord Person (String name, String address) {}\n"
+					+ "}")
+	public static class Issue846_record_nested_within_annotation {
+	}
+
+	@CompareCompilationUnitsAsStrings(
+			pre = "public enum NestingRecord {\n" + ";\n"
+					+ "\n"
+					+ "\tpublic static final record Person (String name, String address) {}\n"
+					+ "}",
+			post = "public enum NestingRecord {\n" + ";\n"
+					+ "\n"
+					+ "\tpublic record Person (String name, String address) {}\n"
+					+ "}")
+	public static class Issue846_record_nested_within_enum {
 	}
 
 	@CompareCompilationUnitsAsResources(
-			pre = "/source/do_not_format_me/UnnecessaryModifier/" + "NestingRecord_Issue846_Pre.java",
-			post = "/source/do_not_format_me/UnnecessaryModifier/" + "NestingRecord_Issue846_Post.java")
+			pre = "/source/do_not_format_me/UnnecessaryModifier/NestingRecord_Issue846_Pre.java",
+			post = "/source/do_not_format_me/UnnecessaryModifier/NestingRecord_Issue846_Post.java")
 	public static class Issue846_record_nesting {
 	}
-
 }

@@ -22,4 +22,10 @@ public record SomeRecord(int i) {
 
 	public @interface SomeAnnotation {
 	}
+
+	public enum SomeEnum {
+	}
+
+	public record SomeNestedRecord(int i) {
+	}
 }

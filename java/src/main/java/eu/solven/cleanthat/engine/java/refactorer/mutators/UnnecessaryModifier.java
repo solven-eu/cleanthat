@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
@@ -31,7 +30,6 @@ import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableSet;
 
@@ -98,101 +96,59 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 		return "https://jsparrow.github.io/rules/remove-modifiers-in-interface-properties.html";
 	}
 
-	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
 	protected boolean processNotRecursively(NodeAndSymbolSolver<?> nodeAndSymbolSolver) {
-		Node node = nodeAndSymbolSolver.getNode();
-		if (!(node instanceof Modifier)) {
-			return false;
-		}
-		var modifier = (Modifier) node;
+		return Optional.ofNullable(nodeAndSymbolSolver.getNode())
+				.filter(Modifier.class::isInstance)
+				.map(Modifier.class::cast)
+				.map(modifier -> isRedundant(modifier) && removeModifier(modifier))
+				.orElse(false);
+	}
 
-		if (modifier.getParentNode().isEmpty()) {
-			return false;
-		}
+	private boolean isRedundant(Modifier modifier) {
+		return modifier.getParentNode().map(parentNode -> {
+			switch (modifier.getKeyword()) {
+			case ABSTRACT:
+				return isImplicitlyAbstract(parentNode);
+			case FINAL:
+				return isImplicitlyFinal(parentNode);
+			case PUBLIC:
+				return isImplicitlyPublic(parentNode);
+			case STATIC:
+				return isImplicitlyStatic(parentNode);
+			default:
+				return false;
+			}
+		}).orElse(false);
+	}
 
-		var parentNode = modifier.getParentNode().get();
-		if (!(parentNode instanceof MethodDeclaration) && !(parentNode instanceof FieldDeclaration)
-		// TypeDeclaration covers interface|class|enum|record
-				&& !(parentNode instanceof TypeDeclaration)
-				&& !(parentNode instanceof AnnotationMemberDeclaration)) {
-			return false;
-		}
+	private boolean isImplicitlyAbstract(Node node) {
+		return isInterfaceLike(node)
+				|| (node instanceof MethodDeclaration || node instanceof AnnotationMemberDeclaration)
+						&& node.getParentNode().filter(this::isInterfaceLike).isPresent();
+	}
 
-		boolean isStatic = modifier.getKeyword() == Keyword.STATIC;
-		boolean isAbstract = modifier.getKeyword() == Keyword.ABSTRACT;
-		boolean isFinal = modifier.getKeyword() == Keyword.FINAL;
+	private boolean isImplicitlyFinal(Node node) {
+		return node instanceof RecordDeclaration
+				|| node instanceof FieldDeclaration && node.getParentNode().filter(this::isInterfaceLike).isPresent()
+				|| node instanceof MethodDeclaration && ((MethodDeclaration) node).isPrivate();
+	}
 
-		// Some modifiers can be removed based only on their parent
-		{
-			if (parentNode instanceof RecordDeclaration) {
-				// Records are implicitly static, independently of their parentNode
-				// https://github.com/projectlombok/lombok/issues/3140
-				if (isStatic) {
-					return removeModifier(modifier);
-				}
+	private boolean isImplicitlyPublic(Node node) {
+		return node.getParentNode().filter(this::isInterfaceLike).isPresent();
+	}
 
-				// Records are implicitly final, independently of their parentNode
-				if (isFinal) {
-					return removeModifier(modifier);
-				}
-			} else if (parentNode instanceof MethodDeclaration) {
-				// static methods are never implicit
-				if (isStatic) {
-					return false;
-				}
-				if (isFinal && ((MethodDeclaration) parentNode).isPrivate()) {
-					return removeModifier(modifier);
-				}
-			} else if (isInterfaceLike(parentNode)) {
-				// interfaceLike are implicitly static and abstract
-				if (isStatic || isAbstract) {
-					return removeModifier(modifier);
-				}
-			} else if (parentNode instanceof EnumDeclaration) {
+	private boolean isImplicitlyStatic(Node node) {
+		// interfaces and annotations are implicitly static
+		return isInterfaceLike(node)
 				// enums are implicitly static
 				// https://stackoverflow.com/questions/23127926/static-enum-vs-non-static-enum
-				if (isStatic) {
-					return removeModifier(modifier);
-				}
-			} else {
-				log.trace("Let's check rules for inner|nested nodes");
-			}
-		}
-
-		if (parentNode.getParentNode().isEmpty()) {
-			// Given a modifier, the grandParent node would be the owning method|field|type
-			return false;
-		}
-		var grandParentNode = parentNode.getParentNode().get();
-
-		if (!(grandParentNode instanceof TypeDeclaration)) {
-			// Only types like Interfaces and Annotations may have fields|methods with implicit modifiers
-			return false;
-		}
-
-		boolean isInInterfaceLike = isInterfaceLike(grandParentNode);
-		if (!isInInterfaceLike) {
-			return false;
-		}
-
-		boolean isNestedOrInnerClass = parentNode instanceof ClassOrInterfaceDeclaration
-				&& !((ClassOrInterfaceDeclaration) parentNode).isInterface();
-
-		boolean isPublic = modifier.getKeyword() == Keyword.PUBLIC;
-
-		// We are considering a modifier from an interface method|field|classOrInterface|annotation|enum
-		if (isPublic || isStatic) {
-			return removeModifier(modifier);
-		} else if (isNestedOrInnerClass) {
-			// nestedOrInnerClass: no more qualifiers could be removed
-			return false;
-		} else if (isAbstract || isFinal) {
-			// interface: field|method are implicitly abstract|final
-			return removeModifier(modifier);
-		}
-
-		return false;
+				|| node instanceof EnumDeclaration
+				// records are implicitly static
+				// https://github.com/projectlombok/lombok/issues/3140
+				|| node instanceof RecordDeclaration
+				|| (node instanceof ClassOrInterfaceDeclaration || node instanceof FieldDeclaration)
+						&& node.getParentNode().filter(this::isInterfaceLike).isPresent();
 	}
 
 	private boolean isInterfaceLike(Node node) {

@@ -50,7 +50,7 @@
 
 		<!-- https://github.com/solven-eu/pepper/releases -->
 		<pepper.version>4.5</pepper.version>
-		<error-prone.version>2.33.0</error-prone.version>
+		<error-prone.version>2.34.0</error-prone.version>
 		<!-- 2.36.0 is broken due to https://github.com/diffplug/spotless/issues/1583 -->
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
 		<spotless.version>2.43.0</spotless.version>

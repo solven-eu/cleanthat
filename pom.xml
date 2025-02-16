@@ -60,7 +60,7 @@
 
 		<!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
 		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-		<sentry-spring.version>7.17.0</sentry-spring.version>
+		<sentry-spring.version>7.12.1</sentry-spring.version>
 		<!-- Used for agnostic AWS-Lambda -->
 		<spring-cloud.version>2021.0.9</spring-cloud.version>
 
@@ -97,7 +97,7 @@
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>1.12.778</version>
+				<version>1.12.765</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -106,18 +106,18 @@
 				<!-- Guava brings 2.5.2 while Pepper brings 2.9.0 -->
 				<groupId>org.checkerframework</groupId>
 				<artifactId>checker-qual</artifactId>
-				<version>3.48.2</version>
+				<version>3.45.0</version>
 			</dependency>
 			<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
 			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>9.47</version>
+				<version>9.40</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>33.3.1-jre</version>
+				<version>33.2.1-jre</version>
 			</dependency>
 
 			<!-- <dependency> -->
@@ -389,7 +389,7 @@
 					<!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
 					<groupId>io.github.git-commit-id</groupId>
 					<artifactId>git-commit-id-maven-plugin</artifactId>
-					<version>9.0.1</version>
+					<version>8.0.2</version>
 					<configuration>
 						<format>json</format>
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>

@@ -1,21 +1,82 @@
-# Set the default behavior, in case people don't have core.autocrlf set.
-* text=auto
+# https://github.com/github/gitignore/blob/master/Maven.gitignore
+target/
+pom.xml.tag
+# mvn release
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
-*.c text
-*.h text
 
-# Declare files that will always have CRLF line endings on checkout.
-*.bat text eol=crlf
-*.ps1 text eol=crlf
+# Custom
+*.class
 
-# C#
-*.sln text eol=crlf
-*.cs text eol=crlf
-*.csproj text eol=crlf
+# Package Files #
+# *.jar keep jar as we may need to commit external jars not in any maven repo
+*.war
+*.ear
 
-# Denote all files that are truly binary and should not be modified.
-*.png binary
-*.jpg binary
-*.svg binary
+# eclipse
+.classpath
+.project
+.settings
+bin
+.factorypath
+
+# JavaMissionControl
+*.jfr
+
+#netbeans
+nbproject
+
+# hs_err
+*.log
+*.log.gz
+
+#IntelliJ
+*.iml
+.idea
+
+.DS_Store
+Thumbs.db
+# Used by jenv under MacOS
+.java-version
+
+
+#Android Studio
+#http://stackoverflow.com/questions/16736856/what-should-be-in-my-gitignore-for-an-android-studio-project
+.gradle
+/local.properties
+.google
+#build is expected by NodeWebPack
+#build
+captures
+screenshots
+*.apk
+
+# H2
+*.db
+
+# NPM
+node
+node_modules
+
+.pmd
+.pmdruleset.xml
+.checkstyle
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+# VS Build folder?
+obj
+
+# In bash module
+.jython_cache

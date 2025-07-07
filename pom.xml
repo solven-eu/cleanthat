@@ -47,6 +47,9 @@
 		<module>spotless</module>
 
 		<module>openrewrite</module>
+
+		<!-- assert rules on code base -->
+		<module>meta-tests</module>
 	</modules>
 
 	<scm>

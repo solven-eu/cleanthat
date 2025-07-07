@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,9 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  */
 public class AllIncludingDraftCompositeMutators extends CompositeMutator<CompositeMutator<?>>
 		implements IConstructorNeedsJdkVersion {
-	// This packageName is not part of the public API
-	@Deprecated
-	static final String PACKAGE_COMPOSITE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators.composite";
 
 	static final Supplier<List<Class<? extends CompositeMutator<?>>>> ALL_INCLUDINGDRAFT =
-			Suppliers.memoize(() -> MutatorsScanner.scanPackageMutators(PACKAGE_COMPOSITE_MUTATORS)
+			Suppliers.memoize(() -> MutatorsScanner.scanCompositeMutators()
 					.stream()
 					// Exclude itself
 					.filter(m -> !m.equals(AllIncludingDraftCompositeMutators.class))
@@ -51,7 +48,7 @@ public class AllIncludingDraftCompositeMutators extends CompositeMutator<Composi
 					.map(m -> (Class<? extends CompositeMutator<?>>) m)
 
 					// Sort by className, to always apply mutators in the same order
-					.sorted(Comparator.comparing(m -> m.getClass().getName()))
+					.sorted(Comparator.comparing(Class::getName))
 					.collect(Collectors.toList()));
 
 	/**

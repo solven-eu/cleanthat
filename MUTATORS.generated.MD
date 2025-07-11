@@ -692,14 +692,6 @@ isDraft
 
 languageLevel: jdk1
 
-### [CompositeMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeMutator.java)
-
-Cleanthat own ID: CompositeMutator
-
-isDraft
-
-languageLevel: jdk1
-
 ### [CompositeWalkingMutator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/composite/CompositeWalkingMutator.java)
 
 Cleanthat own ID: CompositeWalkingMutator

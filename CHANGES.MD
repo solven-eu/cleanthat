@@ -2,11 +2,12 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
-## [2.23 - Unreleased]
+## [2.23]
 
 * `UnnecessaryModifier` is reworked for simplification. It includes further management of `record`. (https://github.com/solven-eu/cleanthat/pull/848)
+* `MutatorsScanner` now relies on a hard-coded list of classNames to enable GraalVM compability (https://github.com/solven-eu/cleanthat/pull/895)
 
-## [2.22 - Unreleased]
+## [2.22]
 
 ### Fixed
 

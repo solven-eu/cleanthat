@@ -9,6 +9,8 @@
 	</parent>
 
 	<artifactId>java-eclipse</artifactId>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
 
 	<dependencyManagement>
 		<dependencies>

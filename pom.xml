@@ -9,6 +9,8 @@
 	</parent>
 	<artifactId>aggregator-cleanthat</artifactId>
 	<packaging>pom</packaging>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
 
 	<modules>
 		<module>parent</module>

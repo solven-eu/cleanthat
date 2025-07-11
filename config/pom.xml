@@ -7,6 +7,8 @@
 		<version>2.23-SNAPSHOT</version>
 	</parent>
 	<artifactId>config</artifactId>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
 
 	<properties>
 		<jacoco.branch.ratio>0.00</jacoco.branch.ratio>

@@ -9,6 +9,8 @@
 	</parent>
 
 	<artifactId>refactorer-test-helpers</artifactId>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
 
 	<dependencies>
 		<dependency>

@@ -9,6 +9,20 @@
 	</parent>
 
 	<artifactId>meta-tests</artifactId>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Holds integration tests, to ensure hardcoded mutators are the same as the one that would be found with classpath-scanning (for GraalVM support).</description>
+
+	<properties>
+		<!-- <wrapper.version>1.0.17.RELEASE</wrapper.version> -->
+		<maven.deploy.skip>true</maven.deploy.skip>
+
+		<!-- The equivalent property for nexus-staging-maven-plugin -->
+		<!-- https://github.com/sonatype/nexus-maven-plugins/blob/main/staging/maven-plugin/README.md -->
+		<!-- Useless with central-publishing-maven-plugin? -->
+		<!-- see excludeArtifacts in https://central.sonatype.org/publish/publish-portal-maven/ -->
+		<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+	</properties>
 
 	<dependencies>
 		<dependency>

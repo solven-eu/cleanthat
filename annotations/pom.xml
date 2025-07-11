@@ -9,6 +9,8 @@
 	</parent>
 
 	<artifactId>annotations</artifactId>
+	<!-- `name` is required by Sonatype-->
+	<name>${project.groupId}:${project.artifactId}</name>
 
 	<!-- Make sure this has not a single dependency ! -->
 </project>

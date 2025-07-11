@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,12 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScann
  */
 public class AllIncludingDraftSingleMutators extends CompositeMutator<IMutator> implements IConstructorNeedsJdkVersion {
 	// This packageName is not part of the public API
-	@Deprecated
-	static final String PACKAGE_SINGLE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators";
 
 	static final Supplier<List<Class<? extends IMutator>>> ALL_INCLUDINGDRAFT =
-			Suppliers.memoize(() -> MutatorsScanner.scanPackageMutators(PACKAGE_SINGLE_MUTATORS)
+			Suppliers.memoize(() -> MutatorsScanner.scanSingleMutators()
 					.stream()
 					// Sort by className, to always apply mutators in the same order
-					.sorted(Comparator.comparing(m -> m.getName()))
+					.sorted(Comparator.comparing(Class::getName))
 					.collect(Collectors.toList()));
 
 	public AllIncludingDraftSingleMutators(JavaVersion sourceJdkVersion) {

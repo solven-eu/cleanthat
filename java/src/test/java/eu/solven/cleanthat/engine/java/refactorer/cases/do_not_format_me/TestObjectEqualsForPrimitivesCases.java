@@ -36,19 +36,23 @@ public class TestObjectEqualsForPrimitivesCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	@UnmodifiedMethod
-	public static class CaseIntLong {
-		public boolean pre(int a, long b) {
-			return Objects.equals(a, b);
-		}
-	}
+	// Commented until the following is fixed (NOK with Eclipse 3.36.0 (June 2025))
+	// https://github.com/eclipse-jdt/eclipse.jdt.core/issues/3870
+	// @UnmodifiedMethod
+	// public static class CaseIntLong {
+	// public boolean pre(int a, long b) {
+	// return Objects.equals(a, b);
+	// }
+	// }
 
-	@UnmodifiedMethod
-	public static class CaseIntDouble {
-		public boolean pre(int a, double b) {
-			return Objects.equals(a, b);
-		}
-	}
+	// Commented until the following is fixed (NOK with Eclipse 3.36.0 (June 2025))
+	// https://github.com/eclipse-jdt/eclipse.jdt.core/issues/3870
+	// @UnmodifiedMethod
+	// public static class CaseIntDouble {
+	// public boolean pre(int a, double b) {
+	// return Objects.equals(a, b);
+	// }
+	// }
 
 	@UnmodifiedMethod
 	public static class CaseObject {

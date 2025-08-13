@@ -4,6 +4,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemen
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareInnerClasses;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedInnerClass;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
@@ -101,6 +102,27 @@ public class TestUseUnderscoresInNumericLiteralsCases extends AJavaparserRefacto
 		public interface Pre {
 			long i_hex = 0x12E45A6E;
 			double d_hex = 0x4.5p1f;
+		}
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/896
+	@CompareMethods
+	public static class Case896 {
+		public Object pre() {
+			return 4070.44239;
+		}
+
+		public Object post() {
+			return 4_070.442_39;
+		}
+	}
+
+	// This is invalid due to `The literal 36e-11234 of type double is out of range `
+	@UnmodifiedMethod
+	public static class LargeExponent {
+		public int pre() {
+			// double binary = 36e-11234;
+			return 0;
 		}
 	}
 }

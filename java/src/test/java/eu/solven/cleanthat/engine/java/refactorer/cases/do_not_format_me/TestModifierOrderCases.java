@@ -116,4 +116,11 @@ public class TestModifierOrderCases extends AJavaparserRefactorerCases {
 			post = "public sealed interface IUpdatePortCommand permits UpdateScheduleCommand, UpdateStateCommand {}")
 	public static class Issue_SealedClass_wrongOrder {
 	}
+
+	// https://github.com/solven-eu/cleanthat/issues/897
+	@CompareCompilationUnitsAsStrings(
+			pre = "public class A { private transient final @Deprecated String ANNOTATED; }",
+			post = "public class A { @Deprecated private final transient String ANNOTATED; }")
+	public static class Issue_MissingWhiteSpaceBetweenAnnotationAndFirstModifier {
+	}
 }

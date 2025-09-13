@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.NodeWithModifiers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -152,6 +154,16 @@ public class ModifierOrder extends AJavaparserNodeMutator {
 					sortedModifiers,
 					"https://github.com/javaparser/javaparser/issues/4245");
 			return false;
+		}
+
+		// https://github.com/solven-eu/cleanthat/issues/897
+		if (nodeWithModifiers instanceof NodeWithAnnotations) {
+			var nodeWithAnnotations = (NodeWithAnnotations<?>) nodeWithModifiers;
+			NodeList<AnnotationExpr> annotations = nodeWithAnnotations.getAnnotations();
+			if (annotations.isNonEmpty()) {
+				nodeWithAnnotations.setAnnotations(new NodeList<>());
+				nodeWithAnnotations.setAnnotations(annotations);
+			}
 		}
 
 		// https://github.com/javaparser/javaparser/issues/3935

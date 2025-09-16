@@ -20,7 +20,7 @@ public class TestModifierOrderThenUnnecessaryModifierCases extends AJavaparserRe
 
 	// https://github.com/solven-eu/cleanthat/issues/802
 	@CompareCompilationUnitsAsStrings(pre = "interface TopLevelInterface { public  final static int i = 0; }",
-			post = "interface TopLevelInterface {\n" + "\n" + "    int i = 0;\n" + "}\n")
+			post = "interface TopLevelInterface { int i = 0; }")
 	public static class Issue802 {
 	}
 

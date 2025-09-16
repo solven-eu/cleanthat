@@ -136,13 +136,25 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserNodeMutator {
 					var totalNbDigits = noUnderscore.length() - 1;
 					sb = new StringBuilder(totalNbDigits + 1 + totalNbDigits / BLOCK_SIZE);
 
-					{
-						var beforeDot = noUnderscore.substring(0, indexOfDot);
+					var beforeDot = noUnderscore.substring(0, indexOfDot);
+					var afterDot = noUnderscore.substring(indexOfDot + 1, lastIndex);
+
+					// Simulate each legs in a temporary StringBuilder to know if they would add an `_`
+					StringBuilder tmpSB = new StringBuilder();
+					boolean hasBeforeUnderscore = appendWithUnderscores(beforeDot, tmpSB);
+					boolean hasAfterUnderscore = appendWithUnderscores(afterDot, tmpSB, true);
+
+					// https://www.baeldung.com/java-xor-operator
+					if (hasBeforeUnderscore ^ hasAfterUnderscore) {
+						// https://github.com/solven-eu/cleanthat/issues/896
+						// We need both legs to have underscores, following PMD expectation
+						doAppendWithUnderscores(beforeDot, sb, false);
+						sb.append('.');
+						doAppendWithUnderscores(afterDot, sb, true);
+					} else {
+						// Treat each legs independantly
 						appendWithUnderscores(beforeDot, sb);
-					}
-					sb.append('.');
-					{
-						var afterDot = noUnderscore.substring(indexOfDot + 1, lastIndex);
+						sb.append('.');
 						appendWithUnderscores(afterDot, sb, true);
 					}
 				}
@@ -175,26 +187,49 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserNodeMutator {
 		}
 	}
 
-	private void appendWithUnderscores(String noUnderscore, StringBuilder sb) {
-		appendWithUnderscores(noUnderscore, sb, false);
+	private boolean appendWithUnderscores(String noUnderscore, StringBuilder sb) {
+		return appendWithUnderscores(noUnderscore, sb, false);
 	}
 
-	private void appendWithUnderscores(String noUnderscore, StringBuilder sb, boolean reverseForDecimals) {
+	/**
+	 * 
+	 * @param noUnderscore
+	 * @param sb
+	 * @param reverseForDecimals
+	 * @return true if at least one underscore is added
+	 */
+	private boolean appendWithUnderscores(String noUnderscore, StringBuilder sb, boolean reverseForDecimals) {
 		if (noUnderscore.length() <= getAcceptableDecimalLength()) {
 			sb.append(noUnderscore);
 
-			return;
+			return false;
 		}
 
+		return doAppendWithUnderscores(noUnderscore, sb, reverseForDecimals);
+	}
+
+	/**
+	 * Force adding `_` in proper locations. Even if the number is smaller than
+	 * {@link UseUnderscoresInNumericLiterals#getAcceptableDecimalLength()}.
+	 * 
+	 * @param noUnderscore
+	 * @param sb
+	 * @param reverseForDecimals
+	 * @return true if at least one underscore is added
+	 */
+	private boolean doAppendWithUnderscores(String noUnderscore, StringBuilder sb, boolean reverseForDecimals) {
 		assert noUnderscore.matches("\\d+");
 
 		var nbDigits = noUnderscore.length();
 
 		var position = 0;
 		var nbDigitsLeft = nbDigits;
+
+		boolean hasUnderscore = false;
 		while (nbDigitsLeft > 0) {
 			if (position != 0) {
 				sb.append('_');
+				hasUnderscore = true;
 			}
 
 			int nextBlockSize;
@@ -209,6 +244,8 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserNodeMutator {
 			nbDigitsLeft -= nextBlockSize;
 			position = nextPosition;
 		}
+
+		return hasUnderscore;
 	}
 
 }

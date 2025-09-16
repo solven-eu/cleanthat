@@ -109,11 +109,23 @@ public class TestUseUnderscoresInNumericLiteralsCases extends AJavaparserRefacto
 	@CompareMethods
 	public static class Case896 {
 		public Object pre() {
-			return 4070.44239;
+			return 1234.12345;
 		}
 
 		public Object post() {
-			return 4_070.442_39;
+			return 1_234.123_45;
+		}
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/896
+	@CompareMethods
+	public static class Case896_LongerPrefixThanSuffix {
+		public Object pre() {
+			return 12345.1234;
+		}
+
+		public Object post() {
+			return 12_345.123_4;
 		}
 	}
 

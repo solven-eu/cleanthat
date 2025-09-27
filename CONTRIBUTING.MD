@@ -65,6 +65,14 @@ A given rule can be tested against a large set of codebases with https://github.
 
 # Notes for maintainers
 
+## Additional mutator
+
+Add you rule in `eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner`.
+
+## Generate documentation
+
+Run `TestGenerateDocumentation`.
+
 ## Deploy into Production (AWS Lambda):
 
         git push origin master:deploy-prd

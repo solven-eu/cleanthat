@@ -2,6 +2,12 @@ This document is intended for CleanThat developers and users (e.g. through [Spot
 
 We adhere to the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format
 
+## [2.24]
+
+* `UseUnderscoresInNumericLiterals` has now homogeneous behavior between both floating number legs, following PMD expectation. https://github.com/solven-eu/cleanthat/issues/896
+* `ModifierOrder` may corrupt code by lack of whitespaces due to JavaParser bug. https://github.com/solven-eu/cleanthat/issues/897
+* `JavaParser` is updated to `3.27.0` to fix https://github.com/solven-eu/cleanthat/issues/899
+
 ## [2.23]
 
 * `UnnecessaryModifier` is reworked for simplification. It includes further management of `record`. (https://github.com/solven-eu/cleanthat/pull/848)

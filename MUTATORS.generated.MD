@@ -110,7 +110,7 @@ languageLevel: jdk1.8
 
 ### [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
 
-PMD: [SimplifyStartsWith]("https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_performance.html#simplifystartswith")
+PMD: [SimplifyStartsWith](https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_performance.html#simplifystartswith)
 
 Cleanthat own ID: SimplifyStartsWith
 

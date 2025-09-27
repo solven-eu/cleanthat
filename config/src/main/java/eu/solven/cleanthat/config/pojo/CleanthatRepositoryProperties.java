@@ -44,7 +44,7 @@ public final class CleanthatRepositoryProperties implements IHasSourceCodeProper
 	public static final String PREVIOUS_SYNTAX_VERSION = "2021-08-02";
 	public static final String LATEST_SYNTAX_VERSION = "2023-01-09";
 
-	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or the the user_config
+	// Not named 'config_version' else it may be unclear if it applies to that config_syntax or to the user_config
 	// version
 	// AWS IAM policy relies on a field named 'Version' with a localDate as value: it is a source of inspiration
 	@Builder.Default

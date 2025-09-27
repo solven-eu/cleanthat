@@ -244,11 +244,11 @@ public abstract class AbstractGitHubWireMockTest {
 	 * Creates a temporary repository that will be deleted at the end of the test.
 	 *
 	 * @param name
-	 *            string name of the the repository
+	 *            string name of the repository
 	 *
 	 * @return a temporary repository
 	 * @throws IOException
-	 *             if repository could not be created or retrieved.
+	 *             if the repository could not be created or retrieved.
 	 */
 	protected GHRepository getTempRepository(String name) throws IOException {
 		var fullName = getOrganization() + '/' + name;

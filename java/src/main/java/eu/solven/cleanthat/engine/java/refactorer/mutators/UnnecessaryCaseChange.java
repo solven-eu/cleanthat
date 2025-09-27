@@ -31,7 +31,7 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
- * Switch o.toLowerCase().equals("someString") to o.equalsIgnoreCase("someString")
+ * Switch o.toLowerCase().equals("some_string") to o.equalsIgnoreCase("some_string")
  *
  * @author Balazs Glatz
  */

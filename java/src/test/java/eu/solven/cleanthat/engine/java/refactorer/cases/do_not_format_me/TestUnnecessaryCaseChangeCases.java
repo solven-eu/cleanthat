@@ -16,19 +16,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         return new UnnecessaryCaseChange();
     }
 
-    @UnmodifiedMethod
-    public static class CaseToLowerCaseWithLocale {
-        public Object pre(String string) {
-            return string.toLowerCase(Locale.ENGLISH).equals("lowercase");
-        }
-    }
-
-    @UnmodifiedMethod
-    public static class CaseToUpperCaseWithLocale {
-        public Object pre(String string) {
-            return string.toUpperCase(Locale.ENGLISH).equals("UPPERCASE");
-        }
-    }
+    // Cases that should be replaced with equalsIgnoreCase
 
     @CompareMethods
     public static class CaseToLowerCaseWithHardcodedLowercase {
@@ -49,6 +37,68 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
 
         public Object post(String string) {
             return string.equalsIgnoreCase("UPPERCASE");
+        }
+    }
+
+    @CompareMethods
+    public static class CaseToLowerCaseWithHardcodedNull {
+        public Object pre(String string) {
+            return string.toLowerCase().equals(null);
+        }
+
+        public Object post(String string) {
+            return string.equalsIgnoreCase(null);
+        }
+    }
+
+    @CompareMethods
+    public static class CaseToUpperCaseWithHardcodedNull {
+        public Object pre(String string) {
+            return string.toUpperCase().equals(null);
+        }
+
+        public Object post(String string) {
+            return string.equalsIgnoreCase(null);
+        }
+    }
+
+    @Ignore("WIP")
+    @CompareMethods
+    public static class CaseToLowerCaseWithHardcodedLowercaseFlipped {
+        public Object pre(String string) {
+            return "lowercase".equals(string.toLowerCase());
+        }
+
+        public Object post(String string) {
+            return "lowercase".equalsIgnoreCase(string);
+        }
+    }
+
+    @Ignore("WIP")
+    @CompareMethods
+    public static class CaseToUpperCaseWithHardcodedUppercaseFlipped {
+        public Object pre(String string) {
+            return "UPPERCASE".equals(string.toUpperCase());
+        }
+
+        public Object post(String string) {
+            return "UPPERCASE".equalsIgnoreCase(string);
+        }
+    }
+
+    // Cases thats should be ignored as the replacement would change execution behavior
+
+    @UnmodifiedMethod
+    public static class CaseToLowerCaseWithLocale {
+        public Object pre(String string) {
+            return string.toLowerCase(Locale.ENGLISH).equals("lowercase");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseToUpperCaseWithLocale {
+        public Object pre(String string) {
+            return string.toUpperCase(Locale.ENGLISH).equals("UPPERCASE");
         }
     }
 
@@ -80,28 +130,6 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    @CompareMethods
-    public static class CaseToLowerCaseWithHardcodedNull {
-        public Object pre(String string) {
-            return string.toLowerCase().equals(null);
-        }
-
-        public Object post(String string) {
-            return string.equalsIgnoreCase(null);
-        }
-    }
-
-    @CompareMethods
-    public static class CaseToUpperCaseWithHardcodedNull {
-        public Object pre(String string) {
-            return string.toUpperCase().equals(null);
-        }
-
-        public Object post(String string) {
-            return string.equalsIgnoreCase(null);
-        }
-    }
-
     @UnmodifiedMethod
     public static class CaseToLowerCaseWithLocaleFlipped {
         public Object pre(String string) {
@@ -113,30 +141,6 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     public static class CaseToUpperCaseWithLocaleFlipped {
         public Object pre(String string) {
             return "UPPERCASE".equals(string.toUpperCase(Locale.ENGLISH));
-        }
-    }
-
-    @Ignore("WIP")
-    @CompareMethods
-    public static class CaseToLowerCaseWithHardcodedLowercaseFlipped {
-        public Object pre(String string) {
-            return "lowercase".equals(string.toLowerCase());
-        }
-
-        public Object post(String string) {
-            return "lowercase".equalsIgnoreCase(string);
-        }
-    }
-
-    @Ignore("WIP")
-    @CompareMethods
-    public static class CaseToUpperCaseWithHardcodedUppercaseFlipped {
-        public Object pre(String string) {
-            return "UPPERCASE".equals(string.toUpperCase());
-        }
-
-        public Object post(String string) {
-            return "UPPERCASE".equalsIgnoreCase(string);
         }
     }
 
@@ -165,6 +169,40 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     public static class CaseToUpperCaseWithHardcodedMixedCaseFlipped {
         public Object pre(String string) {
             return "MixedCase".equals(string.toUpperCase());
+        }
+    }
+
+    // Out-of-scope cases, where the replacement should be `equals()` instead of `equalsIgnoreCase()`
+
+    @Ignore("WIP")
+    @UnmodifiedMethod
+    public static class CaseToLowerCaseWithToLowerCase {
+        public Object pre(String first, String second) {
+            return first.toLowerCase().equals(second.toLowerCase());
+        }
+    }
+
+    @Ignore("WIP")
+    @UnmodifiedMethod
+    public static class CaseToUpperCaseWithToUpperCase {
+        public Object pre(String first, String second) {
+            return first.toUpperCase().equals(second.toUpperCase());
+        }
+    }
+
+    @Ignore("WIP")
+    @UnmodifiedMethod
+    public static class CaseToLowerCaseWithToUpperCase {
+        public Object pre(String first, String second) {
+            return first.toLowerCase().equals(second.toUpperCase());
+        }
+    }
+
+    @Ignore("WIP")
+    @UnmodifiedMethod
+    public static class CaseToUpperCaseWithToLowerCase {
+        public Object pre(String first, String second) {
+            return first.toUpperCase().equals(second.toLowerCase());
         }
     }
 

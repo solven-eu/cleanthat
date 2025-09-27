@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,10 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.codeprovider.git.GitRepoBranchSha1;
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Enable a Facade over RewiewRequestProvider
@@ -36,8 +35,8 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public final class GithubFacade {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubFacade.class);
 
 	final GitHub github;
 	final String repoName;

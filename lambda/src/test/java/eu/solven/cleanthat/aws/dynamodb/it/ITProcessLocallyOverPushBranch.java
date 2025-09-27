@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,6 +30,7 @@ import com.nimbusds.jose.JOSEException;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.CheckWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step1_checkconfiguration.CheckConfigWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This enables processing similarly that on a push event over given branch
@@ -39,13 +38,13 @@ import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLamb
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 @Deprecated(since = "NotReady: it is complicated to craft GitHub events manually (installation.id, after.sha1, ...)")
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { CheckWebhooksLambdaFunction.class,
 		CheckConfigWebhooksLambdaFunction.class,
 		ExecuteCleaningWebhooksLambdaFunction.class })
 public class ITProcessLocallyOverPushBranch {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITProcessLocallyOverPushBranch.class);
 
 	@Autowired
 	CheckWebhooksLambdaFunction checkEvent;

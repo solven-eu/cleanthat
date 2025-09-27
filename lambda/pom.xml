@@ -82,6 +82,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
 			<!-- https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html#_comparing_functional_with_traditional_bean_definitions -->
 			<!-- It seems we need this to open an actual HTTP server for the Function -->
 			<groupId>org.springframework.cloud</groupId>

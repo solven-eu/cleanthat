@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -29,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns '{}' into ''
@@ -36,8 +34,8 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  * @author Benoit Lacelle
  */
 // https://github.com/openrewrite/rewrite/blob/main/rewrite-java/src/main/java/org/openrewrite/java/cleanup/EmptyBlockVisitor.java
+@Slf4j
 public class EmptyControlStatement extends AJavaparserNodeMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmptyControlStatement.class);
 
 	@Override
 	public String minimalJavaVersion() {

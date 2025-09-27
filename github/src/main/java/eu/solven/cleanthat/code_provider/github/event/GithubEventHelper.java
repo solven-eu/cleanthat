@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
@@ -37,6 +35,7 @@ import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.pepper.resource.PepperResourceHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps executing logic on GithubEvents
@@ -44,8 +43,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class GithubEventHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubEventHelper.class);
 
 	protected GithubEventHelper() {
 		// hidden

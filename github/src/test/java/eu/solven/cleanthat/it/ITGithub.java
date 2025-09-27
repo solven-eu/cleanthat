@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.kohsuke.github.GHApp;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -57,11 +55,11 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
+import lombok.extern.slf4j.Slf4j;
 
 //https://github-api.kohsuke.org/githubappjwtauth.html
+@Slf4j
 public class ITGithub {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITGithub.class);
-
 	private static final String SOLVEN_EU_MITRUST_DATASHARING = "solven-eu/mitrust-datasharing";
 	private static final String SOLVEN_EU_CLEANTHAT = "solven-eu/cleanthat";
 	private static final String SOLVEN_EU_CLEANTHAT_ITS = "solven-eu/cleanthat-integrationtests";

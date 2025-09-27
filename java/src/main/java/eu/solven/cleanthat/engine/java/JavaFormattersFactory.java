@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatStepProperties;
@@ -35,14 +32,15 @@ import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Formatter for Java
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class JavaFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JavaFormattersFactory.class);
 
 	public JavaFormattersFactory(ConfigHelpers configHelpers) {
 		super(configHelpers);

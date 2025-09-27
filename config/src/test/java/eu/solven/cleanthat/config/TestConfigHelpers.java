@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
@@ -37,10 +35,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import eu.solven.cleanthat.config.pojo.SourceCodeProperties;
 import eu.solven.cleanthat.formatter.LineEnding;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class TestConfigHelpers {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestConfigHelpers.class);
 
 	private static final String EOL = System.lineSeparator();
 

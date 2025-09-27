@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -37,6 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.VariableDeclarationExprHepers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns `boolean b=false; if(X) b=true;` into `boolean b=X;`
@@ -46,10 +44,10 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @RepeatOnSuccess
 @ApplyBeforeMe({ RedundantLogicalComplementsInStream.class })
 public class SimplifyBooleanInitialization extends ARefactorConsecutiveStatements {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimplifyBooleanInitialization.class);
 
 	@Override
 	public String minimalJavaVersion() {

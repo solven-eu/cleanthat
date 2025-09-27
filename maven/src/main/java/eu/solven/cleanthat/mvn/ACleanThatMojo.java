@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,12 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The mojo of the mvn plugin
@@ -41,8 +40,8 @@ import eu.solven.cleanthat.config.ICleanthatConfigConstants;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@Slf4j
 public abstract class ACleanThatMojo extends AbstractMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
 
 	// To be synced with CodeProviderHelpers.PATHES_CLEANTHAT.get(0)
 	public static final String MARKER_ANY_PARENT_DOTCLEANTHAT =

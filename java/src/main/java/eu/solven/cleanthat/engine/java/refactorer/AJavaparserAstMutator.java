@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
@@ -32,15 +29,16 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.pepper.logging.PepperLogHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Enables common behavior to JavaParser-based rules
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 public abstract class AJavaparserAstMutator implements IJavaparserAstMutator, ICountMutatorIssues {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AJavaparserAstMutator.class);
 
 	// Some mutator may edit thr input Node, before cancelling the operation: it would leave the input Node in an
 	// inconsistent state. To workaround this, we tried first simulating the operation on a cloned Node, but it led to

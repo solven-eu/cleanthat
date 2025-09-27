@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import org.junit.runner.RunWith;
 import org.kohsuke.github.AbstractGitHubWireMockTest;
 import org.kohsuke.github.GitHub;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +43,7 @@ import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.step2_executeclean.ExecuteCleaningWebhooksLambdaFunction;
 import eu.solven.cleanthat.language.IEngineProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This enables re-processing an event locally. Very useful to reproduce an issue, or test a know workload over a
@@ -53,11 +52,11 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { ExecuteCleaningWebhooksLambdaFunction.class,
 		AProcessLocallyDynamoDbEvent_ExecuteClean.CleanthatWiremockSpringConfigContext.class })
 public abstract class AProcessLocallyDynamoDbEvent_ExecuteClean extends AbstractGitHubWireMockTest {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AProcessLocallyDynamoDbEvent_ExecuteClean.class);
 
 	public static final String ENV_GITHUB_DO_RECORD = "github.do_record";
 	public static final String ENV_GITHUB_DO_REPLAY = "github.do_replay";

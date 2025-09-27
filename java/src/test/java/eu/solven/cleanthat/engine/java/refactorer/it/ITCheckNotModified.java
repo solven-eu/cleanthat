@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ import java.util.Map;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.StaticJavaParser;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 // TODO Move this to somewhere not specific to lambda?
 // https://github.com/javaparser/javaparser/issues/3317
+@Slf4j
 public class ITCheckNotModified {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITCheckNotModified.class);
 
 	protected Map<?, ?> ShouldNotMutate() {
 		// Before

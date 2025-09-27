@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,12 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns 'public static final someMethod();' into 'someMethod();' in interfaces
  *
  * @author Benoit Lacelle
  */
-@Slf4j
 public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 	@Override

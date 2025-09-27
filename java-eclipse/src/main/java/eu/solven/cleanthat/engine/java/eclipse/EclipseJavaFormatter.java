@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,11 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
 import eu.solven.pepper.logging.PepperLogHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Bridges to Eclipse formatting engine
@@ -43,8 +42,8 @@ import eu.solven.pepper.logging.PepperLogHelper;
 // Example configurations:
 // https://raw.githubusercontent.com/spring-io/spring-javaformat/master/.eclipse/eclipse-code-formatter.xml
 // https://raw.githubusercontent.com/solven-eu/pepper/master/static/src/main/resources/eclipse/eclipse_java_code_formatter.xml
+@Slf4j
 public class EclipseJavaFormatter implements ILintFixerWithId {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatter.class);
 
 	public static final String ID = "eclipse_formatter";
 

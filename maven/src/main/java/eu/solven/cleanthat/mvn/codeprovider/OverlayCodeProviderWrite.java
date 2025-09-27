@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 
@@ -33,6 +30,7 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This {@link ICodeProviderWriter} enables considering some files with a specific read-only content.
@@ -40,8 +38,8 @@ import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class OverlayCodeProviderWrite implements ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OverlayCodeProviderWrite.class);
 
 	final ICodeProviderWriter underlying;
 

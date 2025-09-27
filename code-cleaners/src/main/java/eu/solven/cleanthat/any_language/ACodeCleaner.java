@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.solven.cleanthat.codeprovider.CodeProviderDecoratingWriter;
@@ -38,15 +35,15 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Asbtract for {@link ICodeCleaner}
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public abstract class ACodeCleaner implements ICodeCleaner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ACodeCleaner.class);
-
 	final Collection<ObjectMapper> objectMappers;
 	final ICleanthatConfigInitializer configInitializer;
 	final ICodeProviderFormatter formatterProvider;

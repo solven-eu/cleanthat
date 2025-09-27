@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.kohsuke.github.GHCommitPointer;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.github.GithubHelper;
 import eu.solven.cleanthat.code_provider.github.decorator.GithubDecoratorHelper;
@@ -44,6 +42,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.utils.ResultOrError;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Relates to verifying an Event can trigger a cleaning or not
@@ -51,8 +50,8 @@ import eu.solven.cleanthat.utils.ResultOrError;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CheckGithubEventHasValidConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CheckGithubEventHasValidConfig.class);
 
 	final Path root;
 	final ICodeCleanerFactory cleanerFactory;

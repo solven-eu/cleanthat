@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ import org.kohsuke.github.GHMarketplacePurchase;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +49,7 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.logging.PepperLogHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -58,11 +57,10 @@ import eu.solven.pepper.logging.PepperLogHelper;
  * @author Benoit Lacelle
  */
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 public final class GithubWebhookHandler implements IGithubWebhookHandler {
 	private static final String EOL = "\r\n";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookHandler.class);
 
 	final IGithubAppFactory githubAppFactory;
 	final GHApp githubApp;

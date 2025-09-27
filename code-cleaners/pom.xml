@@ -47,7 +47,6 @@
 			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

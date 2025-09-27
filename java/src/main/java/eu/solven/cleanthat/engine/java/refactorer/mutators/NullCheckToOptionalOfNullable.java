@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
@@ -45,6 +42,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.BinaryExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.LambdaExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns `if (s != null) {...}` into `Optional.ofNullable(s).ifPresent(...)`
@@ -55,9 +53,9 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
  * @author Benoit Lacelle
  */
 // https://community.sonarsource.com/t/java-optional-used-as-replacement-for-local-null-check/43842
+@Slf4j
 @ApplyAfterMe({ OptionalWrappedIfToFilter.class, OptionalWrappedVariableToMap.class })
 public class NullCheckToOptionalOfNullable extends AJavaparserStmtMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(NullCheckToOptionalOfNullable.class);
 
 	final NullLiteralExpr nullLiteralExpr = new NullLiteralExpr();
 

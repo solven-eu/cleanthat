@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Typically used to be able to read from one {@link ICodeProvider} and write into a different
@@ -33,8 +32,8 @@ import org.slf4j.LoggerFactory;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CodeProviderDecoratingWriter implements ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderDecoratingWriter.class);
 	protected final ICodeProvider codeProvider;
 
 	protected final Supplier<ICodeProviderWriterLogic> writerLogicSupplier;

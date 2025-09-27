@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,12 @@ import org.openrewrite.Recipe;
 import org.openrewrite.Result;
 import org.openrewrite.SourceFile;
 import org.openrewrite.java.JavaParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.formatter.PathAndContent;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A {@link IMutator} configuring over an OpenRewrite {@link Recipe}
@@ -45,8 +44,8 @@ import eu.solven.cleanthat.formatter.PathAndContent;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class OpenrewriteRefactorer extends AAstRefactorer<SourceFile, JavaParser, Result, OpenrewriteMutator> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteRefactorer.class);
 
 	// Is this threadsafe/stateless?
 	final ExecutionContext ctx = new InMemoryExecutionContext(Throwable::printStackTrace);

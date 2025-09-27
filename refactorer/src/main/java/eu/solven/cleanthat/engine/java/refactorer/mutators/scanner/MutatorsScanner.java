@@ -22,8 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -31,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IConstructorNeedsJdkVersion;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Scans dynamically for available rules
@@ -39,8 +38,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
  *
  */
 // https://stackoverflow.com/questions/520328/can-you-find-all-classes-in-a-package-using-reflection
+@Slf4j
 public final class MutatorsScanner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
 	private static final AtomicInteger ERROR_COUNTS = new AtomicInteger();
 

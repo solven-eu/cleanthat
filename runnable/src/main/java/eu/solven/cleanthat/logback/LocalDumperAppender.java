@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import eu.solven.pepper.memory.IPepperMemoryConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This LogBack {@link Appender} shall help enabling a log to be produced for each run.
@@ -36,8 +34,8 @@ import eu.solven.pepper.memory.IPepperMemoryConstants;
  *
  */
 // TODO
+@Slf4j
 public class LocalDumperAppender extends AppenderBase<ILoggingEvent> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LocalDumperAppender.class);
 
 	private static final ThreadLocal<List<byte[]>> TL_LOGS = new ThreadLocal<>() {
 		@Override

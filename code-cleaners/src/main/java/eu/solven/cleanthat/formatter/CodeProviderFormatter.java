@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AtomicLongMap;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -56,16 +54,16 @@ import eu.solven.cleanthat.engine.ICodeFormatterApplier;
 import eu.solven.cleanthat.engine.IEngineFormatterFactory;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.pepper.thread.PepperExecutorsHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Unclear what is the point of this class
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class CodeProviderFormatter implements ICodeProviderFormatter {
 	private static final String KEY_NB_FILES_FORMATTED = "nb_files_formatted";
-
-	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(CodeProviderFormatter.class);
 
 	public static final String EOL = "\r\n";
 	private static final int MAX_LOG_MANY_FILES = 128;

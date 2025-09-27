@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2023 Benoit Lacelle - SOLVEN
+ * Copyright 2002-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class to write eclipse formatter/cleanup profile XML files.
@@ -41,8 +39,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Alexandros Karypidis
  *
  */
+@Slf4j
 public final class XmlProfileWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(XmlProfileWriter.class);
 
 	private static final String XML_NODE_ROOT = "profiles";
 	private static final String XML_NODE_PROFILE = "profile";

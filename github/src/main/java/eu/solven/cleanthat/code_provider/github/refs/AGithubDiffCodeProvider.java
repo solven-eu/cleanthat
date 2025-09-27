@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@ import java.util.stream.Stream;
 import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -41,14 +39,15 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.pepper.logging.PepperLogHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public abstract class AGithubDiffCodeProvider extends AGithubCodeProvider implements IListOnlyModifiedFiles {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AGithubDiffCodeProvider.class);
 
 	private static final int LIMIT_COMMIT_IN_COMPARE = 250;
 

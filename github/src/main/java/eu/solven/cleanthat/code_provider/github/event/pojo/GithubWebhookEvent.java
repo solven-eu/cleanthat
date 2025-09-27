@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@ package eu.solven.cleanthat.code_provider.github.event.pojo;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * a POJO holding details about Github webhooks
@@ -33,8 +31,8 @@ import eu.solven.pepper.collection.PepperMapHelper;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubWebhookEvent.class);
 
 	public static final String KEY_BODY = "body";
 	public static final String KEY_HEADERS = "headers";

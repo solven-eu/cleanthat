@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.Node;
@@ -37,9 +35,10 @@ import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ITAnonymousClass {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITAnonymousClass.class);
 	private static final String eol = System.lineSeparator();
 
 	public static class CaseAnonymousClass_HashMap {

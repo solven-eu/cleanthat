@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class JavaService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
 
 	public void sayHello() {
 		LOGGER.info("Java says 'Hello World!'");

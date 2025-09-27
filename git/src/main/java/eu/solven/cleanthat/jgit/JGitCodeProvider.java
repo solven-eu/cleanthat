@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -56,15 +54,16 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 public class JGitCodeProvider implements ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JGitCodeProvider.class);
 
 	final boolean commitPush;
 	final Path workingDir;

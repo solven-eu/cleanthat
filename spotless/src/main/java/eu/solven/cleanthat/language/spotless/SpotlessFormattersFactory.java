@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.diffplug.spotless.Provisioner;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,14 +46,15 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties.SpotlessEnginePropertiesBuilder;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Formatter for Spotless Engine
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class SpotlessFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessFormattersFactory.class);
 
 	final Provisioner provisionner;
 

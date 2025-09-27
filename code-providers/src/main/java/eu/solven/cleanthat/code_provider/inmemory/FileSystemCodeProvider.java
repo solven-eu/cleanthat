@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.jimfs.Jimfs;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,14 +43,15 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * An {@link ICodeProvider} for {@link FileSystem}
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class FileSystemCodeProvider implements ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemCodeProvider.class);
 
 	final FileSystem fs;
 	final Path root;

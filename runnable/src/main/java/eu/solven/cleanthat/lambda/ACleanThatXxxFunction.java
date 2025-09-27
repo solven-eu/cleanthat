@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import io.sentry.Sentry;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Based class for Lambda, Functions, etc
@@ -31,8 +29,8 @@ import io.sentry.Sentry;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public abstract class ACleanThatXxxFunction extends ACleanThatXxxApplication {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ACleanThatXxxFunction.class);
 
 	static {
 		// https://stackoverflow.com/questions/35298616/aws-lambda-and-inaccurate-memory-allocation

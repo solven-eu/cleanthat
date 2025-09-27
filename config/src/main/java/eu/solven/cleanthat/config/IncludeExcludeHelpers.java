@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helpers related to include and exclude rules
@@ -34,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class IncludeExcludeHelpers {
-	private static final Logger LOGGER = LoggerFactory.getLogger(IncludeExcludeHelpers.class);
 
 	// It is good to know that '/' will be interpreted as folder separator even under Windows
 	// https://stackoverflow.com/questions/9148528/how-do-i-use-directory-globbing-in-jdk7

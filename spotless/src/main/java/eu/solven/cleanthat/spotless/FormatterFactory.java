@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.resolver.examples.util.Booter;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.diffplug.spotless.FormatExceptionPolicy;
 import com.diffplug.spotless.FormatExceptionPolicyStrict;
@@ -56,6 +54,7 @@ import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import eu.solven.cleanthat.spotless.pojo.SpotlessEngineProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Knows how to instantiate {@link AFormatterStepFactory}
@@ -63,8 +62,8 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class FormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterFactory.class);
 
 	// '-Dcleanthat.spotless.m2.repository=/Users/blacelle/.m2/repository' to reuse a local repository
 	public static final String PATH_M2_REPO = "cleanthat.spotless.m2.repository";

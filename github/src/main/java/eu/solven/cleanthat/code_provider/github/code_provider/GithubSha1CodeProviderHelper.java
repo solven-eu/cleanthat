@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ import java.util.zip.ZipInputStream;
 
 import org.eclipse.jgit.api.Git;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
 
 import com.google.common.collect.Iterables;
@@ -42,14 +40,15 @@ import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.pepper.logging.PepperLogHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helper for Github sha1
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class GithubSha1CodeProviderHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubSha1CodeProviderHelper.class);
 
 	// To be compared with the limit of 5000 calls per hour per installation
 	private static final int MAX_FILE_BEFORE_CLONING = 512;

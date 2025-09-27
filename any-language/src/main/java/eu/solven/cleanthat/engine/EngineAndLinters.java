@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package eu.solven.cleanthat.engine;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.MoreObjects;
 
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.language.IEngineProperties;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Computed processors, to be applicable to any file of a given repository
@@ -32,24 +32,13 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
+@Getter
+@RequiredArgsConstructor
 public class EngineAndLinters implements AutoCloseable {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EngineAndLinters.class);
 
 	final IEngineProperties engineProperties;
 	final List<ILintFixer> linters;
-
-	public EngineAndLinters(IEngineProperties engineProperties, List<ILintFixer> linters) {
-		this.engineProperties = engineProperties;
-		this.linters = linters;
-	}
-
-	public IEngineProperties getEngineProperties() {
-		return engineProperties;
-	}
-
-	public List<ILintFixer> getLinters() {
-		return linters;
-	}
 
 	@Override
 	public String toString() {

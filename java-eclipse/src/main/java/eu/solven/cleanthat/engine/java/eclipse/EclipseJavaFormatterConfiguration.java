@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.JavaCore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.xml.sax.SAXException;
 
@@ -39,6 +37,7 @@ import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReadException;
 import eu.solven.cleanthat.engine.java.eclipse.config.ConfigReader;
 import eu.solven.cleanthat.language.IEngineProperties;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Load the configuration. It is useful to be cached, as it may rely on an external {@link URL}
@@ -46,9 +45,8 @@ import lombok.Data;
  * @author Benoit Lacelle
  */
 @Data
+@Slf4j
 public class EclipseJavaFormatterConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseJavaFormatterConfiguration.class);
-
 	private static final String KEY_URL = "url";
 
 	private final Map<String, String> settings;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -52,6 +49,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import lombok.extern.slf4j.Slf4j;
+
 // TODO: Auto-generated Javadoc
 /**
  * The standard WireMockRule eagerly initializes a WireMockServer. This version suptakes a laze approach allowing us to
@@ -60,8 +59,8 @@ import com.google.gson.JsonSerializer;
  * @author Liam Newman
  */
 // https://github.com/hub4j/github-api/blob/main/src/test/java/org/kohsuke/github/junit/GitHubWireMockRule.java
+@Slf4j
 public class GitHubWireMockRule extends WireMockMultiServerRule {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GitHubWireMockRule.class);
 
 	public static final String KEY_TAKE_SNAPSHOT = "test.github.takeSnapshot";
 	// By default the wiremock tests will run without proxy or taking a snapshot.

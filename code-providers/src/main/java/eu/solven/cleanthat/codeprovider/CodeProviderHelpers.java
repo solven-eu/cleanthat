@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -33,6 +30,7 @@ import com.google.common.collect.Maps;
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.config.ICleanthatConfigConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helpers working for any {@link ICodeProvider}
@@ -40,8 +38,8 @@ import eu.solven.cleanthat.config.ICleanthatConfigConstants;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CodeProviderHelpers {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeProviderHelpers.class);
 
 	protected Collection<ObjectMapper> objectMappers;
 

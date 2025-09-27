@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -56,6 +54,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.github.run.ICleanThatITConstants;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This enables running CleanThat cleaning logic directly on given branch
@@ -63,8 +62,8 @@ import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class RunCleanGithubBranch extends ACleanThatXxxApplication implements ICleanThatITConstants {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RunCleanGithubBranch.class);
 
 	final String repoFullName = SOLVEN_EU_MITRUST_DATASHARING;
 	// If empty, we will process the default branch

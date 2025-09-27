@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.junit.GitHubWireMockRule;
 import org.kohsuke.github.junit.WireMockMultiServerRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
@@ -45,6 +43,7 @@ import eu.solven.cleanthat.code_provider.github.event.GithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.event.IGithubAppFactory;
 import eu.solven.cleanthat.code_provider.github.refs.GithubRefCleaner;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This case represents a push of multiple commits to a branch. It leads to cleanthat receive one `push` events per
@@ -53,11 +52,11 @@ import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 @RunWith(SpringRunner.class)
 @ActiveProfiles(resolver = TestExecuteClean_Record_PushProtectedBranch.class)
 public class TestExecuteClean_Record_PushProtectedBranch extends AProcessLocallyDynamoDbEvent_ExecuteClean
 		implements ActiveProfilesResolver {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestExecuteClean_Record_PushProtectedBranch.class);
 
 	// Please make a first run with this set to true, then keep it to false;
 	public static boolean DO_RECORD = false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -46,6 +44,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
 import eu.solven.pepper.resource.PepperResourceHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Base class for Cleanthat testing framework
@@ -55,9 +54,9 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @param <N>
  * @param <R>
  */
+@Slf4j
 @SuppressWarnings({ "PMD.CouplingBetweenObjects", "PMD.GodClass" })
 public class OneMutatorCase<N, R> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OneMutatorCase.class);
 
 	private static final String PRE_METHOD = "pre";
 	private static final String PRE_CLASS = "Pre";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
@@ -30,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Prevent relying .equals on {@link Enum} types
@@ -38,8 +36,8 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  */
 // see https://jsparrow.github.io/rules/enums-without-equals.html#properties
 // https://stackoverflow.com/questions/1750435/comparing-java-enum-members-or-equals
+@Slf4j
 public class EnumsWithoutEquals extends AJavaparserNodeMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EnumsWithoutEquals.class);
 
 	@Override
 	public String minimalJavaVersion() {

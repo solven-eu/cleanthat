@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -39,14 +36,15 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.OptionalOrRejection;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ResolvedTypeHelpers;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns '1F + 0.1F` into `(double) 1F + 0.1F`
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class ArithmeticOverFloats extends AJavaparserExprMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArithmeticOverFloats.class);
 
 	private static final Set<BinaryExpr.Operator> MATH_FLOAT_OPERATORS = Set.of(BinaryExpr.Operator.PLUS,
 			BinaryExpr.Operator.MINUS,

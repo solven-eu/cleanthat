@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 Benoit Lacelle - SOLVEN
+ * Copyright 2009-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class containing all configurations for a eclipse-formatter-profile.
  * 
  * @author Lukas Frena
  */
+@Slf4j
 public class FormatterConfiguration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterConfiguration.class);
 
 	/** Map containing all eclipse editor-settings. */
 	private final Map<String, String> mCleanupSettings = new HashMap<>();

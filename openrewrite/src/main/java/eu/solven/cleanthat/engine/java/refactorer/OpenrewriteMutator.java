@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,12 @@ import org.openrewrite.RecipeRun;
 import org.openrewrite.Result;
 import org.openrewrite.SourceFile;
 import org.openrewrite.internal.InMemoryLargeSourceSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A {@link IMutator} configuring over an OpenRewrite {@link Recipe}
@@ -42,8 +41,8 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class OpenrewriteMutator implements IWalkingMutator<SourceFile, Result> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteMutator.class);
 
 	final Recipe recipe;
 

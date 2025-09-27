@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,17 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A simplistic repository listener that logs events to the console.
  * 
  * @author https://github.com/apache/maven-resolver/
  */
+@Slf4j
 @SuppressWarnings({ "PMD", "checkstyle:AvoidInlineConditionals" })
 public class LoggingRepositoryListener extends AbstractRepositoryListener {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingRepositoryListener.class);
 
 	public void artifactDeployed(RepositoryEvent event) {
 		requireNonNull(event, "event cannot be null");

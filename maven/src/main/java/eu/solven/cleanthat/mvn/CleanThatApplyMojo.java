@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,6 +47,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.language.cleanthat.CleanthatForIntegrators;
 import eu.solven.cleanthat.language.javaparser.ICleanthatJavaparserConstants;
 import eu.solven.cleanthat.mvn.codeprovider.OverlayCodeProviderWrite;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This {@link org.apache.maven.plugin.Mojo} enables applying a single {@link IMutator} over current directory.
@@ -57,6 +56,7 @@ import eu.solven.cleanthat.mvn.codeprovider.OverlayCodeProviderWrite;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@Slf4j
 @Mojo(name = CleanThatApplyMojo.MOJO_SINGLE,
 		defaultPhase = LifecyclePhase.PROCESS_SOURCES,
 		threadSafe = true,
@@ -66,7 +66,6 @@ import eu.solven.cleanthat.mvn.codeprovider.OverlayCodeProviderWrite;
 		requiresProject = false)
 @SuppressWarnings("PMD.ImmutableField")
 public class CleanThatApplyMojo extends ACleanThatSpringMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatApplyMojo.class);
 
 	public static final String MOJO_SINGLE = "apply";
 

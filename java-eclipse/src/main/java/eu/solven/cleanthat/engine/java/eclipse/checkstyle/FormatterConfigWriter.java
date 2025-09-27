@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2023 Benoit Lacelle - SOLVEN
+ * Copyright 2009-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import javax.xml.transform.TransformerException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class for writing a new eclipse-configuration-file. Gets used by class Transformer. Two eclipse-formatter-profile
@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * @author Lars Ködderitzsch
  */
 // https://github.com/checkstyle/eclipse-cs/blob/master/net.sf.eclipsecs.core/src/net/sf/eclipsecs/core/transformer/FormatterConfigWriter.java
+@Slf4j
 public class FormatterConfigWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FormatterConfigWriter.class);
 
 	/** Constant for show generated code. */
 	private static final String CS_GENERATED = "CheckStyle-Generated ";

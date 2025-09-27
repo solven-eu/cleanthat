@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -45,14 +43,15 @@ import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps working with configuration files
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class ConfigHelpers {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigHelpers.class);
 
 	private static final String KEY_EXCLUDES = "excludes";
 	private static final String KEY_INCLUDES = "includes";

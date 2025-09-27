@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codehaus.plexus.languages.java.version.JavaVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -44,6 +42,7 @@ import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.ILintFixerWithPath;
 import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.language.IEngineProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is dedicated to refactoring. Most mutators will refactor code to a better (e.g. shorter, faster, safer,
@@ -52,10 +51,10 @@ import eu.solven.cleanthat.language.IEngineProperties;
  * @author Benoit Lacelle
  */
 // https://github.com/revelc/formatter-maven-plugin/blob/master/src/main/java/net/revelc/code/formatter/java/JavaFormatter.java
+@Slf4j
 @SuppressWarnings("PMD.GenericsNaming")
 public abstract class AAstRefactorer<AST, P, R, M extends IWalkingMutator<AST, R>>
 		implements ILintFixerWithId, ILintFixerWithPath {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AAstRefactorer.class);
 
 	private static final int MAX_REAPPLY = 10;
 

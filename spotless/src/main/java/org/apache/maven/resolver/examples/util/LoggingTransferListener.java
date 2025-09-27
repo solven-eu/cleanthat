@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,17 @@ import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A simplistic transfer listener that logs uploads/downloads to the console.
  * 
  * @author https://github.com/apache/maven-resolver/
  */
+@Slf4j
 @SuppressWarnings({ "PMD", "checkstyle:JavadocType", "checkstyle:AvoidInlineConditionals", "checkstyle:MagicNumber" })
 public class LoggingTransferListener extends AbstractTransferListener {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingTransferListener.class);
 
 	private final Map<TransferResource, Long> downloads = new ConcurrentHashMap<>();
 

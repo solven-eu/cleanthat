@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.eclipse.jgit.api.Git;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -42,6 +40,7 @@ import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
 import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This enables easy cleaning of any given folder. Given folder is supposedly the root of a repository.
@@ -52,8 +51,8 @@ import eu.solven.cleanthat.lambda.ACleanThatXxxApplication;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class ITCleanLocalRepository extends ACleanThatXxxApplication {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITCleanLocalRepository.class);
 
 	public static void main(String[] args) {
 		SpringApplication springApp = new SpringApplication(ITCleanLocalRepository.class);

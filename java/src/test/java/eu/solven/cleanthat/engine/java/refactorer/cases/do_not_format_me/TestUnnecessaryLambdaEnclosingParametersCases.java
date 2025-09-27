@@ -23,7 +23,6 @@ public class TestUnnecessaryLambdaEnclosingParametersCases extends AJavaparserRe
 		public Runnable pre() {
 			return () -> System.out.print("ok");
 		}
-
 	}
 
 	@Ignore("TODO")
@@ -39,9 +38,23 @@ public class TestUnnecessaryLambdaEnclosingParametersCases extends AJavaparserRe
 	}
 
 	@UnmodifiedMethod
+	public static class CaseTypedFunction {
+		public Function<Integer, Integer> pre() {
+			return (Integer a) -> a % 5;
+		}
+	}
+
+	@UnmodifiedMethod
 	public static class CaseBiFunction {
 		public BiFunction<Integer, Integer, Integer> pre() {
 			return (a, b) -> a + b;
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class CaseTypedBiFunction {
+		public BiFunction<Integer, Integer, Integer> pre() {
+			return (Integer a, Integer b) -> a + b;
 		}
 	}
 

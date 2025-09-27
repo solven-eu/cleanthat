@@ -43,7 +43,7 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator
 
 	@Override
 	public boolean isDraft() {
-		// see UnnecessaryLambdaEnclosingParametersCases.CaseFunction
+		// see TestUnnecessaryLambdaEnclosingParametersCases.CaseFunction
 		return true;
 	}
 
@@ -54,13 +54,18 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator
 		}
 
 		var lambdaExpr = (LambdaExpr) node.getNode();
+        if (lambdaExpr.getParameters().size() != 1 || !lambdaExpr.isEnclosingParameters()) {
+            return false;
+        }
 
-		if (lambdaExpr.getParameters().size() == 1 && lambdaExpr.isEnclosingParameters()) {
-			var newLambdaExpr = lambdaExpr.clone();
-			newLambdaExpr.setEnclosingParameters(false);
-			return tryReplace(lambdaExpr, newLambdaExpr);
-		}
+        var param = lambdaExpr.getParameters().get(0);
+        if (param.getType() != null) {
+            return false;
+        }
 
-		return false;
-	}
+        var newLambdaExpr = lambdaExpr.clone();
+        newLambdaExpr.setEnclosingParameters(false);
+        return tryReplace(lambdaExpr, newLambdaExpr);
+
+    }
 }

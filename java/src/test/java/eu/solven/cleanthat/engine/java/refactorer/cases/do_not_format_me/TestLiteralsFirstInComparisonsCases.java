@@ -121,7 +121,7 @@ public class TestLiteralsFirstInComparisonsCases extends AJavaparserRefactorerCa
 		}
 	}
 
-	// https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons
+	// https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#literalsfirstincomparisons
 	@CompareMethods
 	public static class CasePMD_stringEquals {
 		boolean pre(String x) {

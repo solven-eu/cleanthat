@@ -54,7 +54,7 @@ languageLevel: jdk1.2
 
 ### [ComparisonWithNaN](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ComparisonWithNaN.java)
 
-PMD: [ComparisonWithNaN](https://pmd.github.io/latest/pmd_rules_java_errorprone.html#comparisonwithnan)
+PMD: [ComparisonWithNaN](https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#comparisonwithnan)
 
 Cleanthat own ID: ComparisonWithNaN
 
@@ -62,7 +62,7 @@ languageLevel: jdk11
 
 ### [LiteralsFirstInComparisons](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/LiteralsFirstInComparisons.java)
 
-PMD: [LiteralsFirstInComparisons](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons)
+PMD: [LiteralsFirstInComparisons](https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#literalsfirstincomparisons)
 
 Cleanthat own ID: LiteralsFirstInComparisons
 
@@ -110,7 +110,7 @@ languageLevel: jdk1.8
 
 ### [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
 
-PMD: [SimplifyStartsWith](https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith)
+PMD: [SimplifyStartsWith]("https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_performance.html#simplifystartswith")
 
 Cleanthat own ID: SimplifyStartsWith
 
@@ -134,7 +134,7 @@ languageLevel: jdk1.4
 
 ### [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
 
-PMD: [StringToString](https://pmd.github.io/latest/pmd_rules_java_performance.html#stringtostring)
+PMD: [StringToString](https://pmd.github.io/pmd/pmd_rules_java_performance.html#stringtostring)
 
 jSparrow: [RemoveToStringOnString](https://jsparrow.github.io/rules/remove-to-string-on-string.html)
 
@@ -152,7 +152,7 @@ languageLevel: jdk1.1
 
 ### [UnnecessaryModifier](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryModifier.java)
 
-PMD: [UnnecessaryModifier](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarymodifier)
+PMD: [UnnecessaryModifier](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessarymodifier)
 
 CheckStyle: [RedundantModifier](https://checkstyle.sourceforge.io/config_modifier.html#RedundantModifier)
 
@@ -166,7 +166,7 @@ languageLevel: jdk1
 
 ### [UseCollectionIsEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseCollectionIsEmpty.java)
 
-PMD: [UseCollectionIsEmpty](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty)
+PMD: [UseCollectionIsEmpty](https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#usecollectionisempty)
 
 Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
 
@@ -178,7 +178,7 @@ languageLevel: jdk1.2
 
 ### [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
 
-PMD: [UseIndexOfChar](https://pmd.github.io/latest/pmd_rules_java_performance.html#useindexofchar)
+PMD: [UseIndexOfChar](https://pmd.github.io/pmd/pmd_rules_java_performance.html#useindexofchar)
 
 Sonar: [RSPEC-1155](https://rules.sonarsource.com/java/RSPEC-1155)
 
@@ -194,7 +194,7 @@ languageLevel: jdk1.6
 
 ### [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
 
-PMD: [UseUnderscoresInNumericLiterals](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#useunderscoresinnumericliterals)
+PMD: [UseUnderscoresInNumericLiterals](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#useunderscoresinnumericliterals)
 
 Sonar: [RSPEC-2148](https://rules.sonarsource.com/java/RSPEC-2148)
 
@@ -216,7 +216,7 @@ languageLevel: jdk1
 
 ### [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 
-PMD: [AvoidFileStream](https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream)
+PMD: [AvoidFileStream](https://pmd.github.io/pmd/pmd_rules_java_performance.html#avoidfilestream)
 
 Cleanthat own ID: AvoidFileStream
 
@@ -226,7 +226,7 @@ languageLevel: jdk1.7
 
 ### [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
 
-PMD: [AvoidUncheckedExceptionsInSignatures](https://pmd.github.io/latest/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures)
+PMD: [AvoidUncheckedExceptionsInSignatures](https://pmd.github.io/pmd/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures)
 
 Cleanthat own ID: AvoidUncheckedExceptionsInSignatures
 
@@ -472,7 +472,7 @@ languageLevel: jdk1.8
 
 ### [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 
-PMD: [PrimitiveWrapperInstantiation](https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation)
+PMD: [PrimitiveWrapperInstantiation](https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#primitivewrapperinstantiation)
 
 Cleanthat own ID: PrimitiveWrapperInstantiation
 
@@ -588,7 +588,7 @@ languageLevel: jdk1
 
 ### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
 
-PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)
+PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)
 
 Cleanthat own ID: UnnecessaryFullyQualifiedName
 
@@ -618,7 +618,7 @@ languageLevel: jdk1.8
 
 ### [UnnecessarySemicolon](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessarySemicolon.java)
 
-PMD: [UnnecessarySemicolon](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarysemicolon)
+PMD: [UnnecessarySemicolon](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessarysemicolon)
 
 Sonar: [RSPEC-2959](https://rules.sonarsource.com/java/RSPEC-2959)
 
@@ -630,7 +630,7 @@ languageLevel: jdk1
 
 ### [UseDiamondOperator](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperator.java)
 
-PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator)
+PMD: [UseDiamondOperator](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#usediamondoperator)
 
 Sonar: [RSPEC-2293](https://rules.sonarsource.com/java/RSPEC-2293)
 
@@ -642,7 +642,7 @@ languageLevel: jdk1.7
 
 ### [UseDiamondOperatorJdk8](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseDiamondOperatorJdk8.java)
 
-PMD: [UseDiamondOperator](https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator)
+PMD: [UseDiamondOperator](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#usediamondoperator)
 
 Sonar: [RSPEC-2293](https://rules.sonarsource.com/java/RSPEC-2293)
 

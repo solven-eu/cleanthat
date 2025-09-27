@@ -50,7 +50,7 @@ public class UseCollectionIsEmpty extends AUseXIsEmpty {
 	@Override
 	public String pmdUrl() {
 		// https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/bestpractices/UseCollectionIsEmptyRule.java
-		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#usecollectionisempty";
+		return "https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#usecollectionisempty";
 	}
 
 	@Override

@@ -76,8 +76,8 @@ public class UnnecessaryImport extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		// https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#unusedimports
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryimport";
+		// https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_bestpractices.html#unusedimports
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryimport";
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class UnnecessaryModifier extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessarymodifier";
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessarymodifier";
 	}
 
 	@Override

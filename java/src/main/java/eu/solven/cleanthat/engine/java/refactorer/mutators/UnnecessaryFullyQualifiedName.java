@@ -64,7 +64,7 @@ public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname";
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname";
 	}
 
 	/**

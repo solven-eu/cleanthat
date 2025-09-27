@@ -67,7 +67,7 @@ public class UnnecessaryBoxing extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		// "https://pmd.github.io/latest/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
+		// "https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_performance.html#unnecessarywrapperobjectcreation";
 		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryboxing";
 	}
 

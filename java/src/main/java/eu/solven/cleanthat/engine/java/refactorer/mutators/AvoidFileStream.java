@@ -52,7 +52,7 @@ public class AvoidFileStream extends ATodoJavaParserMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#avoidfilestream";
+		return "https://pmd.github.io/pmd/pmd_rules_java_performance.html#avoidfilestream";
 	}
 
 }

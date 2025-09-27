@@ -59,7 +59,7 @@ public class SimplifyStartsWith extends AJavaparserExprMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#simplifystartswith";
+		return "https://pmd.github.io/pmd-doc-6.55.0/pmd_rules_java_performance.html#simplifystartswith";
 	}
 
 	@Override

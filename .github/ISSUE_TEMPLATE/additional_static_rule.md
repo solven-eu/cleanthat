@@ -11,7 +11,7 @@ assignees: ''
 If existing, a reference to the rule from the external system :
 
 - https://rules.sonarsource.com/java/RSPEC-1116
-- https://pmd.github.io/latest/pmd_rules_java_codestyle.html#emptycontrolstatement
+- https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#emptycontrolstatement
 - https://javadoc.io/static/com.puppycrawl.tools/checkstyle/8.37/com/puppycrawl/tools/checkstyle/checks/coding/EmptyStatementCheck.html
 
 Please also provide code examples `before` -> `after`.

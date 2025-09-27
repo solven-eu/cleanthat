@@ -55,7 +55,7 @@ public class UseUnderscoresInNumericLiterals extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#useunderscoresinnumericliterals";
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#useunderscoresinnumericliterals";
 	}
 
 	@Override

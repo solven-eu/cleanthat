@@ -70,7 +70,7 @@ public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implement
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_bestpractices.html#literalsfirstincomparisons";
+		return "https://pmd.github.io/pmd/pmd_rules_java_bestpractices.html#literalsfirstincomparisons";
 	}
 
 	@Override

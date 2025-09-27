@@ -50,7 +50,7 @@ public class AvoidUncheckedExceptionsInSignatures extends AJavaparserNodeMutator
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures";
+		return "https://pmd.github.io/pmd/pmd_rules_java_design.html#avoiduncheckedexceptionsinsignatures";
 	}
 
 	@Override

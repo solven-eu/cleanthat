@@ -54,7 +54,7 @@ public class UseIndexOfChar extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_performance.html#useindexofchar";
+		return "https://pmd.github.io/pmd/pmd_rules_java_performance.html#useindexofchar";
 	}
 
 	@Override

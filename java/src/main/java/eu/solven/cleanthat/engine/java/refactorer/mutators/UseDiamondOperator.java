@@ -59,7 +59,7 @@ public class UseDiamondOperator extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_codestyle.html#usediamondoperator";
+		return "https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#usediamondoperator";
 	}
 
 	@Override

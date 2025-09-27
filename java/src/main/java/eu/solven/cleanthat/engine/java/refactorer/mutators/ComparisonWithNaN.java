@@ -64,7 +64,7 @@ public class ComparisonWithNaN extends AJavaparserNodeMutator {
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/latest/pmd_rules_java_errorprone.html#comparisonwithnan";
+		return "https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#comparisonwithnan";
 	}
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })

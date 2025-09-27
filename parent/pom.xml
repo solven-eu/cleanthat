@@ -288,7 +288,7 @@
 				<plugin>
 					<!--https://maven.apache.org/plugins/maven-pmd-plugin/ -->
 					<!-- Skip a row by adding '//NOPMD' at the end -->
-					<!-- https://pmd.github.io/pmd-6.6.0/pmd_userdocs_suppressing_warnings.html#nopmd-comment -->
+					<!-- https://pmd.github.io/pmd/pmd_userdocs_suppressing_warnings.html#nopmd-comment -->
 					<!-- Trigger only pmd with 'mvn pmd:check' -->
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-pmd-plugin</artifactId>

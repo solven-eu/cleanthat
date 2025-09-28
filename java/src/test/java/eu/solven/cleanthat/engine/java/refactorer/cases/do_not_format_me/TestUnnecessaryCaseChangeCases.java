@@ -62,7 +62,6 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    @Ignore("WIP")
     @CompareMethods
     public static class CaseToLowerCaseWithHardcodedLowercaseFlipped {
         public Object pre(String string) {
@@ -74,7 +73,6 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    @Ignore("WIP")
     @CompareMethods
     public static class CaseToUpperCaseWithHardcodedUppercaseFlipped {
         public Object pre(String string) {
@@ -86,7 +84,29 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    // Cases thats should be ignored as the replacement would change execution behavior
+    @CompareMethods
+    public static class CaseToLowerCaseWithToLowerCase {
+        public Object pre(String left, String right) {
+            return left.toLowerCase().equals(right.toLowerCase());
+        }
+
+        public Object post(String left, String right) {
+            return left.equalsIgnoreCase(right);
+        }
+    }
+
+    @CompareMethods
+    public static class CaseToUpperCaseWithToUpperCase {
+        public Object pre(String left, String right) {
+            return left.toUpperCase().equals(right.toUpperCase());
+        }
+
+        public Object post(String left, String right) {
+            return left.equalsIgnoreCase(right);
+        }
+    }
+
+    // Cases that should be ignored as the replacement would change execution behavior
 
     @UnmodifiedMethod
     public static class CaseToLowerCaseWithLocale {
@@ -172,37 +192,47 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    // Out-of-scope cases, where the replacement should be `equals()` instead of `equalsIgnoreCase()`
-
-    @Ignore("WIP")
-    @UnmodifiedMethod
-    public static class CaseToLowerCaseWithToLowerCase {
-        public Object pre(String first, String second) {
-            return first.toLowerCase().equals(second.toLowerCase());
-        }
-    }
-
-    @Ignore("WIP")
-    @UnmodifiedMethod
-    public static class CaseToUpperCaseWithToUpperCase {
-        public Object pre(String first, String second) {
-            return first.toUpperCase().equals(second.toUpperCase());
-        }
-    }
-
-    @Ignore("WIP")
     @UnmodifiedMethod
     public static class CaseToLowerCaseWithToUpperCase {
-        public Object pre(String first, String second) {
-            return first.toLowerCase().equals(second.toUpperCase());
+        public Object pre(String left, String right) {
+            return left.toLowerCase().equals(right.toUpperCase());
         }
     }
 
-    @Ignore("WIP")
     @UnmodifiedMethod
     public static class CaseToUpperCaseWithToLowerCase {
-        public Object pre(String first, String second) {
-            return first.toUpperCase().equals(second.toLowerCase());
+        public Object pre(String left, String right) {
+            return left.toUpperCase().equals(right.toLowerCase());
+        }
+    }
+
+    // Cases that should be ignored as the replacement could change execution behavior
+
+    @UnmodifiedMethod
+    public static class CaseRightToLowerCase {
+        public Object pre(String left, String right) {
+            return left.equals(right.toLowerCase());
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseRightToUpperCase {
+        public Object pre(String left, String right) {
+            return left.equals(right.toUpperCase());
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseLeftToLowerCase {
+        public Object pre(String left, String right) {
+            return left.toLowerCase().equals(right);
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseLeftToUpperCase {
+        public Object pre(String left, String right) {
+            return left.toUpperCase().equals(right);
         }
     }
 

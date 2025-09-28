@@ -35,7 +35,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  */
 public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
-	public static final String METHOD_EQUALS = "equals";
+	private static final String METHOD_EQUALS = "equals";
 	private static final String METHOD_EQUALS_IGNORE_CASE = "equalsIgnoreCase";
 
 	@Override
@@ -61,7 +61,8 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		}
 
 		var methodCall = expression.getNode().asMethodCallExpr();
-		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(methodCall.getScope()), String.class)) {
+		Optional<Expression> scope = methodCall.getScope();
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), String.class)) {
 			return false;
 		}
 
@@ -73,10 +74,9 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return false;
 		}
 
-		Expression scope = methodCall.getScope().orElse(null);
 		Expression argument = methodCall.getArgument(0);
 
-		var left = new Side(scope);
+		var left = new Side(scope.get());
 		var right = new Side(argument);
 
 		if (left.invalid || right.invalid) {
@@ -130,7 +130,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		if (equalsIgnoreCase && right.isMethodCall) {
 			Expression newArg = getScope(right.methodCall);
 
-			var replacement = new MethodCallExpr(scope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+			var replacement = new MethodCallExpr(scope.get(), METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
 
 			return tryReplace(methodCall, replacement);
 		}

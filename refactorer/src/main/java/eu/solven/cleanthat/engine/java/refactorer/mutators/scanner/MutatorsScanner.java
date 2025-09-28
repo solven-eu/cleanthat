@@ -42,6 +42,9 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMu
 public final class MutatorsScanner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MutatorsScanner.class);
 
+	private static final String PACKAGE_MUTATORS = "eu.solven.cleanthat.engine.java.refactorer.mutators.";
+	private static final String PACKAGE_COMPOSITE_MUTATORS = PACKAGE_MUTATORS + "composite.";
+
 	private static final AtomicInteger ERROR_COUNTS = new AtomicInteger();
 
 	private static final Set<Class<? extends IMutator>> SINGLE_MUTATORS;
@@ -50,146 +53,80 @@ public final class MutatorsScanner {
 		try {
 			// noinspection unchecked
 			SINGLE_MUTATORS = Set.of(
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArithmethicAssignment"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArithmeticOverFloats"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArraysDotStream"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "AvoidFileStream"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "AvoidInlineConditionals"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "AvoidMultipleUnaryOperators"),
 					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ArithmethicAssignment"),
+							.forName(PACKAGE_MUTATORS + "AvoidUncheckedExceptionsInSignatures"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CastMathOperandsBeforeAssignement"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionIndexOfToContains"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionToOptional"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ComparisonWithNaN"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CreateTempFilesUsingNio"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "EmptyControlStatement"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "EnumsWithoutEquals"),
 					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ArithmeticOverFloats"),
+							.forName(PACKAGE_MUTATORS + "ForEachAddToStreamCollectToCollection"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ForEachIfBreakElseToStreamTakeWhile"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ForEachIfBreakToStreamFindFirst"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ForEachIfToIfStreamAnyMatch"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ForEachToIterableForEach"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "GuavaImmutableMapBuilderOverVarargs"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "GuavaInlineStringsRepeat"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "GuavaStringsIsNullOrEmpty"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ImportQualifiedTokens"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "JUnit4ToJUnit5"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "LambdaIsMethodReference"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "LambdaReturnsSingleStatement"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "LiteralsFirstInComparisons"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "LocalVariableTypeInference"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "LoopIntRangeToIntStreamForEach"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ModifierOrder"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "NullCheckToOptionalOfNullable"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ObjectEqualsForPrimitives"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ObjectsHashCodePrimitive"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "OptionalMapIdentity"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "OptionalNotEmpty"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "OptionalWrappedIfToFilter"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "OptionalWrappedVariableToMap"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "PrimitiveWrapperInstantiation"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "RedundantLogicalComplementsInStream"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "RemoveAllToClearCollection"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "RemoveExplicitCallToSuper"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "SimplifyBooleanExpression"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "SimplifyBooleanInitialization"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "SimplifyStartsWith"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamAnyMatch"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamFlatMapStreamToFlatMap"),
 					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ArraysDotStream"),
+							.forName(PACKAGE_MUTATORS + "StreamForEachNestingForLoopToFlatMap"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamMapIdentity"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamWrappedIfToFilter"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamWrappedMethodRefToMap"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StreamWrappedVariableToMap"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StringFromString"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StringIndexOfToContains"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StringReplaceAllWithQuotableInput"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StringToString"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ThreadRunToThreadStart"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryBoxing"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryFullyQualifiedName"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryImport"),
 					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidFileStream"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidInlineConditionals"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidMultipleUnaryOperators"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.AvoidUncheckedExceptionsInSignatures"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.CastMathOperandsBeforeAssignement"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionIndexOfToContains"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.CollectionToOptional"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ComparisonWithNaN"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.CreateTempFilesUsingNio"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.EmptyControlStatement"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.EnumsWithoutEquals"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachAddToStreamCollectToCollection"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfBreakElseToStreamTakeWhile"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfBreakToStreamFindFirst"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachIfToIfStreamAnyMatch"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ForEachToIterableForEach"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaImmutableMapBuilderOverVarargs"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaInlineStringsRepeat"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.GuavaStringsIsNullOrEmpty"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ImportQualifiedTokens"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.JUnit4ToJUnit5"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaIsMethodReference"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.LambdaReturnsSingleStatement"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInference"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.LoopIntRangeToIntStreamForEach"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ModifierOrder"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.NullCheckToOptionalOfNullable"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectEqualsForPrimitives"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ObjectsHashCodePrimitive"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalMapIdentity"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalNotEmpty"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedIfToFilter"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.OptionalWrappedVariableToMap"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.PrimitiveWrapperInstantiation"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.RedundantLogicalComplementsInStream"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveAllToClearCollection"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.RemoveExplicitCallToSuper"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanExpression"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyBooleanInitialization"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.SimplifyStartsWith"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StreamAnyMatch"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.StreamFlatMapStreamToFlatMap"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.StreamForEachNestingForLoopToFlatMap"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StreamMapIdentity"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedIfToFilter"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedMethodRefToMap"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StreamWrappedVariableToMap"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StringFromString"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StringIndexOfToContains"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.StringReplaceAllWithQuotableInput"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.StringToString"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.ThreadRunToThreadStart"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryBoxing"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryFullyQualifiedName"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryImport"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryLambdaEnclosingParameters"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryModifier"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessarySemicolon"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseCollectionIsEmpty"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperatorJdk8"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseIndexOfChar"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.UsePredefinedStandardCharset"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseStringIsEmpty"),
-					(Class<? extends IMutator>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.UseTextBlocks"),
-					(Class<? extends IMutator>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.UseUnderscoresInNumericLiterals"));
+							.forName(PACKAGE_MUTATORS + "UnnecessaryLambdaEnclosingParameters"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryModifier"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessarySemicolon"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseCollectionIsEmpty"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseDiamondOperator"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseDiamondOperatorJdk8"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseIndexOfChar"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UsePredefinedStandardCharset"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseStringIsEmpty"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseTextBlocks"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UseUnderscoresInNumericLiterals"));
 		} catch (ClassNotFoundException e) {
 			ERROR_COUNTS.incrementAndGet();
 			throw new IllegalStateException("Cannot load CleanThat mutators", e);
@@ -201,36 +138,32 @@ public final class MutatorsScanner {
 		try {
 			// noinspection unchecked
 			COMPOSITE_MUTATORS = Set.of(
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeWalkingMutator"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CheckStyleMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.ErrorProneMutators"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.GuavaMutators"),
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "CompositeWalkingMutator"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.JSparrowMutators"),
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "CheckStyleMutators"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.PMDMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeButControversialMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeButNotConsensualMutators"),
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "ErrorProneMutators"),
+					(Class<? extends CompositeMutator<?>>) Class.forName(PACKAGE_COMPOSITE_MUTATORS + "GuavaMutators"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SonarMutators"),
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "JSparrowMutators"),
+					(Class<? extends CompositeMutator<?>>) Class.forName(PACKAGE_COMPOSITE_MUTATORS + "PMDMutators"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SpotBugsMutators"),
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "SafeAndConsensualMutators"),
 					(Class<? extends CompositeMutator<?>>) Class
-							.forName("eu.solven.cleanthat.engine.java.refactorer.mutators.composite.StreamMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.UnsafeDueToGenerics"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftCompositeMutators"),
-					(Class<? extends CompositeMutator<?>>) Class.forName(
-							"eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators"));
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "SafeButControversialMutators"),
+					(Class<? extends CompositeMutator<?>>) Class
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "SafeButNotConsensualMutators"),
+					(Class<? extends CompositeMutator<?>>) Class.forName(PACKAGE_COMPOSITE_MUTATORS + "SonarMutators"),
+					(Class<? extends CompositeMutator<?>>) Class
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "SpotBugsMutators"),
+					(Class<? extends CompositeMutator<?>>) Class.forName(PACKAGE_COMPOSITE_MUTATORS + "StreamMutators"),
+					(Class<? extends CompositeMutator<?>>) Class
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "UnsafeDueToGenerics"),
+					(Class<? extends CompositeMutator<?>>) Class
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "AllIncludingDraftCompositeMutators"),
+					(Class<? extends CompositeMutator<?>>) Class
+							.forName(PACKAGE_COMPOSITE_MUTATORS + "AllIncludingDraftSingleMutators"));
 
 		} catch (ClassNotFoundException e) {
 			ERROR_COUNTS.incrementAndGet();

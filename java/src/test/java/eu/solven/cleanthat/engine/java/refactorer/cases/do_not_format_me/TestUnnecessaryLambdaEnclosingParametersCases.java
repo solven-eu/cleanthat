@@ -25,7 +25,7 @@ public class TestUnnecessaryLambdaEnclosingParametersCases extends AJavaparserRe
 		}
 	}
 
-	@Ignore("TODO")
+	@Ignore("JavaParser seems to ignore `setEnclosingParameters(false)`")
 	@CompareMethods
 	public static class CaseFunction {
 		public Function<Integer, Integer> pre() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -40,6 +38,7 @@ import eu.solven.cleanthat.engine.StringFormatterFactory;
 import eu.solven.cleanthat.formatter.CodeFormatterApplier;
 import eu.solven.cleanthat.formatter.CodeProviderFormatter;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The {@link Configuration} enabling {@link GitHub}
@@ -47,11 +46,10 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 @Configuration
 @Import({ ConfigSpringConfig.class })
 public class CodeCleanerSpringConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeCleanerSpringConfig.class);
-
 	@Bean
 	public ICodeFormatterApplier codeFormatterApplier() {
 		return new CodeFormatterApplier();

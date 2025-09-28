@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,6 +35,7 @@ import com.github.seratch.jslack.api.webhook.WebhookResponse;
 import com.google.common.base.Strings;
 
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Manages marketPlace events for Github
@@ -44,8 +43,8 @@ import eu.solven.pepper.collection.PepperMapHelper;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class MarketPlaceEventManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MarketPlaceEventManager.class);
 
 	protected MarketPlaceEventManager() {
 		// hidden

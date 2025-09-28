@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import org.eclipse.jdt.core.manipulation.ICleanUpFixCore;
 import org.eclipse.jdt.core.refactoring.CompilationUnitChange;
 import org.eclipse.jdt.internal.ui.fix.PlainReplacementCleanUpCore;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Process code with standard Eclipse clean-up rules.
@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 // https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_contributing_a_cleanup.htm
 // https://stackoverflow.com/questions/10120072/how-to-invoke-a-eclipse-clean-up-profile-programmatically
 // https://stackoverflow.com/questions/11166862/eclipse-create-compilationunit-from-java-file
+@Slf4j
 @Deprecated(since = "TODO")
 public class EclipseCleanupProcessor {
-	private static final Logger LOGGER = LoggerFactory.getLogger(EclipseCleanupProcessor.class);
 
 	public CleanUpContextCore makeContext(ICompilationUnit unit, CompilationUnit ast) {
 		return new CleanUpContextCore(unit, ast);

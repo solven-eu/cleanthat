@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,12 @@ import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.config.pojo.CleanthatRefFilterProperties;
 import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps working with Github
@@ -43,8 +42,8 @@ import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class GithubHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubHelper.class);
 
 	protected GithubHelper() {
 		// hidden

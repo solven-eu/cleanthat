@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import java.util.Set;
 
 import org.openrewrite.Recipe;
 import org.openrewrite.config.Environment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,14 +37,15 @@ import eu.solven.cleanthat.formatter.CleanthatSession;
 import eu.solven.cleanthat.formatter.ILintFixer;
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.language.IEngineProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Formatter for OpenRewrite Engine
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class OpenrewriteFormattersFactory extends ASourceCodeFormatterFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(OpenrewriteFormattersFactory.class);
 
 	public OpenrewriteFormattersFactory(ConfigHelpers configHelpers) {
 		super(configHelpers);

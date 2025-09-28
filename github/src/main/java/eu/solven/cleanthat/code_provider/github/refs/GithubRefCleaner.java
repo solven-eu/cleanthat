@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,6 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeBuilder;
 import org.kohsuke.github.GHUser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -80,15 +78,16 @@ import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.ICleanthatGitRefsConstants;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.utils.ResultOrError;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default for {@link IGitRefCleaner}
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 public class GithubRefCleaner extends ACodeCleaner implements IGitRefCleaner, ICleanthatGitRefsConstants {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubRefCleaner.class);
 
 	public static final String ENV_TEMPORARY_BRANCH_SUFFIX = "cleanthat.temporary_branch_suffix";
 

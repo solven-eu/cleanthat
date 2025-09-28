@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +45,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.config.spring.ConfigSpringConfig;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This mojo will generate a relevant cleanthat configuration in current folder
@@ -56,6 +55,7 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@Slf4j
 @Mojo(name = CleanThatInitMojo.MOJO_INIT,
 		// This would be called once and for all
 		defaultPhase = LifecyclePhase.NONE,
@@ -63,7 +63,6 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 		// One may rely on the mvn plugin to initialize a configuration, even if no pom.xml is available
 		requiresProject = false)
 public class CleanThatInitMojo extends ACleanThatSpringMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatInitMojo.class);
 
 	public static final String MOJO_INIT = "init";
 

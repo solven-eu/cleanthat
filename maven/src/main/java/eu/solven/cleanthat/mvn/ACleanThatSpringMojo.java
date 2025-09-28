@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -44,6 +42,7 @@ import eu.solven.cleanthat.config.IGitService;
 import eu.solven.cleanthat.spotless.mvn.ArtifactResolver;
 import eu.solven.cleanthat.spotless.mvn.MavenProvisioner;
 import io.sentry.IHub;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Mojo relying on a Spring {@link ApplicationContext}
@@ -52,8 +51,8 @@ import io.sentry.IHub;
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@Slf4j
 public abstract class ACleanThatSpringMojo extends ACleanThatMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ACleanThatSpringMojo.class);
 
 	protected static final AtomicReference<ACleanThatSpringMojo> CURRENT_MOJO = new AtomicReference<>();
 

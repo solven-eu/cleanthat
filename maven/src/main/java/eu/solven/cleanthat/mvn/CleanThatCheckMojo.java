@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import java.util.List;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import eu.solven.cleanthat.any_language.ICodeCleaner;
@@ -31,6 +29,7 @@ import eu.solven.cleanthat.code_provider.github.GithubSpringConfig;
 import eu.solven.cleanthat.codeprovider.CodeProviderHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The mojo checking the code is clean
@@ -45,10 +44,9 @@ import eu.solven.cleanthat.lambda.AllEnginesSpringConfig;
 // SpotBugs is VERIFY: https://spotbugs.github.io/spotbugs-maven-plugin/check-mojo.html
 // Revelc is VALIDATE: https://code.revelc.net/formatter-maven-plugin/validate-mojo.html
 @Mojo(name = CleanThatCheckMojo.MOJO_CHECK, defaultPhase = LifecyclePhase.VERIFY, threadSafe = true)
+@Slf4j
 public class CleanThatCheckMojo extends ACleanThatSpringMojo {
 	public static final String MOJO_CHECK = "check";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCheckMojo.class);
 
 	@Override
 	protected List<Class<?>> springClasses() {

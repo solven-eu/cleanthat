@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.util.concurrent.AtomicLongMap;
 
@@ -36,6 +33,7 @@ import eu.solven.cleanthat.config.pojo.CleanthatEngineProperties;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.engine.IEngineStep;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps generating a default {@link CleanthatRepositoryProperties}
@@ -43,8 +41,8 @@ import eu.solven.cleanthat.engine.IEngineStep;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class GenerateInitialConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GenerateInitialConfig.class);
 
 	final Collection<IEngineLintFixerFactory> factories;
 

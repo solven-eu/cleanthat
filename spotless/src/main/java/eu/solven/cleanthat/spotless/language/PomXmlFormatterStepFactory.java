@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@ package eu.solven.cleanthat.spotless.language;
 
 import java.lang.reflect.Field;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.Provisioner;
 import com.diffplug.spotless.pom.SortPomCfg;
@@ -30,6 +27,7 @@ import eu.solven.cleanthat.spotless.AFormatterStepFactory;
 import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configure Spotless engine for 'pom.xml' files
@@ -37,8 +35,8 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class PomXmlFormatterStepFactory extends AFormatterStepFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PomXmlFormatterStepFactory.class);
 
 	public PomXmlFormatterStepFactory(PomXmlFormatterFactory pomXmlFactory,
 			ICodeProvider codeProvider,

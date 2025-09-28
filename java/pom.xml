@@ -41,13 +41,6 @@
 		</dependency>
 
 		<dependency>
-			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<!-- https://stackoverflow.com/questions/1829904/is-there-a-way-to-ignore-a-single-findbugs-warning -->
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>annotations</artifactId>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRef;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.code_provider.github.code_provider.AGithubSha1CodeProvider;
@@ -40,15 +38,16 @@ import eu.solven.cleanthat.codeprovider.ICodeWritingMetadata;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class GithubPRCodeProvider extends AGithubSha1CodeProvider
 		implements IListOnlyModifiedFiles, ICodeProviderWriter {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubPRCodeProvider.class);
 
 	final String eventKey;
 

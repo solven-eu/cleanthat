@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.eclipse.jdt.internal.formatter.DefaultCodeFormatterOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import com.github.difflib.patch.PatchFailedException;
@@ -40,14 +38,15 @@ import com.google.common.io.ByteStreams;
 import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
 import eu.solven.cleanthat.engine.java.eclipse.checkstyle.XmlProfileWriter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Execute the procedure to generate a minimizing Eclipse Formatter configuration
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class RunGenerateEclipseStylesheet {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RunGenerateEclipseStylesheet.class);
 
 	protected RunGenerateEclipseStylesheet() {
 		// hidden

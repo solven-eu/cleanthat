@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +27,7 @@ import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderWriter;
 import eu.solven.cleanthat.config.ICleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helper methods in the context of a mvn plugin
@@ -36,8 +35,8 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CleanThatMavenHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatMavenHelper.class);
 
 	protected CleanThatMavenHelper() {
 		// hidden

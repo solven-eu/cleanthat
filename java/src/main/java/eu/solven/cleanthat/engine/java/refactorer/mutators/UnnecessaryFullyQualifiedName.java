@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
@@ -33,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This will remove unnecessary fully qualified type reference, typically because given type if imported.
@@ -44,8 +42,8 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public class UnnecessaryFullyQualifiedName extends AJavaparserNodeMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UnnecessaryFullyQualifiedName.class);
 
 	@Override
 	public String minimalJavaVersion() {

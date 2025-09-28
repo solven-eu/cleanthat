@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A factory for repository system instances that employs Maven Artifact Resolver's built-in service locator
@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 // CHECKSTYLE:OFF: checkstyle:LineLength
 // https://github.com/apache/maven-resolver/blob/master/maven-resolver-demos/maven-resolver-demo-snippets/src/main/java/org/apache/maven/resolver/examples/manual/ManualRepositorySystemFactory.java
 // CHECKSTYLE:ON: checkstyle:LineLength
+@Slf4j
 @SuppressWarnings({ "PMD", "checkstyle:HideUtilityClassConstructor" })
 public class ManualRepositorySystemFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ManualRepositorySystemFactory.class);
 
 	public static RepositorySystem newRepositorySystem() {
 		/*

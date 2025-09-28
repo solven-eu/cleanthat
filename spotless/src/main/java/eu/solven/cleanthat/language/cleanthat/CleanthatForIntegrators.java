@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.diffplug.common.annotations.VisibleForTesting;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.resource.PepperResourceHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps integrating CleanThat
@@ -37,8 +35,8 @@ import eu.solven.pepper.resource.PepperResourceHelper;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CleanthatForIntegrators {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanthatForIntegrators.class);
 
 	public static final String ENV_CLEANTHAT_INCLUDE_DRAFT = "cleanthat.include_draft";
 

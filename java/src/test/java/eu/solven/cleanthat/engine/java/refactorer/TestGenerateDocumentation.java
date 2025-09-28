@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
 import org.junit.Test;
 import org.junit.jupiter.params.provider.Arguments;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -40,10 +38,11 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludin
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.CompositeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.test.LocalClassTestHelper;
+import lombok.extern.slf4j.Slf4j;
 
 // BEWARE: This will generate a versioned file: It may lead to unexpected result. However, it will also make sure this file is often up-to-date
+@Slf4j
 public class TestGenerateDocumentation {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestGenerateDocumentation.class);
 
 	static final String EOL = System.lineSeparator();
 

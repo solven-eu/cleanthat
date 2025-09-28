@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Modifier.Keyword;
 import com.github.javaparser.ast.Node;
@@ -39,6 +36,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Order modifiers according the the Java specification.
@@ -47,9 +45,9 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
  * @see https://github.com/checkstyle/checkstyle/blob/master/src/xdocs/checks/modifier/modifierorder.xml
  * @see
  */
+@Slf4j
 @ApplyBeforeMe(UnnecessaryModifier.class)
 public class ModifierOrder extends AJavaparserNodeMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ModifierOrder.class);
 
 	private static final List<String> ORDERED_MODIFIERS = ImmutableList.of("public",
 			"protected",

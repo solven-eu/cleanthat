@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -36,6 +34,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResul
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Used to check if given webhook is associated to a valid configuration (e.g. to filter irrelevant repositories).
@@ -43,8 +42,8 @@ import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class CheckConfigWebhooksLambdaFunction extends AWebhooksLambdaFunction {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigWebhooksLambdaFunction.class);
 
 	public AmazonDynamoDB makeDynamoDbClient() {
 		return SaveToDynamoDb.makeDynamoDbClient();

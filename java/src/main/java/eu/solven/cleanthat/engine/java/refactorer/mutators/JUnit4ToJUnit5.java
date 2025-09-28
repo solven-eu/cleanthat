@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
@@ -42,6 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.IDisabledMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.ImportDeclarationHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Migrate from JUnit4 to JUnit5/Jupiter.
@@ -54,8 +52,8 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 // https://jsparrow.github.io/tags/#junit
 // https://www.baeldung.com/junit-5-migration
 // https://docs.openrewrite.org/running-recipes/popular-recipe-guides/migrate-from-junit-4-to-junit-5
+@Slf4j
 public class JUnit4ToJUnit5 extends AJavaparserNodeMutator implements IDisabledMutator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JUnit4ToJUnit5.class);
 
 	private final Map<String, String> fromTo = ImmutableMap.<String, String>builder()
 			.put("org.junit.Before", "org.junit.jupiter.api.BeforeEach")

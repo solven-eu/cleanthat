@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -41,6 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyAfterMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns `stream.forEach(value -> { value.forEach(user -> { System.out.println(user); }); });`
@@ -49,10 +47,10 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.RepeatOnSuccess;
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @ApplyAfterMe({ LambdaIsMethodReference.class })
 @RepeatOnSuccess
 public class StreamForEachNestingForLoopToFlatMap extends AJavaparserExprMutator implements IReApplyUntilNoop {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StreamForEachNestingForLoopToFlatMap.class);
 
 	private static final Map<Class<?>, String> TYPE_TO_FLATMAP = Map.of(Stream.class,
 			"flatMap",

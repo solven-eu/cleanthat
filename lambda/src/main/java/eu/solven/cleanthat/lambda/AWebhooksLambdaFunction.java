@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
@@ -43,6 +41,7 @@ import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The main used by AWS Lambda. This is a {@link SpringBootApplication} which is quite fat. There is lighter
@@ -53,8 +52,8 @@ import eu.solven.pepper.collection.PepperMapHelper;
 // https://github.com/spring-cloud/spring-cloud-function
 // https://cloud.spring.io/spring-cloud-static/spring-cloud-function/2.1.1.RELEASE/spring-cloud-function.html
 // https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252FupperCase
+@Slf4j
 public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AWebhooksLambdaFunction.class);
 
 	private static final String KEY_BODY = "body";
 	private static final String KEY_HEADERS = "headers";

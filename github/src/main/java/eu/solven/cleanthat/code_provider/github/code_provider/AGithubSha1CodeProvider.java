@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,20 @@ import java.util.function.Consumer;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * An {@link ICodeProvider} for Github pull-requests
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 public abstract class AGithubSha1CodeProvider extends AGithubCodeProvider implements IGithubSha1CodeProvider {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AGithubSha1CodeProvider.class);
 
 	final String token;
 	final GHRepository repo;

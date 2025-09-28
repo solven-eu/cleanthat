@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch.Operation;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
 
@@ -39,6 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorer;
 import eu.solven.cleanthat.engine.java.refactorer.JavaRefactorerProperties;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.LiteralsFirstInComparisons;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndConsensualMutators;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This is useful to investigate a misbehavior over current project file
@@ -46,8 +45,8 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.SafeAndCons
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class ITTestRemoteFile {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ITTestRemoteFile.class);
 
 	final String hashMapPath =
 			"https://raw.githubusercontent.com/openjdk/jdk/master/src/java.base/share/classes/java/util/HashMap.java";

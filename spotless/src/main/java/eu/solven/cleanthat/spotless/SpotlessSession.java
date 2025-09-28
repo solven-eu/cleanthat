@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.codehaus.plexus.util.MatchPatterns;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.diffplug.spotless.PaddedCell;
 
 import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.formatter.PathAndContent;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Trigger Spotless engine
@@ -45,8 +44,8 @@ import eu.solven.cleanthat.formatter.PathAndContent;
  *
  */
 // see com.diffplug.spotless.maven.SpotlessApplyMojo
+@Slf4j
 public class SpotlessSession {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpotlessSession.class);
 
 	final ImpactedFilesTracker filesTracker = new ImpactedFilesTracker();
 

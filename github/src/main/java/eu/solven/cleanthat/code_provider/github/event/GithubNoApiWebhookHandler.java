@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,6 +33,7 @@ import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.jvm.GCInspector;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Default implementation for IGithubWebhookHandler
@@ -43,9 +41,9 @@ import eu.solven.pepper.jvm.GCInspector;
  * @author Benoit Lacelle
  */
 // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 public class GithubNoApiWebhookHandler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubNoApiWebhookHandler.class);
 
 	final List<ObjectMapper> objectMappers;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,18 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This hold the logic of applying a single {@link IMutator}
  *
  * @author Benoit Lacelle
  */
+@Slf4j
 @SuppressWarnings("PMD.GenericsNaming")
 class AstRefactorerInstance<AST, P, R> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(AstRefactorerInstance.class);
 
 	final AAstRefactorer<AST, P, R, ? extends IWalkingMutator<AST, R>> astRefactorer;
 	final P parser;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 
@@ -81,14 +79,16 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import eu.solven.cleanthat.utils.ResultOrError;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * The mojo generates an Eclipse formatter stylesheet minimyzing modifications over existing codebase.
+ * The mojo generates an Eclipse formatter stylesheet minimizing modifications over the existing codebase.
  * 
  * @author Benoit Lacelle
  *
  */
 // https://maven.apache.org/guides/plugin/guide-java-plugin-development.html
+@Slf4j
 @SuppressWarnings("PMD.GodClass")
 @Mojo(name = CleanThatGenerateEclipseStylesheetMojo.GOAL_ECLIPSE,
 		defaultPhase = LifecyclePhase.NONE,
@@ -96,7 +96,6 @@ import eu.solven.cleanthat.utils.ResultOrError;
 		aggregator = true,
 		requiresProject = false)
 public class CleanThatGenerateEclipseStylesheetMojo extends ACleanThatSpringMojo {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CleanThatCleanThatMojo.class);
 
 	// ".*/src/[main|test]/java/.*/.*\\.java"
 	public static final String DEFAULT_JAVA_REGEX = ".*\\.java";

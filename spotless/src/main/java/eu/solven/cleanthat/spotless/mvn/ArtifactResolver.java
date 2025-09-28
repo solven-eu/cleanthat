@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Benoit Lacelle - SOLVEN
+ * Copyright 2016-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.resolution.DependencyResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Duplicates com.diffplug.spotless.maven.ArtifactResolver, as it is difficult to import from a maven-plugin jar.
@@ -50,8 +50,8 @@ import org.slf4j.LoggerFactory;
  * @see com.diffplug.spotless.maven.ArtifactResolver
  *
  */
+@Slf4j
 public class ArtifactResolver {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactResolver.class);
 
 	private static final Exclusion EXCLUDE_ALL_TRANSITIVES = new Exclusion("*", "*", "*", "*");
 

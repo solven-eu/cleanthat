@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A very limitted implementation of a .gitgnore parser. It is very limitted as it handles only a very small subset of
@@ -34,8 +33,8 @@ import org.slf4j.LoggerFactory;
  */
 // Inspired by https://github.com/codemix/gitignore-parser/blob/master/lib/index.js
 // https://git-scm.com/docs/gitignore
+@Slf4j
 public class GitIgnoreParser {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreParser.class);
 
 	protected GitIgnoreParser() {
 		// hidden

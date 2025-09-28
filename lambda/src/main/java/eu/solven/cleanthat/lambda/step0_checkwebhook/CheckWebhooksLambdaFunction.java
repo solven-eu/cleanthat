@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -36,6 +34,7 @@ import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.pepper.collection.PepperMapHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Used to filter relevant webhooks for useless webhooks.
@@ -47,8 +46,8 @@ import eu.solven.pepper.collection.PepperMapHelper;
  *
  */
 // https://docs.github.com/en/developers/github-marketplace/using-the-github-marketplace-api-in-your-app/webhook-events-for-the-github-marketplace-api
+@Slf4j
 public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CheckWebhooksLambdaFunction.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(CheckWebhooksLambdaFunction.class, args);

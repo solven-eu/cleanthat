@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 Benoit Lacelle - SOLVEN
+ * Copyright 2016-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,6 @@ import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.CoreConfig.AutoCRLF;
 import org.eclipse.jgit.lib.CoreConfig.EOL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.LazyForwardingEquality;
@@ -56,6 +54,7 @@ import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharSequenceNod
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.spotless.pojo.SpotlessGitProperties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Uses <a href="https://git-scm.com/docs/gitattributes">.gitattributes</a> to determine the appropriate line ending.
@@ -67,9 +66,9 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessGitProperties;
  */
 // This differs from original GitAttributesLineEndings as it rely on a .gitattributes as a String, and no not try
 // consider any system git configuration
+@Slf4j
 @SuppressWarnings("checkstyle:TypeName")
 public final class GitAttributesLineEndings_InMemory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GitAttributesLineEndings_InMemory.class);
 
 	// prevent direct instantiation
 	private GitAttributesLineEndings_InMemory() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@ package eu.solven.cleanthat.engine.java.refactorer.helpers;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -30,6 +27,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Helps working with {@link ResolvedType}
@@ -37,8 +35,8 @@ import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class ResolvedTypeHelpers {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ResolvedTypeHelpers.class);
 
 	protected ResolvedTypeHelpers() {
 		// hidden

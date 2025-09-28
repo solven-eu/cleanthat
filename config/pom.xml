@@ -32,13 +32,6 @@
 			<artifactId>jackson-dataformat-yaml</artifactId>
 		</dependency>
 		<dependency>
-			<!-- For Eclipse, given downloaded jar: 'java -jar lombok.jar' -->
-			<!-- For Eclipse: 'Install New Software' over https://projectlombok.org/p2 -->
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>io.github.solven-eu.cleanthat</groupId>
 			<artifactId>test-helpers</artifactId>
 			<version>${project.version}</version>

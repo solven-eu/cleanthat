@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -50,6 +48,7 @@ import eu.solven.cleanthat.engine.java.refactorer.mutators.LocalVariableTypeInfe
 import eu.solven.cleanthat.engine.java.refactorer.mutators.composite.AllIncludingDraftSingleMutators;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.scanner.MutatorsScanner;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This is some sort of integration tests. it will process any resource in `/source/do_not_format_me/XXX` where XXX is
@@ -58,9 +57,9 @@ import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserTestCases;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 @RunWith(Parameterized.class)
 public class TestMutatorOnFiles extends AJavaparserTestCases {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestMutatorOnFiles.class);
 
 	private static final String DIR = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/source/do_not_format_me/";
 

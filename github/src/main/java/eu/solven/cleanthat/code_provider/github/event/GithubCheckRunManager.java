@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@ import org.kohsuke.github.GHCheckRunBuilder.Action;
 import org.kohsuke.github.GHCheckRunBuilder.Output;
 import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Ascii;
 import com.google.common.base.Throwables;
 
 import eu.solven.cleanthat.config.IDocumentationConstants;
 import eu.solven.cleanthat.config.IGitService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * manages CheckRun in GitHub API
@@ -42,8 +41,8 @@ import eu.solven.cleanthat.config.IGitService;
  *
  */
 // https://stackoverflow.com/questions/67919168/github-checks-api-vs-check-runs-vs-check-suites
+@Slf4j
 public class GithubCheckRunManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubCheckRunManager.class);
 
 	private static final String ID_CLEANTHAT = "Cleanthat";
 	private static final int LIMIT_IDENTIFIER = 20;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import org.kohsuke.github.HttpException;
 import org.kohsuke.github.connector.GitHubConnector;
 import org.kohsuke.github.extras.authorization.JWTTokenProvider;
 import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 
 import com.google.common.base.Ascii;
@@ -46,6 +44,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import eu.solven.cleanthat.code_provider.github.event.pojo.WebhookRelevancyResult;
 import eu.solven.cleanthat.utils.ResultOrError;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
 /**
@@ -55,11 +54,10 @@ import okhttp3.OkHttpClient;
  *
  */
 // https://github.com/spotbugs/spotbugs/issues/2695
+@Slf4j
 @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 public class GithubAppFactory implements IGithubAppFactory {
 	private static final int PUBLIC_CHARS_IN_TOKEN = 10;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(GithubAppFactory.class);
 
 	public static final String ENV_GITHUB_APP_PRIVATE_JWK = "github.app.private-jwk";
 

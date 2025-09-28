@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +28,8 @@ import com.google.common.util.concurrent.AtomicLongMap;
  * @author Benoit Lacelle
  *
  */
+@Slf4j
 public class LocaleHelper {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LocaleHelper.class);
 
 	private static final Supplier<Set<String>> ISO_LANGUAGES =
 			Suppliers.memoize(() -> ImmutableSet.copyOf(Locale.getISOLanguages()));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Turns '"a\r\n" + "b\r\n"’ into ’"""aEOLbEOL"""'
@@ -43,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 // https://www.baeldung.com/java-text-blocks
 // https://stackoverflow.com/questions/878573/does-java-have-support-for-multiline-strings/50155171#50155171
 // TODO Handle intermediate parenthesis
-@Slf4j
 public class UseTextBlocks extends AJavaparserNodeMutator {
 	@Override
 	public String minimalJavaVersion() {

@@ -76,7 +76,7 @@ public class AppendCharacterWithChar extends AJavaparserNodeMutator {
 		}
 
 		Expression argument = methodCall.getArgument(0);
-		if (argument.isCharLiteralExpr() || !argument.isStringLiteralExpr()) {
+		if (!argument.isStringLiteralExpr()) {
 			return false;
 		}
 

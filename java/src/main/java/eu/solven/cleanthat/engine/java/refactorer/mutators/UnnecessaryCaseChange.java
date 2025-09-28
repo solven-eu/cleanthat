@@ -34,6 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  */
 public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
+	public static final String METHOD_EQUALS = "equals";
 	private static final String METHOD_EQUALS_IGNORE_CASE = "equalsIgnoreCase";
 
 	@Override
@@ -61,7 +62,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		var methodCall = (MethodCallExpr) node.getNode();
 		var methodName = methodCall.getNameAsString();
 
-		boolean equals = "equals".equals(methodName);
+		boolean equals = METHOD_EQUALS.equals(methodName);
 		boolean equalsIgnoreCase = METHOD_EQUALS_IGNORE_CASE.equals(methodName);
 
 		if (!(equals || equalsIgnoreCase) || methodCall.getArguments().size() != 1) {

@@ -35,7 +35,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     // Cases that should be replaced with equalsIgnoreCase
 
     @CompareMethods
-    public static class CaseToLowerCaseWithHardcodedLowercase {
+    public static class CaseToLowerCaseWithLiteralLowercase {
         public Object pre(String string) {
             return string.toLowerCase().equals("lowercase");
         }
@@ -46,7 +46,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     }
 
     @CompareMethods
-    public static class CaseToUpperCaseWithHardcodedUppercase {
+    public static class CaseToUpperCaseWithLiteralUppercase {
         public Object pre(String string) {
             return string.toUpperCase().equals("UPPERCASE");
         }
@@ -57,7 +57,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     }
 
     @CompareMethods
-    public static class CaseToLowerCaseWithHardcodedLowercaseFlipped {
+    public static class CaseLiteralLowercaseWithToLowerCaseWith {
         public Object pre(String string) {
             return "lowercase".equals(string.toLowerCase());
         }
@@ -68,7 +68,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     }
 
     @CompareMethods
-    public static class CaseToUpperCaseWithHardcodedUppercaseFlipped {
+    public static class CaseLiteralUppercaseWithToUpperCase {
         public Object pre(String string) {
             return "UPPERCASE".equals(string.toUpperCase());
         }
@@ -193,14 +193,14 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     // Cases that could be replaced, but are ignored for now
 
     @UnmodifiedMethod
-    public static class CaseToLowerCaseWithHardcodedNull {
+    public static class CaseToLowerCaseWithNull {
         public Object pre(String string) {
             return string.toLowerCase().equals(null);
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseToUpperCaseWithHardcodedNull {
+    public static class CaseToUpperCaseWithNull {
         public Object pre(String string) {
             return string.toUpperCase().equals(null);
         }
@@ -209,56 +209,56 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     // Cases that should be ignored as the replacement WOULD change execution behavior
 
     @UnmodifiedMethod
-    public static class CaseToLowerCaseWithHardcodedUppercase {
+    public static class CaseToLowerCaseWithLiteralUppercase {
         public Object pre(String string) {
             return string.toLowerCase().equals("UPPERCASE");
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseToUpperCaseWithHardcodedLowercase {
+    public static class CaseToUpperCaseWithLiteralLowercase {
         public Object pre(String string) {
             return string.toUpperCase().equals("lowercase");
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseToLowerCaseWithHardcodedMixedCase {
+    public static class CaseToLowerCaseWithLiteralMixedCase {
         public Object pre(String string) {
             return string.toLowerCase().equals("MixedCase");
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseToUpperCaseWithHardcodedMixedCase {
+    public static class CaseToUpperCaseWithLiteralMixedCase {
         public Object pre(String string) {
             return string.toUpperCase().equals("MixedCase");
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseHardcodedUppercaseWithToLowerCase {
+    public static class CaseLiteralUppercaseWithToLowerCase {
         public Object pre(String string) {
             return "UPPERCASE".equals(string.toLowerCase());
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseHardcodedLowercaseWithToUpperCase {
+    public static class CaseLiteralLowercaseWithToUpperCase {
         public Object pre(String string) {
             return "lowercase".equals(string.toUpperCase());
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseHardcodedMixedCaseWithToLowerCase {
+    public static class CaseLiteralMixedCaseWithToLowerCase {
         public Object pre(String string) {
             return "MixedCase".equals(string.toLowerCase());
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseHardcodedMixedCaseWithToUpperCase {
+    public static class CaseLiteralMixedCaseWithToUpperCase {
         public Object pre(String string) {
             return "MixedCase".equals(string.toUpperCase());
         }
@@ -367,14 +367,14 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     // Cases that should be ignored as there is no case change involved
 
     @UnmodifiedMethod
-    public static class CaseHardcodedEqualsHardcoded {
+    public static class CaseLiteralEqualsLiteral {
         public Object pre() {
             return "lowercase".equals("lowercase");
         }
     }
 
     @UnmodifiedMethod
-    public static class CaseHardcodedEqualsIgnoreCaseHardcoded {
+    public static class CaseLiteralEqualsIgnoreCaseLiteral {
         public Object pre() {
             return "lowercase".equalsIgnoreCase("lowercase");
         }

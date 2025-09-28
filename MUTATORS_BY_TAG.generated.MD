@@ -21,6 +21,7 @@
 
 ## Draft
 
+- [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
 - [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
@@ -151,6 +152,7 @@
 
 ## PMD
 
+- [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
 - [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
 - [AvoidMultipleUnaryOperators](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidMultipleUnaryOperators.java)
 - [AvoidUncheckedExceptionsInSignatures](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidUncheckedExceptionsInSignatures.java)
@@ -311,6 +313,7 @@
 
 ## With JDK 1.5
 
+- [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
 - [EnumsWithoutEquals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/EnumsWithoutEquals.java)
 - [PrimitiveWrapperInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/PrimitiveWrapperInstantiation.java)
 

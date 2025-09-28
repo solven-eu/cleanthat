@@ -204,6 +204,16 @@ languageLevel: jdk1.7
 
 ## Single Mutators (DRAFTs)
 
+### [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
+
+PMD: [AppendCharacterWithChar](https://pmd.github.io/pmd/pmd_rules_java_performance.html#appendcharacterwithchar)
+
+Cleanthat own ID: AppendCharacterWithChar
+
+isDraft
+
+languageLevel: jdk1.5
+
 ### [ArithmeticOverFloats](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ArithmeticOverFloats.java)
 
 Sonar: [RSPEC-2164](https://rules.sonarsource.com/java/RSPEC-2164)

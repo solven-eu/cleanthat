@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**

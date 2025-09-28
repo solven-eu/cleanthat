@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,18 +54,12 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator
 		}
 
 		var lambdaExpr = (LambdaExpr) node.getNode();
-        if (lambdaExpr.getParameters().size() != 1 || !lambdaExpr.isEnclosingParameters()) {
-            return false;
-        }
+		if (lambdaExpr.getParameters().size() != 1 || lambdaExpr.isExplicitlyTyped()) {
+			return false;
+		}
 
-        var param = lambdaExpr.getParameters().get(0);
-        if (param.getType() != null) {
-            return false;
-        }
-
-        var newLambdaExpr = lambdaExpr.clone();
-        newLambdaExpr.setEnclosingParameters(false);
-        return tryReplace(lambdaExpr, newLambdaExpr);
-
-    }
+		var newLambdaExpr = lambdaExpr.clone();
+		newLambdaExpr.setEnclosingParameters(false);
+		return tryReplace(lambdaExpr, newLambdaExpr);
+	}
 }

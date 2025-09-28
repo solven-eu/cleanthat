@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Switch o.toLowerCase().equals("some_string") to o.equalsIgnoreCase("some_string")
@@ -54,14 +55,17 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
 	@Override
 	@SuppressWarnings("PMD.NPathComplexity")
-	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
-		if (!(node.getNode() instanceof MethodCallExpr)) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
+		if (!(expression.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = node.getNode().asMethodCallExpr();
-		var methodName = methodCall.getNameAsString();
+		var methodCall = expression.getNode().asMethodCallExpr();
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(methodCall.getScope()), String.class)) {
+			return false;
+		}
 
+		var methodName = methodCall.getNameAsString();
 		boolean equals = METHOD_EQUALS.equals(methodName);
 		boolean equalsIgnoreCase = METHOD_EQUALS_IGNORE_CASE.equals(methodName);
 
@@ -156,9 +160,9 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		private Side(Expression expression) {
 			if (expression instanceof MethodCallExpr) {
 				isMethodCall = true;
-				methodCall = (MethodCallExpr) expression;
+				methodCall = expression.asMethodCallExpr();
 
-				if (!methodCall.getArguments().isEmpty() || !isString(methodCall)) {
+				if (!methodCall.getArguments().isEmpty()) {
 					invalid = true;
 					return;
 				}
@@ -181,11 +185,6 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			String literal = stringLiteral.getValue();
 			isLowercase = literal.equals(literal.toLowerCase());
 			isUppercase = literal.equals(literal.toUpperCase());
-		}
-
-		private static boolean isString(Expression expression) {
-			String typeName = expression.calculateResolvedType().describe();
-			return "java.lang.String".equals(typeName);
 		}
 	}
 

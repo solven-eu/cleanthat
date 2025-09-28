@@ -39,6 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  */
 public class AppendCharacterWithChar extends AJavaparserExprMutator {
 
+	public static final String APOSTROPHE = "'";
 	public static final String METHOD_APPEND = "append";
 
 	@Override
@@ -84,7 +85,7 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 		}
 
 		var argumentAsString = argument.asStringLiteralExpr().getValue();
-		if (couldBeCharacter(argumentAsString)) {
+		if (APOSTROPHE.equals(argumentAsString) || !couldBeCharacter(argumentAsString)) {
 			return false;
 		}
 
@@ -95,7 +96,7 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 	}
 
 	private static boolean couldBeCharacter(String argumentAsString) {
-		return StringEscapeUtils.unescapeJava(argumentAsString).length() != 1;
+		return StringEscapeUtils.unescapeJava(argumentAsString).length() == 1;
 	}
 
 }

@@ -73,13 +73,6 @@ public class TestAppendCharacterWithCharCases extends AJavaparserRefactorerCases
         }
     }
 
-    @UnmodifiedMethod
-    public static class CaseEmptyString {
-        public Object pre() {
-            return new StringBuilder().append("");
-        }
-    }
-
     @CompareMethods
     public static class CaseCharChain {
         public Object pre() {
@@ -124,6 +117,42 @@ public class TestAppendCharacterWithCharCases extends AJavaparserRefactorerCases
 
         public Object post() {
             return new StringBuilder().append("aa").append('b');
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseEmptyString {
+        public Object pre() {
+            return new StringBuilder().append("");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseApostrophe {
+        public Object pre() {
+            return new StringBuilder().append("'");
+        }
+    }
+
+    @CompareMethods
+    public static class CaseTab {
+        public Object pre() {
+            return new StringBuilder().append("\t");
+        }
+
+        public Object post() {
+            return new StringBuilder().append('\t');
+        }
+    }
+
+    @CompareMethods
+    public static class CaseDelete {
+        public Object pre() {
+            return new StringBuilder().append("\u007F");
+        }
+
+        public Object post() {
+            return new StringBuilder().append('\u007F');
         }
     }
 

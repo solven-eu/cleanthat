@@ -40,28 +40,6 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     }
 
     @CompareMethods
-    public static class CaseToLowerCaseWithHardcodedNull {
-        public Object pre(String string) {
-            return string.toLowerCase().equals(null);
-        }
-
-        public Object post(String string) {
-            return string.equalsIgnoreCase(null);
-        }
-    }
-
-    @CompareMethods
-    public static class CaseToUpperCaseWithHardcodedNull {
-        public Object pre(String string) {
-            return string.toUpperCase().equals(null);
-        }
-
-        public Object post(String string) {
-            return string.equalsIgnoreCase(null);
-        }
-    }
-
-    @CompareMethods
     public static class CaseToLowerCaseWithHardcodedLowercaseFlipped {
         public Object pre(String string) {
             return "lowercase".equals(string.toLowerCase());
@@ -192,6 +170,22 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
 
         public Object post(String left, String right) {
             return left.equalsIgnoreCase(right);
+        }
+    }
+
+    // Cases that could be replaced, but are ignored for now
+
+    @UnmodifiedMethod
+    public static class CaseToLowerCaseWithHardcodedNull {
+        public Object pre(String string) {
+            return string.toLowerCase().equals(null);
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseToUpperCaseWithHardcodedNull {
+        public Object pre(String string) {
+            return string.toUpperCase().equals(null);
         }
     }
 

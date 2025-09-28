@@ -15,16 +15,13 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
@@ -37,8 +34,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  */
 public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
-	private static final Map<String, Predicate<String>> CASE_CHECKERS = Map
-			.of("toLowerCase", UnnecessaryCaseChange::isLowerCase, "toUpperCase", UnnecessaryCaseChange::isUpperCase);
+	private static final String METHOD_EQUALS_IGNORE_CASE = "equalsIgnoreCase";
 
 	@Override
 	public Set<String> getTags() {
@@ -56,6 +52,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 	}
 
 	@Override
+	@SuppressWarnings("PMD.NPathComplexity")
 	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
 		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
@@ -63,53 +60,127 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
 		var methodCall = (MethodCallExpr) node.getNode();
 		var methodName = methodCall.getNameAsString();
-		if (!("equals".equals(methodName) || "equalsIgnoreCase".equals(methodName)) || methodCall.getArguments().size() != 1) {
+
+		boolean equals = "equals".equals(methodName);
+		boolean equalsIgnoreCase = METHOD_EQUALS_IGNORE_CASE.equals(methodName);
+
+		if (!(equals || equalsIgnoreCase) || methodCall.getArguments().size() != 1) {
 			return false;
 		}
 
-		var scope = methodCall.getScope().orElse(null);
-		if (!(scope instanceof MethodCallExpr)) {
+		Expression scope = methodCall.getScope().orElse(null);
+		Expression argument = methodCall.getArgument(0);
+
+		var left = new Side(scope);
+		var right = new Side(argument);
+
+		if (left.invalid || right.invalid) {
 			return false;
 		}
 
-		var innerCall = (MethodCallExpr) scope;
-		var checker = CASE_CHECKERS.get(innerCall.getNameAsString());
-		if (checker == null || !innerCall.getArguments().isEmpty()) {
-			return false;
+		if (left.isToLowerCase && right.isToLowerCase || left.isToUpperCase && right.isToUpperCase) {
+			Expression newScope = getScope(left.methodCall);
+			Expression newArg = getScope(right.methodCall);
+
+			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+
+			return tryReplace(methodCall, replacement);
 		}
 
-		var scopeExpr = innerCall.getScope().orElse(null);
-		if (!isString(scopeExpr)) {
-			return false;
+		if (left.isToLowerCase && right.isLowercase || left.isToUpperCase && right.isUppercase) {
+			Expression newScope = getScope(left.methodCall);
+
+			var replacement =
+					new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(right.stringLiteral));
+
+			return tryReplace(methodCall, replacement);
 		}
 
-		var argument = methodCall.getArgument(0);
-		if (argument.isStringLiteralExpr()) {
-			var literalValue = argument.asStringLiteralExpr().asString();
+		if (left.isLowercase && right.isToLowerCase || left.isUppercase && right.isToUpperCase) {
+			Expression newArg = getScope(right.methodCall);
 
-			if (!checker.test(literalValue)) {
-				return false;
+			var replacement =
+					new MethodCallExpr(left.stringLiteral, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+
+			return tryReplace(methodCall, replacement);
+		}
+
+		if (equalsIgnoreCase && left.isMethodCall && right.isMethodCall) {
+			Expression newScope = getScope(left.methodCall);
+			Expression newArg = getScope(right.methodCall);
+
+			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+
+			return tryReplace(methodCall, replacement);
+		}
+
+		if (equalsIgnoreCase && left.isMethodCall) {
+			Expression newScope = getScope(left.methodCall);
+
+			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(argument));
+
+			return tryReplace(methodCall, replacement);
+		}
+
+		if (equalsIgnoreCase && right.isMethodCall) {
+			Expression newArg = getScope(right.methodCall);
+
+			var replacement = new MethodCallExpr(scope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+
+			return tryReplace(methodCall, replacement);
+		}
+
+		return false;
+	}
+
+	private static Expression getScope(MethodCallExpr scope) {
+		return scope.getScope().get().clone();
+	}
+
+	@SuppressWarnings("PMD.ImmutableField")
+	private static final class Side {
+		private boolean isMethodCall;
+		private MethodCallExpr methodCall;
+		private StringLiteralExpr stringLiteral;
+
+		private boolean invalid;
+
+		private boolean isToLowerCase;
+		private boolean isToUpperCase;
+
+		private boolean isLowercase;
+		private boolean isUppercase;
+
+		@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
+		private Side(Expression expression) {
+			if (expression instanceof MethodCallExpr) {
+				isMethodCall = true;
+				methodCall = (MethodCallExpr) expression;
+
+				if (!methodCall.getArguments().isEmpty()) {
+					invalid = true;
+					return;
+				}
+
+				var methodName = methodCall.getNameAsString();
+				isToLowerCase = "toLowerCase".equals(methodName);
+				isToUpperCase = "toUpperCase".equals(methodName);
+
+				if (!isToLowerCase && !isToUpperCase) {
+					invalid = true;
+					return;
+				}
 			}
+
+			if (!expression.isStringLiteralExpr()) {
+				return;
+			}
+
+			stringLiteral = expression.asStringLiteralExpr();
+			String literal = stringLiteral.getValue();
+			isLowercase = literal.equals(literal.toLowerCase());
+			isUppercase = literal.equals(literal.toUpperCase());
 		}
-
-		var replacement = new MethodCallExpr(scopeExpr.clone(),
-				"equalsIgnoreCase",
-				NodeList.nodeList(methodCall.getArguments().get(0).clone()));
-
-		return tryReplace(methodCall, replacement);
 	}
 
-	private static boolean isString(Expression expression) {
-		return expression != null && "java.lang.String".equals(expression.calculateResolvedType().describe());
-	}
-
-	@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
-	private static boolean isLowerCase(@Nonnull String string) {
-		return string.toLowerCase().equals(string);
-	}
-
-	@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
-	private static boolean isUpperCase(@Nonnull String string) {
-		return string.toUpperCase().equals(string);
-	}
 }

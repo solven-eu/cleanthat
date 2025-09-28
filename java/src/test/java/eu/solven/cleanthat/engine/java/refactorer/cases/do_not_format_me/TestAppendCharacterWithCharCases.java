@@ -73,6 +73,13 @@ public class TestAppendCharacterWithCharCases extends AJavaparserRefactorerCases
         }
     }
 
+    @UnmodifiedMethod
+    public static class CaseEmptyString {
+        public Object pre() {
+            return new StringBuilder().append("");
+        }
+    }
+
     @CompareMethods
     public static class CaseCharChain {
         public Object pre() {

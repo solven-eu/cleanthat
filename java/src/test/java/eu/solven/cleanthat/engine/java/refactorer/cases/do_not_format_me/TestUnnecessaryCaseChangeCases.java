@@ -15,6 +15,23 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         return new UnnecessaryCaseChange();
     }
 
+    private static final class CustomClass {
+        private CustomClass equalsIgnoreCase(String string) {
+            return this;
+        }
+
+        private CustomClass toLowerCase() {
+            return this;
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseCustomClassWithEqualsIgnoreCase {
+        public Object pre() {
+            return new CustomClass().toLowerCase().equalsIgnoreCase("lowercase");
+        }
+    }
+
     // Cases that should be replaced with equalsIgnoreCase
 
     @CompareMethods

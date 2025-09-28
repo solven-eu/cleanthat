@@ -157,7 +157,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 				isMethodCall = true;
 				methodCall = (MethodCallExpr) expression;
 
-				if (!methodCall.getArguments().isEmpty()) {
+				if (!methodCall.getArguments().isEmpty() || !isString(methodCall)) {
 					invalid = true;
 					return;
 				}
@@ -180,6 +180,11 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			String literal = stringLiteral.getValue();
 			isLowercase = literal.equals(literal.toLowerCase());
 			isUppercase = literal.equals(literal.toUpperCase());
+		}
+
+		private static boolean isString(Expression expression) {
+			String typeName = expression.calculateResolvedType().describe();
+			return "java.lang.String".equals(typeName);
 		}
 	}
 

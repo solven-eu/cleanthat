@@ -28,20 +28,18 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 
 /**
  * Turns `stringBuilder.append("c")` into `stringBuilder.append('c')`
  * <p>
- * Works with classes listed in {@code SUPPORTED_TYPES}.
+ * Works with classes implementing {@link Appendable}.
  *
  * @author Balazs Glatz
  */
 public class AppendCharacterWithChar extends AJavaparserExprMutator {
 
 	public static final String METHOD_APPEND = "append";
-
-	private static final Set<String> SUPPORTED_TYPES = Set
-			.of("java.io.CharArrayWriter", "java.io.StringWriter", "java.lang.StringBuffer", "java.lang.StringBuilder");
 
 	@Override
 	public String minimalJavaVersion() {
@@ -64,12 +62,12 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 	}
 
 	@Override
-	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
-		if (!(node.getNode() instanceof MethodCallExpr)) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
+		if (!(expression.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = node.getNode().asMethodCallExpr();
+		var methodCall = expression.getNode().asMethodCallExpr();
 		var methodName = methodCall.getNameAsString();
 		if (!METHOD_APPEND.equals(methodName) || methodCall.getArguments().size() != 1) {
 			return false;
@@ -80,8 +78,8 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 			return false;
 		}
 
-		Expression scope = methodCall.getScope().orElse(null);
-		if (!isSupportedType(scope)) {
+		Optional<Expression> scope = methodCall.getScope();
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), Appendable.class)) {
 			return false;
 		}
 
@@ -91,17 +89,9 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 		}
 
 		CharLiteralExpr character = new CharLiteralExpr(argumentAsString);
-		var replacement = new MethodCallExpr(scope, METHOD_APPEND, NodeList.nodeList(character));
+		var replacement = new MethodCallExpr(scope.get(), METHOD_APPEND, NodeList.nodeList(character));
 
 		return tryReplace(methodCall, replacement);
-	}
-
-	private static boolean isSupportedType(Expression expression) {
-		if (expression == null) {
-			return false;
-		}
-		String typeName = expression.calculateResolvedType().describe();
-		return SUPPORTED_TYPES.contains(typeName);
 	}
 
 	private static boolean couldBeCharacter(String argumentAsString) {

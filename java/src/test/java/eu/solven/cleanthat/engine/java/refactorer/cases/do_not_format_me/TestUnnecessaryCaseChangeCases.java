@@ -195,7 +195,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    // Cases that should be ignored as the replacement would change execution behavior
+    // Cases that should be ignored as the replacement WOULD change execution behavior
 
     @UnmodifiedMethod
     public static class CaseToLowerCaseWithHardcodedUppercase {
@@ -267,7 +267,7 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
         }
     }
 
-    // Cases that should be ignored as the replacement could change execution behavior
+    // Cases that should be ignored as the replacement COULD change execution behavior
 
     @UnmodifiedMethod
     public static class CaseToLowerCaseWithLocaleAndEqualsIgnoreCase {
@@ -350,6 +350,22 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     public static class CaseToUpperCaseWithVariable {
         public Object pre(String left, String right) {
             return left.toUpperCase().equals(right);
+        }
+    }
+
+    // Cases that should be ignored as there is no case change involved
+
+    @UnmodifiedMethod
+    public static class CaseHardcodedEqualsHardcoded {
+        public Object pre() {
+            return "lowercase".equals("lowercase");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class CaseHardcodedEqualsIgnoreCaseHardcoded {
+        public Object pre() {
+            return "lowercase".equalsIgnoreCase("lowercase");
         }
     }
 

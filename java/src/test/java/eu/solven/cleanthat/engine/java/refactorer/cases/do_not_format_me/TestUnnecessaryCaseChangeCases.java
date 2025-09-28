@@ -35,6 +35,28 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
     // Cases that should be replaced with equalsIgnoreCase
 
     @CompareMethods
+    public static class CaseToLowerCaseWithLiteralEmpty {
+        public Object pre(String string) {
+            return string.toLowerCase().equals("");
+        }
+
+        public Object post(String string) {
+            return string.equalsIgnoreCase("");
+        }
+    }
+
+    @CompareMethods
+    public static class CaseToUpperCaseWithLiteralEmpty {
+        public Object pre(String string) {
+            return string.toUpperCase().equals("");
+        }
+
+        public Object post(String string) {
+            return string.equalsIgnoreCase("");
+        }
+    }
+
+    @CompareMethods
     public static class CaseToLowerCaseWithLiteralLowercase {
         public Object pre(String string) {
             return string.toLowerCase().equals("lowercase");
@@ -53,6 +75,28 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
 
         public Object post(String string) {
             return string.equalsIgnoreCase("UPPERCASE");
+        }
+    }
+
+    @CompareMethods
+    public static class CaseLiteralEmptyWithToLowerCaseWith {
+        public Object pre(String string) {
+            return "".equals(string.toLowerCase());
+        }
+
+        public Object post(String string) {
+            return "".equalsIgnoreCase(string);
+        }
+    }
+
+    @CompareMethods
+    public static class CaseLiteralEmptyWithToUpperCase {
+        public Object pre(String string) {
+            return "".equals(string.toUpperCase());
+        }
+
+        public Object post(String string) {
+            return "".equalsIgnoreCase(string);
         }
     }
 

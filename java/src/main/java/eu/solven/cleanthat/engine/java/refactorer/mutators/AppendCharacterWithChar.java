@@ -26,6 +26,7 @@ import com.github.javaparser.utils.StringEscapeUtils;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
@@ -36,7 +37,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  *
  * @author Balazs Glatz
  */
-public class AppendCharacterWithChar extends AJavaparserNodeMutator {
+public class AppendCharacterWithChar extends AJavaparserExprMutator {
 
 	public static final String METHOD_APPEND = "append";
 
@@ -64,12 +65,12 @@ public class AppendCharacterWithChar extends AJavaparserNodeMutator {
 	}
 
 	@Override
-	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
 		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = (MethodCallExpr) node.getNode();
+		var methodCall = node.getNode().asMethodCallExpr();
 		var methodName = methodCall.getNameAsString();
 		if (!METHOD_APPEND.equals(methodName) || methodCall.getArguments().size() != 1) {
 			return false;

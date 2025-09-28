@@ -62,7 +62,8 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		}
 
 		var methodCall = (MethodCallExpr) node.getNode();
-		if (!"equals".equals(methodCall.getNameAsString()) || methodCall.getArguments().size() != 1) {
+		var methodName = methodCall.getNameAsString();
+		if (!("equals".equals(methodName) || "equalsIgnoreCase".equals(methodName)) || methodCall.getArguments().size() != 1) {
 			return false;
 		}
 

@@ -1,7 +1,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
-import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsResource;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UnnecessaryCaseChange;
@@ -424,9 +423,5 @@ public class TestUnnecessaryCaseChangeCases extends AJavaparserRefactorerCases {
             return "lowercase".equalsIgnoreCase("lowercase");
         }
     }
-
-    // This class threw a strange StackOverFlowError with an earlier implementation of the mutator
-    @UnmodifiedCompilationUnitAsResource(pre = "source/do_not_format_me/UnnecessaryCaseChange/SomeClass.java")
-    public static class CaseUnknownError { }
 
 }

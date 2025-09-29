@@ -52,6 +52,7 @@ public final class MutatorsScanner {
 		try {
 			// noinspection unchecked
 			SINGLE_MUTATORS = Set.of(
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "AppendCharacterWithChar"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArithmethicAssignment"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArithmeticOverFloats"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ArraysDotStream"),

@@ -11,6 +11,17 @@ Once done (or re-done after a release), you can simply:
 
 # Note for `mutator` contributors
 
+## Bug with JavaParser
+
+We regularly encounter bugs with `JavaParser` upstream dependency. In such case, with or without a workaround, it would be beneficial to report the case to JavaParser.
+
+Many issues are related with `LexicalPreservingPrinter`.
+
+Typical cases are:
+
+- https://github.com/javaparser/javaparser/issues/3924
+- https://github.com/javaparser/javaparser/issues/3936
+
 ## Unit-tests
 
 Mutators are subject to many edge-cases, due to the complexity of syntaxes (including Java).

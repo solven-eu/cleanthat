@@ -30,11 +30,10 @@ import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
@@ -47,9 +46,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("PMD.GodClass")
 @Slf4j
-public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implements IMutatorDescriber {
+public class LiteralsFirstInComparisons extends AJavaparserExprMutator implements IMutatorDescriber {
 
+	private static final String METHOD_COMPARE_TO = "compareTo";
+	private static final String METHOD_COMPARE_TO_IGNORE_CASE = "compareToIgnoreCase";
+	private static final String METHOD_CONTENT_EQUALS = "contentEquals";
 	private static final String METHOD_EQUALS = "equals";
+	private static final String METHOD_EQUALS_IGNORE_CASE = "equalsIgnoreCase";
+
+	private static final Set<String> SWITCHABLE_STRING_METHODS =
+			Set.of(METHOD_EQUALS, METHOD_EQUALS_IGNORE_CASE, METHOD_CONTENT_EQUALS);
+
+	private static final Set<String> COMPARE_STRING_METHODS = Set.of(METHOD_COMPARE_TO, METHOD_COMPARE_TO_IGNORE_CASE);
 
 	@Override
 	public String minimalJavaVersion() {
@@ -86,7 +94,7 @@ public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implement
 
 	@SuppressWarnings({ "PMD.CognitiveComplexity", "PMD.NPathComplexity" })
 	@Override
-	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
 		if (!(node.getNode() instanceof MethodCallExpr)) {
 			return false;
 		}
@@ -136,7 +144,7 @@ public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implement
 		}
 		var scope = optScope.get();
 
-		if (stringScopeOnly && !isStringScope(node.editNode(scope))) {
+		if (stringScopeOnly && !MethodCallExprHelpers.scopeHasRequiredType(node.editNode(scope), String.class)) {
 			return false;
 		}
 
@@ -190,28 +198,11 @@ public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implement
 		return name.asString().matches("[A-Z0-9_]+");
 	}
 
-	private boolean isStringScope(NodeAndSymbolSolver<? extends Expression> scope) {
-		Optional<ResolvedType> optType = MethodCallExprHelpers.optResolvedType(scope);
-		if (optType.isEmpty()) {
-			return false;
-		}
-		var type = optType.get();
-		if (type.isConstraint()) {
-			// This happens on lambda expression: the type we're looking for is the Lambda bound-type
-			type = type.asConstraintType().getBound();
-		}
-		if (type.isReferenceType() && type.asReferenceType().getQualifiedName().equals(String.class.getName())) {
-			return true;
-		}
-		return false;
-	}
-
 	private boolean isSwitchableStringMethod(String methodCallName) {
-		return METHOD_EQUALS.equals(methodCallName) || "equalsIgnoreCase".equals(methodCallName)
-				|| "contentEquals".equals(methodCallName);
+		return SWITCHABLE_STRING_METHODS.contains(methodCallName);
 	}
 
 	private boolean isCompareStringMethod(String methodCallName) {
-		return "compareTo".equals(methodCallName) || "compareToIgnoreCase".equals(methodCallName);
+		return COMPARE_STRING_METHODS.contains(methodCallName);
 	}
 }

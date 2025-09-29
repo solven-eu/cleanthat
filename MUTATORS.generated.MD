@@ -262,6 +262,16 @@ isDraft
 
 languageLevel: jdk1.8
 
+### [ConsecutiveLiteralAppends](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/ConsecutiveLiteralAppends.java)
+
+PMD: [ConsecutiveLiteralAppends](https://pmd.github.io/pmd/pmd_rules_java_performance.html#consecutiveliteralappends)
+
+Cleanthat own ID: ConsecutiveLiteralAppends
+
+isDraft
+
+languageLevel: jdk1.5
+
 ### [CreateTempFilesUsingNio](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CreateTempFilesUsingNio.java)
 
 Sonar: [RSPEC-2976](https://rules.sonarsource.com/java/RSPEC-2976)

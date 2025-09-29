@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class RemoveAllToClearCollection extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("Collection");
+		return ImmutableSet.of("Collection", "Performance");
 	}
 
 	@Override

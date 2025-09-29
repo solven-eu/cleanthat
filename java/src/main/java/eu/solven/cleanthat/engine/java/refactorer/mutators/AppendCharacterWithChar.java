@@ -49,7 +49,7 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("String");
+		return ImmutableSet.of("Performance", "String");
 	}
 
 	@Override

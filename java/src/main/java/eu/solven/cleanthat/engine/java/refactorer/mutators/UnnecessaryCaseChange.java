@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
-import lombok.Value;
 
 /**
  * Switch o.toLowerCase().equals("some_string") to o.equalsIgnoreCase("some_string")
@@ -165,17 +164,17 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		return new MethodCallExpr(scope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(argument));
 	}
 
-	@Value
+	@SuppressWarnings("PMD.ImmutableField")
 	private static final class UnnecessaryCaseChangeExpression {
-		boolean isMethodCall;
-		MethodCallExpr methodCall;
-		StringLiteralExpr stringLiteral;
+		private boolean isMethodCall;
+		private MethodCallExpr methodCall;
+		private StringLiteralExpr stringLiteral;
 
-		boolean isToLowerCase;
-		boolean isToUpperCase;
+		private boolean isToLowerCase;
+		private boolean isToUpperCase;
 
-		boolean isLowercase;
-		boolean isUppercase;
+		private boolean isLowercase;
+		private boolean isUppercase;
 
 		/**
 		 * @param expression
@@ -186,44 +185,29 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		 */
 		@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
 		private UnnecessaryCaseChangeExpression(Expression expression) {
-			isMethodCall = expression instanceof MethodCallExpr;
-			if (isMethodCall) {
+			if (expression instanceof MethodCallExpr) {
+				isMethodCall = true;
 				methodCall = expression.asMethodCallExpr();
-			} else {
-				methodCall = new MethodCallExpr();
-			}
-			if (isMethodCall && !methodCall.getArguments().isEmpty()) {
-				throw new IllegalStateException();
-			}
 
-			String methodName;
-			if (isMethodCall) {
-				methodName = methodCall.getNameAsString();
-			} else {
-				methodName = "";
-			}
+				if (!methodCall.getArguments().isEmpty()) {
+					throw new IllegalStateException();
+				}
 
-			isToLowerCase = "toLowerCase".equals(methodName);
-			isToUpperCase = "toUpperCase".equals(methodName);
+				var methodName = methodCall.getNameAsString();
+				isToLowerCase = "toLowerCase".equals(methodName);
+				isToUpperCase = "toUpperCase".equals(methodName);
 
-			if (isMethodCall && !isToLowerCase && !isToUpperCase) {
-				throw new IllegalStateException();
+				if (!isToLowerCase && !isToUpperCase) {
+					throw new IllegalStateException();
+				}
 			}
 
-			var isStringLiteral = expression.isStringLiteralExpr();
-			if (isStringLiteral) {
-				stringLiteral = expression.asStringLiteralExpr();
-			} else {
-				stringLiteral = new StringLiteralExpr();
+			if (!expression.isStringLiteralExpr()) {
+				return;
 			}
 
-			String literal;
-			if (isStringLiteral) {
-				literal = stringLiteral.getValue();
-			} else {
-				literal = "MixedCase";
-			}
-
+			stringLiteral = expression.asStringLiteralExpr();
+			String literal = stringLiteral.getValue();
 			isLowercase = literal.equals(literal.toLowerCase());
 			isUppercase = literal.equals(literal.toUpperCase());
 		}

@@ -86,6 +86,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return false;
 		}
 
+		// left.toLowerCase().equals(right.toLowerCase()) || left.toUpperCase().equals(right.toUpperCase())
 		if (scope.isToLowerCase && argument.isToLowerCase || scope.isToUpperCase && argument.isToUpperCase) {
 			Expression newScope = getScope(scope.methodCall);
 			Expression newArg = getScope(argument.methodCall);
@@ -95,6 +96,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return tryReplace(methodCall, replacement);
 		}
 
+		// left.toLowerCase().equals("lowercase") || left.toUpperCase().equals("UPPERCASE")
 		if (scope.isToLowerCase && argument.isLowercase || scope.isToUpperCase && argument.isUppercase) {
 			Expression newScope = getScope(scope.methodCall);
 
@@ -103,6 +105,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return tryReplace(methodCall, replacement);
 		}
 
+		// "lowercase".equals(right.toLowerCase()) || "UPPERCASE".equals(right.toUpperCase())
 		if (scope.isLowercase && argument.isToLowerCase || scope.isUppercase && argument.isToUpperCase) {
 			Expression newArg = getScope(argument.methodCall);
 
@@ -111,6 +114,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return tryReplace(methodCall, replacement);
 		}
 
+		// left.toLowerCase().equalsIgnoreCase(right.toLowerCase())
 		if (equalsIgnoreCase && scope.isMethodCall && argument.isMethodCall) {
 			Expression newScope = getScope(scope.methodCall);
 			Expression newArg = getScope(argument.methodCall);
@@ -120,6 +124,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return tryReplace(methodCall, replacement);
 		}
 
+		// left.toLowerCase().equalsIgnoreCase(right)
 		if (equalsIgnoreCase && scope.isMethodCall) {
 			Expression newScope = getScope(scope.methodCall);
 
@@ -128,6 +133,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			return tryReplace(methodCall, replacement);
 		}
 
+		// left.equalsIgnoreCase(right.toLowerCase())
 		if (equalsIgnoreCase && argument.isMethodCall) {
 			Expression newArg = getScope(argument.methodCall);
 
@@ -170,6 +176,13 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		private boolean isLowercase;
 		private boolean isUppercase;
 
+		/**
+		 * @param expression
+		 *            either the scope or the argument of an equals/equalsIgnoreCase method call
+		 *
+		 * @throws IllegalStateException
+		 *             when the expression is neither a String literal nor a toLowerCase/toUpperCase method call
+		 */
 		@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
 		private UnnecessaryCaseChangeExpression(Expression expression) {
 			if (expression instanceof MethodCallExpr) {

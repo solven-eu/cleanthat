@@ -61,16 +61,17 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		}
 
 		var methodCall = expression.getNode().asMethodCallExpr();
-		Optional<Expression> scope = methodCall.getScope();
-		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), String.class)) {
-			return false;
-		}
 
 		var methodName = methodCall.getNameAsString();
 		boolean equals = METHOD_EQUALS.equals(methodName);
 		boolean equalsIgnoreCase = METHOD_EQUALS_IGNORE_CASE.equals(methodName);
 
 		if (!(equals || equalsIgnoreCase) || methodCall.getArguments().size() != 1) {
+			return false;
+		}
+
+		Optional<Expression> scope = methodCall.getScope();
+		if (!MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), String.class)) {
 			return false;
 		}
 

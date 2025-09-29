@@ -606,6 +606,16 @@ isDraft
 
 languageLevel: jdk1
 
+### [UnnecessaryCaseChange](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryCaseChange.java)
+
+PMD: [UnnecessaryCaseChange](https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#unnecessarycasechange)
+
+Cleanthat own ID: UnnecessaryCaseChange
+
+isDraft
+
+languageLevel: jdk1
+
 ### [UnnecessaryFullyQualifiedName](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UnnecessaryFullyQualifiedName.java)
 
 PMD: [UnnecessaryFullyQualifiedName](https://pmd.github.io/pmd/pmd_rules_java_codestyle.html#unnecessaryfullyqualifiedname)

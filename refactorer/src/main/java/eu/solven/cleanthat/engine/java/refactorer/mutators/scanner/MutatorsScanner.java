@@ -114,6 +114,7 @@ public final class MutatorsScanner {
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "StringToString"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ThreadRunToThreadStart"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryBoxing"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryCaseChange"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryFullyQualifiedName"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "UnnecessaryImport"),
 					(Class<? extends IMutator>) Class

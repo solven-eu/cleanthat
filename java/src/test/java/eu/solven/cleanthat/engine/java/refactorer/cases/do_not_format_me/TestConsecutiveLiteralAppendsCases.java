@@ -24,80 +24,80 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 
 	@UnmodifiedMethod
 	public static class Literal {
-		public Object pre() {
-			return new StringBuilder().append("first");
+		public Object pre(StringBuilder builder) {
+			return builder.append("first");
 		}
 	}
 
 	@UnmodifiedMethod
 	public static class Variable {
-		public Object pre(String first) {
-			return new StringBuilder().append(first);
+		public Object pre(StringBuilder builder, String first) {
+			return builder.append(first);
 		}
 	}
 
 	@CompareMethods
 	public static class TwoLiterals {
-		public Object pre() {
-			return new StringBuilder().append("app").append("end");
+		public Object pre(StringBuilder builder) {
+			return builder.append("app").append("end");
 		}
 
-		public Object post() {
-			return new StringBuilder().append("append");
+		public Object post(StringBuilder builder) {
+			return builder.append("append");
 		}
 	}
 
 	@CompareMethods
 	public static class TwoChars {
-		public Object pre() {
-			return new StringBuilder().append('a').append('b');
+		public Object pre(StringBuilder builder) {
+			return builder.append('a').append('b');
 		}
 
-		public Object post() {
-			return new StringBuilder().append("ab");
+		public Object post(StringBuilder builder) {
+			return builder.append("ab");
 		}
 	}
 
 	@UnmodifiedMethod
 	public static class TwoVariables {
-		public Object pre(String first, String second) {
-			return new StringBuilder().append(first).append(second);
+		public Object pre(StringBuilder builder, String first, String second) {
+			return builder.append(first).append(second);
 		}
 	}
 
 	@CompareMethods
 	public static class CharAndString {
-		public Object pre() {
-			return new StringBuilder().append('a').append("ppend");
+		public Object pre(StringBuilder builder) {
+			return builder.append('a').append("ppend");
 		}
 
-		public Object post() {
-			return new StringBuilder().append("append");
+		public Object post(StringBuilder builder) {
+			return builder.append("append");
 		}
 	}
 
 	@CompareMethods
 	public static class StringAndChar {
-		public Object pre() {
-			return new StringBuilder().append("map").append('s');
+		public Object pre(StringBuilder builder) {
+			return builder.append("map").append('s');
 		}
 
-		public Object post() {
-			return new StringBuilder().append("maps");
+		public Object post(StringBuilder builder) {
+			return builder.append("maps");
 		}
 	}
 
 	@UnmodifiedMethod
 	public static class VariableAndLiteral {
-		public Object pre(String first) {
-			return new StringBuilder().append(first).append("second");
+		public Object pre(StringBuilder builder, String first) {
+			return builder.append(first).append("second");
 		}
 	}
 
 	@UnmodifiedMethod
 	public static class LiteralAndVariable {
-		public Object pre(String second) {
-			return new StringBuilder().append("first").append(second);
+		public Object pre(StringBuilder builder, String second) {
+			return builder.append("first").append(second);
 		}
 	}
 

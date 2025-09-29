@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
@@ -98,6 +99,29 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 	public static class LiteralAndVariable {
 		public Object pre(StringBuilder builder, String second) {
 			return builder.append("first").append(second);
+		}
+	}
+
+	@CompareMethods
+	public static class TwoIntegers {
+		public Object pre(StringBuilder builder) {
+			return builder.append(1).append(2);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("12");
+		}
+	}
+
+	// This most likely could be handled, but does not seem to worth the effort
+	@UnmodifiedMethod
+	public static class CastedIntegers {
+		public Object pre(StringBuilder builder) {
+			return builder.append((char) 1).append((char) 2);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("12");
 		}
 	}
 

@@ -82,7 +82,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		try {
 			scope = new UnnecessaryCaseChangeExpression(originalScope);
 			argument = new UnnecessaryCaseChangeExpression(originalArgument);
-		} catch (IllegalArgumentException exception) {
+		} catch (IllegalStateException exception) {
 			return false;
 		}
 
@@ -177,7 +177,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 				methodCall = expression.asMethodCallExpr();
 
 				if (!methodCall.getArguments().isEmpty()) {
-					throw new IllegalArgumentException();
+					throw new IllegalStateException();
 				}
 
 				var methodName = methodCall.getNameAsString();
@@ -185,7 +185,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 				isToUpperCase = "toUpperCase".equals(methodName);
 
 				if (!isToLowerCase && !isToUpperCase) {
-					throw new IllegalArgumentException();
+					throw new IllegalStateException();
 				}
 			}
 

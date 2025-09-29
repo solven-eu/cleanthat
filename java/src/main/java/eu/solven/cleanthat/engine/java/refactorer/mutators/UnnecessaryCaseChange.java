@@ -200,16 +200,12 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 				if (!isToLowerCase && !isToUpperCase) {
 					throw new IllegalStateException();
 				}
+			} else if (expression.isStringLiteralExpr()) {
+				stringLiteral = expression.asStringLiteralExpr();
+				String literal = stringLiteral.getValue();
+				isLowercase = literal.equals(literal.toLowerCase());
+				isUppercase = literal.equals(literal.toUpperCase());
 			}
-
-			if (!expression.isStringLiteralExpr()) {
-				return;
-			}
-
-			stringLiteral = expression.asStringLiteralExpr();
-			String literal = stringLiteral.getValue();
-			isLowercase = literal.equals(literal.toLowerCase());
-			isUppercase = literal.equals(literal.toUpperCase());
 		}
 	}
 

@@ -17,11 +17,12 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Set;
 
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
@@ -29,7 +30,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator {
+public class UnnecessaryLambdaEnclosingParameters extends AJavaparserExprMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -48,7 +49,7 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator
 	}
 
 	@Override
-	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
 		if (!(node.getNode() instanceof LambdaExpr)) {
 			return false;
 		}

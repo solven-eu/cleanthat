@@ -88,7 +88,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			Expression newScope = getScope(left.methodCall);
 			Expression newArg = getScope(right.methodCall);
 
-			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+			var replacement = getReplacement(newScope, newArg);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -96,8 +96,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		if (left.isToLowerCase && right.isLowercase || left.isToUpperCase && right.isUppercase) {
 			Expression newScope = getScope(left.methodCall);
 
-			var replacement =
-					new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(right.stringLiteral));
+			var replacement = getReplacement(newScope, right.stringLiteral);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -105,8 +104,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		if (left.isLowercase && right.isToLowerCase || left.isUppercase && right.isToUpperCase) {
 			Expression newArg = getScope(right.methodCall);
 
-			var replacement =
-					new MethodCallExpr(left.stringLiteral, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+			var replacement = getReplacement(left.stringLiteral, newArg);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -115,7 +113,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 			Expression newScope = getScope(left.methodCall);
 			Expression newArg = getScope(right.methodCall);
 
-			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+			var replacement = getReplacement(newScope, newArg);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -123,7 +121,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		if (equalsIgnoreCase && left.isMethodCall) {
 			Expression newScope = getScope(left.methodCall);
 
-			var replacement = new MethodCallExpr(newScope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(argument));
+			var replacement = getReplacement(newScope, argument);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -131,7 +129,7 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		if (equalsIgnoreCase && right.isMethodCall) {
 			Expression newArg = getScope(right.methodCall);
 
-			var replacement = new MethodCallExpr(scope.get(), METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(newArg));
+			var replacement = getReplacement(scope.get(), newArg);
 
 			return tryReplace(methodCall, replacement);
 		}
@@ -141,6 +139,10 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 
 	private static Expression getScope(MethodCallExpr scope) {
 		return scope.getScope().get().clone();
+	}
+
+	private static MethodCallExpr getReplacement(Expression scope, Expression argument) {
+		return new MethodCallExpr(scope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(argument));
 	}
 
 	@SuppressWarnings("PMD.ImmutableField")

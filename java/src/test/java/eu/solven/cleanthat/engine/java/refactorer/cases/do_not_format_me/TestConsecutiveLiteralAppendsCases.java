@@ -112,6 +112,38 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
+	@UnmodifiedMethod
+	public static class NonSingleDigitIntegers {
+		public Object pre(StringBuilder builder) {
+			return builder.append(123).append(456);
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class IntegerOverflow {
+		public Object pre(StringBuilder builder) {
+			return builder.append(2147483647).append(1);
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class NegativeInteger {
+		public Object pre(StringBuilder builder) {
+			return builder.append(1).append(-2);
+		}
+	}
+
+	@CompareMethods
+	public static class HexadecimalIntegers {
+		public Object pre(StringBuilder builder) {
+			return builder.append(0x1).append(0x2);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("12");
+		}
+	}
+
 	// Cast integers should be ignored (for now)
 	@UnmodifiedMethod
 	public static class CastedIntegers {

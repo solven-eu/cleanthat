@@ -144,7 +144,7 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	// Cast integers should be ignored (for now)
+	// Cast integers should be ignored
 	@UnmodifiedMethod
 	public static class CastedIntegers {
 		public Object pre(StringBuilder builder) {

@@ -59,11 +59,12 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 	@Override
 	@SuppressWarnings("PMD.NPathComplexity")
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
-		if (!(expression.getNode() instanceof MethodCallExpr)) {
+		Expression node = expression.getNode();
+		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = expression.getNode().asMethodCallExpr();
+		var methodCall = node.asMethodCallExpr();
 
 		var methodName = methodCall.getNameAsString();
 		boolean equals = METHOD_EQUALS.equals(methodName);

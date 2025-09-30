@@ -44,7 +44,7 @@ public class UseIndexOfChar extends AJavaparserNodeMutator {
 
 	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("String");
+		return ImmutableSet.of("Performance", "String");
 	}
 
 	@Override

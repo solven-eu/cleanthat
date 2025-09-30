@@ -26,13 +26,15 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns `"someString".toString()` into `"someString"`
  *
  * @author Benoit Lacelle
  */
-public class StringToString extends AJavaparserExprMutator {
+public class StringToString extends AJavaparserExprMutator implements IMutatorDescriber {
+
 	private static final String METHOD_TO_STRING = "toString";
 
 	@Override
@@ -43,6 +45,11 @@ public class StringToString extends AJavaparserExprMutator {
 	@Override
 	public boolean isDraft() {
 		return IS_PRODUCTION_READY;
+	}
+
+	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
 	}
 
 	@Override

@@ -27,18 +27,24 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns 'c.removeAll(c)' into 'c.clear()' in Collection
  *
  * @author Benoit Lacelle
  */
-public class RemoveAllToClearCollection extends AJavaparserExprMutator {
+public class RemoveAllToClearCollection extends AJavaparserExprMutator implements IMutatorDescriber {
 
 	@Override
 	public String minimalJavaVersion() {
 		// Collection has been introduced in JDK2
 		return IJdkVersionConstants.JDK_2;
+	}
+
+	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
 	}
 
 	@Override

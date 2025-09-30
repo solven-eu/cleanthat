@@ -29,6 +29,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns `stringBuilder.append("c")` into `stringBuilder.append('c')`
@@ -37,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  *
  * @author Balazs Glatz
  */
-public class AppendCharacterWithChar extends AJavaparserExprMutator {
+public class AppendCharacterWithChar extends AJavaparserExprMutator implements IMutatorDescriber {
 
 	public static final String APOSTROPHE = "'";
 	public static final String METHOD_APPEND = "append";
@@ -45,6 +46,11 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_5;
+	}
+
+	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
 	}
 
 	@Override

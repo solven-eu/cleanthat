@@ -113,15 +113,11 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	// This most likely could be handled, but does not seem to worth the effort
+	// Cast integers should be ignored (for now)
 	@UnmodifiedMethod
 	public static class CastedIntegers {
 		public Object pre(StringBuilder builder) {
 			return builder.append((char) 1).append((char) 2);
-		}
-
-		public Object post(StringBuilder builder) {
-			return builder.append("12");
 		}
 	}
 

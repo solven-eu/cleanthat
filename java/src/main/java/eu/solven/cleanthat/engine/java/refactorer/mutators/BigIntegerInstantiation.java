@@ -74,11 +74,12 @@ public class BigIntegerInstantiation extends AJavaparserExprMutator implements I
 
 	@Override
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
-		if (!(expression.getNode() instanceof ObjectCreationExpr)) {
+		Expression node = expression.getNode();
+		if (!(node instanceof ObjectCreationExpr)) {
 			return false;
 		}
 
-		var objectCreation = expression.getNode().asObjectCreationExpr();
+		var objectCreation = node.asObjectCreationExpr();
 		if (!isSingleArgumentObjectCreation(objectCreation)) {
 			return false;
 		}

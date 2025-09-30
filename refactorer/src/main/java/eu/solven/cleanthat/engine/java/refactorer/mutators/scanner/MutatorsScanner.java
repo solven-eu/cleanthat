@@ -61,6 +61,7 @@ public final class MutatorsScanner {
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "AvoidMultipleUnaryOperators"),
 					(Class<? extends IMutator>) Class
 							.forName(PACKAGE_MUTATORS + "AvoidUncheckedExceptionsInSignatures"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "BigIntegerInstantiation"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CastMathOperandsBeforeAssignement"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionIndexOfToContains"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionToOptional"),

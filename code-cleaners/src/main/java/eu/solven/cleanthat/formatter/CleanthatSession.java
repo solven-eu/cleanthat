@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,21 @@ import java.nio.file.Path;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
 /**
  * The core components attached to a clean session. The cleaning session granularity is a full repository: it will
- * process all files, all all formatters, and a single {@link CleanthatRepositoryProperties}.
- * 
+ * process all files, all formatters, and a single {@link CleanthatRepositoryProperties}.
+ *
  * @author Benoit Lacelle
  *
  */
 @Value
 @Builder
-@AllArgsConstructor
 public class CleanthatSession {
-	final Path repositoryRoot;
-	final ICodeProvider codeProvider;
-	final CleanthatRepositoryProperties repositoryProperties;
+	Path repositoryRoot;
+	ICodeProvider codeProvider;
+	CleanthatRepositoryProperties repositoryProperties;
 
 }

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.config.pojo.CleanthatRepositoryProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
@@ -31,6 +32,7 @@ import lombok.Value;
  */
 @Value
 @Builder
+@AllArgsConstructor
 public class CleanthatSession {
 	Path repositoryRoot;
 	ICodeProvider codeProvider;

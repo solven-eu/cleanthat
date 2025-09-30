@@ -63,11 +63,12 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator {
 
 	@Override
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
-		if (!(expression.getNode() instanceof MethodCallExpr)) {
+		Expression node = expression.getNode();
+		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = expression.getNode().asMethodCallExpr();
+		var methodCall = node.asMethodCallExpr();
 		if (!isAppendWithSingleParam(methodCall)) {
 			return false;
 		}

@@ -132,6 +132,9 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements
 		if (argument.isLongLiteralExpr()) {
 			return argument.asLongLiteralExpr().asNumber().toString();
 		}
+		if (argument.isDoubleLiteralExpr()) {
+			return String.valueOf(argument.asDoubleLiteralExpr().asDouble());
+		}
 		return null;
 	}
 

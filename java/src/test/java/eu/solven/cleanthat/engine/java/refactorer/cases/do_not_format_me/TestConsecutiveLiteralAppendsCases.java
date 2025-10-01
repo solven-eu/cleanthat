@@ -135,6 +135,17 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
+	@CompareMethods
+	public static class Doubles {
+		public Object pre(StringBuilder builder) {
+			return builder.append(1.2).append(3.4);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("1.23.4");
+		}
+	}
+
 	@UnmodifiedMethod
 	public static class NegativeInteger {
 		public Object pre(StringBuilder builder) {

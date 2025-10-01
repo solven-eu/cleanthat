@@ -1,5 +1,6 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
+import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
@@ -112,17 +113,25 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	@UnmodifiedMethod
+	@CompareMethods
 	public static class NonSingleDigitIntegers {
 		public Object pre(StringBuilder builder) {
 			return builder.append(123).append(456);
 		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("123456");
+		}
 	}
 
-	@UnmodifiedMethod
+	@CompareMethods
 	public static class IntegerOverflow {
 		public Object pre(StringBuilder builder) {
 			return builder.append(2147483647).append(1);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("21474836471");
 		}
 	}
 

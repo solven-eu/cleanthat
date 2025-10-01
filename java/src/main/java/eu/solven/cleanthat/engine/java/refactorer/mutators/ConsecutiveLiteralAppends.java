@@ -28,22 +28,25 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Switch builder.append("string").append("builder") to builder.append("stringbuilder")
  *
  * @author Balazs Glatz
  */
-public class ConsecutiveLiteralAppends extends AJavaparserExprMutator {
-
-	private static final int LARGEST_SINGLE_DIGIT_NUMBER = 9;
-	private static final int SMALLEST_SINGLE_DIGIT_NUMBER = 0;
+public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements IMutatorDescriber {
 
 	private static final String METHOD_APPEND = "append";
 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_5;
+	}
+
+	@Override
+	public boolean isPerformanceImprovment() {
+		return true;
 	}
 
 	@Override
@@ -124,10 +127,10 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator {
 			return argument.asCharLiteralExpr().getValue();
 		}
 		if (argument.isIntegerLiteralExpr()) {
-			var intValue = argument.asIntegerLiteralExpr().asNumber().intValue();
-			if (SMALLEST_SINGLE_DIGIT_NUMBER <= intValue && intValue <= LARGEST_SINGLE_DIGIT_NUMBER) {
-				return String.valueOf(intValue);
-			}
+			return argument.asIntegerLiteralExpr().asNumber().toString();
+		}
+		if (argument.isLongLiteralExpr()) {
+			return argument.asLongLiteralExpr().asNumber().toString();
 		}
 		return null;
 	}

@@ -146,10 +146,14 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 		}
 	}
 
-	@UnmodifiedMethod
+	@CompareMethods
 	public static class NegativeInteger {
 		public Object pre(StringBuilder builder) {
 			return builder.append(1).append(-2);
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("1-2");
 		}
 	}
 

@@ -22,6 +22,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
@@ -134,6 +135,9 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements
 		}
 		if (argument.isDoubleLiteralExpr()) {
 			return String.valueOf(argument.asDoubleLiteralExpr().asDouble());
+		}
+		if (argument.isUnaryExpr()) {
+			return argument.asUnaryExpr().toString();
 		}
 		return null;
 	}

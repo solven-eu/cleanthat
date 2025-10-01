@@ -73,7 +73,7 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator {
 			return false;
 		}
 
-		String argument = getStringValue(methodCall.getArgument(SMALLEST_SINGLE_DIGIT_NUMBER));
+		String argument = getStringValue(methodCall.getArgument(0));
 		if (argument == null) {
 			return false;
 		}
@@ -96,7 +96,7 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator {
 			return false;
 		}
 
-		String previousArgument = getStringValue(previousMethodCall.getArgument(SMALLEST_SINGLE_DIGIT_NUMBER));
+		String previousArgument = getStringValue(previousMethodCall.getArgument(0));
 		if (previousArgument == null) {
 			return false;
 		}

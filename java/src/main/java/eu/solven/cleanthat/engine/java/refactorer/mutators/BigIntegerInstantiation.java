@@ -15,20 +15,24 @@
  */
 package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
-import com.github.javaparser.ast.expr.LiteralStringValueExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithArguments;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
+import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
@@ -38,15 +42,16 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
  */
 public class BigIntegerInstantiation extends AJavaparserExprMutator implements IMutatorDescriber {
 
-	private static final String NOTHING = "";
-
-	private static final String NUMERIC_LITERAL_SUFFIX_REGEX = "(?<=\\d)(\\.0?)?([ldfLDF])?$";
-
-	private static final Map<String, String> CONSTANTS = Map.of("0", "ZERO", "1", "ONE", "10", "TEN");
+	private static final Map<String, String> NUMBER_TO_CONSTANT = Map.of("0", "ZERO", "1", "ONE", "10", "TEN");
 
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_5;
+	}
+
+	@Override
+	public boolean isPerformanceImprovment() {
+		return true;
 	}
 
 	@Override
@@ -64,34 +69,59 @@ public class BigIntegerInstantiation extends AJavaparserExprMutator implements I
 		return "https://pmd.github.io/pmd/pmd_rules_java_performance.html#bigintegerinstantiation";
 	}
 
-	/**
-	 * {@link BigIntegerInstantiation} may turn NumberFormatException into a BigInteger.
-	 */
-	@Override
-	public boolean isPreventingExceptions() {
-		return true;
-	}
-
 	@Override
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
-		Expression node = expression.getNode();
-		if (!(node instanceof ObjectCreationExpr)) {
+		var node = expression.getNode();
+
+		var isObjectCreation = node instanceof ObjectCreationExpr;
+		var isMethodCall = node instanceof MethodCallExpr;
+
+		if (!(isObjectCreation || isMethodCall)) {
 			return false;
 		}
 
-		var objectCreation = node.asObjectCreationExpr();
-		if (!isSingleArgumentObjectCreation(objectCreation)) {
+		var arguments = ((NodeWithArguments<?>) node).getArguments();
+
+		if (arguments.size() != 1) {
 			return false;
 		}
 
-		String typeName = objectCreation.getType().getNameAsString();
-		Expression argument = objectCreation.getArgument(0);
-		if (!isSupportedObjectCreation(typeName, argument)) {
-			return false;
+		String typeName;
+		if (isObjectCreation) {
+			var objectCreation = node.asObjectCreationExpr();
+			typeName = objectCreation.getType().getNameAsString();
+		} else {
+			var methodCall = node.asMethodCallExpr();
+			if (!"valueOf".equals(methodCall.getNameAsString())) {
+				return false;
+			}
+			Optional<Expression> scope = methodCall.getScope();
+			var isBigInteger = MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), BigInteger.class);
+			var isBigDecimal = MethodCallExprHelpers.scopeHasRequiredType(expression.editNode(scope), BigDecimal.class);
+			if (isBigInteger) {
+				typeName = "BigInteger";
+			} else if (isBigDecimal) {
+				typeName = "BigDecimal";
+			} else {
+				return false;
+			}
 		}
 
-		String value = getValue((LiteralStringValueExpr) argument);
-		String constant = CONSTANTS.get(value);
+		var argument = arguments.get(0);
+
+		String number;
+		if (argument.isStringLiteralExpr()) {
+			number = getValueAsString(typeName, argument.asStringLiteralExpr().getValue());
+		} else if (argument.isDoubleLiteralExpr()) {
+			number = getValueAsString(argument.asDoubleLiteralExpr().asDouble());
+		} else {
+			number = getValueAsString(typeName, getArgumentAsNumber(argument));
+		}
+
+		if (number == null) {
+			return false;
+		}
+		var constant = NUMBER_TO_CONSTANT.get(number);
 		if (constant == null) {
 			return false;
 		}
@@ -101,22 +131,47 @@ public class BigIntegerInstantiation extends AJavaparserExprMutator implements I
 		return tryReplace(expression, replacement);
 	}
 
-	private static boolean isSingleArgumentObjectCreation(ObjectCreationExpr objectCreation) {
-		return objectCreation.getArguments().size() == 1;
+	private Long getArgumentAsNumber(Expression argument) {
+		if (argument.isIntegerLiteralExpr()) {
+			return argument.asIntegerLiteralExpr().asNumber().longValue();
+		} else if (argument.isLongLiteralExpr()) {
+			return argument.asLongLiteralExpr().asNumber().longValue();
+		} else {
+			return null;
+		}
 	}
 
-	private static boolean isSupportedObjectCreation(String typeName, Expression argument) {
-		return ("BigDecimal".equals(typeName) || "BigInteger".equals(typeName)) && isSupportedArgumentType(argument);
+	public static String getValueAsString(String klass, String value) {
+		try {
+			if ("BigDecimal".equals(klass)) {
+				return new BigDecimal(value).toString();
+			}
+			return new BigInteger(value).toString();
+		} catch (NumberFormatException exception) {
+			return null;
+		}
 	}
 
-	private static boolean isSupportedArgumentType(Expression argument) {
-		return argument.isStringLiteralExpr() || argument.isIntegerLiteralExpr()
-				|| argument.isLongLiteralExpr()
-				|| argument.isDoubleLiteralExpr();
+	public static String getValueAsString(double value) {
+		try {
+			return BigDecimal.valueOf(value).toString();
+		} catch (ClassCastException | NumberFormatException ignored) {
+			return null;
+		}
 	}
 
-	private static String getValue(LiteralStringValueExpr argument) {
-		return argument.getValue().replaceAll(NUMERIC_LITERAL_SUFFIX_REGEX, NOTHING);
+	public static String getValueAsString(String klass, Long value) {
+		if (value == null) {
+			return null;
+		}
+		try {
+			if ("BigDecimal".equals(klass)) {
+				return BigDecimal.valueOf(value).toString();
+			}
+			return BigInteger.valueOf(value).toString();
+		} catch (ClassCastException | NumberFormatException exception) {
+			return null;
+		}
 	}
 
 }

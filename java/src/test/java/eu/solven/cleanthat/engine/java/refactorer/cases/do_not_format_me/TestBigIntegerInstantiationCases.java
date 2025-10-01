@@ -17,6 +17,17 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
     }
 
     @CompareMethods
+    public static class BigIntegerOfZero {
+        public Object pre() {
+            return BigInteger.valueOf(0);
+        }
+
+        public Object post() {
+            return BigInteger.ZERO;
+        }
+    }
+
+    @CompareMethods
     public static class BigIntegerZero {
         public Object pre() {
             return new BigInteger("0");
@@ -127,6 +138,50 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
     }
 
     @CompareMethods
+    public static class BigDecimalZeros {
+        public Object pre() {
+            return new BigDecimal(00);
+        }
+
+        public Object post() {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    @CompareMethods
+    public static class BigDecimalStringZeros {
+        public Object pre() {
+            return new BigDecimal("00");
+        }
+
+        public Object post() {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    @CompareMethods
+    public static class BigDecimalLeadingZero {
+        public Object pre() {
+            return new BigDecimal(01);
+        }
+
+        public Object post() {
+            return BigDecimal.ONE;
+        }
+    }
+
+    @CompareMethods
+    public static class BigDecimalLeadingZeroString {
+        public Object pre() {
+            return new BigDecimal("01");
+        }
+
+        public Object post() {
+            return BigDecimal.ONE;
+        }
+    }
+
+    @CompareMethods
     public static class BigDecimalOneDouble {
         public Object pre() {
             return new BigDecimal(1.);
@@ -184,9 +239,37 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
     }
 
     @UnmodifiedMethod
+    public static class BigDecimalDecimal {
+        public Object pre() {
+            return new BigDecimal("1.2");
+        }
+    }
+
+    @UnmodifiedMethod
     public static class BigIntegerDot {
         public Object pre() {
             return new BigInteger(".");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class BigDecimalDots {
+        public Object pre() {
+            return new BigDecimal("0..");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class BigDecimalZeroDotZero {
+        public Object pre() {
+            return new BigDecimal("0.0");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class BigDecimalDotZeroDot {
+        public Object pre() {
+            return new BigDecimal(".0.");
         }
     }
 
@@ -205,6 +288,13 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
     }
 
     @UnmodifiedMethod
+    public static class BigDecimalTrailingZeros {
+        public Object pre() {
+            return new BigDecimal("0.0000");
+        }
+    }
+
+    @UnmodifiedMethod
     public static class BigDecimalRandomDouble {
         public Object pre() {
             return new BigDecimal(10.00000001);
@@ -218,23 +308,42 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
         }
     }
 
-    // Could be supported, but it's not worth adding complexity for a marginal case
     @UnmodifiedMethod
-    public static class BigDecimalTenUnderscore {
-        public Object pre() {
-            return new BigDecimal(1_0);
-        }
-    }
-
-    // Turns NumberFormatException into a BigInteger
-    @CompareMethods
     public static class BigIntegerInvalidOne {
         public Object pre() {
             return new BigInteger("1.");
         }
+    }
+
+    @UnmodifiedMethod
+    public static class BigIntegerLongMaxValue {
+        public Object pre() {
+            return new BigInteger(Long.MAX_VALUE + "");
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class BigDecimalLongMaxValue {
+        public Object pre() {
+            return new BigDecimal(Long.MAX_VALUE);
+        }
+    }
+
+    @UnmodifiedMethod
+    public static class BigDecimalOfLongMaxValue {
+        public Object pre() {
+            return BigDecimal.valueOf(Long.MAX_VALUE);
+        }
+    }
+
+    @CompareMethods
+    public static class BigDecimalTenUnderscore {
+        public Object pre() {
+            return new BigDecimal(1_0);
+        }
 
         public Object post() {
-            return BigInteger.ONE;
+            return BigDecimal.TEN;
         }
     }
 

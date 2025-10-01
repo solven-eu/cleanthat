@@ -50,6 +50,7 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator implements I
 
 	@Override
 	public boolean isPerformanceImprovement() {
+		// Avoids the extra indirection of creating or handling a String and uses the most direct, efficient overload.
 		return true;
 	}
 

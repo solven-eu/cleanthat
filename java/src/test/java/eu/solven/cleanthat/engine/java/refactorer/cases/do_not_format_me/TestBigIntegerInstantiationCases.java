@@ -184,6 +184,13 @@ public class TestBigIntegerInstantiationCases extends AJavaparserRefactorerCases
     }
 
     @UnmodifiedMethod
+    public static class BigIntegerDot {
+        public Object pre() {
+            return new BigInteger(".");
+        }
+    }
+
+    @UnmodifiedMethod
     public static class BigIntegerEmpty {
         public Object pre() {
             return new BigInteger("");

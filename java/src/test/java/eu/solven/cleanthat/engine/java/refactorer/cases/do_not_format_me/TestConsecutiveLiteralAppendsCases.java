@@ -5,6 +5,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.ConsecutiveLiteralAppends;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
+import org.junit.Ignore;
 
 public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCases {
 
@@ -55,6 +56,18 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 
 		public Object post(StringBuilder builder) {
 			return builder.append("append");
+		}
+	}
+
+	@Ignore("Not yet implemented")
+	@CompareMethods
+	public static class ThreeLiterals {
+		public Object pre(StringBuilder builder) {
+			return builder.append("app").append("end").append("ed");
+		}
+
+		public Object post(StringBuilder builder) {
+			return builder.append("appended");
 		}
 	}
 

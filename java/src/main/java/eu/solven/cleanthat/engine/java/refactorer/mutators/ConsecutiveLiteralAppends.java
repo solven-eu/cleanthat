@@ -67,12 +67,12 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements
 	@Override
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
 		Expression node = expression.getNode();
-		if (!(node instanceof MethodCallExpr)) {
+		if (!isMethodCall(node)) {
 			return false;
 		}
 
 		var methodCall = node.asMethodCallExpr();
-		if (!isAppendWithSingleParam(methodCall)) {
+		if (!isAppendMethodWithSingleParam(methodCall)) {
 			return false;
 		}
 
@@ -82,25 +82,21 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements
 		}
 
 		Optional<Expression> scope = methodCall.getScope();
-		if (scope.isEmpty()) {
-			return false;
-		}
-
-		if (!(scope.get() instanceof MethodCallExpr) || !isAppendableScope(expression, scope)) {
+		if (!isMethodCallOnAppendable(expression, scope)) {
 			return false;
 		}
 
 		var previousMethodCall = scope.get().asMethodCallExpr();
-		if (!isAppendWithSingleParam(previousMethodCall)) {
-			return false;
-		}
-
-		if (!isAppendableScope(expression, previousMethodCall.getScope())) {
+		if (!isAppendMethodWithSingleParam(previousMethodCall)) {
 			return false;
 		}
 
 		String previousArgument = getStringValue(previousMethodCall.getArgument(0));
 		if (previousArgument == null) {
+			return false;
+		}
+
+		if (!isAppendableScope(expression, previousMethodCall.getScope())) {
 			return false;
 		}
 
@@ -111,7 +107,15 @@ public class ConsecutiveLiteralAppends extends AJavaparserExprMutator implements
 		return tryReplace(expression, replacement);
 	}
 
-	private static boolean isAppendWithSingleParam(MethodCallExpr methodCall) {
+	private static boolean isMethodCall(Expression node) {
+		return node instanceof MethodCallExpr;
+	}
+
+	private static boolean isMethodCallOnAppendable(NodeAndSymbolSolver<Expression> expression, Optional<Expression> scope) {
+		return scope.isPresent() && scope.get() instanceof MethodCallExpr && isAppendableScope(expression, scope);
+	}
+
+	private static boolean isAppendMethodWithSingleParam(MethodCallExpr methodCall) {
 		return METHOD_APPEND.equals(methodCall.getNameAsString()) && methodCall.getArguments().size() == 1;
 	}
 

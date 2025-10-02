@@ -1,6 +1,5 @@
 package eu.solven.cleanthat.engine.java.refactorer.cases.do_not_format_me;
 
-import eu.solven.cleanthat.engine.java.refactorer.annotations.CaseNotYetImplemented;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
@@ -24,14 +23,25 @@ public class TestConsecutiveLiteralAppendsCases extends AJavaparserRefactorerCas
 	}
 
 	@UnmodifiedMethod
-	public static class Literal {
+	public static class FakeChainedAppend {
+		private StringBuilder append(String string) {
+			return new StringBuilder();
+		}
+
+		public void pre() {
+			append("fakeAppend").append("realAppend");
+		}
+	}
+
+	@UnmodifiedMethod
+	public static class UnchainedLiteral {
 		public Object pre(StringBuilder builder) {
 			return builder.append("first");
 		}
 	}
 
 	@UnmodifiedMethod
-	public static class Variable {
+	public static class UnchainedVariable {
 		public Object pre(StringBuilder builder, String first) {
 			return builder.append(first);
 		}

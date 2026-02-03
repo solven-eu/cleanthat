@@ -33,7 +33,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 
 import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.pepper.mappath.MapPathGet;
+import eu.solven.pepper.collection.PepperMapHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -79,12 +79,12 @@ public class SaveToDynamoDb {
 	public static String saveToDynamoDb(String table, IWebhookEvent input, AmazonDynamoDB client) {
 		// We re-use the same xGitHubDelivery for the different steps (checkEvent, checkConfig, executeClean)
 		String primaryKey =
-				MapPathGet.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-						.orElseGet(() -> MapPathGet
+				PepperMapHelper.getOptionalString(input.getHeaders(), GithubWebhookEvent.X_GIT_HUB_DELIVERY)
+						.orElseGet(() -> PepperMapHelper
 								.getOptionalString(input.getBody(),
 										GithubWebhookEvent.KEY_HEADERS,
 										GithubWebhookEvent.X_GIT_HUB_DELIVERY)
-								.orElseGet(() -> MapPathGet
+								.orElseGet(() -> PepperMapHelper
 										.getOptionalString(input.getBody(),
 												GithubWebhookEvent.KEY_GITHUB,
 												GithubWebhookEvent.KEY_HEADERS,

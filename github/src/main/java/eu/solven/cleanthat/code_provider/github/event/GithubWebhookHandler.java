@@ -47,8 +47,8 @@ import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
 import eu.solven.cleanthat.utils.ResultOrError;
-import eu.solven.pepper.core.PepperLogHelper;
-import eu.solven.pepper.mappath.MapPathGet;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -140,7 +140,7 @@ public final class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
-		var installationId = MapPathGet.getRequiredNumber(input, "installation", "id").longValue();
+		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 
 		ResultOrError<GithubAndToken, WebhookRelevancyResult> optToken =
 				githubAppFactory.makeInstallationGithub(installationId);
@@ -242,7 +242,7 @@ public final class GithubWebhookHandler implements IGithubWebhookHandler {
 			}
 		}
 		// We suppose this is always the same as the base repository id
-		var baseRepoId = MapPathGet.getRequiredNumber(input, "repository", "id").longValue();
+		var baseRepoId = PepperMapHelper.getRequiredNumber(input, "repository", "id").longValue();
 		GHRepository baseRepo;
 		try {
 			baseRepo = githubAsInst.getRepositoryById(baseRepoId);
@@ -274,7 +274,7 @@ public final class GithubWebhookHandler implements IGithubWebhookHandler {
 		}
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = externalCodeEvent.getBody();
-		var installationId = MapPathGet.getRequiredNumber(input, "installation", "id").longValue();
+		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
 		GithubAndToken githubAuthAsInst = githubAppFactory.makeInstallationGithub(installationId).getOptResult().get();
 		GHRepository repo = connectToRepository(input, githubAuthAsInst).getOptResult().get();
 

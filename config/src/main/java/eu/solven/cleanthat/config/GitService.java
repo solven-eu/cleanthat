@@ -25,7 +25,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.pepper.mappath.MapPathGet;
+import eu.solven.pepper.collection.PepperMapHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -71,7 +71,7 @@ public class GitService implements IGitService, InitializingBean {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		return MapPathGet.getRequiredString(properties, KEY_GIT_COMMIT_ID);
+		return PepperMapHelper.getRequiredString(properties, KEY_GIT_COMMIT_ID);
 	}
 
 	public static String safeGetSha1() {

@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 
 import eu.solven.cleanthat.config.pojo.ICleanthatStepParametersProperties;
-import eu.solven.pepper.mappath.MapPathGet;
-import eu.solven.pepper.spring.PepperResourceHelper;
+import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -87,7 +87,7 @@ public class CleanthatForIntegrators {
 	@VisibleForTesting
 	static String cleanCleanthatVersionFromMvnProperties(Map<?, ?> asMap) {
 		String cleanthatVersion;
-		var rawMavenProjectVersion = MapPathGet.getRequiredString(asMap, "project.version");
+		var rawMavenProjectVersion = PepperMapHelper.getRequiredString(asMap, "project.version");
 		if (rawMavenProjectVersion.startsWith("@")) {
 			rawMavenProjectVersion = DEFAULT_DEFAULT_CLEANTHAT_VERSION;
 			cleanthatVersion = rawMavenProjectVersion;

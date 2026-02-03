@@ -45,7 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilat
 import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
-import eu.solven.pepper.spring.PepperResourceHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

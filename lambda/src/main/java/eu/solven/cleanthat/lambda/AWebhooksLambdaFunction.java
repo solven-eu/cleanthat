@@ -40,7 +40,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
 import eu.solven.cleanthat.lambda.jackson.CustomSnakeCase;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.pepper.mappath.MapPathGet;
+import eu.solven.pepper.collection.PepperMapHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -85,7 +85,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			if (input.containsKey("Records")) {
 				// This comes from SQS, which pushes SQSEvent
-				Collection<Map<String, ?>> records = MapPathGet.getRequiredAs(input, "Records");
+				Collection<Map<String, ?>> records = PepperMapHelper.getRequiredAs(input, "Records");
 				LOGGER.info("About to process a batch of {} events from AWS", records.size());
 				// https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-sqs/src/main/java/com/amazonaws/services/sqs/model/Message.java
 				List<?> output = records.stream().map(r -> {
@@ -154,16 +154,16 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 		IWebhookEvent event;
 		if (input.containsKey(KEY_BODY) && input.containsKey(KEY_HEADERS)) {
-			String eventKey = MapPathGet.getRequiredString(input, GithubWebhookEvent.X_GIT_HUB_DELIVERY);
+			String eventKey = PepperMapHelper.getRequiredString(input, GithubWebhookEvent.X_GIT_HUB_DELIVERY);
 			// see CheckWebhooksLambdaFunction.saveToDynamoDb(String, IWebhookEvent, AmazonDynamoDB)
 			// event = SaveToDynamoDb.NONE;
 
-			Map<String, Object> rootBody = MapPathGet.getRequiredMap(input, KEY_BODY);
+			Map<String, Object> rootBody = PepperMapHelper.getRequiredMap(input, KEY_BODY);
 
 			if (rootBody.containsKey(GithubWebhookEvent.KEY_GITHUB)) {
-				Map<String, Object> github = MapPathGet.getRequiredMap(rootBody, GithubWebhookEvent.KEY_GITHUB);
+				Map<String, Object> github = PepperMapHelper.getRequiredMap(rootBody, GithubWebhookEvent.KEY_GITHUB);
 
-				Map<String, Object> githubHeaders = MapPathGet.getRequiredMap(github, KEY_HEADERS);
+				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(github, KEY_HEADERS);
 
 				if (githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
 					Object realDelivery = githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
@@ -185,13 +185,13 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 					github.put(KEY_HEADERS, githubHeaders);
 				}
 			} else if (rootBody.containsKey(GithubWebhookEvent.KEY_HEADERS)) {
-				Map<String, Object> githubHeaders = MapPathGet.getRequiredMap(rootBody, KEY_HEADERS);
+				Map<String, Object> githubHeaders = PepperMapHelper.getRequiredMap(rootBody, KEY_HEADERS);
 				if (!githubHeaders.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
 					githubHeaders.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
 				}
 			}
 
-			Map<String, Object> headers = MapPathGet.getRequiredMap(input, KEY_HEADERS);
+			Map<String, Object> headers = PepperMapHelper.getRequiredMap(input, KEY_HEADERS);
 			if (!headers.containsKey(GithubWebhookEvent.X_GIT_HUB_DELIVERY)) {
 				headers.put(GithubWebhookEvent.X_GIT_HUB_DELIVERY, eventKey);
 			}
@@ -215,14 +215,14 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 		// see StreamRecord
 		LOGGER.debug("TODO Learn how to process me: {}", r);
 
-		var eventName = MapPathGet.getRequiredString(r, "eventName");
+		var eventName = PepperMapHelper.getRequiredString(r, "eventName");
 
 		if (
 		// INSERT event: this is something new process
 		"INSERT".equals(eventName)
 				// MODIFY event: this is typically an admin which modify an event manually
 				|| "MODIFY".equals(eventName)) {
-			Map<String, ?> dynamoDbMap = MapPathGet.getRequiredMap(r, "dynamodb", "NewImage");
+			Map<String, ?> dynamoDbMap = PepperMapHelper.getRequiredMap(r, "dynamodb", "NewImage");
 
 			// We receive from DynamoDb a json in a special format
 			// https://stackoverflow.com/questions/32712675/formatting-dynamodb-data-to-normal-json-in-aws-lambda
@@ -236,7 +236,7 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 
 			LOGGER.info("processing {}={} by {}",
 					GithubWebhookEvent.X_GIT_HUB_DELIVERY,
-					MapPathGet.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY),
+					PepperMapHelper.getRequiredString(asMap, GithubWebhookEvent.X_GIT_HUB_DELIVERY),
 					this.getClass().getName());
 		} else {
 			// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_Record.html
@@ -250,8 +250,8 @@ public abstract class AWebhooksLambdaFunction extends ACleanThatXxxFunction {
 	public Map<String, ?> parseSqsEvent(ObjectMapper objectMapper, Map<String, ?> r) {
 		Map<String, ?> asMap;
 		// SQS
-		var body = MapPathGet.getRequiredString(r, KEY_BODY);
-		Optional<Object> messageAttributes = MapPathGet.getOptionalAs(r, "messageAttributes");
+		var body = PepperMapHelper.getRequiredString(r, KEY_BODY);
+		Optional<Object> messageAttributes = PepperMapHelper.getOptionalAs(r, "messageAttributes");
 		if (messageAttributes.isPresent()) {
 			LOGGER.info("Attributes: {}", messageAttributes);
 		}

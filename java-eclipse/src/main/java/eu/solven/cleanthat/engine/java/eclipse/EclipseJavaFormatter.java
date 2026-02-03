@@ -30,7 +30,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import eu.solven.cleanthat.formatter.ILintFixerWithId;
 import eu.solven.cleanthat.formatter.LineEnding;
-import eu.solven.pepper.core.PepperLogHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

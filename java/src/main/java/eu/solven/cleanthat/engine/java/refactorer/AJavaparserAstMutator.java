@@ -28,7 +28,7 @@ import eu.solven.cleanthat.SuppressCleanthat;
 import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutator;
-import eu.solven.pepper.core.PepperLogHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

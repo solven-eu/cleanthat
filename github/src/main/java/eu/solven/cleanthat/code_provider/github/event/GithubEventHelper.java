@@ -34,7 +34,7 @@ import eu.solven.cleanthat.codeprovider.git.IGitRefCleaner;
 import eu.solven.cleanthat.config.CleanthatConfigInitializer;
 import eu.solven.cleanthat.formatter.CodeFormatResult;
 import eu.solven.cleanthat.git_abstraction.GithubRepositoryFacade;
-import eu.solven.pepper.spring.PepperResourceHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

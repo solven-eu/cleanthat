@@ -38,7 +38,7 @@ import eu.solven.cleanthat.codeprovider.DummyCodeProviderFile;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.codeprovider.IListOnlyModifiedFiles;
-import eu.solven.pepper.core.PepperLogHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -60,7 +60,7 @@ import eu.solven.cleanthat.formatter.PathAndContent;
 import eu.solven.cleanthat.formatter.SourceCodeFormatterHelper;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.spotless.SpotlessFormattersFactory;
-import eu.solven.pepper.spring.PepperResourceHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 
 public class TestSpotlessFormatter_Eclipse {
 

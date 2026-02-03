@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
 
 import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatter;
 import eu.solven.cleanthat.engine.java.eclipse.EclipseJavaFormatterConfiguration;
-import eu.solven.pepper.core.PepperLogHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

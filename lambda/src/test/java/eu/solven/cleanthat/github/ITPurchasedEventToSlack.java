@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.seratch.jslack.Slack;
 
 import eu.solven.cleanthat.lambda.step0_checkwebhook.MarketPlaceEventManager;
-import eu.solven.pepper.spring.PepperResourceHelper;
+import eu.solven.pepper.resource.PepperResourceHelper;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { Slack.class })

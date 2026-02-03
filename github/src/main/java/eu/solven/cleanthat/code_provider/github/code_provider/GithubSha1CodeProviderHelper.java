@@ -39,7 +39,7 @@ import eu.solven.cleanthat.code_provider.local.FileSystemGitCodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.codeprovider.ICodeProviderFile;
 import eu.solven.cleanthat.jgit.JGitCodeProvider;
-import eu.solven.pepper.core.PepperLogHelper;
+import eu.solven.pepper.logging.PepperLogHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**

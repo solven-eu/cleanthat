@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.pepper.jvm.GCInspector;
 import eu.solven.pepper.mappath.MapPathGet;
 import eu.solven.pepper.system.PepperEnvHelper;
 import lombok.extern.slf4j.Slf4j;

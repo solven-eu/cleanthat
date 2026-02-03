@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,8 +115,7 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 
 			var xGithubEvent = MapPathGet.getOptionalString(githubHeaders, "X-GitHub-Event").orElse("");
 			var xGithubDelivery = MapPathGet.getOptionalString(githubHeaders, X_GIT_HUB_DELIVERY).orElse("");
-			var xGithubSignature256 =
-					MapPathGet.getOptionalString(githubHeaders, "X-GitHub-Signature-256").orElse("");
+			var xGithubSignature256 = MapPathGet.getOptionalString(githubHeaders, "X-GitHub-Signature-256").orElse("");
 
 			return new GithubWebhookEvent(xGithubEvent,
 					xGithubDelivery,

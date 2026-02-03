@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.solven.pepper.collection.PepperMapHelper;
-import eu.solven.pepper.mappath.MapPath;
 import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 

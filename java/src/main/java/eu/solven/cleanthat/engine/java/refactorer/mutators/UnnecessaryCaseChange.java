@@ -27,6 +27,9 @@ import com.google.common.collect.ImmutableSet;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Switch o.toLowerCase().equals("some_string") to o.equalsIgnoreCase("some_string")
@@ -56,11 +59,12 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 	@Override
 	@SuppressWarnings("PMD.NPathComplexity")
 	protected boolean processExpression(NodeAndSymbolSolver<Expression> expression) {
-		if (!(expression.getNode() instanceof MethodCallExpr)) {
+		Expression node = expression.getNode();
+		if (!(node instanceof MethodCallExpr)) {
 			return false;
 		}
 
-		var methodCall = expression.getNode().asMethodCallExpr();
+		var methodCall = node.asMethodCallExpr();
 
 		var methodName = methodCall.getNameAsString();
 		boolean equals = METHOD_EQUALS.equals(methodName);
@@ -80,8 +84,8 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		UnnecessaryCaseChangeExpression scope;
 		UnnecessaryCaseChangeExpression argument;
 		try {
-			scope = new UnnecessaryCaseChangeExpression(originalScope);
-			argument = new UnnecessaryCaseChangeExpression(originalArgument);
+			scope = UnnecessaryCaseChangeExpression.from(originalScope);
+			argument = UnnecessaryCaseChangeExpression.from(originalArgument);
 		} catch (IllegalStateException exception) {
 			return false;
 		}
@@ -164,17 +168,18 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		return new MethodCallExpr(scope, METHOD_EQUALS_IGNORE_CASE, NodeList.nodeList(argument));
 	}
 
-	@SuppressWarnings("PMD.ImmutableField")
+	@Builder
+	@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 	private static final class UnnecessaryCaseChangeExpression {
-		private boolean isMethodCall;
-		private MethodCallExpr methodCall;
-		private StringLiteralExpr stringLiteral;
+		boolean isMethodCall;
+		MethodCallExpr methodCall;
+		StringLiteralExpr stringLiteral;
 
-		private boolean isToLowerCase;
-		private boolean isToUpperCase;
+		boolean isToLowerCase;
+		boolean isToUpperCase;
 
-		private boolean isLowercase;
-		private boolean isUppercase;
+		boolean isLowercase;
+		boolean isUppercase;
 
 		/**
 		 * @param expression
@@ -184,28 +189,38 @@ public class UnnecessaryCaseChange extends AJavaparserExprMutator {
 		 *             when the expression is neither a String literal nor a toLowerCase/toUpperCase method call
 		 */
 		@SuppressWarnings({ "PMD.UnnecessaryCaseChange", "PMD.UseLocaleWithCaseConversions" })
-		private UnnecessaryCaseChangeExpression(Expression expression) {
-			if (expression instanceof MethodCallExpr) {
-				isMethodCall = true;
-				methodCall = expression.asMethodCallExpr();
+		private static UnnecessaryCaseChangeExpression from(Expression expression) {
+			var builder = UnnecessaryCaseChangeExpression.builder();
 
+			if (expression instanceof MethodCallExpr) {
+				var methodCall = expression.asMethodCallExpr();
 				if (!methodCall.getArguments().isEmpty()) {
 					throw new IllegalStateException();
 				}
 
 				var methodName = methodCall.getNameAsString();
-				isToLowerCase = "toLowerCase".equals(methodName);
-				isToUpperCase = "toUpperCase".equals(methodName);
+				var isToLowerCase = "toLowerCase".equals(methodName);
+				var isToUpperCase = "toUpperCase".equals(methodName);
 
 				if (!isToLowerCase && !isToUpperCase) {
 					throw new IllegalStateException();
 				}
+
+				builder.isMethodCall(true)
+						.methodCall(methodCall)
+						.isToLowerCase(isToLowerCase)
+						.isToUpperCase(isToUpperCase);
+
 			} else if (expression.isStringLiteralExpr()) {
-				stringLiteral = expression.asStringLiteralExpr();
-				String literal = stringLiteral.getValue();
-				isLowercase = literal.equals(literal.toLowerCase());
-				isUppercase = literal.equals(literal.toUpperCase());
+				var stringLiteral = expression.asStringLiteralExpr();
+				var literal = stringLiteral.getValue();
+
+				builder.stringLiteral(stringLiteral)
+						.isLowercase(literal.equals(literal.toLowerCase()))
+						.isUppercase(literal.equals(literal.toUpperCase()));
 			}
+
+			return builder.build();
 		}
 	}
 

@@ -223,7 +223,7 @@
 						<dependency>
 							<!-- This dependency holds the default configuration -->
 							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
+							<artifactId>pepper-resources</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>
@@ -254,7 +254,7 @@
 						<dependency>
 							<!-- This dependency holds the default configuration -->
 							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
+							<artifactId>pepper-resources</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>
@@ -313,7 +313,7 @@
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
+							<artifactId>pepper-resources</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>

@@ -264,6 +264,7 @@
 
 ## String
 
+- [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
 - [GuavaStringsIsNullOrEmpty](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/GuavaStringsIsNullOrEmpty.java)
 - [SimplifyStartsWith](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyStartsWith.java)
 - [StringFromString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringFromString.java)

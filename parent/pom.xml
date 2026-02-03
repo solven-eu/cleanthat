@@ -23,8 +23,8 @@
 	<developers>
 		<developer>
 			<id>blacelle</id>
-			<name>Benoit Lacelle</name>
-			<email>benoit.lacelle at solven.eu</email>
+			<name>Benoit Chatain Lacelle</name>
+			<email>benoit at solven.eu</email>
 			<roles>
 				<role>Project lead</role>
 			</roles>
@@ -51,7 +51,8 @@
 		<scm.url>https://github.com/solven-eu/cleanthat</scm.url>
 
 		<!-- https://github.com/solven-eu/pepper/releases -->
-		<pepper.version>4.5</pepper.version>
+		<!-- 5.3+ requires JDK17 -->
+		<pepper.version>4.6</pepper.version>
 		<error-prone.version>2.35.1</error-prone.version>
 		<!-- 2.36.0 is broken due to https://github.com/diffplug/spotless/issues/1583 -->
 		<!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
@@ -223,6 +224,7 @@
 						<dependency>
 							<!-- This dependency holds the default configuration -->
 							<groupId>io.github.solven-eu.pepper</groupId>
+							<!--							<artifactId>pepper-resources</artifactId>-->
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -254,6 +256,7 @@
 						<dependency>
 							<!-- This dependency holds the default configuration -->
 							<groupId>io.github.solven-eu.pepper</groupId>
+							<!--							<artifactId>pepper-resources</artifactId>-->
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -313,6 +316,7 @@
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
+							<!--							<artifactId>pepper-resources</artifactId>-->
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
@@ -494,6 +498,7 @@
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
+							<!--							<artifactId>pepper-resources</artifactId>-->
 							<artifactId>pepper-static</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>

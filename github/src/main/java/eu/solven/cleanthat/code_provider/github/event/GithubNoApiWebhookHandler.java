@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.pepper.collection.PepperMapHelper;
-import eu.solven.pepper.jvm.GCInspector;
+import eu.solven.pepper.util.PepperEnvHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -234,7 +234,7 @@ public class GithubNoApiWebhookHandler {
 			}
 		}
 		// We log the payload temporarily, in order to have easy access to metadata
-		if (!GCInspector.inUnitTest()) {
+		if (!PepperEnvHelper.inUnitTest()) {
 			try {
 				LOGGER.debug("TMP payload: {}", ConfigHelpers.getJson(objectMappers).writeValueAsString(input));
 			} catch (JsonProcessingException e) {

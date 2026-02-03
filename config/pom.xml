@@ -21,6 +21,20 @@
 			<artifactId>pepper</artifactId>
 			<version>${pepper.version}</version>
 		</dependency>
+		<!-- Pepper5, JDK17-->
+		<!--		<dependency>-->
+		<!--			<groupId>io.github.solven-eu.pepper</groupId>-->
+		<!--			<artifactId>pepper-mappath</artifactId>-->
+		<!--			<version>${pepper.version}</version>-->
+		<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 		<dependency>
 			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 			<groupId>com.fasterxml.jackson.core</groupId>

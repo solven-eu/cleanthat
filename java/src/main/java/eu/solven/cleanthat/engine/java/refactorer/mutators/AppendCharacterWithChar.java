@@ -29,6 +29,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns `stringBuilder.append("c")` into `stringBuilder.append('c')`
@@ -37,7 +38,7 @@ import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
  *
  * @author Balazs Glatz
  */
-public class AppendCharacterWithChar extends AJavaparserExprMutator {
+public class AppendCharacterWithChar extends AJavaparserExprMutator implements IMutatorDescriber {
 
 	public static final String APOSTROPHE = "'";
 	public static final String METHOD_APPEND = "append";
@@ -48,8 +49,14 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator {
 	}
 
 	@Override
+	public boolean isPerformanceImprovement() {
+		// Avoids the extra indirection of creating or handling a String and uses the most direct, efficient overload.
+		return true;
+	}
+
+	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("String");
+		return ImmutableSet.of("Performance", "String");
 	}
 
 	@Override

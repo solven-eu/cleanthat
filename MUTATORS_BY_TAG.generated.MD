@@ -172,6 +172,14 @@
 - [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
 - [UseUnderscoresInNumericLiterals](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseUnderscoresInNumericLiterals.java)
 
+## Performance
+
+- [AppendCharacterWithChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AppendCharacterWithChar.java)
+- [AvoidFileStream](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/AvoidFileStream.java)
+- [RemoveAllToClearCollection](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/RemoveAllToClearCollection.java)
+- [StringToString](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/StringToString.java)
+- [UseIndexOfChar](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/UseIndexOfChar.java)
+
 ## PitFall
 
 - [SimplifyBooleanExpression](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/SimplifyBooleanExpression.java)

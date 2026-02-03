@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,15 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns `"someString".toString()` into `"someString"`
  *
  * @author Benoit Lacelle
  */
-public class StringToString extends AJavaparserExprMutator {
+public class StringToString extends AJavaparserExprMutator implements IMutatorDescriber {
+
 	private static final String METHOD_TO_STRING = "toString";
 
 	@Override
@@ -46,8 +48,13 @@ public class StringToString extends AJavaparserExprMutator {
 	}
 
 	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
+	}
+
+	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("String");
+		return ImmutableSet.of("Performance", "String");
 	}
 
 	@Override

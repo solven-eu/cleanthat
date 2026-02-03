@@ -23,8 +23,8 @@
 	<developers>
 		<developer>
 			<id>blacelle</id>
-			<name>Benoit Lacelle</name>
-			<email>benoit.lacelle at solven.eu</email>
+			<name>Benoit Chatain Lacelle</name>
+			<email>benoit at solven.eu</email>
 			<roles>
 				<role>Project lead</role>
 			</roles>
@@ -494,7 +494,7 @@
 					<dependencies>
 						<dependency>
 							<groupId>io.github.solven-eu.pepper</groupId>
-							<artifactId>pepper-static</artifactId>
+							<artifactId>pepper-resources</artifactId>
 							<version>${pepper.version}</version>
 							<scope>runtime</scope>
 						</dependency>

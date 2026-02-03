@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ package eu.solven.cleanthat.engine.java.refactorer.test;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
@@ -43,7 +45,7 @@ import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilat
 import eu.solven.cleanthat.engine.java.refactorer.meta.ICountMutatorIssues;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IReApplyUntilNoop;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IWalkingMutator;
-import eu.solven.pepper.resource.PepperResourceHelper;
+import eu.solven.pepper.spring.PepperResourceHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -405,7 +407,22 @@ public class OneMutatorCase<N, R> {
 			UnmodifiedCompilationUnitAsResource annotation) {
 		String preAsString = PepperResourceHelper.loadAsString(annotation.pre());
 		var pre = throwIfProblems(javaParser.parse(preAsString));
-		doCheckUnmodifiedNode(testCase, pre.getClassByName("SomeClass").get());
+
+		// Similar with `pre.getClassByName`
+		List<ClassOrInterfaceDeclaration> singleClass = pre.getTypes()
+				.stream()
+				.filter(type -> type instanceof ClassOrInterfaceDeclaration
+						&& !((ClassOrInterfaceDeclaration) type).isInterface())
+				.map(t -> (ClassOrInterfaceDeclaration) t)
+				.collect(Collectors.toList());
+
+		if (singleClass.isEmpty()) {
+			throw new IllegalArgumentException("Not a single class in " + testCase);
+		} else if (singleClass.size() > 1) {
+			throw new IllegalArgumentException("Ambiguous tested class in " + testCase);
+		}
+
+		doCheckUnmodifiedNode(testCase, singleClass.get(0));
 	}
 
 	public static <T> T throwIfProblems(ParseResult<T> parse) {

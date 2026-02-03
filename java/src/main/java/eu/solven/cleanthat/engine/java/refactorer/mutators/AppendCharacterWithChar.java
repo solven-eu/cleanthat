@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Benoit Lacelle - SOLVEN
+ * Copyright 2025-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class AppendCharacterWithChar extends AJavaparserExprMutator implements I
 
 	@Override
 	public String pmdUrl() {
-		return "https://pmd.github.io/pmd/pmd_rules_java_errorprone.html#appendcharacterwithchar";
+		return "https://pmd.github.io/pmd/pmd_rules_java_performance.html#appendcharacterwithchar";
 	}
 
 	@Override

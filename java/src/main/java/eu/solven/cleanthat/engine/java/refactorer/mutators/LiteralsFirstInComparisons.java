@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("PMD.GodClass")
 @Slf4j
 @ApplyBeforeMe(UnnecessaryCaseChange.class)
-public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implements IMutatorDescriber {
+public class LiteralsFirstInComparisons extends AJavaparserExprMutator implements IMutatorDescriber {
 
 	private static final String METHOD_COMPARE_TO = "compareTo";
 	private static final String METHOD_COMPARE_TO_IGNORE_CASE = "compareToIgnoreCase";

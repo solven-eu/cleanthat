@@ -36,6 +36,7 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +47,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("PMD.GodClass")
 @Slf4j
-public class LiteralsFirstInComparisons extends AJavaparserExprMutator implements IMutatorDescriber {
+@ApplyBeforeMe(UnnecessaryCaseChange.class)
+public class LiteralsFirstInComparisons extends AJavaparserNodeMutator implements IMutatorDescriber {
 
 	private static final String METHOD_COMPARE_TO = "compareTo";
 	private static final String METHOD_COMPARE_TO_IGNORE_CASE = "compareToIgnoreCase";

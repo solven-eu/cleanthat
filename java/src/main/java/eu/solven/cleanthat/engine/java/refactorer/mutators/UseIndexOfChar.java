@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@ import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 import eu.solven.cleanthat.engine.java.refactorer.helpers.MethodCallExprHelpers;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Turns 's.indexOf("s")’ into ’s.indexOf('s')'.
  *
  * @author Benoit Lacelle
  */
-public class UseIndexOfChar extends AJavaparserNodeMutator {
+public class UseIndexOfChar extends AJavaparserNodeMutator implements IMutatorDescriber {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -43,8 +44,13 @@ public class UseIndexOfChar extends AJavaparserNodeMutator {
 	}
 
 	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
+	}
+
+	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("String");
+		return ImmutableSet.of("Performance", "String");
 	}
 
 	@Override

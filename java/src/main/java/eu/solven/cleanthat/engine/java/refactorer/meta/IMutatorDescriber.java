@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public interface IMutatorDescriber {
 	 * @see UseCollectionIsEmpty
 	 */
 	// Relates to https://eslint.org/docs/user-guide/command-line-interface#--fix-type
-	default boolean isPerformanceImprovment() {
+	default boolean isPerformanceImprovement() {
 		return false;
 	}
 

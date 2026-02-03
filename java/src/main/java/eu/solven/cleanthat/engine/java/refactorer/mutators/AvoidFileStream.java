@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
 import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
+import eu.solven.cleanthat.engine.java.refactorer.meta.IMutatorDescriber;
 
 /**
  * Avoid use of {@link FileInputStream}, {@link FileOutputStream}, {@link FileReader} and {@link FileWriter}
@@ -34,15 +35,21 @@ import eu.solven.cleanthat.engine.java.refactorer.ATodoJavaParserMutator;
  *
  */
 @Deprecated(since = "Not-ready")
-public class AvoidFileStream extends ATodoJavaParserMutator {
+public class AvoidFileStream extends ATodoJavaParserMutator implements IMutatorDescriber {
+
 	@Override
 	public String minimalJavaVersion() {
 		return IJdkVersionConstants.JDK_7;
 	}
 
 	@Override
+	public boolean isPerformanceImprovement() {
+		return true;
+	}
+
+	@Override
 	public Set<String> getTags() {
-		return ImmutableSet.of("NIO");
+		return ImmutableSet.of("NIO", "Performance");
 	}
 
 	@Override

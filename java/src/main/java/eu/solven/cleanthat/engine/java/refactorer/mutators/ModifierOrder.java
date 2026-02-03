@@ -39,7 +39,7 @@ import eu.solven.cleanthat.engine.java.refactorer.meta.ApplyBeforeMe;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Order modifiers according the the Java specification.
+ * Order modifiers according to the Java specification.
  *
  * @author Benoit Lacelle
  * @see https://github.com/checkstyle/checkstyle/blob/master/src/xdocs/checks/modifier/modifierorder.xml

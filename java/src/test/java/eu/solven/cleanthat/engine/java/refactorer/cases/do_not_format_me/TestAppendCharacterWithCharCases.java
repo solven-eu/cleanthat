@@ -24,135 +24,135 @@ public class TestAppendCharacterWithCharCases extends AJavaparserRefactorerCases
 
     @UnmodifiedMethod
     public static class CaseCustomStringBuilder {
-        public Object pre() {
-            return new CustomStringBuilder().append("a");
+        public Object pre(CustomStringBuilder builder) {
+            return builder.append("a");
         }
     }
 
     @CompareMethods
     public static class CaseCharArrayWriter {
-        public Object pre() {
-            return new CharArrayWriter().append("a");
+        public Object pre(CharArrayWriter writer) {
+            return writer.append("a");
         }
 
-        public Object post() {
-            return new CharArrayWriter().append('a');
+        public Object post(CharArrayWriter writer) {
+            return writer.append('a');
         }
     }
 
     @CompareMethods
     public static class CaseStringWriter {
-        public Object pre() {
-            return new StringWriter().append("a");
+        public Object pre(StringWriter writer) {
+            return writer.append("a");
         }
 
-        public Object post() {
-            return new StringWriter().append('a');
+        public Object post(StringWriter writer) {
+            return writer.append('a');
         }
     }
 
     @CompareMethods
     public static class CaseStringBuffer {
-        public Object pre() {
-            return new StringBuffer().append("a");
+        public Object pre(StringBuffer buffer) {
+            return buffer.append("a");
         }
 
-        public Object post() {
-            return new StringBuffer().append('a');
+        public Object post(StringBuffer buffer) {
+            return buffer.append('a');
         }
     }
 
     @CompareMethods
     public static class CaseStringBuilder {
-        public Object pre() {
-            return new StringBuilder().append("a");
+        public Object pre(StringBuilder builder) {
+            return builder.append("a");
         }
 
-        public Object post() {
-            return new StringBuilder().append('a');
+        public Object post(StringBuilder builder) {
+            return builder.append('a');
         }
     }
 
     @CompareMethods
     public static class CaseCharChain {
-        public Object pre() {
-            return new StringBuilder().append("a").append("b");
+        public Object pre(StringBuilder builder) {
+            return builder.append("a").append("b");
         }
 
-        public Object post() {
-            return new StringBuilder().append('a').append('b');
+        public Object post(StringBuilder builder) {
+            return builder.append('a').append('b');
         }
     }
 
     @UnmodifiedMethod
     public static class CaseString {
-        public Object pre() {
-            return new StringBuilder().append("aa");
+        public Object pre(StringBuilder builder) {
+            return builder.append("aa");
         }
     }
 
     @UnmodifiedMethod
     public static class CaseStringChain {
-        public Object pre() {
-            return new StringBuilder().append("aa").append("bb");
+        public Object pre(StringBuilder builder) {
+            return builder.append("aa").append("bb");
         }
     }
 
     @CompareMethods
     public static class CaseMixedChain {
-        public Object pre() {
-            return new StringBuilder().append("a").append("bb");
+        public Object pre(StringBuilder builder) {
+            return builder.append("a").append("bb");
         }
 
-        public Object post() {
-            return new StringBuilder().append('a').append("bb");
+        public Object post(StringBuilder builder) {
+            return builder.append('a').append("bb");
         }
     }
 
     @CompareMethods
     public static class CaseMixedChainFlipped {
-        public Object pre() {
-            return new StringBuilder().append("aa").append("b");
+        public Object pre(StringBuilder builder) {
+            return builder.append("aa").append("b");
         }
 
-        public Object post() {
-            return new StringBuilder().append("aa").append('b');
+        public Object post(StringBuilder builder) {
+            return builder.append("aa").append('b');
         }
     }
 
     @UnmodifiedMethod
     public static class CaseEmptyString {
-        public Object pre() {
-            return new StringBuilder().append("");
+        public Object pre(StringBuilder builder) {
+            return builder.append("");
         }
     }
 
     @UnmodifiedMethod
     public static class CaseApostrophe {
-        public Object pre() {
-            return new StringBuilder().append("'");
+        public Object pre(StringBuilder builder) {
+            return builder.append("'");
         }
     }
 
     @CompareMethods
     public static class CaseTab {
-        public Object pre() {
-            return new StringBuilder().append("\t");
+        public Object pre(StringBuilder builder) {
+            return builder.append("\t");
         }
 
-        public Object post() {
-            return new StringBuilder().append('\t');
+        public Object post(StringBuilder builder) {
+            return builder.append('\t');
         }
     }
 
     @CompareMethods
     public static class CaseDelete {
-        public Object pre() {
-            return new StringBuilder().append("\u007F");
+        public Object pre(StringBuilder builder) {
+            return builder.append("\u007F");
         }
 
-        public Object post() {
-            return new StringBuilder().append('\u007F');
+        public Object post(StringBuilder builder) {
+            return builder.append('\u007F');
         }
     }
 

@@ -22,7 +22,7 @@ import com.google.common.base.Strings;
 
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.IWebhookEvent;
-import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -106,22 +106,22 @@ public class GithubWebhookEvent implements I3rdPartyWebhookEvent {
 			Map<String, ?> githubBodyAndHeaders;
 			if (cleanthatBody.containsKey(GithubWebhookEvent.KEY_GITHUB)) {
 				LOGGER.warn("Processing a legacy input: {}", githubAcceptedEvent);
-				githubBodyAndHeaders = PepperMapHelper.getRequiredMap(cleanthatBody, GithubWebhookEvent.KEY_GITHUB);
+				githubBodyAndHeaders = MapPathGet.getRequiredMap(cleanthatBody, GithubWebhookEvent.KEY_GITHUB);
 			} else {
 				githubBodyAndHeaders = cleanthatBody;
 			}
 
-			Map<Object, ?> githubHeaders = PepperMapHelper.getRequiredMap(githubBodyAndHeaders, KEY_HEADERS);
+			Map<Object, ?> githubHeaders = MapPathGet.getRequiredMap(githubBodyAndHeaders, KEY_HEADERS);
 
-			var xGithubEvent = PepperMapHelper.getOptionalString(githubHeaders, "X-GitHub-Event").orElse("");
-			var xGithubDelivery = PepperMapHelper.getOptionalString(githubHeaders, X_GIT_HUB_DELIVERY).orElse("");
+			var xGithubEvent = MapPathGet.getOptionalString(githubHeaders, "X-GitHub-Event").orElse("");
+			var xGithubDelivery = MapPathGet.getOptionalString(githubHeaders, X_GIT_HUB_DELIVERY).orElse("");
 			var xGithubSignature256 =
-					PepperMapHelper.getOptionalString(githubHeaders, "X-GitHub-Signature-256").orElse("");
+					MapPathGet.getOptionalString(githubHeaders, "X-GitHub-Signature-256").orElse("");
 
 			return new GithubWebhookEvent(xGithubEvent,
 					xGithubDelivery,
 					xGithubSignature256,
-					PepperMapHelper.getRequiredMap(githubBodyAndHeaders, KEY_BODY));
+					MapPathGet.getRequiredMap(githubBodyAndHeaders, KEY_BODY));
 		} else {
 			throw new IllegalArgumentException("What is this? body=" + githubAcceptedEvent.getBody());
 		}

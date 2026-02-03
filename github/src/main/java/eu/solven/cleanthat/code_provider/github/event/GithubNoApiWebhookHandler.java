@@ -31,8 +31,9 @@ import eu.solven.cleanthat.config.ConfigHelpers;
 import eu.solven.cleanthat.git_abstraction.GithubFacade;
 import eu.solven.cleanthat.github.IGitRefsConstants;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.pepper.collection.PepperMapHelper;
 import eu.solven.pepper.jvm.GCInspector;
+import eu.solven.pepper.mappath.MapPathGet;
+import eu.solven.pepper.system.PepperEnvHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -67,8 +68,8 @@ public class GithubNoApiWebhookHandler {
 	public GitWebhookRelevancyResult filterWebhookEventRelevant(I3rdPartyWebhookEvent githubEvent) {
 		// https://developer.github.com/webhooks/event-payloads/
 		Map<String, ?> input = githubEvent.getBody();
-		var installationId = PepperMapHelper.getRequiredNumber(input, "installation", "id").longValue();
-		Optional<Object> organizationUrl = PepperMapHelper.getOptionalAs(input, "organization", "url");
+		var installationId = MapPathGet.getRequiredNumber(input, "installation", "id").longValue();
+		Optional<Object> organizationUrl = MapPathGet.getOptionalAs(input, "organization", "url");
 		LOGGER.info("Received a webhook for installationId={} (organization={})",
 				installationId,
 				organizationUrl.orElse("<missing>"));
@@ -85,8 +86,8 @@ public class GithubNoApiWebhookHandler {
 		// https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
 		// Push on PR: there is no action. There may be multiple commits being pushed
 		// Present for PR, PR_review and PR_review_comment
-		Optional<Map<String, ?>> optPullRequest = PepperMapHelper.getOptionalAs(input, "pull_request");
-		var optAction = PepperMapHelper.getOptionalString(input, "action");
+		Optional<Map<String, ?>> optPullRequest = MapPathGet.getOptionalAs(input, "pull_request");
+		var optAction = MapPathGet.getOptionalString(input, "action");
 		// We are notified a PR has been open: its branch may be keep_cleaned or not
 		boolean prOpen;
 		Optional<GitPrHeadRef> optOpenPr;
@@ -108,7 +109,7 @@ public class GithubNoApiWebhookHandler {
 			}
 			var githubAction = optAction.get();
 			if ("opened".equals(githubAction) || "reopened".equals(githubAction)) {
-				var shortHeadRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "ref");
+				var shortHeadRef = MapPathGet.getRequiredString(optPullRequest.get(), "head", "ref");
 				String headRef = GithubFacade.branchToRef(shortHeadRef);
 
 				if (headRef.startsWith(GithubRefCleaner.PREFIX_REF_CLEANTHAT)) {
@@ -122,16 +123,16 @@ public class GithubNoApiWebhookHandler {
 				}
 				// Some dirty commits may have been pushed while the PR was closed
 				prOpen = true;
-				var baseRepoName = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
-				var shortBaseRef = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "ref");
+				var baseRepoName = MapPathGet.getRequiredString(optPullRequest.get(), "base", "repo", "full_name");
+				var shortBaseRef = MapPathGet.getRequiredString(optPullRequest.get(), "base", "ref");
 				String baseRef = GithubFacade.branchToRef(shortBaseRef);
 
-				var prNumber = PepperMapHelper.getRequiredNumber(optPullRequest.get(), "number").longValue();
-				var headRepoName = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
-				var baseSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "base", "sha");
+				var prNumber = MapPathGet.getRequiredNumber(optPullRequest.get(), "number").longValue();
+				var headRepoName = MapPathGet.getRequiredString(optPullRequest.get(), "head", "repo", "full_name");
+				var baseSha = MapPathGet.getRequiredString(optPullRequest.get(), "base", "sha");
 				var base = new GitRepoBranchSha1(baseRepoName, baseRef, baseSha);
 				optBaseRef = Optional.of(base);
-				var headSha = PepperMapHelper.getRequiredString(optPullRequest.get(), "head", "sha");
+				var headSha = MapPathGet.getRequiredString(optPullRequest.get(), "head", "sha");
 				var head = new GitRepoBranchSha1(headRepoName, headRef, headSha);
 				optHeadRef = Optional.of(head);
 				optOpenPr = Optional.of(new GitPrHeadRef(baseRepoName, prNumber, base.getRef(), head.getRef()));
@@ -166,9 +167,9 @@ public class GithubNoApiWebhookHandler {
 				// to a branch, not a commit.
 				// In fact, keeping only a sha1 is not relevant, as we need a ref/branch to record our cleaning anyway.
 				// https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-				var optBeforeSha = PepperMapHelper.getOptionalString(input, "before");
-				var optAfterSha = PepperMapHelper.getOptionalString(input, "after");
-				var optFullRefName = PepperMapHelper.getOptionalString(input, "ref");
+				var optBeforeSha = MapPathGet.getOptionalString(input, "before");
+				var optAfterSha = MapPathGet.getOptionalString(input, "after");
+				var optFullRefName = MapPathGet.getOptionalString(input, "ref");
 				if (optAfterSha.isPresent() && optFullRefName.isPresent()) {
 					var afterSha = optAfterSha.get();
 					if (afterSha.matches("0+")) {
@@ -179,7 +180,7 @@ public class GithubNoApiWebhookHandler {
 								Optional.empty(),
 								Optional.empty());
 					}
-					var pusherName = PepperMapHelper.getRequiredString(input, "pusher", "name");
+					var pusherName = MapPathGet.getRequiredString(input, "pusher", "name");
 					// TODO 'cleanthat' username should not be hardcoded
 					if (pusherName.toLowerCase(Locale.US).contains("cleanthat")) {
 						LOGGER.info("We discard as pusherName is: {}", pusherName);
@@ -191,15 +192,15 @@ public class GithubNoApiWebhookHandler {
 					}
 					pushBranch = true;
 					var ref = optFullRefName.get();
-					String repoName = PepperMapHelper.getRequiredAs(input, "repository", "full_name");
+					String repoName = MapPathGet.getRequiredAs(input, "repository", "full_name");
 					LOGGER.info("Event for repository={}", repoName);
 					LOGGER.info("Event for pushing into {}", ref);
 					var after = new GitRepoBranchSha1(repoName, ref, afterSha);
 					optHeadRef = Optional.of(after);
 					var beforeSha = optBeforeSha.get();
 
-					var created = PepperMapHelper.getRequiredBoolean(input, "created");
-					var forced = PepperMapHelper.getRequiredBoolean(input, "forced");
+					var created = MapPathGet.getRequiredBoolean(input, "created");
+					var forced = MapPathGet.getRequiredBoolean(input, "forced");
 
 					if (created) {
 						LOGGER.info(
@@ -234,7 +235,7 @@ public class GithubNoApiWebhookHandler {
 			}
 		}
 		// We log the payload temporarily, in order to have easy access to metadata
-		if (!GCInspector.inUnitTest()) {
+		if (!PepperEnvHelper.inUnitTest()) {
 			try {
 				LOGGER.debug("TMP payload: {}", ConfigHelpers.getJson(objectMappers).writeValueAsString(input));
 			} catch (JsonProcessingException e) {

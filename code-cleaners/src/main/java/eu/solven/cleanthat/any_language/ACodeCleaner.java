@@ -35,6 +35,7 @@ import eu.solven.cleanthat.formatter.ICodeProviderFormatter;
 import eu.solven.cleanthat.github.CleanthatConfigHelper;
 import eu.solven.cleanthat.utils.ResultOrError;
 import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -74,7 +75,7 @@ public abstract class ACodeCleaner implements ICodeCleaner {
 					codeProvider);
 			return ResultOrError.error("No configuration");
 		}
-		var version = PepperMapHelper.getOptionalString(optPrConfig.get(), "syntax_version");
+		var version = MapPathGet.getOptionalString(optPrConfig.get(), "syntax_version");
 		if (version.isEmpty()) {
 			LOGGER.warn("No version on configuration applying to PR {}", codeProvider);
 			return ResultOrError.error("No syntax_version in configuration");

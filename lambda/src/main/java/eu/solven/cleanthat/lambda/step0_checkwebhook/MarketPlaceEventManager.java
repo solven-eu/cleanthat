@@ -34,7 +34,7 @@ import com.github.seratch.jslack.api.webhook.Payload;
 import com.github.seratch.jslack.api.webhook.WebhookResponse;
 import com.google.common.base.Strings;
 
-import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -77,10 +77,10 @@ public class MarketPlaceEventManager {
 			blocks.add(section);
 		}
 
-		var action = PepperMapHelper.getRequiredString(marketplaceEvent, "action");
-		var effectiveDate = PepperMapHelper.getRequiredString(marketplaceEvent, "effective_date");
-		// Map<String, ?> marketplacePurchase = PepperMapHelper.getRequiredAs(marketplaceEvent, "marketplace_purchase");
-		// String accountLogin = PepperMapHelper.getRequiredString(marketplacePurchase, "account", "login");
+		var action = MapPathGet.getRequiredString(marketplaceEvent, "action");
+		var effectiveDate = MapPathGet.getRequiredString(marketplaceEvent, "effective_date");
+		// Map<String, ?> marketplacePurchase = MapPathGet.getRequiredAs(marketplaceEvent, "marketplace_purchase");
+		// String accountLogin = MapPathGet.getRequiredString(marketplacePurchase, "account", "login");
 
 		Payload payload = Payload.builder()
 				// The text seems to appear only in the notification, but not in the channel

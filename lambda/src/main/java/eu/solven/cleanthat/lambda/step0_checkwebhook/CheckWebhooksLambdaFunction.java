@@ -33,7 +33,7 @@ import eu.solven.cleanthat.code_provider.github.event.pojo.GithubWebhookEvent;
 import eu.solven.cleanthat.codeprovider.git.GitWebhookRelevancyResult;
 import eu.solven.cleanthat.lambda.AWebhooksLambdaFunction;
 import eu.solven.cleanthat.lambda.dynamodb.SaveToDynamoDb;
-import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -59,7 +59,7 @@ public class CheckWebhooksLambdaFunction extends AWebhooksLambdaFunction {
 		GithubWebhookEvent githubEvent = (GithubWebhookEvent) input;
 
 		Optional<Map<String, ?>> optMarketplacePurchase =
-				PepperMapHelper.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
+				MapPathGet.getOptionalAs(githubEvent.getBody(), "marketplace_purchase");
 		if (optMarketplacePurchase.isPresent()) {
 			Slack slack = getSlack();
 

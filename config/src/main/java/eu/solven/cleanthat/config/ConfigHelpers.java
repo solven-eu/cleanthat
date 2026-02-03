@@ -43,6 +43,7 @@ import eu.solven.cleanthat.github.IHasSourceCodeProperties;
 import eu.solven.cleanthat.language.IEngineProperties;
 import eu.solven.cleanthat.language.ISourceCodeProperties;
 import eu.solven.pepper.collection.PepperMapHelper;
+import eu.solven.pepper.mappath.MapPathGet;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -133,7 +134,7 @@ public class ConfigHelpers {
 			Map<String, ?> dirtyLanguageConfig) {
 		var rootSourceConfigAsMap = objectMapper.convertValue(properties.getSourceCode(), Map.class);
 		var explicitSourceCodeProperties =
-				PepperMapHelper.<Map<String, ?>>getOptionalAs(dirtyLanguageConfig, KEY_SOURCE_CODE).orElse(Map.of());
+				MapPathGet.<Map<String, ?>>getOptionalAs(dirtyLanguageConfig, KEY_SOURCE_CODE).orElse(Map.of());
 
 		var sourceConfig = mergeSourceCodeProperties(rootSourceConfigAsMap, explicitSourceCodeProperties);
 

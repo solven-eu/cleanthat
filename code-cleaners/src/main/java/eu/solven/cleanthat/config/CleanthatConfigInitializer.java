@@ -26,7 +26,7 @@ import eu.solven.cleanthat.code_provider.CleanthatPathHelpers;
 import eu.solven.cleanthat.codeprovider.ICodeProvider;
 import eu.solven.cleanthat.engine.IEngineLintFixerFactory;
 import eu.solven.cleanthat.lambda.step0_checkwebhook.I3rdPartyWebhookEvent;
-import eu.solven.pepper.resource.PepperResourceHelper;
+import eu.solven.pepper.spring.PepperResourceHelper;
 
 /**
  * This will help configuration CleanThat by proposing a reasonnable default configuration.

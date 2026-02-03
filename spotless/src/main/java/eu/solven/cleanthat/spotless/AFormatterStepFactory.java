@@ -54,7 +54,7 @@ import eu.solven.cleanthat.spotless.pojo.SpotlessFormatterProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepParametersProperties;
 import eu.solven.cleanthat.spotless.pojo.SpotlessStepProperties;
 import eu.solven.pepper.memory.IPepperMemoryConstants;
-import eu.solven.pepper.resource.PepperResourceHelper;
+import eu.solven.pepper.spring.PepperResourceHelper;
 
 /**
  * COmmon behavior to any Spotless engine steps factory

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2025 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@ package eu.solven.cleanthat.engine.java.refactorer.mutators;
 
 import java.util.Set;
 
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.google.common.collect.ImmutableSet;
 
 import eu.solven.cleanthat.engine.java.IJdkVersionConstants;
-import eu.solven.cleanthat.engine.java.refactorer.AJavaparserNodeMutator;
+import eu.solven.cleanthat.engine.java.refactorer.AJavaparserExprMutator;
 import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
 
 /**
@@ -29,7 +30,7 @@ import eu.solven.cleanthat.engine.java.refactorer.NodeAndSymbolSolver;
  *
  * @author Benoit Lacelle
  */
-public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator {
+public class UnnecessaryLambdaEnclosingParameters extends AJavaparserExprMutator {
 
 	@Override
 	public String minimalJavaVersion() {
@@ -48,24 +49,18 @@ public class UnnecessaryLambdaEnclosingParameters extends AJavaparserNodeMutator
 	}
 
 	@Override
-	protected boolean processNotRecursively(NodeAndSymbolSolver<?> node) {
+	protected boolean processExpression(NodeAndSymbolSolver<Expression> node) {
 		if (!(node.getNode() instanceof LambdaExpr)) {
 			return false;
 		}
 
 		var lambdaExpr = (LambdaExpr) node.getNode();
-        if (lambdaExpr.getParameters().size() != 1 || !lambdaExpr.isEnclosingParameters()) {
-            return false;
-        }
+		if (lambdaExpr.getParameters().size() != 1 || lambdaExpr.isExplicitlyTyped()) {
+			return false;
+		}
 
-        var param = lambdaExpr.getParameters().get(0);
-        if (param.getType() != null) {
-            return false;
-        }
-
-        var newLambdaExpr = lambdaExpr.clone();
-        newLambdaExpr.setEnclosingParameters(false);
-        return tryReplace(lambdaExpr, newLambdaExpr);
-
-    }
+		var newLambdaExpr = lambdaExpr.clone();
+		newLambdaExpr.setEnclosingParameters(false);
+		return tryReplace(lambdaExpr, newLambdaExpr);
+	}
 }

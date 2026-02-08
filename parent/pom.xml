@@ -520,7 +520,7 @@
 					<!-- https://docs.openrewrite.org/reference/rewrite-maven-plugin -->
 					<groupId>org.openrewrite.maven</groupId>
 					<artifactId>rewrite-maven-plugin</artifactId>
-					<version>5.45.0</version>
+					<version>5.47.3</version>
 					<configuration>
 						<activeRecipes>
 							<recipe>org.openrewrite.java.Spring</recipe>

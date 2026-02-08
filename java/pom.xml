@@ -28,7 +28,7 @@
 			<!-- https://github.com/INRIA/spoon -->
 			<groupId>fr.inria.gforge.spoon</groupId>
 			<artifactId>spoon-core</artifactId>
-			<version>11.1.0</version>
+			<version>11.3.0</version>
 			<!-- Spoon is added for reference, but not used for now -->
 			<optional>true</optional>
 		</dependency>

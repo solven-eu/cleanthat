@@ -97,10 +97,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
+			<groupId>org.wiremock</groupId>
 			<!-- standalone looks better at it seems necessary to start the servers lazily -->
-			<artifactId>wiremock-jre8-standalone</artifactId>
-			<version>2.35.2</version>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>3.0.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

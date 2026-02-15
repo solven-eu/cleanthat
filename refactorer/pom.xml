@@ -33,7 +33,7 @@
 			<!-- Used to parse Java versions with JavaVersion -->
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-java</artifactId>
-			<version>1.3.0</version>
+			<version>1.5.2</version>
 		</dependency>
 
 		<dependency>

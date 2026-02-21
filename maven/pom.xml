@@ -56,7 +56,7 @@
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.11.0</version>
+			<version>3.15.2</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -108,7 +108,7 @@
 			<!-- https://maven.apache.org/plugin-testing/maven-plugin-testing-harness/getting-started/index.html -->
 			<groupId>org.apache.maven.plugin-testing</groupId>
 			<artifactId>maven-plugin-testing-harness</artifactId>
-			<version>3.3.0</version>
+			<version>3.5.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -143,7 +143,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>3.15.2</version>
 				<executions>
 					<execution>
 						<id>mojo-descriptor</id>

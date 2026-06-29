@@ -70,7 +70,7 @@
 			<!-- Used to clean unexpected changes by Javaparser -->
 			<groupId>io.github.java-diff-utils</groupId>
 			<artifactId>java-diff-utils</artifactId>
-			<version>4.12</version>
+			<version>4.16</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
@@ -78,7 +78,7 @@
 			<!-- Used to find longest common for diff -->
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.12.0</version>
+			<version>1.15.0</version>
 		</dependency>
 
 		<dependency>

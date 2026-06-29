@@ -24,7 +24,7 @@
 			<!-- JavaParser is used to load testCases -->
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-symbol-solver-core</artifactId>
-			<version>3.27.0</version>
+			<version>3.28.0</version>
 		</dependency>
 
 		<dependency>
@@ -39,7 +39,7 @@
 			<!-- Used to clean unexpected changes by Javaparser -->
 			<groupId>io.github.java-diff-utils</groupId>
 			<artifactId>java-diff-utils</artifactId>
-			<version>4.12</version>
+			<version>4.16</version>
 		</dependency>
 
 		<dependency>

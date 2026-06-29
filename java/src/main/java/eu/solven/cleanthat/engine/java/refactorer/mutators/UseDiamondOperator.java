@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ public class UseDiamondOperator extends AJavaparserNodeMutator {
 				return false;
 			}
 
-			var asClass = asReferenceType.getTypeDeclaration().get().asClass();
+			var asClass = asReferenceType.getTypeDeclaration().get().asType();
 			if (asClass.isAnonymousClass()) {
 				// We need the explicit type in the generic type for anonymous class
 				return false;

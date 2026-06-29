@@ -7,18 +7,19 @@ import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 
 import eu.solven.cleanthat.engine.java.refactorer.annotations.CompareMethods;
+import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedCompilationUnitAsResource;
 import eu.solven.cleanthat.engine.java.refactorer.annotations.UnmodifiedMethod;
 import eu.solven.cleanthat.engine.java.refactorer.meta.IJavaparserAstMutator;
 import eu.solven.cleanthat.engine.java.refactorer.mutators.UseDiamondOperator;
 import eu.solven.cleanthat.engine.java.refactorer.test.AJavaparserRefactorerCases;
 
-@Disabled("IMutator not-ready")
 public class TestUseDiamondOperatorCases extends AJavaparserRefactorerCases {
 	@Override
 	public IJavaparserAstMutator getTransformer() {
 		return new UseDiamondOperator();
 	}
 
+	@Disabled("IMutator not-ready")
 	@CompareMethods
 	public static class CaseCollection {
 		public Map<String, List<String>> pre() {
@@ -31,6 +32,8 @@ public class TestUseDiamondOperatorCases extends AJavaparserRefactorerCases {
 	}
 
 	// https://youtrack.jetbrains.com/issue/IDEA-67125
+
+	@Disabled("IMutator not-ready")
 	@UnmodifiedMethod
 	public static class CaseAnonymousClass {
 
@@ -43,6 +46,12 @@ public class TestUseDiamondOperatorCases extends AJavaparserRefactorerCases {
 				}
 			};
 		}
+	}
+
+	// https://github.com/solven-eu/cleanthat/issues/954
+	@UnmodifiedCompilationUnitAsResource(pre = "/source/do_not_format_me/UseDiamondOperator/RecordJDK25_Pre.java")
+	public static class TestRecord {
+
 	}
 
 }

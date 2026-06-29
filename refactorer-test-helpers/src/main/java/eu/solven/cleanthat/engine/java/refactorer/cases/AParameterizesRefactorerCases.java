@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Benoit Lacelle - SOLVEN
+ * Copyright 2023-2026 Benoit Lacelle - SOLVEN
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -59,6 +60,7 @@ import eu.solven.cleanthat.engine.java.refactorer.test.OneMutatorCase;
  * @param <N>
  * @param <R>
  */
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, R> {
 
 	public static Stream<Arguments> listCases(AParameterizesRefactorerCases<?, ?> testCases) throws IOException {
@@ -87,6 +89,7 @@ public abstract class AParameterizesRefactorerCases<N, R> extends ATestCases<N, 
 			IWalkingMutator<N, R> mutator,
 			ClassOrInterfaceDeclaration testCase) {
 		Assume.assumeFalse("Ignored", testCase.getAnnotationByClass(Ignore.class).isPresent());
+		Assume.assumeFalse("Disabled", testCase.getAnnotationByClass(Disabled.class).isPresent());
 
 		OneMutatorCase<N, R> oneTestCase = new OneMutatorCase<>(javaParser, mutator, this);
 

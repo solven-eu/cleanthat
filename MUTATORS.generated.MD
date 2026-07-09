@@ -244,6 +244,16 @@ isDraft
 
 languageLevel: jdk1
 
+### [BigIntegerInstantiation](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/BigIntegerInstantiation.java)
+
+PMD: [BigIntegerInstantiation](https://pmd.github.io/pmd/pmd_rules_java_performance.html#bigintegerinstantiation)
+
+Cleanthat own ID: BigIntegerInstantiation
+
+isDraft
+
+languageLevel: jdk1.5
+
 ### [CastMathOperandsBeforeAssignement](java/src/main/java/eu/solven/cleanthat/engine/java/refactorer/mutators/CastMathOperandsBeforeAssignement.java)
 
 Sonar: [RSPEC-2184](https://rules.sonarsource.com/java/RSPEC-2184)

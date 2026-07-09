@@ -65,6 +65,7 @@ public final class MutatorsScanner {
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionIndexOfToContains"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CollectionToOptional"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ComparisonWithNaN"),
+					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "ConsecutiveLiteralAppends"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "CreateTempFilesUsingNio"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "EmptyControlStatement"),
 					(Class<? extends IMutator>) Class.forName(PACKAGE_MUTATORS + "EnumsWithoutEquals"),
